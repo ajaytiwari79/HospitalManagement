@@ -1,33 +1,25 @@
 package com.kairos.service.data_subject_management;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
-import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
-import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
-import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
+import com.kairos.persistence.model.master_data.data_category_element.*;
+import com.kairos.persistence.repository.master_data.data_category_element.*;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
-public class DataCategoryService extends MongoBaseService {
+public class DataCategoryService{
 
     private Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
-
-    @Inject
-    private DataCategoryMongoRepository dataCategoryMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -36,10 +28,10 @@ public class DataCategoryService extends MongoBaseService {
     private DataElementService dataElementService;
 
     @Inject
-    private DataElementMongoRepository dataElementMongoRepository;
+    private DataSubjectRepository dataSubjectRepository;
 
     @Inject
-    private DataSubjectMappingRepository dataSubjectMappingRepository;
+    private DataCategoryRepository dataCategoryRepository;
 
 
     /**
@@ -50,17 +42,19 @@ public class DataCategoryService extends MongoBaseService {
      */
     public DataCategoryDTO saveDataCategoryAndDataElement(Long referenceId, boolean isUnitId, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory previousDataCategory = isUnitId ? dataCategoryMongoRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryMongoRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
+        DataCategory previousDataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(previousDataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
-        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isUnitId, dataCategoryDto.getDataElements());
-        DataCategory dataCategory = new DataCategory(dataCategoryDto.getName(), dataElementList.stream().map(DataElement::getId).collect(Collectors.toList()));
+
+        DataCategory dataCategory = new DataCategory(dataCategoryDto.getName());
         if (isUnitId)
             dataCategory.setOrganizationId(referenceId);
         else
             dataCategory.setCountryId(referenceId);
-        dataCategoryMongoRepository.save(dataCategory);
+        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isUnitId, dataCategoryDto.getDataElements(), dataCategory);
+        dataCategory.setDataElements(dataElementList);
+        dataCategoryRepository.save(dataCategory);
         dataCategoryDto.setId(dataCategory.getId());
         return dataCategoryDto;
     }
@@ -73,39 +67,40 @@ public class DataCategoryService extends MongoBaseService {
      * @return Data category with updated data elements and new Data Elements
      * @description this method update data category , data elements and create new data elements if add to data category
      */
-    public DataCategoryDTO updateDataCategoryAndDataElement(Long referenceId, boolean isUnitId, BigInteger dataCategoryId, DataCategoryDTO dataCategoryDto) {
+    public DataCategoryDTO updateDataCategoryAndDataElement(Long referenceId, boolean isUnitId, Long dataCategoryId, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = isUnitId ? dataCategoryMongoRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryMongoRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
+        DataCategory dataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !dataCategoryId.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
-        dataCategory = dataCategoryMongoRepository.findOne(dataCategoryId);
+        dataCategory = dataCategoryRepository.getOne(dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
         List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isUnitId, dataCategoryDto.getDataElements());
         dataCategory.setName(dataCategoryDto.getName());
-        dataCategory.setDataElements(dataElements.stream().map(DataElement::getId).collect(Collectors.toList()));
-        dataCategoryMongoRepository.save(dataCategory);
+       // dataCategory.setDataElements(dataElements);
+        dataCategoryRepository.save(dataCategory);
 
         return dataCategoryDto;
 
     }
 
 
-    public boolean deleteDataCategoryById(Long refrenceId, boolean isUnitId, BigInteger dataCategoryId) {
+    public boolean deleteDataCategoryById(Long referenceId, boolean isUnitId, Long dataCategoryId) {
 
-        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(refrenceId, dataCategoryId)
-                : dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(refrenceId, dataCategoryId);
+        List<String> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(referenceId, dataCategoryId)
+                : dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(referenceId, dataCategoryId);
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
-            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", dataSubjectLinkedWithDataCategory.stream().map(DataSubjectMappingBasicResponseDTO::getName).collect(Collectors.joining(",")));
+            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", StringUtils.join(dataSubjectLinkedWithDataCategory , ","));
         }
-        DataCategory dataCategory = dataCategoryMongoRepository.findOne(dataCategoryId);
-        if (!Optional.ofNullable(dataCategory).isPresent()) {
+        Integer updateCount = 0;
+        updateCount = isUnitId ? dataCategoryRepository.safelyDeleteDataCategory(dataCategoryId, referenceId) : dataCategoryRepository.safelyDeleteMasterDataCategory(dataCategoryId, referenceId);
+        if(updateCount > 0){
+            LOGGER.info("Data Category with id :: {} deleted safely and successfully", dataCategoryId);
+        }else{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        dataCategoryMongoRepository.safeDeleteById(dataCategoryId);
-        dataElementMongoRepository.safeDeleteByIds(new HashSet<>(dataCategory.getDataElements()));
         return true;
 
     }
@@ -116,12 +111,12 @@ public class DataCategoryService extends MongoBaseService {
      * @param dataCategoryId data category id
      * @return return data category with its data elements
      */
-    public DataCategoryResponseDTO getDataCategoryWithDataElementByCountryIdAndId(Long countryId, BigInteger dataCategoryId) {
-        DataCategoryResponseDTO dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementById(countryId, dataCategoryId);
+    public DataCategoryResponseDTO getDataCategoryWithDataElementByCountryIdAndId(Long countryId, Long dataCategoryId) {
+        DataCategory dataCategory = dataCategoryRepository.getDataCategoryByCountryIdAndId(countryId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        return dataCategory;
+        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory , DataCategoryResponseDTO.class);
 
     }
 
@@ -130,12 +125,12 @@ public class DataCategoryService extends MongoBaseService {
      * @param dataCategoryId data category id
      * @return return data category with its data elements
      */
-    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId) {
-        DataCategoryResponseDTO dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementByUnitIdAndId(unitId, dataCategoryId);
+    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, Long dataCategoryId) {
+        DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        return dataCategory;
+        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory , DataCategoryResponseDTO.class);
 
     }
 
@@ -145,7 +140,8 @@ public class DataCategoryService extends MongoBaseService {
      * @return return list of Data Category with data Elements
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByCountryId(Long countryId) {
-        return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
 
@@ -154,8 +150,18 @@ public class DataCategoryService extends MongoBaseService {
      * @return return list of Data Category with data Elements
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
-        return dataCategoryMongoRepository.getAllDataCategoryWithDataElementByUnitId(unitId);
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(unitId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
+
+    /**
+     * @param ids LIst of data category ids
+     * @return return list of Data Category with data Elements
+     */
+    public List<DataCategory> getAllDataCategoriesByIds(Set<Long> ids) {
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByIds(ids);
+        return dataCategories;
+    }
 
 }

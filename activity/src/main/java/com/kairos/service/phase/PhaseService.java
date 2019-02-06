@@ -312,7 +312,7 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), v->v));
         Map<BigInteger,Phase> phaseAndIdMap=phases.stream().collect(Collectors.toMap(Phase::getId, v->v));
-        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone), phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay() == null?DayOfWeek.MONDAY:phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime previousMonday=DateUtils.getDateForPreviousDay(DateUtils.getLocalDateFromTimezone(timeZone),DayOfWeek.MONDAY).atStartOfDay();
         Set<LocalDate> localDates=new HashSet<>();
         dates.forEach(d->{localDates.add(d.toLocalDate());});

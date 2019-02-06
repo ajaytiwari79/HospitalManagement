@@ -95,19 +95,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
@@ -392,8 +396,8 @@ public class StaffService {
             exceptionService.actionNotPermittedException("error.access.expired", accessGroup.getName());
         }
 
-        List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
-        List<Integer> staffErrorList = new ArrayList<>();
+        List<StaffDTO> staffList = new ArrayList<>();
+        List<StaffDTO> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
@@ -422,8 +426,6 @@ public class StaffService {
                 exceptionService.internalServerError("error.xssfsheet.noMoreRow", 0);
 
             }
-            Row header = sheet.getRow(0);
-
             Set<Long> externalIdsOfStaffToBeSaved = new HashSet<>();
             boolean headerSkipped = false;
             for (Row row : sheet) { // For each Row.
@@ -433,33 +435,15 @@ public class StaffService {
                 }
                 Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
                 if (cell != null) {
-//                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
-                    externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
+                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                    if (cell.getNumericCellValue() > 0) {
+                        externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
+                    }
                 }
             }
             List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(externalIdsOfStaffToBeSaved);
-            logger.info(externalIdsOfStaffToBeSaved.toString());
-
-            int NumberOfColumnsInSheet = header.getLastCellNum();
-            int cprHeader = -1;
-
-            for (int i = 0; i < NumberOfColumnsInSheet; i++) {
-                String columnHeader = header.getCell(i).getStringCellValue();
-                if (columnHeader.equalsIgnoreCase(CPR_NUMBER)) {
-                    cprHeader = i;
-                    break;
-                }
-            }
-            if (cprHeader == -1) {
-                logger.info("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
-                exceptionService.internalServerError("error.sheet.add.crpnumber");
-
-            }
-
             // TODO get CountryId
             SystemLanguage defaultSystemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
-
-            logger.info("Sheet has rows");
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 if (String.valueOf(row.getCell(0)) == null || String.valueOf(row.getCell(0)).isEmpty()) {
@@ -467,36 +451,50 @@ public class StaffService {
                 }
                 if (row.getCell(0) == null) {
                     logger.info("No more rows");
-                    if (staffList.size() != 0) {
-                        break;
-                    }
+                    break;
                 }
                 // Skip headers
                 if (row.getRowNum() == 0) {
                     continue;
                 }
                 // to check mandatory fields
-                int[] mandatoryCellColumnIndexs = {2, 8, 19, 20, 21, 23, 41};
+                int[] mandatoryCellColumnIndexs = {2, 20, 21, 23, 28, 41};
                 boolean isPerStaffMandatoryFieldsExists = validateStaffData(row, mandatoryCellColumnIndexs);
+                Long cprAsLong = null; String firstName = ""; String lastName = ""; String privateEmail = "";
+                if( isNotNull(row.getCell(41)) ){
+                    cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
+                }
+                if( isNotNull(row.getCell(20)) ){
+                    firstName = getStringValueOfIndexedCell(row, 20);
+                }
+                if( isNotNull(row.getCell(21)) ){
+                    lastName =getStringValueOfIndexedCell(row, 21);
+                }
+                if( isNotNull(row.getCell(28)) ){
+                    privateEmail = getStringValueOfIndexedCell(row, 28);
+                }
                 if (!isPerStaffMandatoryFieldsExists) {
-                    logger.info(" This row is missing some mandatory field so skipping this {}", row.getRowNum());
-                    staffErrorList.add(row.getRowNum());
-
+                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail,"Some of the mandatory fields are missing");
+                    if(isNotNull(cprAsLong)) {
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                    }
+                    staffErrorList.add(staffDTO);
                 } else {
                     String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId, externalIdValueAsString);
-                        staffErrorList.add(row.getRowNum());
+                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail,"Duplicate External Id");
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                        staffErrorList.add(staffDTO);
                         continue;
                     }
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    staff.setUserName(getStringValueOfIndexedCell(row, 19));
-                    staff.setFirstName(getStringValueOfIndexedCell(row, 20));
-                    staff.setLastName(getStringValueOfIndexedCell(row, 21));
-                    staff.setFamilyName(staff.getLastName());
+                    staff.setUserName(privateEmail);
+                    staff.setFirstName(firstName);
+                    staff.setLastName(lastName);
+                    staff.setFamilyName(lastName);
                     if (row.getCell(17) != null) {
                         staff.setBadgeNumber(getStringValueOfIndexedCell(row, 17));
                     }
@@ -509,21 +507,16 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        user = userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row, 2)
-                                , getStringValueOfIndexedCell(row, 28).toLowerCase()
-                                , getStringValueOfIndexedCell(row, 28).toLowerCase()
-                        );
+                        user = userGraphRepository.findByEmail(privateEmail.toLowerCase());
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(getStringValueOfIndexedCell(row, 20));
-                            user.setLastName(getStringValueOfIndexedCell(row, 21));
-                            Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
-                            user.setCprNumber(cprNumberLong.toString().trim());
+                            user.setFirstName(firstName);
+                            user.setLastName(lastName);
+                            user.setCprNumber(cprAsLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
-                            user.setTimeCareExternalId(externalIdValueAsString);
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
@@ -536,19 +529,19 @@ public class StaffService {
                         }
                         staff.setUser(user);
                     }
-
                     staffGraphRepository.save(staff);
-                    StaffPersonalDetailDTO staffPersonalDetailDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetailDTO.class);
-                    staffPersonalDetailDTO.setGender(user.getGender());
-                    staffPersonalDetailDTO.setCprNumber(user.getCprNumber()); //Setting CPR-Number to get Age.
-                    staffList.add(staffPersonalDetailDTO);
+                    StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
+                    staffDTO.setGender(user.getGender());
+                    staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
+                    staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                         createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
                     }
-
                 }
             }
-            activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())), unitId);
+            if(isCollectionNotEmpty(staffList)) {
+                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())), unitId);
+            }
             return staffUploadBySheetQueryResult;
         } catch (IOException e) {
             e.printStackTrace();
@@ -1354,11 +1347,11 @@ public class StaffService {
         return unitPositionDetails;
     }
 
-    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
+    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
         Long userId = UserContext.getUserDetails().getId();
-
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
@@ -1372,9 +1365,10 @@ public class StaffService {
 
     }
 
-    public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
+    public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound", staffFilterDTO.getId());
@@ -1385,9 +1379,10 @@ public class StaffService {
 
     }
 
-    public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long organizationId) {
+    public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound", staffFavouriteFilterId);
@@ -1398,9 +1393,10 @@ public class StaffService {
 
     }
 
-    public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long organizationId) {
+    public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);
     }
 

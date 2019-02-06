@@ -51,7 +51,6 @@ public class AppConstants {
     public static final String FULL_DAY = "Full day";
     public static final String PARTIALLY = "Partially";
 
-    public static final String DAY = "Day";
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
     public static final String KMD_NEXUS_CLIENT_SECRET = "APNaYeGDVGOdjQf-jIFgU59tfkPux2mD6xGpbbAEuUc32ie8FRn7Y2cxcSayV6VafluS0pLu2TyhARFHtdHc-NQ";
@@ -164,7 +163,7 @@ public class AppConstants {
     public static final String UNPAID_BREAK = "UNPAID_BREAK";
     public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
-    public static final String SHIFT = "SHIFT";
+    public static final String SHIFT = "Shift";
     public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s, Accumulated timebank- %s, Delta Weeklytimebank- %s," +
             " PlannedHoursweek- %s";
     public static final String SHIFT_EMAIL_BODY = "Hi, %s, \n shift %s  will start on %s at %s .";
@@ -202,14 +201,21 @@ public class AppConstants {
     public static final long SHIFT_LEAST_GRANULARITY =15;
 
     //KPI  BAR chart property
-    public static final String XAXIS="label";
-    public static final String YAXIS="value";
+    public static final String HOURS = "Hours";
+    public static final String CONTRACTUAL_HOURS = "Contractual Hours";
+    public static final String PLANNED_HOURS = "Planned Hours";
+    public static final String STAFF = "Staff";
+    public static final String DATE = "Dates";
+    public static final String LABEL = "label";
+    public static final String VALUE_FIELD = "value";
     //for ContractualAndPlannedHoursCalculationService
-    public static final String BAR_YAXIS ="barValue";
-    public static final String LINEFIELD="lineValue";
-    public static final String SEND_GRID_API_KEY="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";
+    public static final String BAR_YAXIS = "barValue";
+    public static final String LINE_FIELD = "lineValue";
+    public static final String SEND_GRID_API_KEY = "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";
 
     public static final short MULTIPLE_ACTIVITY = 1;
 
+    //for use timeslot in timeslot kpi
+    public static final String NIGHT = "Night";
 
 }

@@ -1,14 +1,14 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Document
-public class DataElement extends MongoBaseEntity {
+@Entity
+public class DataElement extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -16,6 +16,10 @@ public class DataElement extends MongoBaseEntity {
     private String name;
 
     private Long countryId;
+
+   /* @ManyToOne
+    @JoinColumn(name="dataCategory_id")
+    private DataCategory dataCategory;*/
 
     public Long getCountryId() {
         return countryId;
@@ -33,15 +37,16 @@ public class DataElement extends MongoBaseEntity {
         this.name = name;
     }
 
-    public DataElement( String name, Long countryId) {
+    public DataElement(String name, Long countryId) {
         this.name = name;
         this.countryId = countryId;
     }
 
-    public DataElement( String name) {
+    public DataElement(String name) {
         this.name = name;
     }
 
     public DataElement() {
     }
+
 }

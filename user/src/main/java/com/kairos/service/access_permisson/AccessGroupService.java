@@ -206,8 +206,6 @@ public class AccessGroupService {
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroupQueryResult countryAccessGroup : countryAccessGroups) {
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypes(), countryAccessGroup.getStartDate(), countryAccessGroup.getEndDate());
-                accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
-                accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 accessGroupRepository.save(accessGroup);
                 countryAndOrgAccessGroupIdsMap.put(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroup.getId(), accessGroup.getId());
@@ -257,7 +255,6 @@ public class AccessGroupService {
             AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             parent.setId(currentAccessGroup.getId());
             AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
-            accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
             accessGroup.setParentAccessGroup(parent);
             accessGroup.setLastModificationDate(accessGroup.getCreationDate());
             countryAndOrgAccessGroupIdsMap.put(currentAccessGroup.getId(), null);
@@ -661,8 +658,6 @@ public class AccessGroupService {
         AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) ? new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), accountType, dayTypes, accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate()) : new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), dayTypes, accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate());
 
         CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country, accessGroup, accessGroupDTO.getOrganizationCategory());
-        accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
-        accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         countryGraphRepository.save(country);
         //set default permission of access page while creating access group
@@ -697,7 +692,6 @@ public class AccessGroupService {
         }
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
-        accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGrpToUpdate.get().setRole(accessGroupDTO.getRole());
         accessGrpToUpdate.get().setEnabled(accessGroupDTO.isEnabled());
         accessGrpToUpdate.get().setStartDate(accessGroupDTO.getStartDate());
@@ -715,7 +709,6 @@ public class AccessGroupService {
 
         }
         accessGroupToDelete.setDeleted(true);
-        accessGroupToDelete.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRepository.save(accessGroupToDelete);
         return true;
     }
@@ -856,12 +849,8 @@ public class AccessGroupService {
 
         }
         AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), currentAccessGroup.get().getRole(), currentAccessGroup.get().getAccountType(), currentAccessGroup.get().getDayTypes(), currentAccessGroup.get().getStartDate(), currentAccessGroup.get().getEndDate());
-        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
-        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country.get(), accessGroup, countryAccessGroupDTO.getOrganizationCategory());
-        accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
-        accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         countryGraphRepository.save(country.get());
         accessPageRepository.copyAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());

@@ -2,9 +2,9 @@ package com.kairos.persistence.model.organization_type;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -16,9 +16,9 @@ public class OrganizationTypeSubTypeAndServicesQueryResult {
     private Long id;
     private String name;
     private Long countryId;
-    private List<OrganizationSubType> organizationSubTypes;
-    private List<ServiceCategory> organizationServices;
-    private List<SubServiceCategory> organizationSubServices;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<ServiceCategoryDTO> organizationServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
     public Long getId() { return id; }
 
@@ -28,17 +28,17 @@ public class OrganizationTypeSubTypeAndServicesQueryResult {
 
     public void setName(String name) { this.name = name; }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() { return organizationSubTypes; }
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() { return organizationSubTypeDTOS; }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
 
-    public List<ServiceCategory> getOrganizationServices() { return organizationServices; }
+    public List<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
 
-    public List<SubServiceCategory> getOrganizationSubServices() { return organizationSubServices; }
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     public Long getCountryId() { return countryId; }
 

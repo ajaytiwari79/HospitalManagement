@@ -324,8 +324,8 @@ public class OrganizationActivityController {
     @ApiOperation(value = "Init optplanner integration")
     @RequestMapping(value = "/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organizationId, unitId));
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync( unitId));
     }
 
     @ApiOperation("Get all activity based on unitId")
@@ -355,6 +355,21 @@ public class OrganizationActivityController {
     @DeleteMapping(value = "/activity/{activityId}/remove_uploaded_attachments")
     ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
+    }
+
+    @ApiOperation(value = "Get All Activities by unitId")
+    @RequestMapping(value = "/activity", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivityByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                activityService.getActivityByUnitId(unitId, type));
+    }
+
+    @ApiOperation(value = "Get All Activities and Phases by unitId")
+    @RequestMapping(value = "/activityWithPhase", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
     }
 
 }

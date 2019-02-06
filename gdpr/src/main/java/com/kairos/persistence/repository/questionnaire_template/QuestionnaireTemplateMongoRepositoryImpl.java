@@ -1,33 +1,8 @@
 package com.kairos.persistence.repository.questionnaire_template;
 
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+public class QuestionnaireTemplateMongoRepositoryImpl {
 
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-
-
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.List;
-
-public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionnaireTemplateRepository {
-
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -260,5 +235,5 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 .and("assetTypeId").is(assetTypeId)
                 .and("assetSubTypeId").is(assetSubTypeId));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
-    }
+    }*/
 }

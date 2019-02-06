@@ -6,13 +6,6 @@ import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
-import com.kairos.persistence.repository.clause.ClauseMongoRepository;
-import com.kairos.persistence.repository.filter.FilterMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
-import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
-import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.filter.FilterAndFavouriteFilterDTO;
 import com.kairos.response.dto.filter.FilterCategoryResult;
 import com.kairos.response.dto.filter.FilterResponseDTO;
@@ -20,15 +13,9 @@ import com.kairos.utils.FilterResponseWithData;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-
-import static com.kairos.constants.AppConstant.*;
 
 
 @Service
@@ -36,26 +23,18 @@ public class FilterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterService.class);
 
-    @Inject
-    private FilterMongoRepository filterMongoRepository;
+    /*@Inject
+    private FilterMongoRepository filterMongoRepository;*/
 
     @Inject
     private ExceptionService exceptionService;
 
 
-    @Inject
-    private ClauseMongoRepository clauseMongoRepository;
-
-    @Inject
-    private MasterAssetMongoRepository masterAssetMongoRepository;
-
-    @Inject
-    private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
     //get fields with distinct values on which filter is applicable
     public FilterAndFavouriteFilterDTO getFilterCategories(Long countryId,  String moduleId) {
-
-        Map<String, AggregationOperation> filterCriteria ;
+//TODO
+     /*   Map<String, AggregationOperation> filterCriteria = null;
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         List<FilterResponseDTO> filterResponseData = new ArrayList<>();
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
@@ -78,9 +57,9 @@ public class FilterService {
             return filterAndFavouriteFilterDto;
 
         } else
-            throw new InvalidRequestException("invalid Request filter group not exist for moduleId " + moduleId);
+            throw new InvalidRequestException("invalid Request filter group not exist for moduleId " + moduleId);*/
 
-
+return  new FilterAndFavouriteFilterDTO();
     }
 
 
@@ -105,10 +84,11 @@ public class FilterService {
 
     //get filter data on the bases of selection of data and get filter Group By moduleId
     public FilterResponseWithData getFilterDataWithFilterSelection(Long countryId, String moduleId, FilterSelectionDTO filterSelectionDto) {
-        FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
+        FilterGroup filterGroup = null;
+       /* FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         if (!Optional.ofNullable(filterGroup).isPresent()) {
             exceptionService.invalidRequestException("filter group not exists for " + moduleId);
-        }
+        }*/
         String domainName = null;
         if (filterGroup.getAccessModule().size() != 0) {
             for (ModuleIdDTO moduleIdDto1 : filterGroup.getAccessModule()) {
@@ -126,7 +106,8 @@ public class FilterService {
     public FilterResponseWithData getFilterDataByModuleName(Long countryId,  String moduleName, FilterSelectionDTO filterSelectionDto) {
 
         switch (moduleName) {
-            case CLAUSE_MODULE_NAME:
+            //TODO
+      /*      case CLAUSE_MODULE_NAME:
                 List<ClauseResponseDTO> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, filterSelectionDto);
                 FilterResponseWithData<List<ClauseResponseDTO>> clauseFilterData = new FilterResponseWithData<>();
                 clauseFilterData.setData(clauses);
@@ -140,7 +121,7 @@ public class FilterService {
                 List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, filterSelectionDto);
                 FilterResponseWithData<List<MasterProcessingActivityResponseDTO>> processingActivityFilterData = new FilterResponseWithData<>();
                 processingActivityFilterData.setData(processingActivities);
-                return processingActivityFilterData;
+                return processingActivityFilterData;*/
             default:
                 throw new DataNotFoundByIdException("data not found by moduleName " + moduleName);
         }

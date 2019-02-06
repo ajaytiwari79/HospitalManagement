@@ -493,6 +493,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "         '_id' : 1,\n" +
                 "    'name' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
+                "    'staffId' : 1,\n" +
                 "    'startDate' : 1,\n" +
                 "    'endDate' : 1,\n" +
                 " 'dayOfWeek': { '$dayOfWeek': '$startDate' }\n"+
@@ -518,7 +519,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private String groupByShiftAndActivity(){
         return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
-                "'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'}'activities':{'$addToSet':'$activities'}}}";
+                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'}'activities':{'$addToSet':'$activities'}}}";
     }
     private String projectionOfShift(){
         return  "{'$project' : { 'refId' : '$_id' ,'value':'$plannedHours'} }";

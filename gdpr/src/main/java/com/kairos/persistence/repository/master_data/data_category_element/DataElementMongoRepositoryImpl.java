@@ -1,23 +1,9 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
-import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Set;
-
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-
-public class DataElementMongoRepositoryImpl implements CustomDataElementRepository {
+public class DataElementMongoRepositoryImpl {
 
 
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
     @Override
@@ -37,5 +23,5 @@ public class DataElementMongoRepositoryImpl implements CustomDataElementReposito
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, DataElement.class);
 
-    }
+    }*/
 }

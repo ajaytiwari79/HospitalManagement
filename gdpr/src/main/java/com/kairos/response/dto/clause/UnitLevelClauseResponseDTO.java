@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitLevelClauseResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String title;
     private String titleHtml;
     private String description;
@@ -26,11 +25,11 @@ public class UnitLevelClauseResponseDTO {
     private boolean linkedWithOtherTemplate;
     private List<TemplateTypeResponseDTO> templateTypes = new ArrayList<>();
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

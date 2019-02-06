@@ -25,7 +25,7 @@ import static com.kairos.constants.ApiConstants.*;
  * 1.Calls SkillCategoryService
  * 2. Call for CRUD operation on SkillCategory using SkillCategoryService.
  */
-@RequestMapping(API_V1+PARENT_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 @Api(API_V1)
 @RestController
 public class SkillCategoryController {

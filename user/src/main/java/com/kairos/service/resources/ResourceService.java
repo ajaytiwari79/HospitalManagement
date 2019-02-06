@@ -171,7 +171,6 @@ public class ResourceService {
                     withHour(0).withMinute(0).withSecond(0).withNano(0);
             resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         }
-        resource.setCreationDate(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         organization.addResource(resource);
         organizationGraphRepository.save(organization);
         return resource;

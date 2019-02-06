@@ -13,15 +13,18 @@ public class ProcessingActivityRelatedDataSubject {
 
 
     @NotNull
-    private BigInteger id;
+    private Long id;
+
+    @NotNull
+    private String name;
 
     private List<ProcessingActivityRelatedDataCategory> dataCategories;
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -31,5 +34,13 @@ public class ProcessingActivityRelatedDataSubject {
 
     public void setDataCategories(List<ProcessingActivityRelatedDataCategory> dataCategories) {
         this.dataCategories = dataCategories;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

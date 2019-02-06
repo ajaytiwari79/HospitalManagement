@@ -30,7 +30,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/webjars/**","/resources/**","/swagger-resources/**/**","/swagger-ui.html","/v2/api-docs").permitAll()
-                .antMatchers( API_ORGANIZATION_URL + "/time_care/**").permitAll()
+                .antMatchers( API_V1 + "/time_care/**").permitAll()
                 .antMatchers( API_ORGANIZATION_UNIT_URL + COUNTRY_URL + "/time_care/**").permitAll()
                 .antMatchers(API_CREATE_KMD_TASK_DEMAND).permitAll()
                 .antMatchers(API_ORGANIZATION_UNIT_URL+"/api/v1/ws/**").permitAll()

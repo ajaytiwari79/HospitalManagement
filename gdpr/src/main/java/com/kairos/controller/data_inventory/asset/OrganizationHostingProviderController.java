@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -43,7 +42,7 @@ public class OrganizationHostingProviderController {
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(unitId, hostingProviderId));
 
     }
@@ -58,14 +57,14 @@ public class OrganizationHostingProviderController {
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, hostingProviderId, hostingProviderDTO));
 
     }

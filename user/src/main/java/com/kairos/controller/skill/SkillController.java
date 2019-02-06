@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
+
 
 /**
  * Created by oodles on 15/9/16B.
@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
 
 @RestController
 @Api(API_V1)
-@RequestMapping(API_V1+PARENT_ORGANIZATION_URL )
+@RequestMapping(API_V1 )
 public class SkillController {
 
     @Inject

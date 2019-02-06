@@ -9,7 +9,7 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataDisposalDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "Name can't be empty")
     @Pattern(message = "Number and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
@@ -21,9 +21,9 @@ public class DataDisposalDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name.trim(); }
 

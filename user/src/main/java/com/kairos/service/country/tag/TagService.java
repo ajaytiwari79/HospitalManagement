@@ -71,7 +71,6 @@ public class TagService {
         Tag tag = tagGraphRepository.getCountryTagByIdAndDataType(tagId, countryId, tagDTO.getMasterDataType().toString(), false);
         if( tag == null) {
             exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
-
         }
 
         /*if(! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
@@ -81,14 +80,14 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
 
         }
-        return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
+        tag.setName(tagDTO.getName());
+        return tagGraphRepository.save(tag);
     }
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
-
         }
 
         if(filterText == null){
@@ -182,7 +181,10 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
 
         }
-        return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
+        tag.setName(tagDTO.getName());
+        tagGraphRepository.save(tag);
+        return tag;
+        //return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
 
     public Boolean deleteOrganizationTag(Long orgId, Long tagId, String type){

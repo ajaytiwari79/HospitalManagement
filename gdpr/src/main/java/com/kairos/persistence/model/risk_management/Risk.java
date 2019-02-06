@@ -1,17 +1,28 @@
 package com.kairos.persistence.model.risk_management;
 
-import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.response.dto.common.RiskResponseDTO;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
-import java.time.LocalDate;
 
-@Document
-public class Risk extends MongoBaseEntity {
+@Entity
+@NamedNativeQuery(name = "getAllRiskData", resultClass = RiskResponseDTO.class, query = "select risk.id as id ,risk.name as name, risk.description as description, risk.risk_recommendation as riskRecommendation,  risk.is_reminder_active as isReminderActive,risk.days_to_reminder_before as daysToReminderBefore,/* risk.risk_level as riskLevel,*/PA.name as processingActivityName, PA.id as processingActivityId, PA.sub_processing_activity as isSubProcessing from riskmd risk inner join processing_activitymd_risks PAR ON PAR.risks_id = risk.id left join processing_activitymd PA ON PAR.processing_activitymd_id = PA.id where risk.organization_id = ?1 and risk.deleted = false", resultSetMapping = "getAllRiskData")
+@SqlResultSetMapping(
+        name = "getAllRiskData",
+        classes = @ConstructorResult(
+                targetClass = RiskResponseDTO.class,
+                columns = {
+                        @ColumnResult(name = "id"),  @ColumnResult(name = "name"), @ColumnResult(name = "description"), @ColumnResult(name = "riskRecommendation"),  @ColumnResult(name = "isReminderActive"),  @ColumnResult(name = "daysToReminderBefore"),
+                        /*@ColumnResult(name = "riskLevel"),*/  @ColumnResult(name = "processingActivityName"),
+                        @ColumnResult(name = "processingActivityId"), @ColumnResult(name = "isSubProcessing")
+
+                }
+        )
+)
+public class Risk extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
@@ -26,9 +37,6 @@ public class Risk extends MongoBaseEntity {
     // private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
-    private BigInteger assetType;
-    private BigInteger processingActivity;
-
 
     public Risk() {
     }
@@ -51,14 +59,9 @@ public class Risk extends MongoBaseEntity {
         this.riskLevel = riskLevel;
     }
 
-
-    public BigInteger getAssetType() { return assetType; }
-
-    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
-
-    public BigInteger getProcessingActivity() { return processingActivity; }
-
-    public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
+    public Risk(Long id){
+        this.id= id;
+    }
 
     public String getName() {
         return name;
@@ -114,6 +117,5 @@ public class Risk extends MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
-
 
 }

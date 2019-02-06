@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,14 +43,14 @@ public class ProcessingPurposeController {
     @ApiOperation("add processing purpose")
     @PostMapping("/processing_purpose")
     public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, processingPurposes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, processingPurposes.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get processing purpose by id")
     @GetMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger processingPurposeId) {
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId, @PathVariable Long processingPurposeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, processingPurposeId));
     }
 
@@ -65,21 +64,21 @@ public class ProcessingPurposeController {
 
     @ApiOperation("delete processing purpose by id")
     @DeleteMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger processingPurposeId) {
+    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long countryId, @PathVariable Long processingPurposeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(countryId, processingPurposeId));
 
     }
 
     @ApiOperation("update processing purpose by id")
     @PutMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable Long processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
            return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(countryId, processingPurposeId, processingPurpose));
     }
 
 
     @ApiOperation("update Suggested status of Processing Purposes")
     @PutMapping("/processing_purpose")
-    public ResponseEntity<Object> updateSuggestedStatusOfProcessingPurposes(@PathVariable Long countryId, @RequestBody Set<BigInteger> processingPurposeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfProcessingPurposes(@PathVariable Long countryId, @RequestBody Set<Long> processingPurposeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(processingPurposeIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Processing Purpose is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

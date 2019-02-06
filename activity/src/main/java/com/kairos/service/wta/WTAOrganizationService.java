@@ -65,18 +65,12 @@ public class WTAOrganizationService extends MongoBaseService {
         workingTimeAgreements.forEach(wta->{
             wtaResponseDTOs.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
         });
-        wtaResponseDTOs.forEach(wtaResponseDTO -> {
-            wtaResponseDTO.setStartDateMillis(wtaResponseDTO.getStartDate().getTime());
-            if(wtaResponseDTO.getEndDate()!=null){
-                wtaResponseDTO.setEndDateMillis(wtaResponseDTO.getStartDate().getTime());
-            }
-        });
         return wtaResponseDTOs;
     }
 
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
-        if (DateUtils.getLocalDate(updateDTO.getStartDateMillis()).isBefore(LocalDate.now())) {
+        if (updateDTO.getStartDate().isBefore(LocalDate.now())) {
             exceptionService.actionNotPermittedException("message.wta.start-end-date");
         }
         WorkingTimeAgreement WTADuplicate = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
@@ -102,7 +96,7 @@ public class WTAOrganizationService extends MongoBaseService {
         newWta.setId(null);
         newWta.setDeleted(true);
         newWta.setStartDate(oldWta.getStartDate());
-        newWta.setEndDate(new Date(updateDTO.getStartDateMillis()));
+        newWta.setEndDate(updateDTO.getStartDate());
         newWta.setCountryParentWTA(null);
         //ruleTemplateCategoryMongoRepository.detachPreviousRuleTemplates(oldWta.getId());
         save(newWta);
@@ -114,10 +108,8 @@ public class WTAOrganizationService extends MongoBaseService {
         oldWta.setName(updateDTO.getName());
         oldWta.setDescription(updateDTO.getDescription());
 
-        oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
-        if(updateDTO.getEndDateMillis()!=null){
-            oldWta.setEndDate(new Date(updateDTO.getEndDateMillis()));
-        }
+        oldWta.setStartDate(updateDTO.getStartDate());
+        oldWta.setEndDate(updateDTO.getEndDate());
         oldWta.setExpertise(oldWta.getExpertise());
         oldWta.setParentId(newWta.getId());
         oldWta.setDisabled(false);
@@ -137,10 +129,8 @@ public class WTAOrganizationService extends MongoBaseService {
         //workingTimeAgreementMongoRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDate());
         oldWta.setParentId(newWta.getParentId());
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
-        wtaResponseDTO.setStartDateMillis(oldWta.getStartDate().getTime());
-        if (oldWta.getEndDate() != null) {
-            wtaResponseDTO.setEndDateMillis(oldWta.getEndDate().getTime());
-        }
+        wtaResponseDTO.setStartDate(oldWta.getStartDate());
+        wtaResponseDTO.setEndDate(oldWta.getEndDate());
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         /*oldWta.getExpertise().setCountryId(null);*/
         return wtaResponseDTO;

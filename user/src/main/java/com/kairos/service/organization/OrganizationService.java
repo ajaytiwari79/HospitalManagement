@@ -729,8 +729,8 @@ public class OrganizationService {
     }
 
 
-    public Organization updateExternalId(long organizationId, long externalId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId);
+    public Organization updateExternalId(long unitId, long externalId) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             return null;
         }
@@ -852,7 +852,7 @@ public class OrganizationService {
      * @auther anil maurya
      * this method is called from task micro service
      */
-    public Map<String, Object> getUnitVisitationInfo(long organizationId, long unitId) {
+    public Map<String, Object> getUnitVisitationInfo( long unitId) {
 
         Map<String, Object> organizationResult = new HashMap();
         Map<String, Object> unitData = new HashMap();
@@ -860,7 +860,7 @@ public class OrganizationService {
         Map<String, Object> organizationTimeSlotList = timeSlotService.getTimeSlots(unitId);
         unitData.put("organizationTimeSlotList", organizationTimeSlotList.get("timeSlots"));
 
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
         unitData.put("clientStatusList", clientStatusList);
         List<Object> localAreaTagsList = new ArrayList<>();
@@ -870,7 +870,7 @@ public class OrganizationService {
         }
         unitData.put("localAreaTags", localAreaTagsList);
         unitData.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
+        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(unitId);
 
         if (timeSlotData != null) {
             unitData.put("timeSlotList", timeSlotData);
@@ -1086,8 +1086,9 @@ public class OrganizationService {
     }
 
 
-    public List<com.kairos.persistence.model.country.DayType> getDayType(Long organizationId, Date date) {
-        Long countryId = organizationGraphRepository.getCountryId(organizationId);
+    public List<com.kairos.persistence.model.country.DayType> getDayType(Long unitId, Date date) {
+        Organization parentOrganization=fetchParentOrganization(unitId);
+        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
@@ -1275,7 +1276,7 @@ public class OrganizationService {
                 skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
     }
 
-    public PlannerSyncResponseDTO initialOptaplannerSync(Long organizationId, Long unitId) {
+    public PlannerSyncResponseDTO initialOptaplannerSync( Long unitId) {
         List<Staff> staff = staffGraphRepository.getAllStaffByUnitId(unitId);
         boolean syncStarted = false;
         if (!staff.isEmpty()) {

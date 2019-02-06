@@ -25,7 +25,7 @@ public class ExpertiseNightWorkerSettingController {
     ExpertiseNightWorkerSettingService expertiseNightWorkerSettingService;
 
     @ApiOperation(value = "create expertise night worker settings")
-    @PostMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
+    @PostMapping(value = COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,
                                                                                @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {
@@ -33,14 +33,14 @@ public class ExpertiseNightWorkerSettingController {
     }
 
     @ApiOperation(value = "get expertise night worker settings")
-    @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
+    @GetMapping(value = COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(countryId, expertiseId));
     }
 
     @ApiOperation(value = "update expertise night worker settings")
-    @PutMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
+    @PutMapping(value = COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,
                                                                                @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {

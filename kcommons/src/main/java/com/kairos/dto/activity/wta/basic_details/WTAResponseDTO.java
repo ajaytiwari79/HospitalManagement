@@ -8,6 +8,7 @@ import com.kairos.dto.user.organization.OrganizationTypeDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,11 +25,8 @@ public class WTAResponseDTO {
 
     private BigInteger parentId;
     private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
-
-    private Long startDateMillis;
-    private Long endDateMillis;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long expiryDate;
     private String name;
     private Long unitPositionId;
@@ -52,10 +50,10 @@ public class WTAResponseDTO {
         this.parentId = parentId;
     }
 
-    public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
+    public WTAResponseDTO(BigInteger id, LocalDate startDate, LocalDate endDate, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
         this.id = id;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
+        this.startDate =startDate;
+        this.endDate = endDate;
         this.name = name;
         this.description = description;
 
@@ -93,37 +91,20 @@ public class WTAResponseDTO {
         this.parentWTAResponse = parentWTAResponse;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
-    }
-
-
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -214,10 +195,10 @@ public class WTAResponseDTO {
         this.organizationParentId = organizationParentId;
     }
 
-    public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, String name, String description, ExpertiseResponseDTO expertise, OrganizationTypeDTO organizationType, OrganizationTypeDTO organizationSubType, List<TagDTO> tags) {
-        this.startDateMillis = startDateMillis;
+    public WTAResponseDTO(BigInteger id, LocalDate startDate, LocalDate endDate, String name, String description, ExpertiseResponseDTO expertise, OrganizationTypeDTO organizationType, OrganizationTypeDTO organizationSubType, List<TagDTO> tags) {
+        this.startDate = startDate;
         this.id = id;
-        this.endDateMillis = endDateMillis;
+        this.endDate = endDate;
         this.name = name;
         this.description = description;
         this.expertise = expertise;

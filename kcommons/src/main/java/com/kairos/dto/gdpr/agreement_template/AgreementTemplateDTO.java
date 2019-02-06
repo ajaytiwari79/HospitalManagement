@@ -7,18 +7,18 @@ import java.math.BigInteger;
 
 public class AgreementTemplateDTO {
 
-    protected BigInteger id;
+    protected Long id;
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     protected String name;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     protected String description;
     @NotNull(message = "error.message.templateType.notNull")
-    protected BigInteger templateTypeId;
+    protected Long templateTypeId;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 
@@ -28,7 +28,7 @@ public class AgreementTemplateDTO {
 
     public void setDescription(String description) { this.description = description; }
 
-    public BigInteger getTemplateTypeId() { return templateTypeId; }
+    public Long getTemplateTypeId() { return templateTypeId; }
 
-    public void setTemplateTypeId(BigInteger templateTypeId) { this.templateTypeId = templateTypeId; }
+    public void setTemplateTypeId(Long templateTypeId) { this.templateTypeId = templateTypeId; }
 }

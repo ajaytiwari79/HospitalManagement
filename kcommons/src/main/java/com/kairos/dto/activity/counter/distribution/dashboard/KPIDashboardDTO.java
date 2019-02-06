@@ -5,7 +5,7 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import java.math.BigInteger;
 
 public class KPIDashboardDTO {
-    private BigInteger id;
+    //private BigInteger id;
     private String parentModuleId;
     private String moduleId;
     private String name;
@@ -13,14 +13,18 @@ public class KPIDashboardDTO {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private boolean enable=true;
+    private boolean active=true;
+    private boolean defaultTab;
 
-    public BigInteger getId() {
-        return id;
-    }
 
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+//    public BigInteger getId() {
+//        return id;
+//    }
+//
+//    public void setId(BigInteger id) {
+//        this.id = id;
+//    }
 
     public String getParentModuleId() {
         return parentModuleId;
@@ -76,5 +80,29 @@ public class KPIDashboardDTO {
 
     public void setLevel(ConfLevel level) {
         this.level = level;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isDefaultTab() {
+        return defaultTab;
+    }
+
+    public void setDefaultTab(boolean defaultTab) {
+        this.defaultTab = defaultTab;
     }
 }

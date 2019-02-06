@@ -2,8 +2,8 @@ package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +11,17 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetTypeResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private List<AssetTypeResponseDTO> subAssetTypes=new ArrayList<>();
+    private List<OrganizationLevelRiskDTO> risks=new ArrayList<>();
     private Boolean hasSubAsset;
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -46,5 +47,13 @@ public class AssetTypeResponseDTO {
 
     public void setHasSubAsset(Boolean hasSubAsset) {
         this.hasSubAsset = hasSubAsset;
+    }
+
+    public List<OrganizationLevelRiskDTO> getRisks() {
+        return risks;
+    }
+
+    public void setRisks(List<OrganizationLevelRiskDTO> risks) {
+        this.risks = risks;
     }
 }

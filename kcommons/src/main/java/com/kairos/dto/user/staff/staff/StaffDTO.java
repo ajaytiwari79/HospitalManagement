@@ -23,19 +23,26 @@ public class StaffDTO {
     @NotBlank(message = "error.StaffDTO.cprNumber.notEmpty")
     private BigInteger cprNumber;
     private String familyName;
-
     private String privateEmail;
     private Integer privatePhone;
     private String workEmail;
     private Integer workPhone;
-
     private Date employedSince;
     private Long inactiveFrom;
-
     @NotNull(message = "error.StaffDTO.teamId.notnull")
     private Long teamId;
-
     private String primaryEmailAddress;
+    private List<Long> skills;
+    private  Long unit;
+    private Long anonymousStaffId;
+    private StaffStatusEnum currentStatus;
+    private Integer age;
+    private Gender gender;
+    private String errorMessage; //This field is used for reporting error message on staff upload via excel sheet
+
+    public StaffDTO() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -43,14 +50,6 @@ public class StaffDTO {
     public void setId(Long id) {
         this.id = id;
     }
-
-    private List<Long> skills;
-
-    private  Long unit;
-    private Long anonymousStaffId;
-    private StaffStatusEnum currentStatus;
-    private Integer age;
-    private Gender gender;
 
     public String getFamilyName() {
         return familyName;
@@ -76,8 +75,6 @@ public class StaffDTO {
         this.lastName = lastName;
     }
 
-
-
     public String getPrivateEmail() {
         return privateEmail;
     }
@@ -86,8 +83,6 @@ public class StaffDTO {
         this.privateEmail = privateEmail;
     }
 
-
-
     public String getWorkEmail() {
         return workEmail;
     }
@@ -95,7 +90,6 @@ public class StaffDTO {
     public void setWorkEmail(String workEmail) {
         this.workEmail = workEmail;
     }
-
 
     public BigInteger getCprNumber() {
         return cprNumber;
@@ -120,8 +114,6 @@ public class StaffDTO {
     public void setWorkPhone(Integer workPhone) {
         this.workPhone = workPhone;
     }
-
-
 
     public Date getEmployedSince() {
         return employedSince;
@@ -203,12 +195,17 @@ public class StaffDTO {
         this.gender = gender;
     }
 
-    public StaffDTO() {
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
-    public StaffDTO(Long id, String firstName, String lastName, BigInteger cprNumber,String familyName, String privateEmail, Integer privatePhone,
-                    String workEmail, Integer workPhone, Date employedSince,Long inactiveFrom,Long teamId, List<Long> skills,
-                    Long unit, Long anonymousStaffId,StaffStatusEnum currentStatus) {
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public StaffDTO(Long id, String firstName, String lastName, BigInteger cprNumber, String familyName, String privateEmail, Integer privatePhone,
+                    String workEmail, Integer workPhone, Date employedSince, Long inactiveFrom, Long teamId, List<Long> skills,
+                    Long unit, Long anonymousStaffId, StaffStatusEnum currentStatus) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -233,5 +230,12 @@ public class StaffDTO {
         this.lastName = lastName;
         this.gender=gender;
         this.age=age;
+    }
+
+    public StaffDTO(String firstName, String lastName, String privateEmail, String errorMessage) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.privateEmail = privateEmail;
+        this.errorMessage = errorMessage;
     }
 }

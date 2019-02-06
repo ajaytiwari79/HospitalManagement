@@ -45,6 +45,8 @@ public class CountryExpertiseDTO {
     @NotNull(message = "union can not be null")
   /*  private Long unionId;*/
     private UnionIDNameDTO union;
+
+    @NotNull(message = "FullTime Weekly Minutes can not be null")
     private Integer fullTimeWeeklyMinutes ; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
