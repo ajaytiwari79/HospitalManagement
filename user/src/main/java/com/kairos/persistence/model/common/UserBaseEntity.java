@@ -35,8 +35,10 @@ public abstract class UserBaseEntity implements Serializable {
     @LastModifiedDate
     private LocalDateTime lastModificationDate;
 
+    @JsonIgnore
     @CreatedBy
     protected Long createdBy;
+    @JsonIgnore
     @LastModifiedBy
     protected Long lastModifiedBy;
 
