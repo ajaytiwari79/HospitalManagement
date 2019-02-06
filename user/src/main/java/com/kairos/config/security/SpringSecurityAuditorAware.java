@@ -27,7 +27,7 @@ public class SpringSecurityAuditorAware implements AuditorAware<Long> {
             LOGGER.info("Created by or modified by " + UserContext.getUserDetails().getId());
             return Optional.of(UserContext.getUserDetails().getId());
         } else {
-            return Optional.ofNullable(null);
+            return Optional.empty();
         }
     }
 }
