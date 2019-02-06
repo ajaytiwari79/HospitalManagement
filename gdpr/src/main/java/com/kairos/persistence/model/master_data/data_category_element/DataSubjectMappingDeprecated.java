@@ -23,9 +23,9 @@ public class DataSubjectMappingDeprecated {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
 
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     private Set<BigInteger> dataCategories = new HashSet<>();
 
@@ -35,12 +35,12 @@ public class DataSubjectMappingDeprecated {
     public DataSubjectMappingDeprecated() {
     }
 
-    public DataSubjectMappingDeprecated(String name, String description, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS,
+    public DataSubjectMappingDeprecated(String name, String description, List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes,
                                         Set<BigInteger> dataCategories) {
         this.name = name;
         this.description = description;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.dataCategories = dataCategories;
     }
 
@@ -90,19 +90,19 @@ public class DataSubjectMappingDeprecated {
     }
 
     public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
+    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
 

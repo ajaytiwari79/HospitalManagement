@@ -186,15 +186,15 @@ public class MasterAssetService{
         masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(masterAsset.getAssetType().getId(),masterAsset.getAssetType().getName(), masterAsset.getAssetType().isSubAssetType()));
         masterAssetResponseDTO.setAssetSubType(new AssetTypeBasicResponseDTO(masterAsset.getSubAssetType().getId(),masterAsset.getSubAssetType().getName(), masterAsset.getSubAssetType().isSubAssetType()));
 
-        List<OrganizationTypeDTO> organizationTypeDTOS = new ArrayList<>();
-        List<OrganizationSubTypeDTO> organizationSubTypeDTOS = new ArrayList<>();
+        List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
+        List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
         List<ServiceCategoryDTO> serviceCategories = new ArrayList<>();
         List<SubServiceCategoryDTO> subServiceCategories = new ArrayList<>();
         for(OrganizationType orgType : masterAsset.getOrganizationTypes()){
-            organizationTypeDTOS.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
+            organizationTypes.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
         }
         for(OrganizationSubType orgSubType : masterAsset.getOrganizationSubTypes()){
-            organizationSubTypeDTOS.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
+            organizationSubTypes.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
         }
         for(ServiceCategory category : masterAsset.getOrganizationServices()){
             serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName())) ;
@@ -203,8 +203,8 @@ public class MasterAssetService{
             subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
         }
 
-        masterAssetResponseDTO.setOrganizationTypeDTOS(organizationTypeDTOS);
-        masterAssetResponseDTO.setOrganizationSubTypeDTOS(organizationSubTypeDTOS);
+        masterAssetResponseDTO.setOrganizationTypeDTOS(organizationTypes);
+        masterAssetResponseDTO.setOrganizationSubTypeDTOS(organizationSubTypes);
         masterAssetResponseDTO.setOrganizationServices(serviceCategories);
         masterAssetResponseDTO.setOrganizationSubServices(subServiceCategories);
         return masterAssetResponseDTO;

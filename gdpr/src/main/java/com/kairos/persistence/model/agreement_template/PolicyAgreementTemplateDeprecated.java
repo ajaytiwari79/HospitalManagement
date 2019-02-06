@@ -24,8 +24,8 @@ public class PolicyAgreementTemplateDeprecated {
     private Long countryId;
     private List<AccountTypeVO> accountTypes;
     private List<BigInteger> agreementSections=new ArrayList<>();
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
     private BigInteger templateTypeId;
@@ -40,12 +40,12 @@ public class PolicyAgreementTemplateDeprecated {
     private ClauseTagDeprecated defaultClauseTag;
 
 
-    public PolicyAgreementTemplateDeprecated(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+    public PolicyAgreementTemplateDeprecated(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
         this.name = name;
         this.description = description;
         this.countryId = countryId;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
     }
@@ -102,16 +102,16 @@ public class PolicyAgreementTemplateDeprecated {
     public void setAgreementSections(List<BigInteger> agreementSections) { this.agreementSections = agreementSections; }
 
     public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public PolicyAgreementTemplateDeprecated setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS;return this; }
+    public PolicyAgreementTemplateDeprecated setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes;return this; }
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+        return organizationSubTypes;
     }
 
-    public PolicyAgreementTemplateDeprecated setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; return this;}
+    public PolicyAgreementTemplateDeprecated setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; return this;}
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;

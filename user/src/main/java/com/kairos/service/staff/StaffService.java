@@ -217,8 +217,8 @@ public class StaffService {
     private UserService userService;
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
-    @Inject
-    @Lazy
+
+    @Inject @Lazy
     private PasswordEncoder passwordEncoder;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -246,21 +246,17 @@ public class StaffService {
         return true;
     }
 
-
     public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
         User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
-        if (passwordEncoder.matches(oldPassword, user.getPassword())){
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
             userGraphRepository.save(user);
         } else {
-            logger.error("Password not matched ");
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
-
         }
         return true;
-
     }
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
