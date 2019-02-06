@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
 
 /**
@@ -65,9 +66,9 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            Optional<CareDaysDTO> careDaysOptional = infoWrapper.getChildCareDays().stream().filter(careDaysDTO -> (careDaysDTO.getFrom() <= infoWrapper.getStaffAge() && careDaysDTO.getTo() >= infoWrapper.getStaffAge())).findFirst();
-            if (careDaysOptional.isPresent()) {
-                int leaveCount = careDaysOptional.get().getLeavesAllowed();
+            CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(),infoWrapper.getStaffAge());
+            if (isNotNull(careDays)) {
+                int leaveCount = careDays.getLeavesAllowed();
 
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
                 List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
@@ -80,6 +81,17 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     }
 
+    private CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS,int staffAge){
+        CareDaysDTO staffCareDaysDTO = null;
+        for (CareDaysDTO careDaysDTO : careDaysDTOS) {
+            if(careDaysDTO.getTo()==null && staffAge > careDaysDTO.getFrom()){
+                staffCareDaysDTO = careDaysDTO;
+            } else if(isNotNull(careDaysDTO.getId())&&careDaysDTO.getFrom() <= staffAge && careDaysDTO.getTo() >= staffAge){
+                staffCareDaysDTO = careDaysDTO;
+            }
+        }
+        return staffCareDaysDTO;
+    }
 
     public CutOffIntervalUnit getCutOffIntervalUnit() {
         return cutOffIntervalUnit;
