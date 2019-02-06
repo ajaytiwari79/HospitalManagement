@@ -19,8 +19,8 @@ public class MasterProcessingActivityDeprecated {
     @NotBlank(message = "Name can't be empty")
     private String name;
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
     private List<BigInteger> subProcessingActivityIds;
@@ -37,11 +37,11 @@ public class MasterProcessingActivityDeprecated {
     }
 
 
-    public MasterProcessingActivityDeprecated(String name, String description, SuggestedDataStatus suggestedDataStatus, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+    public MasterProcessingActivityDeprecated(String name, String description, SuggestedDataStatus suggestedDataStatus, List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
         this.name = name;
         this.description = description;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
@@ -99,16 +99,16 @@ public class MasterProcessingActivityDeprecated {
     public MasterProcessingActivityDeprecated setDescription(String description) { this.description = description; return this; }
 
     public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public MasterProcessingActivityDeprecated setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS;  return this;}
+    public MasterProcessingActivityDeprecated setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes;  return this;}
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+        return organizationSubTypes;
     }
 
-    public MasterProcessingActivityDeprecated setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; return this; }
+    public MasterProcessingActivityDeprecated setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; return this; }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;

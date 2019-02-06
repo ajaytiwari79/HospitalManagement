@@ -272,15 +272,15 @@ public class MasterProcessingActivityService{
 
     private MasterProcessingActivityResponseDTO  prepareMasterProcessingActivityResponseDTO(MasterProcessingActivity processingActivity, List<MasterProcessingActivityResponseDTO> masterSPAResponseDTO){
         MasterProcessingActivityResponseDTO masterPAResponseDTO = new MasterProcessingActivityResponseDTO(processingActivity.getId(),processingActivity.getName(),processingActivity.getDescription(), processingActivity.getSuggestedDate(), processingActivity.getSuggestedDataStatus());
-        List<OrganizationTypeDTO> organizationTypeDTOS = new ArrayList<>();
-        List<OrganizationSubTypeDTO> organizationSubTypeDTOS = new ArrayList<>();
+        List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
+        List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
         List<ServiceCategoryDTO> serviceCategories = new ArrayList<>();
         List<SubServiceCategoryDTO> subServiceCategories = new ArrayList<>();
         for(OrganizationType orgType : processingActivity.getOrganizationTypes()){
-            organizationTypeDTOS.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
+            organizationTypes.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
         }
         for(OrganizationSubType orgSubType : processingActivity.getOrganizationSubTypes()){
-            organizationSubTypeDTOS.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
+            organizationSubTypes.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
         }
         for(ServiceCategory category : processingActivity.getOrganizationServices()){
             serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName())) ;
@@ -289,8 +289,8 @@ public class MasterProcessingActivityService{
             subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
         }
 
-        masterPAResponseDTO.setOrganizationTypes(organizationTypeDTOS);
-        masterPAResponseDTO.setOrganizationSubTypes(organizationSubTypeDTOS);
+        masterPAResponseDTO.setOrganizationTypes(organizationTypes);
+        masterPAResponseDTO.setOrganizationSubTypes(organizationSubTypes);
         masterPAResponseDTO.setOrganizationServices(serviceCategories);
         masterPAResponseDTO.setOrganizationSubServices(subServiceCategories);
         if(processingActivity.isHasSubProcessingActivity()) {

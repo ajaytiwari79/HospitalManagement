@@ -54,16 +54,16 @@ public class DataSubjectMappingResponseDTO {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypes = organizationTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypes = organizationSubTypeDTOS;
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
     public List<DataCategoryResponseDTO> getDataCategories() {
