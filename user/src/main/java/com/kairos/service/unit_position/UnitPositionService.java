@@ -468,7 +468,7 @@ public class UnitPositionService {
                 }
                 //TODO uncomment if function setting is changed currently function not add in unitpositionLine KP-6010
                // if (changeResultDTO.isFunctionsChanged()) {
-                    //linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
+                    linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
                 //}
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
@@ -480,11 +480,10 @@ public class UnitPositionService {
                 unitPositionGraphRepository.save(oldUnitPosition);
                 linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
                // if (changeResultDTO.isFunctionsChanged()) {
-                  //  linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false, unitPositionDTO.getFunctions());
+                   linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false, unitPositionDTO.getFunctions());
                 //}
                 unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
-            linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
 
             CTAWTAWrapper newCTAWTAWrapper = null;
             if (changeResultDTO.getCtaId() != null || changeResultDTO.getWtaId() != null) {
