@@ -43,7 +43,7 @@ public class TemplateTypeController {
     @PostMapping(COUNTRY_URL+"/template")
     public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TemplateType> templateData) {
         if (CollectionUtils.isEmpty(templateData.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.createTemplateType(countryId, templateData.getRequestBody()));
     }

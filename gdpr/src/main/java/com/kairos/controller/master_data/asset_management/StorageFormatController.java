@@ -45,7 +45,7 @@ public class StorageFormatController {
     public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
         if (CollectionUtils.isEmpty(storageFormat.getRequestBody()))
         {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"message.enter.valid.data");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(countryId, storageFormat.getRequestBody(), false));
 

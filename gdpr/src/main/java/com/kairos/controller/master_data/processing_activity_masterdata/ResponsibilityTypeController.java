@@ -44,7 +44,7 @@ public class ResponsibilityTypeController {
     public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypes) {
 
         if (CollectionUtils.isEmpty(responsibilityTypes.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, responsibilityTypes.getRequestBody(), false));
 

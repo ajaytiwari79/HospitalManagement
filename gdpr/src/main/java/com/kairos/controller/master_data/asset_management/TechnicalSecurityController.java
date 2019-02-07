@@ -43,7 +43,7 @@ public class TechnicalSecurityController {
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
 
         if (CollectionUtils.isEmpty(securityMeasures.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures.getRequestBody(), false));
 

@@ -43,7 +43,7 @@ public class ProcessingLegalBasisController {
     @PostMapping("/legal_basis")
     public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
         if (CollectionUtils.isEmpty(legalBases.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId, legalBases.getRequestBody(), false));
 
