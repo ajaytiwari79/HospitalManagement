@@ -1,15 +1,15 @@
 package com.kairos.service.country;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.OwnershipType;
+import com.kairos.persistence.model.country.default_data.OwnershipType;
+import com.kairos.persistence.model.country.default_data.OwnershipTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.OwnershipTypeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by oodles on 9/1/17.
@@ -20,42 +20,45 @@ public class OwnershipTypeService {
 
     @Inject
     private OwnershipTypeGraphRepository ownershipTypeGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createOwnershipType(long countryId, OwnershipType ownershipType){
+    public OwnershipTypeDTO createOwnershipType(long countryId, OwnershipTypeDTO ownershipTypeDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        OwnershipType ownershipType = null;
+        if ( country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean ownershipTypeExistInCountryByName = ownershipTypeGraphRepository.ownershipTypeExistInCountryByName(countryId, "(?i)" + ownershipTypeDTO.getName(), -1L);
+            if (ownershipTypeExistInCountryByName) {
+                exceptionService.duplicateDataException("error.OwnershipType.name.exist");
+            }
+            ownershipType = new OwnershipType(ownershipTypeDTO.getName(), ownershipTypeDTO.getDescription());
             ownershipType.setCountry(country);
             ownershipTypeGraphRepository.save(ownershipType);
-            return ownershipType.retrieveDetails();
         }
-        return null;
+        ownershipTypeDTO.setId(ownershipType.getId());
+        return ownershipTypeDTO;
     }
 
-    public List<Object> getOwnershipTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<OwnershipTypeDTO> getOwnershipTypeByCountryId(long countryId){
+        return ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
     }
 
-    public Map<String, Object> updateOwnershipType(OwnershipType ownershipType){
-        OwnershipType currentOwnershipType = ownershipTypeGraphRepository.findOne(ownershipType.getId());
+    public OwnershipTypeDTO updateOwnershipType(long countryId, OwnershipTypeDTO ownershipTypeDTO){
+        Boolean clinicTypeExistInCountryByName = ownershipTypeGraphRepository.ownershipTypeExistInCountryByName(countryId, "(?i)" + ownershipTypeDTO.getName(), ownershipTypeDTO.getId());
+        if (clinicTypeExistInCountryByName) {
+            exceptionService.duplicateDataException("error.OwnershipType.name.exist");
+        }
+        OwnershipType currentOwnershipType = ownershipTypeGraphRepository.findOne(ownershipTypeDTO.getId());
         if (currentOwnershipType!=null){
-            currentOwnershipType.setName(ownershipType.getName());
-            currentOwnershipType.setDescription(ownershipType.getDescription());
+            currentOwnershipType.setName(ownershipTypeDTO.getName());
+            currentOwnershipType.setDescription(ownershipTypeDTO.getDescription());
             ownershipTypeGraphRepository.save(currentOwnershipType);
-            return currentOwnershipType.retrieveDetails();
         }
-        return null;
+        return ownershipTypeDTO;
     }
 
     public boolean deleteOwnershipType(long ownershipTypeId){
@@ -63,8 +66,9 @@ public class OwnershipTypeService {
         if (ownershipType!=null){
             ownershipType.setEnabled(false);
             ownershipTypeGraphRepository.save(ownershipType);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.OwnershipType.notfound");
         }
-        return false;
+        return true;
     }
 }

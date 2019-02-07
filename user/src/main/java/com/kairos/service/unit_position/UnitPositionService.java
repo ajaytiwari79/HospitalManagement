@@ -92,6 +92,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -310,7 +311,6 @@ public class UnitPositionService {
             exceptionService.actionNotPermittedException("message.lastdate.notlessthan.enddate");
         }
         oldUnitPosition.setLastWorkingDate(unitPositionDTO.getLastWorkingDate());
-
         UnitPositionLine unitPositionLine = new UnitPositionLine.UnitPositionLineBuilder()
                 .setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours())
                 .setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60) + unitPositionDTO.getTotalWeeklyMinutes())
@@ -378,7 +378,6 @@ public class UnitPositionService {
         if (newAppliedFunctions.size() != olderAppliesFunctions.size()) {
             changeResultDTO.setCalculativeChanged(true);
             changeResultDTO.setFunctionsChanged(true);
-            changeResultDTO.setFunctions(newAppliedFunctions);
         } else {  // earlier appilied function 4 amount 5 new applied 4 but amount 6
             olderAppliesFunctions.forEach(currentOldFunction -> {
                 AtomicBoolean currentMatched = new AtomicBoolean(false);
@@ -392,11 +391,12 @@ public class UnitPositionService {
                 if (!currentMatched.get()) {
                     changeResultDTO.setCalculativeChanged(true);
                     changeResultDTO.setFunctionsChanged(true);
-                    changeResultDTO.setFunctions(newAppliedFunctions);
                     return; // this is used to break from outer loop.
                 }
             });
         }
+        //TODO add outside if statement becouse if function size is same not sent setCalculativeChanged true
+        changeResultDTO.setFunctions(newAppliedFunctions);
         return changeResultDTO;
     }
 
@@ -433,8 +433,11 @@ public class UnitPositionService {
         CTAWTAWrapper existingCtaWtaWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, APPLICABLE_CTA_WTA, param,
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
                 });
-        if (existingCtaWtaWrapper.getCta().isEmpty() || existingCtaWtaWrapper.getWta().isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.unitPosition.ctawtamissing", existingCtaWtaWrapper.getCta().isEmpty(), existingCtaWtaWrapper.getWta().isEmpty(), unitPositionId);
+        if (existingCtaWtaWrapper.getCta().isEmpty()) {
+            exceptionService.dataNotFoundByIdException("message.unitPosition.ctamissing", unitPositionDTO.getStartDate(), unitPositionId);
+        }
+        if(existingCtaWtaWrapper.getWta().isEmpty()){
+            exceptionService.dataNotFoundByIdException("message.unitPosition.wtamissing", unitPositionDTO.getStartDate(), unitPositionId);
         }
 
         EmploymentType employmentType = employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(), 0).orElse(null);
@@ -464,9 +467,10 @@ public class UnitPositionService {
                 if (changeResultDTO.isEmploymentTypeChanged()) {
                     unitPositionEmploymentTypeRelationShipGraphRepository.updateEmploymentTypeInCurrentUnitPositionLine(currentUnitPositionLine.getId(), unitPositionDTO.getEmploymentTypeId(), unitPositionDTO.getEmploymentTypeCategory());
                 }
-                if (changeResultDTO.isFunctionsChanged()) {
+                //TODO uncomment if function setting is changed currently function not add in unitpositionLine KP-6010
+               // if (changeResultDTO.isFunctionsChanged()) {
                     linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
-                }
+                //}
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
                 unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, currentUnitPositionLine);
@@ -476,12 +480,11 @@ public class UnitPositionService {
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
                 linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
-                if (changeResultDTO.isFunctionsChanged()) {
-                    linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false, unitPositionDTO.getFunctions());
-                }
+               // if (changeResultDTO.isFunctionsChanged()) {
+                   linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false, unitPositionDTO.getFunctions());
+                //}
                 unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
-
 
             CTAWTAWrapper newCTAWTAWrapper = null;
             if (changeResultDTO.getCtaId() != null || changeResultDTO.getWtaId() != null) {
@@ -948,7 +951,7 @@ public class UnitPositionService {
         List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
         Map<Long, StaffUnitPositionDetails> staffUnitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(StaffUnitPositionDetails::getStaffId, Function.identity()));
         List<String> invalidStaffs = staffAdditionalInfoQueryResult.stream().filter(staffAdditionalInfoQueryResult1 -> !staffUnitPositionDetailsMap.containsKey(staffAdditionalInfoQueryResult1.getId())).map(StaffAdditionalInfoQueryResult::getName).collect(Collectors.toList());
-        if (isCollectionEmpty(invalidStaffs)) {
+        if (isCollectionNotEmpty(invalidStaffs)) {
             exceptionService.dataNotMatchedException("unit_position.absent", invalidStaffs);
         }
         Map<Long, StaffUnitPositionDetails> unitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));
