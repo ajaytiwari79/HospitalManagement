@@ -50,7 +50,6 @@ public class ProcessingLegalBasisService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
         Set<String> legalBasisNames = new HashSet<>();
-        if (!processingLegalBasisDTOS.isEmpty()) {
             for (ProcessingLegalBasisDTO legalBasis : processingLegalBasisDTOS) {
                 legalBasisNames.add(legalBasis.getName());
             }
@@ -80,10 +79,6 @@ public class ProcessingLegalBasisService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
     }
 
 
@@ -104,7 +99,7 @@ public class ProcessingLegalBasisService{
      */
 
     public ProcessingLegalBasis getProcessingLegalBasis(Long countryId, Long id) {
-        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -135,7 +130,7 @@ public class ProcessingLegalBasisService{
      * @return ProcessingLegalBasis updated object
      */
     public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long countryId, Long id, ProcessingLegalBasisDTO processingLegalBasisDTO) {
-        ProcessingLegalBasis processingLegalBasis = processingLegalBasisRepository.findByCountryIdAndDeletedAndName( countryId, false , processingLegalBasisDTO.getName());
+        ProcessingLegalBasis processingLegalBasis = processingLegalBasisRepository.findByCountryIdAndName( countryId,  processingLegalBasisDTO.getName());
         if (Optional.ofNullable(processingLegalBasis).isPresent()) {
             if (id.equals(processingLegalBasis.getId())) {
                 return processingLegalBasisDTO;

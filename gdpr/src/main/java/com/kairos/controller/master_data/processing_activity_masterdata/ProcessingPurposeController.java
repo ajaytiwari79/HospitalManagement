@@ -43,6 +43,10 @@ public class ProcessingPurposeController {
     @ApiOperation("add processing purpose")
     @PostMapping("/processing_purpose")
     public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
+
+        if (CollectionUtils.isEmpty(processingPurposes.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, processingPurposes.getRequestBody(), false));
 
     }
@@ -72,7 +76,7 @@ public class ProcessingPurposeController {
     @ApiOperation("update processing purpose by id")
     @PutMapping("/processing_purpose/{processingPurposeId}")
     public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable Long processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
-           return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(countryId, processingPurposeId, processingPurpose));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(countryId, processingPurposeId, processingPurpose));
     }
 
 

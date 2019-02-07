@@ -42,6 +42,10 @@ public class OrganizationalSecurityMeasureController {
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/organization_security")
     public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
+        if (CollectionUtils.isEmpty(orgSecurityMeasures.getRequestBody()))
+        {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"message.enter.valid.data");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId, orgSecurityMeasures.getRequestBody(),false));
 
     }

@@ -42,7 +42,10 @@ public class ProcessingLegalBasisController {
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/legal_basis")
     public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId, legalBases.getRequestBody(),false));
+        if (CollectionUtils.isEmpty(legalBases.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId, legalBases.getRequestBody(), false));
 
     }
 
@@ -50,7 +53,7 @@ public class ProcessingLegalBasisController {
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/legal_basis/{processingLegalBasisId}")
     public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long processingLegalBasisId) {
-      return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, processingLegalBasisId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, processingLegalBasisId));
     }
 
 
@@ -71,7 +74,7 @@ public class ProcessingLegalBasisController {
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/legal_basis/{processingLegalBasisId}")
     public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long processingLegalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
-             return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, processingLegalBasisId, legalBasis));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, processingLegalBasisId, legalBasis));
     }
 
     @ApiOperation("update Suggested status of Processing Legal Basis")

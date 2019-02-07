@@ -29,11 +29,11 @@ public interface CustomGenericRepository<T extends BaseEntity> extends JpaReposi
     Integer deleteByIdAndCountryId(Long id, Long countryId);
 
     @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.id = ?1 and EN.countryId = ?2 and EN.deleted = false")
-    T findByIdAndCountryIdAndDeleted(Long id, Long countryId);
+    T findByIdAndCountryIdAndDeletedFalse(Long id, Long countryId);
     
 
-    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = ?2 and lower(EN.name) = lower(?3)")
-    T findByCountryIdAndDeletedAndName(Long countryId, boolean deleted, String name);
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false and lower(EN.name) = lower(?2)")
+    T findByCountryIdAndName(Long countryId, String name);
 
 
 

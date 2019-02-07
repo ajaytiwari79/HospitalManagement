@@ -54,7 +54,7 @@ public class QuestionnaireSectionService{
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
     public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long organizationCountryId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto, boolean isMaster) {
-        QuestionnaireTemplate questionnaireTemplate = isMaster ? questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, organizationCountryId) :
+        QuestionnaireTemplate questionnaireTemplate = isMaster ? questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse(templateId, organizationCountryId) :
                 questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(templateId, organizationCountryId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);

@@ -52,7 +52,6 @@ public class ProcessingPurposeService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
-        if (!processingPurposeDTOS.isEmpty()) {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
                     processingPurposesNames.add(processingPurpose.getName());
@@ -82,12 +81,7 @@ public class ProcessingPurposeService{
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
-    }
+            return result; }
 
 
     /**
@@ -107,7 +101,7 @@ public class ProcessingPurposeService{
      * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
     public ProcessingPurpose getProcessingPurpose(Long countryId, Long id) {
-        ProcessingPurpose exist = processingPurposeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -137,7 +131,7 @@ public class ProcessingPurposeService{
      * @return ProcessingPurpose updated object
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
-        ProcessingPurpose processingPurpose = processingPurposeRepository.findByCountryIdAndDeletedAndName( countryId, false, processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeRepository.findByCountryIdAndName( countryId,  processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;

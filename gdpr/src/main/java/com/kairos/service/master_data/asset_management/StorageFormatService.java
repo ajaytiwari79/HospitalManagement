@@ -48,7 +48,6 @@ public class StorageFormatService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<StorageFormat>> result = new HashMap<>();
         Set<String> storageFormatNames = new HashSet<>();
-        if (!storageFormatDTOS.isEmpty()) {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
             }
@@ -76,10 +75,6 @@ public class StorageFormatService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
     }
 
 
@@ -101,7 +96,7 @@ public class StorageFormatService{
      */
     public StorageFormat getStorageFormat(Long countryId, Long id) {
 
-        StorageFormat exist = storageFormatRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        StorageFormat exist = storageFormatRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -132,7 +127,7 @@ public class StorageFormatService{
      */
     public StorageFormatDTO updateStorageFormat(Long countryId, Long id, StorageFormatDTO storageFormatDTO) {
         //TODO What actually this code is doing?
-        StorageFormat storageFormat = storageFormatRepository.findByCountryIdAndDeletedAndName(countryId, false, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatRepository.findByCountryIdAndName(countryId,  storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;

@@ -48,7 +48,7 @@ public class HostingTypeService{
     //TODO still need to optimize we can get name of list in string from here
         Map<String, List<HostingType>> result = new HashMap<>();
         Set<String> hostingTypeNames = new HashSet<>();
-        if (!hostingTypeDTOS.isEmpty()) {
+
             for (HostingTypeDTO hostingType : hostingTypeDTOS) {
                 hostingTypeNames.add(hostingType.getName());
             }
@@ -75,9 +75,6 @@ public class HostingTypeService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingTypes);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
 
     }
 
@@ -101,7 +98,7 @@ public class HostingTypeService{
      */
     public HostingType getHostingType(Long countryId, Long id) {
 
-        HostingType exist = hostingTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        HostingType exist = hostingTypeRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -134,7 +131,7 @@ public class HostingTypeService{
     public HostingTypeDTO updateHostingType(Long countryId, Long id, HostingTypeDTO hostingTypeDTO) {
 
         //TODO What actually this code is doing?
-        HostingType hostingType = hostingTypeRepository.findByCountryIdAndDeletedAndName(countryId, false, hostingTypeDTO.getName());
+        HostingType hostingType = hostingTypeRepository.findByCountryIdAndName(countryId,  hostingTypeDTO.getName());
         if (Optional.ofNullable(hostingType).isPresent()) {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
