@@ -184,11 +184,12 @@ public class ShiftBreakService {
                         // situation not handled i.e after adding shift for blocking time the break is required for 30 min and only 20 min of duration is left
                         logger.debug("un handled case while adding break");
                         return shifts;
+
                     }
                     if (currentlyAllottedDurationInMinute<=breakAllowedWithShiftMinute){
                         // add shift for remaining time
                         endDateMillis=startDateMillis+((breakAllowedWithShiftMinute-currentlyAllottedDurationInMinute) *ONE_MINUTE); // adding shift for next half
-                        shifts.add(++itemsAddedFromBeginning,getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(),
+                        shifts.add(++itemsAddedFromBeginning,(updateShift)?getShiftByStartDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis)):getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(),
                                 new Date(startDateMillis), new Date(endDateMillis), false,mainShift.getActivities().get(0).getAbsenceReasonCodeId(),null));
                         shiftDurationInMinute -= (breakAllowedWithShiftMinute-currentlyAllottedDurationInMinute);
                         currentlyAllottedDurationInMinute=0L;
@@ -196,7 +197,7 @@ public class ShiftBreakService {
                     }
                 } else if (shiftDurationInMinute >= breakAllowedWithShiftMinute) {
                     endDateMillis=startDateMillis+((breakAllowedWithShiftMinute/2) *ONE_MINUTE); // adding shift for next half
-                    shifts.add(++itemsAddedFromBeginning,getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(),
+                    shifts.add(++itemsAddedFromBeginning,(updateShift)?getShiftByStartDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis)):getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(),
                             new Date(startDateMillis), new Date(endDateMillis), false,mainShift.getActivities().get(0).getAbsenceReasonCodeId(),null));
                     shiftDurationInMinute-=breakAllowedWithShiftMinute/2;
                     currentlyAllottedDurationInMinute=breakAllowedWithShiftMinute/2;
