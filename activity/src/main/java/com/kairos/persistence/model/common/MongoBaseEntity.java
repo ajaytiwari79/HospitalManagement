@@ -13,13 +13,14 @@ import java.util.Date;
 /**
  * Created by oodles on 4/1/17.
  */
-@JsonIgnoreProperties({"createdAt","createdBy","lastModifiedBy","updatedAt"}) //This annotation is used because at the time of deserialization this will become null
 public abstract class MongoBaseEntity {
 
     @Id
     protected BigInteger id;
+    @JsonIgnore
     @CreatedDate
     protected Date createdAt;
+    @JsonIgnore
     @LastModifiedDate
     protected Date updatedAt;
     @JsonIgnore

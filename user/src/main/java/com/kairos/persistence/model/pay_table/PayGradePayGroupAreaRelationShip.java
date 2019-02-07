@@ -15,7 +15,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  * Created by vipul on 15/3/18.
  */
 @RelationshipEntity(type = HAS_PAY_GROUP_AREA)
-@QueryResult
 public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
     @StartNode
     private PayGrade payGrade;

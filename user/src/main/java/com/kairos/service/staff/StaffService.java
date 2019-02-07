@@ -266,7 +266,7 @@ public class StaffService {
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
         }
-        if (!staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
+        if (isNotNull(staffToUpdate.getContactDetail().getPrivateEmail())  && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
             if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentOrganization.getId()) != null) {
                 exceptionService.duplicateDataException("message.email.alreadyExist", "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
             }
@@ -484,7 +484,7 @@ public class StaffService {
                     privateEmail = getStringValueOfIndexedCell(row, 28);
                 }
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
-                if (!isPerStaffMandatoryFieldsExists || cprAsLong==null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
+                if (!isPerStaffMandatoryFieldsExists || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
                     StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Some of the mandatory fields are missing");
                     if (isNotNull(cprAsLong)) {
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
@@ -492,7 +492,7 @@ public class StaffService {
                     staffErrorList.add(staffDTO);
                 } else {
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
-                    if (alreadyAddedStaffIds.contains(externalId) ) {
+                    if (alreadyAddedStaffIds.contains(externalId)) {
                         StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Duplicate External Id");
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                         staffErrorList.add(staffDTO);
@@ -517,7 +517,7 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail );
+                        user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail);
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
