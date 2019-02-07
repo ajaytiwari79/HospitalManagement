@@ -22,9 +22,6 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
     @Query("{deleted:false,phaseId:?0,unitId:?1,shiftId:{'$in':?2}}")
     List<ShiftState> getShiftsState(BigInteger phaseId, Long unitId, List<BigInteger> shifiIds);
 
-    @Query("{deleted:false,staffId:?0, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
-    List<ShiftState> getAllByStaffBetweenDate(Long staffId, Date startDate, Date endDate);
-
     @Query("{deleted:false,staffId:{$in:?0}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<ShiftState> getAllByStaffsByIdsBetweenDate(List<Long> staffIds, Date startDate, Date endDate);
 
@@ -36,12 +33,6 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
 
     @Query("{deleted:false,shiftId:?0,shiftStatePhaseId:?1,accessGroupRole:?2}")
     ShiftState findShiftStateByShiftIdAndActualPhaseAndRole(BigInteger shiftId, BigInteger shiftStatePhaseId, AccessGroupRole role);
-
-    @Query("{deleted:false,staffId:{$in:?0},startDate: {$lt: ?3},endDate:{$gt:?2}}")
-    List<ShiftState> findAllShiftStateByShiftIdAndActualPhase(List<Long> staffIds, String actualPhaseState,Date startDate, Date endDate);
-
-    @Query(value = "{shiftId:?0}",delete = true)
-    void deleteShiftStateByShiftId(BigInteger shiftId);
 
     List<ShiftState> findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(Set<BigInteger> shiftIds, AccessGroupRole accessGroupRole);
 

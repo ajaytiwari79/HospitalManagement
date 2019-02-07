@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.pay_table;
 
 import com.kairos.persistence.model.pay_table.PayGradePayGroupAreaRelationShip;
+import com.kairos.persistence.model.pay_table.PayGradePayGroupAreaRelationShipQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 public interface PayTableRelationShipGraphRepository extends Neo4jBaseRepository<PayGradePayGroupAreaRelationShip, Long> {
 
     @Query("MATCH(payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea:PayGroupArea) where id(payTable)={0} return id(pgaRel) as id, pgaRel.payGroupAreaAmount as payGroupAreaAmount,payGrade,payGroupArea")
-    List<PayGradePayGroupAreaRelationShip> findAllByPayTableId(Long payTableId);
+    List<PayGradePayGroupAreaRelationShipQueryResult> findAllByPayTableId(Long payTableId);
 }
 

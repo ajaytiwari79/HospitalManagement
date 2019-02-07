@@ -6,6 +6,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -24,8 +25,8 @@ public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long
     boolean isFeatureExistsWithSameName(String name, Long countryId, boolean isDeleted);
 
 
-    @Query("MATCH (c:Country) WHERE id(c)={0} CREATE (c)-[:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature{name:{1}, description:{2}, deleted:false, creationDate:{3}, lastModificationDate:{3}}) return feature")
-    Feature createFeature(Long countryId, String featureName, String description, Long date);
+    @Query("MATCH (c:Country) WHERE id(c)={0} CREATE (c)-[:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature{name:{1}, description:{2}, deleted:false, lastModificationDate:{3}}) return feature")
+    Feature createFeature(Long countryId, String featureName, String description, String date);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
             "WHERE id(feature)={0} AND id(country) = {1} AND feature.deleted={2} \n" +
@@ -36,7 +37,7 @@ public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long
             "WHERE id(feature)={0} AND id(country) = {1} \n" +
             "SET feature.name={2},feature.description={3}, feature.lastModificationDate={4}\n" +
             "return id(feature) as id, feature.name as name, feature.description as description")
-    FeatureQueryResult updateFeature(Long featureId, Long countryId, String name, String description, long lastModificationDate);
+    FeatureQueryResult updateFeature(Long featureId, Long countryId, String name, String description, String lastModificationDate);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
             "WHERE id(country)={0} AND feature.deleted= {1} AND lower(feature.name) contains lower({2})\n" +

@@ -123,7 +123,7 @@ public class ShiftCopyService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exits", copyShiftDTO.getStartDate());
         }
 
-        Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap = planningPeriods.stream().collect(Collectors.toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), v -> v));
+        Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap = planningPeriods.stream().collect(Collectors.toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate().plusDays(1)), v -> v));
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
         List<ShiftResponseDTO> previousShiftBetweenDatesByUnitPosition = shiftMongoRepository.findShiftsBetweenDurationByUnitPositions(unitPositionIds, DateUtils.asDate(copyShiftDTO.getStartDate().atTime(LocalTime.MIN)), DateUtils.asDate(copyShiftDTO.getEndDate().atTime(LocalTime.MAX)));
         Map<Long, List<Shift>> unitPositionWiseShifts = previousShiftBetweenDatesByUnitPosition.stream().collect(Collectors.toMap(key -> key.getUnitPositionId(), value -> value.getShifts()));
