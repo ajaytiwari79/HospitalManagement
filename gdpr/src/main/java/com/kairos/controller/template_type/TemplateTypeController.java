@@ -19,8 +19,8 @@ import javax.validation.Valid;
 import static com.kairos.constants.ApiConstant.*;
 
 @RestController
-@Api(API_TEMPLATE_TYPE_URL)
-@RequestMapping(API_TEMPLATE_TYPE_URL)
+@Api(API_V1)
+@RequestMapping(API_V1)
 public class TemplateTypeController {
 
 
@@ -40,7 +40,7 @@ public class TemplateTypeController {
      */
 
     @ApiOperation(value = "create new Template type")
-    @PostMapping("/createTemplate")
+    @PostMapping(COUNTRY_URL+"/template")
     public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TemplateType> templateData) {
         if (CollectionUtils.isEmpty(templateData.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "message.enter.valid.data");
@@ -58,7 +58,7 @@ public class TemplateTypeController {
      * @author vikash patwal
      */
     @ApiOperation(value = "update template")
-    @PutMapping(value = "/updateTemplate/{id}")
+    @PutMapping(value = COUNTRY_URL+"/template/{id}")
     public ResponseEntity<Object> updateTemplate(@PathVariable Long id, @PathVariable Long countryId, @Valid @RequestBody TemplateType templateType) {
 
         if (id == null) {
@@ -76,7 +76,7 @@ public class TemplateTypeController {
      * @returne Boolean
      */
     @ApiOperation(value = "delete template by id")
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value =COUNTRY_URL+"/template/{id}")
     public ResponseEntity<Object> deleteTemplateType(@PathVariable Long countryId, @PathVariable Long id) {
         if (id == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
@@ -92,7 +92,7 @@ public class TemplateTypeController {
      * @author vikash patwal
      */
     @ApiOperation(value = "All Template Type type ")
-    @GetMapping(value = "/all")
+    @GetMapping(value = COUNTRY_URL+"/template")
     public ResponseEntity<Object> getAllTemplateType(@PathVariable Long countryId) {
         if (countryId != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.getAllTemplateType(countryId));

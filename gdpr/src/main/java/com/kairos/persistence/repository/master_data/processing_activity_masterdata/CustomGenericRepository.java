@@ -14,7 +14,7 @@ import java.util.Set;
 @NoRepositoryBean
 public interface CustomGenericRepository<T extends BaseEntity> extends JpaRepository<T, Long> {
 
-    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false and lower(EN.name) IN ?3")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false and lower(EN.name) IN ?2")
     List<T>  findByCountryIdAndDeletedAndNameIn(Long countryId, List<String> userNames);
 
     @Transactional

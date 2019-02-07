@@ -21,7 +21,7 @@ public class TemplateType extends BaseEntity {
     private Long countryId;
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
