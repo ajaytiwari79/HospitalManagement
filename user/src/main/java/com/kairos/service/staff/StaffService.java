@@ -470,6 +470,7 @@ public class StaffService {
                 String firstName = "";
                 String lastName = "";
                 String privateEmail = "";
+                String externalIdValueAsString = "";
                 if (isNotNull(row.getCell(41))) {
                     cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
                 }
@@ -482,16 +483,16 @@ public class StaffService {
                 if (isNotNull(row.getCell(28))) {
                     privateEmail = getStringValueOfIndexedCell(row, 28);
                 }
-                if (!isPerStaffMandatoryFieldsExists) {
+                externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
+                if (!isPerStaffMandatoryFieldsExists || cprAsLong==null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
                     StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Some of the mandatory fields are missing");
                     if (isNotNull(cprAsLong)) {
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                     }
                     staffErrorList.add(staffDTO);
                 } else {
-                    String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
-                    if (alreadyAddedStaffIds.contains(externalId)) {
+                    if (alreadyAddedStaffIds.contains(externalId) ) {
                         StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Duplicate External Id");
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                         staffErrorList.add(staffDTO);
@@ -516,7 +517,7 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        user = userGraphRepository.findByEmail(privateEmail.toLowerCase());
+                        user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail );
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
