@@ -29,7 +29,8 @@ public class QuestionnaireTemplate extends BaseEntity {
     private boolean isDefaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
     private QuestionnaireTemplateType riskAssociatedEntity;
-    @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.LAZY,orphanRemoval = true)
+    @JoinColumn(name = "questionnaire_template_id")
     private List<QuestionnaireSection> sections=new ArrayList<>();
 
 

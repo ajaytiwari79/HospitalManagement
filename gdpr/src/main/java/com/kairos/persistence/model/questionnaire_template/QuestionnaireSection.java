@@ -5,6 +5,7 @@ import com.kairos.persistence.model.common.BaseEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,8 @@ public class QuestionnaireSection extends BaseEntity {
 
     private String title;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL ,orphanRemoval = true)
+    @JoinColumn(name = "questionnaire_section_id")
     private List<Question> questions=new ArrayList<>();
     private Long countryId;
 
