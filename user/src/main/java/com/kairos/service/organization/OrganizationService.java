@@ -23,10 +23,8 @@ import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.default_data.BusinessType;
-import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.default_data.ContractType;
-import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
+import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
@@ -1086,13 +1084,13 @@ public class OrganizationService {
     }
 
 
-    public List<com.kairos.persistence.model.country.DayType> getDayType(Long unitId, Date date) {
+    public List<DayType> getDayType(Long unitId, Date date) {
         Organization parentOrganization=fetchParentOrganization(unitId);
         Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
-    public List<com.kairos.persistence.model.country.DayType> getAllDayTypeofOrganization(Long organizationId) {
+    public List<DayType> getAllDayTypeofOrganization(Long organizationId) {
         Organization parentOrganization=fetchParentOrganization(organizationId);
         Long countryId=organizationGraphRepository.getCountryId(parentOrganization.getId());
         return dayTypeService.getAllDayTypeByCountryId(countryId);
@@ -1271,7 +1269,7 @@ public class OrganizationService {
         List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.ORDER);
-        List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(),
                 skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
     }
@@ -1306,7 +1304,7 @@ public class OrganizationService {
         Organization organization = organizationGraphRepository.findOne(unitId);
         Long countryId = organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);
         List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());

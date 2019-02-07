@@ -10,6 +10,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.LOCAT
 @NodeEntity
 public class Location extends UserBaseEntity {
     private String name;
+    private boolean defaultLocation;
 
     @Relationship(type=LOCATION_HAS_ADDRESS)
     private ContactAddress address;
@@ -19,6 +20,12 @@ public class Location extends UserBaseEntity {
     }
     public Location(String name, ContactAddress address) {
         this.name=name;
+        this.address = address;
+    }
+
+    public Location(String name, boolean defaultLocation, ContactAddress address) {
+        this.name = name;
+        this.defaultLocation = defaultLocation;
         this.address = address;
     }
 
@@ -36,5 +43,13 @@ public class Location extends UserBaseEntity {
 
     public void setAddress(ContactAddress address) {
         this.address = address;
+    }
+
+    public boolean isDefaultLocation() {
+        return defaultLocation;
+    }
+
+    public void setDefaultLocation(boolean defaultLocation) {
+        this.defaultLocation = defaultLocation;
     }
 }

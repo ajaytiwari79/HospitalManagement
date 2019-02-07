@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -65,6 +66,7 @@ import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -89,13 +91,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,7 +114,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
@@ -209,10 +213,13 @@ public class StaffService {
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
-
-
+    @Inject
+    private UserService userService;
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
+    @Inject
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -239,39 +246,39 @@ public class StaffService {
         return true;
     }
 
-
-    public boolean updatePassword(long staffId, PasswordUpdateDTO passwordUpdateDTO) {
-
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        if (!Optional.ofNullable(user).isPresent()) {
-            logger.error("User not found belongs to this staff id " + staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.user.id.notfound", staffId);
-
-        }
+    public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
+        User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
-        if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
             userGraphRepository.save(user);
         } else {
-            logger.error("Password not matched ");
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
-
         }
         return true;
-
     }
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
-
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+        }
+        if (!staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
+            if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentOrganization.getId()) != null) {
+                exceptionService.duplicateDataException("message.email.alreadyExist", "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
+            }
         }
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
         }
+        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
+            exceptionService.actionNotPermittedException("message.unitposition.expertise.notchanged");
+        }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
 //        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
 //        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
@@ -315,9 +322,8 @@ public class StaffService {
 
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
-        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         staffToUpdate.setLanguage(language);
-        // Setting Staff Details
+        // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
         staffGraphRepository.save(staffToUpdate);
 
@@ -460,30 +466,34 @@ public class StaffService {
                 // to check mandatory fields
                 int[] mandatoryCellColumnIndexs = {2, 20, 21, 23, 28, 41};
                 boolean isPerStaffMandatoryFieldsExists = validateStaffData(row, mandatoryCellColumnIndexs);
-                Long cprAsLong = null; String firstName = ""; String lastName = ""; String privateEmail = "";
-                if( isNotNull(row.getCell(41)) ){
+                Long cprAsLong = null;
+                String firstName = "";
+                String lastName = "";
+                String privateEmail = "";
+                String externalIdValueAsString = "";
+                if (isNotNull(row.getCell(41))) {
                     cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
                 }
-                if( isNotNull(row.getCell(20)) ){
+                if (isNotNull(row.getCell(20))) {
                     firstName = getStringValueOfIndexedCell(row, 20);
                 }
-                if( isNotNull(row.getCell(21)) ){
-                    lastName =getStringValueOfIndexedCell(row, 21);
+                if (isNotNull(row.getCell(21))) {
+                    lastName = getStringValueOfIndexedCell(row, 21);
                 }
-                if( isNotNull(row.getCell(28)) ){
+                if (isNotNull(row.getCell(28))) {
                     privateEmail = getStringValueOfIndexedCell(row, 28);
                 }
-                if (!isPerStaffMandatoryFieldsExists) {
-                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail,"Some of the mandatory fields are missing");
-                    if(isNotNull(cprAsLong)) {
+                externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
+                if (!isPerStaffMandatoryFieldsExists || cprAsLong==null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
+                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Some of the mandatory fields are missing");
+                    if (isNotNull(cprAsLong)) {
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                     }
                     staffErrorList.add(staffDTO);
                 } else {
-                    String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
-                    if (alreadyAddedStaffIds.contains(externalId)) {
-                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail,"Duplicate External Id");
+                    if (alreadyAddedStaffIds.contains(externalId) ) {
+                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Duplicate External Id");
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                         staffErrorList.add(staffDTO);
                         continue;
@@ -507,7 +517,7 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        user = userGraphRepository.findByEmail(privateEmail.toLowerCase());
+                        user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail );
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
@@ -539,7 +549,7 @@ public class StaffService {
                     }
                 }
             }
-            if(isCollectionNotEmpty(staffList)) {
+            if (isCollectionNotEmpty(staffList)) {
                 activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())), unitId);
             }
             return staffUploadBySheetQueryResult;
@@ -764,7 +774,6 @@ public class StaffService {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
-
         }
         Organization parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
@@ -792,7 +801,6 @@ public class StaffService {
 
         }
         setBasicDetailsOfUser(user, payload);
-
         // Set default language of User
         Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId);
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
@@ -800,12 +808,10 @@ public class StaffService {
         staff = createStaffObject(parent, unit, payload);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
-
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
-
         StaffDTO staffDTO = new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
         return staffDTO;
     }
@@ -937,9 +943,7 @@ public class StaffService {
             unitPermission.setAccessGroup(accessGroup);
             linkAccessOfModules(accessGroup, unitPermission);
         }
-
         unitPermissionGraphRepository.save(unitPermission);
-
     }
 
     private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
@@ -974,7 +978,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = (union|| parentOrganization) ? accessGroupRepository.getAccessGroupByParentAccessGroupId(organization.getId(),accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = (union || parentOrganization) ? accessGroupRepository.getAccessGroupByParentAccessGroupId(organization.getId(), accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
@@ -1013,18 +1017,18 @@ public class StaffService {
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
 
-        if (contactAddress != null)
+        if (contactAddress != null) {
             staff.setContactAddress(contactAddress);
-
-        if (engineerTypeId != null)
+        }
+        if (engineerTypeId != null) {
             staff.setEngineerType(engineerTypeGraphRepository.findOne(engineerTypeId));
+        }
         staff.setUser(user);
         staff.setOrganizationId(unit.getId());
         staff = staffGraphRepository.save(staff);
         Organization parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
@@ -1157,8 +1161,6 @@ public class StaffService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-
-
         List<Map<String, Object>> unitManagers;
         if (parent == null)
             unitManagers = staffGraphRepository.getUnitManagers(unitId, unitId);
@@ -1177,7 +1179,6 @@ public class StaffService {
 
 
     private void sendEmailToUnitManager(UnitManagerDTO unitManagerDTO, String password) {
-
         String body = "Hi,\n\n" + "You are assigned as an unit manager and to get access in KairosPlanning.\n" + "Your username " + unitManagerDTO.getEmail() + " and password is " + password + "\n\n Thanks";
         String subject = "You are a unit manager at KairosPlanning";
         mailService.sendPlainMailWithSendGrid(unitManagerDTO.getEmail(), body, subject);
@@ -1187,9 +1188,7 @@ public class StaffService {
         return staffGraphRepository.getUploadedStaffByOrganizationId(organizationId);
     }
 
-
     public UnitManagerDTO updateUnitManager(Long staffId, UnitManagerDTO unitManagerDTO) {
-
         Staff staff = staffGraphRepository.findOne(staffId);
         User user = userGraphRepository.findByEmail(unitManagerDTO.getEmail());
         staff.setFirstName(unitManagerDTO.getFirstName());
@@ -1284,7 +1283,6 @@ public class StaffService {
 
     public List<Long> getCountryAdminIds(long organizationId) {
         return staffGraphRepository.getCountryAdminIds(organizationId);
-
     }
 
     public List<Long> getUnitManagerIds(long unitId) {
@@ -1296,15 +1294,11 @@ public class StaffService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-
-
         List<Long> unitManagers;
         if (parent == null)
             unitManagers = staffGraphRepository.getUnitManagersIds(unitId, unitId);
         else
             unitManagers = staffGraphRepository.getUnitManagersIds(parent.getId(), unitId);
-
-
         return unitManagers;
     }
 
@@ -1332,7 +1326,6 @@ public class StaffService {
 
         }
         return staffPersonalDetailList;
-
     }
 
     public StaffUnitPositionDetails getUnitPositionOfStaff(long staffId, long unitId) {
@@ -1361,8 +1354,6 @@ public class StaffService {
         staffFilterDTO.setName(staffFavouriteFilter.getName());
         staffFilterDTO.setId(staffFavouriteFilter.getId());
         return staffFilterDTO;
-
-
     }
 
     public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
@@ -1376,7 +1367,6 @@ public class StaffService {
         staffFavouriteFilter.setName(staffFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return staffFilterDTO;
-
     }
 
     public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long unitId) {
@@ -1390,7 +1380,6 @@ public class StaffService {
         }
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return true;
-
     }
 
     public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long unitId) {
@@ -1416,7 +1405,6 @@ public class StaffService {
         Organization organization = organizationGraphRepository.findByExternalId(externalId);
         if (organization == null) {
             exceptionService.dataNotFoundByIdException("message.externalid.notfound");
-
         }
 
         List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).
@@ -1438,7 +1426,6 @@ public class StaffService {
             user.setUserLanguage(systemLanguage);
             if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
                 exceptionService.duplicateDataException("message.staff.alreadyexist");
-
             }
 
             if (timeCareStaffDTO.getGender().equalsIgnoreCase("m")) {
@@ -1503,8 +1490,6 @@ public class StaffService {
         staff.setFirstName(timeCareStaffDTO.getFirstName());
         staff.setLastName(timeCareStaffDTO.getLastName());
         return staff;
-
-
     }
 
     public List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds) {
@@ -1515,7 +1500,7 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-            if(isNotNull(staff.getAccess_token())){
+            if (isNotNull(staff.getAccess_token())) {
                 addStaffInChatServer(staff);
             }
         });

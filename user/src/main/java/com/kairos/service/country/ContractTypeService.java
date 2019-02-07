@@ -2,8 +2,11 @@ package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.ContractType;
+import com.kairos.persistence.model.country.default_data.ContractTypeDTO;
+import com.kairos.persistence.model.country.default_data.VatType;
 import com.kairos.persistence.repository.user.country.ContractTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,43 +25,46 @@ public class ContractTypeService {
 
     @Inject
     private ContractTypeGraphRepository contractTypeGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createContractType(long countryId, ContractType contractType){
+    public ContractTypeDTO createContractType(long countryId, ContractTypeDTO contractTypeDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        ContractType contractType = null;
+        if ( country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean contractTypeExistInCountryByNameOrCode = contractTypeGraphRepository.contractTypeExistInCountryByNameOrCode(countryId, "(?i)" + contractTypeDTO.getName(), contractTypeDTO.getCode(), -1L);
+            if (contractTypeExistInCountryByNameOrCode) {
+                exceptionService.duplicateDataException("error.ContractType.name.code.exist");
+            }
+            contractType = new ContractType(contractTypeDTO.getName(), contractTypeDTO.getCode(), contractTypeDTO.getDescription());
             contractType.setCountry(country);
             contractTypeGraphRepository.save(contractType);
-            return contractType.retrieveDetails();
         }
-        return null;
+        contractTypeDTO.setId(contractType.getId());
+        return contractTypeDTO;
     }
 
-    public List<Object> getContractTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = contractTypeGraphRepository.findContractTypeByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<ContractTypeDTO> getContractTypeByCountryId(long countryId){
+        return contractTypeGraphRepository.findContractTypeByCountry(countryId);
     }
 
-    public Map<String, Object> updateContractType(ContractType contractType){
-        ContractType currentContractType = contractTypeGraphRepository.findOne(contractType.getId());
-        if (currentContractType!=null){
-            currentContractType.setName(contractType.getName());
-            currentContractType.setDescription(contractType.getDescription());
-            currentContractType.setCode(contractType.getCode());
+    public ContractTypeDTO updateContractType(long countryId, ContractTypeDTO contractTypeDTO){
+        Boolean vatTypeExistInCountryByNameOrCode = contractTypeGraphRepository.contractTypeExistInCountryByNameOrCode(countryId, "(?i)" + contractTypeDTO.getName(), contractTypeDTO.getCode(), contractTypeDTO.getId());
+        if (vatTypeExistInCountryByNameOrCode) {
+            exceptionService.duplicateDataException("error.ContractType.name.code.exist");
+        }
+        ContractType currentContractType = contractTypeGraphRepository.findOne(contractTypeDTO.getId());
+        if (currentContractType != null){
+            currentContractType.setName(contractTypeDTO.getName());
+            currentContractType.setDescription(contractTypeDTO.getDescription());
+            currentContractType.setCode(contractTypeDTO.getCode());
             contractTypeGraphRepository.save(currentContractType);
-            return currentContractType.retrieveDetails();
         }
-        return null;
+        return contractTypeDTO;
     }
 
     public boolean deleteContractType(long contractTypeId){
@@ -66,28 +72,10 @@ public class ContractTypeService {
         if (contractType!=null){
             contractType.setEnabled(false);
             contractTypeGraphRepository.save(contractType);
-            return true;
+        }else {
+            exceptionService.duplicateDataException("error.VatType.notfound");
         }
-        return false;
+        return true;
     }
 
-
-    /**
-     * @auther anil maurya
-     * This method is used in task micro service
-     *
-     * @return
-     */
-    public List<Map<String,Object>> getAllContractType(){
-
-        List<ContractType> contractTypes = contractTypeGraphRepository.findAll();
-        List<Map<String,Object>> filterContractTypes = new ArrayList<>();
-        for(ContractType contractType : contractTypes){
-            Map<String,Object> map = new HashMap<>();
-            map.put("name",contractType.getName());
-            map.put("id",contractType.getId());
-            filterContractTypes.add(map);
-        }
-        return filterContractTypes;
-    }
 }

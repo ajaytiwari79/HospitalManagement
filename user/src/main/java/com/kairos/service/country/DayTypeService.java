@@ -4,7 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,8 +52,8 @@ public class DayTypeService {
 
     public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
 
-        Boolean dayTypeExists = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
-        if (dayTypeExists) {
+        Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
+        if (dayTypeExistInCountryByNameOrCode) {
             exceptionService.duplicateDataException("message.dayType.name.code.exist");
         }
         Country country = countryGraphRepository.findOne(countryId);
@@ -83,8 +81,8 @@ public class DayTypeService {
         if (dayType != null) {
             //If there's a change in DayType name or in DayType then only verify existing DayTypes
             if (!dayTypeDTO.getName().equalsIgnoreCase(dayType.getName()) || dayTypeDTO.getCode() != dayType.getCode()) {
-                Boolean dayTypeExists = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
-                if (dayTypeExists) {
+                Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
+                if (dayTypeExistInCountryByNameOrCode) {
                     exceptionService.duplicateDataException("message.dayType.name.code.exist");
                 }
             }

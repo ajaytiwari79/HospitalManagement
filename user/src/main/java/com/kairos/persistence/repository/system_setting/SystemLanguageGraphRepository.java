@@ -35,9 +35,8 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
     boolean isSystemLanguageSetInAnyCountry(Long syatemLanguageId);
 
-    @Query("MATCH (c:Country)-[:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} RETURN language")
+    @Query("MATCH (c:Country)-[:"+ HAS_SYSTEM_LANGUAGE +"{defaultLanguage:true}]-(language:SystemLanguage) WHERE id(c)={0} RETURN language")
     SystemLanguage getSystemLanguageOfCountry(Long countryId);
-
 
     @Query("MATCH (language:SystemLanguage{deleted:false}) WHERE lower(language.name)=lower({0})\n" +
             "RETURN language")

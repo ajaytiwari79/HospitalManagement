@@ -6,6 +6,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Range;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -26,16 +27,22 @@ public class ContractType extends UserBaseEntity {
 
     @NotBlank(message = "error.ContractType.name.notEmpty")
     private String name;
-
+    @NotNull(message = "error.ContractType.code.notEmpty")
+    @Range(min = 1, message = "error.ContractType.code.greaterThenOne")
     private int code;
-
-    //@NotEmpty(message = "error.ContractType.description.notEmpty") @NotNull(message = "error.ContractType.description.notnull")
     private String description;
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     private boolean isEnabled = true;
+
+    public ContractType() {
+    }
+
+    public ContractType(@NotBlank(message = "error.ContractType.name.notEmpty") String name, @NotNull(message = "error.ContractType.code.notEmpty") @Range(min = 1, message = "error.ContractType.code.greaterThenOne") int code, String description) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -77,18 +84,5 @@ public class ContractType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public ContractType() {
-    }
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("code",this.code);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
-    }
 
 }

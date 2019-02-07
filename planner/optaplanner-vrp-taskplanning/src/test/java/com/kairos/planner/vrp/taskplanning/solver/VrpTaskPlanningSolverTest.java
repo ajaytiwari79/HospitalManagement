@@ -1,6 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class VrpTaskPlanningSolverTest {
 
     @Test
+    @Ignore
     public void solve() throws IOException {
         boolean readFromSolution=false;
         if(readFromSolution){
@@ -24,6 +26,7 @@ public class VrpTaskPlanningSolverTest {
 
     }
     @Test
+    @Ignore
     public void solveWithDrls(){
         String drlsPath="../../planner/src/main/resources/droolsFile";
         List<File> files=  Arrays.stream(new File(drlsPath).listFiles()).filter(f->f.getName().endsWith(".drl")).collect(Collectors.toList());

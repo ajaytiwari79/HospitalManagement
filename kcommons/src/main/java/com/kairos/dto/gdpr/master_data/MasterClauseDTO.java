@@ -45,7 +45,7 @@ public class MasterClauseDTO extends ClauseDTO{
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypes = organizationTypeDTOS; }
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;

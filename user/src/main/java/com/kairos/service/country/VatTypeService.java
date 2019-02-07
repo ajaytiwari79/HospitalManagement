@@ -1,12 +1,17 @@
 package com.kairos.service.country;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.VatType;
+import com.kairos.persistence.model.country.default_data.IndustryType;
+import com.kairos.persistence.model.country.default_data.OwnershipType;
+import com.kairos.persistence.model.country.default_data.VatType;
+import com.kairos.persistence.model.country.default_data.VatTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.VatTypeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,55 +25,57 @@ public class VatTypeService {
 
     @Inject
     private VatTypeGraphRepository vatTypeGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createVatType(long countryId, VatType vatType){
+    public VatTypeDTO createVatType(long countryId, VatTypeDTO vatTypeDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
-            vatType.setCountry(country);
-             vatTypeGraphRepository.save(vatType);
-            return vatType.retrieveDetails();
-        }
-        return null;
-    }
-
-    public List<Object> getVatTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = vatTypeGraphRepository.findVATtypeByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
+        VatType vatType;
+        if ( country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean vatTypeExistInCountryByNameOrCode = vatTypeGraphRepository.vatTypeExistInCountryByNameOrCode(countryId, "(?i)" + vatTypeDTO.getName(), vatTypeDTO.getCode(), -1L);
+            if (vatTypeExistInCountryByNameOrCode) {
+                exceptionService.duplicateDataException("error.VatType.name.code.exist");
             }
-            return response;
+            vatType = new VatType(vatTypeDTO.getName(), vatTypeDTO.getCode(), vatTypeDTO.getDescription(), vatTypeDTO.getPercentage());
+            vatType.setCountry(country);
+            vatTypeGraphRepository.save(vatType);
         }
-        return null;
+        vatTypeDTO.setId(vatTypeDTO.getId());
+        return vatTypeDTO;
+   }
+
+    public List<VatTypeDTO> getVatTypeByCountryId(long countryId){
+        return vatTypeGraphRepository.findVatTypesByCountry(countryId);
     }
 
-    public Map<String, Object> updateVatType(VatType vatType){
-        VatType currentVatType = vatTypeGraphRepository.findOne(vatType.getId());
-        if (currentVatType!=null){
-            currentVatType.setName(vatType.getName());
-            currentVatType.setDescription(vatType.getDescription());
-            currentVatType.setPercentage(vatType.getPercentage());
-            currentVatType.setCode(vatType.getCode());
-            vatTypeGraphRepository.save(currentVatType);
-
-            return currentVatType.retrieveDetails();
-
+    public VatTypeDTO updateVatType(long countryId, VatTypeDTO vatTypeDTO){
+        Boolean vatTypeExistInCountryByNameOrCode = vatTypeGraphRepository.vatTypeExistInCountryByNameOrCode(countryId, "(?i)" + vatTypeDTO.getName(), vatTypeDTO.getCode(), vatTypeDTO.getId());
+        if (vatTypeExistInCountryByNameOrCode) {
+            exceptionService.duplicateDataException("error.VatType.name.code.exist");
         }
-        return null;
+        VatType currentVatType = vatTypeGraphRepository.findOne(vatTypeDTO.getId());
+        if (currentVatType != null){
+            currentVatType.setName(vatTypeDTO.getName());
+            currentVatType.setDescription(vatTypeDTO.getDescription());
+            currentVatType.setPercentage(vatTypeDTO.getPercentage());
+            currentVatType.setCode(vatTypeDTO.getCode());
+            vatTypeGraphRepository.save(currentVatType);
+        }
+        return vatTypeDTO;
     }
 
     public boolean deleteVatType(long contractTypeId){
         VatType vatType = vatTypeGraphRepository.findOne(contractTypeId);
-        if (vatType !=null){
+        if (vatType != null){
             vatType.setEnabled(false);
             vatTypeGraphRepository.save(vatType);
-            return true;
+        } else {
+            exceptionService.duplicateDataException("error.VatType.notfound");
         }
-        return false;
+        return true;
     }
 }
