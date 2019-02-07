@@ -15,7 +15,7 @@ public class PasswordUpdateDTO {
     @NotEmpty
     private char[] confirmPassword;
 
-    @Size(min = 6)
+    @Size(min = 6,max = 50)
     private char[] newPassword;
 
     public char[] getOldPassword() {
