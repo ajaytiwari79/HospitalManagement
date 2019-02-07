@@ -42,6 +42,10 @@ public class ResponsibilityTypeController {
     @ApiOperation("add ResponsibilityType  ")
     @PostMapping("/responsibility_type")
     public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypes) {
+
+        if (CollectionUtils.isEmpty(responsibilityTypes.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, responsibilityTypes.getRequestBody(), false));
 
     }
@@ -64,7 +68,7 @@ public class ResponsibilityTypeController {
     @ApiOperation("delete ResponsibilityType  by id")
     @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long countryId, @PathVariable Long responsibilityTypeId) {
-          return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(countryId, responsibilityTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(countryId, responsibilityTypeId));
 
     }
 
@@ -72,7 +76,7 @@ public class ResponsibilityTypeController {
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable Long responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, responsibilityTypeId, responsibilityType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, responsibilityTypeId, responsibilityType));
 
     }
 

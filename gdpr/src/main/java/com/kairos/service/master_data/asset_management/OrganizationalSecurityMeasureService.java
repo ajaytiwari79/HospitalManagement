@@ -49,7 +49,7 @@ public class OrganizationalSecurityMeasureService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
         Set<String> orgSecurityMeasureNames = new HashSet<>();
-        if (!securityMeasureDTOS.isEmpty()) {
+
             for (OrganizationalSecurityMeasureDTO securityMeasure : securityMeasureDTOS) {
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
@@ -77,9 +77,6 @@ public class OrganizationalSecurityMeasureService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newOrgSecurityMeasures);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
 
     }
 
@@ -102,7 +99,7 @@ public class OrganizationalSecurityMeasureService{
      */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId, Long id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -134,7 +131,7 @@ public class OrganizationalSecurityMeasureService{
     public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, Long id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
 
         //TODO What actually this code is doing?
-        OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, securityMeasureDTO.getName());
+        OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureRepository.findByCountryIdAndName(countryId,  securityMeasureDTO.getName());
         if (Optional.ofNullable(orgSecurityMeasure).isPresent()) {
             if (id.equals(orgSecurityMeasure.getId())) {
                 return securityMeasureDTO;

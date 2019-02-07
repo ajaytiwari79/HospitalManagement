@@ -52,7 +52,7 @@ public class QuestionnaireTemplateService{
      * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE_KEY)
      */
     public QuestionnaireTemplateDTO saveMasterQuestionnaireTemplate(Long countryId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplate previousMasterTemplate = questionnaireTemplateRepository.findByCountryIdAndDeletedAndName(countryId, false, templateDto.getName());
+        QuestionnaireTemplate previousMasterTemplate = questionnaireTemplateRepository.findByCountryIdAndName(countryId,  templateDto.getName());
         if (Optional.ofNullable(previousMasterTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Master Questionnaire template", templateDto.getName());
         }
@@ -230,7 +230,7 @@ public class QuestionnaireTemplateService{
      * @description delete questionnaire template ,sections and question related to template.
      */
     public boolean deleteMasterQuestionnaireTemplate(Long countryId, Long id) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted( id,countryId);
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse( id,countryId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", id);
         }
@@ -247,7 +247,7 @@ public class QuestionnaireTemplateService{
      * @return updated Questionnaire template with basic data (name,description ,template type)
      */
     public QuestionnaireTemplateDTO updateMasterQuestionnaireTemplate(Long countryId, Long questionnaireTemplateId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplate masterQuestionnaireTemplate = questionnaireTemplateRepository.findByCountryIdAndDeletedAndName(countryId,false, templateDto.getName());
+        QuestionnaireTemplate masterQuestionnaireTemplate = questionnaireTemplateRepository.findByCountryIdAndName(countryId, templateDto.getName());
         if (Optional.ofNullable(masterQuestionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(masterQuestionnaireTemplate.getId())) {
             throw new DuplicateDataException("Template Exists with same name " + templateDto.getName());
         }

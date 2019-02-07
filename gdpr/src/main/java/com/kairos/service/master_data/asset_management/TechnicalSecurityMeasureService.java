@@ -47,7 +47,6 @@ public class TechnicalSecurityMeasureService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
         Set<String> techSecurityMeasureNames = new HashSet<>();
-        if (!technicalSecurityMeasureDTOS.isEmpty()) {
             for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
                 techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
             }
@@ -76,11 +75,7 @@ public class TechnicalSecurityMeasureService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
-    }
+       }
 
 
     /**
@@ -102,7 +97,7 @@ public class TechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, Long id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -134,7 +129,7 @@ public class TechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
         //TODO What actually this code is doing?
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndName(countryId,  technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;

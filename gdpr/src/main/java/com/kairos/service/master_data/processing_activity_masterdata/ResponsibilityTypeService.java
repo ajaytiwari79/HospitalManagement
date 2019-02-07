@@ -48,7 +48,6 @@ public class ResponsibilityTypeService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
         Set<String> responsibilityTypeNames = new HashSet<>();
-        if (!responsibilityTypeDTOS.isEmpty()) {
             for (ResponsibilityTypeDTO responsibilityType : responsibilityTypeDTOS) {
                 responsibilityTypeNames.add(responsibilityType.getName());
             }
@@ -76,9 +75,6 @@ public class ResponsibilityTypeService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newResponsibilityTypes);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
 
     }
 
@@ -97,7 +93,7 @@ public class ResponsibilityTypeService{
      * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
      */
     public ResponsibilityType getResponsibilityType(Long countryId, Long id) {
-        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -130,7 +126,7 @@ public class ResponsibilityTypeService{
     public ResponsibilityTypeDTO updateResponsibilityType(Long countryId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByCountryIdAndDeletedAndName(countryId, false, responsibilityTypeDTO.getName());
+        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByCountryIdAndName(countryId,  responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
