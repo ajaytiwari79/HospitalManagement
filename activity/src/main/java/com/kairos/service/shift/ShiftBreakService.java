@@ -184,7 +184,6 @@ public class ShiftBreakService {
                         // situation not handled i.e after adding shift for blocking time the break is required for 30 min and only 20 min of duration is left
                         logger.debug("un handled case while adding break");
                         return shifts;
-
                     }
                     if (currentlyAllottedDurationInMinute<=breakAllowedWithShiftMinute){
                         // add shift for remaining time
