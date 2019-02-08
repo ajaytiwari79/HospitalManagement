@@ -49,22 +49,24 @@ public class QuestionnaireTemplateRepositoryImpl implements CustomQuestionnaireT
 
     @Override
     public QuestionnaireTemplate findPublishedRiskTemplateByAssetTypeIdAndOrgId(Long orgId, Long assetTypeId) {
-        LOGGER.debug("findPublishedRiskTemplateByAssociatedEntityAndOrgId() method call");
+        LOGGER.debug("findPublishedRiskTemplateByAssetTypeIdAndOrgId() method call");
         try {
             TypedQuery<QuestionnaireTemplate> query = entityManager.createQuery(selectConstant +
                     "where QT.organizationId = :orgId " +
                     "and QT.deleted = false " +
                     "and QT.assetType.id = :assetTypeId " +
                     "and QT.templateType = :templateType " +
+                    "and QT.riskAssociatedEntity = :riskAssociatedEntity "+
                     "and QT.templateStatus = :templateStatus", QuestionnaireTemplate.class);
             query.setParameter("orgId", orgId);
             query.setParameter("assetTypeId",assetTypeId);
+            query.setParameter("riskAssociatedEntity",QuestionnaireTemplateType.ASSET_TYPE);
             query.setParameter("templateType", QuestionnaireTemplateType.RISK);
             query.setParameter("templateStatus", QuestionnaireTemplateStatus.PUBLISHED);
             return query.getSingleResult();
 
         } catch (Exception e) {
-            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method findPublishedRiskTemplateByAssociatedEntityAndOrgId");
+            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method findPublishedRiskTemplateByAssetTypeIdAndOrgId");
             throw new JpaCustomDatabaseException(e.getMessage());
         }
 
@@ -150,6 +152,27 @@ public class QuestionnaireTemplateRepositoryImpl implements CustomQuestionnaireT
 
         } catch (Exception e) {
             LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method findRiskTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeId");
+            throw new JpaCustomDatabaseException(e.getMessage());
+        }
+    }
+
+    @Override
+    public QuestionnaireTemplate getDefaultPublishedAssetQuestionnaireTemplateByUnitId(Long orgId) {
+        LOGGER.debug("getDefaultPublishedAssetQuestionnaireTemplateByUnitId() method call");
+        try {
+            TypedQuery<QuestionnaireTemplate> query = entityManager.createQuery(selectConstant +
+                    "where QT.organizationId = :orgId " +
+                    "and QT.deleted = false " +
+                    "and QT.isDefaultAssetTemplate = true " +
+                    "and QT.templateStatus = :templateStatus" +
+                    "and QT.templateType = :templateType ", QuestionnaireTemplate.class);
+            query.setParameter("templateType", QuestionnaireTemplateType.ASSET_TYPE);
+            query.setParameter("orgId",orgId);
+            query.setParameter("templateStatus",QuestionnaireTemplateStatus.PUBLISHED);
+            return query.getSingleResult();
+
+        } catch (Exception e) {
+            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method getDefaultPublishedAssetQuestionnaireTemplateByUnitId");
             throw new JpaCustomDatabaseException(e.getMessage());
         }
     }

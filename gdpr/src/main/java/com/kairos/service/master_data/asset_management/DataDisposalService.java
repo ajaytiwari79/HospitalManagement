@@ -50,7 +50,6 @@ public class DataDisposalService{
         for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
             dataDisposalsNames.add(dataDisposal.getName());
         }
-
         List<String> nameInLowerCase = dataDisposalsNames.stream().map(String::toLowerCase)
                 .collect(Collectors.toList());
 
@@ -94,7 +93,7 @@ public class DataDisposalService{
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
     public DataDisposal getDataDisposalById(Long countryId, Long id) {
-        DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -125,7 +124,7 @@ public class DataDisposalService{
     public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
-        DataDisposal dataDisposal = dataDisposalRepository.findByCountryIdAndDeletedAndName(countryId, false, dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalRepository.findByCountryIdAndName(countryId,  dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;

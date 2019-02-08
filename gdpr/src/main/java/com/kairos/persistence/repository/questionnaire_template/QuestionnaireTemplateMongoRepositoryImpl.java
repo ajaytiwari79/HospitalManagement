@@ -164,7 +164,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId) {
+    public QuestionnaireTemplate getDefaultPublishedAssetQuestionnaireTemplateByUnitId(Long unitId) {
 
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)

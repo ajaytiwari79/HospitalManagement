@@ -49,7 +49,7 @@ public class QuestionnaireTemplateService {
      * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE_KEY)
      */
     public QuestionnaireTemplateDTO saveMasterQuestionnaireTemplate(Long countryId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplate previousMasterTemplate = questionnaireTemplateRepository.findByCountryIdAndDeletedAndName(countryId, false, templateDto.getName());
+        QuestionnaireTemplate previousMasterTemplate = questionnaireTemplateRepository.findByCountryIdAndName(countryId,  templateDto.getName());
         if (Optional.ofNullable(previousMasterTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "message.questionnaireTemplate", templateDto.getName());
         }
@@ -95,7 +95,7 @@ public class QuestionnaireTemplateService {
 
         QuestionnaireTemplate previousTemplate = null;
         if (templateDto.isDefaultAssetTemplate()) {
-            previousTemplate = isUnitId ? questionnaireTemplateRepository.findDefaultAssetQuestionnaireTemplateByUnitId(referenceId, QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED) : questionnaireTemplateRepository.findDefaultAssetQuestionnaireTemplateByCountryId(referenceId);
+            previousTemplate = isUnitId ? questionnaireTemplateRepository.getDefaultPublishedAssetQuestionnaireTemplateByUnitId(referenceId) : questionnaireTemplateRepository.findDefaultAssetQuestionnaireTemplateByCountryId(referenceId);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.duplicateDataException("duplicate.questionnaire.template.assetType.defaultTemplate");
             }
@@ -176,9 +176,9 @@ public class QuestionnaireTemplateService {
      * @description delete questionnaire template ,sections and question related to template.
      */
     public boolean deleteMasterQuestionnaireTemplate(Long countryId, Long id) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse( id,countryId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", id);
         }
         questionnaireTemplate.delete();
         questionnaireTemplateRepository.save(questionnaireTemplate);
@@ -193,7 +193,8 @@ public class QuestionnaireTemplateService {
      * @return updated Questionnaire template with basic data (name,description ,template type)
      */
     public QuestionnaireTemplateDTO updateMasterQuestionnaireTemplate(Long countryId, Long questionnaireTemplateId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplate masterQuestionnaireTemplate = questionnaireTemplateRepository.findByCountryIdAndDeletedAndName(countryId, false, templateDto.getName());
+
+        QuestionnaireTemplate masterQuestionnaireTemplate = questionnaireTemplateRepository.findByCountryIdAndName(countryId, templateDto.getName());
         if (Optional.ofNullable(masterQuestionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(masterQuestionnaireTemplate.getId())) {
             throw new DuplicateDataException("Template Exists with same name " + templateDto.getName());
         }
@@ -204,7 +205,7 @@ public class QuestionnaireTemplateService {
             validateQuestionnaireTemplateAndAddTemplateType(countryId, false, masterQuestionnaireTemplate, templateDto);
             questionnaireTemplateRepository.save(masterQuestionnaireTemplate);
         } catch (EntityNotFoundException ene) {
-            exceptionService.duplicateDataException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
+            exceptionService.duplicateDataException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
         } catch (Exception ex) {
             LOGGER.error("Error in updating questionnaire template with id :: {}", questionnaireTemplateId);
             exceptionService.internalError(ex.getMessage());
@@ -224,7 +225,7 @@ public class QuestionnaireTemplateService {
         QuestionnaireTemplate questionnaireTemplate = isUnitId ?
                 questionnaireTemplateRepository.getQuestionnaireTemplateWithSectionsByOrganizationId(referenceId, questionnaireTemplateId) : questionnaireTemplateRepository.getMasterQuestionnaireTemplateWithSectionsByCountryId(referenceId, questionnaireTemplateId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(questionnaireTemplate, QuestionnaireTemplateResponseDTO.class);
     }
@@ -266,7 +267,7 @@ public class QuestionnaireTemplateService {
 
         QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.questionnaireTemplate", questionnaireTemplateDTO.getName());
         }
         QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), QuestionnaireTemplateStatus.DRAFT);
         questionnaireTemplate.setOrganizationId(unitId);
@@ -288,7 +289,7 @@ public class QuestionnaireTemplateService {
 
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(questionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(questionnaireTemplate.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.questionnaireTemplate", questionnaireTemplateDTO.getName());
         }
         try {
             questionnaireTemplate = questionnaireTemplateRepository.getOne(questionnaireTemplateId);
@@ -297,7 +298,7 @@ public class QuestionnaireTemplateService {
             validateQuestionnaireTemplateAndAddTemplateType(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
             questionnaireTemplateRepository.save(questionnaireTemplate);
         } catch (EntityNotFoundException ene) {
-            exceptionService.duplicateDataException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
+            exceptionService.duplicateDataException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
         } catch (Exception ex) {
             exceptionService.internalError(ex.getMessage());
         }
@@ -308,7 +309,7 @@ public class QuestionnaireTemplateService {
     public boolean deleteQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId) {
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
         }
         questionnaireTemplate.delete();
         questionnaireTemplateRepository.save(questionnaireTemplate);

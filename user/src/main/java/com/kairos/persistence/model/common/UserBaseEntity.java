@@ -27,14 +27,11 @@ public abstract class UserBaseEntity implements Serializable {
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore
-
     @CreatedDate
     private LocalDateTime creationDate;
     @JsonIgnore
-
     @LastModifiedDate
     private LocalDateTime lastModificationDate;
-
     @JsonIgnore
     @CreatedBy
     protected Long createdBy;

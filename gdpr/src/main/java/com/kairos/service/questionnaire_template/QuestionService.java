@@ -36,18 +36,18 @@ public class QuestionService{
     private QuestionRepository questionRepository;
 
 
-    /**
+   /* *//**
      * @param referenceId
      * @param isUnitId
      * @param sectionAndQuestionDTOListMap
      * @param templateType
      * @return
-     */
+     *//*
     public List<QuestionnaireSectionDeprecated> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnitId, Map<QuestionnaireSectionDeprecated, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
 
         List<QuestionDeprecated> globalQuestionList = new ArrayList<>();
         Map<QuestionnaireSectionDeprecated, List<QuestionDeprecated>> sectionQuestionListMap = new HashMap<>();
-        Map<BigInteger, QuestionDTO> questionDTOAndIdMap = new HashMap<>();
+       // Map<BigInteger, QuestionDTO> questionDTOAndIdMap = new HashMap<>();
         List<QuestionnaireSectionDeprecated> questionnaireSections = new ArrayList<>();
         Set<String> titles = new HashSet<>();
         sectionAndQuestionDTOListMap.forEach((questionnaireSection, questionDTOS) -> {
@@ -71,7 +71,7 @@ public class QuestionService{
             questionnaireSections.add(questionnaireSection);
         });
         //TODO
-      /*  if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
+      *//*  if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
             List<Question> existingQuestionList = isUnitId ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionDTOAndIdMap.keySet()) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionDTOAndIdMap.keySet());
             existingQuestionList.forEach(question -> {
                 QuestionDTO questionDTO = questionDTOAndIdMap.get(question.getId());
@@ -80,7 +80,7 @@ public class QuestionService{
             });
             globalQuestionList.addAll(existingQuestionList);
         }
-        questionMongoRepository.saveAll(getNextSequence(globalQuestionList));*/
+        questionMongoRepository.saveAll(getNextSequence(globalQuestionList));*//*
         questionnaireSections.forEach(questionnaireSection -> {
             if (Optional.ofNullable(sectionQuestionListMap.get(questionnaireSection)).isPresent()) {
                // questionnaireSection.getQuestions().addAll(sectionQuestionListMap.get(questionnaireSection).stream().map(Question::getId).collect(Collectors.toList()));
@@ -89,7 +89,7 @@ public class QuestionService{
         return questionnaireSections;
     }
 
-
+*/
     private List<QuestionDeprecated> buildQuestionForQuestionnaireSectionAtUnitLevel(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
         List<QuestionDeprecated> questions = new ArrayList<>();
         for (QuestionDTO questionDTO : questionDTOs) {

@@ -20,66 +20,47 @@ public class ProcessingActivity extends BaseEntity {
     private String name;
     @NotBlank(message = "Description can't be empty")
     private String description;
-
     @Embedded
     private ManagingOrganization managingDepartment;
-
     @Embedded
     private Staff processOwner;
-
-    Long countryId;
-
+    private Long countryId;
     @OneToMany(fetch = FetchType.LAZY)
     private List<ProcessingPurpose> processingPurposes  = new ArrayList<>();
-
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<DataSource> dataSources  = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<TransferMethod> transferMethods  = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<AccessorParty> accessorParties  = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<ProcessingLegalBasis> processingLegalBasis  = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<Asset> linkedAssets  = new ArrayList<>();
-
     @ManyToOne
     @JoinColumn(name="processingActivity_id")
     private ProcessingActivity processingActivity;
-
     @OneToMany(mappedBy = "processingActivity", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     private List<ProcessingActivity> subProcessingActivities  = new ArrayList<>();
-
     @OneToOne
-    ResponsibilityType responsibilityType;
-
+    private ResponsibilityType responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
-
     private boolean isSubProcessingActivity;
-
     @OneToMany(cascade = CascadeType.PERSIST)
     private List<RelatedDataSubject> dataSubjects = new ArrayList<>();
-
-
-   private boolean active = true;
-
+    private Long organizationId;
+    private boolean active = true;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Risk> risks  = new ArrayList<Risk>();
     private boolean suggested;
 
     public ProcessingActivity() {
     }
-
     public ProcessingActivity(String name, String description) {
         this.name = name;
         this.description = description;
@@ -91,7 +72,9 @@ public class ProcessingActivity extends BaseEntity {
         this.description = description;
         this.active = active;
     }
+    public Long getOrganizationId() { return organizationId; }
 
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
     public boolean isSuggested() { return suggested; }
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }

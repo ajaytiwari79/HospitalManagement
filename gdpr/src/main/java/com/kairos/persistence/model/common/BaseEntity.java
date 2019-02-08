@@ -26,7 +26,6 @@ public abstract  class BaseEntity {
     @JsonIgnore
     protected boolean deleted;
 
-    protected Long organizationId;
 
     public Long getId() {
         return id;
@@ -35,10 +34,6 @@ public abstract  class BaseEntity {
     public void setId(Long id) {
         this.id = id;
     }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public Date getCreatedAt() {
         return createdAt;

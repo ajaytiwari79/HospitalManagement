@@ -29,10 +29,10 @@ public class QuestionnaireTemplate extends BaseEntity {
     private boolean isDefaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
     private QuestionnaireTemplateType riskAssociatedEntity;
-    @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.LAZY,orphanRemoval = true)
-    @JoinColumn(name = "questionnaire_template_id")
+    @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.LAZY)
+    @JoinColumn(name = "questionnaire_template_id" )
     private List<QuestionnaireSection> sections=new ArrayList<>();
-
+    private Long organizationId;
 
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
@@ -46,6 +46,9 @@ public class QuestionnaireTemplate extends BaseEntity {
         this.description = description;
         this.templateStatus=templateStatus;
     }
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 

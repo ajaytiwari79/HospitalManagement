@@ -195,7 +195,7 @@ public class JaversCommonService {
                 fieldValues.add(storageFormatRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case DATA_DISPOSAL_KEY:
-                fieldValues.add(dataDisposalRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
+                fieldValues.add(dataDisposalRepository.findByIdAndDeletedFalse((Long) historyMap.getPropertyValue(field)));
                 break;
             case ORG_SECURITY_MEASURE_KEY:
                 fieldValues.add(organizationalSecurityMeasureRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
@@ -204,10 +204,10 @@ public class JaversCommonService {
                 fieldValues.add(technicalSecurityMeasureRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case HOSTING_PROVIDER_KEY:
-                fieldValues.add(hostingProviderRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
+                fieldValues.add(hostingProviderRepository.findByIdAndDeletedFalse((Long) historyMap.getPropertyValue(field)));
                 break;
             case HOSTING_TYPE_KEY:
-                fieldValues.add(hostingTypeRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
+                fieldValues.add(hostingTypeRepository.findByIdAndDeletedFalse((Long) historyMap.getPropertyValue(field)));
                 break;
             //processing activity keys
             case PROCESSING_PURPOSE_KEY:
@@ -226,7 +226,7 @@ public class JaversCommonService {
                 fieldValues.add(processingLegalBasisRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case RESPONSIBILITY_TYPE_KEY:
-                fieldValues.add(responsibilityTypeRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
+                fieldValues.add(responsibilityTypeRepository.findByIdAndDeletedFalse((Long) historyMap.getPropertyValue(field)));
                 break;
             case SUB_PROCESSING_ACTIVITY_KEY:
                 fieldValues.add(processingActivityRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));

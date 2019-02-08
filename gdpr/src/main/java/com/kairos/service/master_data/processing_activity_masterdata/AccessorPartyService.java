@@ -48,7 +48,6 @@ public class AccessorPartyService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<AccessorParty>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
-        if (!accessorParties.isEmpty()) {
             for (AccessorPartyDTO accessorParty : accessorParties) {
                 accessorPartyNames.add(accessorParty.getName());
             }
@@ -75,10 +74,6 @@ public class AccessorPartyService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
     }
 
 
@@ -92,7 +87,7 @@ public class AccessorPartyService{
      * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
     public AccessorParty getAccessorParty(Long countryId, Long id) {
-        AccessorParty exist = accessorPartyRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        AccessorParty exist = accessorPartyRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -122,7 +117,7 @@ public class AccessorPartyService{
      */
     public AccessorPartyDTO updateAccessorParty(Long countryId, Long id, AccessorPartyDTO accessorPartyDTO) {
 
-        AccessorParty accessorParty = accessorPartyRepository.findByCountryIdAndDeletedAndName(countryId, false, accessorPartyDTO.getName() );
+        AccessorParty accessorParty = accessorPartyRepository.findByCountryIdAndName(countryId,  accessorPartyDTO.getName() );
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;

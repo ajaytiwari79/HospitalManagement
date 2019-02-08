@@ -20,5 +20,7 @@ public interface CustomQuestionnaireTemplateRepository {
 
 
 
+    QuestionnaireTemplate getDefaultPublishedAssetQuestionnaireTemplateByUnitId(Long orgId);
+
 
 }
