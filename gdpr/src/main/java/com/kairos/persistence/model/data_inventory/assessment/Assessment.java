@@ -28,43 +28,32 @@ public class Assessment extends BaseEntity {
     private LocalDate endDate;
     private LocalDate completedDate;
     private String comment;
-
     @OneToOne
     private Asset asset;
     private boolean isRiskAssessment;
-    @OneToOne
-    private ProcessingActivity processingActivity;
-
+    @OneToOne private ProcessingActivity processingActivity;
     @OneToMany
     private List<Risk> risks = new ArrayList<>();
-
     @ElementCollection
     private List<AssessmentAnswer> assessmentAnswers = new ArrayList<>();
-
     @NotNull
     @Valid
     @ElementCollection
     private List<Staff> assigneeList = new ArrayList<>();
-
     @NotNull
     private Staff approver;
-
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
-
     @OneToOne
     private QuestionnaireTemplate questionnaireTemplate;
-
     @Embedded
     private UserVO assessmentLastAssistBy;
     private LocalDate assessmentLaunchedDate;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
-
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     private int relativeDeadlineDuration;
     private DurationType relativeDeadlineType;
-
-
+    private Long organizationId;
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver, String comment, @NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate) {
         this.name = name;
         this.endDate = endDate;
@@ -84,6 +73,14 @@ public class Assessment extends BaseEntity {
 
     public Assessment() {
     }
+
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+
+
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 

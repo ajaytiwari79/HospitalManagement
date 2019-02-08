@@ -37,12 +37,11 @@ public class Risk extends BaseEntity {
     // private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
+    private Long organizationId;
 
-    public Risk() {
-    }
 
     public Risk(Long countryId, @NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
+                                             @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -58,6 +57,14 @@ public class Risk extends BaseEntity {
         this.riskRecommendation = riskRecommendation;
         this.riskLevel = riskLevel;
     }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+    public Risk() {
+    }
+
 
     public Risk(Long id){
         this.id= id;

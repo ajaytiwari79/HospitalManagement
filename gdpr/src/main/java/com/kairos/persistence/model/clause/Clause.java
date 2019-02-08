@@ -44,6 +44,7 @@ public class Clause extends BaseEntity {
     @ElementCollection
     private List<AccountType> accountTypes = new ArrayList<>();
     private Long countryId;
+    private Long organizationId;
 
     //TODO
     //private List<Long> organizationList;
@@ -223,5 +224,13 @@ public class Clause extends BaseEntity {
 
     public void setTempClauseId(UUID tempClauseId) {
         this.tempClauseId = tempClauseId;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }
