@@ -18,11 +18,6 @@ public class ShiftWrapper {
         //default case
     }
 
-    public ShiftWrapper(List<ShiftDTO> assignedShifts, List<OpenShiftResponseDTO> openShifts) {
-        this.assignedShifts = assignedShifts;
-        this.openShifts = openShifts;
-    }
-
     public ShiftWrapper(List<ShiftDTO> assignedShifts, List<OpenShiftResponseDTO> openShifts, StaffAccessRoleDTO staffDetails,ButtonConfig buttonConfig) {
         this.assignedShifts = assignedShifts;
         this.openShifts = openShifts;
