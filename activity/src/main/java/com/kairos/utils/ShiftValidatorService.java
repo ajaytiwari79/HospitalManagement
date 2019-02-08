@@ -163,9 +163,6 @@ public class ShiftValidatorService {
 
 
     public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean byUpdate, boolean byTandAPhase) {
-        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-            exceptionService.actionNotPermittedException("message.wta.notFound");
-        }
         if (wtaQueryResultDTO.getEndDate() != null && wtaQueryResultDTO.getEndDate().isBefore(DateUtils.asLocalDate(shift.getEndDate()))) {
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
@@ -315,7 +312,7 @@ public class ShiftValidatorService {
                 staffUnitPositionDetails.getEndDate() == null ? endTimeOfInterval.getTime() : DateUtils.getLongFromLocalDate(staffUnitPositionDetails.getEndDate()));
 
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionDetails.getId(), staffUnitPositionDetails.getTotalWeeklyMinutes(), staffUnitPositionDetails.getWorkingDaysInWeek(),
-                staffUnitPositionDetails.getStartDate(), staffUnitPositionDetails.getEndDate() != null ? staffUnitPositionDetails.getEndDate() : null, staffUnitPositionDetails.getTotalWeeklyMinutes());
+                staffUnitPositionDetails.getStartDate(), staffUnitPositionDetails.getEndDate(), staffUnitPositionDetails.getTotalWeeklyMinutes());
 
         Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shift.getUnitId(), interval.getStart().toDate(), interval.getEnd().toDate());
 

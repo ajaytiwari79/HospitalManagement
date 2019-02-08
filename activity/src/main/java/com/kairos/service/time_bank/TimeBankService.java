@@ -8,6 +8,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.CopyShiftDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -284,9 +285,15 @@ public class TimeBankService extends MongoBaseService {
         }
         List<PayOutTransaction> payOutTransactions = payOutTransactionMongoRepository.findAllByUnitPositionIdAndDate(unitPositionId, startDate, endDate);
         List<PayOut> payOuts = payOutRepository.findAllByUnitPositionAndDate(unitPositionId, startDate, endDate);
-        TimeBankAndPayoutDTO timeBankAndPayoutDTO = timeBankCalculationService.getTimeBankAdvanceView(unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, unitPositionWithCtaDetailsDTO, timeTypeDTOS, payOuts, payOutTransactions);
+        List<Interval> intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);
+        Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, payOutTransactions);
+        TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankAdvanceView(intervals,unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, unitPositionWithCtaDetailsDTO, timeTypeDTOS, payoutTransactionIntervalMap);
+        List<PayOut> payOutBeforestartDate = payOutRepository.findAllByUnitPositionAndBeforeDate(unitPositionId,startDate);
+        long payoutMinutesBefore = isCollectionNotEmpty(payOutBeforestartDate)
+                ? payOutBeforestartDate.stream().mapToLong(payout -> payout.getTotalPayOutMin()).sum() : 0;
+        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOuts,payoutMinutesBefore, payoutTransactionIntervalMap, unitPositionWithCtaDetailsDTO, query);
         //timeBankDTO1.setCostTimeAgreement(getCostTimeAgreement(145l));
-        return timeBankAndPayoutDTO;
+        return new TimeBankAndPayoutDTO(timeBankDTO,payOut);
     }
 
     /**
@@ -574,6 +581,7 @@ public class TimeBankService extends MongoBaseService {
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(unitPositionWithCtaDetailsDTO.getId(),asDate(startDate),asDate(endDate.plusDays(1)));
         Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k->k.getDate(),v->v));
         int accumulatedTimebank = 0;
+        //TODO This code calculate the Accumulated timebank till shiftStartDate
         while (startDate.isBefore(endDate)){
             if(dateDailyTimeBankEntryMap.containsKey(startDate)){
                 accumulatedTimebank+= dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMin();
@@ -583,6 +591,7 @@ public class TimeBankService extends MongoBaseService {
             startDate = startDate.plusDays(1);
         }
         int totalTimeBankMinutes;
+        //TODO This code calculate the Delta timebank till shiftStartDate
         if(dateDailyTimeBankEntryMap.containsKey(startDate)){
             totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMin();
         }else {
@@ -599,16 +608,15 @@ public class TimeBankService extends MongoBaseService {
 
     public List<ShiftDTO> updateTimebankDetailsInShiftDTO(List<ShiftDTO> shiftDTOS,LocalDate startDate,LocalDate endDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         if(isCollectionNotEmpty(shiftDTOS)){
-            ShiftDTO firstShiftDTO = shiftDTOS.get(0);
             UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getUnitPositionDetailDTO(staffAdditionalInfoDTO);
             LocalDate unitPositionEndDate = isNull(unitPositionWithCtaDetailsDTO.getEndDate()) ? endDate : unitPositionWithCtaDetailsDTO.getEndDate().isAfter(endDate) ? endDate : unitPositionWithCtaDetailsDTO.getEndDate();
             logger.info("startDate : "+startDate +"endDate :"+endDate);
             List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(unitPositionWithCtaDetailsDTO.getId(),asDate(unitPositionWithCtaDetailsDTO.getStartDate()),asDate(endDate));
-            Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(firstShiftDTO.getUnitId(), asDate(startDate), asDate(unitPositionEndDate));
-            long accumulatedTimebank = 0;//getAccumulatedTimebank(unitPositionWithCtaDetailsDTO,tillDate,planningPeriodIntervals);
+            Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shiftDTOS.get(0).getUnitId(), asDate(startDate), asDate(unitPositionEndDate));
+            long accumulatedTimebank = 0;
             Map<LocalDate,List<ShiftDTO>> dateWiseShiftMap = shiftDTOS.stream().collect(Collectors.groupingBy(s->DateUtils.asLocalDate(s.getStartDate()),toList()));
             Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k->k.getDate(),v->v));
-            while (startDate.isBefore(endDate)){
+            while (startDate.isBefore(endDate) || startDate.equals(endDate)){
                 if(startDate.isAfter(unitPositionWithCtaDetailsDTO.getStartDate()) || startDate.equals(unitPositionWithCtaDetailsDTO.getStartDate())){
                     int totalTimeBankMinutes;
                     if(dateDailyTimeBankEntryMap.containsKey(startDate)){
@@ -617,7 +625,6 @@ public class TimeBankService extends MongoBaseService {
                         totalTimeBankMinutes = (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
                     }
                     accumulatedTimebank+=totalTimeBankMinutes;
-
                     if(dateWiseShiftMap.containsKey(startDate)){
                         for (ShiftDTO shiftDTO : dateWiseShiftMap.get(startDate)) {
                             shiftDTO.setDeltaTimeBankMinutes(totalTimeBankMinutes);
