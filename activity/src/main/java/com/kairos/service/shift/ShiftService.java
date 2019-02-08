@@ -1056,7 +1056,7 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO, buttonConfig);
     }
 
-    private ButtonConfig findButtonConfig(List<ShiftDTO> shifts, Date startDate, Date endDate, boolean management) {
+    public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, Date startDate, Date endDate, boolean management) {
         ButtonConfig buttonConfig = new ButtonConfig();
         if (management) {
             if (!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY) ||
