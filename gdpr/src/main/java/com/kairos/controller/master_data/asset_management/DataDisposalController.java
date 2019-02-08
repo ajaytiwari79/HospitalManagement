@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,14 +41,17 @@ public class DataDisposalController {
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal")
     public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody()));
+        if (CollectionUtils.isEmpty(dataDisposalDTOs.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, dataDisposalId));
 
     }
@@ -65,20 +67,20 @@ public class DataDisposalController {
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(countryId, dataDisposalId));
 
     }
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable Long dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, dataDisposalId, dataDisposalDTO));
     }
 
     @ApiOperation("update Suggested status of Data Disposal")
     @PutMapping("/data_disposal")
-    public ResponseEntity<Object> updateSuggestedStatusOfDataDisposals(@PathVariable Long countryId, @RequestBody Set<BigInteger> dataDisposalIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfDataDisposals(@PathVariable Long countryId, @RequestBody Set<Long> dataDisposalIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(dataDisposalIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Data Disposal is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

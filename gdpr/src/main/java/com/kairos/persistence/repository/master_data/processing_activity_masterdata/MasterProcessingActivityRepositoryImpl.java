@@ -1,38 +1,10 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
-import com.kairos.dto.gdpr.FilterSelection;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.enums.gdpr.FilterType;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
-import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import javax.inject.Inject;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ID;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+public class MasterProcessingActivityRepositoryImpl {
 
 
-public class MasterProcessingActivityRepositoryImpl implements CustomMasterProcessingActivity {
-
-
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -164,6 +136,6 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         AggregationResults<MasterProcessingActivityRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityRiskResponseDTO.class);
         return result.getMappedResults();
     }
-
+*/
 
 }

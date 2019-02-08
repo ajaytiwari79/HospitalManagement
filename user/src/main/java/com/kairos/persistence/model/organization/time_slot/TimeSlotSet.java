@@ -21,7 +21,6 @@ public class TimeSlotSet extends UserBaseEntity{
     private LocalDate endDate;
     private TimeSlotMode timeSlotMode;
     private TimeSlotType timeSlotType;
-    private boolean deleted;
     private boolean defaultSet = false;
 
 
@@ -74,14 +73,6 @@ public class TimeSlotSet extends UserBaseEntity{
 
     public void setTimeSlotMode(TimeSlotMode timeSlotMode) {
         this.timeSlotMode = timeSlotMode;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     public TimeSlotType getTimeSlotType() {

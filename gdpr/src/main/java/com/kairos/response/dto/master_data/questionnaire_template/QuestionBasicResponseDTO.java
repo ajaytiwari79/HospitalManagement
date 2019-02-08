@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.gdpr.QuestionType;
 
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class QuestionBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "Name can't be empty")
     private String question;
@@ -36,11 +35,11 @@ public class QuestionBasicResponseDTO {
 
     public void setRequired(boolean required) { this.required = required; }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

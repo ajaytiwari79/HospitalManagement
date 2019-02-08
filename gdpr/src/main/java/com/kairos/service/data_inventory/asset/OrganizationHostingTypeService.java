@@ -5,19 +5,14 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -30,22 +25,19 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class OrganizationHostingTypeService extends MongoBaseService {
+public class OrganizationHostingTypeService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingTypeService.class);
 
     @Inject
-    private HostingTypeMongoRepository hostingTypeMongoRepository;
+    private HostingTypeRepository hostingTypeRepository;
 
     @Inject
     private ExceptionService exceptionService;
 
     @Inject
     private HostingTypeService hostingTypeService;
-
-    @Inject
-    private AssetMongoRepository assetMongoRepository;
 
 
     /**
@@ -67,7 +59,10 @@ public class OrganizationHostingTypeService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingType> existing = findMetaDataByNameAndUnitId(organizationId, hostingTypeNames, HostingType.class);
+            List<String> nameInLowerCase = hostingTypeNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<HostingType> existing = hostingTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
@@ -76,7 +71,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
                     newHostingType.setOrganizationId(organizationId);
                     newHostingTypes.add(newHostingType);
                 }
-                newHostingTypes = hostingTypeMongoRepository.saveAll(getNextSequence(newHostingTypes));
+                newHostingTypes = hostingTypeRepository.saveAll(newHostingTypes);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingTypes);
@@ -94,7 +89,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long organizationId) {
-        return hostingTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return hostingTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
 
@@ -105,9 +100,9 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @return HostingType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if HostingType not found for given id
      */
-    public HostingType getHostingType(Long organizationId, BigInteger id) {
+    public HostingType getHostingType(Long organizationId, Long id) {
 
-        HostingType exist = hostingTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        HostingType exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -119,11 +114,11 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
     public Boolean deleteHostingType(Long unitId, BigInteger hostingTypeId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithHostingType = assetMongoRepository.findAllAssetLinkedWithHostingType(unitId, hostingTypeId);
+      /*  List<AssetBasicResponseDTO> assetsLinkedWithHostingType = assetMongoRepository.findAllAssetLinkedWithHostingType(unitId, hostingTypeId);
         if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingType)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Type", new StringBuilder(assetsLinkedWithHostingType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        hostingTypeMongoRepository.safeDeleteById(hostingTypeId);
+        hostingTypeMongoRepository.safeDeleteById(hostingTypeId);*/
         return true;
     }
 
@@ -136,22 +131,22 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @return HostingType updated object
      * @throws DuplicateDataException if HostingType already exist with same name
      */
-    public HostingTypeDTO updateHostingType(Long organizationId, BigInteger id, HostingTypeDTO hostingTypeDTO) {
+    public HostingTypeDTO updateHostingType(Long organizationId, Long id, HostingTypeDTO hostingTypeDTO) {
 
 
-        HostingType hostingType = hostingTypeMongoRepository.findByOrganizationIdAndName(organizationId, hostingTypeDTO.getName());
+        HostingType hostingType = hostingTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId,  hostingTypeDTO.getName());
         if (Optional.ofNullable(hostingType).isPresent()) {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Hosting Type", hostingType.getName());
         }
-        hostingType = hostingTypeMongoRepository.findByid(id);
-        if (!Optional.ofNullable(hostingType).isPresent()) {
+        Integer resultCount =  hostingTypeRepository.updateMetadataName(hostingTypeDTO.getName(), id, organizationId);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingTypeDTO.getName());
         }
-        hostingType.setName(hostingTypeDTO.getName());
-        hostingTypeMongoRepository.save(hostingType);
         return hostingTypeDTO;
 
 
@@ -160,8 +155,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
     public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
 
-        Map<String, List<HostingType>> result;
-        result = createHostingType(organizationId, hostingTypeDTOS);
+        Map<String, List<HostingType>> result = createHostingType(organizationId, hostingTypeDTOS);
         List<HostingType> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, hostingTypeDTOS);
         if (!masterHostingTypeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterHostingTypeSuggestedByUnit);

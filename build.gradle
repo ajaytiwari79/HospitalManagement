@@ -72,8 +72,8 @@ sonarqube {
         property "sonar.projectName", "kairos"
         property "sonar.projectKey", "kairos"
         property "sonar.sources","src"
-        property "sonar.host.url","http://localhost:9000"
-        property "sonar.login","bc108db3fb3802d76a37527c5c739bbc9a5a9075"
+        property "sonar.host.url","http://os008.oodleslab.com:9000"
+        property "sonar.login","b6799511be0b33e4b35e17db1747a232e6c18a3c"
         property "sonar.sourceEncoding", "UTF-8"
     }
 }

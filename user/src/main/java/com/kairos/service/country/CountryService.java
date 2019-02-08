@@ -12,16 +12,16 @@ import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
-import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.Currency;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
@@ -574,6 +574,7 @@ public class CountryService {
     }
 
     public Long getCountryIdByUnitId(long unitId){
-        return countryGraphRepository.getCountryIdByUnitId(unitId);
+        Organization parent=organizationService.fetchParentOrganization(unitId);
+        return countryGraphRepository.getCountryIdByUnitId(parent.getId());
     }
 }

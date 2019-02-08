@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -44,7 +43,7 @@ public class OrganizationProcessingLegalBasisController {
 
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long unitId, @PathVariable BigInteger legalBasisId) {
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -63,7 +62,7 @@ public class OrganizationProcessingLegalBasisController {
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
     @DeleteMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long unitId, @PathVariable BigInteger legalBasisId) {
+    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -74,7 +73,7 @@ public class OrganizationProcessingLegalBasisController {
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long unitId, @PathVariable BigInteger legalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

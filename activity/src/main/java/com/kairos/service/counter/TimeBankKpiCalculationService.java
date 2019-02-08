@@ -4,10 +4,10 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.KPIUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.counter.chart.BarLineChartKPiDateUnit;
-import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
+import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -85,7 +85,7 @@ public class TimeBankKpiCalculationService implements  CounterService {
     }
 
     private List<CommonKpiDataUnit> getTimeBankForUnitKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi){
-        List<CommonKpiDataUnit> basicChartKpiDateUnits=new ArrayList<>();
+        List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         List<BigInteger> phaseIds=filterBasedCriteria.containsKey(FilterType.PHASE)?KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PHASE)):new ArrayList<>();
         List<String> daysOfWeek=filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK)?filterBasedCriteria.get(FilterType.DAYS_OF_WEEK):Stream.of(DayOfWeek.values()).map(Enum::name).collect(Collectors.toList());
         List<Long> staffIds=filterBasedCriteria.containsKey(FilterType.STAFF_IDS)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
@@ -112,21 +112,21 @@ public class TimeBankKpiCalculationService implements  CounterService {
                     totalTimeBankOfUnit+=totalTimeBank;
                 }
             }
-            basicChartKpiDateUnits.add(new BasicChartKpiDateUnit(unitName,unitId,DateUtils.getHoursByMinutes(totalTimeBankOfUnit)));
+            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(unitName, unitId, Arrays.asList(new ClusteredBarChartKpiDataUnit(unitName,DateUtils.getHoursByMinutes(totalTimeBankOfUnit)))));
         });
-        return basicChartKpiDateUnits;
+        return kpiDataUnits;
     }
 
 
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList= getTimeBankForUnitKpiData(organizationId,filterBasedCriteria,true);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.YAXIS);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList,new KPIAxisData(AppConstants.STAFF,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList= getTimeBankForUnitKpiData(organizationId,filterBasedCriteria,false);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.YAXIS);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
     }
 }

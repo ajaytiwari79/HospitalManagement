@@ -3,30 +3,46 @@ package com.kairos.persistence.model.questionnaire_template;
 
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class QuestionnaireTemplate extends MongoBaseEntity {
+@Entity
+public class QuestionnaireTemplate extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
+
     @NotBlank(message = "Description cannot be empty")
     private String description;
-    @NotBlank(message = "Template type cannot be empty ")
+
+    @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
-    private BigInteger assetTypeId;
-    private BigInteger assetSubTypeId;
+
+    @OneToOne
+    private AssetType assetType;
+
+    @OneToOne
+    private AssetType assetSubType;
+
     private Long countryId;
-    private boolean defaultAssetTemplate;
+
+    private boolean isDefaultAssetTemplate;
+
     private QuestionnaireTemplateStatus templateStatus;
+
     private QuestionnaireTemplateType riskAssociatedEntity;
-    private List<BigInteger> sections=new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<QuestionnaireSection> sections=new ArrayList<>();
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
         this.name = name;
@@ -55,9 +71,29 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
 
     public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
 
-    public List<BigInteger> getSections() { return sections; }
+    public AssetType getAssetType() {
+        return assetType;
+    }
 
-    public void setSections(List<BigInteger> sections) { this.sections = sections; }
+    public void setAssetType(AssetType assetType) {
+        this.assetType = assetType;
+    }
+
+    public AssetType getAssetSubType() {
+        return assetSubType;
+    }
+
+    public void setAssetSubType(AssetType assetSubType) {
+        this.assetSubType = assetSubType;
+    }
+
+    public List<QuestionnaireSection> getSections() {
+        return sections;
+    }
+
+    public void setSections(List<QuestionnaireSection> sections) {
+        this.sections = sections;
+    }
 
     public QuestionnaireTemplateType getTemplateType() { return templateType; }
 
@@ -71,18 +107,18 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
+    public boolean isDefaultAssetTemplate() { return isDefaultAssetTemplate; }
 
-    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
-
-    public BigInteger getAssetTypeId() { return assetTypeId; }
-
-    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
-
-    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
-
-    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.isDefaultAssetTemplate = defaultAssetTemplate; }
 
     public QuestionnaireTemplate() {
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.getSections().forEach( section -> {
+            section.delete();
+        });
     }
 }

@@ -142,7 +142,7 @@ public class OrganizationType extends UserBaseEntity {
         return map;
     }
 
-    public OrganizationType(Long id,@NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull") String name, String description) {
+    public OrganizationType(Long id,@NotBlank(message = "error.OrganizationType.name.notEmpty")String name, String description) {
         this.name = name;
         this.id=id;
         this.description = description;

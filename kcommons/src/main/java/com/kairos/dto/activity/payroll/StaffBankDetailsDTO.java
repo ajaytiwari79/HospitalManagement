@@ -1,5 +1,8 @@
 package com.kairos.dto.activity.payroll;
 
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
+
 import java.math.BigInteger;
 
 /**
@@ -12,6 +15,7 @@ public class StaffBankDetailsDTO {
     private Long staffId;
     private BigInteger bankId;
     private boolean useNemkontoAccount;
+    @Range(message = "accountNumber.greater_than.provided_value")
     private Long accountNumber;
 
 

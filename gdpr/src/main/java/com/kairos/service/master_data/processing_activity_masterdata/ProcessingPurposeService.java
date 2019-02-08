@@ -9,32 +9,35 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class ProcessingPurposeService extends MongoBaseService {
+public class ProcessingPurposeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPurposeService.class);
 
     @Inject
-    private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
+    private ProcessingPurposeRepository processingPurposeRepository;
+
+    @Inject
+    private ExceptionService exceptionService;
+
 
     /**
      * @param countryId
@@ -45,11 +48,10 @@ public class ProcessingPurposeService extends MongoBaseService {
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
-
+    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS, boolean isSuggestion) {
+        //TODO still need to optimize we can get name of list in string from here
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
-        if (!processingPurposeDTOS.isEmpty()) {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
                     processingPurposesNames.add(processingPurpose.getName());
@@ -57,27 +59,29 @@ public class ProcessingPurposeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing = findMetaDataByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
+            List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<ProcessingPurpose> existing = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
             if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
-
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId,SuggestedDataStatus.APPROVED);
+                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId);
+                    if(isSuggestion){
+                        newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newProcessingPurpose.setSuggestedDate(LocalDate.now());
+                    }else{
+                        newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newProcessingPurposes.add(newProcessingPurpose);
-
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(getNextSequence(newProcessingPurposes));
+                newProcessingPurposes = processingPurposeRepository.saveAll(newProcessingPurposes);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
-    }
+            return result; }
 
 
     /**
@@ -86,7 +90,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
-        return processingPurposeMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return processingPurposeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
     /**
@@ -96,11 +100,10 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return ProcessingPurpose object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
-    public ProcessingPurpose getProcessingPurpose(Long countryId, BigInteger id) {
-
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId, id);
+    public ProcessingPurpose getProcessingPurpose(Long countryId, Long id) {
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("No data found");
         } else {
             return exist;
 
@@ -108,14 +111,14 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingPurpose(Long countryId, BigInteger id) {
-
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(processingPurpose).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+    public Boolean deleteProcessingPurpose(Long countryId, Long id) {
+        Integer resultCount = processingPurposeRepository.deleteByIdAndCountryId(id, countryId);
+        if (resultCount > 0) {
+            LOGGER.info("Processing Purpose deleted successfully for id :: {}", id);
+        }else{
+            throw new DataNotFoundByIdException("No data found");
         }
-            delete(processingPurpose);
-            return true;
+        return true;
 
     }
 
@@ -127,19 +130,20 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @param processingPurposeDTO
      * @return ProcessingPurpose updated object
      */
-    public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, BigInteger id, ProcessingPurposeDTO processingPurposeDTO) {
-
-
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByName(countryId, processingPurposeDTO.getName());
+    public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
+        ProcessingPurpose processingPurpose = processingPurposeRepository.findByCountryIdAndName( countryId,  processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
             throw new DuplicateDataException("data  exist for  " + processingPurposeDTO.getName());
         } else {
-            processingPurpose = processingPurposeMongoRepository.findByid(id);
-            processingPurpose.setName(processingPurpose.getName());
-             processingPurposeMongoRepository.save(processingPurpose);
+            Integer resultCount =  processingPurposeRepository.updateMasterMetadataName(processingPurposeDTO.getName(), id, countryId);
+            if(resultCount <=0){
+                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
+            }else{
+                LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingPurposeDTO.getName());
+            }
              return processingPurposeDTO;
 
         }
@@ -152,27 +156,9 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return
      */
     public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+        Map<String, List<ProcessingPurpose>> result = createProcessingPurpose(countryId, processingPurposeDTOS, true);
+        return result.get(NEW_DATA_LIST);
 
-        Set<String> processingPurposeNameList = new HashSet<>();
-        for (ProcessingPurposeDTO ProcessingPurpose : processingPurposeDTOS) {
-            processingPurposeNameList.add(ProcessingPurpose.getName());
-        }
-        List<ProcessingPurpose> existingProcessingPurposes = findMetaDataByNamesAndCountryId(countryId, processingPurposeNameList, ProcessingPurpose.class);
-        processingPurposeNameList = ComparisonUtils.getNameListForMetadata(existingProcessingPurposes, processingPurposeNameList);
-        List<ProcessingPurpose> processingPurposeList = new ArrayList<>();
-        if (!processingPurposeNameList.isEmpty()) {
-            for (String name : processingPurposeNameList) {
-
-                ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
-                processingPurpose.setCountryId(countryId);
-                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                processingPurpose.setSuggestedDate(LocalDate.now());
-                processingPurposeList.add(processingPurpose);
-            }
-
-             processingPurposeMongoRepository.saveAll(getNextSequence(processingPurposeList));
-        }
-        return processingPurposeList;
     }
 
 
@@ -183,13 +169,17 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @param suggestedDataStatus
      * @return
      */
-    public List<ProcessingPurpose> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<BigInteger> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<ProcessingPurpose> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<Long> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<ProcessingPurpose> processingPurposeList = processingPurposeMongoRepository.getProcessingPurposeListByIds(countryId, processingPurposeIds);
-        processingPurposeList.forEach(processingPurpose-> processingPurpose.setSuggestedDataStatus(suggestedDataStatus));
-        processingPurposeMongoRepository.saveAll(getNextSequence(processingPurposeList));
-        return processingPurposeList;
+        Integer updateCount = processingPurposeRepository.updateMetadataStatus(countryId, processingPurposeIds,suggestedDataStatus);
+        if(updateCount > 0){
+            LOGGER.info("Processing Purposes are updated successfully with ids :: {}", processingPurposeIds);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", processingPurposeIds);
+        }
+        return processingPurposeRepository.findAllByIds(processingPurposeIds);
     }
+
 
 }
 

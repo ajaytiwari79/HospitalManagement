@@ -4,18 +4,21 @@ package com.kairos.dto.gdpr.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessingActivityDTO {
 
 
-    private BigInteger id;
+    private Long id;
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
@@ -25,14 +28,14 @@ public class ProcessingActivityDTO {
     private ManagingOrganization managingDepartment;
     @NotNull(message = "error.message.processOwner.notNull")
     private Staff processOwner;
-    private List<BigInteger> processingPurposes;
-    private List<BigInteger> dataSources;
-    private List<BigInteger> transferMethods;
-    private List<BigInteger> accessorParties;
-    private List<BigInteger> processingLegalBasis;
+    private Set<Long> processingPurposes;
+    private Set<Long> dataSources;
+    private Set<Long> transferMethods;
+    private Set<Long> accessorParties;
+    private Set<Long> processingLegalBasis;
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
-    private List<ProcessingActivityRelatedDataSubject> dataSubjectList=new ArrayList<>();
-    private BigInteger responsibilityType;
+    private List<ProcessingActivityRelatedDataSubject> dataSubjectSet=new ArrayList<>();
+    private Long responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
@@ -42,13 +45,16 @@ public class ProcessingActivityDTO {
     private boolean suggestToCountryAdmin;
     private boolean suggested=false;
 
+    @Valid
+    private List<OrganizationLevelRiskDTO> risks = new ArrayList<>();
+
     public boolean isSuggested() { return suggested; }
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public List<ProcessingActivityDTO> getSubProcessingActivities() { return subProcessingActivities; }
 
@@ -60,9 +66,9 @@ public class ProcessingActivityDTO {
 
     public Staff getProcessOwner() { return processOwner; }
 
-    public List<BigInteger> getProcessingPurposes() { return processingPurposes; }
+    public Set<Long> getProcessingPurposes() { return processingPurposes; }
 
-    public List<BigInteger> getDataSources() { return dataSources; }
+    public Set<Long> getDataSources() { return dataSources; }
 
     public void setName(String name) { this.name = name; }
 
@@ -72,19 +78,19 @@ public class ProcessingActivityDTO {
 
     public void setProcessOwner(Staff processOwner) { this.processOwner = processOwner; }
 
-    public void setProcessingPurposes(List<BigInteger> processingPurposes) { this.processingPurposes = processingPurposes; }
+    public void setProcessingPurposes(Set<Long> processingPurposes) { this.processingPurposes = processingPurposes; }
 
-    public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
+    public void setDataSources(Set<Long> dataSources) { this.dataSources = dataSources; }
 
-    public void setTransferMethods(List<BigInteger> transferMethods) { this.transferMethods = transferMethods; }
+    public void setTransferMethods(Set<Long> transferMethods) { this.transferMethods = transferMethods; }
 
-    public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
+    public void setAccessorParties(Set<Long> accessorParties) { this.accessorParties = accessorParties; }
 
-    public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
+    public void setProcessingLegalBasis(Set<Long> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
     public void setSubProcessingActivities(List<ProcessingActivityDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
-    public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
+    public void setResponsibilityType(Long responsibilityType) { this.responsibilityType = responsibilityType; }
 
     public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
 
@@ -102,13 +108,13 @@ public class ProcessingActivityDTO {
 
     public void setSuggestToCountryAdmin(boolean suggestToCountryAdmin) { this.suggestToCountryAdmin = suggestToCountryAdmin; }
 
-    public List<BigInteger> getTransferMethods() { return transferMethods; }
+    public Set<Long> getTransferMethods() { return transferMethods; }
 
-    public List<BigInteger> getAccessorParties() { return accessorParties; }
+    public Set<Long> getAccessorParties() { return accessorParties; }
 
-    public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
+    public Set<Long> getProcessingLegalBasis() { return processingLegalBasis; }
 
-    public BigInteger getResponsibilityType() { return responsibilityType; }
+    public Long getResponsibilityType() { return responsibilityType; }
 
     public Integer getControllerContactInfo() { return controllerContactInfo; }
 
@@ -122,12 +128,20 @@ public class ProcessingActivityDTO {
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
-    public List<ProcessingActivityRelatedDataSubject> getDataSubjectList() {
-        return dataSubjectList;
+    public List<ProcessingActivityRelatedDataSubject> getDataSubjectSet() {
+        return dataSubjectSet;
     }
 
-    public void setDataSubjectList(List<ProcessingActivityRelatedDataSubject> dataSubjectList) {
-        this.dataSubjectList = dataSubjectList;
+    public void setDataSubjectSet(List<ProcessingActivityRelatedDataSubject> dataSubjectSet) {
+        this.dataSubjectSet = dataSubjectSet;
+    }
+
+    public List<OrganizationLevelRiskDTO> getRisks() {
+        return risks;
+    }
+
+    public void setRisks(List<OrganizationLevelRiskDTO> risks) {
+        this.risks = risks;
     }
 
     public ProcessingActivityDTO() {

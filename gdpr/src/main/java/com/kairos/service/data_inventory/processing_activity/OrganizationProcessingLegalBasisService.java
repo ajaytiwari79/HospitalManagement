@@ -7,21 +7,18 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,13 +26,13 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationProcessingLegalBasisService extends MongoBaseService {
+public class OrganizationProcessingLegalBasisService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationProcessingLegalBasisService.class);
 
     @Inject
-    private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
+    private ProcessingLegalBasisRepository processingLegalBasisRepository;
 
     @Inject
     private ProcessingLegalBasisService processingLegalBasisService;
@@ -43,7 +40,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
 
     /**
      * @param organizationId
@@ -59,23 +56,23 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
         Set<String> legalBasisNames = new HashSet<>();
         if (!legalBasisDTOList.isEmpty()) {
             for (ProcessingLegalBasisDTO legalBasis : legalBasisDTOList) {
-
                 legalBasisNames.add(legalBasis.getName());
             }
-            List<ProcessingLegalBasis> existing = findMetaDataByNameAndUnitId(organizationId, legalBasisNames, ProcessingLegalBasis.class);
+            List<String> nameInLowerCase = legalBasisNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<ProcessingLegalBasis> existing = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
             if (legalBasisNames.size() != 0) {
                 for (String name : legalBasisNames) {
-
                     ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis(name);
                     newProcessingLegalBasis.setOrganizationId(organizationId);
                     newProcessingLegalBasisList.add(newProcessingLegalBasis);
-
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(newProcessingLegalBasisList));
+                newProcessingLegalBasisList = processingLegalBasisRepository.saveAll(newProcessingLegalBasisList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
@@ -92,7 +89,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @return list of ProcessingLegalBasis
      */
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long organizationId) {
-        return legalBasisMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return processingLegalBasisRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
     /**
@@ -101,9 +98,9 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @return ProcessingLegalBasis object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ProcessingLegalBasis not found for given id
      */
-    public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, BigInteger id) {
+    public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, Long id) {
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByUnitIdAndId(organizationId, id);
+        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -111,13 +108,13 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingLegalBasis(Long unitId, BigInteger legalBasisId) {
+    public Boolean deleteProcessingLegalBasis(Long unitId, Long legalBasisId) {
 
-        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", StringUtils.join(processingActivities, ','));
         }
-        legalBasisMongoRepository.safeDeleteById(legalBasisId);
+        processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, unitId);
         return true;
     }
 
@@ -128,21 +125,21 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @param legalBasisDTO
      * @return ProcessingLegalBasis updated object
      */
-    public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long organizationId, BigInteger id, ProcessingLegalBasisDTO legalBasisDTO) {
+    public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long organizationId, Long id, ProcessingLegalBasisDTO legalBasisDTO) {
 
-        ProcessingLegalBasis processingLegalBasis = legalBasisMongoRepository.findByNameAndUnitId(organizationId, legalBasisDTO.getName());
+        ProcessingLegalBasis processingLegalBasis = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndName(organizationId,  legalBasisDTO.getName());
         if (Optional.ofNullable(processingLegalBasis).isPresent()) {
             if (id.equals(processingLegalBasis.getId())) {
                 return legalBasisDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Legal Basis", processingLegalBasis.getName());
         }
-        processingLegalBasis = legalBasisMongoRepository.findByid(id);
-        if (!Optional.ofNullable(processingLegalBasis).isPresent()) {
+        Integer resultCount =  processingLegalBasisRepository.updateMetadataName(legalBasisDTO.getName(), id, organizationId);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, legalBasisDTO.getName());
         }
-        processingLegalBasis.setName(legalBasisDTO.getName());
-        legalBasisMongoRepository.save(processingLegalBasis);
         return legalBasisDTO;
 
 
@@ -150,8 +147,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
     public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasis(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
 
-        Map<String, List<ProcessingLegalBasis>> result;
-        result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
+        Map<String, List<ProcessingLegalBasis>> result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
         List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasisFromUnit(countryId, processingLegalBasisDTOS);
         if (!masterProcessingLegalBasisSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterProcessingLegalBasisSuggestedByUnit);

@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -23,7 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +39,6 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ShiftServiceUnitTest {
-    private final Logger logger = LoggerFactory.getLogger(ShiftServiceUnitTest.class);
     @InjectMocks
     private ShiftService shiftService;
 
@@ -47,7 +49,6 @@ public class ShiftServiceUnitTest {
     @Mock
     private ShiftStateMongoRepository shiftStateMongoRepository;
     @Mock private PhaseService phaseService;
-    public Phase phase;
     public ShiftDTO shiftDTO;
     public ShiftActivity activity;
     public ShiftActivityDTO activity1;
@@ -56,10 +57,17 @@ public class ShiftServiceUnitTest {
     public boolean realtime=true;
     boolean thrown=true;
 
+    /**
+     * This method is being used to check the all shift is not validated. So it should return false
+     * send to payroll button will be shown only if all shifts is validated
+     */
     @Test
     public void findButtonConfigForSendToPayrollNegativeCase() {
-        Date startDate = new Date(2018,11,19);
-        Date endDate = new Date(2018,11,25);
+        LocalDate startdate = LocalDate.now();
+        startdate = startdate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        LocalDate enddate=startdate.plusDays(7);
+        Date startDate = DateUtils.asDate(startdate);
+        Date endDate = DateUtils.asDate(enddate);
         List<ShiftDTO> shifts = new ArrayList<>();
 
         ShiftDTO shift = new ShiftDTO(BigInteger.valueOf(13870L),new Date(2018,11,19,13,0),new Date(2018,11,19,16,0),35602L,14139L);
@@ -85,10 +93,17 @@ public class ShiftServiceUnitTest {
     }
 
 
+    /**
+     * This method is being used to check the all shift is  validated. So it should return true.
+     * send to payroll button will be shown only if all shifts is validated
+     */
     @Test
     public void findButtonConfigForSendToPayrollPositiveCase() {
-        Date startDate = new Date(2018,11,19);
-        Date endDate = new Date(2018,11,25);
+        LocalDate startdate = LocalDate.now();
+        startdate = startdate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        LocalDate enddate=startdate.plusDays(7);
+        Date startDate = DateUtils.asDate(startdate);
+        Date endDate = DateUtils.asDate(enddate);
         List<ShiftDTO> shifts = new ArrayList<>();
 
         ShiftDTO shift = new ShiftDTO(BigInteger.valueOf(13879L),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
@@ -116,13 +131,14 @@ public class ShiftServiceUnitTest {
     public void validateRealTimeShift(){
         timeZone="Asia/Kolkata";
         Long unitId=958l;
-        phase=new Phase();
+        Phase phase=new Phase();
         phase.setPhaseEnum(PhaseDefaultName.REALTIME);
         phase.setRealtimeDuration(5);
         phase.setId(BigInteger.valueOf(69));
         Map<String,Phase> phaseMap=new HashMap<>();
         phaseMap.put(phase.getPhaseEnum().toString(),phase);
         activity=new ShiftActivity();
+        activity.setId(new BigInteger("12"));
         activity.setActivityId(BigInteger.valueOf(47));
         activity.setStartDate(new Date(2018,10,28,12,30));
         activity.setEndDate(new Date(2018,10,28,18,00));
@@ -176,7 +192,6 @@ public class ShiftServiceUnitTest {
         shiftDTO.setShiftStatePhaseId(BigInteger.valueOf(69));
         shiftDTO.setShiftDate(LocalDate.of(2018,11,28));
         shiftDTO.setShiftId(BigInteger.valueOf(354));
-        when(phaseMongoRepository.findByUnitIdAndName(958l,PhaseDefaultName.REALTIME.toString())).thenReturn(phase);
         when(genericIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
         when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
@@ -188,5 +203,7 @@ public class ShiftServiceUnitTest {
         assertTrue(thrown);
 
     }
+
+
 
 }

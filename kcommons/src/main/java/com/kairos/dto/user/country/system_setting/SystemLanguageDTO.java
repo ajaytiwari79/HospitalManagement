@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.system_setting;
 
+
 public class SystemLanguageDTO {
 
     private Long id;
@@ -7,6 +8,7 @@ public class SystemLanguageDTO {
     private String code;
     private boolean active;
     private boolean defaultLanguage;
+    private boolean selected;
 
     public SystemLanguageDTO(){
         // default constructor
@@ -66,5 +68,13 @@ public class SystemLanguageDTO {
 
     public void setDefaultLanguage(boolean defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

@@ -6,8 +6,6 @@ import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,7 @@ import java.util.List;
 public class AgreementSectionDTO {
 
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String title;
@@ -24,21 +22,21 @@ public class AgreementSectionDTO {
     @Valid
     private List<ClauseBasicDTO> clauses = new ArrayList<>();
     @Valid
-    private List<AgreementSectionDTO> subSections = new ArrayList<>();
+    private List<AgreementSectionDTO> agreementSubSections = new ArrayList<>();
 
-    public List<AgreementSectionDTO> getSubSections() {
-        return subSections;
+    public List<AgreementSectionDTO> getAgreementSubSections() {
+        return agreementSubSections;
     }
 
-    public void setSubSections(List<AgreementSectionDTO> subSections) {
-        this.subSections = subSections;
+    public void setAgreementSubSections(List<AgreementSectionDTO> agreementSubSections) {
+        this.agreementSubSections = agreementSubSections;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

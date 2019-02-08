@@ -28,8 +28,6 @@ public class Tag extends UserBaseEntity {
     @EnumString(MasterDataTypeEnum.class)
     private MasterDataTypeEnum masterDataType;
 
-    private boolean deleted;
-
     private boolean countryTag;
 
     Tag(){}
@@ -40,14 +38,6 @@ public class Tag extends UserBaseEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     public boolean isCountryTag() {

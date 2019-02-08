@@ -71,10 +71,10 @@ public class RestClientUrlUtil {
 
     public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
         if (hasUnitInUrl) {
-            String baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            String baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             return baseUrl;
         } else {
-            String baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl = new StringBuilder(userServiceUrl).toString();
             return baseUrl;
         }
     }

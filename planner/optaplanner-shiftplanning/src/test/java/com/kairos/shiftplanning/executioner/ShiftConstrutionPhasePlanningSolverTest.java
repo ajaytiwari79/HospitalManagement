@@ -28,6 +28,7 @@ import static com.kairos.enums.constraint.ConstraintSubType.*;
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftConstrutionPhasePlanningSolverTest {
     @Test
+    @Ignore
     public void test() {
         //RequestedTask requestedTask =  new RequestedTask();
         //requestedTask.loadXMLFromDB();
@@ -42,7 +43,7 @@ public class ShiftConstrutionPhasePlanningSolverTest {
         new ShiftPlanningSolver().buildBenchmarker();
     }
     @Test
-    //@Ignore
+    @Ignore
     public void runBenchmarker() {
         new ShiftPlanningSolver().runBenchmarker();
     }
@@ -66,6 +67,7 @@ public class ShiftConstrutionPhasePlanningSolverTest {
 
 
 	@Test
+    @Ignore
     public void sendDataToKairos(){
         ShiftRequestPhasePlanningSolution solution = new ShiftPlanningGenerator().loadUnsolvedSolutionFromXML("/home/pradeep/Downloads/shift_solution (1).xml");
         new ShiftPlanningSolver().sendSolutionToKairos(solution);

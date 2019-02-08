@@ -76,14 +76,13 @@ public class GenericIntegrationService {
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
 
-    public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId, Long dateInMillis) {
-        BasicNameValuePair basicNameValuePair = new BasicNameValuePair("dateInMillis", dateInMillis.toString());
-        Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+    public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId) {
+        Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, staffId, expertiseId);
         if (value == null) {
             exceptionService.dataNotFoundByIdException("message.unitPosition.notFound", expertiseId);
         }
-        return value.longValue();
+        return value;
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmployment(Long countryId) {

@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstants.*;
  * Created by pawanmandhan on 5/8/17.
  */
 
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 @RestController
 public class RuleTemplateController {
 

@@ -12,17 +12,19 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetTypeBasicDTO {
 
-    private BigInteger id;
+    private Long id;
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     @Valid
     private List<AssetTypeBasicDTO> subAssetTypes = new ArrayList<>();
 
+    private Boolean subAssetType;
 
-    public BigInteger getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name.trim(); }
 
@@ -31,4 +33,12 @@ public class AssetTypeBasicDTO {
     public List<AssetTypeBasicDTO> getSubAssetTypes() { return subAssetTypes; }
 
     public void setSubAssetTypes(List<AssetTypeBasicDTO> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
+
+    public Boolean getSubAssetType() {
+        return subAssetType;
+    }
+
+    public void setSubAssetType(Boolean subAssetType) {
+        this.subAssetType = subAssetType;
+    }
 }

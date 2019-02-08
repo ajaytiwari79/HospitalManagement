@@ -1,5 +1,6 @@
 package com.kairos.controller.user;
 
+import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -133,19 +135,19 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateSelectedLanguageOfUser(languageId));
     }
 
-    @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staffs")
+    @GetMapping(value = "/user/{userId}/staffs")
     @ApiOperation("get staff ids by userid")
     ResponseEntity<Map<String, Object>> getStaffIdsAndReasonCodeByUserId(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffIdsAndReasonCodeByUserId(userId));
     }
 
-    @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staff_unit_mapping")
+    @GetMapping(value = "/user/{userId}/staff_unit_mapping")
     @ApiOperation("get staff ids and unit ids by userid")
     ResponseEntity<Map<String, Object>> getStaffIdsUnitByUserId(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffIdsUnitByUserId(userId));
     }
 
-    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/user/staffId")
+    @GetMapping(value = UNIT_URL+"/user/staffId")
     @ApiOperation("get staffId by userId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffIdOfLoggedInUser(@PathVariable Long unitId) {
@@ -153,24 +155,30 @@ public class UserController {
     }
 
 
-    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/user/accessgroup")
+    @GetMapping(value = UNIT_URL+"/staff/user/accessgroup")
     @ApiOperation("get accessgroup ids and iscountryadmin")
     public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaffs(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAccessGroupIdsOfStaff(unitId));
     }
 
 
-    @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/unit_sick_settings")
+    @GetMapping(value = "/user/{userId}/unit_sick_settings")
     @ApiOperation("get staff ans sick activities of a user")
     ResponseEntity<Map<String, Object>> getStaffAndUnitSickSettings(@PathVariable long userId,@RequestParam String sickSettingsRequired) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userSickService.getStaffAndUnitSickSettings(userId,sickSettingsRequired));
     }
 
 
-    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/access_groups")
+    @GetMapping(value = UNIT_URL+"/staff/access_groups")
     @ApiOperation("get accessgroup ids and iscountryadmin")
     public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaff(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupIdsByStaffIdAndUnitId(unitId));
 
+    }
+
+    @RequestMapping(value = UNIT_URL+"/update_password", method = RequestMethod.PUT)
+    @ApiOperation("update password")
+    public ResponseEntity<Map<String, Object>> updatePassword(@Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePassword(passwordUpdateDTO));
     }
 }

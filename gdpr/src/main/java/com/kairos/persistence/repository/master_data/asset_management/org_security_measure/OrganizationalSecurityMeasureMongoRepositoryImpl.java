@@ -1,27 +1,10 @@
 package com.kairos.persistence.repository.master_data.asset_management.org_security_measure;
 
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
-import org.bson.Document;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+
+public class OrganizationalSecurityMeasureMongoRepositoryImpl{
 
 
-public class OrganizationalSecurityMeasureMongoRepositoryImpl implements CustomOrganizationalSecurityRepository {
-
-
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -48,5 +31,5 @@ public class OrganizationalSecurityMeasureMongoRepositoryImpl implements CustomO
 
         AggregationResults<OrganizationalSecurityMeasureResponseDTO> results = mongoTemplate.aggregate(aggregation, OrganizationalSecurityMeasure.class, OrganizationalSecurityMeasureResponseDTO.class);
         return results.getMappedResults();
-    }
+    }*/
 }

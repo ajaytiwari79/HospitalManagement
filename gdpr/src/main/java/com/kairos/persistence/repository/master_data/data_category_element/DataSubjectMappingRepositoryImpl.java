@@ -1,33 +1,9 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
-import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-import javax.inject.Inject;
+public class DataSubjectMappingRepositoryImpl  {
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-
-
-public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappingRepository {
-
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
     @Override
@@ -166,6 +142,6 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
         return result.getUniqueMappedResult();
     }
-
+*/
 
 }

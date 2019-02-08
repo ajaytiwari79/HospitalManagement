@@ -1,18 +1,21 @@
 package com.kairos.persistence.model.questionnaire_template;
 
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
 
-import java.math.BigInteger;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class QuestionnaireSection extends MongoBaseEntity {
+@Entity
+public class QuestionnaireSection extends BaseEntity {
 
     private String title;
-    private List<BigInteger> questions=new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Question> questions=new ArrayList<>();
     private Long countryId;
 
 
@@ -44,14 +47,20 @@ public class QuestionnaireSection extends MongoBaseEntity {
         this.title = title;
     }
 
-    public List<BigInteger> getQuestions() {
+    public List<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<BigInteger> questions) {
+    public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
 
 
-
+    @Override
+    public void delete() {
+        super.delete();
+        this.questions.forEach(question -> {
+            question.delete();
+        });
+    }
 }
