@@ -47,6 +47,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.utils.ShiftValidatorService.convertMessage;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -106,7 +107,6 @@ public class ShiftCopyService extends MongoBaseService {
         List<Long> unitPositionIds = staffDataList.stream().map(StaffUnitPositionDetails::getId).collect(Collectors.toList());
         findAndAddCTAInUnitPositions(staffDataList, copyShiftDTO, dataWrapper, unitPositionIds);
         Map<Long, List<WTAQueryResultDTO>> WTAMapByUnitPositionId = findAllWTAGroupByUnitPositionId(unitPositionIds, copyShiftDTO);
-
         List<Long> expertiseIds = staffDataList.stream().map(staffUnitPositionDetails -> staffUnitPositionDetails.getExpertise().getId()).collect(Collectors.toList());
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(expertiseIds);
         Map<BigInteger, ActivityWrapper> breakActivitiesMap = shiftBreakService.getBreakActivities(breakSettings, unitId);
@@ -156,13 +156,14 @@ public class ShiftCopyService extends MongoBaseService {
 
         ShiftResponse shiftResponse;
         while (shiftCreationLastDate.isAfter(shiftCreationStartDate) || shiftCreationLastDate.equals(shiftCreationStartDate)) {
-            if ((shiftCreationStartDate.equals(staffUnitPosition.getStartDate()) || shiftCreationStartDate.isAfter(staffUnitPosition.getStartDate())) &&
-                    (staffUnitPosition.getEndDate() == null || shiftCreationStartDate.equals(staffUnitPosition.getEndDate()) || shiftCreationStartDate.isBefore(staffUnitPosition.getEndDate()))) {
                 ShiftResponseDTO shiftResponseDTO = shifts.get(counter);
                 List<String> validationMessages = new ArrayList<>();
                 for (Shift sourceShift : shiftResponseDTO.getShifts()) {
+                    if ((shiftCreationStartDate.equals(staffUnitPosition.getStartDate()) || shiftCreationStartDate.isAfter(staffUnitPosition.getStartDate())) &&
+                            (staffUnitPosition.getEndDate() == null || shiftCreationStartDate.equals(staffUnitPosition.getEndDate()) || shiftCreationStartDate.isBefore(staffUnitPosition.getEndDate()))) {
+                        validationMessages.add(convertMessage("message.unit_position.not.active",shiftCreationStartDate));
+                    }
                     ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap);
-
                     PlanningPeriodDTO planningPeriod = getCurrentPlanningPeriod(planningPeriodMap, shiftCreationStartDate);
                     Date startDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getStartDate()));
                     Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
@@ -182,7 +183,6 @@ public class ShiftCopyService extends MongoBaseService {
                         errorInCopyingShifts.add(shiftResponse);
                     }
                 }
-            }
             shiftCreationStartDate = shiftCreationStartDate.plusDays(1);
             if (counter++ == shifts.size() - 1) {
                 counter = 0;

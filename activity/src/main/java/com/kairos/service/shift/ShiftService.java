@@ -659,6 +659,9 @@ public class ShiftService extends MongoBaseService {
     }
 
     public ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long unitPositionId) {
+        if (staffId == null) {
+            exceptionService.actionNotPermittedException("staff_id.null");
+        }
         Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap();
         List<ReasonCodeDTO> reasonCodeDTOS;
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
@@ -1026,6 +1029,9 @@ public class ShiftService extends MongoBaseService {
     }
 
     private ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate, ViewType viewType) {
+        if (endDate == null) {
+            exceptionService.actionNotPermittedException("endDate.null");
+        }
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
         UserAccessRoleDTO userAccessRoleDTO = genericIntegrationService.getAccessRolesOfStaff(unitId);
         List<OpenShift> openShifts = userAccessRoleDTO.getManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) :
@@ -1056,7 +1062,7 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO, buttonConfig);
     }
 
-    private ButtonConfig findButtonConfig(List<ShiftDTO> shifts, Date startDate, Date endDate, boolean management) {
+    public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, Date startDate, Date endDate, boolean management) {
         ButtonConfig buttonConfig = new ButtonConfig();
         if (management) {
             if (!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY) ||
@@ -1078,6 +1084,9 @@ public class ShiftService extends MongoBaseService {
     }
 
     private List<ShiftDTO> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, Date startDate, Date endDate, Long expertiseId) {
+        if (staffId == null || endDate == null || expertiseId == null) {
+            exceptionService.actionNotPermittedException("staff_id.end_date.null");
+        }
         Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, expertiseId);
         return shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDate, endDate, unitId);
     }
@@ -1423,21 +1432,12 @@ public class ShiftService extends MongoBaseService {
         }
         switch (shiftFilterParam) {
             case INDIVIDUAL_VIEW:
-                if (staffId == null) {
-                    exceptionService.actionNotPermittedException("staff_id.null");
-                }
                 object = getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId);
                 break;
             case OPEN_SHIFT:
-                if (endDate == null) {
-                    exceptionService.actionNotPermittedException("endDate.null");
-                }
                 object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), viewType);
                 break;
             case EXPERTISE:
-                if (staffId == null || endDate == null || expertiseId == null) {
-                    exceptionService.actionNotPermittedException("staff_id.end_date.null");
-                }
                 object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId);
                 break;
             case SHIFT_STATE:
