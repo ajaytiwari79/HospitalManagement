@@ -120,7 +120,7 @@ public class TimeBankCalculationService {
                                     int ctaTimeBankMin = 0;
                                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
                                         dailyScheduledMin += shiftActivity.getScheduledMinutes();
-                                        totalDailyTimebank += dailyScheduledMin;
+                                        totalDailyTimebank += shiftActivity.getScheduledMinutes();
                                     } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                         for (CompensationTableInterval ctaInterval : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
                                             List<Interval> intervalOfCTAs = getCTAInterval(ctaInterval, interval.getStart());
