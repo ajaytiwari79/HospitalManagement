@@ -37,7 +37,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public List<QuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(Long countryId) {
+    public List<QuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateByCountryId(Long countryId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 

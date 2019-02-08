@@ -237,8 +237,8 @@ public class QuestionnaireTemplateService {
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long referenceId, boolean isUnitId) {
-        return isUnitId ? questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(referenceId) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(referenceId);
+    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateByCountryIdOrOrganizationId(Long referenceId, boolean isUnitId) {
+        return isUnitId ? questionnaireTemplateRepository.getAllQuestionnaireTemplateByOrganizationId(referenceId) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateByCountryId(referenceId);
 
     }
 

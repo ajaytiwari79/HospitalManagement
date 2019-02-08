@@ -4,12 +4,14 @@ import com.kairos.custom_exception.JpaCustomDatabaseException;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.List;
 
 public class QuestionnaireTemplateRepositoryImpl implements CustomQuestionnaireTemplateRepository {
 
@@ -19,7 +21,7 @@ public class QuestionnaireTemplateRepositoryImpl implements CustomQuestionnaireT
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static String selectConstant="Select QT from QuestionnaireTemplate QT";
+    private static String selectConstant="Select QT from QuestionnaireTemplate QT ";
 
 
     @Override
@@ -176,4 +178,37 @@ public class QuestionnaireTemplateRepositoryImpl implements CustomQuestionnaireT
             throw new JpaCustomDatabaseException(e.getMessage());
         }
     }
+
+    @Override
+    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateByOrganizationId(Long orgId) {
+        LOGGER.debug("getAllQuestionnaireTemplateByOrganizationId() method call");
+        try {
+            TypedQuery<QuestionnaireTemplate> query = entityManager.createQuery(
+                    "select QT FROM QuestionnaireTemplate QT "+
+                    "where QT.organizationId = :orgId " +
+                    "and QT.deleted = false "
+                   , QuestionnaireTemplate.class);
+            query.setParameter("orgId",orgId);return query.getResultList();
+
+        } catch (Exception e) {
+            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method getAllQuestionnaireTemplateByOrganizationId");
+            throw new JpaCustomDatabaseException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<QuestionnaireTemplate> getAllMasterQuestionnaireTemplateByCountryId(Long countryId) {
+        LOGGER.debug("getAllMasterQuestionnaireTemplateByCountryId() method call");
+        try {
+            TypedQuery<QuestionnaireTemplate> query = entityManager.createQuery(
+                    "select QT FROM QuestionnaireTemplate QT "+
+                    "where QT.countryId = :countryId " +
+                    "and QT.deleted = false " , QuestionnaireTemplate.class);
+            query.setParameter("countryId",countryId);
+            return query.getResultList();
+
+        } catch (Exception e) {
+            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method getAllMasterQuestionnaireTemplateByCountryId");
+            throw new JpaCustomDatabaseException(e.getMessage());
+        }    }
 }

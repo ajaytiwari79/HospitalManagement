@@ -3,6 +3,8 @@ package com.kairos.persistence.repository.questionnaire_template;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 
+import java.util.List;
+
 public interface CustomQuestionnaireTemplateRepository {
 
 
@@ -18,9 +20,11 @@ public interface CustomQuestionnaireTemplateRepository {
 
     QuestionnaireTemplate findRiskTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeId(Long countryid,Long assetTypeId,Long assetSubTypeId);
 
-
-
     QuestionnaireTemplate getDefaultPublishedAssetQuestionnaireTemplateByUnitId(Long orgId);
+
+    List<QuestionnaireTemplate> getAllQuestionnaireTemplateByOrganizationId(Long orgId);
+
+    List<QuestionnaireTemplate> getAllMasterQuestionnaireTemplateByCountryId(Long countryId);
 
 
 }
