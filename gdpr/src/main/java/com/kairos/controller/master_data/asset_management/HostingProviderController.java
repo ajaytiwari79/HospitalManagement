@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,14 +43,17 @@ public class HostingProviderController {
     @ApiOperation("add HostingProvider")
     @PostMapping("/hosting_provider")
     public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviderDTOs.getRequestBody()));
+        if (CollectionUtils.isEmpty(hostingProviderDTOs.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviderDTOs.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable Long hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, hostingProviderId));
 
     }
@@ -66,21 +68,21 @@ public class HostingProviderController {
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable Long hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(countryId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable Long hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, hostingProviderId, hostingProviderDTO));
 
     }
 
     @ApiOperation("update Suggested status of Hosting provider")
     @PutMapping("/hosting_provider")
-    public ResponseEntity<Object> updateSuggestedStatusOfHostingProviders(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingProviderIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfHostingProviders(@PathVariable Long countryId, @RequestBody Set<Long> hostingProviderIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(hostingProviderIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Provider is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

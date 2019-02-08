@@ -14,15 +14,15 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by vipul on 15/12/17.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 public class CountryPhaseController {
     @Inject
     private PhaseService phaseService;

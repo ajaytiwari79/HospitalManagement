@@ -1,9 +1,8 @@
 package com.kairos.persistence.model.country.holiday;
 import com.kairos.config.neo4j.converter.LocalTimeConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.time.LocalDate;

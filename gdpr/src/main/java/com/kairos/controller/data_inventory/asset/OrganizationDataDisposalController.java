@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -40,7 +39,7 @@ public class OrganizationDataDisposalController {
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(unitId, dataDisposalId));
     }
 
@@ -53,13 +52,13 @@ public class OrganizationDataDisposalController {
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(unitId, dataDisposalId));
     }
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(unitId, dataDisposalId, dataDisposalDTO));
 
     }

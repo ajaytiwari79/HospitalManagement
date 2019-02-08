@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,13 +43,16 @@ public class TransferMethodController {
     @ApiOperation("add transfer Method ")
     @PostMapping("/transfer_method")
     public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethods) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.createTransferMethod(countryId, transferMethods.getRequestBody()));
+        if (CollectionUtils.isEmpty(transferMethods.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.createTransferMethod(countryId, transferMethods.getRequestBody(), false));
     }
 
 
     @ApiOperation("get transfer Method by id")
     @GetMapping("/transfer_method/{transferMethodId}")
-    public ResponseEntity<Object> getTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId) {
+    public ResponseEntity<Object> getTransferMethod(@PathVariable Long countryId, @PathVariable Long transferMethodId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(countryId, transferMethodId));
     }
 
@@ -63,21 +65,21 @@ public class TransferMethodController {
 
     @ApiOperation("delete transfer Method by id")
     @DeleteMapping("/transfer_method/{transferMethodId}")
-    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId) {
+    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long countryId, @PathVariable Long transferMethodId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(countryId, transferMethodId));
     }
 
 
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/{transferMethodId}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable Long transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(countryId, transferMethodId, transferMethod));
     }
 
 
     @ApiOperation("update Suggested status of Transfer methods")
     @PutMapping("/transfer_method")
-    public ResponseEntity<Object> updateSuggestedStatusOfTransferMethods(@PathVariable Long countryId, @RequestBody Set<BigInteger> transferMethodIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfTransferMethods(@PathVariable Long countryId, @RequestBody Set<Long> transferMethodIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(transferMethodIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Transfer Method is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

@@ -21,8 +21,8 @@ public interface LocationGraphRepository extends Neo4jBaseRepository<Location, L
     @Query("MATCH(union:Organization{deleted:false})-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) WHERE id(union)={0} RETURN location")
     List<Location> findLocationsByUnion(Long unionId);
 
-    @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) WHERE LOWER(location.name)=LOWER({0}) and id(union)={1} RETURN COUNT(location)>0")
-    boolean existsByName(String name,Long unionId);
+    @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) WHERE id(location)<>{2} AND location.name=~{0} and id(union)={1} RETURN COUNT(location)>0")
+    boolean existsByName(String name,Long unionId,Long locationId);
 
     @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]->(location:Location{deleted:false}) WHERE (id(location)={0} or LOWER(location.name)=LOWER({1})) and id(union)={2} WITH union,location " +
             "OPTIONAL MATCH(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) WITH union,location,address" +

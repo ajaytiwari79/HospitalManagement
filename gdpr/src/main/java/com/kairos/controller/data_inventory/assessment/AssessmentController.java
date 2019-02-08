@@ -7,7 +7,6 @@ import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -39,7 +38,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "launch assessment for Asset")
     @PostMapping( "/assessment/asset/{assetId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable Long assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForAsset(unitId,  assetId, assessmentDTO));
 
     }
@@ -47,16 +46,16 @@ public class AssessmentController {
 
     @ApiOperation(value = "launch assessment for processing activity")
     @PostMapping( "/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO,subProcessingActivity));
 
     }
 
-    @ApiOperation(value = "get Assessment  By Id")
+    /*@ApiOperation(value = "get Assessment  By Id")
     @GetMapping( "/assessment/{assessmentId}")
     public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentById( unitId, assessmentId));
-    }
+    }*/
 
 
     @ApiOperation(value = "get All launched Assessment Assign Staff Member")
@@ -73,7 +72,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "delete Assessment by id")
     @DeleteMapping("/assessment/{assessmentId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable Long assessmentId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentById(unitId,assessmentId));
     }
 
@@ -93,7 +92,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "Change Assessment status")
     @PutMapping("/assessment/{assessmentId}/status")
-    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
+    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable Long assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
         if (!Optional.ofNullable(assessmentStatus).isPresent())
         {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Assessment Status "+assessmentStatus+" is invalid");

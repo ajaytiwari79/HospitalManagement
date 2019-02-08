@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
@@ -39,25 +38,25 @@ public class DataSubjectMappingController {
 
     @ApiOperation("delete data Subject mapping by id ")
     @DeleteMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> deleteDataSubjectAndMappingById(@PathVariable Long countryId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> deleteDataSubjectAndMappingById(@PathVariable Long countryId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.deleteDataSubjectById( dataSubjectId));
     }
 
     @ApiOperation("get data Subject mapping with data Category and data elements by id ")
     @GetMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementsById(@PathVariable Long countryId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementsById(@PathVariable Long countryId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithDataByCountryIdAndId(countryId, dataSubjectId));
     }
 
     @ApiOperation("get all data Subject  ")
     @GetMapping(COUNTRY_URL+"/data_subject")
     public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElements(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectWithDataCategoryByCountryId(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectWithDataCategoryByCountryId(countryId, true));
     }
 
     @ApiOperation("update data Subject ")
     @PutMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable BigInteger dataSubjectId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectMappingDto) {
+    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long dataSubjectId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectMappingDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateDataSubjectAndMapping(countryId, dataSubjectId, dataSubjectMappingDto));
     }
 
@@ -76,13 +75,13 @@ public class DataSubjectMappingController {
 
     @ApiOperation("organization, delete data Subject by id ")
     @DeleteMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> deleteOrganizationDataSubjectById(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> deleteOrganizationDataSubjectById(@PathVariable Long unitId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.deleteDataSubjectById(dataSubjectId));
     }
 
     @ApiOperation("Organization get data Subject with data Category and data elements by id ")
     @GetMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> getOrganizationDataSubjectWithDataCategoryAndElementsById(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> getOrganizationDataSubjectWithDataCategoryAndElementsById(@PathVariable Long unitId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectWithDataCategoryAndElementByUnitIdAndId(unitId, dataSubjectId));
     }
 
@@ -94,7 +93,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("organization, update data Subject ")
     @PutMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> updateOrganizationDataSubjectAndMapping(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
+    public ResponseEntity<Object> updateOrganizationDataSubjectAndMapping(@PathVariable Long unitId, @PathVariable Long dataSubjectId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateOrganizationDataSubject(unitId, dataSubjectId, dataSubjectDTO));
     }
 

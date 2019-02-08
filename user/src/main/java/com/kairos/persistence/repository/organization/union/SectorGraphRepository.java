@@ -19,8 +19,8 @@ public interface SectorGraphRepository extends Neo4jBaseRepository<Sector, Long>
     @Query("MATCH(sector:Sector{deleted:false}) WHERE id(sector)={0} RETURN sector")
     Sector findSectorById(Long sectorId);
 
-    @Query("MATCH(sector:Sector{deleted:false}) WHERE sector.name={0} RETURN count(sector)>0")
-    boolean existsByName(String name);
+    @Query("MATCH(sector:Sector{deleted:false}) WHERE id(sector)<>{1} AND sector.name=~{0} RETURN count(sector)>0")
+    boolean existsByName(String name,Long sectorId);
 
     @Query("MATCH(sector:Sector{deleted:false}) WHERE id(sector) IN {0} RETURN sector")
     List<Sector> findSectorsById(List<Long> sectorIds);

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;

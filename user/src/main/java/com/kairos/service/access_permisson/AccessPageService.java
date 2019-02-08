@@ -32,7 +32,6 @@ import com.kairos.dto.user.staff.permission.StaffPermissionDTO;
 import com.kairos.dto.user.staff.permission.StaffTabPermission;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.user_context.UserContext;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -168,8 +167,6 @@ public class AccessPageService {
                 EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
                 employmentAccessPageRelation.setRead(true);
                 employmentAccessPageRelation.setWrite(false);
-                employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-                employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
                 employmentAccessPageRelations.add(employmentAccessPageRelation);
             }
         }
@@ -183,8 +180,6 @@ public class AccessPageService {
             EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
             employmentAccessPageRelation.setRead(true);
             employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-            employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
@@ -197,8 +192,6 @@ public class AccessPageService {
             EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
             employmentAccessPageRelation.setRead(true);
             employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-            employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);

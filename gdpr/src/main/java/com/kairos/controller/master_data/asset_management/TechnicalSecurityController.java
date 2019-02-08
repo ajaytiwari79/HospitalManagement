@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,15 +41,19 @@ public class TechnicalSecurityController {
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures.getRequestBody()));
+
+        if (CollectionUtils.isEmpty(securityMeasures.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
     @GetMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId) {
-           return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long techSecurityMeasureId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
     }
 
 
@@ -62,7 +65,7 @@ public class TechnicalSecurityController {
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
     @DeleteMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId) {
+    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long techSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
 
     }
@@ -70,17 +73,17 @@ public class TechnicalSecurityController {
 
     @ApiOperation("update Technical security measure by id")
     @PutMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
+    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(countryId, techSecurityMeasureId, securityMeasure));
 
     }
 
     @ApiOperation("update Suggested status of Technical Security")
     @PutMapping("/technical_security")
-    public ResponseEntity<Object> updateSuggestedStatusOfTechnicalSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<BigInteger> techSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfTechnicalSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<Long> techSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(techSecurityMeasureIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Security Measure is Not Selected");
-        }else   if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateSuggestedStatusOfTechnicalSecurityMeasures(countryId, techSecurityMeasureIds, suggestedDataStatus));

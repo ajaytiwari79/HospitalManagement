@@ -27,15 +27,19 @@ public class AgreementTemplateSectionResponseDTO {
 
     private List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
 
-    private List<AgreementSectionResponseDTO> sections = new ArrayList<>();
+    private List<AgreementSectionResponseDTO> agreementSections = new ArrayList<>();
 
     public List<ClauseBasicResponseDTO> getClauseListForTemplate() { return clauseListForTemplate; }
 
     public void setClauseListForTemplate(List<ClauseBasicResponseDTO> clauseListForTemplate) { this.clauseListForTemplate = clauseListForTemplate; }
 
-    public List<AgreementSectionResponseDTO> getSections() { return sections; }
+    public List<AgreementSectionResponseDTO> getAgreementSections() {
+        return agreementSections;
+    }
 
-    public void setSections(List<AgreementSectionResponseDTO> sections) { this.sections = sections; }
+    public void setAgreementSections(List<AgreementSectionResponseDTO> agreementSections) {
+        this.agreementSections = agreementSections;
+    }
 
     public boolean isCoverPageAdded() { return coverPageAdded; }
 

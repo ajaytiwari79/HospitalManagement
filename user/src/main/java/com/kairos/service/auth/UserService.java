@@ -6,13 +6,15 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
@@ -409,6 +411,7 @@ public class UserService {
     }
 
     public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organizationId);
         long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
@@ -461,6 +464,7 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationId(organizationId);
+        permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 

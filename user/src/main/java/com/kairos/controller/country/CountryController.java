@@ -1,6 +1,7 @@
 package com.kairos.controller.country;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
 import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
@@ -8,10 +9,7 @@ import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.default_data.BusinessType;
-import com.kairos.persistence.model.country.default_data.CitizenStatus;
-import com.kairos.persistence.model.country.default_data.ClinicType;
-import com.kairos.persistence.model.country.default_data.ContractType;
+import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
@@ -56,8 +54,8 @@ import static com.kairos.constants.ApiConstants.*;
  * 1.Calls Country Service
  * 2. Call for CRUD operation on Country
  */
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 @RestController
 public class CountryController {
 
@@ -151,7 +149,7 @@ public class CountryController {
     @RequestMapping(value = "/country", method = RequestMethod.GET)
     @ApiOperation("Find all Countries")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllCountry(@PathVariable Long organizationId) {
+    public ResponseEntity<Map<String, Object>> getAllCountry() {
         List<Map<String, Object>> countryList = countryService.getAllCountries();
         if (countryList.size() != 0)
             return ResponseHandler.generateResponse(HttpStatus.OK, true, countryList);
@@ -341,10 +339,9 @@ public class CountryController {
     @ApiOperation(value = "Add a Parent Organization")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
-                                                                        @PathVariable long countryId,
+    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable long countryId,
                                                                         @Valid @RequestBody OrganizationBasicDTO organizationBasicDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationBasicDTO, countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationBasicDTO, countryId));
     }
 
 
@@ -408,15 +405,15 @@ public class CountryController {
     @ApiOperation(value = "Add DayType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/clinicType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addClinicType(@PathVariable long countryId, @Validated @RequestBody ClinicType clinicType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.createClinicType(countryId, clinicType));
+    public ResponseEntity<Map<String, Object>> addClinicType(@PathVariable long countryId, @Validated @RequestBody ClinicTypeDTO clinicTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.createClinicType(countryId, clinicTypeDTO));
     }
 
     @ApiOperation(value = "Update DayType")
     @RequestMapping(value = COUNTRY_URL + "/clinicType", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateClinicType(@Validated @RequestBody ClinicType clinicType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.updateClinicType(clinicType));
+    public ResponseEntity<Map<String, Object>> updateClinicType(@PathVariable long countryId, @Validated @RequestBody ClinicTypeDTO clinicTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.updateClinicType(countryId, clinicTypeDTO));
     }
 
     @ApiOperation(value = "Delete DayType by dayTypeId")
@@ -439,15 +436,15 @@ public class CountryController {
     @ApiOperation(value = "Add IndustryType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/industryType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addIndustryType(@PathVariable long countryId, @Validated @RequestBody IndustryType industryType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.createIndustryType(countryId, industryType));
+    public ResponseEntity<Map<String, Object>> addIndustryType(@PathVariable long countryId, @Validated @RequestBody IndustryTypeDTO industryTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.createIndustryType(countryId, industryTypeDTO));
     }
 
     @ApiOperation(value = "Update IndustryType")
     @RequestMapping(value = COUNTRY_URL + "/industryType", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateIndustryType(@Validated @RequestBody IndustryType industryType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.updateIndustryType(industryType));
+    public ResponseEntity<Map<String, Object>> updateIndustryType(@PathVariable long countryId, @Validated @RequestBody IndustryTypeDTO industryTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.updateIndustryType(countryId, industryTypeDTO));
     }
 
     @ApiOperation(value = "Delete IndustryType by industryTypeId")
@@ -470,15 +467,15 @@ public class CountryController {
     @ApiOperation(value = "Add OwnershipType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/ownershipType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOwnershipType(@PathVariable long countryId, @Validated @RequestBody OwnershipType ownershipType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.createOwnershipType(countryId, ownershipType));
+    public ResponseEntity<Map<String, Object>> addOwnershipType(@PathVariable long countryId, @Validated @RequestBody OwnershipTypeDTO ownershipTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.createOwnershipType(countryId, ownershipTypeDTO));
     }
 
     @ApiOperation(value = "Update OwnershipType")
     @RequestMapping(value = COUNTRY_URL + "/ownershipType", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOwnershipType(@Validated @RequestBody OwnershipType ownershipType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.updateOwnershipType(ownershipType));
+    public ResponseEntity<Map<String, Object>> updateOwnershipType(@PathVariable long countryId, @Validated @RequestBody OwnershipTypeDTO ownershipTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.updateOwnershipType(countryId, ownershipTypeDTO));
     }
 
     @ApiOperation(value = "Delete OwnershipType by ownershipTypeId")
@@ -532,15 +529,15 @@ public class CountryController {
     @ApiOperation(value = "Add ContractType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/contractType", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addContractType(@PathVariable long countryId, @Validated @RequestBody ContractType contractType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.createContractType(countryId, contractType));
+    public ResponseEntity<Map<String, Object>> addContractType(@PathVariable long countryId, @Validated @RequestBody ContractTypeDTO contractTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.createContractType(countryId, contractTypeDTO));
     }
 
     @ApiOperation(value = "Update ContractType")
     @RequestMapping(value = COUNTRY_URL + "/contractType", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateContractType(@Validated @RequestBody ContractType contractType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateContractType(contractType));
+    public ResponseEntity<Map<String, Object>> updateContractType(@PathVariable long countryId, @Validated @RequestBody ContractTypeDTO contractTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateContractType(countryId, contractTypeDTO));
     }
 
     @ApiOperation(value = "Delete ContractType by contractTypeId")
@@ -562,15 +559,15 @@ public class CountryController {
     @ApiOperation(value = "Add VatType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/vatType", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addVatType(@PathVariable long countryId, @Validated @RequestBody VatType vatType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.createVatType(countryId, vatType));
+    public ResponseEntity<Map<String, Object>> addVatType(@PathVariable long countryId, @Validated @RequestBody VatTypeDTO vatTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.createVatType(countryId, vatTypeDTO));
     }
 
     @ApiOperation(value = "Update VatType")
     @RequestMapping(value = COUNTRY_URL + "/vatType", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateVatType(@Validated @RequestBody VatType vatType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.updateVatType(vatType));
+    public ResponseEntity<Map<String, Object>> updateVatType(@PathVariable long countryId, @Validated @RequestBody VatTypeDTO vatTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.updateVatType(countryId, vatTypeDTO));
     }
 
     @ApiOperation(value = "Delete VatType by vatTypeId")
@@ -944,12 +941,12 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.deleteExpertise(expertiseId));
     }
 
-    @ApiOperation(value = "get a single expertise based on Id")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseById(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
-    }
+//    @ApiOperation(value = "get a single expertise based on Id")
+//    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.GET)
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getExpertiseById(@PathVariable Long expertiseId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
+//    }
 
     @ApiOperation(value = "Publish expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/publish", method = RequestMethod.PUT)

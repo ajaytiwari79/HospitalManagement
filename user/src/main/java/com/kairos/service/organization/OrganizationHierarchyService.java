@@ -7,7 +7,6 @@ import com.kairos.dto.gdpr.filter.FilterAttributes;
 import com.kairos.dto.gdpr.filter.FilterResponseDTO;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.enums.gdpr.FilterType;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -42,6 +40,8 @@ public class OrganizationHierarchyService {
     UserGraphRepository userGraphRepository;
     @Inject
     private AccessPageService accessPageService;
+    @Inject
+    private OrganizationService organizationService;
 
     public QueryResult generateHierarchyMinimum(long parentOrganizationId) {
         List<Map<String, Object>> units = organizationGraphRepository.getSubOrgHierarchy(parentOrganizationId);
@@ -218,7 +218,6 @@ public class OrganizationHierarchyService {
      */
     public QueryResult generateOrganizationHierarchyByFilter(long parentOrganizationId,OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId,organizationHierarchyFilterDTO);
-
         if (units.isEmpty()) {
             Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
             if (organization == null) {
@@ -275,12 +274,13 @@ public class OrganizationHierarchyService {
 
     /**
      *
-     * @param parentOrganizationId
+     * @param unitId
      * @return
      */
-    public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long parentOrganizationId) {
+    public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long unitId) {
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         FilterAndFavouriteFilterDTO filterAndFavouriteFilter=new FilterAndFavouriteFilterDTO();
-        Map<String,Object> filterTypeDataMap= organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
+        Map<String,Object> filterTypeDataMap= organizationGraphRepository.getFiltersByParentOrganizationId(parent.getId());
         List<FilterResponseDTO> filterResponseDTOList=new ArrayList<>();
         for(String filterType:filterTypeDataMap.keySet()){
             FilterResponseDTO filterResponseDTO=new FilterResponseDTO();

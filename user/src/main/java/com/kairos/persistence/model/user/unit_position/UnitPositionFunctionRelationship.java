@@ -21,7 +21,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
 
 @RelationshipEntity(type = APPLIED_FUNCTION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@QueryResult
 public class UnitPositionFunctionRelationship extends UserBaseEntity {
 
     @StartNode

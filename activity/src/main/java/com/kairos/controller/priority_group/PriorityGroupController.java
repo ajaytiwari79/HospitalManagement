@@ -17,8 +17,8 @@ import java.util.Map;
 import static com.kairos.constants.ApiConstants.*;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 public class PriorityGroupController {
     @Inject
     private PriorityGroupService priorityGroupService;

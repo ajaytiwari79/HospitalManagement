@@ -1,37 +1,9 @@
 package com.kairos.persistence.repository.data_inventory.processing_activity;
 
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-
-import static com.kairos.constants.AppConstant.*;
-
-public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingActivityRepository {
+public class ProcessingActivityMongoRepositoryImpl {
 
 
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -203,5 +175,5 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         AggregationResults<ProcessingActivityRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityRiskResponseDTO.class);
         return result.getMappedResults();
 
-    }
+    }*/
 }

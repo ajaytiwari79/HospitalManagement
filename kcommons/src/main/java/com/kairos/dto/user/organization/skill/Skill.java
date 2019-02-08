@@ -3,6 +3,7 @@ package com.kairos.dto.user.organization.skill;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -14,30 +15,22 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class Skill {
 
     private Long id;
-
-    @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
+    @NotBlank(message = "error.Skill.name.notEmpty")
     private String name;
-
-
     private String description;
-
     private boolean isEnabled = true;
-
     private String shortName;
-
     private SkillStatus skillStatus;
     private SkillCategory skillCategory;
-    /*User requestedBy;
 
-    User approvedBy;*/
+    public Skill() {
+    }
 
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;
         this.skillCategory = skillCategory;
     }
 
-    public Skill() {
-    }
 
     public String getShortName() {
         return shortName;

@@ -3,17 +3,16 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataSubjectMappingResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -21,17 +20,17 @@ public class DataSubjectMappingResponseDTO {
 
     private Long countryId;
 
-    private List<OrganizationType> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypes;
 
-    private List<OrganizationSubType> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     private List<DataCategoryResponseDTO> dataCategories;
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,19 +50,19 @@ public class DataSubjectMappingResponseDTO {
         this.description = description;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 

@@ -1,33 +1,8 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
-import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+public class DataCategoryMongoRepositoryImpl {
 
-import javax.inject.Inject;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-
-public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryRepository {
-
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -129,5 +104,5 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
         AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
         return result.getUniqueMappedResult();
-    }
+    }*/
 }

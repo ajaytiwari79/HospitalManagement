@@ -37,8 +37,8 @@ import static com.kairos.constants.ApiConstants.*;
  * Created by prabjot on 5/10/16.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(value = API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(value = API_V1)
 public class TaskTypeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTypeController.class);
@@ -581,12 +581,12 @@ public class TaskTypeController {
     }
 
     // Selected
-    @RequestMapping(value = "/organization/{organizationId}/sub_service/{subServiceId}/task_types", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/sub_service/{subServiceId}/task_types", method = RequestMethod.GET)
     @ApiOperation("Get Selected Tasks in SubService of Organization")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTaskTypesOfOrganizations(@PathVariable long organizationId, @PathVariable long subServiceId) {
+    public ResponseEntity<Map<String, Object>> getTaskTypesOfOrganizations(@PathVariable long unitId, @PathVariable long subServiceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                taskTypeService.getTaskTypesOfOrganizations(organizationId, subServiceId));
+                taskTypeService.getTaskTypesOfOrganizations(unitId, subServiceId));
     }
 
 
@@ -719,9 +719,9 @@ public class TaskTypeController {
     @ApiOperation(value = "Add/ Remove TaskType to Organization")
     @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable long subServiceId,
+    public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long unitId, @PathVariable long subServiceId,
                                                                          @RequestBody Map<String, Object> data, @RequestParam("type") String type) throws CloneNotSupportedException {
-        String taskTypeId = data.get("taskTypeId") + "";
+        String taskTypeId = data.get("taskTyp/task_types/getAllAvlSkilleId") + "";
         boolean isSelected = (boolean) data.get("isSelected");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 taskTypeService.updateTaskType(unitId, subServiceId, taskTypeId, isSelected, type));

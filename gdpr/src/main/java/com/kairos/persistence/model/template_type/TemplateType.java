@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.template_type;
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -10,18 +10,18 @@ import javax.validation.constraints.Pattern;
  * @Auther vikash patwal
  */
 
-@Document
-public class TemplateType extends MongoBaseEntity {
+@Entity
+public class TemplateType extends BaseEntity {
 
 
-    @NotBlank(message = "templateName cannot be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {

@@ -14,7 +14,6 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.wrapper.staff.StaffEmploymentWrapper;
@@ -168,9 +167,9 @@ public class StaffFilterService {
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, moduleId);
     }
 
-    public StaffFilterDTO addFavouriteFilter(Long organizationId, StaffFilterDTO staffFilterDTO) {
+    public StaffFilterDTO addFavouriteFilter(Long unitId, StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, unitId);
 
 
         if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
@@ -230,10 +229,10 @@ public class StaffFilterService {
         return favouriteFilterDTO;
     }
 
-    public Boolean deleteFavouriteFilter(Long filterId, Long organizationId) {
+    public Boolean deleteFavouriteFilter(Long filterId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
-                userId, organizationId, filterId);
+                userId, unitId, filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 

@@ -9,11 +9,8 @@ import com.kairos.dto.user.client.ClientExceptionDTO;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
-import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.planner.vrp.TaskAddress;
-import com.kairos.dto.user.client.ClientExceptionDTO;
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
@@ -68,16 +65,10 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.dto.user.staff.ContactPersonDTO;
-import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
-import com.kairos.dto.user.staff.client.ClientFilterDTO;
-import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
-import com.kairos.dto.planner.vrp.TaskAddress;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.wrapper.ContactPersonTabDataDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
@@ -187,7 +178,8 @@ public class ClientService {
     @Inject private ClientContactPersonRelationshipRepository clientContactPersonRelationshipRepository;
     @Inject private ClientContactPersonGraphRepository clientContactPersonGraphRepository;
     @Inject private StaffRetrievalService staffRetrievalService;
-
+    @Inject
+    private com.kairos.service.organization.OrganizationService organizationService;
 
     /*
         public Client createCitizen(Client client) {
@@ -1088,7 +1080,7 @@ public class ClientService {
     }
 
 
-    public HashMap<String, Object> getOrganizationAllClients(long organizationId, long unitId, long staffId) {
+    public HashMap<String, Object> getOrganizationAllClients( long unitId, long staffId) {
         List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(unitId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
@@ -1097,7 +1089,7 @@ public class ClientService {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(organizationId, unitId, staffId)));
+        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration( unitId, staffId)));
         return response;
     }
 
@@ -1660,18 +1652,18 @@ public class ClientService {
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId, long parentOrganizationId) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long unitId, ClientFilterDTO clientFilterDTO, String skip, String moduleId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()) {
-            List<TaskTypeAggregateResult> taskTypeAggregateResults = taskDemandRestClient.getCitizensByFilters(organizationId, clientFilterDTO);
+            List<TaskTypeAggregateResult> taskTypeAggregateResults = taskDemandRestClient.getCitizensByFilters(unitId, clientFilterDTO);
             citizenIds.addAll(taskTypeAggregateResults.stream().map(taskTypeAggregateResult -> taskTypeAggregateResult.getId()).collect(Collectors.toList()));
         }
-        logger.debug("Finding citizen with Id: " + organizationId);
+        logger.debug("Finding citizen with Id: " + unitId);
         List<Map> mapList = new ArrayList<>();
 
        /* if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
@@ -1690,11 +1682,11 @@ public class ClientService {
 
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
-        mapList.addAll(organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip, moduleId));
-
-        Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parentOrganizationId);
+        mapList.addAll(organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, unitId, imagePath, skip, moduleId));
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parent.getId());
         //anil maurya move some business logic in task demand service (task micro service )
-        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
+        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), unitId, mapList);
         response.putAll(responseFromTask);
 
 

@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 
 /**
  * @author pradeep
@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
  */
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 public class CostTimeAgreementRuleTemplateController {
     @Inject private
     CostTimeAgreementService costTimeAgreementService;

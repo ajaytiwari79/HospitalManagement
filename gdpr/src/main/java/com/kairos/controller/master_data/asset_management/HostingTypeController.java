@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,14 +42,18 @@ public class HostingTypeController {
     @ApiOperation("add HostingType")
     @PostMapping("/hosting_type")
     public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId, hostingTypeDTOs.getRequestBody()));
+
+        if (CollectionUtils.isEmpty(hostingTypeDTOs.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId, hostingTypeDTOs.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get HostingType by id")
     @GetMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> getHostingType(@PathVariable Long countryId, @PathVariable BigInteger hostingTypeId) {
+    public ResponseEntity<Object> getHostingType(@PathVariable Long countryId, @PathVariable Long hostingTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(countryId, hostingTypeId));
     }
 
@@ -64,21 +67,21 @@ public class HostingTypeController {
 
     @ApiOperation("delete HostingType  by id")
     @DeleteMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> deleteHostingType(@PathVariable Long countryId, @PathVariable BigInteger hostingTypeId) {
+    public ResponseEntity<Object> deleteHostingType(@PathVariable Long countryId, @PathVariable Long hostingTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(countryId, hostingTypeId));
 
     }
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable BigInteger hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingType) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable Long hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, hostingTypeId, hostingType));
 
     }
 
     @ApiOperation("update Suggested status of Hosting types")
     @PutMapping("/hosting_type")
-    public ResponseEntity<Object> updateSuggestedStatusOfHostingTypes(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfHostingTypes(@PathVariable Long countryId, @RequestBody Set<Long> hostingTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(hostingTypeIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Type is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

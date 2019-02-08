@@ -1,8 +1,6 @@
 package com.kairos.controller.auth;
 
-import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.persistence.model.auth.OrganizationSelectionDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.auth.UserService;
@@ -30,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**
@@ -178,9 +176,9 @@ public class AuthController {
     }
 
 
-    @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(organizationId));
+    @RequestMapping(value =  UNIT_URL+"/user/permissions", method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(unitId));
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
 
