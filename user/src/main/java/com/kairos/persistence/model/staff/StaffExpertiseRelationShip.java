@@ -22,7 +22,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF
 @RelationshipEntity(type = STAFF_HAS_EXPERTISE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@QueryResult
 public class StaffExpertiseRelationShip extends UserBaseEntity{
     @StartNode
     private Staff staff;

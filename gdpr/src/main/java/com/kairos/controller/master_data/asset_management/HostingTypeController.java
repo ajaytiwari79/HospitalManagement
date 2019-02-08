@@ -42,7 +42,11 @@ public class HostingTypeController {
     @ApiOperation("add HostingType")
     @PostMapping("/hosting_type")
     public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId, hostingTypeDTOs.getRequestBody(),false));
+
+        if (CollectionUtils.isEmpty(hostingTypeDTOs.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId, hostingTypeDTOs.getRequestBody(), false));
 
     }
 

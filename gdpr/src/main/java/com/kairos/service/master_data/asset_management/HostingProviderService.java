@@ -48,7 +48,7 @@ public class HostingProviderService{
     //TODO still need to optimize we can get name of list in string from here
         Map<String, List<HostingProvider>> result = new HashMap<>();
         Set<String> hostingProviderNames = new HashSet<>();
-        if (!hostingProviderDTOS.isEmpty()) {
+
             for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
                 hostingProviderNames.add(hostingProvider.getName());
             }
@@ -76,9 +76,6 @@ public class HostingProviderService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingProviders);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
 
     }
 
@@ -102,7 +99,7 @@ public class HostingProviderService{
      */
     public HostingProvider getHostingProviderById(Long countryId, Long id) {
 
-        HostingProvider exist = hostingProviderRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        HostingProvider exist = hostingProviderRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -134,7 +131,7 @@ public class HostingProviderService{
      */
     public HostingProviderDTO updateHostingProvider(Long countryId, Long id, HostingProviderDTO hostingProviderDTO) {
         //TODO What actually this code is doing?
-        HostingProvider hostingProvider = hostingProviderRepository.findByCountryIdAndDeletedAndName(countryId, false,  hostingProviderDTO.getName());
+        HostingProvider hostingProvider = hostingProviderRepository.findByCountryIdAndName(countryId,   hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
