@@ -74,8 +74,6 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private OrganizationRestClient organizationRestClient;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private ShiftStateMongoRepository shiftStateMongoRepository;

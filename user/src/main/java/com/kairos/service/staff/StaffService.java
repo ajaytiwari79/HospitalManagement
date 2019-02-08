@@ -98,6 +98,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.util.*;
@@ -106,6 +107,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
@@ -1185,7 +1187,7 @@ public class StaffService {
 
         String body = "Hi,\n\n" + "You are assigned as an unit manager and to get access in KairosPlanning.\n" + "Your username " + unitManagerDTO.getEmail() + " and password is " + password + "\n\n Thanks";
         String subject = "You are a unit manager at KairosPlanning";
-        mailService.sendPlainMail(unitManagerDTO.getEmail(), body, subject);
+        mailService.sendPlainMailWithSendGrid(unitManagerDTO.getEmail(), body, subject);
     }
 
     public List<Staff> getUploadedStaffByOrganizationId(Long organizationId) {
@@ -1347,7 +1349,7 @@ public class StaffService {
             unitPositionDetails = convertUnitPositionObject(unitPosition);
             unitPositionDetails.setUnitId(unitId);
             List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
-            unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
+            unitPositionDetails.setHourlyCost(CollectionUtils.isNotEmpty(data) ? data.get(0).getHourlyCost() : new BigDecimal(0));
         }
         return unitPositionDetails;
     }
@@ -1517,9 +1519,11 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-            addStaffInChatServer(staff);
-            staffGraphRepository.save(staff);
+            if(isNotNull(staff.getAccess_token())){
+                addStaffInChatServer(staff);
+            }
         });
+        staffGraphRepository.saveAll(staffList);
         return true;
     }
 

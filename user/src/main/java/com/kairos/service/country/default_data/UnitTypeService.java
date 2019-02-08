@@ -37,7 +37,7 @@ public class UnitTypeService{
     public UnitTypeDTO addUnitTypeInCountry(Long countryId, UnitTypeDTO unitTypeDTO) {
         Optional<Country> country = countryGraphRepository.findById(countryId, 0);
         if (!country.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
         Boolean exists = unitTypeGraphRepository.checkUnitTypeExistInCountry(country.get().getId(), "(?i)" + unitTypeDTO.getName(), -1L);
         if (exists) {

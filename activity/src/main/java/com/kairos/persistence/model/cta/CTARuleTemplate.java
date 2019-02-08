@@ -100,24 +100,6 @@ public class CTARuleTemplate extends MongoBaseEntity {
         return employmentTypes;
     }
 
-    public CTARuleTemplate(String name, String description, String payrollType, String payrollSystem, BigInteger ruleTemplateCategoryId,CalculationUnit calculationUnit,CompensationTable compensationTable,CalculateValueAgainst calculateValueAgainst,ApprovalWorkFlow approvalWorkFlow,BudgetType budgetType,ActivityTypeForCostCalculation activityTypeForCostCalculation,PlanningCategory planningCategory,PlannedTimeWithFactor plannedTimeWithFactor,Long countryId) {
-        this.name = name;
-        this.description = description;
-        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
-        this.payrollType = payrollType;
-        this.payrollSystem = payrollSystem;
-        this.calculationUnit = calculationUnit;
-        this.compensationTable = compensationTable;
-        this.calculateValueAgainst = calculateValueAgainst;
-        this.approvalWorkFlow = approvalWorkFlow;
-        this.budgetType = budgetType;
-        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
-        this.planningCategory = planningCategory;
-        this.plannedTimeWithFactor = plannedTimeWithFactor;
-        this.countryId = countryId;
-
-
-    }
 
 
     public boolean isCalculateScheduledHours() {
@@ -245,17 +227,6 @@ public class CTARuleTemplate extends MongoBaseEntity {
     }
 
 
-
-
-
-   /* public ActivityType getActivityType() {
-        return activityType;
-    }
-
-    public void setActivityType(ActivityType activityType) {
-        this.activityType = activityType;
-    }*/
-
     public PlanningCategory getPlanningCategory() {
         return planningCategory;
     }
@@ -280,13 +251,6 @@ public class CTARuleTemplate extends MongoBaseEntity {
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    /*public CTARuleTemplateType getRuleTemplateType() {
-        return ruleTemplateType;
-    }
-
-    public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
-        this.ruleTemplateType = ruleTemplateType;
-    }*/
 
     public List<Long> getDayTypeIds() {
         return dayTypeIds;
@@ -306,39 +270,28 @@ public class CTARuleTemplate extends MongoBaseEntity {
 
 
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CTARuleTemplate that = (CTARuleTemplate) o;
-        return disabled == that.disabled &&
-                calculateScheduledHours == that.calculateScheduledHours &&
-                Objects.equals(payrollType, that.payrollType) &&
-                Objects.equals(payrollSystem, that.payrollSystem) &&
-                calculationUnit == that.calculationUnit &&
-                Objects.equals(compensationTable, that.compensationTable) &&
-                Objects.equals(calculateValueAgainst, that.calculateValueAgainst) &&
-                approvalWorkFlow == that.approvalWorkFlow &&
-                Objects.equals(phaseInfo, that.phaseInfo) &&
-                budgetType == that.budgetType &&
-                Objects.equals(calculateValueIfPlanned, that.calculateValueIfPlanned) &&
-                Objects.equals(employmentTypes, that.employmentTypes) &&
-                planningCategory == that.planningCategory &&
-                Objects.equals(staffFunctions, that.staffFunctions) &&
-                Objects.equals(plannedTimeWithFactor, that.plannedTimeWithFactor) &&
-                activityTypeForCostCalculation == that.activityTypeForCostCalculation &&
-                Objects.equals(activityIds, that.activityIds) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds) &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(dayTypeIds, that.dayTypeIds) &&
-                calculationFor == that.calculationFor;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(disabled, payrollType, payrollSystem, calculationUnit, compensationTable, calculateValueAgainst, approvalWorkFlow, phaseInfo, budgetType, calculateValueIfPlanned, employmentTypes, planningCategory, staffFunctions, plannedTimeWithFactor, activityTypeForCostCalculation, activityIds, timeTypeIds, plannedTimeIds, dayTypeIds, calculateScheduledHours, calculationFor);
+    public boolean isCalculatedValueChanged(CTARuleTemplate ctaRuleTemplate){
+        return (this!=ctaRuleTemplate) && !(disabled == ctaRuleTemplate.disabled &&
+                calculateScheduledHours == ctaRuleTemplate.calculateScheduledHours &&
+                Objects.equals(payrollType, ctaRuleTemplate.payrollType) &&
+                Objects.equals(payrollSystem, ctaRuleTemplate.payrollSystem) &&
+                calculationUnit == ctaRuleTemplate.calculationUnit &&
+                Objects.equals(compensationTable, ctaRuleTemplate.compensationTable) &&
+                Objects.equals(calculateValueAgainst, ctaRuleTemplate.calculateValueAgainst) &&
+                approvalWorkFlow == ctaRuleTemplate.approvalWorkFlow &&
+                Objects.equals(phaseInfo, ctaRuleTemplate.phaseInfo) &&
+                budgetType == ctaRuleTemplate.budgetType &&
+                Objects.equals(calculateValueIfPlanned, ctaRuleTemplate.calculateValueIfPlanned) &&
+                Objects.equals(employmentTypes, ctaRuleTemplate.employmentTypes) &&
+                planningCategory == ctaRuleTemplate.planningCategory &&
+                Objects.equals(staffFunctions, ctaRuleTemplate.staffFunctions) &&
+                Objects.equals(plannedTimeWithFactor, ctaRuleTemplate.plannedTimeWithFactor) &&
+                activityTypeForCostCalculation == ctaRuleTemplate.activityTypeForCostCalculation &&
+                Objects.equals(activityIds, ctaRuleTemplate.activityIds) &&
+                Objects.equals(timeTypeIds, ctaRuleTemplate.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, ctaRuleTemplate.plannedTimeIds) &&
+                Objects.equals(dayTypeIds, ctaRuleTemplate.dayTypeIds) &&
+                calculationFor == ctaRuleTemplate.calculationFor);
     }
 }
 

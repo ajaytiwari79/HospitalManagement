@@ -83,7 +83,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long organizationId, @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift( shiftDTO, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift( shiftDTO, type,false));
     }
 
     @ApiOperation("delete a Shift of a staff")
@@ -107,21 +107,6 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
     }
-
-    /*// sub shifts workflow
-    @ApiOperation("add a sub shift for a staff")
-    @PutMapping(value = "/sub-shift")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSubShift(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift(unitId, shiftDTO, type));
-    }*/
-
-    /*@ApiOperation("update a sub shifts for a staff")
-    @PutMapping(value = "/sub-shifts")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSubShifts(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody List<ShiftDTO> shiftDTOS) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts(unitId, shiftDTOS, type));
-    }*/
 
     @ApiOperation("update status of shifts")
     @PutMapping(value = "/shift/update_status")
@@ -192,8 +177,8 @@ public class ShiftController {
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
-    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody @Valid ShiftDTO shiftDTO,@RequestParam Boolean validatedByStaff){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShift(unitId,shiftDTO,type,validatedByStaff));
+    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam Boolean updatedByStaff){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShiftByTandA(unitId,shiftDTO,type,updatedByStaff));
     }
 
 

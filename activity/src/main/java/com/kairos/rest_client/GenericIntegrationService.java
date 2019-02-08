@@ -8,6 +8,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.UnitPositionDTO;
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
@@ -61,6 +62,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.*;
 
 
@@ -454,7 +456,9 @@ public class GenericIntegrationService {
     public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId, List<Long> unitIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("countryId", countryId.toString()));
-        queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
+        if(isNotNull(organizationId)) {
+            queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
+        }
         queryParamList.add(new BasicNameValuePair("organizationTypeId", organizationTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationSubTypeId", organizationSubTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("expertiseId", expertiseId.toString()));
@@ -718,10 +722,14 @@ public class GenericIntegrationService {
 
 
     public List<StaffKpiFilterDTO> getStaffsByFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, STAFF_BY_EMPLOYMENT_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffKpiFilterDTO>>>() {
+        return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, STAFF_BY_KPI_FILTER, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffKpiFilterDTO>>>() {
         });
     }
 
+    public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, KPI_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
+        });
+    }
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByUnitPositionId(Long unitId,LocalDate shiftDate, String type, Long unitPositionId,Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();

@@ -161,9 +161,9 @@ public class PayOutCalculationService {
      * @param unitPositionWithCtaDetailsDTO
      * @return PayOutDTO
      */
-    public PayOutDTO getAdvanceViewPayout(List<Interval> intervals, List<PayOut> payOuts, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, String query) {
+    public PayOutDTO getAdvanceViewPayout(List<Interval> intervals, List<PayOut> payOuts,long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, String query) {
         Map<Interval, List<PayOut>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOuts);
-        List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap, payoutTransactionAndIntervalMap, unitPositionWithCtaDetailsDTO, query);
+        List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutMinutesBefore, payoutTransactionAndIntervalMap, unitPositionWithCtaDetailsDTO, query);
         long[] payoutCalculatedValue = calculatePayoutForInterval(payoutIntervalDTOS);
         Map<BigInteger, Long> ctaDistributionMap = payoutIntervalDTOS.stream().flatMap(p -> p.getPayOutDistribution().getChildren().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb -> ptb.getId(), Collectors.summingLong(p -> p.getMinutes())));
         List<CTADistributionDTO> ctaDistributionDTOS = getDistributionOfPayout(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
@@ -210,7 +210,7 @@ public class PayOutCalculationService {
      * @param unitPositionWithCtaDetailsDTO
      * @return List<PayOutIntervalDTO>
      */
-    private List<PayOutIntervalDTO> getPayoutIntervals(List<Interval> intervals, Map<Interval, List<PayOut>> payoutsIntervalMap, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, String query) {
+    private List<PayOutIntervalDTO> getPayoutIntervals(List<Interval> intervals, Map<Interval, List<PayOut>> payoutsIntervalMap,long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, String query) {
         List<PayOutIntervalDTO> payOutIntervalDTOS = new ArrayList<>(intervals.size());
         for (Interval interval : intervals) {
             List<PayOut> payOuts = payoutsIntervalMap.get(interval);
@@ -218,14 +218,14 @@ public class PayOutCalculationService {
             Long payoutChange = payOuts.stream().mapToLong(p -> p.getTotalPayOutMin()).sum();
             Long approvePayOut = payOutTransactionList.stream().filter(p -> p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.APPROVED)).mapToLong(p -> (long) p.getMinutes()).sum();
             payoutChange += approvePayOut;
-            Long payoutBefore = payOuts.isEmpty() ? 0 : payOuts.get(0).getPayoutBeforeThisDate();
-            Long payoutAfter = payoutBefore + payoutChange;
+            Long payoutAfter = payoutMinutesBefore + payoutChange;
             Map<BigInteger, Long> ctaDistributionMap = payOuts.stream().flatMap(p -> p.getPayOutCTADistributions().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb -> ptb.getCtaRuleTemplateId(), Collectors.summingLong(p -> p.getMinutes())));
             List<CTADistributionDTO> payOutCTADistributionDTOS = getDistributionOfPayout(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
             Long payoutFromCTA = payOutCTADistributionDTOS.stream().mapToLong(pd -> pd.getMinutes()).sum();
             PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(payoutFromCTA, payOutCTADistributionDTOS);
             String title = getTitle(query, interval);
-            PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate(), payoutAfter, payoutBefore, payoutChange, payOutCTADistributionDTO, DayOfWeek.of(interval.getStart().getDayOfWeek()), title);
+            PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate(), payoutAfter, payoutMinutesBefore, payoutChange, payOutCTADistributionDTO, DayOfWeek.of(interval.getStart().getDayOfWeek()), title);
+            payoutMinutesBefore+=payoutChange;
             payOutIntervalDTOS.add(payOutIntervalDTO);
         }
         Collections.reverse(payOutIntervalDTOS);

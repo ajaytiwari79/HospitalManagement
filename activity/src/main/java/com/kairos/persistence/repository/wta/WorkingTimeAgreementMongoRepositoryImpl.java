@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -257,6 +258,22 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
+    }
+
+
+    //find Overlap wta of unitPositionId
+    @Override
+    public boolean wtaExistsByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate) {
+        Criteria endDateCriteria = isNotNull(endDate) ? Criteria.where("endDate").exists(false).and("startDate").lte(endDate) : Criteria.where("endDate").exists(false);
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
+        return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
+    }
+
+    @Override
+    public boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId, Date startDate, Date endDate){
+        Criteria endDateCriteria = isNotNull(endDate) ? Criteria.where("endDate").exists(false).and("startDate").lte(endDate) : Criteria.where("endDate").exists(false);
+        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(wtaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
+        return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
     }
 
 }

@@ -1,0 +1,28 @@
+//add kpi for country
+db.getCollection('counter').insert({
+    "_id" : "20",nextsequence
+    "type" : "DAYTYPE_AND_TIMESLOT",
+    "title" : "DatType And TimeSlot",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_8X2"
+})
+db.getCollection('applicableKPI').insert({
+    "_id" : "174",nextsequence
+    "activeKpiId" : "20",
+    "baseKpiId" : "20",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+})
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 174}})
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$set":{"sequenceNumber" : 18}})

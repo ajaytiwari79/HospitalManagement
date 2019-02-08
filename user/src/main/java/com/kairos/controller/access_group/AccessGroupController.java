@@ -243,8 +243,8 @@ public class AccessGroupController {
     @ApiOperation("Get country Access Groups by account type")
     @GetMapping(value = COUNTRY_URL + "/access_group/account_type/{accountTypeId}" )
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getCountryAccessGroupByAccountTypeId (@PathVariable Long countryId, @PathVariable Long accountTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId));
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupByAccountTypeId (@PathVariable Long countryId, @PathVariable Long accountTypeId, @RequestParam(value = "accessGroupRole",required=false) String accessGroupRole) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId,accessGroupRole));
     }
 
     @ApiOperation("get staff ids by unit id and accessgroup id")

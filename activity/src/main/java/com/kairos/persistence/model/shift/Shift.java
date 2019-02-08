@@ -11,8 +11,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * Created by vipul on 30/8/17.
@@ -159,6 +162,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public void setActivities(List<ShiftActivity> activities) {
+        activities = isNull(activities) ? new ArrayList<>() : activities;
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }

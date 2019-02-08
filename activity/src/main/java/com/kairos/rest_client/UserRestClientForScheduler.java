@@ -33,7 +33,7 @@ import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 
 @Service
 public class UserRestClientForScheduler {
-    private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
+    private static Logger logger = LoggerFactory.getLogger(UserRestClientForScheduler.class);
 
 
     @Inject

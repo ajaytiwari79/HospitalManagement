@@ -51,7 +51,6 @@ public class AppConstants {
     public static final String FULL_DAY = "Full day";
     public static final String PARTIALLY = "Partially";
 
-    public static final String DAY = "Day";
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
     public static final String KMD_NEXUS_CLIENT_SECRET = "APNaYeGDVGOdjQf-jIFgU59tfkPux2mD6xGpbbAEuUc32ie8FRn7Y2cxcSayV6VafluS0pLu2TyhARFHtdHc-NQ";
@@ -211,5 +210,7 @@ public class AppConstants {
 
     public static final short MULTIPLE_ACTIVITY = 1;
 
+    //for use timeslot in timeslot kpi
+    public static final String NIGHT = "Night";
 
 }

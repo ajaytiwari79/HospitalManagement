@@ -322,10 +322,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     Long findAccessGroupByEmploymentId(Long employmentId);
 
 
-    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]->(ag:AccessGroup{deleted:false})-[:"+HAS_ACCOUNT_TYPE+"]->(accountType:AccountType) WHERE id(c)={0} AND id(accountType)={1} AND ag.role={2}" +
+    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]->(ag:AccessGroup{deleted:false})-[:"+HAS_ACCOUNT_TYPE+"]->(accountType:AccountType) WHERE id(c)={0} AND id(accountType)={1} AND ag.role IN {2}" +
             "OPTIONAL MATCH (ag)-[:"+DAY_TYPES+"]-(dayType:DayType) \n" +
             "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.role AS role, ag.enabled AS enabled , ag.startDate AS startDate, ag.endDate AS endDate, collect(id(dayType)) AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes")
-    List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId, String role);
+    List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId, List<String> role);
 
 
     @Query("MATCH (staff:Staff),(org:Organization) WHERE id(staff)={0} AND id(org)={1} WITH org,staff " +

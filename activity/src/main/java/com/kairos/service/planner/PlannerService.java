@@ -126,20 +126,20 @@ public class PlannerService extends MongoBaseService {
     private TaskMongoRepositoryImpl customTaskMongoRepository;
 
     @Inject
-    TaskService taskService;
+    private TaskService taskService;
     @Inject
     private Scheduler scheduler;
 
     @Inject
-    TaskDemandMongoRepository taskDemandMongoRepository;
+    private TaskDemandMongoRepository taskDemandMongoRepository;
     @Inject
-    TaskTypeMongoRepository taskTypeMongoRepository;
+    private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
-    TaskMongoRepository taskMongoRepository;
+    private TaskMongoRepository taskMongoRepository;
     @Inject
-    EnvConfig envConfig;
+    private EnvConfig envConfig;
     @Inject
-    TaskConverterService taskConverterService;
+    private TaskConverterService taskConverterService;
 
     @Inject
     CustomTimeScaleService customTimeScaleService;
@@ -148,21 +148,17 @@ public class PlannerService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Autowired
-    CustomTimeScaleRepository customTimeScaleRepository;
+    @Inject
+    private CustomTimeScaleRepository customTimeScaleRepository;
 
-    @Autowired
-    ClientExceptionService clientExceptionService;
-    @Autowired TaskDemandService taskDemandService;
-    @Autowired
-    ClientExceptionTypeMongoRepository clientExceptionTypeMongoRepository;
-    @Autowired
-    OrganizationRestClient organizationRestClient;
-    @Autowired
-    TimeSlotRestClient timeSlotRestClient;
+    @Inject
+    private ClientExceptionService clientExceptionService;
+    @Inject private TaskDemandService taskDemandService;
+    @Inject
+    private ClientExceptionTypeMongoRepository clientExceptionTypeMongoRepository;
 
-    @Autowired
-    GenericIntegrationService genericIntegrationService;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
 
     private int getWeekFrequencyAsInt(String frequency) {

@@ -105,21 +105,13 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        ChildCareDaysCheckWTATemplate that = (ChildCareDaysCheckWTATemplate) o;
-        return borrowLeave == that.borrowLeave &&
-                carryForwardLeave == that.carryForwardLeave &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(activityIds, that.activityIds) &&
-                cutOffIntervalUnit == that.cutOffIntervalUnit;
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)wtaBaseRuleTemplate;
+        return (this != childCareDaysCheckWTATemplate) && !(borrowLeave == childCareDaysCheckWTATemplate.borrowLeave &&
+                carryForwardLeave == childCareDaysCheckWTATemplate.carryForwardLeave &&
+                Float.compare(childCareDaysCheckWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(activityIds, childCareDaysCheckWTATemplate.activityIds) &&
+                cutOffIntervalUnit == childCareDaysCheckWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues,childCareDaysCheckWTATemplate.phaseTemplateValues));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), activityIds, borrowLeave, carryForwardLeave, recommendedValue, cutOffIntervalUnit);
-    }
 }

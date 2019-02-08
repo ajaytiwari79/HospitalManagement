@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * Created by vipul on 30/8/17.
  */
@@ -65,6 +67,7 @@ public class ShiftDTO {
     private long accumulatedTimeBankMinutes;
     private int plannedMinutes;
     private boolean multipleActivity;
+    private BigInteger planningPeriodId;
 
     public ShiftDTO() {
         //default Const
@@ -173,7 +176,7 @@ public class ShiftDTO {
     }
 
     public void setActivities(List<ShiftActivityDTO> activities) {
-        if (Optional.ofNullable(activities).isPresent()) {
+        if (Optional.ofNullable(activities).isPresent() && activities.size()>1) {
             activities = activities.stream().filter(shiftActivityDTO -> Optional.ofNullable(shiftActivityDTO.getStartDate()).isPresent()).sorted((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate())).collect(Collectors.toList());
         }
         this.activities = activities;
@@ -316,22 +319,6 @@ public class ShiftDTO {
         return shiftQueryResult;
     }*/
 
-    @Override
-    public String toString() {
-        return "ShiftDTO{" +
-                "id=" + id +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", bid=" + bid +
-                ", pId=" + pId +
-                ", amount=" + amount +
-                ", probability=" + probability +
-                ", remarks='" + remarks + '\'' +
-                ", unitId=" + unitId +
-                ", staffId=" + staffId +
-                '}';
-    }
-
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
@@ -415,5 +402,29 @@ public class ShiftDTO {
 
     public void setPlannedMinutes(int plannedMinutes) {
         this.plannedMinutes = plannedMinutes;
+    }
+
+    public BigInteger getPlanningPeriodId() {
+        return planningPeriodId;
+    }
+
+    public void setPlanningPeriodId(BigInteger planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
+    }
+
+    @Override
+    public String toString() {
+        return "ShiftDTO{" +
+                "id=" + id +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", bid=" + bid +
+                ", pId=" + pId +
+                ", amount=" + amount +
+                ", probability=" + probability +
+                ", remarks='" + remarks + '\'' +
+                ", unitId=" + unitId +
+                ", staffId=" + staffId +
+                '}';
     }
 }

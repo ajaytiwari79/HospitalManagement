@@ -1,7 +1,6 @@
 package com.kairos.service;
 
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;

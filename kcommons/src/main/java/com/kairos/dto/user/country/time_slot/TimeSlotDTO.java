@@ -19,6 +19,7 @@ public class TimeSlotDTO {
     private int endMinute;
     private boolean shiftStartTime;
     private Long id;
+    private Long unitId;
 
     public TimeSlotDTO() {
         //default constructor
@@ -87,5 +88,13 @@ public class TimeSlotDTO {
     public Long getId() {
 
         return id;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

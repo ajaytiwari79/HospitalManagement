@@ -471,15 +471,15 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     }
 
     //dashboard tab
-    public List<KPIDashboard> getKPIDashboardByIds(List<BigInteger> dashboardIds, ConfLevel level, Long refId){
+    public List<KPIDashboard> getKPIDashboardByIds(List<String> dashboardIds, ConfLevel level, Long refId){
         String queryField =getRefQueryField(level);
-        Query query=new Query(Criteria.where("_id").in(dashboardIds).and(queryField).is(refId));
+        Query query=new Query(Criteria.where("moduleId").in(dashboardIds).and(queryField).is(refId).and("level").is(level));
         return mongoTemplate.find(query,KPIDashboard.class);
     }
 
-    public List<KPIDashboardDTO> getKPIDashboard(List<BigInteger> dashBoardIds, ConfLevel level, Long refId){
+    public List<KPIDashboardDTO> getKPIDashboard(List<String> dashBoardIds, ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
-        Criteria matchCriteria = dashBoardIds == null ? Criteria.where(refQueryField).is(refId).and("level").is(level) : Criteria.where("_id").in(dashBoardIds).and(refQueryField).is(refId).and("level").is(level);
+        Criteria matchCriteria = dashBoardIds == null ? Criteria.where(refQueryField).is(refId).and("level").is(level) : Criteria.where("moduleId").in(dashBoardIds).and(refQueryField).is(refId).and("level").is(level);
         Query query=new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
     }
@@ -489,10 +489,28 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
        Aggregation aggregation=Aggregation.newAggregation(
             Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
             Aggregation.group("parentModuleId").push("$$ROOT").as("child"),
-            Aggregation.project().and("$_id").as("moduleId").and("child").as("child")
+            Aggregation.project().and("$_id").as("moduleId").and("child").as("child").and("child.enable").as("enable").and("child.defaultTab").as("defaultTab")
        );
        AggregationResults<KPIAccessPageDTO> results=mongoTemplate.aggregate(aggregation,KPIDashboard.class,KPIAccessPageDTO.class);
        return results.getMappedResults();
    }
+    public List<DashboardKPIConf> getDashboardKPIConfs(List<BigInteger> kpiIds,List<String> moduleIds, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where(refQueryField).is(refId).and("_id").in(kpiIds).and("level").is(level).and("moduleId").in(moduleIds));
+        return mongoTemplate.find(query,DashboardKPIConf.class);
+    }
+
+    public List<KPIDashboardDTO> getKPIDashboard(long unitId,ConfLevel level, Long staffId){
+        Criteria matchCriteria= Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and("level").is(level);
+        Query query=new Query(matchCriteria);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
+    }
+
+    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(ConfLevel level, List<Long> staffIds){
+        Criteria matchCriteria= Criteria.where("deleted").is(false).and("staffId").in(staffIds).and("level").is(level);
+        Query query=new Query(matchCriteria);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
+    }
+
 
 }

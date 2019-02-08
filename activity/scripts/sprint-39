@@ -120,5 +120,9 @@ db.getCollection('applicableKPI').insert({
     "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
 })
 
+db.getCollectionNames().forEach(function(c) {
+   db[c].updateMany({},{'$unset':{'createdBy':null,'lastModifiedBy':null}});
+});
+
 
 //update sequence of ApplicableKPISequence,applicableKPI
