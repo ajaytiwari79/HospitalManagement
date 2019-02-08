@@ -238,11 +238,6 @@ public class ShiftValidatorService {
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shiftDTO.getStaffId(), activityIds);
         Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId, v -> v));
         Map<BigInteger, ShiftTimeDetails> shiftTimeDetailsMap = new HashMap<>();
-       /* for (int i = 0; i < shiftDTO.getActivities().size(); i++) {
-            if(shiftDTO.getActivities().get(i).isBreakShift()){
-                shiftDTO.getActivities().get(i+1).setStartDate(shiftDTO.getActivities().get(i).getStartDate());
-            }
-        }*/
         shiftDTO.getActivities().forEach(shiftActivity -> shiftTimeDetailsMap.put(shiftActivity.getActivityId(), prepareShiftTimeDetails(shiftActivity, shiftTimeDetailsMap)));
         List<ActivityRuleViolation> activityRuleViolations = new ArrayList<>();
         shiftTimeDetailsMap.forEach((activityId, shiftTimeDetails) -> {
