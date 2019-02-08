@@ -312,6 +312,9 @@ public class ShiftService extends MongoBaseService {
             mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         }
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate()));
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+            exceptionService.actionNotPermittedException("message.wta.notFound");
+        }
         List<BigInteger> activityIds = shiftDTO.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
 
@@ -562,6 +565,9 @@ public class ShiftService extends MongoBaseService {
         Set<LocalDateTime> dates = shiftDTOS.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
         Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shiftDTOS.get(0).getUnitId(), dates);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTOS.get(0).getActivities().get(0).getStartDate());
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+            exceptionService.actionNotPermittedException("message.wta.notFound");
+        }
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         Map<BigInteger, ActivityWrapper> activityWrapperMap = new HashMap<>();
         activityWrapperMap.put(activity.getId(), new ActivityWrapper(activity, timeType.getTimeTypes().toValue()));
@@ -627,6 +633,9 @@ public class ShiftService extends MongoBaseService {
         Activity activityOld = activities.stream().filter(k -> k.getActivity().getId().equals(activityId)).findFirst().get().getActivity();
         //Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivities().get(0).getActivityId());
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+            exceptionService.actionNotPermittedException("message.wta.notFound");
+        }
         //copy old state of activity object
         Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
