@@ -42,6 +42,10 @@ public class DataSourceController {
     @ApiOperation("add dataSource")
     @PostMapping("/data_source")
     public ResponseEntity<Object> createDataSource(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
+
+        if (CollectionUtils.isEmpty(dataSource.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource.getRequestBody(), false));
 
     }

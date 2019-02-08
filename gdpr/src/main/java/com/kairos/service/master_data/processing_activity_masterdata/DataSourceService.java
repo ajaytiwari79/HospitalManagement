@@ -48,7 +48,6 @@ public class DataSourceService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
-        if (!dataSources.isEmpty()) {
             for (DataSourceDTO dataSource : dataSources) {
                 dataSourceNames.add(dataSource.getName());
             }
@@ -76,10 +75,6 @@ public class DataSourceService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
     }
 
     /**
@@ -97,7 +92,7 @@ public class DataSourceService{
      * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
     public DataSource getDataSource(Long countryId, Long id) {
-        DataSource exist = dataSourceRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        DataSource exist = dataSourceRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -126,7 +121,7 @@ public class DataSourceService{
      */
     public DataSourceDTO updateDataSource(Long countryId, Long id, DataSourceDTO dataSourceDTO) {
 
-        DataSource dataSource = dataSourceRepository.findByCountryIdAndDeletedAndName(countryId, false, dataSourceDTO.getName());
+        DataSource dataSource = dataSourceRepository.findByCountryIdAndName(countryId,  dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;

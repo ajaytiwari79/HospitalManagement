@@ -50,7 +50,6 @@ public class TransferMethodService{
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<TransferMethod>> result = new HashMap<>();
         Set<String> transferMethodNames = new HashSet<>();
-        if (!transferMethodDTOS.isEmpty()) {
             for (TransferMethodDTO transferMethod : transferMethodDTOS) {
                 transferMethodNames.add(transferMethod.getName());
             }
@@ -77,11 +76,7 @@ public class TransferMethodService{
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTransferMethods);
             return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
-    }
+          }
 
     /**
      * @param countryId
@@ -100,7 +95,7 @@ public class TransferMethodService{
      * @throws DataNotFoundByIdException throw exception if TransferMethod not found for given id
      */
     public TransferMethod getTransferMethod(Long countryId, Long id) {
-        TransferMethod exist = transferMethodRepository.findByIdAndCountryIdAndDeleted(id, countryId);
+        TransferMethod exist = transferMethodRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -131,7 +126,7 @@ public class TransferMethodService{
      */
     public TransferMethodDTO updateTransferMethod(Long countryId, Long id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethod transferMethod = transferMethodRepository.findByCountryIdAndDeletedAndName(countryId, false, transferMethodDTO.getName());
+        TransferMethod transferMethod = transferMethodRepository.findByCountryIdAndName(countryId,  transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;

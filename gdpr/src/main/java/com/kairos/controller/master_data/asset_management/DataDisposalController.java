@@ -41,6 +41,9 @@ public class DataDisposalController {
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal")
     public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
+        if (CollectionUtils.isEmpty(dataDisposalDTOs.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody(), false));
 
     }
