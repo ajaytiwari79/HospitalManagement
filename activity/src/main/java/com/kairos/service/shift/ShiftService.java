@@ -719,7 +719,7 @@ public class ShiftService extends MongoBaseService {
             }
         }
         if(isNotNull(staffAdditionalInfoDTO)) {
-            shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts, startDate, endDate, staffAdditionalInfoDTO);
+            shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts, staffAdditionalInfoDTO.getUnitPosition().getStartDate(), endDate, staffAdditionalInfoDTO);
         }
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
