@@ -173,7 +173,11 @@ public class ShiftSickService extends MongoBaseService {
                 }
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                shiftService.saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityWrapperMap, shift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
+                List<ShiftActivity> breakActivities = shiftService.updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
+                if (!breakActivities.isEmpty()) {
+                    shift.setActivities(breakActivities);
+                }
+                shiftService.saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO,false);
             }
 
             shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
