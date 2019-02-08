@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -198,16 +199,16 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     //find Overlap wta of unitPositionId
     @Override
     public boolean ctaExistsByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate) {
-        Criteria endDateCriteria = isNotNull(endDate) ? Criteria.where("endDate").exists(false).and("startDate").lte(endDate) : Criteria.where("endDate").exists(false);
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
+        Criteria endDateCriteria = Criteria.where("endDate").exists(false).and("startDate").lte(startDate);
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
     }
 
 
     @Override
     public boolean ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger ctaId,Long unitPositionId, Date startDate, Date endDate) {
-        Criteria endDateCriteria = isNotNull(endDate) ? Criteria.where("endDate").exists(false).and("startDate").lte(endDate) : Criteria.where("endDate").exists(false);
-        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(ctaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
+        Criteria endDateCriteria = Criteria.where("endDate").exists(false).and("startDate").lte(startDate);
+        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(ctaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
     }
 
