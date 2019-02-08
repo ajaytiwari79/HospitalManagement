@@ -360,8 +360,6 @@ public class ShiftService extends MongoBaseService {
                                        StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift) {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
-
-        shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             if (shiftActivity.getId() == null) {
                 shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
@@ -466,6 +464,9 @@ public class ShiftService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shiftWithViolatedInfo.getShifts().get(0).getActivities().get(0).getStartDate()));
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+            exceptionService.actionNotPermittedException("message.wta.notFound");
+        }
         List<ShiftActivity> breakActivities = updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
         if (!breakActivities.isEmpty()) {
             shift.setActivities(breakActivities);
