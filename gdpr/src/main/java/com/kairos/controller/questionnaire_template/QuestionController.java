@@ -41,13 +41,13 @@ public class QuestionController {
     @DeleteMapping(COUNTRY_URL+"/question_section/{sectionId}/question/{questionId}")
     public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId, @PathVariable Long questionId, @PathVariable Long sectionId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteQuestionOfQuestionnaireSection(countryId, questionId,sectionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteQuestionOfQuestionnaireSection(questionId,sectionId));
     }
 
     @DeleteMapping(UNIT_URL+"/question_section/{sectionId}/question/{questionId}")
     public ResponseEntity<Object> deleteQuestionOfQuestionnaireSection(@PathVariable Long unitId, @PathVariable Long questionId, @PathVariable Long sectionId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteQuestionOfQuestionnaireSection(unitId, questionId,sectionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteQuestionOfQuestionnaireSection(questionId,sectionId));
     }
 
 

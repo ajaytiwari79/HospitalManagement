@@ -55,10 +55,10 @@ public class QuestionnaireSectionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(unitId, templateId, questionnaireSectionsDto,true));
     }
 
-   /* @ApiOperation("delete questionnaire section by id ")
+    @ApiOperation("delete questionnaire section by id ")
     @DeleteMapping(UNIT_URL + "/questionnaire_template/{templateId}/section/{sectionId}")
     public ResponseEntity<Object> deleteQuestionnaireSectionByUnitId(@PathVariable Long unitId, @PathVariable Long templateId, @PathVariable Long sectionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.deleteQuestionnaireSectionFromTemplate(unitId, templateId, sectionId, true));
-    }*/
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.deleteQuestionnaireSectionFromTemplate(templateId, sectionId));
+    }
 
 }
