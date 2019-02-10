@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -26,7 +27,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -294,7 +294,7 @@ public class TeamService {
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId,staffId);
         if(countOfRel == 0){
 
-           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId, DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId, DateUtils.getCurrentDate().getTime(),DateUtils.getCurrentDate().getTime());
             if(countOfRelCreated>0){
                 if(updateTeamIdOfStaffInVisitour(team.getVisitourId(),staffId, unitId)){
                     staff.setVisitourTeamId(team.getVisitourId());
@@ -306,7 +306,7 @@ public class TeamService {
 
             }
         } else {
-            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId,staffId,DateUtil.getCurrentDate().getTime(),isAssigned);
+            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId,staffId,DateUtils.getCurrentDate().getTime(),isAssigned);
             if(countOfRelCreated>0){
                 if(!isAssigned){
                     staff.setVisitourTeamId("");

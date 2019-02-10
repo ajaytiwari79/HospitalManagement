@@ -64,7 +64,6 @@ import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.utils.DateUtil;
 import com.kairos.wrapper.PositionWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
@@ -91,7 +90,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
@@ -247,7 +245,7 @@ public class UnitPositionService {
     }
 
     private Long updateEmploymentEndDate(Organization organization, UnitPositionDTO unitPositionDTO, Employment employment) throws Exception {
-        Employment employment1 = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(), unitPositionDTO.getEndDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
+        Employment employment1 = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(), unitPositionDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
         return Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment1.getReasonCode().getId() : null;
 
     }
@@ -264,8 +262,8 @@ public class UnitPositionService {
                     exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
                 }
                 if (unitPositionEndDate != null) {
-                    Interval previousInterval = new Interval(DateUtil.getDateFromEpoch(unitPosition.getStartDate()), DateUtil.getDateFromEpoch(unitPosition.getEndDate()));
-                    Interval interval = new Interval(DateUtil.getDateFromEpoch(unitPositionStartDate), DateUtil.getDateFromEpoch(unitPositionEndDate));
+                    Interval previousInterval = new Interval(DateUtils.getDateFromEpoch(unitPosition.getStartDate()), DateUtils.getDateFromEpoch(unitPosition.getEndDate()));
+                    Interval interval = new Interval(DateUtils.getDateFromEpoch(unitPositionStartDate), DateUtils.getDateFromEpoch(unitPositionEndDate));
                     logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
                     if (previousInterval.overlaps(interval))
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
@@ -520,7 +518,7 @@ public class UnitPositionService {
 
 
         Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
-                unitPositionDTO.getEndDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
+                unitPositionDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment.getReasonCode().getId() : null;
         employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
         // Deleting All shifts after employment end date

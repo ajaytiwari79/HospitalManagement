@@ -34,7 +34,6 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -57,8 +56,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -74,7 +71,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -160,7 +156,7 @@ public class EmploymentService {
             }
         }
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
-        Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
+        Long employmentStartDate = DateUtils.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if (Optional.ofNullable(employmentUnitPosition).isPresent()) {
             if (Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent() && employmentStartDate > employmentUnitPosition.getEarliestUnitPositionStartDateMillis())
                 exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.unitpositionstartdate");
@@ -190,7 +186,7 @@ public class EmploymentService {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         //Date employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateConverter.getDate(staffEmploymentDTO.getEmploymentStartDate()) : null;
-        String employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateUtil.getDateFromEpoch(staffEmploymentDTO.getEmploymentStartDate()).toString() : null;
+        String employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateUtils.getDateFromEpoch(staffEmploymentDTO.getEmploymentStartDate()).toString() : null;
         map.put("employedSince", employedSince);
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
@@ -251,7 +247,7 @@ public class EmploymentService {
             } else if (!Optional.ofNullable(unitPermission).isPresent()) {
                 unitPermission = new UnitPermission();
                 unitPermission.setOrganization(unit);
-                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
             }
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
@@ -587,8 +583,8 @@ public class EmploymentService {
 
 
     public boolean moveToReadOnlyAccessGroup(List<Long> employmentIds) {
-        Long curDateMillisStart = DateUtils.getStartOfDay(DateUtil.getCurrentDate()).getTime();
-        Long curDateMillisEnd = DateUtils.getEndOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisStart = DateUtils.getStartOfDay(DateUtils.getCurrentDate()).getTime();
+        Long curDateMillisEnd = DateUtils.getEndOfDay(DateUtils.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
         List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
@@ -615,7 +611,7 @@ public class EmploymentService {
                 if (!Optional.ofNullable(unitPermission).isPresent()) {
                     unitPermission = new UnitPermission();
                     unitPermission.setOrganization(organizations.get(currentElement));
-                    unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                    unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
                 }
                 unitPermission.setAccessGroup(accessGroupDB);
                 employment.getUnitPermissions().add(unitPermission);
@@ -728,10 +724,10 @@ public class EmploymentService {
         if (employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
         }
-        Long mainEmploymentStartDate = DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentStartDate());
+        Long mainEmploymentStartDate = DateUtils.getDateFromEpoch(employmentDTO.getMainEmploymentStartDate());
         Long mainEmploymentEndDate = null;
         if (employmentDTO.getMainEmploymentEndDate() != null) {
-            mainEmploymentEndDate = DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentEndDate());
+            mainEmploymentEndDate = DateUtils.getDateFromEpoch(employmentDTO.getMainEmploymentEndDate());
             if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
                 exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
             }
@@ -750,7 +746,7 @@ public class EmploymentService {
                 Employment employment = mainEmploymentQueryResult.getEmployment();
                 EmploymentOverlapDTO employmentOverlapDTO = new EmploymentOverlapDTO();
                 if (employment.getMainEmploymentEndDate() != null && employmentDTO.getMainEmploymentEndDate() != null) {
-                    DateTimeInterval employmentInterval = new DateTimeInterval(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()), DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate()));
+                    DateTimeInterval employmentInterval = new DateTimeInterval(DateUtils.getDateFromEpoch(employment.getMainEmploymentStartDate()), DateUtils.getDateFromEpoch(employment.getMainEmploymentEndDate()));
                     if (newEmploymentInterval.containsInterval(employmentInterval)) {
                         exceptionService.invalidRequestException("message.employment.alreadyexist", mainEmploymentQueryResult.getOrganizationName());
                     } else {
@@ -766,7 +762,7 @@ public class EmploymentService {
                     }
                 } else {
                     if (employment.getMainEmploymentEndDate() == null && employmentDTO.getMainEmploymentEndDate() != null) {
-                        if (DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()) > mainEmploymentStartDate && DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()) <= mainEmploymentEndDate) {
+                        if (DateUtils.getDateFromEpoch(employment.getMainEmploymentStartDate()) > mainEmploymentStartDate && DateUtils.getDateFromEpoch(employment.getMainEmploymentStartDate()) <= mainEmploymentEndDate) {
                             getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                             employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
                             getAfterChangeMainEmployment(employmentOverlapDTO, employment);
@@ -794,7 +790,7 @@ public class EmploymentService {
                             getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                             employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
                             getAfterChangeMainEmployment(employmentOverlapDTO, employment);
-                        } else if (mainEmploymentStartDate > DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()) && mainEmploymentStartDate <= DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate())) {
+                        } else if (mainEmploymentStartDate > DateUtils.getDateFromEpoch(employment.getMainEmploymentStartDate()) && mainEmploymentStartDate <= DateUtils.getDateFromEpoch(employment.getMainEmploymentEndDate())) {
                             getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                             employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
                             getAfterChangeMainEmployment(employmentOverlapDTO, employment);

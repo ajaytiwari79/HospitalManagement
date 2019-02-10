@@ -47,9 +47,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.utils.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +73,7 @@ public class ExpertiseService {
     private
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
+    private
     StaffGraphRepository staffGraphRepository;
     @Inject
     OrganizationGraphRepository organizationGraphRepository;
@@ -117,7 +116,7 @@ public class ExpertiseService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
         }
-        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+        ExpertiseResponseDTO expertiseResponseDTO;
 
 
         Expertise expertise;
@@ -245,7 +244,7 @@ public class ExpertiseService {
 
     /*This method is responsible for generating Seniority Level response */
     private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevelFromDB, SeniorityLevel seniorityLevel) {
-        SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO();
+        SeniorityLevelDTO seniorityLevelDTO;
         seniorityLevelDTO = objectMapper.convertValue(seniorityLevel, SeniorityLevelDTO.class);
         seniorityLevelDTO.setParentId(seniorityLevelFromDB.getId());
 
@@ -327,7 +326,7 @@ public class ExpertiseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
         }
 
-        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+        ExpertiseResponseDTO expertiseResponseDTO;
 
         if (currentExpertise.isPublished()) {
 
@@ -520,7 +519,7 @@ public class ExpertiseService {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
         for (Expertise currentExpertise : expertise) {
-            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(currentStaff, currentExpertise, 0, DateUtil.getCurrentDate());
+            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(currentStaff, currentExpertise, 0, DateUtils.getCurrentDate());
             staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
         staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
@@ -552,13 +551,13 @@ public class ExpertiseService {
         if (isSelected) {
             for (long skillId : skillIds) {
                 if (expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId, skillId) == 0) {
-                    expertiseGraphRepository.addSkillInExpertise(expertiseId, skillId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                    expertiseGraphRepository.addSkillInExpertise(expertiseId, skillId, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 } else {
-                    expertiseGraphRepository.updateExpertiseSkill(expertiseId, skillId, DateUtil.getCurrentDate().getTime());
+                    expertiseGraphRepository.updateExpertiseSkill(expertiseId, skillId, DateUtils.getCurrentDate().getTime());
                 }
             }
         } else {
-            expertiseGraphRepository.deleteExpertiseSkill(expertiseId, skillIds, DateUtil.getCurrentDate().getTime());
+            expertiseGraphRepository.deleteExpertiseSkill(expertiseId, skillIds, DateUtils.getCurrentDate().getTime());
         }
     }
 
@@ -622,7 +621,6 @@ public class ExpertiseService {
         boolean payGradesExistsForSeniorityLevels = seniorityLevelGraphRepository.checkPayGradesInSeniorityLevel(seniorityLevelId);
         if (!payGradesExistsForSeniorityLevels) {
             exceptionService.actionNotPermittedException("message.seniorityLevel.payGrade.missing");
-
         }
         expertise.setPublished(true);
         expertise.setStartDateMillis(new Date(publishedDateMillis));
@@ -631,6 +629,7 @@ public class ExpertiseService {
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
+            expertiseGraphRepository.linkToUnitPositions(parentExpertise.getId(),expertiseId);
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
             parentExpertise.setHistory(true);
@@ -649,7 +648,7 @@ public class ExpertiseService {
     }
 
 
-    public Map<String, Object> retrieveExpertiseDetails(Staff staff) {
+    private Map<String, Object> retrieveExpertiseDetails(Staff staff) {
         Map<String, Object> map = new HashMap<>();
         map.put("staffId", staff.getId());
         map.put("staffName", staff.getFirstName() + "   " + staff.getLastName());
