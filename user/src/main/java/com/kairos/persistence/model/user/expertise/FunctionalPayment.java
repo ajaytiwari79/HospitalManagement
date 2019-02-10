@@ -7,6 +7,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +34,20 @@ public class FunctionalPayment extends UserBaseEntity {
 
     private boolean hasDraftCopy = false;
 
+    private BigDecimal percentageValue;
+
 
     public FunctionalPayment() {
 
+    }
+
+    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paymentUnit) {
+        this.expertise = expertise;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.published = false;
+        this.hasDraftCopy = false;
+        this.paymentUnit = paymentUnit;
     }
 
     public Expertise getExpertise() {
@@ -103,12 +115,12 @@ public class FunctionalPayment extends UserBaseEntity {
         this.hasDraftCopy = hasDraftCopy;
     }
 
-    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paymentUnit) {
-        this.expertise = expertise;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.published = false;
-        this.hasDraftCopy = false;
-        this.paymentUnit = paymentUnit;
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
     }
+
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
+    }
+
 }

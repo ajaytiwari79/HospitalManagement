@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, Long> {
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where id(level)={0} AND id(payTable)<>{1}" +
-            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis DESC LIMIT 1")
+            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.percentageValue as percentageValue,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis DESC LIMIT 1")
     PayTableResponse findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
@@ -57,7 +57,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,published:true}) where id(level)={0} AND DATE(payTable.startDateMillis) <= DATE({1}) AND (payTable.endDateMillis IS NULL OR DATE(payTable.endDateMillis) >= DATE({1}))" +
             "OPTIONAL MATCH(payTable)-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false})\n" +
             "RETURN id(payTable) as id,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis," +
-            " payTable.name as name ,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
+            " payTable.name as name ,payTable.percentageValue as percentageValue,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
     List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId, String startDate);
 
     @Query("MATCH (payTable:PayTable)<-[rel:" + HAS_TEMP_PAY_TABLE + "]-(parentPayTable:PayTable{deleted:false}) where id(payTable)={0}  detach delete rel \n" +
@@ -67,7 +67,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     PayTableResponse getParentPayTableByPayTableId(Long payTableId);
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where id(level)={0} " +
-            "RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.editable as editable,payTable.hasTempCopy as hasTempCopy,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis ")
+            "RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.percentageValue as percentageValue,payTable.editable as editable,payTable.hasTempCopy as hasTempCopy,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis ")
     List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId);
 
     @Query("MATCH(pt:PayTable)-[:"+IN_ORGANIZATION_LEVEL+"]-(level:Level) WHERE id(pt)={0} \n" +

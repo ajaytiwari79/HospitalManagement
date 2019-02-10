@@ -1,6 +1,7 @@
 package com.kairos.dto.user.country.pay_table;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -21,14 +22,16 @@ public class PayTableUpdateDTO {
     private Long levelId;
     @NotNull(message = "Please provide payment unit type")
     private String paymentUnit;
+    private BigDecimal percentageValue;
 
     public PayTableUpdateDTO() {
         //Default cons
     }
 
-    public PayTableUpdateDTO(Long id, @NotNull(message = "name can't be null") String name) {
+    public PayTableUpdateDTO(Long id, @NotNull(message = "name can't be null") String name,BigDecimal percentageValue) {
         this.id = id;
         this.name = name;
+        this.percentageValue=percentageValue;
     }
 
     public Long getId() {
@@ -87,16 +90,6 @@ public class PayTableUpdateDTO {
         this.levelId = levelId;
     }
 
-    public PayTableUpdateDTO(String name, String shortName, String description, LocalDate startDateMillis, LocalDate endDateMillis, String paymentUnit, Long levelId) {
-        this.name = name;
-        this.shortName = shortName;
-        this.description = description;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.paymentUnit = paymentUnit;
-        this.levelId=levelId;
-    }
-
     public String getPaymentUnit() {
         return paymentUnit;
     }
@@ -104,4 +97,13 @@ public class PayTableUpdateDTO {
     public void setPaymentUnit(String paymentUnit) {
         this.paymentUnit = paymentUnit;
     }
+
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
+    }
+
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
+    }
+
 }

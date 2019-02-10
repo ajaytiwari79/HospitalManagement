@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class FunctionalPaymentService {
 
-    private Logger logger = LoggerFactory.getLogger(FunctionalPaymentService.class);
+    private Logger LOGGER = LoggerFactory.getLogger(FunctionalPaymentService.class);
     private ExpertiseGraphRepository expertiseGraphRepository;
     private ExceptionService exceptionService;
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
