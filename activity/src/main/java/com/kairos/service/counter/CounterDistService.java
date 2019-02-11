@@ -3,6 +3,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
@@ -96,6 +97,7 @@ public class CounterDistService extends MongoBaseService {
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
         if (ConfLevel.STAFF.equals(level)) {
+
             refId = genericIntegrationService.getStaffIdByUserId(refId);
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level);
@@ -711,6 +713,22 @@ public class CounterDistService extends MongoBaseService {
             kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
         });
         if(!kpiDashboards.isEmpty()) save(kpiDashboards);
+    }
+
+
+    //kpi default data and copy and save filter
+    public CounterDTO saveKpiFilterData(Long refId,Long kpiId,CounterDTO counterDTO,ConfLevel level){
+        return  null;
+    }
+
+    public CounterDTO copyKpiFilterData(Long refId,Long kpiId,CounterDTO counterDTO,ConfLevel level){
+        return  null;
+    }
+
+    public TabKPIDTO getKpiPreviewWithFilter(Long unitId,FilterCriteriaDTO filterCriteria){
+        filterCriteria.setUnitId(unitId);
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteria,unitId);
+        return  null;
     }
 }
 

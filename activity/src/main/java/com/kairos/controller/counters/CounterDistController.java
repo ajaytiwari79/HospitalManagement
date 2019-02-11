@@ -1,6 +1,7 @@
 package com.kairos.controller.counters;
 
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
@@ -258,8 +259,46 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-//    @GetMapping("/calculate_planned_hours")
-//    public ResponseEntity<Map<String, Object>> calculatePlannedHours(@PathVariable Long unitId, @RequestParam List<Long> staffIds, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterDataService.calculatePlannedHour(staffIds,unitId,startDate,endDate));
-//    }
+
+    //save and copy kpi and default data of kpi
+
+    @GetMapping(COUNTRY_URL+UNIT_URL+KPI_URL+"/kpi_default_data")
+    public ResponseEntity<Map<String,Object>> getDefaultKpiFilterDataOfCountry(@PathVariable Long countryId,@PathVariable Long unitId,@PathVariable Long kpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+    @GetMapping(UNIT_URL+KPI_URL+"/kpi_default_data")
+    public ResponseEntity<Map<String,Object>> getDefaultKpiFilterDataOfUnit(@PathVariable Long unitId,@PathVariable Long countryId,@PathVariable Long kpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+    @PutMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
+    public ResponseEntity<Map<String,Object>> saveKpiDateOfCountry(@PathVariable Long countryId,@PathVariable Long kpiId,@RequestBody CounterDTO counterDTO){
+        counterManagementService.saveKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+    @PostMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
+    public ResponseEntity<Map<String,Object>> saveKpiDateOfUnit(@PathVariable Long unitId,@PathVariable Long kpiId,@RequestBody CounterDTO counterDTO){
+        counterManagementService.saveKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+    @PostMapping(COUNTRY_URL+KPI_URL+"/copy_kpi")
+    public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@PathVariable Long countryId,@PathVariable Long kpiId,@RequestBody CounterDTO counterDTO){
+        counterManagementService.copyKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+    @PostMapping(UNIT_URL+KPI_URL+"/copy_kpi")
+    public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@PathVariable Long unitId,@PathVariable Long kpiId, @RequestBody CounterDTO counterDTO){
+        counterManagementService.copyKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+    @PostMapping(UNIT_URL+"/preview_kpi")
+    public ResponseEntity<Map<String,Object>> previewKpiDate(@PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria){
+        counterManagementService.getKpiPreviewWithFilter(unitId,filterCriteria);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
 }

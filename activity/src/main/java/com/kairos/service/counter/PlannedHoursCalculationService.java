@@ -34,11 +34,6 @@ public class PlannedHoursCalculationService implements CounterService {
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
-//currently not use
-//    private Map<Long,Long> calculatePlannedHours(Set<Long> staffIds, LocalDate startDate, LocalDate endDate ){
-//        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
-//        return dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
-//    }
 
     private List<CommonKpiDataUnit> getPlannedHoursKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi){
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();

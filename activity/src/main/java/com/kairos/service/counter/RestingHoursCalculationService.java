@@ -41,7 +41,7 @@ public class RestingHoursCalculationService implements CounterService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
 
-    public double getTotalRestingHours(List<Shift> shifts, long initTs, long endTs, boolean dayOffAllowed) {
+    public double getTotalRestingHours(List<Shift> shifts, long initTs, long endTs) {
         //all shifts should be sorted on startDate
         DateTimeInterval dateTimeInterval = new DateTimeInterval(initTs, endTs);
         long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
@@ -54,7 +54,7 @@ public class RestingHoursCalculationService implements CounterService {
         return DateUtils.getHoursFromTotalMilliSeconds(totalrestingMinutes);
     }
 
-    public Map<Long, Double> calculateRestingHours(List<Long> staffIds, Long organizationId, LocalDateTime startDate, LocalDateTime endDate) {
+    public Map<Long, Double> calculateRestingHours(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate) {
         Map<Long, Double> staffRestingHours = new HashMap<>();
         //currently not use
 //        Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
@@ -63,7 +63,7 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
         staffIds.forEach(staffId -> {
             if(staffId != null) {
-                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate), false);
+                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate));
                     staffRestingHours.put(staffId, restingHours);
             }
         });
@@ -85,7 +85,7 @@ public class RestingHoursCalculationService implements CounterService {
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentTypes,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), organizationId, DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1));
+        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1));
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {

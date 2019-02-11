@@ -17,7 +17,12 @@ public class CounterDTO {
     private boolean counter;
     private BigInteger primaryCounter;
     private BigInteger categoryId;
+    //calculation formula of per KPI
+    private String calculationFormula;
+    //applicable filter of kpi
     private List<FilterCriteria> criteriaList;
+    //selected filer by staff
+    private List<FilterCriteria> selectedFilter;
     private Set<ModuleType> supportedModuleTypes;
 
     public CounterDTO() {

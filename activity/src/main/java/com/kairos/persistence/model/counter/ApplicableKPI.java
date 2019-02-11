@@ -1,9 +1,11 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class ApplicableKPI extends MongoBaseEntity {
     private BigInteger activeKpiId;
@@ -12,6 +14,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private List<FilterCriteria> criteriaList;
 
     public ApplicableKPI() {
 
@@ -74,4 +77,11 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.staffId = staffId;
     }
 
+    public List<FilterCriteria> getCriteriaList() {
+        return criteriaList;
+    }
+
+    public void setCriteriaList(List<FilterCriteria> criteriaList) {
+        this.criteriaList = criteriaList;
+    }
 }

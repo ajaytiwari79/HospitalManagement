@@ -22,6 +22,7 @@ public final class ApiConstants {
     public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL + "/timeBank";
     public static final String PAYOUT_URL = API_ORGANIZATION_UNIT_URL + "/payOut";
     public static final String COUNTER_DIST_URL = "/counter/dist";
+    public static final String KPI_URL = "/kpi/{kpiId}";
     public static final String COUNTER_COUNTRY_DIST_URL = COUNTRY_URL + COUNTER_DIST_URL;
     public static final String COUNTER_UNIT_DIST_URL = UNIT_URL + COUNTER_DIST_URL;
     public static final String COUNTER_STAFF_UNIT_DIST_URL = UNIT_URL + STAFF_URL + COUNTER_DIST_URL;
