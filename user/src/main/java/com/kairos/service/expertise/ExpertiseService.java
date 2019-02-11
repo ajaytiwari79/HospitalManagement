@@ -76,20 +76,26 @@ public class ExpertiseService {
     private
     StaffGraphRepository staffGraphRepository;
     @Inject
+    private
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
+    private
     OrganizationServiceRepository organizationServiceRepository;
     @Inject
+    private
     OrganizationServiceService organizationServiceService;
 
     @Inject
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
 
     @Inject
+    private
     TagService tagService;
     @Inject
+    private
     StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
+    private
     ObjectMapper objectMapper;
     @Inject
     private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
@@ -624,16 +630,24 @@ public class ExpertiseService {
         }
         expertise.setPublished(true);
         expertise.setStartDateMillis(new Date(publishedDateMillis));
-
         expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
-            expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
+            //expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
             expertiseGraphRepository.linkToUnitPositions(parentExpertise.getId(),expertiseId);
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
             parentExpertise.setHistory(true);
+            Expertise parentExp=expertiseGraphRepository.findOne(parentExpertise.getId());
+            parentExp.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+            parentExp.setHasDraftCopy(false);
+            parentExp.setHistory(true);
+            parentExp.setId(expertise.getId());
+            expertiseGraphRepository.save(parentExp);
+            expertise.setId(parentExpertise.getId());
+            expertiseGraphRepository.save(expertise);
         }
+
         return parentExpertise;
     }
 
@@ -687,7 +701,7 @@ public class ExpertiseService {
 
 
     //Validating age range
-    public void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
+    private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
@@ -826,7 +840,7 @@ public class ExpertiseService {
     }
 
     private void createDefaultSettings(Expertise targetExpertise, Expertise sourceExpertise) {
-        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList();
+        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
         ExpertisePlannedTimeQueryResult expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.getPlannedTimeConfigurationByExpertise(sourceExpertise.getId());
         if (Optional.ofNullable(expertiseEmploymentTypeRelationships).isPresent()) {
             expertiseEmploymentTypeRelationships.employmentTypes.forEach(employmentType -> {

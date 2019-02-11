@@ -148,7 +148,7 @@ public class EmploymentService {
         } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
             exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
         }
-        if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
+        if (isNotNull(objectToUpdate.getExternalId()) && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
             Staff staff = staffGraphRepository.findByExternalId(staffEmploymentDetail.getTimeCareExternalId());
             if (Optional.ofNullable(staff).isPresent()) {
                 exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");

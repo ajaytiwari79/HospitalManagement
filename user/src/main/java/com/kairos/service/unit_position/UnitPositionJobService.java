@@ -63,7 +63,7 @@ public class UnitPositionJobService {
             if (!unitPositionSeniorityLevelQueryResults.isEmpty()) {
 
                 Map<Long, UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResultMap
-                        = unitPositionSeniorityLevelQueryResults.stream().collect(Collectors.toMap(t -> t.getUnitPositionId(), java.util.function.Function.identity()));
+                        = unitPositionSeniorityLevelQueryResults.stream().collect(Collectors.toMap(UnitPositionSeniorityLevelQueryResult::getUnitPositionId, java.util.function.Function.identity()));
 
                 Set<Long> unitPositionIds = unitPositionSeniorityLevelQueryResultMap.keySet();
                 Iterable<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(unitPositionIds, 2);
@@ -167,8 +167,7 @@ public class UnitPositionJobService {
         employmentGraphRepository.save(employment);
         User user = userGraphRepository.getUserByStaffId(staffId);
         EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), employment.getReasonCode().getId(), employment.getAccessGroupIdOnEmploymentEnd());
-        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
-        return employmentUnitPositionDTO;
+        return new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
 
     }
 

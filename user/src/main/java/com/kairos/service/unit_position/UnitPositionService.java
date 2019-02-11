@@ -173,7 +173,7 @@ public class UnitPositionService {
     private TimeSlotGraphRepository timeSlotGraphRepository;
 
 
-    public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws ExecutionException, Exception {
+    public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
         Organization organization = organizationService.getOrganizationDetail(unitPositionDTO.getUnitId(), type);
         Organization parentOrganization = organization.isParentOrganization() ? organization : organizationService.getParentOfOrganization(organization.getId());
 
