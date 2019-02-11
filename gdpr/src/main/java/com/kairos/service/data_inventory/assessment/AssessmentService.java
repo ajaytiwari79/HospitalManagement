@@ -5,27 +5,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.ManagingOrganization;
-import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.*;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityDeprecated;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistence.model.embeddables.ManagingOrganization;
+import com.kairos.persistence.model.embeddables.Staff;
+import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
+import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
+import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
+import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
@@ -40,29 +51,52 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-public class AssessmentService{
+public class AssessmentService {
 
 
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
-
     @Inject
     private QuestionnaireTemplateRepository questionnaireTemplateRepository;
-
     @Inject
     private AssetRepository assetRepository;
-
     @Inject
     private ExceptionService exceptionService;
-
     @Inject
     private ObjectMapper objectMapper;
-
     @Inject
     private GenericRestClient genericRestClient;
-
     @Inject
     private AssessmentRepository assessmentRepository;
+    @Inject
+    private AccessorPartyRepository accessorPartyRepository;
+    @Inject
+    private ResponsibilityTypeRepository responsibilityTypeRepository;
+    @Inject
+    private ProcessingPurposeRepository processingPurposeRepository;
+    @Inject
+    private DataSourceRepository dataSourceRepository;
+    @Inject
+    private HostingProviderRepository hostingProviderRepository;
+    @Inject
+    private DataDisposalRepository dataDisposalRepository;
+    @Inject
+    private OrganizationalSecurityMeasureRepository organizationalSecurityMeasureRepository;
+    @Inject
+    private TechnicalSecurityMeasureRepository technicalSecurityMeasureRepository;
+    @Inject
+    private HostingTypeRepository hostingTypeRepository;
+    @Inject
+    private StorageFormatRepository storageFormatRepository;
+    @Inject
+    private ProcessingLegalBasisRepository processingLegalBasisRepository;
+    @Inject
+    private TransferMethodRepository transferMethodRepository;
+    @Inject
+    private AssetTypeRepository assetTypeRepository;
+
+
+
 
     private static List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
 
@@ -74,23 +108,23 @@ public class AssessmentService{
      * @return
      */
     public AssessmentDTO launchAssessmentForAsset(Long unitId, Long assetId, AssessmentDTO assessmentDTO) {
-        if(!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()){
+        if (!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()) {
             exceptionService.illegalArgumentException("message.assessment.relativedeadline.require");
         }
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, false);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId,unitId);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
-        validateLaunchAssessmentValue(assessmentDTO);
+        validateRelativeDeadLineDate(assessmentDTO);
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
-        Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, asset) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, asset);
+        Assessment assessment = assessmentDTO.isRiskAssessment() ? validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, asset) : validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, asset);
         assessment.setAsset(asset);
         if (!assessmentDTO.isRiskAssessment()) {
-            //saveAssetValueToAssessment(unitId, assessment, assetResponseDTO);
+            mapEntityValueAsAssessmentAnswer(assessment, asset, null);
         } else {
             //saveRiskTemplateAnswerToAssessment(unitId, assessment);
         }
@@ -99,24 +133,24 @@ public class AssessmentService{
         return assessmentDTO;
     }
 
-    private boolean validateLaunchAssessmentValue(AssessmentDTO assessmentDTO){
-            boolean result=true;
-            if(assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=30)){
-             result=false;
-            }else if(assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=24)){
-                result=false;
-            }else if(assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=12)){
-                result=false;
-            }else {
-                LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadlineType(), 1);
-                if(endDate.isAfter(assessmentDTO.getEndDate())){
-                    result=false;
-                }
+    private boolean validateRelativeDeadLineDate(AssessmentDTO assessmentDTO) {
+        boolean result = true;
+        if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 30)) {
+            result = false;
+        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 24)) {
+            result = false;
+        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 12)) {
+            result = false;
+        } else {
+            LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadlineType(), 1);
+            if (endDate.isAfter(assessmentDTO.getEndDate())) {
+                result = false;
             }
-            if(!result){
-                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value.invalid");
-            }
-            return result;
+        }
+        if (!result) {
+            exceptionService.illegalArgumentException("message.assessment.relativedeadline.value.invalid");
+        }
+        return result;
     }
 
     /**
@@ -125,25 +159,25 @@ public class AssessmentService{
      * @param assessmentDTO        Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
-    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO,boolean subProcessingActivity) {
+    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO, boolean subProcessingActivity) {
 
-        Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId,assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId,assessmentStatusList, false);
+        Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId, assessmentStatusList, false);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.PROCESSING_ACTIVITY);
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId,unitId, false);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId, unitId, false);
         try {
-            Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivity) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivity);
+            Assessment assessment = assessmentDTO.isRiskAssessment() ? validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivity) : validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivity);
             assessment.setProcessingActivity(processingActivity);
             if (!assessmentDTO.isRiskAssessment()) {
-               // saveProcessingActivityValueToAssessment(unitId, assessment, processingActivityDTO);
+                mapEntityValueAsAssessmentAnswer(assessment, null, processingActivity);
             } else {
-               // saveRiskTemplateAnswerToAssessment(unitId, assessment);
+                //  saveRiskTemplateAnswerToAssessment(unitId, assessment);
             }
             assessmentRepository.save(assessment);
             assessmentDTO.setId(assessment.getId());
-        }catch (EntityNotFoundException ene){
+        } catch (EntityNotFoundException ene) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
         }
         return assessmentDTO;
@@ -155,7 +189,7 @@ public class AssessmentService{
      * @param assessmentDTO
      * @return
      */
-    private Assessment buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
+    private Assessment validateLaunchAssessment(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
 
         Assessment previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, assessmentDTO.getName());
         if (Optional.ofNullable(previousAssessment).isPresent()) {
@@ -163,25 +197,24 @@ public class AssessmentService{
         }
         if (assessmentDTO.getStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.startdate");
-        }else if(assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())){
+        } else if (assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(),  assessmentDTO.getComment(),assessmentDTO.getStartDate());
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), assessmentDTO.getStartDate());
         assessment.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class));
         assessment.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class));
         assessment.setOrganizationId(unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
-                Asset asset = (Asset)entity;
-                questionnaireTemplate = checkPreviousLaunchedAssetAssessment(unitId,  asset);
+                Asset asset = (Asset) entity;
+                questionnaireTemplate = getPublishedQuestionnaireTemplateByUnitIdAndAssetTypeOrSubAssetType(unitId, asset);
                 break;
             case RISK:
-                questionnaireTemplate = checkPreviousLaunchedRiskAssessment(unitId, assessmentDTO, assessment, entity);
-                assessment.setRiskAssessment(true);
+                questionnaireTemplate = getPublishedQuestionnaireTemplateByUnitIdAndAssociatedEntity(unitId, assessmentDTO, assessment, entity);
                 break;
             case PROCESSING_ACTIVITY:
-                questionnaireTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByProcessingActivityAndByUnitId(unitId, QuestionnaireTemplateType.PROCESSING_ACTIVITY,QuestionnaireTemplateType.PROCESSING_ACTIVITY,QuestionnaireTemplateStatus.PUBLISHED);
+                questionnaireTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByProcessingActivityAndByUnitId(unitId, QuestionnaireTemplateType.PROCESSING_ACTIVITY, QuestionnaireTemplateType.PROCESSING_ACTIVITY, QuestionnaireTemplateStatus.PUBLISHED);
                 break;
             default:
                 questionnaireTemplate = questionnaireTemplateRepository.getQuestionnaireTemplateByTemplateTypeAndUnitId(templateType, unitId, QuestionnaireTemplateStatus.PUBLISHED);
@@ -209,13 +242,12 @@ public class AssessmentService{
     }
 
 
-    private QuestionnaireTemplate checkPreviousLaunchedAssetAssessment(Long unitId, Asset asset) {
-        //TODO commented due to id type change from Biginteger to Long
-        QuestionnaireTemplate questionnaireTemplate = null;
+    private QuestionnaireTemplate getPublishedQuestionnaireTemplateByUnitIdAndAssetTypeOrSubAssetType(Long unitId, Asset asset) {
+        QuestionnaireTemplate questionnaireTemplate;
         if (asset.getSubAssetType() != null) {
-            questionnaireTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(),QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
+            questionnaireTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
         } else {
-            questionnaireTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByUnitIdAssetTypeIdAndTemplateStatus(unitId, asset.getAssetType().getId(),QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
+            questionnaireTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByUnitIdAssetTypeIdAndTemplateStatus(unitId, asset.getAssetType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
         }
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             questionnaireTemplate = questionnaireTemplateRepository.getDefaultPublishedAssetQuestionnaireTemplateByUnitId(unitId);
@@ -231,32 +263,25 @@ public class AssessmentService{
      * @param entity
      * @return
      */
-    private QuestionnaireTemplate checkPreviousLaunchedRiskAssessment(Long unitId, AssessmentDTO assessmentDTO, Assessment assessment, Object entity) {
-
+    private QuestionnaireTemplate getPublishedQuestionnaireTemplateByUnitIdAndAssociatedEntity(Long unitId, AssessmentDTO assessmentDTO, Assessment assessment, Object entity) {
         List<Risk> risks = new ArrayList<>();
         QuestionnaireTemplate questionnaireTemplate = null;
         if (QuestionnaireTemplateType.ASSET_TYPE.equals(assessmentDTO.getRiskAssociatedEntity())) {
-            Asset asset = (Asset)entity;
+            Asset asset = (Asset) entity;
             risks = asset.getAssetType().getRisks();
             risks.addAll(asset.getSubAssetType().getRisks());
-            if (CollectionUtils.isEmpty(risks)) {
-                exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
-            }
-            if (asset.getSubAssetType() != null)
-                questionnaireTemplate = questionnaireTemplateRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeAndSubAssetTypeAndTemplateType(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(), QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED,QuestionnaireTemplateType.ASSET_TYPE);
-            else
-                questionnaireTemplate = questionnaireTemplateRepository.findPublishedRiskTemplateByAssetTypeIdAndOrgId(unitId, asset.getAssetType().getId());
+            questionnaireTemplate = Optional.ofNullable(asset.getSubAssetType()).isPresent() ? questionnaireTemplateRepository.findPublishedRiskTemplateByOrgIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId())
+                    : questionnaireTemplateRepository.findPublishedRiskTemplateByAssetTypeIdAndOrgId(unitId, asset.getAssetType().getId());
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
             ProcessingActivity processingActivity = (ProcessingActivity) entity;
             risks.addAll(processingActivity.getRisks());
-            if (CollectionUtils.isEmpty(risks)) {
-                exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
-            }
-            //TODO changed due to id changes from Biginteger to Integer
-            //riskIds.addAll(((ProcessingActivityResponseDTO) entity).getRisks().stream().map(RiskBasicResponseDTO::getId).collect(Collectors.toSet()));
-            questionnaireTemplate = questionnaireTemplateRepository.findPublishedRiskTemplateByAssociatedEntityAndOrgId(unitId,  QuestionnaireTemplateType.PROCESSING_ACTIVITY);
+            questionnaireTemplate = questionnaireTemplateRepository.findPublishedRiskTemplateByAssociatedEntityAndOrgId(unitId, QuestionnaireTemplateType.PROCESSING_ACTIVITY);
+        }
+        if (CollectionUtils.isEmpty(risks)) {
+            exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
         }
         assessment.setRisks(risks);
+        assessment.setRiskAssessment(true);
         return questionnaireTemplate;
     }
 
@@ -287,6 +312,7 @@ public class AssessmentService{
     }*/
 
 
+ /*
     private void getRiskAssessmentAnswer(AssessmentDeprecated assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         List<AssessmentAnswerValueObject> assessmentAnswers = assessment.getAssessmentAnswers();
@@ -299,6 +325,7 @@ public class AssessmentService{
         }
 
     }
+
 
 
     private void getAssetAssessmentQuestionAndAnswer(Long unitId, AssessmentDeprecated assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
@@ -342,8 +369,7 @@ public class AssessmentService{
         }
 
     }
-
-
+*/
     private Object addAssessmentAnswerOptionsForAsset(Long unitId, AssetAttributeName assetAttributeName) {
 
 
@@ -403,9 +429,8 @@ public class AssessmentService{
      * @return
      */
     public boolean updateAssessmentStatus(Long unitId, Long assessmentId, AssessmentStatus assessmentStatus) {
-        Assessment assessment = assessmentRepository.findByOrganizationIdAndDeletedAndId( assessmentId,false, unitId);
-        UserVO currentUser = new UserVO();
-        ObjectMapperUtils.copyProperties(UserContext.getUserDetails(), currentUser);
+        Assessment assessment = assessmentRepository.findByOrganizationIdAndDeletedAndId(assessmentId, false, unitId);
+        UserVO currentUser = ObjectMapperUtils.copyPropertiesByMapper(UserContext.getUserDetails(), UserVO.class);
         switch (assessmentStatus) {
             case IN_PROGRESS:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
@@ -419,7 +444,7 @@ public class AssessmentService{
                 } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                     exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
                 }
-                //saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
+                saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
                 break;
             case NEW:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
@@ -443,21 +468,17 @@ public class AssessmentService{
                 if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
                     saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset);
                 } else {
-
                     exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
                 }
-
             });
             assetRepository.save(asset);
-
         } else if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getProcessingActivity()).isPresent()) {
-            ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted( assessment.getProcessingActivity().getId(),unitId);
+            ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(assessment.getProcessingActivity().getId(), unitId);
             List<AssessmentAnswer> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
             assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
                     -> {
                 if (Optional.ofNullable(processingActivityAssessmentAnswer.getAttributeName()).isPresent()) {
-                   // saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
-
+                    saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
                 } else {
                     exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
 
@@ -478,7 +499,7 @@ public class AssessmentService{
         Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments,AssessmentBasicResponseDTO.class );
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments, AssessmentBasicResponseDTO.class);
     }
 
 
@@ -507,7 +528,7 @@ public class AssessmentService{
      * @param assessmentId
      * @return
      */
-    public List<AssessmentAnswerValueObject> addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects, AssessmentStatus status) {
+    public List<AssessmentAnswer> addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, List<AssessmentAnswer> assessmentAnswerValueObjects, AssessmentStatus status) {
 //TODO
         /*Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         UserVO currentUser = new UserVO();
@@ -550,37 +571,36 @@ public class AssessmentService{
             case HOSTING_LOCATION:
                 asset.setHostingLocation((String) assetAttributeValue);
                 break;
-           /* case HOSTING_TYPE:
-                asset.setHostingType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+            case HOSTING_TYPE:
+                asset.setHostingType(hostingTypeRepository.findByIdAndDeletedFalse(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0)));
                 break;
             case DATA_DISPOSAL:
-                asset.setDataDisposal(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setDataDisposal(dataDisposalRepository.findByIdAndDeletedFalse(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0)));
                 break;
             case HOSTING_PROVIDER:
-                asset.setHostingProvider(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setHostingProvider(hostingProviderRepository.findByIdAndDeletedFalse(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0)));
                 break;
             case ASSET_TYPE:
-                asset.setAssetType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setAssetType(assetTypeRepository.findByIdAndDeletedFalse(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0)));
                 break;
             case STORAGE_FORMAT:
-                asset.setStorageFormats(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
+                asset.setStorageFormats(storageFormatRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue)));
                 break;
             case ASSET_SUB_TYPE:
-                asset.setSubAssetType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setSubAssetType(assetTypeRepository.findByIdAndDeletedFalse(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0)));
                 break;
             case TECHNICAL_SECURITY_MEASURES:
-                asset.setTechnicalSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
+                asset.setTechnicalSecurityMeasures(technicalSecurityMeasureRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue)));
                 break;
             case ORGANIZATION_SECURITY_MEASURES:
-                asset.setOrgSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
+                asset.setOrgSecurityMeasures(organizationalSecurityMeasureRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue)));
                 break;
             case MANAGING_DEPARTMENT:
                 asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue, ManagingOrganization.class));
                 break;
             case ASSET_OWNER:
-                asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue, Staff.class));
-                asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue,ManagingOrganization.class));
-                break;*/
+                asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue, com.kairos.persistence.model.embeddables.Staff.class));
+                break;
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
                 break;
@@ -594,7 +614,7 @@ public class AssessmentService{
      * @param processingActivityAttributeValue processing activity  value corresponding to field
      * @param processingActivity               processing activity to which value Assessment answer were filed by assignee
      */
-    public void saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName processingActivityAttributeName, Object processingActivityAttributeValue, ProcessingActivityDeprecated processingActivity) {
+    public void saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName processingActivityAttributeName, Object processingActivityAttributeValue, ProcessingActivity processingActivity) {
         switch (processingActivityAttributeName) {
             case NAME:
                 processingActivity.setName((String) processingActivityAttributeValue);
@@ -603,22 +623,22 @@ public class AssessmentService{
                 processingActivity.setDescription((String) processingActivityAttributeValue);
                 break;
             case RESPONSIBILITY_TYPE:
-                processingActivity.setResponsibilityType(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue).get(0));
+                processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndDeletedFalse(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue).get(0)));
                 break;
             case ACCESSOR_PARTY:
-                processingActivity.setAccessorParties(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
+                processingActivity.setAccessorParties(accessorPartyRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue)));
                 break;
             case PROCESSING_PURPOSES:
-                processingActivity.setProcessingPurposes(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
+                processingActivity.setProcessingPurposes(processingPurposeRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue)));
                 break;
             case PROCESSING_LEGAL_BASIS:
-                processingActivity.setProcessingLegalBasis(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
+                processingActivity.setProcessingLegalBasis(processingLegalBasisRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue)));
                 break;
             case TRANSFER_METHOD:
-                processingActivity.setTransferMethods(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
+                processingActivity.setTransferMethods(transferMethodRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue)));
                 break;
             case DATA_SOURCES:
-                processingActivity.setDataSources(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
+                processingActivity.setDataSources(dataSourceRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue)));
                 break;
             case MANAGING_DEPARTMENT:
 
@@ -626,7 +646,7 @@ public class AssessmentService{
                 break;
             case PROCESS_OWNER:
                 processingActivity.setProcessOwner(objectMapper.convertValue(processingActivityAttributeValue, Staff.class));
-                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue,ManagingOrganization.class));
+                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue, ManagingOrganization.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 processingActivity.setDataRetentionPeriod((Integer) processingActivityAttributeValue);
@@ -649,52 +669,37 @@ public class AssessmentService{
         }
     }
 
-    private List<BigInteger> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
+    private List<Long> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
 
-        List<BigInteger> entityIdList = new ArrayList<>();
+        List<Long> entityIdList = new ArrayList<>();
         if (Optional.ofNullable(objectToCast).isPresent()) {
             if (objectToCast instanceof ArrayList) {
                 List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger(entityKeyValueMap.get("id").toString())));
+                entityList.forEach(entityKeyValueMap -> entityIdList.add(new Long(entityKeyValueMap.get("id").toString())));
             } else {
                 LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-                entityIdList.add(new BigInteger(entityKeyValueMap.get("id").toString()));
+                entityIdList.add(new Long(entityKeyValueMap.get("id").toString()));
             }
         }
         return entityIdList;
     }
 
-//TODO
-    private void saveAssetValueToAssessment(Long unitId, AssessmentDeprecated assessment, AssetResponseDTO assetResponseDTO) {
+    private void mapEntityValueAsAssessmentAnswer(Assessment assessment, Asset asset, ProcessingActivity processingActivity) {
 
-        /*QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
+        QuestionnaireTemplate questionnaireTemplateDTO = assessment.getQuestionnaireTemplate();
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
         }
-        List<AssessmentAnswerValueObject> assetAssessmentAnswerVOS = new ArrayList<>();
-        for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
-            for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                assetAssessmentAnswerVOS.add(mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(assetResponseDTO, questionBasicDTO));
+        List<AssessmentAnswer> assessmentAnswerVOS = new ArrayList<>();
+        for (QuestionnaireSection questionnaireSection : questionnaireTemplateDTO.getSections()) {
+            for (Question question : questionnaireSection.getQuestions()) {
+                assessmentAnswerVOS.add(Optional.ofNullable(asset).isPresent() ? mapAssetValueAsAsessmentAnswer(asset, question) : mapProcessingActivityValueAssessmentAnswer(processingActivity, question));
             }
         }
-        assessment.setAssessmentAnswers(assetAssessmentAnswerVOS);
+        assessment.setAssessmentAnswers(assessmentAnswerVOS);
     }
 
 
-    private void saveProcessingActivityValueToAssessment(Long unitId, Assessment assessment, ProcessingActivityResponseDTO processingActivityDTO) {
-        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
-        if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
-        }
-        List<AssessmentAnswerValueObject> processingActivityAssessmentAnswerVOS = new ArrayList<>();
-        for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
-            for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                processingActivityAssessmentAnswerVOS.add(mapProcessingActivityValueAssessmentAnswerOnStatusUpdatingFromNewToInProgress(processingActivityDTO, questionBasicDTO));
-            }
-        }
-        assessment.setAssessmentAnswers(processingActivityAssessmentAnswerVOS);
-
-    }*/
 
    /* private void saveRiskTemplateAnswerToAssessment(Long unitId, Assessment assessment) {
 
@@ -716,83 +721,83 @@ public class AssessmentService{
 
     //  private void mapRisk
 
-        //TODO
-        /*  private AssessmentAnswerValueObject mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(AssetResponseDTO assetResponseDTO, QuestionBasicResponseDTO questionBasicDTO) {
- AssetAttributeName assetAttributeName = AssetAttributeName.valueOf(questionBasicDTO.getAttributeName());
+    //TODO
+    private AssessmentAnswer mapAssetValueAsAsessmentAnswer(Asset asset, Question question) {
+        AssetAttributeName assetAttributeName = AssetAttributeName.valueOf(question.getAttributeName());
         switch (assetAttributeName) {
-           case NAME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getName(), questionBasicDTO.getQuestionType());
+            case NAME:
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getName(), question.getQuestionType());
             case DESCRIPTION:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDescription(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getDescription(), question.getQuestionType());
             case HOSTING_LOCATION:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getHostingLocation(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getHostingLocation(), question.getQuestionType());
             case HOSTING_TYPE:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getHostingType(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getHostingType(), question.getQuestionType());
             case DATA_DISPOSAL:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataDisposal(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getDataDisposal(), question.getQuestionType());
             case HOSTING_PROVIDER:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getHostingProvider(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getHostingProvider(), question.getQuestionType());
             case ASSET_TYPE:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetType(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getAssetType(), question.getQuestionType());
             case STORAGE_FORMAT:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getStorageFormats(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getStorageFormats(), question.getQuestionType());
             case ASSET_SUB_TYPE:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetSubType(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getSubAssetType(), question.getQuestionType());
             case TECHNICAL_SECURITY_MEASURES:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getTechnicalSecurityMeasures(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getTechnicalSecurityMeasures(), question.getQuestionType());
             case ORGANIZATION_SECURITY_MEASURES:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getOrgSecurityMeasures(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getOrgSecurityMeasures(), question.getQuestionType());
             case MANAGING_DEPARTMENT:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getManagingDepartment(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getManagingDepartment(), question.getQuestionType());
             case ASSET_OWNER:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetOwner(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getAssetOwner(), question.getQuestionType());
             case DATA_RETENTION_PERIOD:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), asset.getDataRetentionPeriod(), question.getQuestionType());
             default:
                 return null;
         }
 
     }
 
-    private AssessmentAnswerValueObject mapProcessingActivityValueAssessmentAnswerOnStatusUpdatingFromNewToInProgress(ProcessingActivityResponseDTO processingActivityDTO, QuestionBasicResponseDTO questionBasicDTO) {
+    private AssessmentAnswer mapProcessingActivityValueAssessmentAnswer(ProcessingActivity processingActivity, Question question) {
 
-        ProcessingActivityAttributeName processingActivityAttributeName = ProcessingActivityAttributeName.valueOf(questionBasicDTO.getAttributeName());
+        ProcessingActivityAttributeName processingActivityAttributeName = ProcessingActivityAttributeName.valueOf(question.getAttributeName());
         switch (processingActivityAttributeName) {
-           /* case NAME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getName(), questionBasicDTO.getQuestionType());
+            case NAME:
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getName(), question.getQuestionType());
             case DESCRIPTION:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getDescription(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getDescription(), question.getQuestionType());
             case RESPONSIBILITY_TYPE:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getResponsibilityType(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getResponsibilityType(), question.getQuestionType());
             case ACCESSOR_PARTY:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getAccessorParties(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getAccessorParties(), question.getQuestionType());
             case PROCESSING_PURPOSES:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getProcessingPurposes(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getProcessingPurposes(), question.getQuestionType());
             case PROCESSING_LEGAL_BASIS:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getProcessingLegalBasis(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getProcessingLegalBasis(), question.getQuestionType());
             case TRANSFER_METHOD:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getTransferMethods(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getTransferMethods(), question.getQuestionType());
             case DATA_SOURCES:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getDataSources(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getDataSources(), question.getQuestionType());
             case PROCESS_OWNER:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getProcessOwner(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getProcessOwner(), question.getQuestionType());
             case MANAGING_DEPARTMENT:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getManagingDepartment(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getManagingDepartment(), question.getQuestionType());
             case DATA_RETENTION_PERIOD:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getDataRetentionPeriod(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getDataRetentionPeriod(), question.getQuestionType());
             case DPO_CONTACT_INFO:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getDpoContactInfo(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getDpoContactInfo(), question.getQuestionType());
             case CONTROLLER_CONTACT_INFO:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getControllerContactInfo(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getControllerContactInfo(), question.getQuestionType());
             case MAX_DATA_SUBJECT_VOLUME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getMaxDataSubjectVolume(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getMaxDataSubjectVolume(), question.getQuestionType());
             case MIN_DATA_SUBJECT_VOLUME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getMinDataSubjectVolume(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getMinDataSubjectVolume(), question.getQuestionType());
             case JOINT_CONTROLLER_CONTACT_INFO:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getJointControllerContactInfo(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswer(question.getId(), question.getAttributeName(), processingActivity.getJointControllerContactInfo(), question.getQuestionType());
             default:
                 return null;
-        }*/
+        }
 
     }
 

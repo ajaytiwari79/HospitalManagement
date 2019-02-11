@@ -66,7 +66,7 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     AssetType findByIdAndCountryIdAndAssetTypeAndDeleted(Long id, Long assetTypeId, Long countryId);
 
     @Query(value = "SELECT at FROM AssetType at WHERE at.deleted = false and at.id = ?1")
-    AssetType findByIdAndDeleted(Long id);
+    AssetType findByIdAndDeletedFalse(Long id);
 
     @Query(value = "SELECT at FROM AssetType at WHERE at.id IN (?1) and at.deleted = false and at.subAssetType = ?2")
     List<AssetType>  findAllByIds(List<Long> ids, boolean subAssetType);

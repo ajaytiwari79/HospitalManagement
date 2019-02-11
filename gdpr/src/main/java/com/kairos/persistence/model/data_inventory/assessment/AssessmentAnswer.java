@@ -19,7 +19,7 @@ public class AssessmentAnswer {
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private Long questionId;
     private String attributeName;
-    private String value;
+    private Object value;
     private QuestionType questionType;
 
 
@@ -27,7 +27,7 @@ public class AssessmentAnswer {
     public AssessmentAnswer() {
     }
 
-    public AssessmentAnswer(Long questionId, String attributeName, String value, QuestionType questionType) {
+    public AssessmentAnswer(Long questionId, String attributeName, Object value, QuestionType questionType) {
         this.questionId = questionId;
         this.attributeName = attributeName;
         this.value = value;
@@ -50,7 +50,9 @@ public class AssessmentAnswer {
 
     public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
-    public String getValue() { return value; }
+    public Object getValue() {return value; }
+
+    public void setValue(Object value) { this.value = value; }
 
     public void setValue(String value) { this.value = value; }
 

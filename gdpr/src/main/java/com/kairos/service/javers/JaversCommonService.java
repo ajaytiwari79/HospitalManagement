@@ -186,7 +186,7 @@ public class JaversCommonService {
         switch (field) {
 
             case ASSET_TYPE_KEY:
-                fieldValues.add(assetTypeRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
+                fieldValues.add(assetTypeRepository.findByIdAndDeletedFalse((Long) historyMap.getPropertyValue(field)));
                 break;
             case ASSET_SUB_TYPE_KEY:
                 fieldValues.add(assetTypeRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field), true));
