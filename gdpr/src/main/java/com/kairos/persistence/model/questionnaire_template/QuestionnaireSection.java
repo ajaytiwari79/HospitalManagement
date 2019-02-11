@@ -3,10 +3,7 @@ package com.kairos.persistence.model.questionnaire_template;
 
 import com.kairos.persistence.model.common.BaseEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -14,46 +11,37 @@ public class QuestionnaireSection extends BaseEntity {
 
     private String title;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Question> questions=new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
+    @JoinColumn(name = "questionnaire_section_id")
+    private List<Question> questions;
     private Long countryId;
+    private Long organizationId;
 
-
-    public QuestionnaireSection(String title, Long countryId) {
-        this.title = title;
-        this.countryId = countryId;
-    }
-
-
-    public QuestionnaireSection(String title) {
-        this.title = title;
-    }
     public QuestionnaireSection() {
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
+    public QuestionnaireSection(String title,  Long countryId, Long organizationId) {
         this.title = title;
+        this.countryId = countryId;
+        this.organizationId = organizationId;
     }
 
-    public List<Question> getQuestions() {
-        return questions;
-    }
+    public Long getOrganizationId() { return organizationId; }
 
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
-    }
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+    public Long getCountryId() { return countryId; }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
+
+    public String getTitle() { return title; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public List<Question> getQuestions() { return questions; }
+
+    public void setQuestions(List<Question> questions) { this.questions = questions; }
 
 
     @Override

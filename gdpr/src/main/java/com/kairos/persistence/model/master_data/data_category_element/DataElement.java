@@ -14,12 +14,17 @@ public class DataElement extends BaseEntity {
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     private Long countryId;
+    private Long organizationId;
+
 
    /* @ManyToOne
     @JoinColumn(name="dataCategory_id")
     private DataCategory dataCategory;*/
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public Long getCountryId() {
         return countryId;

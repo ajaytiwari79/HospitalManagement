@@ -19,20 +19,17 @@ public class DataSubjectMapping extends BaseEntity {
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
-
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.EAGER)
     private List<DataCategory> dataCategories=new ArrayList<>();
-
     private Long countryId;
+    private Long organizationId;
+
 
 
     public DataSubjectMapping() {
@@ -59,6 +56,10 @@ public class DataSubjectMapping extends BaseEntity {
         this.name = name;
         this.description=description;
     }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public Long getCountryId() {
         return countryId;

@@ -37,7 +37,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public List<QuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(Long countryId) {
+    public List<QuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateByCountryId(Long countryId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -164,7 +164,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId) {
+    public QuestionnaireTemplate getDefaultPublishedAssetQuestionnaireTemplateByUnitId(Long unitId) {
 
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
@@ -185,7 +185,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(Long unitId, BigInteger assetTypeId) {
+    public QuestionnaireTemplate findQuestionnaireTemplateByUnitIdAssetTypeIdAndTemplateStatus(Long unitId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and("assetTypeId").is(assetTypeId)
                 .and("assetSubTypeId").exists(false)
@@ -226,7 +226,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
+    public QuestionnaireTemplate findPublishedRiskTemplateByOrgIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)

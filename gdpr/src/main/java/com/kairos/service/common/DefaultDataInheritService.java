@@ -230,7 +230,7 @@ public class DefaultDataInheritService{
             return true;
         };
         /*Callable<Boolean> questionniareTemplateTask = () -> {
-            List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(countryId);
+            List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllQuestionnaireTemplateByCountryIdOrOrganizationId(countryId);
             copyQuestionnaireTemplateFromCountry(unitId, questionnaireTemplateDTOS);
             return true;
         };
