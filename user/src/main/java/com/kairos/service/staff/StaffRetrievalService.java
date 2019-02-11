@@ -296,6 +296,9 @@ public class StaffRetrievalService {
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         }
+        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.findUserAccessRole(unitId);
+        staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
+        staffAccessGroupQueryResult.setStaff(userAccessRoleDTO.getStaff());
         staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;

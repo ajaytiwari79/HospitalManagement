@@ -15,6 +15,8 @@ public class StaffAccessGroupQueryResult {
     private Long countryId;
     private Boolean isCountryAdmin;
     private List<Long> accessGroupIds;
+    private Boolean staff;
+    private Boolean management;
 
     public StaffAccessGroupQueryResult() {
         //Default Constructor
@@ -50,5 +52,21 @@ public class StaffAccessGroupQueryResult {
 
     public void setAccessGroupIds(List<Long> accessGroupIds) {
         this.accessGroupIds = accessGroupIds;
+    }
+
+    public Boolean getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Boolean staff) {
+        this.staff = staff;
+    }
+
+    public Boolean getManagement() {
+        return management;
+    }
+
+    public void setManagement(Boolean management) {
+        this.management = management;
     }
 }

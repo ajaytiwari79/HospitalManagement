@@ -92,4 +92,21 @@ public class CounterDTO {
     public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
         this.supportedModuleTypes = supportedModuleTypes;
     }
+
+    public List<FilterCriteria> getSelectedFilter() {
+        return selectedFilter;
+    }
+
+    public void setSelectedFilter(List<FilterCriteria> selectedFilter) {
+        this.selectedFilter = selectedFilter;
+    }
+
+    public String getCalculationFormula() {
+
+        return calculationFormula;
+    }
+
+    public void setCalculationFormula(String calculationFormula) {
+        this.calculationFormula = calculationFormula;
+    }
 }

@@ -68,6 +68,11 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
+    public Counter getCounterByid(BigInteger counterId){
+        Query query = new Query(Criteria.where("id").is(counterId));
+        return mongoTemplate.findOne(query, Counter.class);
+    }
+
     public List<KPI> getKPIsByIds(List<BigInteger> kpiIds){
         Query query = new Query(Criteria.where("id").in(kpiIds));
         return mongoTemplate.find(query, KPI.class);

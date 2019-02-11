@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -273,25 +274,25 @@ public class CounterDistController {
     }
 
     @PutMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
-    public ResponseEntity<Map<String,Object>> saveKpiDateOfCountry(@PathVariable Long countryId,@PathVariable Long kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> saveKpiDateOfCountry(@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
         counterManagementService.saveKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
-    public ResponseEntity<Map<String,Object>> saveKpiDateOfUnit(@PathVariable Long unitId,@PathVariable Long kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> saveKpiDateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
         counterManagementService.saveKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@PathVariable Long countryId,@PathVariable Long kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
         counterManagementService.copyKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@PathVariable Long unitId,@PathVariable Long kpiId, @RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
         counterManagementService.copyKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
