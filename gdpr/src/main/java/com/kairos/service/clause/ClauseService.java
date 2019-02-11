@@ -189,10 +189,10 @@ public class ClauseService{
         clauseResponseDTO.setTags(clause.getTags());
         clauseResponseDTO.setTemplateTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getTemplateTypes(), TemplateTypeResponseDTO.class));
         clauseResponseDTO.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getAccountTypes(), AccountTypeVO.class));
-        clauseResponseDTO.setOrganizationTypeDTOS(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationTypes(), OrganizationTypeDTO.class));
+        clauseResponseDTO.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationTypes(), OrganizationTypeDTO.class));
         clauseResponseDTO.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationServices(), ServiceCategoryDTO.class));
         clauseResponseDTO.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubServices(), SubServiceCategoryDTO.class));
-        clauseResponseDTO.setOrganizationSubTypeDTOS(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+        clauseResponseDTO.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
         return clauseResponseDTO;
     }
 
