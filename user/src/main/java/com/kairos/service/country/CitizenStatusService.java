@@ -2,8 +2,10 @@ package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,29 +23,41 @@ public class CitizenStatusService{
 
     @Inject
     CitizenStatusGraphRepository citizenStatusGraphRepository;
-
     @Inject
     CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createCitizenStatus(long countryId, CitizenStatus citizenStatus){
+    public CitizenStatusDTO createCitizenStatus(long countryId, CitizenStatusDTO citizenStatusDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        CitizenStatus citizenStatus = null;
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean citizenStatusExistInCountryByName = citizenStatusGraphRepository.citizenStatusExistInCountryByName(countryId, "(?i)" + citizenStatusDTO.getName(), -1L);
+            if (citizenStatusExistInCountryByName) {
+                exceptionService.duplicateDataException("error.CitizenStatus.name.exist");
+            }
+            citizenStatus = new CitizenStatus(citizenStatusDTO.getName(), citizenStatusDTO.getDescription());
             citizenStatus.setCountry(country);
             citizenStatusGraphRepository.save(citizenStatus);
-            return citizenStatus.retrieveDetails();
         }
-        return  null;
+        citizenStatusDTO.setId(citizenStatus.getId());
+        return citizenStatusDTO;
     }
 
-    public Map<String, Object> updateCitizenStatus(CitizenStatus citizenStatus){
-        CitizenStatus currentCivilianStatus = citizenStatusGraphRepository.findOne(citizenStatus.getId(),1);
-        if (currentCivilianStatus!=null ){
-            currentCivilianStatus.setName(citizenStatus.getName());
-            currentCivilianStatus.setDescription(citizenStatus.getDescription());
-            citizenStatusGraphRepository.save(currentCivilianStatus);
-            return currentCivilianStatus.retrieveDetails();
+    public CitizenStatusDTO updateCitizenStatus(CitizenStatusDTO citizenStatusDTO, long countryId){
+        Boolean citizenStatusExistInCountryByName = citizenStatusGraphRepository.citizenStatusExistInCountryByName(countryId, "(?i)" + citizenStatusDTO.getName(), citizenStatusDTO.getId());
+        if (citizenStatusExistInCountryByName) {
+            exceptionService.duplicateDataException("error.CitizenStatus.name.exist");
         }
-        return  null;
+        CitizenStatus currentCitizenStatus = citizenStatusGraphRepository.findOne(citizenStatusDTO.getId());
+        if (currentCitizenStatus != null) {
+            currentCitizenStatus.setName(citizenStatusDTO.getName());
+            currentCitizenStatus.setDescription(citizenStatusDTO.getDescription());
+            citizenStatusGraphRepository.save(currentCitizenStatus);
+        }
+        return citizenStatusDTO;
     }
 
 
@@ -52,17 +66,14 @@ public class CitizenStatusService{
         if (currentCivilianStatus!=null){
             currentCivilianStatus.setEnabled(false);
             citizenStatusGraphRepository.save(currentCivilianStatus);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.CitizenStatus.notfound");
         }
-        return  false;
+        return true;
     }
 
-    public List<Map<String,Object>> getCitizenStatusByCountryId(long countryId){
-        List<Map<String, Object>> data = citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
-        if(data==null){
-            return  null;
-        }
-        return FormatUtil.formatNeoResponse(data);
+    public List<CitizenStatusDTO> getCitizenStatusByCountryId(long countryId){
+        return citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
     }
 
 

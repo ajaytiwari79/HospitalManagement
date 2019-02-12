@@ -1,8 +1,9 @@
 package com.kairos.persistence.repository.user.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.RelationType;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.default_data.RelationTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -130,11 +131,17 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} RETURN level")
     List<Level> getLevelsByCountry(long countryId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} RETURN relationType")
-    List<RelationType> getRelationTypesByCountry(long countryId);
+    @Query("MATCH (country:Country)-[:"+ HAS_RELATION_TYPES +"]->(relationType:RelationType {enabled:true}) where id(country)={0} " +
+            "RETURN id(relationType) as id, relationType.name as name, relationType.description as description ORDER BY relationType.creationDate DESC")
+    List<RelationTypeDTO> getRelationTypesByCountry(long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} AND id(relationType)={1} RETURN relationType")
     RelationType getRelationType(long countryId, long relationTypeId);
+
+    @Query("MATCH(country:Country)<-[:" + HAS_RELATION_TYPES + "]-(relationType:RelationType {isEnabled:true}) WHERE id(country)={0} AND id(relationType)<>{2} AND relationType.name =~{1}  " +
+            " WITH count(relationType) as totalCount " +
+            " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
+    Boolean relationTypeExistInCountryByName(Long countryId, String name, Long currentRelationTypeId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} AND id(resources)={1} RETURN resources")
     Vehicle getResources(long countryId, long resourcesId);

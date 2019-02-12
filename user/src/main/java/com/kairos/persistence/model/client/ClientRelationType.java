@@ -3,7 +3,7 @@ package com.kairos.persistence.model.client;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.RelationType;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import org.neo4j.ogm.annotation.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.RELATION_TYPE;
