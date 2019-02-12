@@ -288,6 +288,7 @@ public class FunctionalPaymentService {
         for (FunctionalPayment functionalPayment : functionalPaymentList) {
             if (endDate == null) {
                 if (functionalPayment.getStartDate().isAfter(startDate.minusDays(1))) {
+                    functionalPayment.setPercentageValue(percentageValue);
                     toUpdateInExisting.add(functionalPayment);
                 } else if (functionalPayment.getStartDate().isBefore(startDate)) {
                     toBreakInNewList.add(functionalPayment);
@@ -329,6 +330,7 @@ public class FunctionalPaymentService {
                             functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
                     functionalPayment.setParentFunctionalPayment(existing);
                     functionalPayment.setPublished(functionalPaymentQueryResult.isPublished());
+                    functionalPayment.setPercentageValue(percentageValue);
                     updateMatrixInFunctionalPayment(functionalPaymentQueryResult.getFunctionalPaymentMatrices(), functionalPayment, percentageValue);
                     functionalPaymentListAfterDate.add(functionalPayment);
                 }
