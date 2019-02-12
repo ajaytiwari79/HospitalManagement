@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-////@JaversSpringDataAuditable
-public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
+@JaversSpringDataAuditable
+public interface AssessmentRepository extends JpaRepository<Assessment, Long> ,CustomAssessmentRepository {
 
     @Query(value = "Select assessment from Assessment assessment where assessment.organizationId = ?1 and assessment.asset.id = ?2 and assessment.assessmentStatus IN (?3) and assessment.isRiskAssessment = ?4 and assessment.deleted = false")
     Assessment findPreviousLaunchedAssessmentByUnitIdAndAssetId(Long orgId, Long assetId, List<AssessmentStatus> status, boolean isRiskAssessment);
@@ -36,5 +37,7 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.id = ?2 and assessment.assessmentStatus = ?3 and assessment.deleted = false")
     Assessment findByUnitIdAndIdAndAssessmentStatus(Long unitId, Long assessmentId, AssessmentStatus status);
+
+
 
 }

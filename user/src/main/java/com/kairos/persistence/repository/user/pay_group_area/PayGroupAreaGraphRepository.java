@@ -30,7 +30,7 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             "RETURN  DISTINCT id(payGroupArea) as id,payGroupArea.name as name")
     List<PayGroupAreaQueryResult> getPayGroupAreaByOrganizationLevelId(Long organizationLevelId);
 
-    @Query("MATCH (level:Level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(level)={0} AND id(municipality)={1} AND id(rel) <> {2}\n" +
+    @Query("MATCH (level:Level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(level)={0} AND id(municipality) = {1} AND id(rel) <> {2}\n" +
             "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description,municipality as municipality, " +
             "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
     List<PayGroupAreaQueryResult> findPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId, Long currentRelationId);

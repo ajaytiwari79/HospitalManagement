@@ -6,10 +6,7 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -20,29 +17,23 @@ public class QuestionnaireTemplate extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
-
     @NotBlank(message = "Description cannot be empty")
     private String description;
-
     @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
-
     @OneToOne
     private AssetType assetType;
-
     @OneToOne
     private AssetType assetSubType;
-
     private Long countryId;
-
     private boolean isDefaultAssetTemplate;
-
     private QuestionnaireTemplateStatus templateStatus;
-
     private QuestionnaireTemplateType riskAssociatedEntity;
-
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.LAZY)
+    @JoinColumn(name = "questionnaire_template_id" )
     private List<QuestionnaireSection> sections=new ArrayList<>();
+    private Long organizationId;
+
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
         this.name = name;
@@ -55,6 +46,9 @@ public class QuestionnaireTemplate extends BaseEntity {
         this.description = description;
         this.templateStatus=templateStatus;
     }
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import org.javers.core.metamodel.annotation.Value;
 
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class QuestionnaireTemplateResponseDTO {
     private QuestionnaireAssetTypeDTO assetSubType;
     private QuestionnaireTemplateStatus templateStatus;
     private List<QuestionnaireSectionResponseDTO> sections;
+
+
 
 
     public Long getId() {
@@ -77,19 +80,6 @@ public class QuestionnaireTemplateResponseDTO {
 
     public void setSections(List<QuestionnaireSectionResponseDTO> sections) {
         this.sections = sections;
-    }
-
-    public QuestionnaireTemplateResponseDTO(Long id, String name, String description, QuestionnaireTemplateType templateType, boolean isDefaultAssetTemplate, QuestionnaireTemplateStatus templateStatus) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.templateType = templateType;
-        this.isDefaultAssetTemplate = isDefaultAssetTemplate;
-        this.templateStatus = templateStatus;
-    }
-
-    public QuestionnaireTemplateResponseDTO(Long id) {
-        this.id = id;
     }
 
     public QuestionnaireTemplateResponseDTO() {

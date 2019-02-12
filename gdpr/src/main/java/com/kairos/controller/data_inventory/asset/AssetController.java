@@ -72,7 +72,7 @@ public class AssetController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long assetId) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long unitId,@PathVariable Long assetId) throws ClassNotFoundException{
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId));
     }
 

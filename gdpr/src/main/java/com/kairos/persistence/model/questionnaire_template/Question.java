@@ -20,21 +20,23 @@ public class Question extends BaseEntity {
     private boolean notSureAllowed;
     private String attributeName;
     private Long countryId;
+    private Long organizationId;
 
-    public Question(String question, String description, boolean required, QuestionType questionType, boolean notSureAllowed, Long countryId) {
-        this.question = question;
-        this.description = description;
-        this.questionType = questionType;
-        this.countryId = countryId;
-    }
 
-    public Question(String question, String description, boolean required, QuestionType questionType, boolean notSureAllowed) {
+    public Question(@NotBlank(message = "Question cant'be empty") String question, @NotBlank(message = "Description can't be empty") String description, boolean required, @NotNull QuestionType questionType, boolean notSureAllowed, Long countryId, Long organizationId) {
         this.question = question;
         this.description = description;
         this.required = required;
         this.questionType = questionType;
         this.notSureAllowed = notSureAllowed;
+        this.countryId = countryId;
+        this.organizationId = organizationId;
     }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
 
     public String getAttributeName() { return attributeName; }
 

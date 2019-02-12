@@ -39,13 +39,13 @@ public class QuestionnaireTemplateController {
     @ApiOperation(value = "get all questionnaire template basic response ")
     @GetMapping(COUNTRY_URL + "/questionnaire_template")
     public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(countryId, true));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateByCountryIdOrOrganizationId(countryId, false));
     }
 
     @ApiOperation(value = "get questionnaire template With Sections by Id ")
     @GetMapping(COUNTRY_URL + "/questionnaire_template/{questionnaireTemplateId}")
     public ResponseEntity<Object> getMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId, @PathVariable Long questionnaireTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(countryId, questionnaireTemplateId, true));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(countryId, questionnaireTemplateId, false));
     }
 
     @ApiOperation(value = "delete questionnaire template by id ")
@@ -95,14 +95,14 @@ public class QuestionnaireTemplateController {
     @ApiOperation(value = "get questionnaire template With Sections by Id of unit")
     @GetMapping(UNIT_URL + "/questionnaire_template/{questionnaireTemplateId}")
     public ResponseEntity<Object> getQuestionnaireTemplateWithSectionAndQuestionById(@PathVariable Long unitId, @PathVariable Long questionnaireTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(unitId, questionnaireTemplateId, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(unitId, questionnaireTemplateId, true));
     }
 
 
     @ApiOperation(value = "get all questionnaire template of unit ")
     @GetMapping(UNIT_URL + "/questionnaire_template")
     public ResponseEntity<Object> getAllQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(unitId, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateByCountryIdOrOrganizationId(unitId, true));
     }
 
 }

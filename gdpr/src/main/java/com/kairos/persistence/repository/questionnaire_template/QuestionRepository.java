@@ -16,5 +16,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query(value = "Select Q from questionmd Q INNER JOIN questionnaire_sectionmd_questions SQ ON Q.id = SQ.questions_id where Q.id = ?1 and SQ.questionnaire_sectionmd_id = ?2 and Q.deleted = false", nativeQuery = true)
     Question findQuestionByIdAndSectionId(Long id, Long sectionId);
 
+    Question findByIdAndDeletedFalse(Long id);
 
 }
