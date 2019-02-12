@@ -26,7 +26,7 @@ public class PayGroupAreaDTO {
     private String description;
 
     @NotNull(message = "Please select municipality")
-    private List<Long> municipalityIds;
+    private Long municipalityId;;
 
     @NotNull(message = "Start date can't be null")
     //@DateLong
@@ -69,12 +69,12 @@ public class PayGroupAreaDTO {
         this.description = description;
     }
 
-    public List<Long> getMunicipalityIds() {
-        return municipalityIds;
+    public Long getMunicipalityId() {
+        return municipalityId;
     }
 
-    public void setMunicipalityIds(List<Long> municipalityIds) {
-        this.municipalityIds = municipalityIds;
+    public void setMunicipalityId(Long municipalityId) {
+        this.municipalityId = municipalityId;
     }
 
     public Date getStartDateMillis() {

@@ -65,7 +65,4 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
 
     @Query("MATCH(address:ContactAddress)-[municipalityRel:"+MUNICIPALITY+"]-(municipality:Municipality) WHERE id(address)={0} and id(municipality)={1} DELETE municipalityRel")
     void deleteAddressMunicipalityRelation(Long addressId, Long municipalityId);
-
-    @Query("MATCH(municipality:Municipality) WHERE id(municipality) IN {0} RETURN municipality")
-    List<Municipality> findAllMunicipalities(List<Long> ids);
 }
