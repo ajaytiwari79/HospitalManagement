@@ -279,7 +279,7 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
 
-    @PostMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
+    @PostMapping(UNIT_URL+KPI_URL+"/save_kpi")
     public ResponseEntity<Map<String,Object>> saveKpiDateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
         counterManagementService.saveKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);

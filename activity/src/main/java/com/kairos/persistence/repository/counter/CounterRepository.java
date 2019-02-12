@@ -68,9 +68,9 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
-    public Counter getCounterByid(BigInteger counterId){
+    public KPI getCounterByid(BigInteger counterId){
         Query query = new Query(Criteria.where("id").is(counterId));
-        return mongoTemplate.findOne(query, Counter.class);
+        return mongoTemplate.findOne(query, KPI.class);
     }
 
     public List<KPI> getKPIsByIds(List<BigInteger> kpiIds){
@@ -126,10 +126,12 @@ public class CounterRepository {
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
-    public List<ApplicableKPI> getFilterBaseApplicableKPI(List<BigInteger> kpiIds, ConfLevel level){
-        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and("level").ne(level).and("applicableFilter.modified").is(false));
+    public List<ApplicableKPI> getFilterBaseApplicableKPI(List<BigInteger> kpiIds, List<ConfLevel> level){
+        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and("level").in(level).and("applicableFilter.modified").is(false));
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
+
+
     //category CRUD
 
     public List<KPICategory> getKPICategoryByIds(List<BigInteger> categoryIds, ConfLevel level, Long refId){

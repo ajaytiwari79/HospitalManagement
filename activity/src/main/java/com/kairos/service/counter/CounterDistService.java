@@ -35,6 +35,7 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.utils.user_context.UserContext;
 import com.mongodb.client.result.DeleteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -718,25 +719,30 @@ public class CounterDistService extends MongoBaseService {
 
     //kpi default data and copy and save filter
     public CounterDTO saveKpiFilterData(Long refId,BigInteger kpiId,CounterDTO counterDTO,ConfLevel level){
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        Counter counter=counterRepository.getCounterByid(kpiId);
-        if(!counter.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&accessGroupPermissionCounterDTO.getCountryAdmin()){
+        KPI kpi=counterRepository.getCounterByid(kpiId);
+        if(!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&accessGroupPermissionCounterDTO.getCountryAdmin()){
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
-        counter.setTitle(counterDTO.getTitle());
-        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilter(),false));
-        List<ApplicableKPI> applicableKPIS1=counterRepository.getFilterBaseApplicableKPI(Arrays.asList(kpiId),level);
+        kpi.setTitle(counterDTO.getTitle());
+        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(),true));
+        List<ApplicableKPI> updateApplicableKPI;
+        if(!ConfLevel.STAFF.equals(level)) {
+            updateApplicableKPI = counterRepository.getFilterBaseApplicableKPI(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF));
+            updateApplicableKPI.forEach(applicableKPI -> applicableKPI.setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(), false)));
+            applicableKPIS.addAll(updateApplicableKPI);
+        }
         save(applicableKPIS);
-        save(counter);
+        save(kpi);
         return  counterDTO;
     }
 
     public CounterDTO copyKpiFilterData(Long refId,BigInteger kpiId,CounterDTO counterDTO,ConfLevel level){
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         if(!accessGroupPermissionCounterDTO.getManagement()){
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
@@ -744,22 +750,22 @@ public class CounterDistService extends MongoBaseService {
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        Counter counter=counterRepository.getCounterByid(kpiId);
-        if(!counter.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&accessGroupPermissionCounterDTO.getCountryAdmin()){
+        KPI kpi=counterRepository.getCounterByid(kpiId);
+        if(!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&!accessGroupPermissionCounterDTO.getCountryAdmin()){
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
-        Counter copyCounter=ObjectMapperUtils.copyPropertiesByMapper(counter,Counter.class);
-        copyCounter.setId(null);
-        copyCounter.setTitle(counterDTO.getTitle());
-        copyCounter.setCriteriaList(counterDTO.getCriteriaList());
-        save(copyCounter);
+        KPI copyKpi=ObjectMapperUtils.copyPropertiesByMapper(kpi,KPI.class);
+        copyKpi.setId(null);
+        copyKpi.setTitle(counterDTO.getTitle());
+        copyKpi.setCriteriaList(counterDTO.getCriteriaList());
+        save(copyKpi);
         List<ApplicableKPI> applicableKPIs=new ArrayList<>();
         if(ConfLevel.COUNTRY.equals(level)||accessGroupPermissionCounterDTO.getCountryAdmin()){
-            applicableKPIs.add(new ApplicableKPI(counter.getId(),copyCounter.getId(),accessGroupPermissionCounterDTO.getCountryId(),null,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(),kpi.getId(),accessGroupPermissionCounterDTO.getCountryId(),null,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
         }
         if(ConfLevel.UNIT.equals(level)){
-            applicableKPIs.add(new ApplicableKPI(counter.getId(),copyCounter.getId(),null,refId,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
-            applicableKPIs.add(new ApplicableKPI(counter.getId(),copyCounter.getId(),null,refId,accessGroupPermissionCounterDTO.getStaffId(),ConfLevel.STAFF,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(),kpi.getId(),null,refId,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(),kpi.getId(),null,refId,accessGroupPermissionCounterDTO.getStaffId(),ConfLevel.STAFF,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
         }
         save(applicableKPIs);
         return  counterDTO;
