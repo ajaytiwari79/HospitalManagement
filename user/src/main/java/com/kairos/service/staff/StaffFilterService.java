@@ -36,6 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 
 /**
  * Created by prerna on 1/5/18.
@@ -279,7 +282,9 @@ public class StaffFilterService {
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
-        staffEmploymentWrapper.setStaffList(filterStaffByRoles(staffEmploymentWrapper.getStaffList(),unitId));
+        List<Map> staffs = filterStaffByRoles(staffEmploymentWrapper.getStaffList(),unitId);
+        staffs = staffs.stream().filter(distinctByKey(a->a.get("id"))).collect(Collectors.toList());
+        staffEmploymentWrapper.setStaffList(staffs);
         return staffEmploymentWrapper;
 
     }

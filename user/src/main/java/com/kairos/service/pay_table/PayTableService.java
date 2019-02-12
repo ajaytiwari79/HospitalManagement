@@ -252,6 +252,8 @@ public class PayTableService {
         copiedPayTable.setId(null);
         copiedPayTable.setPayTable(payTable);
         copiedPayTable.setPayGrades(null);
+        copiedPayTable.setPercentageValue(payTable.getPercentageValue());
+        payTable.setPercentageValue(null);
         if (payGradeDTO != null) {
             payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
         }
@@ -567,7 +569,7 @@ public class PayTableService {
             }
         }
         Long id = CollectionUtils.isEmpty(payGradeResponses) ? payTable.getId() : payGradeResponses.get(0).getPayTableId();
-        return new PayTableUpdateDTO(id, payTable.getName());
+        return new PayTableUpdateDTO(id, payTable.getName(),payTable.getPercentageValue());
     }
 
     private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate) {

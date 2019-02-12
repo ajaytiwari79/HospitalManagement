@@ -25,6 +25,7 @@ public class AssetType extends BaseEntity {
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "assetType_id")
     private List<Risk> risks  = new ArrayList<Risk>();
     @ManyToOne
     @JoinColumn(name="assetType_id")

@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.risk_management;
 
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -9,8 +10,7 @@ import java.util.List;
 
 
 @Repository
-////@JaversSpringDataAuditable
-
+@JaversSpringDataAuditable
 public interface RiskRepository extends CustomGenericRepository<Risk> {
 
     /*@Query(value = "Select risk from Risk risk where risk.id = ?1 and risk.organizationId = ?2 and risk.assetType.id = ?3 and risk.deleted = false")
