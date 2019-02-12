@@ -331,12 +331,10 @@ public class ExpertiseService {
 
         if (currentExpertise.isPublished()) {
 
-            // current is published now we need to create a copy and update in that and return the updated copy
-
+            //current is published now we need to create a copy and update in that and return the updated copy
             Expertise copiedExpertise = new Expertise();
             BeanUtils.copyProperties(currentExpertise, copiedExpertise);
             copiedExpertise.setId(null);
-
             currentExpertise.setHasDraftCopy(true);
             currentExpertise.setHistory(true);
             copiedExpertise.setPublished(false);
