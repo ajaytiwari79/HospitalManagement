@@ -200,9 +200,9 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", unitPositionDTO.getEmploymentTypeId());
         }
         List<FunctionWithAmountQueryResult> functions = findAndValidateFunction(unitPositionDTO);
-        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage());
+        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage(),unitPositionDTO.getAccumulatedTimebankMinutes());
 
-        preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
+        preparePosition(unitPosition, unitPositionDTO);
         if ((unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO, -1)) {
             unitPosition.setMainUnitPosition(true);
         }
@@ -627,7 +627,7 @@ public class UnitPositionService {
     }
 
 
-    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) throws Exception {
+    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) throws Exception {
         CompletableFuture<Boolean> done = setDefaultData(unitPositionDTO, unitPosition);
         CompletableFuture.allOf(done).join();
         // UEP can be created for past dates from time care
@@ -767,12 +767,12 @@ public class UnitPositionService {
         seniorityLevel.put("payGrade", Optional.ofNullable(unitPositionLine.getSeniorityLevel().getPayGrade()).isPresent() ? unitPositionLine.getSeniorityLevel().getPayGrade() : payGradeGraphRepository.getPayGradeBySeniorityLevelId(unitPositionLine.getSeniorityLevel().getId()));
         UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
                 , unitPositionLine.getWorkingDaysInWeek(), unitPositionLine.getTotalWeeklyMinutes() / 60, unitPositionLine.getAvgDailyWorkingHours(), unitPositionLine.getFullTimeWeeklyMinutes(), 0D,
-                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel, unitPosition.getId());
+                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel, unitPosition.getId(),unitPosition.getAccumulatedTimebankMinutes());
 
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
                 , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.isMainUnitPosition(),
-                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage());
+                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage(),unitPosition.getAccumulatedTimebankMinutes());
 
     }
 

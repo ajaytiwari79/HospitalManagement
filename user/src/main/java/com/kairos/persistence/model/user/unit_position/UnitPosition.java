@@ -49,6 +49,7 @@ public class UnitPosition extends UserBaseEntity {
     private List<UnitPositionLine> unitPositionLines;
     private boolean mainUnitPosition;
     private float taxDeductionPercentage;
+    private long accumulatedTimebankMinutes;
 
     public UnitPosition() {
 
@@ -59,12 +60,13 @@ public class UnitPosition extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public UnitPosition(Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published,float taxDeductionPercentage) {
+    public UnitPosition(Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published,float taxDeductionPercentage,long accumulatedTimebankMinutes) {
         this.unit = unit;
         this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;
         this.published=published;
         this.taxDeductionPercentage=taxDeductionPercentage;
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 
     public Expertise getExpertise() {
@@ -173,6 +175,14 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setTaxDeductionPercentage(float taxDeductionPercentage) {
         this.taxDeductionPercentage = taxDeductionPercentage;
+    }
+
+    public long getAccumulatedTimebankMinutes() {
+        return accumulatedTimebankMinutes;
+    }
+
+    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 
     @Override

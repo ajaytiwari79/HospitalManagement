@@ -29,12 +29,13 @@ public class UnitPositionLinesQueryResult {
     private Map<String, Object> seniorityLevel;
     private WTAResponseDTO workingTimeAgreement;
     private CTAResponseDTO costTimeAgreement;
+    private long accumulatedTimebankMinutes;
 
     public UnitPositionLinesQueryResult() {
         //DC
     }
 
-    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, BigDecimal hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel,Long unitPositionId) {
+    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, BigDecimal hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel,Long unitPositionId,long accumulatedTimebankMinutes) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -48,6 +49,7 @@ public class UnitPositionLinesQueryResult {
         this.employmentType = employmentType;
         this.seniorityLevel = seniorityLevel;
         this.unitPositionId=unitPositionId;
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 
     public Long getId() {
@@ -168,5 +170,13 @@ public class UnitPositionLinesQueryResult {
 
     public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
         this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public long getAccumulatedTimebankMinutes() {
+        return accumulatedTimebankMinutes;
+    }
+
+    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 }

@@ -72,6 +72,7 @@ public class UnitPositionDTO {
     private boolean mainUnitPosition;
     private float taxDeductionPercentage;
     private ExpertiseResponseDTO expertise;
+    private long accumulatedTimebankMinutes;
 
 
 
@@ -351,5 +352,13 @@ public class UnitPositionDTO {
 
     public void setExpertise(ExpertiseResponseDTO expertise) {
         this.expertise = expertise;
+    }
+
+    public long getAccumulatedTimebankMinutes() {
+        return accumulatedTimebankMinutes;
+    }
+
+    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 }
