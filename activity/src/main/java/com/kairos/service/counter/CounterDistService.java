@@ -98,7 +98,6 @@ public class CounterDistService extends MongoBaseService {
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
         if (ConfLevel.STAFF.equals(level)) {
-
             refId = genericIntegrationService.getStaffIdByUserId(refId);
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level);
@@ -725,9 +724,12 @@ public class CounterDistService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
         Counter counter=counterRepository.getCounterByid(kpiId);
-
+        if(!counter.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&accessGroupPermissionCounterDTO.getCountryAdmin()){
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
         counter.setTitle(counterDTO.getTitle());
-        applicableKPIS.get(0).setCriteriaList(counterDTO.getSelectedFilter());
+        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilter(),false));
+        List<ApplicableKPI> applicableKPIS1=counterRepository.getFilterBaseApplicableKPI(Arrays.asList(kpiId),level);
         save(applicableKPIS);
         save(counter);
         return  counterDTO;
@@ -736,7 +738,7 @@ public class CounterDistService extends MongoBaseService {
     public CounterDTO copyKpiFilterData(Long refId,BigInteger kpiId,CounterDTO counterDTO,ConfLevel level){
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
         if(!accessGroupPermissionCounterDTO.getManagement()){
-            exceptionService.actionNotPermittedException("you dont have permission to copy Kpi");
+            exceptionService.actionNotPermittedException("message.kpi.permission");
         }
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
@@ -744,15 +746,22 @@ public class CounterDistService extends MongoBaseService {
         }
         Counter counter=counterRepository.getCounterByid(kpiId);
         if(!counter.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&accessGroupPermissionCounterDTO.getCountryAdmin()){
-            exceptionService.actionNotPermittedException("you dont have permission to update");
+            exceptionService.actionNotPermittedException("message.kpi.permission");
         }
-        Counter copyCounter=ObjectMapperUtils.copyPropertiesByMapper(counterDTO,Counter.class);
-        if(!counter.getType().equals(copyCounter.getType())) {
-            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
-        }
+        Counter copyCounter=ObjectMapperUtils.copyPropertiesByMapper(counter,Counter.class);
+        copyCounter.setId(null);
+        copyCounter.setTitle(counterDTO.getTitle());
+        copyCounter.setCriteriaList(counterDTO.getCriteriaList());
         save(copyCounter);
-        ApplicableKPI applicableKPI=new ApplicableKPI(counter.getId(),copyCounter.getId(),refId,null,null,level);
-        save(applicableKPI);
+        List<ApplicableKPI> applicableKPIs=new ArrayList<>();
+        if(ConfLevel.COUNTRY.equals(level)||accessGroupPermissionCounterDTO.getCountryAdmin()){
+            applicableKPIs.add(new ApplicableKPI(counter.getId(),copyCounter.getId(),accessGroupPermissionCounterDTO.getCountryId(),null,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+        }
+        if(ConfLevel.UNIT.equals(level)){
+            applicableKPIs.add(new ApplicableKPI(counter.getId(),copyCounter.getId(),null,refId,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+            applicableKPIs.add(new ApplicableKPI(counter.getId(),copyCounter.getId(),null,refId,accessGroupPermissionCounterDTO.getStaffId(),ConfLevel.STAFF,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+        }
+        save(applicableKPIs);
         return  counterDTO;
     }
 
