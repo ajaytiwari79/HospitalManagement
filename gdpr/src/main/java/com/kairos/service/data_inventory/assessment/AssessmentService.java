@@ -641,12 +641,10 @@ public class AssessmentService {
                 processingActivity.setDataSources(dataSourceRepository.findAllByIds(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue)));
                 break;
             case MANAGING_DEPARTMENT:
-
                 processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue, ManagingOrganization.class));
                 break;
             case PROCESS_OWNER:
                 processingActivity.setProcessOwner(objectMapper.convertValue(processingActivityAttributeValue, Staff.class));
-                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue, ManagingOrganization.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 processingActivity.setDataRetentionPeriod((Integer) processingActivityAttributeValue);

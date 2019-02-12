@@ -31,7 +31,8 @@ public class Assessment extends BaseEntity {
     @OneToOne
     private Asset asset;
     private boolean isRiskAssessment;
-    @OneToOne private ProcessingActivity processingActivity;
+    @OneToOne
+    private ProcessingActivity processingActivity;
     @OneToMany
     private List<Risk> risks = new ArrayList<>();
     @ElementCollection
