@@ -33,7 +33,7 @@ public class FunctionalPayment extends UserBaseEntity {
     private FunctionalPayment parentFunctionalPayment;
 
     private boolean hasDraftCopy = false;
-
+    // this is kept for tracking to show how many percentage got increase via payTable
     private BigDecimal percentageValue;
 
 

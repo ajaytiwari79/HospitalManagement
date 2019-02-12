@@ -26,7 +26,7 @@ public class PayGroupAreaDTO {
     private String description;
 
     @NotNull(message = "Please select municipality")
-    private Long municipalityId;;
+    private Long municipalityId;
 
     @NotNull(message = "Start date can't be null")
     //@DateLong
