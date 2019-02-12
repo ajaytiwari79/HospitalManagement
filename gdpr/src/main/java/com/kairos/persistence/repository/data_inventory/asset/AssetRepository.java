@@ -2,13 +2,14 @@ package com.kairos.persistence.repository.data_inventory.asset;
 
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-////@JaversSpringDataAuditable
+@JaversSpringDataAuditable
 public interface AssetRepository extends CustomGenericRepository<Asset> {
 
     @Query(value = "Select name from Asset where organizationId = ?1 and deleted = false and (assetType.id  = ?2 OR subAssetType.id = ?2)")
