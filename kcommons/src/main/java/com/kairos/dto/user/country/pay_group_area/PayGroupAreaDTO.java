@@ -6,6 +6,7 @@ import com.kairos.dto.user.country.pay_table.FutureDate;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by prabjot on 21/12/17.
@@ -114,5 +115,18 @@ public class PayGroupAreaDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.levelId = levelId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PayGroupAreaDTO that = (PayGroupAreaDTO) o;
+        return Objects.equals(municipalityId, that.municipalityId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(municipalityId);
     }
 }
