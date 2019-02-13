@@ -1,9 +1,12 @@
 package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.KairosStatus;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.KairosStatus;
+import com.kairos.persistence.model.country.default_data.KairosStatusDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.KairosStatusGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,42 +24,45 @@ public class KairosStatusService {
 
     @Inject
     private KairosStatusGraphRepository kairosStatusGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createKairosStatus(long countryId, KairosStatus kairosStatus){
+    public KairosStatusDTO createKairosStatus(long countryId, KairosStatusDTO kairosStatusDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        KairosStatus kairosStatus = null;
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean kairosStatusExistInCountryByName = kairosStatusGraphRepository.kairosStatusExistInCountryByName(countryId, "(?i)" + kairosStatusDTO.getName(), -1L);
+            if (kairosStatusExistInCountryByName) {
+                exceptionService.duplicateDataException("error.BusinessType.name.exist");
+            }
+            kairosStatus = new KairosStatus(kairosStatusDTO.getName(), kairosStatusDTO.getDescription());
             kairosStatus.setCountry(country);
             kairosStatusGraphRepository.save(kairosStatus);
-            return  kairosStatus.retrieveDetails();
         }
-        return null;
+        kairosStatusDTO.setId(kairosStatus.getId());
+        return kairosStatusDTO;
     }
 
-    public List<Object> getKairosStatusByCountryId(long countryId){
-        List<Map<String,Object>>  data = kairosStatusGraphRepository.findKairosStatusByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<KairosStatusDTO> getKairosStatusByCountryId(long countryId){
+        return kairosStatusGraphRepository.findKairosStatusByCountry(countryId);
     }
 
-    public Map<String, Object> updateEmployeeLimit(KairosStatus kairosStatus){
-        KairosStatus currentKairosStatus = kairosStatusGraphRepository.findOne(kairosStatus.getId());
-        if (currentKairosStatus!=null){
-            currentKairosStatus.setName(kairosStatus.getName());
-            currentKairosStatus.setDescription(kairosStatus.getDescription());
+    public KairosStatusDTO updateKairosStatus(long countryId, KairosStatusDTO kairosStatusDTO){
+        Boolean kairosStatusExistInCountryByName = kairosStatusGraphRepository.kairosStatusExistInCountryByName(countryId, "(?i)" + kairosStatusDTO.getName(), kairosStatusDTO.getId());
+        if (kairosStatusExistInCountryByName) {
+            exceptionService.duplicateDataException("error.KairosStatus.name.exist");
+        }
+        KairosStatus currentKairosStatus = kairosStatusGraphRepository.findOne(kairosStatusDTO.getId());
+        if (currentKairosStatus != null) {
+            currentKairosStatus.setName(kairosStatusDTO.getName());
+            currentKairosStatus.setDescription(kairosStatusDTO.getDescription());
             kairosStatusGraphRepository.save(currentKairosStatus);
-            return currentKairosStatus.retrieveDetails();
         }
-        return null;
+        return kairosStatusDTO;
     }
 
     public boolean deleteKairosStatus(long kairosStatusId){
@@ -64,8 +70,9 @@ public class KairosStatusService {
         if (kairosStatus !=null){
             kairosStatus.setEnabled(false);
             kairosStatusGraphRepository.save(kairosStatus);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.KairosStatus.notfound");
         }
-        return false;
+        return true;
     }
 }
