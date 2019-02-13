@@ -162,7 +162,7 @@ public class PayGroupAreaService {
                         }
                     } else {
                         if (payGroupAreaDTO.getEndDateMillis().after(new Date(payGroupArea.getStartDateMillis()))) {
-                            Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
+                            Long dateOneDayLessStartDate = DateUtils.minusDays(payGroupAreaDTO.getStartDateMillis(),1).getTime();
                             payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupArea.getId(), payGroupArea.getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
                         } else {
                             exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap", asLocalDate(payGroupAreaDTO.getEndDateMillis()), asLocalDate(payGroupArea.getStartDateMillis()));
