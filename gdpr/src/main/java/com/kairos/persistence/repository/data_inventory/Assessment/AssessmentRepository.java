@@ -29,7 +29,7 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> ,C
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.deleted = ?2 and assessment.id = ?3")
     Assessment findByOrganizationIdAndDeletedAndId(Long orgId, boolean deleted, Long id);
 
-    @Query(value = "SELECT assessment FROM assessmentmd assessment JOIN assessmentmd_assignee_list staff ON assessment.id = assessmentmd_assignee_list.assessmentmd_id WHERE assessment.organization_id = ?1 and staff.staff_id = ?2 and assessment.assessment_status IN (?3)", nativeQuery = true)
+    @Query(value = "SELECT assessment FROM assessment assessment JOIN assessment_assignee_list staff ON assessment.id = assessment_assignee_list.assessment_id WHERE assessment.organization_id = ?1 and staff.staff_id = ?2 and assessment.assessment_status IN (?3)", nativeQuery = true)
     List<Assessment> getAllAssessmentByUnitIdAndStaffId(Long unitId, Long staffId, List<AssessmentStatus> status);
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.deleted = false")

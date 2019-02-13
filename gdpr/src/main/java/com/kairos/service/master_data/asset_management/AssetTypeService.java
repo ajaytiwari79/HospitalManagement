@@ -109,7 +109,7 @@ public class AssetTypeService{
      * @return map of Sub asset Types List and Ids (List for rollback)
      * @description this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      */
-    private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetTypeMD) {
+    private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetType) {
         List<BasicRiskDTO> newRiskOfSubAssetType = new ArrayList<>();
         Map<Long, AssetTypeDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
         Map<Long, BasicRiskDTO> subAssetTypeExistingRiskDtoCorrespondingToIds = new HashMap<>();
@@ -129,7 +129,7 @@ public class AssetTypeService{
             } else {
                 AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
                 assetSubType.setSubAssetType(true);
-                assetSubType.setAssetType(assetTypeMD);
+                assetSubType.setAssetType(assetType);
                 List<Risk>  subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), Risk.class);
                 assetSubType.setRisks(subAssetRisks);
                 subAssetTypes.add(assetSubType);
@@ -137,7 +137,7 @@ public class AssetTypeService{
 
         });
 
-        assetTypeMD.getSubAssetTypes().forEach(subAssetType -> {
+        assetType.getSubAssetTypes().forEach(subAssetType -> {
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             subAssetType.setName(subAssetTypeDto.getName());
             if(!subAssetType.getRisks().isEmpty() && !subAssetTypeExistingRiskDtoCorrespondingToIds.isEmpty()){
