@@ -1497,7 +1497,7 @@ public class StaffService {
 
 
     public boolean registerAllStaffsToChatServer() {
-        List<Staff> staffList = staffGraphRepository.findAll();
+        List<Staff> staffList = staffGraphRepository.findAll();CustomJwtAccessTokenConverter
         staffList.forEach(staff -> {
             if (isNotNull(staff.getAccess_token())) {
                 addStaffInChatServer(staff);
