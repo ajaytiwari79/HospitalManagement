@@ -7,6 +7,7 @@ import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.Min;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @QueryResult
@@ -18,6 +19,7 @@ public class FunctionalPaymentDTO {
     private LocalDate endDate;
     private PaidOutFrequencyEnum paymentUnit;
     private boolean published;
+    private BigDecimal percentageValue;
 
 
 
@@ -72,5 +74,13 @@ public class FunctionalPaymentDTO {
 
     public void setPublished(boolean published) {
         this.published = published;
+    }
+
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
+    }
+
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
     }
 }

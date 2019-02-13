@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.Level;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PayTableResponse implements Comparable<PayTableResponse> {
+public class PayTableResponse {
     private Long id;
     private String name;
     private String shortName;
@@ -27,9 +28,23 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
     private String description;
     private Boolean published;
     private Boolean editable;
+    private BigDecimal percentageValue;
 
 
     public PayTableResponse() {
+    }
+
+    public PayTableResponse(String name, String shortName, String description, LocalDate startDateMillis, LocalDate endDateMillis, Boolean published, String paymentUnit, Boolean editable) {
+        this.name = name;
+        this.published = published;
+        this.description = description;
+        this.shortName = shortName;
+        this.startDateMillis = startDateMillis;
+        this.editable = editable;
+        this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
+
+
     }
 
     public Long getId() {
@@ -112,17 +127,20 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.editable = editable;
     }
 
-    public PayTableResponse(String name, String shortName, String description, LocalDate startDateMillis, LocalDate endDateMillis, Boolean published, String paymentUnit, Boolean editable) {
-        this.name = name;
-        this.published = published;
-        this.description = description;
-        this.shortName = shortName;
-        this.startDateMillis = startDateMillis;
-        this.editable = editable;
-        this.endDateMillis = endDateMillis;
+    public String getPaymentUnit() {
+        return paymentUnit;
+    }
+
+    public void setPaymentUnit(String paymentUnit) {
         this.paymentUnit = paymentUnit;
+    }
 
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
+    }
 
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
     }
 
     @Override
@@ -136,21 +154,5 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         sb.append(", description='").append(description).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-
-    @Override
-    public int compareTo(PayTableResponse payTableResponse) {
-        LocalDate compareQuantity = ((PayTableResponse) payTableResponse).getStartDateMillis();
-        //ascending order
-        return this.getStartDateMillis().compareTo(compareQuantity);
-    }
-
-    public String getPaymentUnit() {
-        return paymentUnit;
-    }
-
-    public void setPaymentUnit(String paymentUnit) {
-        this.paymentUnit = paymentUnit;
     }
 }
