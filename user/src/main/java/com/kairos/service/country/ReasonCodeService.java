@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.kairos.enums.reason_code.ReasonCodeType.TIME_TYPE;
 
@@ -149,8 +150,7 @@ public class ReasonCodeService {
 
     private void createDefaultData(List<ReasonCodeResponseDTO> reasonCodeResponseDTO, Organization organization) {
         if (!reasonCodeResponseDTO.isEmpty()) {
-            List<ReasonCode> reasonCodes = new ArrayList<>();
-            reasonCodeResponseDTO.forEach(reasonCode -> reasonCodes.add(new ReasonCode(reasonCode.getName(), reasonCode.getCode(), reasonCode.getDescription(), reasonCode.getReasonCodeType(), organization, reasonCode.getTimeTypeId())));
+            List<ReasonCode> reasonCodes=reasonCodeResponseDTO.stream().map(reasonCode->new ReasonCode(reasonCode.getName(), reasonCode.getCode(), reasonCode.getDescription(), reasonCode.getReasonCodeType(), organization, reasonCode.getTimeTypeId())).collect(Collectors.toList());
             reasonCodeGraphRepository.saveAll(reasonCodes);
         }
     }
