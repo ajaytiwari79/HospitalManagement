@@ -10,6 +10,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.country.Country;
@@ -284,6 +285,25 @@ public class EmploymentTypeService {
         List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
         List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
         return new DefaultKpiDataDTO(staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS);
+    }
+
+    public DefaultKpiDataDTO getKpiFilterDefaultDate(Long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
+        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
+        OrganizationCommonDTO organizationCommonDTO=new OrganizationCommonDTO();
+        organizationCommonDTO.setId(organization.getId());
+        organization.setName(organization.getName());
+        List<OrganizationCommonDTO> organizationCommonDTOS = new ArrayList<>();
+        for(Organization unit : organization.getChildren()){
+            organizationCommonDTO = new OrganizationCommonDTO();
+            organizationCommonDTO.setId(unit.getId());
+            organizationCommonDTO.setName(unit.getName());
+            organizationCommonDTOS.add(organizationCommonDTO);
+        }
+
+        return null;//new DefaultKpiDataDTO(staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS);
     }
 
 
