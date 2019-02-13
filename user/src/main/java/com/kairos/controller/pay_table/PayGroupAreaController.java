@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class PayGroupAreaController {
 
     @PostMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area")
     public ResponseEntity<Map<String, Object>> savePayGroupArea(@PathVariable Long countryId,
-                                                                @Validated @RequestBody Set<PayGroupAreaDTO> payGroupAreaDTO) {
+                                                                @Validated @RequestBody List<PayGroupAreaDTO> payGroupAreaDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payGroupAreaService.savePayGroupArea(countryId, payGroupAreaDTO));
     }
 

@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
+
 
 /**
  * Created by prabjot on 21/12/17.
@@ -45,18 +47,17 @@ public class PayGroupAreaService {
     private final Logger LOGGER = LoggerFactory.getLogger(PayGroupArea.class);
 
 
-    public List<PayGroupAreaQueryResult> savePayGroupArea(Long countryId, Set<PayGroupAreaDTO> payGroupAreaDTO) {
-        Long payGroupAreaId = payGroupAreaDTO.iterator().next().getPayGroupAreaId();
-        Long levelId = payGroupAreaDTO.iterator().next().getLevelId();
-        List<Long> municipalityIds = payGroupAreaDTO.stream().map(PayGroupAreaDTO::getMunicipalityId).collect(Collectors.toList());
-        String name = payGroupAreaDTO.iterator().next().getName();
+    public List<PayGroupAreaQueryResult> savePayGroupArea(Long countryId, List<PayGroupAreaDTO> payGroupAreaDTOS) {
+        payGroupAreaDTOS = payGroupAreaDTOS.stream().filter(distinctByKey(PayGroupAreaDTO::getMunicipalityId)).collect(Collectors.toList());
+        PayGroupAreaDTO payGroupAreaDTO = payGroupAreaDTOS.get(0);
+        List<Long> municipalityIds = payGroupAreaDTOS.stream().map(PayGroupAreaDTO::getMunicipalityId).collect(Collectors.toList());
         // PatGroup Area id not present so checking name in level
-        if (!Optional.ofNullable(payGroupAreaId).isPresent() && payGroupAreaGraphRepository.isPayGroupAreaExistWithNameInLevel(levelId, name.trim())) {
-            exceptionService.duplicateDataException("message.payGroupArea.exists", name);
+        if (!Optional.ofNullable(payGroupAreaDTO.getPayGroupAreaId()).isPresent() && payGroupAreaGraphRepository.isPayGroupAreaExistWithNameInLevel(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getName())) {
+            exceptionService.duplicateDataException("message.payGroupArea.exists", payGroupAreaDTO.getName());
         }
-        Level level = countryGraphRepository.getLevel(countryId, levelId);
+        Level level = countryGraphRepository.getLevel(countryId, payGroupAreaDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", levelId);
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", payGroupAreaDTO.getLevelId());
 
         }
         List<Municipality> municipalities = municipalityGraphRepository.findAllById(municipalityIds);
@@ -66,35 +67,33 @@ public class PayGroupAreaService {
         Map<Long, Municipality> municipalityMap = municipalities.stream().collect(Collectors.toMap(Municipality::getId, Function.identity()));
         // Pay group area is already created Need to make a relationship with the new Municipality with pay group area
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository
-                .findPayGroupAreaByLevelAndMunicipality(levelId, municipalityIds, -1L);
+                .findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), municipalityIds, -1L);
 
-        validateAllPayGroupAreaByLevelAndMunicipality(new ArrayList<>(payGroupAreaDTO), payGroupAreas);
+        validateAllPayGroupAreaByLevelAndMunicipality(new ArrayList<>(payGroupAreaDTOS), payGroupAreas);
         PayGroupArea payGroupArea;
-        if (Optional.ofNullable(payGroupAreaId).isPresent()) {
-            payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
+        if (Optional.ofNullable(payGroupAreaDTO.getPayGroupAreaId()).isPresent()) {
+            payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getPayGroupAreaId());
             if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted()) {
-                exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound", payGroupAreaId);
+                exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound", payGroupAreaDTO.getPayGroupAreaId());
 
             }
         } else {
             // creating a new Pay group area and creating relationship among them
 
-            payGroupArea = new PayGroupArea(name.trim(), payGroupAreaDTO.iterator().next().getDescription(), level);
+            payGroupArea = new PayGroupArea(payGroupAreaDTO.getName(), payGroupAreaDTO.getDescription(), level);
             payGroupAreaGraphRepository.save(payGroupArea);
-            LOGGER.info(payGroupArea.getId().toString());
+            LOGGER.info("pay group area Id {}",payGroupArea.getId());
         }
 
         List<PayGroupAreaMunicipalityRelationship> municipalityRelationships = new ArrayList<>();
-        payGroupAreaDTO.forEach(payGroupAreaDTO1 -> {
+        payGroupAreaDTOS.forEach(payGroupAreaDTO1 -> {
             Long endDateMillis = (payGroupAreaDTO1.getEndDateMillis() != null) ? payGroupAreaDTO1.getEndDateMillis().getTime() : null;
             municipalityRelationships.add(new PayGroupAreaMunicipalityRelationship(payGroupArea, municipalityMap.get(payGroupAreaDTO1.getMunicipalityId()),
                     payGroupAreaDTO1.getStartDateMillis().getTime(), endDateMillis));
         });
 
         payGroupAreaRelationshipRepository.saveAll(municipalityRelationships);
-        List<PayGroupAreaQueryResult> payGroupAreaQueryResults = new ArrayList<>();
-        municipalityRelationships.forEach(municipalityRelationship -> payGroupAreaQueryResults.add(new PayGroupAreaQueryResult(payGroupArea, municipalityRelationship, municipalityRelationship.getMunicipality())));
-        return payGroupAreaQueryResults;
+        return municipalityRelationships.stream().map(a->new PayGroupAreaQueryResult(payGroupArea, a, a.getMunicipality())).collect(Collectors.toList());
     }
 
     public PayGroupAreaQueryResult updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
