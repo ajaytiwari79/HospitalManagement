@@ -186,7 +186,7 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
     public StaffingLevel getPresenceStaffingLevel(Long unitId, Date currentDate) {
-        logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId);
+        logger.debug("getting staffing level organizationId ,currentDate {},{}", unitId,currentDate);
 
         return staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId, currentDate);
 
@@ -801,7 +801,7 @@ public class StaffingLevelService extends MongoBaseService {
      */
     public List<AbsenceStaffingLevelDto> updateAbsenceStaffingLevel(Long unitId
             , List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos) {
-        logger.info("updating staffing level organizationId  {} ,{}", unitId);
+        logger.info("updating staffing level organizationId  {}", unitId);
         List<StaffingLevel> staffingLevels = new ArrayList<StaffingLevel>();
         List<StaffingLevelPlanningDTO> staffingLevelPlanningDTOS = new ArrayList<>();
         for (AbsenceStaffingLevelDto absenceStaffingLevelDto : absenceStaffingLevelDtos) {

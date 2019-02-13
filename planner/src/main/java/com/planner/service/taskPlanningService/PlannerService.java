@@ -100,17 +100,6 @@ public class PlannerService {
 
 
 
-    private String getObjectOutputStream(TaskPlanningSolution taskPlanningSolution){
-        try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(""));
-            outputStream.writeObject(taskPlanningSolution);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
     public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
         ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
