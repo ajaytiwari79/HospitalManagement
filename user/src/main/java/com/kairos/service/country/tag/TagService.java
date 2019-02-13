@@ -1,5 +1,6 @@
 package com.kairos.service.country.tag;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
@@ -12,7 +13,6 @@ import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.tag.TagDTO;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,7 +59,7 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
 
         }
-        return tagGraphRepository.createCountryTag(countryId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
+        return tagGraphRepository.createCountryTag(countryId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtils.getCurrentDate().getTime());
     }
 
     public Tag  updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
@@ -105,27 +105,6 @@ public class TagService {
         return tagsData;
     }
 
-    /*public HashMap<String,Object> getTagsOfSkill(Long countryId, Long skillId, String filterText){
-        Country country = countryGraphRepository.findOne(countryId,0);
-        if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
-        }
-
-        if(filterText == null){
-            filterText = "";
-        }
-//        String filterTextRegex = "~'.*"+filterText+".*'";
-
-        HashMap<String,Object> tagsData = new HashMap<>();
-        if(masterDataType == null){
-            tagsData.put("tags",tagGraphRepository.getListOfCountryTags(countryId, false, filterText));
-        } else {
-            tagsData.put("tags",tagGraphRepository.getListOfCountryTagsByMasterDataType (countryId, false, filterText,  masterDataType.toString()));
-        }
-
-        return tagsData;
-    }*/
-
     public Boolean deleteCountryTag(Long countryId, Long tagId){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
@@ -142,9 +121,7 @@ public class TagService {
         return true;
     }
 
-    /*public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
-        return tagGraphRepository.addOrganizationTag(tagDTO.getName(), organizationId, tagDTO.getMasterDataType(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime() );
-    }*/
+
 
     public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO, String type) {
         if(type.equalsIgnoreCase("team")){
@@ -160,7 +137,7 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
 
         }
-        return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
+        return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtils.getCurrentDate().getTime());
     }
 
     public Tag  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO, String type) {
@@ -239,13 +216,6 @@ public class TagService {
         return showCountryTags;
     }
 
-    public List<Tag> getTagsByIds(List<Long> tagsId){
-        if (tagsId != null && tagsId.size() > 0) {
-            return tagGraphRepository.getTagsById(tagsId, false);
-        } else {
-            return new ArrayList<Tag>();
-        }
-    }
 
     public List<Tag> getCountryTagsByIdsAndMasterDataType(List<Long> tagsId, MasterDataTypeEnum masterDataType){
         logger.info("tagsId : "+tagsId);
@@ -254,18 +224,18 @@ public class TagService {
             logger.info("tags : "+tags);
             return tags;
         } else {
-            return new ArrayList<Tag>();
+            return new ArrayList<>();
         }
     }
 
-    public List<Tag> getOrganizationTagsByIdsAndMasterDataType(Long orgId, List<Long> tagsId, MasterDataTypeEnum masterDataType){
+    private List<Tag> getOrganizationTagsByIdsAndMasterDataType(Long orgId, List<Long> tagsId){
         logger.info("tagsId : "+tagsId);
         if (tagsId != null && tagsId.size() > 0) {
-            List<Tag> tags = tagGraphRepository.getOrganizationTagsById(orgId, tagsId, masterDataType.toString(), false);
+            List<Tag> tags = tagGraphRepository.getOrganizationTagsById(orgId, tagsId, MasterDataTypeEnum.SKILL.toString(), false);
             logger.info("tags : "+tags);
             return tags;
         } else {
-            return new ArrayList<Tag>();
+            return new ArrayList<>();
         }
     }
 
@@ -287,15 +257,6 @@ public class TagService {
         return tagGraphRepository.getCountryTagsOfExpertiseByIdAndDeleted(expertiseId, filterText, false);
     }
 
-    /*public List<Tag> getCountryTagsOfWTA(long countryId, long wtaId, String filterText){
-        Country country = countryGraphRepository.findOne(countryId,0);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
-
-        }
-        return tagGraphRepository.getCountryTagsOfWTAByIdAndDeleted(wtaId, filterText, false);
-    }*/
-
     public List<Tag> getCountryTagsOfRuleTemplateCategory(long countryId, long ruleTmplCategoryId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
@@ -306,7 +267,7 @@ public class TagService {
     }
 
     public HashMap<String,Object> getListOfMasterDataType(){
-        HashMap<String, Object> tagCategoryData = new HashMap<String,Object>();
+        HashMap<String, Object> tagCategoryData = new HashMap<>();
         tagCategoryData.put("tagCategories",MasterDataTypeEnum.getListOfMasterDataType());
         return tagCategoryData;
     }
@@ -317,7 +278,7 @@ public class TagService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound",orgId);
 
         }
-        HashMap<String, Object> tagCategoryData = new HashMap<String,Object>();
+        HashMap<String, Object> tagCategoryData = new HashMap<>();
         tagCategoryData.put("tagCategories",MasterDataTypeEnum.getListOfMasterDataType());
         tagCategoryData.put("showCountryTags", organization.isShowCountryTags() != null ? organization.isShowCountryTags(): false);
         return tagCategoryData;
@@ -327,20 +288,11 @@ public class TagService {
         Skill skill = skillGraphRepository.findOne(skillId);
         skillGraphRepository.removeAllOrganizationTags(orgId,skillId);
         List<Tag> listOfTags = tagGraphRepository.getTagsOfSkillByDeleted(skillId, false);
-        listOfTags.addAll(getOrganizationTagsByIdsAndMasterDataType(orgId,tagsId,MasterDataTypeEnum.SKILL));
+        listOfTags.addAll(getOrganizationTagsByIdsAndMasterDataType(orgId,tagsId));
         skill.setTags(listOfTags);
         skillGraphRepository.save(skill);
         return true;
 
-    }
-    // Methods created for test cases
-
-    public Tag getCountryTagByName(long countryId, String name, MasterDataTypeEnum masterDataTypeEnum){
-        return tagGraphRepository.getCountryTagByNameAndType(countryId, name, masterDataTypeEnum.toString(), false);
-    }
-
-    public Tag getOrganizationTagByName(long orgId, String name, MasterDataTypeEnum masterDataTypeEnum){
-        return tagGraphRepository.getOrganizationTagByName(orgId, name, masterDataTypeEnum.toString(), false);
     }
 }
 

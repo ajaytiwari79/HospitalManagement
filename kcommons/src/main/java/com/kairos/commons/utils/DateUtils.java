@@ -1,9 +1,12 @@
 package com.kairos.commons.utils;
 
 import com.kairos.enums.DurationType;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -31,6 +34,7 @@ public  class DateUtils {
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DateUtils.class);
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -179,8 +183,7 @@ public  class DateUtils {
     public static Date convertToOnlyDate(String receivedDate, String dateFormat) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date date = simpleDateFormat.parse(receivedDate);
-        return date;
+        return simpleDateFormat.parse(receivedDate);
     }
 
     public static Date convertToOnlyDateTimeWithDateProvided(String receivedDate, long timestampedDate) throws ParseException {
@@ -244,14 +247,6 @@ public  class DateUtils {
     public static LocalTime toLocalTime(DateTime dateTime) {
         return LocalTime.of(dateTime.getHourOfDay(), dateTime.getMinuteOfHour());
     }
-
-    public static Long getIsoDateInLong(String dateReceived) throws ParseException {
-        DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date date = isoFormat.parse(dateReceived);
-        return date.getTime();
-    }
-
 
     public static Long getIsoDateWithTimezoneInLong(String dateReceived) throws ParseException {
         DateFormat isoFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
@@ -872,8 +867,30 @@ public  class DateUtils {
        return new Date(Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime());
     }
 
-    public static Date minusDays(Date date,int minusDays){
+    public static Date minusDays(Date date,int minusDays) {
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusDays(minusDays));
+    }
+    public static Long getIsoDateInLong(String dateReceived) {
+        Long date = null;
+        if (!StringUtils.isEmpty(dateReceived)) {
+            DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
+            isoFormat.setLenient(false);
+            isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            try {
+                date = isoFormat.parse(dateReceived).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return date;
+    }
+
+    public static Long getCurrentDateMillis() {
+        DateTime date = new DateTime().withTime(0, 0, 0, 0);
+        return date.getMillis();
+    }
+    public static Long getDateFromEpoch(LocalDate localDate) {
+        return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
 }
