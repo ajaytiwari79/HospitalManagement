@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<FunctionalPayment, Long> {
     @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0}" +
-            " RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.published as published, " +
+            " RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.percentageValue as percentageValue,functionalPayment.published as published, " +
             " functionalPayment.paymentUnit as paymentUnit ORDER BY startDate ASC")
     List<FunctionalPaymentDTO> getFunctionalPaymentOfExpertise(Long expertiseId);
 
@@ -83,7 +83,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} " +
             "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) "+
-            "SET rel.amount=toString(toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100)) ")
+            "SET functionalPayment.percentageValue={1}, rel.amount=toString(toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100)) ")
     void updateFunctionalAmount(List<Long> functionalPaymentIds, String percentageValue);
 
 

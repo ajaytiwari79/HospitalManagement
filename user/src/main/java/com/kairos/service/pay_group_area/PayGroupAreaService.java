@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+
 /**
  * Created by prabjot on 21/12/17.
  */
@@ -42,6 +43,7 @@ public class PayGroupAreaService {
     @Inject
     private ExceptionService exceptionService;
     private final Logger LOGGER = LoggerFactory.getLogger(PayGroupArea.class);
+
 
     public List<PayGroupAreaQueryResult> savePayGroupArea(Long countryId, Set<PayGroupAreaDTO> payGroupAreaDTO) {
         Long payGroupAreaId = payGroupAreaDTO.iterator().next().getPayGroupAreaId();
