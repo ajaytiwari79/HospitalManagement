@@ -20,7 +20,7 @@ public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long
     List<Feature> findAll();
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
-            "WHERE feature.name={0} AND id(country) = {1} AND feature.deleted={2} \n" +
+            "WHERE feature.name=~{0} AND id(country) = {1} AND feature.deleted={2} \n" +
             "RETURN CASE WHEN count(feature)>0 THEN true ELSE false END")
     boolean isFeatureExistsWithSameName(String name, Long countryId, boolean isDeleted);
 

@@ -415,6 +415,11 @@ public class CountryService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
+        boolean vehicleExistInCountryByName = countryGraphRepository.vehicleExistInCountryByName(countryId,"(?i)" + vehicle.getName(),-1L);
+        if(vehicleExistInCountryByName){
+            exceptionService.duplicateDataException("message.country.vehicle.name.alreadyExist" , vehicle.getName());
+        }
+
         country.addResources(vehicle);
         countryGraphRepository.save(country);
         return vehicle;
@@ -457,6 +462,10 @@ public class CountryService {
             logger.debug("Finding vehicle by id::" + resourcesId);
             exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
 
+        }
+        boolean vehicleExistInCountryByName = countryGraphRepository.vehicleExistInCountryByName(countryId,"(?i)" + vehicle.getName(),-1L);
+        if(vehicleExistInCountryByName){
+            exceptionService.duplicateDataException("message.country.vehicle.name.alreadyExist" , vehicle.getName());
         }
         vehicleToUpdate.setName(vehicle.getName());
         vehicleToUpdate.setDescription(vehicle.getDescription());
