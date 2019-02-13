@@ -28,8 +28,8 @@ public interface CitizenStatusGraphRepository extends Neo4jBaseRepository<Citize
     @Query("MATCH (cs:CitizenStatus{isEnabled:true})-[:"+ CIVILIAN_STATUS +"]-(c:Country) where id(c)={0} AND cs.description={1} return cs")
     CitizenStatus findByDescription(long countryId, String description);
 
-    @Query("MATCH(country:Country)<-[:" + CIVILIAN_STATUS + "]-(businessType:BusinessType {isEnabled:true}) WHERE id(country)={0} AND id(businessType)<>{2} AND businessType.name =~{1}  " +
-            " WITH count(businessType) as totalCount " +
+    @Query("MATCH(country:Country)<-[:" + CIVILIAN_STATUS + "]-(citizenStatus:CitizenStatus {isEnabled:true}) WHERE id(country)={0} AND id(citizenStatus)<>{2} AND citizenStatus.name =~{1}  " +
+            " WITH count(citizenStatus) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean citizenStatusExistInCountryByName(Long countryId, String name, Long currentCitizenStatusId);
 }

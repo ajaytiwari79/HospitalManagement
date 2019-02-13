@@ -123,6 +123,11 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} AND id(resources)={1} RETURN resources")
     Vehicle getResources(long countryId, long resourcesId);
 
+    @Query("MATCH(country:Country)-[:" + HAS_RESOURCES + "]->(resources:Vehicle {enabled:true}) WHERE id(country)={0} AND id(resources)<>{2} AND resources.name =~{1}  " +
+            " WITH count(resources) as totalCount " +
+            " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
+    Boolean vehicleExistInCountryByName(Long countryId, String name, Long currentResourceId);
+
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(res:Vehicle{enabled:true}) where id(country)={0}\n" +
             "OPTIONAL MATCH (res)-[:"+VEHICLE_HAS_FEATURE+"]->(feature:Feature{deleted:false}) with  res, \n" +
             "CASE WHEN feature IS NULL THEN [] ELSE collect({id:id(feature) ,name: feature.name, description:feature.description}) END as features \n"+
