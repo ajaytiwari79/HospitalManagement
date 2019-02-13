@@ -377,7 +377,7 @@ public class CountryService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
 
-        Boolean relationTypeExistInCountryByName = countryGraphRepository.relationTypeExistInCountryByName(countryId, "(?i)" + relationTypeDTO.getName(), relationTypeDTO.getId());
+        Boolean relationTypeExistInCountryByName = countryGraphRepository.relationTypeExistInCountryByName(countryId, "(?i)" + relationTypeDTO.getName(), -1L);
         if (relationTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.RelationType.name.exist");
         }
