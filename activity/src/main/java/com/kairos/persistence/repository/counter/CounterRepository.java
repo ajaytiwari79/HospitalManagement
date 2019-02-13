@@ -73,6 +73,12 @@ public class CounterRepository {
         return mongoTemplate.findOne(query, KPI.class);
     }
 
+    public ApplicableKPI getKpiByTitleAndUnitId(String title,Long refId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("title").is(title).and(refQueryField).is(refId).and("level").is(level));
+        return mongoTemplate.findOne(query, ApplicableKPI.class);
+    }
+
     public List<KPI> getKPIsByIds(List<BigInteger> kpiIds){
         Query query = new Query(Criteria.where("id").in(kpiIds));
         return mongoTemplate.find(query, KPI.class);

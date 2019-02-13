@@ -275,31 +275,26 @@ public class CounterDistController {
 
     @PutMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
     public ResponseEntity<Map<String,Object>> saveKpiDateOfCountry(@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
-        counterManagementService.saveKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY);
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.saveKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
-    @PostMapping(UNIT_URL+KPI_URL+"/save_kpi")
+    @PutMapping(UNIT_URL+KPI_URL+"/save_kpi")
     public ResponseEntity<Map<String,Object>> saveKpiDateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
-        counterManagementService.saveKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.saveKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/copy_kpi")
     public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
-        counterManagementService.copyKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY);
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,  counterManagementService.copyKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/copy_kpi")
     public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
-        counterManagementService.copyKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT);
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.copyKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
-    @PostMapping(UNIT_URL+"/preview_kpi")
-    public ResponseEntity<Map<String,Object>> previewKpiDate(@PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria){
-        counterManagementService.getKpiPreviewWithFilter(unitId,filterCriteria);
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    @PostMapping(UNIT_URL+KPI_URL+"/preview_kpi")
+    public ResponseEntity<Map<String,Object>> previewKpiDate(@PathVariable BigInteger kpiId,@PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.getKpiPreviewWithFilter(kpiId,unitId,filterCriteria));
     }
 }

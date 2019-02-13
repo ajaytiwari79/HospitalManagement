@@ -1,9 +1,11 @@
 package com.kairos.dto.activity.counter.configuration;
 
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class KPIDTO {
     private BigInteger id;
@@ -11,7 +13,11 @@ public class KPIDTO {
     private boolean counter;
     private CounterSize size;
     private ChartType chart;
-
+    private String calculationFormula;
+    //applicable filter of kpi
+    private List<FilterCriteria> criteriaList;
+    //selected filer by staff
+    private List<FilterCriteria> selectedFilter;
     public KPIDTO(){
 
     }
@@ -54,5 +60,29 @@ public class KPIDTO {
 
     public void setSize(CounterSize size) {
         this.size = size;
+    }
+
+    public String getCalculationFormula() {
+        return calculationFormula;
+    }
+
+    public void setCalculationFormula(String calculationFormula) {
+        this.calculationFormula = calculationFormula;
+    }
+
+    public List<FilterCriteria> getCriteriaList() {
+        return criteriaList;
+    }
+
+    public void setCriteriaList(List<FilterCriteria> criteriaList) {
+        this.criteriaList = criteriaList;
+    }
+
+    public List<FilterCriteria> getSelectedFilter() {
+        return selectedFilter;
+    }
+
+    public void setSelectedFilter(List<FilterCriteria> selectedFilter) {
+        this.selectedFilter = selectedFilter;
     }
 }

@@ -718,63 +718,99 @@ public class CounterDistService extends MongoBaseService {
 
 
     //kpi default data and copy and save filter
-    public CounterDTO saveKpiFilterData(Long refId,BigInteger kpiId,CounterDTO counterDTO,ConfLevel level){
+    public CounterDTO getDefaultDataOfKpi(BigInteger kpiId, Long refId, CounterDTO counterDTO, ConfLevel level) {
+        CounterDTO counterDto = new CounterDTO();
+        KPI kpi = counterRepository.getCounterByid(kpiId);
+
+        List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
+        counterDto.setSelectedFilter(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
+        return counterDTO;
+    }
+
+    public TabKPIDTO saveKpiFilterData(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        if (!accessGroupPermissionCounterDTO.getManagement()) {
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        KPI kpi=counterRepository.getCounterByid(kpiId);
-        if(!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&accessGroupPermissionCounterDTO.getCountryAdmin()){
+        KPI kpi = counterRepository.getCounterByid(kpiId);
+        if (!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && accessGroupPermissionCounterDTO.getCountryAdmin()) {
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
+        if (!applicableKPIS.get(0).getTitle().equals(counterDTO.getTitle()) && Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
+            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+        }
+        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(), true));
+        applicableKPIS.get(0).setTitle(counterDTO.getTitle());
         kpi.setTitle(counterDTO.getTitle());
-        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(),true));
         List<ApplicableKPI> updateApplicableKPI;
-        if(!ConfLevel.STAFF.equals(level)) {
+        if (!ConfLevel.STAFF.equals(level)) {
             updateApplicableKPI = counterRepository.getFilterBaseApplicableKPI(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF));
-            updateApplicableKPI.forEach(applicableKPI -> applicableKPI.setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(), false)));
+            for (ApplicableKPI applicableKPI : updateApplicableKPI) {
+                applicableKPI.setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(), false));
+                applicableKPI.setTitle(counterDTO.getTitle());
+            }
             applicableKPIS.addAll(updateApplicableKPI);
         }
         save(applicableKPIS);
         save(kpi);
-        return  counterDTO;
+        TabKPIDTO tabKPIDTO = new TabKPIDTO();
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
+        tabKPIDTO.getKpi().setSelectedFilter(counterDTO.getSelectedFilter());
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilter(), Arrays.asList(kpi.getId())), UserContext.getUserDetails().getLastSelectedOrganizationId());
+        tabKPIDTO.setData(data.get(kpiId));
+        return tabKPIDTO;
     }
 
-    public CounterDTO copyKpiFilterData(Long refId,BigInteger kpiId,CounterDTO counterDTO,ConfLevel level){
+    public TabKPIDTO copyKpiFilterData(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
-        if(!accessGroupPermissionCounterDTO.getManagement()){
+        if (!accessGroupPermissionCounterDTO.getManagement()) {
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        KPI kpi=counterRepository.getCounterByid(kpiId);
-        if(!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())&&!accessGroupPermissionCounterDTO.getCountryAdmin()){
+        KPI kpi = counterRepository.getCounterByid(kpiId);
+        if (!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.getCountryAdmin()) {
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
-        KPI copyKpi=ObjectMapperUtils.copyPropertiesByMapper(kpi,KPI.class);
+        if (!applicableKPIS.get(0).getTitle().equals(counterDTO.getTitle()) && Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
+            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+        }
+        KPI copyKpi = ObjectMapperUtils.copyPropertiesByMapper(kpi, KPI.class);
         copyKpi.setId(null);
         copyKpi.setTitle(counterDTO.getTitle());
         copyKpi.setCriteriaList(counterDTO.getCriteriaList());
         save(copyKpi);
-        List<ApplicableKPI> applicableKPIs=new ArrayList<>();
-        if(ConfLevel.COUNTRY.equals(level)||accessGroupPermissionCounterDTO.getCountryAdmin()){
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(),kpi.getId(),accessGroupPermissionCounterDTO.getCountryId(),null,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+        List<ApplicableKPI> applicableKPIs = new ArrayList<>();
+        if (ConfLevel.COUNTRY.equals(level) || accessGroupPermissionCounterDTO.getCountryAdmin()) {
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), accessGroupPermissionCounterDTO.getCountryId(), null, null, level, new ApplicableFilter(counterDTO.getCriteriaList(), false),counterDTO.getTitle()));
         }
-        if(ConfLevel.UNIT.equals(level)){
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(),kpi.getId(),null,refId,null,level,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(),kpi.getId(),null,refId,accessGroupPermissionCounterDTO.getStaffId(),ConfLevel.STAFF,new ApplicableFilter(counterDTO.getCriteriaList(),false)));
+        if (ConfLevel.UNIT.equals(level)) {
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), null, refId, null, level, new ApplicableFilter(counterDTO.getCriteriaList(), false),counterDTO.getTitle()));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getCriteriaList(), false),counterDTO.getTitle()));
         }
         save(applicableKPIs);
-        return  counterDTO;
+        TabKPIDTO tabKPIDTO = new TabKPIDTO();
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
+        tabKPIDTO.getKpi().setSelectedFilter(counterDTO.getSelectedFilter());
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilter(), Arrays.asList(copyKpi.getId())), UserContext.getUserDetails().getLastSelectedOrganizationId());
+        tabKPIDTO.setData(data.get(copyKpi.getId()));
+        return tabKPIDTO;
     }
 
-    public TabKPIDTO getKpiPreviewWithFilter(Long unitId,FilterCriteriaDTO filterCriteria){
-        filterCriteria.setUnitId(unitId);
-        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteria,unitId);
-        return  null;
+    public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long unitId, FilterCriteriaDTO filterCriteria) {
+        TabKPIDTO tabKPIDTO = new TabKPIDTO();
+        KPI kpi = counterRepository.getCounterByid(kpiId);
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
+        filterCriteria.setKpiIds(Arrays.asList(kpiId));
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteria, unitId);
+        tabKPIDTO.setData(data.get(kpiId));
+        return tabKPIDTO;
     }
 }
 

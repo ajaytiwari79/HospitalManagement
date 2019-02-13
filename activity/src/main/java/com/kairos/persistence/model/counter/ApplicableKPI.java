@@ -14,6 +14,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private String title;
     private ApplicableFilter applicableFilter;
 
     public ApplicableKPI() {
@@ -29,7 +30,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.level = level;
     }
 
-    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter) {
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title) {
         this.activeKpiId = activeKpiId;
         this.baseKpiId = baseKpiId;
         this.countryId = countryId;
@@ -37,6 +38,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.staffId = staffId;
         this.level = level;
         this.applicableFilter=applicableFilter;
+        this.title=title;
     }
 
     public BigInteger getActiveKpiId() {
@@ -91,7 +93,16 @@ public class ApplicableKPI extends MongoBaseEntity {
         return applicableFilter;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public void setApplicableFilter(ApplicableFilter applicableFilter) {
         this.applicableFilter = applicableFilter;
     }
+
 }
