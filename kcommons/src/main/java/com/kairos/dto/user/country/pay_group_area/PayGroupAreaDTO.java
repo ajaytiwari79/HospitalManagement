@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
+
 /**
  * Created by prabjot on 21/12/17.
  *
@@ -57,7 +58,7 @@ public class PayGroupAreaDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getDescription() {
@@ -117,16 +118,4 @@ public class PayGroupAreaDTO {
         this.levelId = levelId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PayGroupAreaDTO that = (PayGroupAreaDTO) o;
-        return Objects.equals(municipalityId, that.municipalityId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(municipalityId);
-    }
 }

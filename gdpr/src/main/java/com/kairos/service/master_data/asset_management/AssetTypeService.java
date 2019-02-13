@@ -284,7 +284,6 @@ public class AssetTypeService{
     private AssetType updateOrAddAssetTypeRisk(AssetType assetType, AssetTypeDTO assetTypeDto){
         List<BasicRiskDTO> newRisks = new ArrayList<>();
         Map<Long, BasicRiskDTO> existingRiskDtoCorrespondingToIds = new HashMap<>();
-        Map<Long, List<BasicRiskDTO>> assetTypeNewRiskDto = new HashMap<>();
         assetTypeDto.getRisks().forEach( assetTypeRiskDto -> {
             if (Optional.ofNullable(assetTypeRiskDto.getId()).isPresent()) {
                 existingRiskDtoCorrespondingToIds.put(assetTypeRiskDto.getId(), assetTypeRiskDto);
@@ -292,22 +291,20 @@ public class AssetTypeService{
                 newRisks.add(assetTypeRiskDto);
             }
         });
-        assetTypeNewRiskDto.put(assetType.getId(), newRisks);
-        if(!assetType.getRisks().isEmpty() && ! existingRiskDtoCorrespondingToIds.isEmpty()) {
-            assetType.getRisks().forEach(assetTypeRisk -> {
+        List<Risk> existingRisk = assetType.getRisks();
+        if(!existingRisk.isEmpty() && ! existingRiskDtoCorrespondingToIds.isEmpty()) {
+            existingRisk.forEach(assetTypeRisk -> {
                 BasicRiskDTO basicRiskDTO = existingRiskDtoCorrespondingToIds.get(assetTypeRisk.getId());
                 assetTypeRisk.setName(basicRiskDTO.getName());
                 assetTypeRisk.setDescription(basicRiskDTO.getDescription());
                 assetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
                 assetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-               // assetTypeRisk.setAssetType(assetType);
-                assetTypeNewRiskDto.get(assetTypeRisk.getId()).forEach(newRisk -> {
-                    Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-                    //risk.setAssetType(assetType);
-                    assetType.getRisks().add(risk);
-                });
             });
         }
+        newRisks.forEach(newRisk -> {
+            Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
+            assetType.getRisks().add(risk);
+        });
         return  assetType;
     }
 

@@ -71,7 +71,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -742,7 +741,7 @@ public class StaffRetrievalService {
         staffExpertiseQueryResults.forEach(staffExpertiseQueryResult -> {
             int maxExperience = staffExpertiseQueryResult.getExpertiseWithExperience().stream().max(Comparator.comparingInt(StaffExpertiseQueryResult::getRelevantExperienceInMonths)).get().getRelevantExperienceInMonths();
             staffExpertiseQueryResult.getExpertiseWithExperience().forEach(expertiseQueryResult -> {
-                expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
+                expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtils.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
                 expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
                 expertiseQueryResult.setSeniorityLevel(calculateApplicableSeniorityLevel(expertiseQueryResult.getSeniorityLevels(), maxExperience));
                 if (expertiseQueryResult.isUnitPositionExists()) {
