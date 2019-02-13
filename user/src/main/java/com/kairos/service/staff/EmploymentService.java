@@ -141,7 +141,7 @@ public class EmploymentService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
-    public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
+    public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail){
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
@@ -149,11 +149,10 @@ public class EmploymentService {
         } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
             exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
         }
-        if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
+        if (isNotNull(objectToUpdate.getExternalId()) && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
             Staff staff = staffGraphRepository.findByExternalId(staffEmploymentDetail.getTimeCareExternalId());
             if (Optional.ofNullable(staff).isPresent()) {
                 exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
-
             }
         }
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
