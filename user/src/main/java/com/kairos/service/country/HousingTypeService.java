@@ -1,9 +1,12 @@
 package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.HousingType;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.HousingType;
+import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,55 +20,59 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class HousingTypeService  {
+public class HousingTypeService {
 
     @Inject
     private HousingTypeGraphRepository housingTypeGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createHousingType(long countryId, HousingType housingType){
+    public HousingTypeDTO createHousingType(long countryId, HousingTypeDTO housingTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        HousingType housingType = null;
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean housingTypeExistInCountryByName = housingTypeGraphRepository.housingTypeExistInCountryByName(countryId, "(?i)" + housingTypeDTO.getName(), -1L);
+            if (housingTypeExistInCountryByName) {
+                exceptionService.duplicateDataException("error.HousingType.name.exist");
+            }
+            housingType = new HousingType(housingTypeDTO.getName(), housingTypeDTO.getDescription());
             housingType.setCountry(country);
             housingTypeGraphRepository.save(housingType);
-            return housingType.retrieveDetails();
         }
-        return null;
+        housingTypeDTO.setId(housingType.getId());
+        return housingTypeDTO;
     }
 
-    public List<Object> getHousingTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = housingTypeGraphRepository.findHousingTypeByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<HousingTypeDTO> getHousingTypeByCountryId(long countryId) {
+        return housingTypeGraphRepository.findHousingTypeByCountry(countryId);
     }
 
-    public Map<String, Object> updateHousingType(HousingType housingType){
-        HousingType currentHousingType = housingTypeGraphRepository.findOne(housingType.getId());
-        if (currentHousingType!=null){
-            currentHousingType.setName(housingType.getName());
-            currentHousingType.setDescription(housingType.getDescription());
+    public HousingTypeDTO updateHousingType(long countryId, HousingTypeDTO housingTypeDTO) {
+        Boolean housingTypeExistInCountryByName = housingTypeGraphRepository.housingTypeExistInCountryByName(countryId, "(?i)" + housingTypeDTO.getName(), housingTypeDTO.getId());
+        if (housingTypeExistInCountryByName) {
+            exceptionService.duplicateDataException("error.HousingType.name.exist");
+        }
+        HousingType currentHousingType = housingTypeGraphRepository.findOne(housingTypeDTO.getId());
+        if (currentHousingType != null) {
+            currentHousingType.setName(housingTypeDTO.getName());
+            currentHousingType.setDescription(housingTypeDTO.getDescription());
             housingTypeGraphRepository.save(currentHousingType);
-            return currentHousingType.retrieveDetails();
         }
-        return null;
+        return housingTypeDTO;
     }
 
-    public boolean deleteHousingType(long kairosStatusId){
-        HousingType housingType = housingTypeGraphRepository.findOne(kairosStatusId);
-        if (housingType !=null){
+    public boolean deleteHousingType(long housingTypeId) {
+        HousingType housingType = housingTypeGraphRepository.findOne(housingTypeId);
+        if (housingType != null) {
             housingType.setEnabled(false);
             housingTypeGraphRepository.save(housingType);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.HousingType.notfound");
         }
-        return false;
+        return true;
     }
 }

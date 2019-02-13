@@ -2,8 +2,10 @@ package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.BusinessTypeDTO;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,51 +23,55 @@ public class BusinessTypeService {
 
     @Inject
     private BusinessTypeGraphRepository businessTypeGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createBusinessType(long countryId, BusinessType businessType){
+    public BusinessTypeDTO createBusinessType(long countryId, BusinessTypeDTO businessTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        BusinessType businessType = null;
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean businessTypeExistInCountryByName = businessTypeGraphRepository.businessTypeExistInCountryByName(countryId, "(?i)" + businessTypeDTO.getName(), -1L);
+            if (businessTypeExistInCountryByName) {
+                exceptionService.duplicateDataException("error.BusinessType.name.exist");
+            }
+            businessType = new BusinessType(businessTypeDTO.getName(), businessTypeDTO.getDescription());
             businessType.setCountry(country);
             businessTypeGraphRepository.save(businessType);
-            return businessType.retrieveDetails();
         }
-        return null;
+        businessTypeDTO.setId(businessType.getId());
+        return businessTypeDTO;
     }
 
-    public List<Object> getBusinessTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = businessTypeGraphRepository.findBusinesTypeByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<BusinessTypeDTO> getBusinessTypeByCountryId(long countryId) {
+        return businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
     }
 
-    public Map<String, Object> updateBusinessType(BusinessType businessType){
-        BusinessType currentBusinessType = businessTypeGraphRepository.findOne(businessType.getId());
-        if (currentBusinessType!=null){
-            currentBusinessType.setName(businessType.getName());
-            currentBusinessType.setDescription(businessType.getDescription());
+    public BusinessTypeDTO updateBusinessType(long countryId, BusinessTypeDTO businessTypeDTO) {
+        Boolean businessTypeExistInCountryByName = businessTypeGraphRepository.businessTypeExistInCountryByName(countryId, "(?i)" + businessTypeDTO.getName(), businessTypeDTO.getId());
+        if (businessTypeExistInCountryByName) {
+            exceptionService.duplicateDataException("error.BusinessType.name.exist");
+        }
+        BusinessType currentBusinessType = businessTypeGraphRepository.findOne(businessTypeDTO.getId());
+        if (currentBusinessType != null) {
+            currentBusinessType.setName(businessTypeDTO.getName());
+            currentBusinessType.setDescription(businessTypeDTO.getDescription());
             businessTypeGraphRepository.save(currentBusinessType);
-            return currentBusinessType.retrieveDetails();
         }
-        return null;
+        return businessTypeDTO;
     }
 
-    public boolean deleteBusinessType(long businessTypeId){
+    public boolean deleteBusinessType(long businessTypeId) {
         BusinessType businessType = businessTypeGraphRepository.findOne(businessTypeId);
-        if (businessType!=null){
+        if (businessType != null) {
             businessType.setEnabled(false);
             businessTypeGraphRepository.save(businessType);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.BusinessType.notfound");
         }
-        return false;
+        return true;
     }
 }
