@@ -18,26 +18,19 @@ public class PolicyAgreementTemplate extends BaseEntity {
     @NotBlank(message = "Description cannot be empty")
     private String description;
     private Long countryId;
-
     @ElementCollection
     private List<AccountType> accountTypes;
-
     @OneToMany(cascade = CascadeType.ALL)
     @OrderColumn
     private List<AgreementSection> agreementSections=new ArrayList<>();
-
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
-
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
-
     @ElementCollection
     private List <ServiceCategory> organizationServices = new ArrayList<>();
-
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
-
     @OneToOne
     private TemplateType templateType;
     private boolean coverPageAdded;
@@ -46,12 +39,11 @@ public class PolicyAgreementTemplate extends BaseEntity {
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
     private String  signatureHtml;
-
     @Embedded
     private CoverPage coverPageData = new CoverPage();
+    private Long organizationId;
     /*@Transient
     private ClauseTag defaultClauseTag;*/
-
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -68,6 +60,14 @@ public class PolicyAgreementTemplate extends BaseEntity {
         this.description = description;
         this.templateType = templateType;
     }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+
+
+
 
     public boolean isIncludeContentPage() { return includeContentPage; }
 

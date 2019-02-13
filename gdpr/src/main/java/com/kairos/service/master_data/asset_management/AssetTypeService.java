@@ -109,7 +109,7 @@ public class AssetTypeService{
      * @return map of Sub asset Types List and Ids (List for rollback)
      * @description this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      */
-    private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetTypeMD) {
+    private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetType) {
         List<BasicRiskDTO> newRiskOfSubAssetType = new ArrayList<>();
         Map<Long, AssetTypeDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
         Map<Long, BasicRiskDTO> subAssetTypeExistingRiskDtoCorrespondingToIds = new HashMap<>();
@@ -129,7 +129,7 @@ public class AssetTypeService{
             } else {
                 AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
                 assetSubType.setSubAssetType(true);
-                assetSubType.setAssetType(assetTypeMD);
+                assetSubType.setAssetType(assetType);
                 List<Risk>  subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), Risk.class);
                 assetSubType.setRisks(subAssetRisks);
                 subAssetTypes.add(assetSubType);
@@ -137,7 +137,7 @@ public class AssetTypeService{
 
         });
 
-        assetTypeMD.getSubAssetTypes().forEach(subAssetType -> {
+        assetType.getSubAssetTypes().forEach(subAssetType -> {
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             subAssetType.setName(subAssetTypeDto.getName());
             if(!subAssetType.getRisks().isEmpty() && !subAssetTypeExistingRiskDtoCorrespondingToIds.isEmpty()){
@@ -284,7 +284,6 @@ public class AssetTypeService{
     private AssetType updateOrAddAssetTypeRisk(AssetType assetType, AssetTypeDTO assetTypeDto){
         List<BasicRiskDTO> newRisks = new ArrayList<>();
         Map<Long, BasicRiskDTO> existingRiskDtoCorrespondingToIds = new HashMap<>();
-        Map<Long, List<BasicRiskDTO>> assetTypeNewRiskDto = new HashMap<>();
         assetTypeDto.getRisks().forEach( assetTypeRiskDto -> {
             if (Optional.ofNullable(assetTypeRiskDto.getId()).isPresent()) {
                 existingRiskDtoCorrespondingToIds.put(assetTypeRiskDto.getId(), assetTypeRiskDto);
@@ -292,22 +291,20 @@ public class AssetTypeService{
                 newRisks.add(assetTypeRiskDto);
             }
         });
-        assetTypeNewRiskDto.put(assetType.getId(), newRisks);
-        if(!assetType.getRisks().isEmpty() && ! existingRiskDtoCorrespondingToIds.isEmpty()) {
-            assetType.getRisks().forEach(assetTypeRisk -> {
+        List<Risk> existingRisk = assetType.getRisks();
+        if(!existingRisk.isEmpty() && ! existingRiskDtoCorrespondingToIds.isEmpty()) {
+            existingRisk.forEach(assetTypeRisk -> {
                 BasicRiskDTO basicRiskDTO = existingRiskDtoCorrespondingToIds.get(assetTypeRisk.getId());
                 assetTypeRisk.setName(basicRiskDTO.getName());
                 assetTypeRisk.setDescription(basicRiskDTO.getDescription());
                 assetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
                 assetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-               // assetTypeRisk.setAssetType(assetType);
-                assetTypeNewRiskDto.get(assetTypeRisk.getId()).forEach(newRisk -> {
-                    Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-                    //risk.setAssetType(assetType);
-                    assetType.getRisks().add(risk);
-                });
             });
         }
+        newRisks.forEach(newRisk -> {
+            Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
+            assetType.getRisks().add(risk);
+        });
         return  assetType;
     }
 

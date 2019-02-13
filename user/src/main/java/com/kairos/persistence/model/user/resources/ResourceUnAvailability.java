@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.user.resources;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import static com.kairos.utils.DateUtil.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Created by arvind on 6/10/16.
@@ -68,18 +68,18 @@ public class ResourceUnAvailability extends UserBaseEntity {
 
     public ResourceUnAvailability setUnavailability(ResourceUnavailabilityDTO unavailabilityDTO, String unavailabilityDate)  {
         try{
-            LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDate,
+            LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(unavailabilityDate,
                     MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
             this.date = startDateIncludeTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
             if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getStartTime())){
-                LocalDateTime timeFrom = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getStartTime(),
+                LocalDateTime timeFrom = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(unavailabilityDTO.getStartTime(),
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 this.startTime = timeFrom.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             }
 
             if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getEndTime())){
-                LocalDateTime timeTo = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getEndTime(),
+                LocalDateTime timeTo = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(unavailabilityDTO.getEndTime(),
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 this.endTime = timeTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             }

@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.clause_tag;
 
 import com.kairos.persistence.model.clause_tag.ClauseTag;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-//@JaversSpringDataAuditable
+@JaversSpringDataAuditable
 public interface ClauseTagRepository extends JpaRepository<ClauseTag,Long> {
 
     @Query(value = "Select CT from ClauseTag CT where CT.organizationId = ?1 and CT.deleted = false and lower(CT.name) IN (?2)")

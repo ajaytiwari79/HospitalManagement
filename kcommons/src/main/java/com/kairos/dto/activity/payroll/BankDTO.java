@@ -23,7 +23,7 @@ public class BankDTO {
     private String swiftCode; //stands for Society for Worldwide Interbank Financial Telecommunication
     private Long organizationId;
     private Long staffId;
-    @Length(max = 16,message = "accountNumber.greater_than.provided_value")
+    @Range(message = "accountNumber.greater_than.provided_value")
     private Long accountNumber;
 
 

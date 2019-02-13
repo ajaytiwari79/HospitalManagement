@@ -648,8 +648,8 @@ public class AggregatorService extends MongoBaseService {
         Map<String, Object> citizenDemandData = new HashMap<String, Object>();
         List<TaskDemand> taskDemands = taskDemandMongoRepository.findAllByCitizenIdAndUnitIdAndRecurrencePattern(clientId,unitId, TaskDemand.RecurrencePattern.WEEKLY);
         for(TaskDemand taskDemand : taskDemands){
-            int weekDayFrequency = 0;
-            int weekEndFrequency = 0;
+            int weekDayFrequency = 1;
+            int weekEndFrequency = 1;
             long weekDayTaskDemandMinutes = 0;
             float weekDayTaskDemandTasks = 0;
             long weekEndTaskDemandMinutes = 0;

@@ -12,7 +12,6 @@ import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.feature.FeatureDTO;
 import com.kairos.dto.user.country.feature.VehicleFeaturesDTO;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class FeatureService{
             exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName());
 
         }
-        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
+        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), LocalDateTime.now().toString());
     }
 
     public FeatureQueryResult updateFeature(Long countryId, Long featureId, FeatureDTO featureDTO) {
@@ -77,7 +77,7 @@ public class FeatureService{
             exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName() );
 
         }
-        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
+        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), LocalDateTime.now().toString());
     }
 
 

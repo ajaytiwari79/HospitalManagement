@@ -10,7 +10,7 @@ public final class ApiConstant {
     public static final String API_ORGANIZATION_URL =API_V1;
     public static final String API_ORGANIZATION_COUNTRY_URL =API_V1 +COUNTRY_URL;
     public static final String API_ORGANIZATION_UNIT_URL =API_V1 +UNIT_URL;
-    public static final String API_TEMPLATE_TYPE_URL = API_V1 +COUNTRY_URL+ "/template";
+    //public static final String API_TEMPLATE_TYPE_URL = API_V1 +COUNTRY_URL+ "/template";
 
 
 

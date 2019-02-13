@@ -380,8 +380,7 @@ public class DateUtils {
     private static long getTimeZoneUTCAndDSTOffset(Date date, TimeZone timeZone)
     {
         long timeZoneDSTOffset = 0;
-        if(timeZone.inDaylightTime(date))
-        {
+        if(timeZone.inDaylightTime(date)) {
             timeZoneDSTOffset = timeZone.getDSTSavings();
         }
 

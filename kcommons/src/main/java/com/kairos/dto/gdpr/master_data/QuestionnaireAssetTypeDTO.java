@@ -49,10 +49,9 @@ public class QuestionnaireAssetTypeDTO {
         this.subAssetType = subAssetType;
     }
 
-    public QuestionnaireAssetTypeDTO(Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, boolean subAssetType) {
+    public QuestionnaireAssetTypeDTO(Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.id = id;
         this.name = name;
-        this.subAssetType = subAssetType;
     }
 
     public QuestionnaireAssetTypeDTO() {

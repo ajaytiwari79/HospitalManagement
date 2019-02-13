@@ -14,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -23,7 +24,7 @@ public class Clause extends BaseEntity {
     @NotBlank
     private String title;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany
     private List<ClauseTag> tags  = new ArrayList<>();
 
     @NotNull
@@ -44,6 +45,7 @@ public class Clause extends BaseEntity {
     @ElementCollection
     private List<AccountType> accountTypes = new ArrayList<>();
     private Long countryId;
+    private Long organizationId;
 
     //TODO
     //private List<Long> organizationList;
@@ -224,4 +226,14 @@ public class Clause extends BaseEntity {
     public void setTempClauseId(UUID tempClauseId) {
         this.tempClauseId = tempClauseId;
     }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+
 }

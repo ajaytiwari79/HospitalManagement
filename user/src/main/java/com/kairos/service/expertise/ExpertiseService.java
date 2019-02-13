@@ -47,9 +47,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.utils.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,22 +73,29 @@ public class ExpertiseService {
     private
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
+    private
     StaffGraphRepository staffGraphRepository;
     @Inject
+    private
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
+    private
     OrganizationServiceRepository organizationServiceRepository;
     @Inject
+    private
     OrganizationServiceService organizationServiceService;
 
     @Inject
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
 
     @Inject
+    private
     TagService tagService;
     @Inject
+    private
     StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
+    private
     ObjectMapper objectMapper;
     @Inject
     private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
@@ -117,7 +122,7 @@ public class ExpertiseService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
         }
-        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+        ExpertiseResponseDTO expertiseResponseDTO;
 
 
         Expertise expertise;
@@ -245,7 +250,7 @@ public class ExpertiseService {
 
     /*This method is responsible for generating Seniority Level response */
     private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevelFromDB, SeniorityLevel seniorityLevel) {
-        SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO();
+        SeniorityLevelDTO seniorityLevelDTO;
         seniorityLevelDTO = objectMapper.convertValue(seniorityLevel, SeniorityLevelDTO.class);
         seniorityLevelDTO.setParentId(seniorityLevelFromDB.getId());
 
@@ -327,16 +332,14 @@ public class ExpertiseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
         }
 
-        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+        ExpertiseResponseDTO expertiseResponseDTO;
 
         if (currentExpertise.isPublished()) {
 
-            // current is published now we need to create a copy and update in that and return the updated copy
-
+            //current is published now we need to create a copy and update in that and return the updated copy
             Expertise copiedExpertise = new Expertise();
             BeanUtils.copyProperties(currentExpertise, copiedExpertise);
             copiedExpertise.setId(null);
-
             currentExpertise.setHasDraftCopy(true);
             currentExpertise.setHistory(true);
             copiedExpertise.setPublished(false);
@@ -520,7 +523,7 @@ public class ExpertiseService {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
         for (Expertise currentExpertise : expertise) {
-            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(currentStaff, currentExpertise, 0, DateUtil.getCurrentDate());
+            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(currentStaff, currentExpertise, 0, DateUtils.getCurrentDate());
             staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
         staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
@@ -552,13 +555,13 @@ public class ExpertiseService {
         if (isSelected) {
             for (long skillId : skillIds) {
                 if (expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId, skillId) == 0) {
-                    expertiseGraphRepository.addSkillInExpertise(expertiseId, skillId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                    expertiseGraphRepository.addSkillInExpertise(expertiseId, skillId, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 } else {
-                    expertiseGraphRepository.updateExpertiseSkill(expertiseId, skillId, DateUtil.getCurrentDate().getTime());
+                    expertiseGraphRepository.updateExpertiseSkill(expertiseId, skillId, DateUtils.getCurrentDate().getTime());
                 }
             }
         } else {
-            expertiseGraphRepository.deleteExpertiseSkill(expertiseId, skillIds, DateUtil.getCurrentDate().getTime());
+            expertiseGraphRepository.deleteExpertiseSkill(expertiseId, skillIds, DateUtils.getCurrentDate().getTime());
         }
     }
 
@@ -622,19 +625,27 @@ public class ExpertiseService {
         boolean payGradesExistsForSeniorityLevels = seniorityLevelGraphRepository.checkPayGradesInSeniorityLevel(seniorityLevelId);
         if (!payGradesExistsForSeniorityLevels) {
             exceptionService.actionNotPermittedException("message.seniorityLevel.payGrade.missing");
-
         }
         expertise.setPublished(true);
         expertise.setStartDateMillis(new Date(publishedDateMillis));
-
         expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
-            expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
+            //expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
+            expertiseGraphRepository.linkToUnitPositions(parentExpertise.getId(),expertiseId);
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
             parentExpertise.setHistory(true);
+            Expertise parentExp=expertiseGraphRepository.findOne(parentExpertise.getId());
+            parentExp.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+            parentExp.setHasDraftCopy(false);
+            parentExp.setHistory(true);
+            parentExp.setId(expertise.getId());
+            expertiseGraphRepository.save(parentExp);
+            expertise.setId(parentExpertise.getId());
+            expertiseGraphRepository.save(expertise);
         }
+
         return parentExpertise;
     }
 
@@ -649,7 +660,7 @@ public class ExpertiseService {
     }
 
 
-    public Map<String, Object> retrieveExpertiseDetails(Staff staff) {
+    private Map<String, Object> retrieveExpertiseDetails(Staff staff) {
         Map<String, Object> map = new HashMap<>();
         map.put("staffId", staff.getId());
         map.put("staffName", staff.getFirstName() + "   " + staff.getLastName());
@@ -688,7 +699,7 @@ public class ExpertiseService {
 
 
     //Validating age range
-    public void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
+    private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
@@ -827,7 +838,7 @@ public class ExpertiseService {
     }
 
     private void createDefaultSettings(Expertise targetExpertise, Expertise sourceExpertise) {
-        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList();
+        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
         ExpertisePlannedTimeQueryResult expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.getPlannedTimeConfigurationByExpertise(sourceExpertise.getId());
         if (Optional.ofNullable(expertiseEmploymentTypeRelationships).isPresent()) {
             expertiseEmploymentTypeRelationships.employmentTypes.forEach(employmentType -> {

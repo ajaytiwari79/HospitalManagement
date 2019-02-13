@@ -2,9 +2,13 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.persistence.model.auth.User;
 import org.neo4j.ogm.annotation.GraphId;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
@@ -23,18 +27,17 @@ public abstract class UserBaseEntity implements Serializable {
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore
-
     @CreatedDate
     private LocalDateTime creationDate;
     @JsonIgnore
-
     @LastModifiedDate
     private LocalDateTime lastModificationDate;
-
     @JsonIgnore
-    protected UserInfo createdBy;
+    @CreatedBy
+    protected Long createdBy;
     @JsonIgnore
-    protected UserInfo lastModifiedBy;
+    @LastModifiedBy
+    protected Long lastModifiedBy;
 
 
     public void setId(Long id) {
@@ -69,19 +72,19 @@ public abstract class UserBaseEntity implements Serializable {
         this.deleted = deleted;
     }
 
-    public UserInfo getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(UserInfo createdBy) {
+    public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public UserInfo getLastModifiedBy() {
+    public Long getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(UserInfo lastModifiedBy) {
+    public void setLastModifiedBy(Long lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 }

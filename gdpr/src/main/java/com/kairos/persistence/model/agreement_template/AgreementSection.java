@@ -34,7 +34,12 @@ public class AgreementSection extends BaseEntity {
 
     private Integer orderedIndex;
     private Long countryId;
+    private Long organizationId;
 
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public boolean isAgreementSubSection() { return isAgreementSubSection; }
 
@@ -50,9 +55,7 @@ public class AgreementSection extends BaseEntity {
         return agreementSubSections;
     }
 
-    public void setAgreementSubSections(List<AgreementSection> agreementSubSections) {
-        this.agreementSubSections = agreementSubSections;
-    }
+    public void setAgreementSubSections(List<AgreementSection> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
 
     public AgreementSection getAgreementSection() {
         return agreementSection;

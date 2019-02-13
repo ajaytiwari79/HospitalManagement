@@ -1,8 +1,6 @@
 package com.kairos.controller.auth;
 
-import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.persistence.model.auth.OrganizationSelectionDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.auth.UserService;

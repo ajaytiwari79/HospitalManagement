@@ -14,14 +14,18 @@ import javax.validation.constraints.Pattern;
 public class TemplateType extends BaseEntity {
 
 
-    @NotBlank(message = "templateName cannot be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     private Long countryId;
+    private Long organizationId;
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {

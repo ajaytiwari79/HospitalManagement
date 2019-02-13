@@ -1,15 +1,18 @@
 package com.kairos.persistence.repository.clause;
 
 import com.kairos.persistence.model.clause.Clause;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 
 @Repository
-////@JaversSpringDataAuditable
+@JaversSpringDataAuditable
 public interface ClauseRepository extends JpaRepository<Clause, Long> {
 
     @Query(value = "Select c from Clause c where c.countryId = ?1 and lower(c.title) = lower(?2) and lower(c.description) = lower(?3) and c.deleted = false")
@@ -18,6 +21,8 @@ public interface ClauseRepository extends JpaRepository<Clause, Long> {
     @Query(value = "Select c from Clause c where c.organizationId = ?1 and lower(c.title) = lower(?2) and lower(c.description) = lower(?3) and c.deleted = false")
     Clause findByUnitIdAndTitleAndDescription(Long referenceId, String title, String description);
 
+    @Modifying
+    @Transactional
     @Query(value = "update Clause set deleted = true where id = ?1 and deleted = false")
     Integer safeDeleteById(Long id);
 

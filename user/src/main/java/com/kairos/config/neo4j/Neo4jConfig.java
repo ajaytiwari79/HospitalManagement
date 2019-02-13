@@ -33,7 +33,7 @@ import static com.kairos.constants.Neo4jConstant.*;
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 @ComponentScan("com.kairos.persistence")
 @EnableTransactionManagement
-//@EnableNeo4jAuditing
+@EnableNeo4jAuditing
 public class Neo4jConfig  implements EnvironmentAware {
 
     private final Logger logger = LoggerFactory.getLogger(Neo4jConfig.class);
@@ -57,7 +57,7 @@ public class Neo4jConfig  implements EnvironmentAware {
         org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration.Builder()
                 .connectionPoolSize(Integer.parseInt(this.environment.getProperty(CONNECTION_POOL_SIZE)))
                 .uri(this.environment.getProperty(NEO4J_URI))
-               .credentials(this.environment.getProperty(NEO4J_USER_NAME), this.environment.getProperty(NEO4J_PASSWORD))
+               .credentials(this.environment.getProperty(NEO4J_USER_NAME), this.environment.getProperty(NEO4J_PASSCODE))
                 .verifyConnection(true)
                 .build();
 
@@ -65,7 +65,7 @@ public class Neo4jConfig  implements EnvironmentAware {
     }
 
     /**
-     * Bean for enviroment variables
+     * Bean for environment variables
      *
      * @return
      */

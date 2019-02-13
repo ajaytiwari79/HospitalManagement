@@ -339,7 +339,7 @@ public class ProcessingActivityService {
      * @description method return audit history of Processing Activity , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(Long processingActivityId) {
+    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(Long processingActivityId) throws ClassNotFoundException {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
