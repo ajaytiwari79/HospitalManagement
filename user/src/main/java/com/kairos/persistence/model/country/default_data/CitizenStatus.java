@@ -22,17 +22,21 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CIVIL
 @NodeEntity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CitizenStatus extends UserBaseEntity {
+
     @NotBlank(message = "error.CitizenStatus.name.notEmpty")
     String name;
-
-    //@NotEmpty(message = "error.CitizenStatus.description.notEmpty") @NotNull(message = "error.CitizenStatus.description.notnull")
     String description;
-
     @Relationship(type = CIVILIAN_STATUS)
     Country country;
-
     private boolean isEnabled = true;
 
+    public CitizenStatus() {
+    }
+
+    public CitizenStatus(@NotBlank(message = "error.CitizenStatus.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public boolean isEnabled() {
         return isEnabled;
@@ -67,8 +71,7 @@ public class CitizenStatus extends UserBaseEntity {
         this.country = country;
     }
 
-    public CitizenStatus() {
-    }
+
 
     public Map<String,Object> retrieveDetails(){
         Map<String,Object> data = new HashMap<>();

@@ -24,7 +24,7 @@ import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
-import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.PartialLeave;
@@ -140,7 +140,7 @@ public class EmploymentService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
-    public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
+    public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail){
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
@@ -152,7 +152,6 @@ public class EmploymentService {
             Staff staff = staffGraphRepository.findByExternalId(staffEmploymentDetail.getTimeCareExternalId());
             if (Optional.ofNullable(staff).isPresent()) {
                 exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
-
             }
         }
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());

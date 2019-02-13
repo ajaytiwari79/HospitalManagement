@@ -54,7 +54,7 @@ public class FeatureService{
 
         }
         logger.info("featureDTO : "+featureDTO.getName());
-        if( featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
+        if( featureGraphRepository.isFeatureExistsWithSameName("(?i)" +featureDTO.getName(), countryId, false) ){
             exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName());
 
         }
@@ -73,7 +73,7 @@ public class FeatureService{
 
         }
 
-        if( ! ( feature.getName().equalsIgnoreCase(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
+        if( ! ( feature.getName().equals(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName("(?i)" +featureDTO.getName(), countryId, false) ){
             exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName() );
 
         }

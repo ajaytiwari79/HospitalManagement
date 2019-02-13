@@ -13,6 +13,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
@@ -26,7 +27,7 @@ import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.payment_type.PaymentType;
+import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
@@ -870,7 +871,7 @@ public class BootDataService {
     }
 
     private void createCurrency() {
-        com.kairos.persistence.model.country.Currency currency = new com.kairos.persistence.model.country.Currency();
+        Currency currency = new Currency();
         currency.setName("krone");
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
