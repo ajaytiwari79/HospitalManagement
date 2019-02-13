@@ -867,6 +867,9 @@ public  class DateUtils {
        return new Date(Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime());
     }
 
+    public static Date minusDays(Date date,int minusDays) {
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusDays(minusDays));
+    }
     public static Long getIsoDateInLong(String dateReceived) {
         Long date = null;
         if (!StringUtils.isEmpty(dateReceived)) {
