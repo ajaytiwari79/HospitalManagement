@@ -348,7 +348,7 @@ public class ShiftService extends MongoBaseService {
 
 
     public void updateTimeBankAndAvailableCountOfStaffingLevel(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
+        timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift);
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
         boolean presenceTypeShift = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         if (TimeTypes.WORKING_TYPE.toString().equals(activityWrapper.getTimeType())) {
@@ -659,7 +659,7 @@ public class ShiftService extends MongoBaseService {
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             shift = saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO, true);
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
-            timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
+            timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
             // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
@@ -810,7 +810,7 @@ public class ShiftService extends MongoBaseService {
         }
         shiftMongoRepository.save(shift);
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-        timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
+        timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift);
         payOutService.deletePayOut(shift.getId());
 
         boolean isShiftForPresence = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));

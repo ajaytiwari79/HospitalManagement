@@ -96,7 +96,7 @@ public class TimeBankCalculationService {
         DailyTimeBankEntry dailyTimeBank = null;
 
         if (CollectionUtils.isNotEmpty(shifts)) {
-            Optional<AppliedFunctionDTO> appliedFunctionDTO=unitPosition.getAppliedFunctions().stream().filter(function->function.getAppliedDates().contains(DateUtils.asLocalDate(shifts.get(0).getStartDate()))).findFirst();
+            Optional<AppliedFunctionDTO> appliedFunctionDTO=unitPosition.getAppliedFunctions().stream().filter(function->function.getAppliedDates().contains(DateUtils.asLocalDate(interval.getStart().toDate()))).findFirst();
             Long functionId=null;
             if(appliedFunctionDTO.isPresent()){
                 functionId= appliedFunctionDTO.get().getId();

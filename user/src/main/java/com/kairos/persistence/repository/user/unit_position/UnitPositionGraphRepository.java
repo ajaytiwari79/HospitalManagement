@@ -36,7 +36,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "with expertise,unitPosition,appliedFunctions,\n" +
             "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,endDate:positionLine.endDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)},fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) end as positionLines\n" +
-            "RETURN  DISTINCT expertise as expertise,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate, appliedFunctions as appliedFunctions,collect(positionLines[0]) as positionLines")
+            "RETURN  DISTINCT expertise as expertise,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.published as published,unitPosition.lastWorkingDate as lastWorkingDate, appliedFunctions as appliedFunctions,collect(positionLines[0]) as positionLines")
     UnitPositionQueryResult getUnitPositionById(Long unitPositionId);
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
