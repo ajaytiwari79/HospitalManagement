@@ -1,5 +1,6 @@
 package com.kairos.service.pay_group_area;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
@@ -173,7 +174,7 @@ public class PayGroupAreaService {
                     } else {
                         LOGGER.info(payGroupAreaDTO.getStartDateMillis() + "to create CURRENT -->" + (new Date(payGroupArea.getStartDateMillis())));
                         if (payGroupAreaDTO.getStartDateMillis().after(new Date(payGroupArea.getStartDateMillis()))) {
-                            Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
+                            Long dateOneDayLessStartDate = DateUtils.minusDays(payGroupAreaDTO.getStartDateMillis(),1).getTime();
                             LOGGER.info(new Date(dateOneDayLessStartDate) + " new Date to update--------------");
                             payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupArea.getId(), payGroupArea.getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
                         } else {
