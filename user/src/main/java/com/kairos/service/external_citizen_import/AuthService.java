@@ -1,6 +1,6 @@
 package com.kairos.service.external_citizen_import;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -32,7 +32,7 @@ public class AuthService {
     private long lastUpdated ;
     private final long oneHourMS = 3100000;
     public void kmdAuth()  {
-        if( DateUtil.getCurrentDate().getTime()-lastUpdated < oneHourMS){
+        if( DateUtils.getCurrentDate().getTime()-lastUpdated < oneHourMS){
             return;
         }
         dokmdAuth();
@@ -64,6 +64,6 @@ public class AuthService {
         JacksonJsonParser jsonParser = new JacksonJsonParser();
         Map<String,Object> parsedData = jsonParser.parseMap(responseEntity);
         AppConstants.KMD_NEXUS_ACCESS_TOKEN = parsedData.get("access_token")+"";
-        lastUpdated = DateUtil.getCurrentDate().getTime();
+        lastUpdated = DateUtils.getCurrentDate().getTime();
     }
 }
