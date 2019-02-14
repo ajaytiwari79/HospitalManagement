@@ -450,15 +450,16 @@ public class PayTableService {
         payTable.setEditable(false);
         payTableByMapper.setHasTempCopy(false);
         payTableGraphRepository.save(payTableByMapper);
+        Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
+        List<PayGroupAreaDTO> existingAmountOfCurrentPayGrade = payGradeGraphRepository.getPayGradeDataByIdAndPayGroupArea(payGradeId, new ArrayList<>(payGroupAreasId));
+        Map<Long, BigDecimal> publishedAmountMap = existingAmountOfCurrentPayGrade.stream().collect(Collectors.toMap(PayGroupAreaDTO::getPayGroupAreaId, PayGroupAreaDTO::getPublishedAmount));
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
             List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
 
             if (payGradeDTO.getPayGradeId().equals(currentPayGrade.getId())) {
                 // user has changed the value in  this pay Grade area of payTable
-                Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
-                List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
-
                 for (PayGroupAreaDTO currentPayGroupArea : payGradeDTO.getPayGroupAreas()) {
                     PayGroupArea payGroupArea = payGroupAreas.stream().filter(payGroupArea1 -> payGroupArea1.getId().equals(currentPayGroupArea.getPayGroupAreaId())).findFirst().get();
                     PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
@@ -477,6 +478,11 @@ public class PayTableService {
             payGradesObjects.add(newPayGrade);
             PayGradeResponse payGradeResponse =
                     new PayGradeResponse(payTableByMapper.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
+            if (currentPayGrade.getId().equals(payGradeId)) {
+                payGradeResponse.getPayGroupAreas().forEach(current -> {
+                    current.setPublishedAmount(publishedAmountMap.get(current.getPayGroupAreaId()));
+                });
+            }
             payGradeResponses.add(payGradeResponse);
         }
         payTableByMapper.setPayGrades(payGradesObjects);
@@ -569,7 +575,7 @@ public class PayTableService {
             }
         }
         Long id = CollectionUtils.isEmpty(payGradeResponses) ? payTable.getId() : payGradeResponses.get(0).getPayTableId();
-        return new PayTableUpdateDTO(id, payTable.getName(),payTable.getPercentageValue());
+        return new PayTableUpdateDTO(id, payTable.getName(), payTable.getPercentageValue());
     }
 
     private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate) {
