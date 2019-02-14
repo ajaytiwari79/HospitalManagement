@@ -33,4 +33,7 @@ public interface MasterAssetRepository extends JpaRepository<MasterAsset,Long>{
     @Modifying
     @Query(value = "update MasterAsset set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
     Integer updateMasterAssetStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
+
+    @Query(value = "Select MA.name from MasterAsset MA where MA.countryId = ?1 and MA.assetType.id = ?2 and MA.deleted = false")
+    List<String> findMasterAssetsLinkedWithAssetType(Long countryId, Long assetTypeId);
 }

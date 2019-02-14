@@ -60,13 +60,13 @@ class AssetTypeController {
 
     }
 
-   /* @ApiOperation("delete AssetType  by id")
-    @DeleteMapping("/asset_type/{assetId}")
-    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable BigInteger assetId) {
+    @ApiOperation("delete AssetType  by id")
+    @DeleteMapping("/asset_type/{assetTypeId}")
+    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable Long assetTypeId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetTypeService.deleteAssetType(countryId,assetId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetTypeService.deleteAssetType(countryId,assetTypeId));
 
-    }*/
+    }
 
     @ApiOperation("update Asset type and Sub Asset ")
     @PutMapping("/asset_type/{assetTypeId}")
