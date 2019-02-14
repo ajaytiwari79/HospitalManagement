@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
@@ -89,7 +90,6 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResponse;
 import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResult;
@@ -322,7 +322,7 @@ public class OrganizationService {
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         if (!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
-            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
         }
         return organization;
     }
@@ -859,7 +859,7 @@ public class OrganizationService {
         unitData.put("organizationTimeSlotList", organizationTimeSlotList.get("timeSlots"));
 
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
+        List<CitizenStatusDTO> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
         unitData.put("clientStatusList", clientStatusList);
         List<Object> localAreaTagsList = new ArrayList<>();
         List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(unitId);

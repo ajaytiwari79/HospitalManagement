@@ -55,18 +55,24 @@ public class StaffFilterService {
     @Inject
     private FilterGroupGraphRepository filterGroupGraphRepository;
     @Inject
+    private
     EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
+    private
     OrganizationService organizationService;
     @Inject
+    private
     EngineerTypeGraphRepository engineerTypeGraphRepository;
     @Inject
+    private
     StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     @Inject
+    private
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
+    private
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -92,26 +98,23 @@ public class StaffFilterService {
         }
         Long countryId = organizationGraphRepository.getCountryId(organization.getId());
         if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
         }
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
-        FiltersAndFavouriteFiltersDTO filtersAndFavouriteFiltersDTO = new FiltersAndFavouriteFiltersDTO(
+        return new FiltersAndFavouriteFiltersDTO(
                 getAllFilters(moduleId, countryId, unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
-        return filtersAndFavouriteFiltersDTO;
     }
 
-    public List<FilterSelectionQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper) {
+    private List<FilterSelectionQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper) {
         List<FilterSelectionQueryResult> queryResults = new ArrayList<>();
 
-        filterData.forEach(filterDetailDTO -> {
-            queryResults.add(objectMapper.convertValue(filterDetailDTO, FilterSelectionQueryResult.class));
-        });
+        filterData.forEach(filterDetailDTO -> queryResults.add(objectMapper.convertValue(filterDetailDTO, FilterSelectionQueryResult.class)));
         return queryResults;
     }
 
-    public List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
+    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
             case EMPLOYMENT_TYPE: {
@@ -140,7 +143,7 @@ public class StaffFilterService {
         return null;
     }
 
-    public FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
+    private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
 
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
         tempFilterDTO.setName(filterType.name());
@@ -149,7 +152,7 @@ public class StaffFilterService {
         return tempFilterDTO;
     }
 
-    public List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
+    private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         if (!Optional.ofNullable(filterGroup).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.feature.notenabled");
@@ -166,7 +169,7 @@ public class StaffFilterService {
         return filterDTOs;
     }
 
-    public List<FavoriteFilterQueryResult> getFavouriteFilters(String moduleId, Long staffId) {
+    private List<FavoriteFilterQueryResult> getFavouriteFilters(String moduleId, Long staffId) {
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, moduleId);
     }
 
@@ -223,9 +226,7 @@ public class StaffFilterService {
         }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterSelection> filters = favouriteFilterDTO.getFiltersData();
-        filters.forEach(filterSelection -> {
-            filterSelection.setId(null);
-        });
+        filters.forEach(filterSelection -> filterSelection.setId(null));
         staffFavouriteFilter.setFiltersData(filters);
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
@@ -245,11 +246,11 @@ public class StaffFilterService {
         return true;
     }
 
-    public List<FilterSelectionQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId) {
+    private List<FilterSelectionQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId) {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    public Map<FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters) {
+    private Map<FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters) {
         Map<FilterType, List<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
@@ -303,7 +304,7 @@ public class StaffFilterService {
                 if(AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)){
                     staffListByRole=staffList;
                 }else if(AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)){
-                    Map staff = staffList.stream().filter(s -> ((Long)s.get("id")).equals(accessGroupQueryResult.getStaffId())).findFirst().get();
+                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().get();
                     staffListByRole.add(staff);
                 }
             }

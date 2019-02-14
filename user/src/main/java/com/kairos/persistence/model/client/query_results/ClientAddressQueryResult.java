@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.client.query_results;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.country.HousingType;
+import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import org.springframework.data.neo4j.annotation.QueryResult;

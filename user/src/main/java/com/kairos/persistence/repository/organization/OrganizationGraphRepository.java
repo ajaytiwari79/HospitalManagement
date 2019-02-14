@@ -54,8 +54,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (o:Organization)-[:HAS_GROUP]->(g:Group) WHERE id(o)={0} RETURN COLLECT({id:id(g),name:g.name}) as groups")
     List<Map<String, Object>> getGroups(long id);
 
-    @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_GROUP + "]->(g:Group {isEnable:true}) WHERE id(o)={0} AND id(g) = {1} RETURN g")
+    @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_GROUP + "]->(g:Group {isEnabled:true}) WHERE id(o)={0} AND id(g) = {1} RETURN g")
     Group getGroups(Long organizationId, Long groupId);
+
+    @Query("MATCH(organization:Organization)-[:" + HAS_GROUP + "]->(group:Group {isEnabled:true}) WHERE id(organization)={0} AND id(group)<>{2} AND group.name =~{1}  " +
+            " WITH count(group) as totalCount " +
+            " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
+    Boolean groupExistInOrganizationByName(Long organizationId, String name, Long currentGroupId);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
             "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) RETURN org limit 1")

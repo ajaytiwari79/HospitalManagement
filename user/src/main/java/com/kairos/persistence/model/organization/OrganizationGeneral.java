@@ -3,6 +3,7 @@ package com.kairos.persistence.model.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -12,46 +13,34 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationGeneral {
 
-    @NotEmpty(message = "error.Organization.formalname.notnull") @NotNull(message = "error.Organization.formalname.notnull")
+    @NotBlank(message = "error.Organization.formalname.notnull")
     private String name;
-   // @NotEmpty(message = "error.Organization.shortname.notnull") @NotNull(message = "error.Organization.shortname.notnull")
     private String shortName;
     private String eanNumber;
     private String costCenterCode;
     private String costCenterName;
-    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
     @NotNull(message = "error.OrganizationType.name.notEmpty")
     private Long organizationTypeId;
     @NotNull(message = "error.OrganizationType.name.notEmpty")
     private List<Long> organizationSubTypeId;
-  //  @NotNull(message = "error.Organization.businesstype.notnull")
     private List<Long> businessTypeId;
     private String websiteUrl;
-   // @NotNull(message = "error.Organization.industrytype.notnull")
     private Long industryTypeId;
-  //  @NotNull(message = "error.Organization.noofemploy.notnull")
     private Long employeeLimitId;
-   // @NotNull(message = "error.Organization.ownershiptype.notnull")
     private Long ownershipTypeId;
- //   @NotNull(message = "error.Organization.kairosstatus.notnull")
     private Long kairosStatusId;
     private String cvrNumber;
     private String pNumber;
-   // @NotNull(message = "error.Organization.vattype.notnull")
     private Long vatTypeId;
-   // @NotNull(message = "error.Organization.contract.notnull")
     private Long contractTypeId;
     private boolean isKairosHub;
     private String clientSince;
     private String municipality;
     private Long municipalityId;
-
     private String externalId;
     private String kmdExternalId;
-
     private int dayShiftTimeDeduction = 4; //in percentage
-
     private int nightShiftTimeDeduction = 7; //in percentage
 
     public void setKmdExternalId(String kmdExternalId) {

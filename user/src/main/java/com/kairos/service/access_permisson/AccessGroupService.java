@@ -41,7 +41,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -392,8 +391,8 @@ public class AccessGroupService {
 
             }
         }
-        long creationDate = DateUtil.getCurrentDate().getTime();
-        long lastModificationDate = DateUtil.getCurrentDate().getTime();
+        long creationDate = DateUtils.getCurrentDate().getTime();
+        long lastModificationDate = DateUtils.getCurrentDate().getTime();
         Boolean read = isSelected;
         Boolean write = isSelected;
 

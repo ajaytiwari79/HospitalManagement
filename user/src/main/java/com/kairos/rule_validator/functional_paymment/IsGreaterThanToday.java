@@ -1,9 +1,9 @@
 package com.kairos.rule_validator.functional_paymment;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DateUtil;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class IsGreaterThanToday extends AbstractSpecification<FunctionalPaymentD
 
     @Override
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
-        LocalDate currentDate = DateUtil.getCurrentLocalDate();
+        LocalDate currentDate = DateUtils.getCurrentLocalDate();
         if (currentDate.isAfter(functionalPaymentDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
         }

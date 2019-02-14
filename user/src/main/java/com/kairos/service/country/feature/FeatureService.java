@@ -12,7 +12,6 @@ import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.feature.FeatureDTO;
 import com.kairos.dto.user.country.feature.VehicleFeaturesDTO;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +54,7 @@ public class FeatureService{
 
         }
         logger.info("featureDTO : "+featureDTO.getName());
-        if( featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
+        if( featureGraphRepository.isFeatureExistsWithSameName("(?i)" +featureDTO.getName(), countryId, false) ){
             exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName());
 
         }
@@ -74,7 +73,7 @@ public class FeatureService{
 
         }
 
-        if( ! ( feature.getName().equalsIgnoreCase(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
+        if( ! ( feature.getName().equals(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName("(?i)" +featureDTO.getName(), countryId, false) ){
             exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName() );
 
         }

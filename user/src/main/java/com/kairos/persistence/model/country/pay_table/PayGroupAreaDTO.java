@@ -17,10 +17,19 @@ public class PayGroupAreaDTO {
     @NotNull(message = "Pay Grade value can not be null")
     private BigDecimal payGroupAreaAmount;
     private Long id;
+    //this is for already published amount in parent payTabe
+    private BigDecimal publishedAmount;
 
 
     public PayGroupAreaDTO() {
         //default cons
+    }
+
+    public PayGroupAreaDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id) {
+        this.payGroupAreaId = payGroupAreaId;
+        this.payGroupAreaAmount = payGroupAreaAmount;
+        this.id = id;
+
     }
 
     public Long getPayGroupAreaId() {
@@ -47,12 +56,12 @@ public class PayGroupAreaDTO {
         this.id = id;
     }
 
+    public BigDecimal getPublishedAmount() {
+        return publishedAmount;
+    }
 
-    public PayGroupAreaDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id) {
-        this.payGroupAreaId = payGroupAreaId;
-        this.payGroupAreaAmount = payGroupAreaAmount;
-        this.id = id;
-
+    public void setPublishedAmount(BigDecimal publishedAmount) {
+        this.publishedAmount = publishedAmount;
     }
 
     @Override

@@ -25,7 +25,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
@@ -79,7 +79,6 @@ import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -227,7 +226,7 @@ public class StaffService {
             return null;
         }
         createDirectory(IMAGES_PATH);
-        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
@@ -332,7 +331,7 @@ public class StaffService {
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
         // Set if user is female and pregnant
         User user = userGraphRepository.getUserByStaffId(staffId);
@@ -369,7 +368,7 @@ public class StaffService {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
         for (Expertise currentExpertise : expertise) {
-            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(staff, currentExpertise, 0, DateUtil.getCurrentDate());
+            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(staff, currentExpertise, 0, DateUtils.getCurrentDate());
             staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
         staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
@@ -545,7 +544,7 @@ public class StaffService {
                     staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
                     staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
+                        createEmployment(parent, unit, staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
                     }
                 }
             }
@@ -810,7 +809,7 @@ public class StaffService {
         staff.setUser(user);
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
+        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
         StaffDTO staffDTO = new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
         return staffDTO;
@@ -996,7 +995,7 @@ public class StaffService {
         staff.setUser(user);
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
-        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+        employment.setStartDateMillis(DateUtils.getCurrentDateMillis());
         organization.getEmployments().add(employment);
         organizationGraphRepository.save(organization);
         if (accessGroupId != null) {

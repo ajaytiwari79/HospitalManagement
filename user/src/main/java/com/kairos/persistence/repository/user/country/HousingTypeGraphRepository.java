@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.country.HousingType;
+import com.kairos.persistence.model.country.default_data.BusinessTypeDTO;
+import com.kairos.persistence.model.country.default_data.HousingType;
+import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -8,14 +10,20 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+
 /**
  * Created by oodles on 9/1/17.
  */
 @Repository
 public interface HousingTypeGraphRepository extends Neo4jBaseRepository<HousingType,Long>{
 
-    List<HousingType> findAll();
+    @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(housingType:HousingType {isEnabled:true}) where id(country)={0} " +
+            "RETURN id(housingType) as id, housingType.name as name, housingType.description as description ORDER BY housingType.creationDate DESC")
+    List<HousingTypeDTO> findHousingTypeByCountry(long countryId);
 
-    @Query("MATCH (c:Country)-[:BELONGS_TO]-(ht:HousingType {isEnabled:true}) where id(c)={0} return {id:id(ht), name:ht.name, description:ht.description } as result")
-    List<Map<String,Object>> findHousingTypeByCountry(long countryId);
+    @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(housingType:HousingType {isEnabled:true}) WHERE id(country)={0} AND id(housingType)<>{2} AND housingType.name =~{1}  " +
+            " WITH count(housingType) as totalCount " +
+            " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
+    Boolean housingTypeExistInCountryByName(Long countryId, String name, Long currentHousingTypeId);
 }

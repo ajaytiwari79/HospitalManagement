@@ -86,11 +86,11 @@ public class ClauseService{
 
     private <E extends ClauseDTO> Clause buildOrUpdateClause(Long referenceId, boolean isUnitId, E clauseDto, Clause clause) {
 
-        List<ClauseTag> clauseTags;
+        List<ClauseTag> clauseTags = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(clauseDto.getTags())) {
             clauseTags = clauseTagService.saveClauseTagList(referenceId, isUnitId, clauseDto.getTags());
         } else {
-            clauseTags = Collections.singletonList(clauseTagRepository.findDefaultTag());
+            clauseTags.add(clauseTagRepository.findDefaultTag());
         }
         List<TemplateType> templateTypes = templateTypeRepository.findAllById(clauseDto.getTemplateTypes());
         if (Optional.ofNullable(clause).isPresent()) {
@@ -100,7 +100,7 @@ public class ClauseService{
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
                 clause.setTitle(masterClauseDTO.getTitle());
                 clause.setDescription(masterClauseDTO.getDescription());
-                clause = getMetadataOfMasterClause(masterClauseDTO, clause);
+                getMetadataOfMasterClause(masterClauseDTO, clause);
                 clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
                 clause.setTemplateTypes(templateTypes);
             }
@@ -149,9 +149,12 @@ public class ClauseService{
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
-        clause = clauseRepository.getOne(clauseId);
-        clause = buildOrUpdateClause(referenceId, isUnitId, clauseDto, clause);
-        clauseRepository.save(clause);
+        Optional<Clause> existingClause = clauseRepository.findById(clauseId);
+        if(existingClause.isPresent()) {
+            clause = existingClause.get();
+            buildOrUpdateClause(referenceId, isUnitId, clauseDto, clause);
+            clauseRepository.save(clause);
+        }
         return clauseDto;
 
     }

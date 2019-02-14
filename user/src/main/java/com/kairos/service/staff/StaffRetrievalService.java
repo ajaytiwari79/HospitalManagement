@@ -28,7 +28,8 @@ import com.kairos.persistence.model.access_permission.query_result.AccessGroupSt
 import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.default_data.DayType;
-import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerTypeDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -71,7 +72,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -166,7 +166,7 @@ public class StaffRetrievalService {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
         List<Language> languages;
-        List<EngineerType> engineerTypes;
+        List<EngineerTypeDTO> engineerTypes;
         if (countryId != null) {
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
             languages = languageGraphRepository.getLanguageByCountryId(countryId);
@@ -315,7 +315,7 @@ public class StaffRetrievalService {
         List<StaffPersonalDetailDTO> staff = null;
         Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerType> engineerTypes = null;
+        List<EngineerTypeDTO> engineerTypes = null;
         Map<String, Object> map = new HashMap();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 //            staff = getStaffWithBasicInfo(id, allStaffRequired);
@@ -455,7 +455,7 @@ public class StaffRetrievalService {
         List<StaffPersonalDetailDTO> staff = null;
         Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerType> engineerTypes = null;
+        List<EngineerTypeDTO> engineerTypes = null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             staff = getStaffWithBasicInfo(id, allStaffRequired);
             roles = accessGroupService.getAccessGroups(id);
@@ -742,7 +742,7 @@ public class StaffRetrievalService {
         staffExpertiseQueryResults.forEach(staffExpertiseQueryResult -> {
             int maxExperience = staffExpertiseQueryResult.getExpertiseWithExperience().stream().max(Comparator.comparingInt(StaffExpertiseQueryResult::getRelevantExperienceInMonths)).get().getRelevantExperienceInMonths();
             staffExpertiseQueryResult.getExpertiseWithExperience().forEach(expertiseQueryResult -> {
-                expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
+                expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtils.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
                 expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
                 expertiseQueryResult.setSeniorityLevel(calculateApplicableSeniorityLevel(expertiseQueryResult.getSeniorityLevels(), maxExperience));
                 if (expertiseQueryResult.isUnitPositionExists()) {

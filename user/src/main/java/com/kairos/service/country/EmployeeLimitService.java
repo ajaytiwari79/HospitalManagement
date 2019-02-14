@@ -1,9 +1,12 @@
 package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.EmployeeLimit;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.EmployeeLimit;
+import com.kairos.persistence.model.country.default_data.EmployeeLimitDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmployeeLimitGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,45 +24,47 @@ public class EmployeeLimitService {
 
     @Inject
     private EmployeeLimitGraphRepository employeeLimitGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createEmployeeLimit(long countryId, EmployeeLimit employeeLimit){
+    public EmployeeLimitDTO createEmployeeLimit(long countryId, EmployeeLimitDTO employeeLimitDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        EmployeeLimit employeeLimit = null;
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean employeeLimitExistInCountryByName = employeeLimitGraphRepository.employeeLimitExistInCountryByName(countryId, "(?i)" + employeeLimitDTO.getName(), -1L);
+            if (employeeLimitExistInCountryByName) {
+                exceptionService.duplicateDataException("error.EmployeeLimit.name.exist");
+            }
+            employeeLimit = new EmployeeLimit(employeeLimitDTO.getName(), employeeLimitDTO.getDescription(), employeeLimitDTO.getMinimum(), employeeLimitDTO.getMaximum());
             employeeLimit.setCountry(country);
             employeeLimitGraphRepository.save(employeeLimit);
-            return employeeLimit.retrieveDetails();
         }
-        return null;
+        employeeLimitDTO.setId(employeeLimit.getId());
+        return employeeLimitDTO;
     }
 
-    public List<Object> getEmployeeLimitByCountryId(long countryId){
-        List<Map<String,Object>>  data = employeeLimitGraphRepository.findContractTypeByCountry(countryId);
-        List<Object> response = new ArrayList<>();;
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o =  map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<EmployeeLimitDTO> getEmployeeLimitByCountryId(long countryId){
+        return employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
     }
 
-    public Map<String, Object> updateEmployeeLimit(EmployeeLimit employeeLimit){
-        EmployeeLimit currentEmployeeLimit = employeeLimitGraphRepository.findOne(employeeLimit.getId());
-        if (currentEmployeeLimit!=null){
-            currentEmployeeLimit.setName(employeeLimit.getName());
-            currentEmployeeLimit.setDescription(employeeLimit.getDescription());
-            currentEmployeeLimit.setMinimum(employeeLimit.getMinimum());
-            currentEmployeeLimit.setMaximum(employeeLimit.getMaximum());
-
+    public EmployeeLimitDTO updateEmployeeLimit(long countryId, EmployeeLimitDTO employeeLimitDTO){
+        Boolean employeeLimitExistInCountryByName = employeeLimitGraphRepository.employeeLimitExistInCountryByName(countryId, "(?i)" + employeeLimitDTO.getName(), employeeLimitDTO.getId());
+        if (employeeLimitExistInCountryByName) {
+            exceptionService.duplicateDataException("error.EmployeeLimit.name.exist");
+        }
+        EmployeeLimit currentEmployeeLimit = employeeLimitGraphRepository.findOne(employeeLimitDTO.getId());
+        if (currentEmployeeLimit != null) {
+            currentEmployeeLimit.setName(employeeLimitDTO.getName());
+            currentEmployeeLimit.setDescription(employeeLimitDTO.getDescription());
+            currentEmployeeLimit.setMinimum(employeeLimitDTO.getMinimum());
+            currentEmployeeLimit.setMaximum(employeeLimitDTO.getMaximum());
             employeeLimitGraphRepository.save(currentEmployeeLimit);
-            return currentEmployeeLimit.retrieveDetails();
         }
-        return null;
+        return employeeLimitDTO;
     }
 
     public boolean deleteEmployeeLimit(long contractTypeId){
@@ -67,8 +72,9 @@ public class EmployeeLimitService {
         if (employeeLimit !=null){
             employeeLimit.setEnabled(false);
             employeeLimitGraphRepository.save(employeeLimit);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.EmployeeLimit.notfound");
         }
-        return false;
+        return true;
     }
 }

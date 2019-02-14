@@ -6,6 +6,8 @@ import com.kairos.dto.user.country.pay_table.FutureDate;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Objects;
+
 
 /**
  * Created by prabjot on 21/12/17.
@@ -56,7 +58,7 @@ public class PayGroupAreaDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getDescription() {
@@ -115,4 +117,5 @@ public class PayGroupAreaDTO {
         this.endDateMillis = endDateMillis;
         this.levelId = levelId;
     }
+
 }

@@ -2,6 +2,7 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
@@ -49,6 +50,11 @@ public class StaffUnitPositionDetails {
     private BigDecimal hourlyCost;
     private Long functionId;
     private List<UnitPositionLinesDTO> positionLines;
+    private Boolean history;
+    private Boolean editable;
+    private boolean published;
+    private CTAResponseDTO costTimeAgreement;
+
 
     public StaffUnitPositionDetails() {
 
@@ -268,5 +274,37 @@ public class StaffUnitPositionDetails {
 
     public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
         this.positionLines = positionLines;
+    }
+
+    public CTAResponseDTO getCostTimeAgreement() {
+        return costTimeAgreement;
+    }
+
+    public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
+        this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public Boolean getHistory() {
+        return history;
+    }
+
+    public void setHistory(Boolean history) {
+        this.history = history;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
     }
 }

@@ -1,5 +1,7 @@
-package com.kairos.persistence.model.user.payment_type;
+package com.kairos.persistence.model.country.default_data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
@@ -9,23 +11,35 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 
 /**
- * Created by prabjot on 9/1/17.
+ * Created by oodles on 9/1/17.
  */
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class PaymentType extends UserBaseEntity {
+public class HousingType extends UserBaseEntity {
 
-
-    @NotBlank(message = "error.PaymentType.name.notEmpty")
+    @NotBlank(message = "error.HousingType.name.notEmpty")
     private String name;
     private String description;
-    private boolean isEnabled = true;
     @Relationship(type = BELONGS_TO)
-    Country country;
+    private Country country;
+    private boolean isEnabled = true;
+
+    public HousingType() {
+    }
+
+    public HousingType(@NotBlank(message = "error.HousingType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getDescription() {
         return description;
@@ -39,18 +53,17 @@ public class PaymentType extends UserBaseEntity {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = StringUtils.trim(name);
+    }
+
+
     public Country getCountry() {
         return country;
     }
 
     public void setCountry(Country country) {
-
         this.country = country;
-    }
-
-    public void setName(String name) {
-
-        this.name = StringUtils.trim(name);
     }
 
     public boolean isEnabled() {
