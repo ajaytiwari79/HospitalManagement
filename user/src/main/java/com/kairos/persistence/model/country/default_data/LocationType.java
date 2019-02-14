@@ -1,8 +1,9 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -22,15 +23,22 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class EngineerType extends UserBaseEntity {
+public class LocationType extends UserBaseEntity {
 
-    @NotBlank(message = "error.EngineerType.name.notEmpty")
+    @NotBlank(message = "error.LocationType.name.notEmpty")
     private String name;
     private String description;
-    private String visitourCode;
     @Relationship(type = BELONGS_TO)
     private Country country;
     private boolean isEnabled = true;
+
+    public LocationType() {
+    }
+
+    public LocationType(@NotBlank(message = "error.LocationType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -63,28 +71,6 @@ public class EngineerType extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
-    }
-
-    public String getVisitourCode() {
-        return visitourCode;
-    }
-
-    public void setVisitourCode(String visitourCode) {
-        this.visitourCode = StringUtils.trim(visitourCode);
-    }
-
-    public EngineerType() {
-    }
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("visitourCode",this.visitourCode);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
     }
 
 }

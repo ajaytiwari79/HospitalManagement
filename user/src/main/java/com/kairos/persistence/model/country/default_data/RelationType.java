@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,6 +19,14 @@ public class RelationType extends UserBaseEntity {
     private String name;
     private String description;
     private boolean enabled = true;
+
+    public RelationType() {
+    }
+
+    public RelationType(@NotBlank(message = "error.relationType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getName() {
         return name;

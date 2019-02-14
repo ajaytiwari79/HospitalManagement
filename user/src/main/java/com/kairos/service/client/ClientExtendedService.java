@@ -8,7 +8,7 @@ import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import com.kairos.persistence.model.client.relationships.ClientNextToKinRelationship;
 import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
-import com.kairos.persistence.model.country.RelationType;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;

@@ -1,8 +1,9 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -15,7 +16,6 @@ import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
-
 /**
  * Created by oodles on 9/1/17.
  */
@@ -23,15 +23,22 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class HousingType extends UserBaseEntity {
+public class KairosStatus extends UserBaseEntity {
 
-    @NotBlank(message = "error.HousingType.name.notEmpty")
+    @NotBlank(message = "error.KairosStatus.name.notEmpty")
     private String name;
     private String description;
     @Relationship(type = BELONGS_TO)
     private Country country;
     private boolean isEnabled = true;
 
+    public KairosStatus() {
+    }
+
+    public KairosStatus(@NotBlank(message = "error.KairosStatus.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getDescription() {
         return description;
@@ -66,16 +73,4 @@ public class HousingType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public HousingType() {
-    }
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
-    }
 }
