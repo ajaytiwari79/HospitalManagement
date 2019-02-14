@@ -79,7 +79,7 @@ class AssessmentController {
 
     @ApiOperation(value = "save answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable Long assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerDTO> assessmentAnswerValueObjects , @RequestParam AssessmentStatus status) {
+    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable Long assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerDTO> assessmentAnswerValueObjects , @RequestParam(required = true) AssessmentStatus status) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentAnswerByUnitIdAndAssessmentId(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
     }
 
@@ -95,7 +95,7 @@ class AssessmentController {
     public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable Long assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
         if (!Optional.ofNullable(assessmentStatus).isPresent())
         {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Assessment Status "+assessmentStatus+" is invalid");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "please enter valid param");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.updateAssessmentStatus(unitId, assessmentId,assessmentStatus));
     }

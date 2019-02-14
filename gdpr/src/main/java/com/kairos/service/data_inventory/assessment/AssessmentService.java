@@ -113,7 +113,7 @@ public class AssessmentService {
      */
     public AssessmentDTO launchAssessmentForAsset(Long unitId, Long assetId, AssessmentDTO assessmentDTO) {
 
-        if(!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()){
+        if (!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()) {
             exceptionService.illegalArgumentException("message.assessment.relativeDeadline.require");
         }
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, false);
@@ -253,7 +253,7 @@ public class AssessmentService {
             questionnaireTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, asset.getAssetType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
         }
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            questionnaireTemplate = questionnaireTemplateRepository.findDefaultTemplateByUnitIdAndTemplateTypeAndStatus(unitId,QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
+            questionnaireTemplate = questionnaireTemplateRepository.findDefaultTemplateByUnitIdAndTemplateTypeAndStatus(unitId, QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
         }
 
         return questionnaireTemplate;
@@ -275,12 +275,12 @@ public class AssessmentService {
             if (Optional.ofNullable(asset.getSubAssetType()).isPresent())
                 risks.addAll(asset.getSubAssetType().getRisks());
             //todo change method
-            questionnaireTemplate = Optional.ofNullable(asset.getSubAssetType()).isPresent() ? questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED)
-                    : questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, asset.getAssetType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED);
+            questionnaireTemplate = Optional.ofNullable(asset.getSubAssetType()).isPresent() ? questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED)
+                    : questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, asset.getAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED);
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
             ProcessingActivity processingActivity = (ProcessingActivity) entity;
             risks.addAll(processingActivity.getRisks());
-            questionnaireTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndRiskAssociatedEntityAndTemplateTypeAndStatus(unitId, QuestionnaireTemplateType.RISK,QuestionnaireTemplateType.PROCESSING_ACTIVITY,QuestionnaireTemplateStatus.PUBLISHED);
+            questionnaireTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndRiskAssociatedEntityAndTemplateTypeAndStatus(unitId, QuestionnaireTemplateType.RISK, QuestionnaireTemplateType.PROCESSING_ACTIVITY, QuestionnaireTemplateStatus.PUBLISHED);
         }
         if (CollectionUtils.isEmpty(risks)) {
             exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
@@ -504,17 +504,23 @@ public class AssessmentService {
 
 
     public List<AssessmentAnswerDTO> saveAssessmentAnswerByUnitIdAndAssessmentId(Long unitId, Long assessmentId, List<AssessmentAnswerDTO> assessmentAnswerValueObjects, AssessmentStatus status) {
+
+
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
-        UserVO currentUser = new UserVO(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getUserName(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFirstName(), UserContext.getUserDetails().getLastName());
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
-        } else if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
-            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
-        } else if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
+        } else if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
+        } else if ((AssessmentStatus.NEW.equals(assessment.getAssessmentStatus()) && AssessmentStatus.COMPLETED.equals(status)) || AssessmentStatus.NEW.equals(status)) {
+            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS.value);
+        }
+
+        UserVO currentUser = new UserVO(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getUserName(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFirstName(), UserContext.getUserDetails().getLastName());
+        if ((AssessmentStatus.IN_PROGRESS.equals(status) && AssessmentStatus.IN_PROGRESS.equals(assessment.getAssessmentStatus())) && !currentUser.equals(assessment.getAssessmentLastAssistBy())) {
+            exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
-        if (Optional.ofNullable(status).isPresent() && AssessmentStatus.COMPLETED.equals(status)) {
+        if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
@@ -578,7 +584,6 @@ public class AssessmentService {
                 }
                 break;
             case COMPLETED:
-
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
                 } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
@@ -621,7 +626,6 @@ public class AssessmentService {
                     saveAssessmentAnswerAsProcessingActivityValueOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
                 } else {
                     exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
-
                 }
             });
             processingActivityRepository.save(processingActivity);
@@ -664,8 +668,8 @@ public class AssessmentService {
 
 
     /**
-     * @param assetAttributeName  asset field
-     * @param asset               asset to which value Assessment answer were filed by assignee
+     * @param assetAttributeName asset field
+     * @param asset              asset to which value Assessment answer were filed by assignee
      */
     public void saveAssessmentAnswerAsAssetValueOnCompletionOfAssessment(AssetAttributeName assetAttributeName, SelectedChoice selectedChoice, Asset asset) {
         switch (assetAttributeName) {
@@ -682,7 +686,7 @@ public class AssessmentService {
                 Optional.ofNullable(((SingleSelectChoice) selectedChoice).getSelectedChoice()).ifPresent(metaDataVO -> asset.setHostingType(hostingTypeRepository.findByIdAndDeletedFalse(metaDataVO.getMetadataId())));
                 break;
             case DATA_DISPOSAL:
-                Optional.ofNullable(((SingleSelectChoice) selectedChoice).getSelectedChoice()).ifPresent(metaDataVO ->asset.setDataDisposal(dataDisposalRepository.findByIdAndDeletedFalse(metaDataVO.getMetadataId())));
+                Optional.ofNullable(((SingleSelectChoice) selectedChoice).getSelectedChoice()).ifPresent(metaDataVO -> asset.setDataDisposal(dataDisposalRepository.findByIdAndDeletedFalse(metaDataVO.getMetadataId())));
                 break;
             case HOSTING_PROVIDER:
                 Optional.ofNullable(((SingleSelectChoice) selectedChoice).getSelectedChoice()).ifPresent(metaDataVO -> asset.setHostingProvider(hostingProviderRepository.findByIdAndDeletedFalse(metaDataVO.getMetadataId())));
@@ -719,7 +723,7 @@ public class AssessmentService {
                 processingActivity.setDescription(((TextChoice) selectedChoice).getTextChoice().trim());
                 break;
             case RESPONSIBILITY_TYPE:
-                Optional.ofNullable(((SingleSelectChoice) selectedChoice).getSelectedChoice()).ifPresent(metaDataVO ->processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndDeletedFalse(metaDataVO.getMetadataId())));
+                Optional.ofNullable(((SingleSelectChoice) selectedChoice).getSelectedChoice()).ifPresent(metaDataVO -> processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndDeletedFalse(metaDataVO.getMetadataId())));
                 break;
             case ACCESSOR_PARTY:
                 processingActivity.setAccessorParties(accessorPartyRepository.findAllByIds(((MultipleSelectChoice) selectedChoice).getSelectedChoice().stream().map(MetaDataVO::getMetadataId).collect(Collectors.toList())));
