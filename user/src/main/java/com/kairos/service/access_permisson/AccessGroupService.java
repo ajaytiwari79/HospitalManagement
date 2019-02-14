@@ -280,7 +280,7 @@ public class AccessGroupService {
         if (!unit.isParentOrganization()) {
             unit = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        return accessGroupRepository.getAccessGroupsForUnit(unit.getId());
+        return accessGroupRepository.getOrganizationAccessGroupByRole(unit.getId(), AccessGroupRole.MANAGEMENT.toString());
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
@@ -892,6 +892,9 @@ public class AccessGroupService {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
         } else {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+            if(accessGroupQueryResult==null){
+                exceptionService.actionNotPermittedException("message.staff.invalid.unit");
+            }
             String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
             boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
             boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
