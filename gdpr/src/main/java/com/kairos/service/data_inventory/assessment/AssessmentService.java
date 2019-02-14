@@ -35,7 +35,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
-import com.kairos.response.dto.common.MetaDataResponseDTO;
+import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
@@ -457,19 +457,19 @@ public class AssessmentService {
 
         switch (assetAttributeName) {
             case HOSTING_PROVIDER:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingProviderRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingProviderRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case HOSTING_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeRepository.getAllAssetTypesByOrganization(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeRepository.getAllAssetTypesByOrganization(unitId), MetaDataCommonResponseDTO.class);
             case STORAGE_FORMAT:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(dataDisposalRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(dataDisposalRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case TECHNICAL_SECURITY_MEASURES:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(technicalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(technicalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ORGANIZATION_SECURITY_MEASURES:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             default:
                 return null;
         }
@@ -483,17 +483,17 @@ public class AssessmentService {
 
         switch (processingActivityAttributeName) {
             case RESPONSIBILITY_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(responsibilityTypeRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(responsibilityTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case PROCESSING_PURPOSES:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(processingPurposeRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(processingPurposeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_SOURCES:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(dataSourceRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(dataSourceRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case TRANSFER_METHOD:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(transferMethodRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(transferMethodRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ACCESSOR_PARTY:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(accessorPartyRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(accessorPartyRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case PROCESSING_LEGAL_BASIS:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(processingLegalBasisRepository.findAllByOrganizationId(unitId), MetaDataResponseDTO.class);
+                return ObjectMapperUtils.copyPropertiesOfListByMapper(processingLegalBasisRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             default:
                 return null;
         }
