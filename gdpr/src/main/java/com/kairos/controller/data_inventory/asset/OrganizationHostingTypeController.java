@@ -25,7 +25,7 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class OrganizationHostingTypeController {
+class OrganizationHostingTypeController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingTypeController.class);

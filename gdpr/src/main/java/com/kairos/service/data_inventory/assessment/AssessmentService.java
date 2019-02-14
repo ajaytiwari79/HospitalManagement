@@ -102,7 +102,7 @@ public class AssessmentService {
     private AssetTypeRepository assetTypeRepository;
 
 
-    private static List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
+    private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
 
 
     /**
@@ -662,6 +662,10 @@ public class AssessmentService {
     }
 
 
+    /**
+     * @param assetAttributeName  asset field
+     * @param asset               asset to which value Assessment answer were filed by assignee
+     */
     public void saveAssessmentAnswerAsAssetValueOnCompletionOfAssessment(AssetAttributeName assetAttributeName, SelectedChoice selectedChoice, Asset asset) {
         switch (assetAttributeName) {
             case NAME:

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProcessingActivityRiskResponseDTO {
+class ProcessingActivityRiskResponseDTO {
 
     private BigInteger id;
     private String name;

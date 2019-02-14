@@ -103,7 +103,7 @@ return  new FilterAndFavouriteFilterDTO();
     }
 
 
-    public FilterResponseWithData getFilterDataByModuleName(Long countryId,  String moduleName, FilterSelectionDTO filterSelectionDto) {
+    private FilterResponseWithData getFilterDataByModuleName(Long countryId, String moduleName, FilterSelectionDTO filterSelectionDto) {
 
         switch (moduleName) {
             //TODO

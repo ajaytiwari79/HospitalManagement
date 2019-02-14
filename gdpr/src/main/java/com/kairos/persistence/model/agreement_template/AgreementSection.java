@@ -75,7 +75,7 @@ public class AgreementSection extends BaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    public List<ClauseCkEditorVO> getClauses() {
+    private List<ClauseCkEditorVO> getClauses() {
         return clauses;
     }
 
@@ -97,14 +97,10 @@ public class AgreementSection extends BaseEntity {
     @Override
     public void delete() {
         super.delete();
-        this.getClauses().forEach( clause -> {
-            clause.setDeleted(false);
-        });
+        this.getClauses().forEach( clause -> clause.setDeleted(false));
         this.agreementSubSections.forEach(subSection -> {
             subSection.delete();
-            subSection.getClauses().forEach( subSectionClause -> {
-                subSectionClause.setDeleted(false);
-            });
+            subSection.getClauses().forEach( subSectionClause -> subSectionClause.setDeleted(false));
         });
     }
 }

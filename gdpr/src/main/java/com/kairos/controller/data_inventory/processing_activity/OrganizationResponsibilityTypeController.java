@@ -23,7 +23,7 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class OrganizationResponsibilityTypeController {
+class OrganizationResponsibilityTypeController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationResponsibilityTypeController.class);

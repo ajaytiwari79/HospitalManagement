@@ -248,11 +248,10 @@ public class AssetService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
 
-        AssetResponseDTO assetResponseDTO = prepareAssetResponseData(asset, false);
         /*if (!Optional.ofNullable(asset.getProcessingActivities().get(0).getId()).isPresent()) {
             asset.getProcessingActivities().clear();
         }*/
-        return assetResponseDTO;
+        return prepareAssetResponseData(asset, false);
     }
 
 
@@ -292,9 +291,7 @@ public class AssetService {
     public List<AssetResponseDTO> getAllAssetByUnitId(Long unitId) {
         List<AssetResponseDTO> assetResponseDTOS = new ArrayList<>();
         List<Asset> assets = assetRepository.findAllByOrganizationId(unitId);
-        assets.forEach(asset -> {
-            assetResponseDTOS.add(prepareAssetResponseData(asset, false));
-        });
+        assets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, false)));
         return assetResponseDTOS;
     }
 
@@ -318,9 +315,7 @@ public class AssetService {
     public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
         List<Asset> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);
         List<AssetResponseDTO> assetResponseDTOS = new ArrayList<>();
-        activeAssets.forEach(asset -> {
-            assetResponseDTOS.add(prepareAssetResponseData(asset, true));
-        });
+        activeAssets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, true)));
         return assetResponseDTOS;
     }
 

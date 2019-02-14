@@ -292,8 +292,8 @@ public class PolicyAgreementTemplateService{
     }
 
 
-    /**
-     * @param referenceId
+    /*
+      @param referenceId
      * @param agreementTemplateClauseUpdateDTO - agreement template ids , clause previous id and new clause id
      * @Description method update agreement template section containing previous clause with new clause
      */

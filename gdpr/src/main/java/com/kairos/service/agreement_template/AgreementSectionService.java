@@ -89,6 +89,7 @@ public class AgreementSectionService{
         return agreementTemplateSectionResponseDTO;
     }
 
+    @SuppressWarnings("unchecked")
     private List<ClauseBasicDTO> findNewClauses(List<AgreementSectionDTO> sectionDTOList){
          List<ClauseBasicDTO> list= new ArrayList();
         sectionDTOList.forEach( section -> {
@@ -101,9 +102,7 @@ public class AgreementSectionService{
 
     private void mapClauseIdToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList, Map<UUID,Long > clauseData){
         sectionDTOList.forEach( section -> {
-            section.getClauses().forEach( clause -> {
-                clause.setId(clauseData.get(clause.getTempClauseId()));
-            });
+            section.getClauses().forEach( clause -> clause.setId(clauseData.get(clause.getTempClauseId())));
             mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(),clauseData);
         });
     }
@@ -114,9 +113,7 @@ public class AgreementSectionService{
         List<Clause> clauses = ObjectMapperUtils.copyPropertiesOfListByMapper(newClauses, Clause.class);
         clauses = clauseRepository.saveAll(clauses);
         Map<UUID,Long > clauseData = new HashMap<>();
-        clauses.forEach(clause -> {
-            clauseData.put(clause.getTempClauseId(), clause.getId());
-        });
+        clauses.forEach(clause -> clauseData.put(clause.getTempClauseId(), clause.getId()));
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSection.class);
     }

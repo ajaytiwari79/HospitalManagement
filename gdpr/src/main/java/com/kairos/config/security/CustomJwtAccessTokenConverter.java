@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
+class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
     private static final Logger log = LoggerFactory.getLogger(CustomJwtAccessTokenConverter.class);
 
     private static final String USER_DETAILS_KEY = "details";

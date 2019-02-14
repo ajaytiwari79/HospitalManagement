@@ -28,7 +28,7 @@ import java.util.*;
 public class QuestionnaireTemplateService {
 
 
-    private Logger LOGGER = LoggerFactory.getLogger(QuestionnaireTemplateService.class);
+    private final Logger  LOGGER = LoggerFactory.getLogger(QuestionnaireTemplateService.class);
 
     @Inject
     private ExceptionService exceptionService;
@@ -315,8 +315,8 @@ public class QuestionnaireTemplateService {
         questionnaireTemplateRepository.save(questionnaireTemplate);
         return true;
     }
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param questionnaireTemplateId
      * @return method return questionnaire template with sections and questions
      * @description we get  section[ {} ] as query response from mongo on using group operation,

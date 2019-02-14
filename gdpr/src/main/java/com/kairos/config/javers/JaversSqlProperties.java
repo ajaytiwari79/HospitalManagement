@@ -4,7 +4,7 @@ import org.javers.spring.JaversSpringProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "javers")
-public class JaversSqlProperties extends JaversSpringProperties {
+class JaversSqlProperties extends JaversSpringProperties {
 
     private boolean sqlSchemaManagementEnabled = true;
     private String sqlSchema;

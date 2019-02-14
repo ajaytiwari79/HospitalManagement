@@ -3,7 +3,6 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
@@ -21,9 +20,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
-
 
 @Service
 public class AccessorPartyService {
@@ -38,8 +34,8 @@ public class AccessorPartyService {
 
 
     /**
-     * @param countryId
      * @param accessorPartyDTOS
+     * @param countryId -countryId
      * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.asset_management.data_disposal;
 
-public class DataDisposalMongoRepositoryImpl  {
+class DataDisposalMongoRepositoryImpl  {
 
     /*@Inject
     private MongoTemplate mongoTemplate;

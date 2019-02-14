@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.asset_management.tech_security_measure;
 
-public class TechnicalSecurityMeasureMongoRepositoryImpl {
+class TechnicalSecurityMeasureMongoRepositoryImpl {
 
    /* @Inject
     private MongoTemplate mongoTemplate;

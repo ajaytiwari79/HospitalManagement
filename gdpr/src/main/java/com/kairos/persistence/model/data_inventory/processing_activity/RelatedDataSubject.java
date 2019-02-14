@@ -13,6 +13,7 @@ public class RelatedDataSubject  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private
     Long id;
 
     @NotNull

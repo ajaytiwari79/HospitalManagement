@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type;
 
-public class ResponsibilityTypeMongoRepositoryImpl  {
+class ResponsibilityTypeMongoRepositoryImpl  {
 
 
 

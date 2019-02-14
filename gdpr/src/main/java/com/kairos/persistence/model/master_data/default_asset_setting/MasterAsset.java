@@ -32,7 +32,7 @@ public class MasterAsset extends BaseEntity {
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
     private Long countryId;
     @OneToOne(fetch = FetchType.EAGER)
-    private AssetType assetTypeMD;
+    private AssetType assetType;
     @OneToOne(fetch = FetchType.EAGER)
     private AssetType subAssetType;
     private LocalDate suggestedDate;
@@ -117,11 +117,11 @@ public class MasterAsset extends BaseEntity {
     public MasterAsset setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
 
     public AssetType getAssetType() {
-        return assetTypeMD;
+        return assetType;
     }
 
     public void setAssetType(AssetType assetType) {
-        this.assetTypeMD = assetType;
+        this.assetType = assetType;
     }
 
     public AssetType getSubAssetType() {

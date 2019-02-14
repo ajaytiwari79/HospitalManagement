@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstant.UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class QuestionnaireTemplateController {
+class QuestionnaireTemplateController {
 
 
     @Inject

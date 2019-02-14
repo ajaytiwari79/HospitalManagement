@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 
+@SuppressWarnings("unchecked")
 @Service
 public class JaversCommonService {
 
@@ -126,28 +127,28 @@ public class JaversCommonService {
     }
 
 
-    public List<Map<String, Object>> addChangedOrAuditValueObject(List<CdoSnapshot> valueObjectSnapShots) {
+    private List<Map<String, Object>> addChangedOrAuditValueObject(List<CdoSnapshot> valueObjectSnapShots) {
 
 
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
         for (CdoSnapshot snapShot : valueObjectSnapShots) {
             Map<String, Object> historyMap = new HashMap<>();
             List<String> changed = snapShot.getChanged();
-            for (int i = 0; i < changed.size(); i++) {
-                historyMap.put(changed.get(i), snapShot.getPropertyValue(changed.get(i)));
+            for (String s : changed) {
+                historyMap.put(s, snapShot.getPropertyValue(s));
             }
             auditHistoryListData.add(historyMap);
         }
         return auditHistoryListData;
     }
 
-    public List<Map<String, Object>> addChangedOrAuditValueObject(CdoSnapshot valueObjectSnapShot) {
+    private List<Map<String, Object>> addChangedOrAuditValueObject(CdoSnapshot valueObjectSnapShot) {
 
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
         Map<String, Object> historyMap = new HashMap<>();
         List<String> changed = valueObjectSnapShot.getChanged();
-        for (int i = 0; i < changed.size(); i++) {
-            historyMap.put(changed.get(i), valueObjectSnapShot.getPropertyValue(changed.get(i)));
+        for (String s : changed) {
+            historyMap.put(s, valueObjectSnapShot.getPropertyValue(s));
         }
         auditHistoryListData.add(historyMap);
         return auditHistoryListData;

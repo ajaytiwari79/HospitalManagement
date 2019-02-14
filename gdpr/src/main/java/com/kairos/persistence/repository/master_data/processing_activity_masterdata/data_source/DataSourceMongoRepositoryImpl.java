@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source;
 
-public class DataSourceMongoRepositoryImpl  {
+class DataSourceMongoRepositoryImpl  {
 
 
     /*@Inject

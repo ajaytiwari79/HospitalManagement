@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
-public class DataCategoryMongoRepositoryImpl {
+class DataCategoryMongoRepositoryImpl {
 
     /*@Inject
     private MongoTemplate mongoTemplate;

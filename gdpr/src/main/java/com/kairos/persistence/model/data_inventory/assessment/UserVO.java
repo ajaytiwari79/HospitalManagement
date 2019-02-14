@@ -48,7 +48,7 @@ public class UserVO {
         this.assessmentUserLastName = assessmentUserLastName;
     }
 
-    public String getAssessmentUserEmail() {
+    private String getAssessmentUserEmail() {
         return assessmentUserEmail;
     }
 
