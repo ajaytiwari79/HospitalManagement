@@ -102,7 +102,7 @@ public class OrganizationProcessingPurposeService{
      */
     public ProcessingPurpose getProcessingPurpose(Long organizationId, Long id) {
 
-        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeletedFalse( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

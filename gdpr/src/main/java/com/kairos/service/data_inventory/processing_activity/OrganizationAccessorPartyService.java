@@ -94,7 +94,7 @@ public class OrganizationAccessorPartyService{
      */
     public AccessorParty getAccessorPartyById(Long organizationId, Long id) {
 
-        AccessorParty exist = accessorPartyRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
+        AccessorParty exist = accessorPartyRepository.findByIdAndOrganizationIdAndDeletedFalse( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

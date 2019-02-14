@@ -103,7 +103,7 @@ public class OrganizationTransferMethodService{
      */
     public TransferMethod getTransferMethod(Long organizationId, Long id) {
 
-        TransferMethod exist = transferMethodRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        TransferMethod exist = transferMethodRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

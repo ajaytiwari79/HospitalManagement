@@ -97,7 +97,7 @@ public class OrganizationDataDisposalService{
      */
     public DataDisposal getDataDisposalById(Long organizationId, Long id) {
 
-        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

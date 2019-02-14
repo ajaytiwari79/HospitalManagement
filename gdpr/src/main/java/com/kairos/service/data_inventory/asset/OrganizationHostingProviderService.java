@@ -103,7 +103,7 @@ public class OrganizationHostingProviderService{
      */
     public HostingProvider getHostingProviderById(Long organizationId, Long id) {
 
-        HostingProvider exist = hostingProviderRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        HostingProvider exist = hostingProviderRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

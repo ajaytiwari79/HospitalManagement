@@ -105,7 +105,7 @@ public class OrganizationResponsibilityTypeService{
      */
     public ResponsibilityType getResponsibilityType(Long organizationId, Long id) {
 
-        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

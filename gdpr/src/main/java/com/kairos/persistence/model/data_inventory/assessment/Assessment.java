@@ -35,7 +35,7 @@ public class Assessment extends BaseEntity {
     private ProcessingActivity processingActivity;
     @OneToMany
     private List<Risk> risks = new ArrayList<>();
-    @ElementCollection
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     private List<AssessmentAnswer> assessmentAnswers = new ArrayList<>();
     @NotNull
     @Valid

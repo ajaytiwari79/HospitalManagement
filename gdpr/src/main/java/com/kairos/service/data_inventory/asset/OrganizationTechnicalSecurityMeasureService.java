@@ -106,7 +106,7 @@ public class OrganizationTechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long organizationId, Long id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {

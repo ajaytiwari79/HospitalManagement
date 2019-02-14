@@ -103,7 +103,7 @@ public class OrganizationDataSourceService{
      */
     public DataSource getDataSource(Long organizationId, Long id) {
 
-        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
+        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeletedFalse( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }

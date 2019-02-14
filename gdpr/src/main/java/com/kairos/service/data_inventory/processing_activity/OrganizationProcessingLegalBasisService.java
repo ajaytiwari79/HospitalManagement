@@ -100,7 +100,7 @@ public class OrganizationProcessingLegalBasisService{
      */
     public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, Long id) {
 
-        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }

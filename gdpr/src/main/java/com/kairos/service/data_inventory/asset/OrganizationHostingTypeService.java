@@ -102,7 +102,7 @@ public class OrganizationHostingTypeService{
      */
     public HostingType getHostingType(Long organizationId, Long id) {
 
-        HostingType exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        HostingType exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
