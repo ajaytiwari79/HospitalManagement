@@ -49,6 +49,7 @@ public class StaffUnitPositionDetails {
     private BigDecimal hourlyCost;
     private Long functionId;
     private List<UnitPositionLinesDTO> positionLines;
+    private Boolean published;
 
     public StaffUnitPositionDetails() {
 
@@ -268,5 +269,13 @@ public class StaffUnitPositionDetails {
 
     public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
         this.positionLines = positionLines;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 }
