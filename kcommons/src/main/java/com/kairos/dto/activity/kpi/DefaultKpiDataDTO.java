@@ -7,11 +7,11 @@ import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import java.util.List;
 
 public class DefaultKpiDataDTO {
-    List<StaffKpiFilterDTO> staffKpiFilterDTOs;
-    List<DayTypeDTO> dayTypeDTOS;
-    List<TimeSlotDTO> timeSlotDTOS;
-    List<OrganizationCommonDTO> organizationCommonDTOS;
-    List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS;
+    private  List<StaffKpiFilterDTO> staffKpiFilterDTOs;
+    private List<DayTypeDTO> dayTypeDTOS;
+    private List<TimeSlotDTO> timeSlotDTOS;
+    private List<OrganizationCommonDTO> organizationCommonDTOS;
+    private List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS;
     private Long countryId;
     public DefaultKpiDataDTO() {
     }

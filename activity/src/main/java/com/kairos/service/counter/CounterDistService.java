@@ -5,6 +5,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.configuration.KPIFilterDefaultDataDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
@@ -32,6 +34,7 @@ import com.kairos.dto.activity.counter.enums.LocationType;
 
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.counter.*;
@@ -735,22 +738,95 @@ public class CounterDistService extends MongoBaseService {
 
 
     //kpi default data and copy and save filter
-    public DefaultKpiDataDTO getDefaultFilterDataOfKpi(BigInteger kpiId, Long refId, ConfLevel level) {
-        CounterDTO counterDto = new CounterDTO();
+    public CounterDTO getDefaultFilterDataOfKpi(BigInteger kpiId, Long refId, ConfLevel level) {
+        List<FilterCriteria> criteriaList=new ArrayList<>();
+        CounterDTO counterDto;
         KPI kpi = counterRepository.getCounterByid(kpiId);
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
+        counterDto=ObjectMapperUtils.copyPropertiesByMapper(kpi,CounterDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = genericIntegrationService.getKpiFilterDefaultData(refId);
-        List<ShiftStatus> activityStatus=Arrays.asList(ShiftStatus.values());
-        List<DayOfWeek>dayOfWeeks=Arrays.asList(DayOfWeek.values());
-        List<TimeType> timeTypes=timeTypeMongoRepository.findAllByCountryId(defaultKpiDataDTO.getCountryId());
+        if(kpi.getFilterTypes().contains(FilterType.EMPLOYMENT_TYPE)){
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            defaultKpiDataDTO.getEmploymentTypeKpiDTOS().forEach( employmentTypeKpiDTO ->   {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(employmentTypeKpiDTO.getId(),employmentTypeKpiDTO.getName()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.EMPLOYMENT_TYPE.value,FilterType.EMPLOYMENT_TYPE,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.TIME_SLOT)){
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            defaultKpiDataDTO.getTimeSlotDTOS().forEach( timeSlotDTO ->   {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeSlotDTO.getId(),timeSlotDTO.getName()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.TIME_SLOT.value,FilterType.TIME_SLOT,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.DAY_TYPE)){
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            defaultKpiDataDTO.getDayTypeDTOS().forEach( dayTypeDTO -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayTypeDTO.getId(),dayTypeDTO.getName()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.DAY_TYPE.value,FilterType.DAY_TYPE,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.UNIT_IDS)){
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            defaultKpiDataDTO.getOrganizationCommonDTOS().forEach( organizationCommonDTO -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(organizationCommonDTO.getId(),organizationCommonDTO.getName()));
+            });
+                criteriaList.add(new FilterCriteria(FilterType.UNIT_IDS.value,FilterType.UNIT_IDS,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.STAFF_IDS)){
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            defaultKpiDataDTO.getStaffKpiFilterDTOs().forEach(staffKpiFilterDTO  -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(staffKpiFilterDTO.getId(),staffKpiFilterDTO.getFullName(),staffKpiFilterDTO.getUnitIds()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.STAFF_IDS.value,FilterType.STAFF_IDS,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)){
+            List<ShiftStatus> activityStatus=Arrays.asList(ShiftStatus.values());
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            activityStatus.forEach(shiftStatus  -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(),shiftStatus.toString()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.value,FilterType.ACTIVITY_STATUS,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)){
+            List<DayOfWeek>dayOfWeeks=Arrays.asList(DayOfWeek.values());
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            dayOfWeeks.forEach(dayOfWeek  -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayOfWeek.toString(),dayOfWeek.toString()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.DAYS_OF_WEEK.value,FilterType.DAYS_OF_WEEK,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.TIME_TYPE)){
+            List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(defaultKpiDataDTO.getCountryId());
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            timeTypes.forEach(timeType -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeType.getId().longValue(),timeType.getLabel()));
+                    });
+            criteriaList.add(new FilterCriteria(FilterType.TIME_TYPE.value,FilterType.TIME_TYPE,(List)kpiFilterDefaultDataDTOS));
+        }
         List<Long> unitIds=defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(organizationCommonDTO -> organizationCommonDTO.getId()).collect(toList());
-        List<Phase> phases=phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(unitIds);
-        List<ActivityDTO> activityDTOS=activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
+        if(kpi.getFilterTypes().contains(FilterType.PHASE)){
+            List<Phase> phases=phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(unitIds);
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            phases.forEach(phase -> {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(phase.getId().longValue(),phase.getName()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.PHASE.value,FilterType.PHASE,(List)kpiFilterDefaultDataDTOS));
+        }
+        if(kpi.getFilterTypes().contains(FilterType.ACTIVITY_IDS)){
+            List<ActivityDTO> activityDTOS=activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
+            List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
+            activityDTOS.forEach(activityDTO ->   {
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(activityDTO.getId().longValue(),activityDTO.getName(),activityDTO.getUnitId()));
+            });
+            criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_IDS.value,FilterType.ACTIVITY_IDS,(List)kpiFilterDefaultDataDTOS));
+        }
+        counterDto.setCriteriaList(criteriaList);
         counterDto.setSelectedFilter(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
-        return defaultKpiDataDTO;
+        return counterDto;
     }
 
     public TabKPIDTO saveKpiFilterData(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {

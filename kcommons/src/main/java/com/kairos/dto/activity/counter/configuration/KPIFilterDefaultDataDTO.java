@@ -2,33 +2,37 @@ package com.kairos.dto.activity.counter.configuration;
 
 import java.util.List;
 
-public class kpiFilterDefaultDataDTO {
-    private Long id;
+public class KPIFilterDefaultDataDTO<T> {
+    private T id;
     private String name;
     private Long unitId;
     private List<Long> unitIds;
 
-    public kpiFilterDefaultDataDTO() {
+    public KPIFilterDefaultDataDTO() {
     }
 
-    public kpiFilterDefaultDataDTO(Long id, String name, Long unitId) {
+    public KPIFilterDefaultDataDTO(T id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public KPIFilterDefaultDataDTO(T id, String name, Long unitId) {
         this.id = id;
         this.name = name;
         this.unitId = unitId;
     }
 
-    public kpiFilterDefaultDataDTO(Long id, String name, Long unitId, List<Long> unitIds) {
+    public KPIFilterDefaultDataDTO(T id, String name, List<Long> unitIds) {
         this.id = id;
         this.name = name;
-        this.unitId = unitId;
         this.unitIds = unitIds;
     }
 
-    public Long getId() {
+    public T getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(T id) {
         this.id = id;
     }
 
