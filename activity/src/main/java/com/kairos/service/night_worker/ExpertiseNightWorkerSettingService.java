@@ -1,7 +1,7 @@
 package com.kairos.service.night_worker;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 
 @Service
@@ -32,7 +31,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
 
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
@@ -88,7 +87,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     }
 
     public Boolean updateNightWorkerStatusByUnitId(Long unitId) {
-        Map<Long, Long> unitPositionIdAndExpertiseMap = genericIntegrationService.getUnitPositionExpertiseMap(unitId, unitId);
+        Map<Long, Long> unitPositionIdAndExpertiseMap = userIntegrationService.getUnitPositionExpertiseMap(unitId, unitId);
         List<ShiftDTO> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
         Map<Long, List<ShiftDTO>> shiftsOfStaff = new HashMap<>();
 

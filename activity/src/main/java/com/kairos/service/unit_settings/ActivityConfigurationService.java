@@ -12,7 +12,7 @@ import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
@@ -38,7 +38,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
@@ -131,7 +131,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public ActivityConfigurationWrapper getDefaultData(Long unitId) {
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }

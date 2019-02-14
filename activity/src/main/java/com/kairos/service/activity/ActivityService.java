@@ -48,7 +48,7 @@ import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.SkillRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -138,7 +138,7 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private ShiftTemplateService shiftTemplateService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -349,7 +349,7 @@ public class ActivityService extends MongoBaseService {
         activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
         Long countryId = activity.getCountryId();
         if (countryId == null) {
-            countryId = genericIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
+            countryId = userIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
         }
         activity.getBalanceSettingsActivityTab().setTimeTypeId(generalActivityTabDTO.getTimeTypeId());
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
@@ -427,7 +427,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
-        List<DayType> dayTypes = genericIntegrationService.getDayTypesByCountryId(countryId);
+        List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
         List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();
@@ -499,7 +499,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypes(countryId);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
@@ -518,7 +518,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
-        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypes(countryId);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -619,7 +619,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
 
-        boolean isSuccess = genericIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
+        boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
         if (!isSuccess) {
             exceptionService.dataNotFoundException("message.parameters.incorrect");
         }
@@ -652,7 +652,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityWithUnitIdDTO getActivityByUnitId(long unitId, String type) {
-        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = genericIntegrationService.getOrganizationTypeAndSubTypeByUnitId(unitId, type);
+        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = userIntegrationService.getOrganizationTypeAndSubTypeByUnitId(unitId, type);
 
         ActivityWithUnitIdDTO activityWithUnitIdDTO = new ActivityWithUnitIdDTO();
         if (!organizationTypeAndSubTypeDTO.isParent()) {
@@ -711,7 +711,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
-        List<DayType> dayTypes = genericIntegrationService.getDayTypes(unitId);
+        List<DayType> dayTypes = userIntegrationService.getDayTypes(unitId);
         LocalDate date = LocalDate.now();
         int year = date.getYear();
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
@@ -720,7 +720,7 @@ public class ActivityService extends MongoBaseService {
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
 
         // Set access Role of staff
-        ReasonCodeWrapper reasonCodeWrapper = genericIntegrationService.getAccessRoleAndReasonCodes();
+        ReasonCodeWrapper reasonCodeWrapper = userIntegrationService.getAccessRoleAndReasonCodes();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
@@ -830,7 +830,7 @@ public class ActivityService extends MongoBaseService {
 
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
                                                                  List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
-        OrganizationDTO organizationDTO = genericIntegrationService.getOrganizationDTO(unitId);
+        OrganizationDTO organizationDTO = userIntegrationService.getOrganizationDTO(unitId);
 
         if (organizationDTO == null) {
             exceptionService.dataNotFoundByIdException("message.organization.id");

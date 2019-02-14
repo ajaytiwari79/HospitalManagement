@@ -1,15 +1,13 @@
 package com.kairos.service.counter;
 
-import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -33,7 +31,7 @@ public class DynamicTabService extends MongoBaseService {
     @Inject
     private CounterRepository counterRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private CounterDistService counterDistService;
 
@@ -48,7 +46,7 @@ public class DynamicTabService extends MongoBaseService {
     public List<KPIDashboardDTO> getDashboardTabOfRef(Long refId, ConfLevel level) {
         List<KPIDashboardDTO> kpiDashboardDTOS;
         if (ConfLevel.STAFF.equals(level)) {
-            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
             kpiDashboardDTOS = counterRepository.getKPIDashboard(refId, level, accessGroupPermissionCounterDTO.getStaffId());
         } else {
             kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
@@ -59,7 +57,7 @@ public class DynamicTabService extends MongoBaseService {
     public List<KPIDashboardDTO> addDashboardTabToRef(Long unitId, Long countryId, List<KPIDashboardDTO> kpiDashboardDTOS, ConfLevel level) {
         Long staffId;
         if (ConfLevel.STAFF.equals(level)) {
-            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
             staffId = accessGroupPermissionCounterDTO.getStaffId();
         } else {
             staffId = null;
@@ -79,7 +77,7 @@ public class DynamicTabService extends MongoBaseService {
             });
             save(kpiDashboards);
         }
-        List<StaffDTO> staffDTOS = genericIntegrationService.getStaffListByUnit();
+        List<StaffDTO> staffDTOS = userIntegrationService.getStaffListByUnit();
         if(ConfLevel.UNIT.equals(level)){
             createTabsForStaff(kpiDashboards,staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
         }
@@ -121,7 +119,7 @@ public class DynamicTabService extends MongoBaseService {
 
     public List<KPIDashboardDTO> updateDashboardTabs(Long refId, KPIDashboardUpdationDTO dashboardTabs, ConfLevel level) {
         if (ConfLevel.STAFF.equals(level)) {
-            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
             refId = accessGroupPermissionCounterDTO.getStaffId();
         }
         Set<String> dashboardTabNames = dashboardTabs.getUpdateDashboardTab().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());

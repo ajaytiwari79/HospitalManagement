@@ -20,7 +20,7 @@ import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
@@ -50,7 +50,7 @@ import static com.kairos.constants.AppConstants.WEEKS;
 public class RuleTemplateService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Autowired
     private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
     @Inject
@@ -64,7 +64,7 @@ public class RuleTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public boolean createRuleTemplate(long countryId) {
-        CountryDTO countryDTO = genericIntegrationService.getCountryById(countryId);
+        CountryDTO countryDTO = userIntegrationService.getCountryById(countryId);
 
         if (countryDTO == null) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
@@ -271,7 +271,7 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
     public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
-        OrganizationDTO organization = genericIntegrationService.getOrganizationWithCountryId(unitId);
+        OrganizationDTO organization = userIntegrationService.getOrganizationWithCountryId(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
@@ -302,7 +302,7 @@ public class RuleTemplateService extends MongoBaseService {
 
 
     public WTABaseRuleTemplateDTO updateRuleTemplate(long countryId, BigInteger ruleTemplateId, WTABaseRuleTemplateDTO templateDTO) {
-        CountryDTO country = genericIntegrationService.getCountryById(countryId);
+        CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -321,7 +321,7 @@ public class RuleTemplateService extends MongoBaseService {
 
 
     public WTABaseRuleTemplateDTO copyRuleTemplate(Long countryId, WTABaseRuleTemplateDTO wtaRuleTemplateDTO) {
-        CountryDTO country = genericIntegrationService.getCountryById(countryId);
+        CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }

@@ -7,7 +7,7 @@ package com.kairos.service.payroll;
 import com.kairos.dto.activity.payroll.*;
 import com.kairos.persistence.model.payroll.*;
 import com.kairos.persistence.repository.payroll.*;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class BankService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private PensionProviderRepository pensionProviderRepository;
     @Inject
@@ -94,7 +94,7 @@ public class BankService extends MongoBaseService {
     }
 
     public StaffBankAndPensionProviderDetailsDTO getBankDetailsOfStaff(Long staffId, Long organizationId) {
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(organizationId);
         List<BankDTO> bankDTOS = bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
         StaffBankDetails staffOfficialBank = staffBankDetailsRepository.findByStaffIdAndDeletedFalse(staffId);
         List<PensionProviderDTO> pensionProviderDTOS = pensionProviderRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
@@ -137,7 +137,7 @@ public class BankService extends MongoBaseService {
     }
 
     public OrganizationBankDetailsAndBanksDTO getBankDetailsOfOrganization(Long organizationId) {
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(organizationId);
         List<BankDTO> bankDTOS = bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
         OrganizationBankDetails organizationBankDetails = organizationBankDetailsRepository.findByOrganizationIdAndDeletedFalse(organizationId);
         return new OrganizationBankDetailsAndBanksDTO(bankDTOS, copyPropertiesByMapper(organizationBankDetails, OrganizationBankDetailsDTO.class));

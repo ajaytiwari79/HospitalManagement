@@ -1,6 +1,6 @@
 package com.kairos.service;
 
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;
@@ -22,7 +22,7 @@ public class CustomTimeScaleService extends MongoBaseService {
     CustomTimeScaleRepository customTimeScaleRepository;
 
     @Autowired
-    GenericIntegrationService genericIntegrationService;
+    UserIntegrationService userIntegrationService;
 
     private static final Logger logger = LoggerFactory.getLogger(CustomTimeScaleService.class);
 
@@ -36,7 +36,7 @@ public class CustomTimeScaleService extends MongoBaseService {
     public  CustomTimeScale updateCitizenTimeScale(Long citizenId,Long unitId,Map<String, Object> payload){
 
         //StaffDTO staff = staffRestClient.getStaff(UserContext.getUserDetails().getId());
-        ClientStaffInfoDTO clientStaffInfoDTO = genericIntegrationService.getStaffInfo();
+        ClientStaffInfoDTO clientStaffInfoDTO = userIntegrationService.getStaffInfo();
 
         int numberOfAdditionalScales = (int) payload.get("numberOfAdditionalScales");
 
