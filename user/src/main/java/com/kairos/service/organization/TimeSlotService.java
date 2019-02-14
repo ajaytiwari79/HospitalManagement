@@ -14,7 +14,6 @@ import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepos
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.utils.DateUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

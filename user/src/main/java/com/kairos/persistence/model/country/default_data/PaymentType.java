@@ -1,5 +1,7 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
+
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -8,25 +10,29 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.RELATED_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 
 /**
  * Created by prabjot on 9/1/17.
  */
 @NodeEntity
-public class Currency extends UserBaseEntity {
+public class PaymentType extends UserBaseEntity {
 
-    @NotBlank(message = "error.Currency.name.notEmpty")
+    @NotBlank(message = "error.PaymentType.name.notEmpty")
     private String name;
-
     private String description;
+    private boolean isEnabled = true;
+    @Relationship(type = BELONGS_TO)
+    Country country;
 
-    @Relationship(type=RELATED_TO)
-    private Country country;
+    public PaymentType() {
+    }
 
-    @NotBlank(message = "error.Currency.currencyCode.notEmpty")
-    private String currencyCode;
+    public PaymentType(@NotBlank(message = "error.PaymentType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getDescription() {
         return description;
@@ -40,26 +46,25 @@ public class Currency extends UserBaseEntity {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = StringUtils.trim(name);
-    }
-
     public Country getCountry() {
         return country;
     }
 
     public void setCountry(Country country) {
+
         this.country = country;
     }
 
+    public void setName(String name) {
 
-
-    public String getCurrencyCode() {
-        return currencyCode;
+        this.name = StringUtils.trim(name);
     }
 
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = StringUtils.trim(currencyCode);
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
 }

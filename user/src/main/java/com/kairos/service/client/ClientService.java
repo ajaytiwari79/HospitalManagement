@@ -25,6 +25,7 @@ import com.kairos.persistence.model.client.query_results.ClientStaffQueryResult;
 import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
 import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
+import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -66,7 +67,6 @@ import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
@@ -91,10 +91,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.enums.CitizenHealthStatus.DECEASED;
 import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
-import static com.kairos.utils.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Created by oodles on 28/9/16.
@@ -230,7 +230,7 @@ public class ClientService {
                     exceptionService.duplicateDataException("message.client.CRPNumber.duplicate");
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDateMillis());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDateMillis());
                 relationService.createRelation(relation);
 
             } else {
@@ -243,7 +243,7 @@ public class ClientService {
                 client.setUser(user);
                 client.setClientType(clientMinimumDTO.getClientType());
                 clientGraphRepository.save(client);
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDateMillis());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDateMillis());
                 relationService.createRelation(relation);
             }
         } else {
@@ -725,7 +725,7 @@ public class ClientService {
     }
 
     private void createHouseHoldRelationship(long clientId, long houseHoldId) {
-        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
     }
 
     private void saveAddressOfHouseHold(Client client, Client houseHold) {
@@ -778,7 +778,7 @@ public class ClientService {
             exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
 
         }
-        Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
+        Date deathDateInDateFormat = DateUtils.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
         switch (citizen.getHealthStatus()) {
             case ALIVE:
                 citizen.setHealthStatus(DECEASED);
@@ -893,7 +893,7 @@ public class ClientService {
      * to assign staff to client,there can be multiple staff assign to multiple citizen
      */
     public boolean assignStaffToCitizen(long citizenId, long staffId, ClientStaffRelation.StaffType staffType) {
-        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
         return true;
     }
 
@@ -905,7 +905,7 @@ public class ClientService {
         for (Map<String, Object> map : staffQueryData) {
             staffIds.add((long) ((Map<String, Object>) map.get("data")).get("id"));
         }
-        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
         long endTime = System.currentTimeMillis();
         logger.info("time taken, client>>assignStaffToCitizen " + (endTime - startTime) + "  ms");
         return true;
@@ -1068,7 +1068,7 @@ public class ClientService {
             return null;
         }
         Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
-        List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
+        List<CitizenStatusDTO> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
         clientData.put("clientStatusList", clientStatusList);
 
         CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(ClientService.class)

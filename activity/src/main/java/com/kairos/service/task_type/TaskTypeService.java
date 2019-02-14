@@ -1066,13 +1066,7 @@ public class TaskTypeService extends MongoBaseService {
         createDirectory(IMAGES_PATH);
         String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
-        try {
-            FileUtil.writeFile(path, multipartFile);
-        } catch (IOException e) {
-            fileName = null;
-        } catch (Exception e) {
-            fileName = null;
-        }
+        FileUtil.writeFile(path, multipartFile);
         taskType.setIcon(fileName);
         save(taskType);
         Map<String, Object> map = new HashMap<>();

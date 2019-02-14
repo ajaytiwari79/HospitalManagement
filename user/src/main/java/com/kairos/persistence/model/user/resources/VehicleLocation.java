@@ -16,6 +16,14 @@ public class VehicleLocation  extends UserBaseEntity {
     private String description;
     private boolean enabled = true;
 
+    public VehicleLocation() {
+    }
+
+    public VehicleLocation(@NotNull(message = "error.name.notnull") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     public String getName() {
         return name;
     }

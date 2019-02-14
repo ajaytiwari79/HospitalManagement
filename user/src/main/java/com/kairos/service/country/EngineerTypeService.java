@@ -1,9 +1,11 @@
 package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,34 +22,45 @@ public class EngineerTypeService{
 
     @Inject
     private EngineerTypeGraphRepository engineerTypeGraphRepository;
-
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public Map<String, Object> createEngineerType(long countryId, EngineerType engineerType){
+    public EngineerTypeDTO createEngineerType(long countryId, EngineerTypeDTO engineerTypeDTO){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        EngineerType engineerType = null;
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        } else {
+            Boolean engineerTypeExistInCountryByName = engineerTypeGraphRepository.engineerTypeExistInCountryByName(countryId, "(?i)" + engineerTypeDTO.getName(), -1L);
+            if (engineerTypeExistInCountryByName) {
+                exceptionService.duplicateDataException("error.EngineerType.name.exist");
+            }
+            engineerType = new EngineerType(engineerTypeDTO.getName(), engineerTypeDTO.getDescription());
             engineerType.setCountry(country);
             engineerTypeGraphRepository.save(engineerType);
-           return engineerType.retrieveDetails();
         }
-        return null;
+        engineerTypeDTO.setId(engineerType.getId());
+        return engineerTypeDTO;
     }
 
-    public List<EngineerType> getEngineerTypeByCountryId(long countryId){
+    public List<EngineerTypeDTO> getEngineerTypeByCountryId(long countryId){
         return engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
     }
 
-    public Map<String, Object> updateEngineerType(EngineerType engineerType){
-        EngineerType currentEngineerType = engineerTypeGraphRepository.findOne(engineerType.getId());
-        if (currentEngineerType!=null){
-            currentEngineerType.setName(engineerType.getName());
-            currentEngineerType.setDescription(engineerType.getDescription());
-            currentEngineerType.setVisitourCode(engineerType.getVisitourCode());
-            engineerTypeGraphRepository.save(currentEngineerType);
-            return currentEngineerType.retrieveDetails();
+    public EngineerTypeDTO updateEngineerType(long countryId, EngineerTypeDTO engineerTypeDTO){
+        Boolean engineerTypeExistInCountryByName = engineerTypeGraphRepository.engineerTypeExistInCountryByName(countryId, "(?i)" + engineerTypeDTO.getName(), engineerTypeDTO.getId());
+        if (engineerTypeExistInCountryByName) {
+            exceptionService.duplicateDataException("error.EngineerType.name.exist");
         }
-        return null;
+        EngineerType currentEngineerType = engineerTypeGraphRepository.findOne(engineerTypeDTO.getId());
+        if (currentEngineerType != null) {
+            currentEngineerType.setName(engineerTypeDTO.getName());
+            currentEngineerType.setDescription(engineerTypeDTO.getDescription());
+            engineerTypeGraphRepository.save(currentEngineerType);
+        }
+        return engineerTypeDTO;
     }
 
     public boolean deleteEngineerType(long engineerTypeId){
@@ -56,7 +69,9 @@ public class EngineerTypeService{
             engineerType.setEnabled(false);
             engineerTypeGraphRepository.save(engineerType);
             return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.EngineerType.notfound");
         }
-        return false;
+        return true;
     }
 }

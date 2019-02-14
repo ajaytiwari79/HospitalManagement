@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,8 @@ public class GroupService  {
     @Inject
     private SkillGraphRepository skillGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
     /**
      * Get List of Group of an Organization
      *
@@ -53,9 +56,12 @@ public class GroupService  {
         if (currentOrganization == null) {
             return null;
         }
+        boolean groupExistInOrganizationByName = organizationGraphRepository.groupExistInOrganizationByName(unitId, group.getName(), group.getId()!=null? group.getId() : -1);
+        if (groupExistInOrganizationByName) {
+            exceptionService.duplicateDataException("message.organization.group.exists");
+        }
         currentOrganization.getGroupList().add(group);
         organizationGraphRepository.save(currentOrganization);
-
         QueryResult queryResult = new QueryResult();
         queryResult.setId(group.getId());
         queryResult.setType(GROUP_LABEL);

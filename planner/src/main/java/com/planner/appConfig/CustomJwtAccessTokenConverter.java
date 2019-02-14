@@ -16,7 +16,7 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
 
     @Override
     public OAuth2Authentication extractAuthentication(Map<String, ?> map) {
-        log.debug("extractAuthentication additional information {} from token");
+        log.debug("extractAuthentication additional information {} from token",map);
         final OAuth2Authentication authentication =    super.extractAuthentication(map);
          Map<String, Object> additionalInfo = new HashMap<>();
           ObjectMapper mapper=new ObjectMapper();

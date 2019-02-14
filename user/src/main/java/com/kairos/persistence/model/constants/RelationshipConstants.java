@@ -33,7 +33,6 @@ public abstract class RelationshipConstants {
     public final static String CONTROL_PANEL_INTERVAL_STRING = ". Every {0} minutes during selected hours.";
     public final static String CONTROL_PANEL_RUN_ONCE_STRING = ". At {0}.";
     public final static String HAS_BILLING_ADDRESS = "HAS_BILLING_ADDRESS";
-    public final static String RELATED_TO = "RELATED_TO";
     public final static String REQUESTED_BY = "REQUESTED_BY";
     public final static String APPROVED_BY = "APPROVED_BY";
     public final static String HAS_CHILD_SLOTS = "HAS_CHILD_SLOTS";
