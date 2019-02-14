@@ -714,6 +714,9 @@ public class UnitPositionService {
                             positionLine.getEndDate() != null && (cta.getStartDate().isBefore(positionLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getStartDate()) || cta.getEndDate().equals(positionLine.getStartDate())))) {
                         positionLine.setCostTimeAgreement(cta);
                     }
+                    //This is the Map of PositionLineId and accumulated timebank in minutes map
+                    Map<Long,Long> positionLineAndTimebankMinutes = ctawtaAndAccumulatedTimebankWrapper.getUnitPositionLineAndTimebankMinuteMap().get(u.getId());
+                    positionLine.setAccumulatedTimebankMinutes(positionLineAndTimebankMinutes.get(positionLine.getId()));
                 });
 
                 ctawtaAndAccumulatedTimebankWrapper.getWta().forEach(wta -> {
