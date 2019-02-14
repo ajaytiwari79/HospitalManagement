@@ -19,10 +19,10 @@ public class AssessmentRepositoryImpl implements CustomAssessmentRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AssessmentRepositoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssessmentRepositoryImpl.class);
 
 
-    private List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
+    private final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
 
 
     @Override

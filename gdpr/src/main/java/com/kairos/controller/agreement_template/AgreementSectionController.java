@@ -27,7 +27,7 @@ import static com.kairos.constants.ApiConstant.*;
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class AgreementSectionController {
+class AgreementSectionController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionController.class);
 

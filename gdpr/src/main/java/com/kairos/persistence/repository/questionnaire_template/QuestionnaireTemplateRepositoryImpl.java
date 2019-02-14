@@ -4,7 +4,6 @@ import com.kairos.custom_exception.JpaCustomDatabaseException;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +15,12 @@ import java.util.List;
 public class QuestionnaireTemplateRepositoryImpl implements CustomQuestionnaireTemplateRepository {
 
 
-    private static Logger LOGGER = LoggerFactory.getLogger(QuestionnaireTemplateRepositoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuestionnaireTemplateRepositoryImpl.class);
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static String selectConstant="Select QT from QuestionnaireTemplate QT ";
+    private static final String selectConstant="Select QT from QuestionnaireTemplate QT ";
 
 
     @Override

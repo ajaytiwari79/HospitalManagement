@@ -91,7 +91,7 @@ public class OrganizationAssetTypeService{
     }
 
 
-    public List<AssetType> buildSubAssetTypeListAndRiskAndLinkedToAssetType(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, AssetType assetTypeMD) {
+    private List<AssetType> buildSubAssetTypeListAndRiskAndLinkedToAssetType(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, AssetType assetTypeMD) {
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
         List<Risk> subAssetRisks = new ArrayList<>();
@@ -154,9 +154,7 @@ public class OrganizationAssetTypeService{
             assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
         }
         if (assetType.isHasSubAsset()) {
-            assetType.getSubAssetTypes().forEach(subAssetType -> {
-                subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType));
-            });
+            assetType.getSubAssetTypes().forEach(subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
             assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
         }
         return assetTypeRiskResponseDTO;
@@ -415,6 +413,7 @@ public class OrganizationAssetTypeService{
      * @return
      * @description create sub Asset tYpe and Asset type with basic detail on Save and Suggest of data from unit to country admin
      */
+    @SuppressWarnings("unchecked")
     private Map<String, AssetTypeBasicDTO> createAssetTypeAndSubAssetTypeWithBasicDetail(Long unitId, AssetTypeBasicDTO assetTypeBasicDTO) {
 
         AssetType assetType = new AssetType(assetTypeBasicDTO.getName());

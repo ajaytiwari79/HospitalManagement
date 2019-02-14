@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.asset_management.hosting_provider;
 
-public class HostingProviderMongoRepositoryImpl {
+class HostingProviderMongoRepositoryImpl {
 
 
 

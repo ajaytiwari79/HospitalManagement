@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 
 
-public class HostingProviderDeprecated {
+class HostingProviderDeprecated {
 
     @NotBlank(message = "Name can't be empty ")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")

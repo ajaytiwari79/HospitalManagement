@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.master_data.asset_management;
 
 
-public class AssetTypeMongoRepositoryImpl  {
+class AssetTypeMongoRepositoryImpl  {
 
 
    /* @Inject

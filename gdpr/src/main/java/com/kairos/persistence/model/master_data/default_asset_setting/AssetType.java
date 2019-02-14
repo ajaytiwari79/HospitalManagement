@@ -26,12 +26,12 @@ public class AssetType extends BaseEntity {
     private LocalDate suggestedDate;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "assetType_id")
-    private List<Risk> risks  = new ArrayList<Risk>();
+    private List<Risk> risks  = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name="assetType_id")
     private AssetType assetType;
     @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<AssetType> subAssetTypes=new ArrayList<AssetType>();
+    private List<AssetType> subAssetTypes= new ArrayList<>();
 
 
 
@@ -107,22 +107,16 @@ public class AssetType extends BaseEntity {
 
     List<Risk> getRiskOfAssetTypeAndSubAssetType(){
         List<Risk> risks = this.getRisks();
-        this.getSubAssetTypes().forEach( subAssetType -> {
-            risks.addAll(subAssetType.getRisks());
-        });
+        this.getSubAssetTypes().forEach( subAssetType -> risks.addAll(subAssetType.getRisks()));
         return risks;
     }
 
     @Override
     public void delete() {
         this.setDeleted(true);
-        this.getRisks().forEach( assetTypeRisk -> {
-            assetTypeRisk.delete();
-        });
+        this.getRisks().forEach(BaseEntity::delete);
         if(!this.getSubAssetTypes().isEmpty()) {
-            this.getSubAssetTypes().forEach(subAssetType -> {
-                subAssetType.delete();
-            });
+            this.getSubAssetTypes().forEach(AssetType::delete);
         }
     }
 }

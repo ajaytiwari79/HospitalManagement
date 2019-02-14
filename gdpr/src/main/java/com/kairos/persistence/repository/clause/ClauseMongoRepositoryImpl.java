@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.clause;
 
 
-public class ClauseMongoRepositoryImpl  {
+class ClauseMongoRepositoryImpl  {
 
 
     /*@Inject

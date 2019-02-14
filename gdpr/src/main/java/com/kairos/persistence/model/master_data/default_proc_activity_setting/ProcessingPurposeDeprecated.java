@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-public class ProcessingPurposeDeprecated {
+class ProcessingPurposeDeprecated {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")

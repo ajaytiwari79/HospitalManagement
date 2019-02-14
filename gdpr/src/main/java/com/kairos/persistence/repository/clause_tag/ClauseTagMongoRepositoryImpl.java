@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.clause_tag;
 
-public class ClauseTagMongoRepositoryImpl {
+class ClauseTagMongoRepositoryImpl {
 
 
     /*@Inject

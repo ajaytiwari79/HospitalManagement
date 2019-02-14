@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-public class TransferMethodDeprecated {
+class TransferMethodDeprecated {
 
 
     @NotBlank(message = "Name can't be empty")

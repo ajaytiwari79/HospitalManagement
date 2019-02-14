@@ -14,6 +14,7 @@ public class AssessmentAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    private
     Long id;
 
     @NotNull(message = "Question id can't be null for Assessment Answer")

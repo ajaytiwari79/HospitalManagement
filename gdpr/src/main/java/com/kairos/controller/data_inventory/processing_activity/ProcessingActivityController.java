@@ -21,7 +21,7 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class ProcessingActivityController {
+class ProcessingActivityController {
 
 
     @Inject
