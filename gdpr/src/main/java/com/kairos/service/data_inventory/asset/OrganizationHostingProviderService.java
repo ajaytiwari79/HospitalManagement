@@ -1,7 +1,9 @@
 package com.kairos.service.data_inventory.asset;
+
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
@@ -25,7 +27,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class OrganizationHostingProviderService{
+public class OrganizationHostingProviderService {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationHostingProviderService.class);
@@ -51,35 +53,28 @@ public class OrganizationHostingProviderService{
      * and if exist then simply add  HostingProvider to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingProvider>> createHostingProviders(Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
+    public List<HostingProviderDTO> createHostingProviders(Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
 
-        Map<String, List<HostingProvider>> result = new HashMap<>();
         Set<String> hostingProviderNames = new HashSet<>();
-        if (!hostingProviderDTOS.isEmpty()) {
-            for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
-                hostingProviderNames.add(hostingProvider.getName());
-            }
-            List<String> nameInLowerCase = hostingProviderNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<HostingProvider> existing = hostingProviderRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
-            List<HostingProvider> newHostingProviders = new ArrayList<>();
-            if (!hostingProviderNames.isEmpty()) {
-                for (String name : hostingProviderNames) {
+        for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
+            hostingProviderNames.add(hostingProvider.getName());
+        }
+        List<String> nameInLowerCase = hostingProviderNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<HostingProvider> previousHostingProvider = hostingProviderRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+        hostingProviderNames = ComparisonUtils.getNameListForMetadata(previousHostingProvider, hostingProviderNames);
+        List<HostingProvider> hostingProviderList = new ArrayList<>();
+        if (!hostingProviderNames.isEmpty()) {
+            for (String name : hostingProviderNames) {
 
-                    HostingProvider newHostingProvider = new HostingProvider(name);
-                    newHostingProvider.setOrganizationId(organizationId);
-                    newHostingProviders.add(newHostingProvider);
-                }
-                newHostingProviders = hostingProviderRepository.saveAll(newHostingProviders);
+                HostingProvider hostingProvider = new HostingProvider(name);
+                hostingProvider.setOrganizationId(organizationId);
+                hostingProviderList.add(hostingProvider);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newHostingProviders);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
+           hostingProviderRepository.saveAll(hostingProviderList);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingProviderList, HostingProviderDTO.class);
 
     }
 
@@ -121,7 +116,7 @@ public class OrganizationHostingProviderService{
         Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, unitId);
         if (resultCount > 0) {
             LOGGER.info("Hosting provider deleted successfully for id :: {}", hostingProviderId);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -138,17 +133,17 @@ public class OrganizationHostingProviderService{
      */
     public HostingProviderDTO updateHostingProvider(Long organizationId, Long id, HostingProviderDTO hostingProviderDTO) {
 
-        HostingProvider hostingProvider = hostingProviderRepository.findByOrganizationIdAndDeletedAndName( organizationId,  hostingProviderDTO.getName());
+        HostingProvider hostingProvider = hostingProviderRepository.findByOrganizationIdAndDeletedAndName(organizationId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Hosting Provider", hostingProvider.getName());
         }
-        Integer resultCount =  hostingProviderRepository.updateMetadataName(hostingProviderDTO.getName(), id, organizationId);
-        if(resultCount <=0){
+        Integer resultCount = hostingProviderRepository.updateMetadataName(hostingProviderDTO.getName(), id, organizationId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting provider", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }
         return hostingProviderDTO;
@@ -157,14 +152,10 @@ public class OrganizationHostingProviderService{
     }
 
 
-    public Map<String, List<HostingProvider>> saveAndSuggestHostingProviders(Long countryId, Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
-
-        Map<String, List<HostingProvider>> result = createHostingProviders(organizationId, hostingProviderDTOS);
-        List<HostingProvider> masterHostingProviderSuggestedByUnit = hostingProviderService.saveSuggestedHostingProvidersFromUnit(countryId, hostingProviderDTOS);
-        if (!masterHostingProviderSuggestedByUnit.isEmpty()) {
-            result.put("SuggestedData", masterHostingProviderSuggestedByUnit);
-        }
-        return result;
+    public List<HostingProviderDTO> saveAndSuggestHostingProviders(Long countryId, Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
+        List<HostingProviderDTO> hostingProviders = createHostingProviders(organizationId, hostingProviderDTOS);
+        hostingProviderService.saveSuggestedHostingProvidersFromUnit(countryId, hostingProviderDTOS);
+        return hostingProviders;
     }
 
 

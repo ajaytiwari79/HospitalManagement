@@ -4,6 +4,7 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
@@ -24,7 +25,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class TechnicalSecurityMeasureService{
+public class TechnicalSecurityMeasureService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TechnicalSecurityMeasureService.class);
 
@@ -43,39 +44,37 @@ public class TechnicalSecurityMeasureService{
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS, boolean isSuggestion) {
+    public List<TechnicalSecurityMeasureDTO> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
         Set<String> techSecurityMeasureNames = new HashSet<>();
-            for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
-                techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
-            }
-            List<String> nameInLowerCase = techSecurityMeasureNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
+        for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
+            techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
+        }
+        List<String> nameInLowerCase = techSecurityMeasureNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
 
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<TechnicalSecurityMeasure> previousSecurityMeasures = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousSecurityMeasures, techSecurityMeasureNames);
 
-            List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
-            if (!techSecurityMeasureNames.isEmpty()) {
-                for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name,countryId);
-                    if(isSuggestion){
-                        newTechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                        newTechnicalSecurityMeasure.setSuggestedDate(LocalDate.now());
-                    }else{
-                        newTechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
-                    }
-                    newTechnicalMeasures.add(newTechnicalSecurityMeasure);
-
+        List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
+        if (!techSecurityMeasureNames.isEmpty()) {
+            for (String name : techSecurityMeasureNames) {
+                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name, countryId);
+                if (isSuggestion) {
+                    technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
+                } else {
+                    technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-                newTechnicalMeasures = technicalSecurityMeasureRepository.saveAll(newTechnicalMeasures);
+                technicalSecurityMeasures.add(technicalSecurityMeasure);
+
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newTechnicalMeasures);
-            return result;
-       }
+            technicalSecurityMeasureRepository.saveAll(technicalSecurityMeasures);
+        }
+
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(technicalSecurityMeasures, TechnicalSecurityMeasureDTO.class);
+    }
 
 
     /**
@@ -107,12 +106,12 @@ public class TechnicalSecurityMeasureService{
     }
 
 
-    public Boolean deleteTechnicalSecurityMeasure(Long countryId,Long id) {
+    public Boolean deleteTechnicalSecurityMeasure(Long countryId, Long id) {
 
         Integer resultCount = technicalSecurityMeasureRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Technical Security Measure deleted successfully for id :: {}", id);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -129,17 +128,17 @@ public class TechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
         //TODO What actually this code is doing?
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndName(countryId,  technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndName(countryId, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
             throw new DuplicateDataException("data  exist for  " + technicalSecurityMeasureDTO.getName());
         }
-        Integer resultCount =  technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, countryId);
-        if(resultCount <=0){
+        Integer resultCount = technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, countryId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, technicalSecurityMeasureDTO.getName());
         }
         return technicalSecurityMeasureDTO;
@@ -148,20 +147,18 @@ public class TechnicalSecurityMeasureService{
     }
 
     /**
-     * @description method save technical security measure  suggested by unit
      * @param countryId
      * @param technicalSecurityMeasureDTOS
      * @return
+     * @description method save technical security measure  suggested by unit
      */
-    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
-        Map<String, List<TechnicalSecurityMeasure>> result = createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<TechnicalSecurityMeasureDTO> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+        return createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
 
     }
 
 
     /**
-     *
      * @param countryId
      * @param techSecurityMeasureIds
      * @param suggestedDataStatus
@@ -170,9 +167,9 @@ public class TechnicalSecurityMeasureService{
     public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<Long> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = technicalSecurityMeasureRepository.updateMetadataStatus(countryId, techSecurityMeasureIds, suggestedDataStatus);
-        if(updateCount > 0){
+        if (updateCount > 0) {
             LOGGER.info("Technical Security Measures are updated successfully with ids :: {}", techSecurityMeasureIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", techSecurityMeasureIds);
         }
         return technicalSecurityMeasureRepository.findAllByIds(techSecurityMeasureIds);

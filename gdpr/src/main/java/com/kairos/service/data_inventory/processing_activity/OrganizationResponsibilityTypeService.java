@@ -4,6 +4,7 @@ package com.kairos.service.data_inventory.processing_activity;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -51,11 +52,9 @@ public class OrganizationResponsibilityTypeService{
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public List<ResponsibilityTypeDTO> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Map<String, List<ResponsibilityType>> result = new HashMap<>();
         Set<String> responsibilityTypeNames = new HashSet<>();
-        if (!responsibilityTypeDTOS.isEmpty()) {
             for (ResponsibilityTypeDTO responsibilityType : responsibilityTypeDTOS) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
                     responsibilityTypeNames.add(responsibilityType.getName());
@@ -66,25 +65,20 @@ public class OrganizationResponsibilityTypeService{
             List<String> nameInLowerCase = responsibilityTypeNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ResponsibilityType> existing = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
+            List<ResponsibilityType> previousResponsibilityTypes = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(previousResponsibilityTypes, responsibilityTypeNames);
 
-            List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
+            List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
-                    newResponsibilityType.setOrganizationId(organizationId);
-                    newResponsibilityTypes.add(newResponsibilityType);
+                    ResponsibilityType responsibilityType = new ResponsibilityType(name);
+                    responsibilityType.setOrganizationId(organizationId);
+                    responsibilityTypes.add(responsibilityType);
                 }
-                newResponsibilityTypes = responsibilityTypeRepository.saveAll(newResponsibilityTypes);
+              responsibilityTypeRepository.saveAll(responsibilityTypes);
 
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newResponsibilityTypes);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
+          return ObjectMapperUtils.copyPropertiesOfListByMapper(responsibilityTypes,ResponsibilityTypeDTO.class);
 
     }
 
@@ -154,13 +148,10 @@ public class OrganizationResponsibilityTypeService{
     }
 
 
-    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public List<ResponsibilityTypeDTO> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Map<String, List<ResponsibilityType>> result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
-        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
-        if (!masterResponsibilityTypeSuggestedByUnit.isEmpty()) {
-            result.put("SuggestedData", masterResponsibilityTypeSuggestedByUnit);
-        }
+        List<ResponsibilityTypeDTO> result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
+        responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
         return result;
     }
 

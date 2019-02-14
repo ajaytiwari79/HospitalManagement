@@ -1,10 +1,10 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
@@ -26,7 +26,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class TransferMethodService{
+public class TransferMethodService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodService.class);
 
@@ -46,37 +46,34 @@ public class TransferMethodService{
      * and if exist then simply add  TransferMethod to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
-    public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS, boolean isSuggestion) {
+    public List<TransferMethodDTO> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<TransferMethod>> result = new HashMap<>();
         Set<String> transferMethodNames = new HashSet<>();
-            for (TransferMethodDTO transferMethod : transferMethodDTOS) {
-                transferMethodNames.add(transferMethod.getName());
-            }
-            List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TransferMethod> existing = transferMethodRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
+        for (TransferMethodDTO transferMethod : transferMethodDTOS) {
+            transferMethodNames.add(transferMethod.getName());
+        }
+        List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<TransferMethod> previousTransferMethods = transferMethodRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        transferMethodNames = ComparisonUtils.getNameListForMetadata(previousTransferMethods, transferMethodNames);
 
-            List<TransferMethod> newTransferMethods = new ArrayList<>();
-            if (!transferMethodNames.isEmpty()) {
-                for (String name : transferMethodNames) {
-                    TransferMethod newTransferMethod = new TransferMethod(name,countryId);
-                    if(isSuggestion){
-                        newTransferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                        newTransferMethod.setSuggestedDate(LocalDate.now());
-                    }else{
-                        newTransferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
-                    }
-                    newTransferMethods.add(newTransferMethod);
+        List<TransferMethod> transferMethods = new ArrayList<>();
+        if (!transferMethodNames.isEmpty()) {
+            for (String name : transferMethodNames) {
+                TransferMethod transferMethod = new TransferMethod(name, countryId);
+                if (isSuggestion) {
+                    transferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    transferMethod.setSuggestedDate(LocalDate.now());
+                } else {
+                    transferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-                newTransferMethods = transferMethodRepository.saveAll(newTransferMethods);
+                transferMethods.add(transferMethod);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newTransferMethods);
-            return result;
-          }
+            transferMethodRepository.saveAll(transferMethods);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(transferMethods, TransferMethodDTO.class);
+    }
 
     /**
      * @param countryId
@@ -110,7 +107,7 @@ public class TransferMethodService{
         Integer resultCount = transferMethodRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Transfer Method deleted successfully for id :: {}", id);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -126,17 +123,17 @@ public class TransferMethodService{
      */
     public TransferMethodDTO updateTransferMethod(Long countryId, Long id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethod transferMethod = transferMethodRepository.findByCountryIdAndName(countryId,  transferMethodDTO.getName());
+        TransferMethod transferMethod = transferMethodRepository.findByCountryIdAndName(countryId, transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
             }
             throw new DuplicateDataException("data  exist for  " + transferMethodDTO.getName());
         }
-        Integer resultCount =  transferMethodRepository.updateMasterMetadataName(transferMethodDTO.getName(), id, countryId);
-        if(resultCount <=0){
+        Integer resultCount = transferMethodRepository.updateMasterMetadataName(transferMethodDTO.getName(), id, countryId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, transferMethodDTO.getName());
         }
         return transferMethodDTO;
@@ -144,31 +141,29 @@ public class TransferMethodService{
     }
 
     /**
-     * @description method save TransferMethod suggested by unit
      * @param countryId
      * @param transferMethodDTOS - transfer method suggested by unit
      * @return
+     * @description method save TransferMethod suggested by unit
      */
-    public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
-        Map<String, List<TransferMethod>> result = createTransferMethod(countryId, transferMethodDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<TransferMethodDTO> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+        return createTransferMethod(countryId, transferMethodDTOS, true);
 
     }
 
 
     /**
-     *
      * @param countryId
      * @param transferMethodIds
      * @param suggestedDataStatus
      * @return
      */
-    public List<TransferMethod> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<Long> transferMethodIds , SuggestedDataStatus suggestedDataStatus) {
+    public List<TransferMethod> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<Long> transferMethodIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = transferMethodRepository.updateMetadataStatus(countryId, transferMethodIds,suggestedDataStatus);
-        if(updateCount > 0){
+        Integer updateCount = transferMethodRepository.updateMetadataStatus(countryId, transferMethodIds, suggestedDataStatus);
+        if (updateCount > 0) {
             LOGGER.info("Transfer Methods are updated successfully with ids :: {}", transferMethodIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", transferMethodIds);
         }
         return transferMethodRepository.findAllByIds(transferMethodIds);

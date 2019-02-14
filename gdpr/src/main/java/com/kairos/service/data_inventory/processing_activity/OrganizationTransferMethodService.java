@@ -4,6 +4,7 @@ package com.kairos.service.data_inventory.processing_activity;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -25,7 +26,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationTransferMethodService{
+public class OrganizationTransferMethodService {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodService.class);
@@ -50,41 +51,33 @@ public class OrganizationTransferMethodService{
      * and if exist then simply add  TransferMethod to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
-    public Map<String, List<TransferMethod>> createTransferMethod(Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
+    public List<TransferMethodDTO> createTransferMethod(Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
-        Map<String, List<TransferMethod>> result = new HashMap<>();
         Set<String> transferMethodNames = new HashSet<>();
-        if (!transferMethodDTOS.isEmpty()) {
-            for (TransferMethodDTO transferMethod : transferMethodDTOS) {
-                if (!StringUtils.isBlank(transferMethod.getName())) {
-                    transferMethodNames.add(transferMethod.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        for (TransferMethodDTO transferMethod : transferMethodDTOS) {
+            if (!StringUtils.isBlank(transferMethod.getName())) {
+                transferMethodNames.add(transferMethod.getName());
+            } else
+                throw new InvalidRequestException("name could not be empty or null");
 
+        }
+        List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<TransferMethod> previousTransferMethods = transferMethodRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+        transferMethodNames = ComparisonUtils.getNameListForMetadata(previousTransferMethods, transferMethodNames);
+
+        List<TransferMethod> transferMethods = new ArrayList<>();
+        if (!transferMethodNames.isEmpty()) {
+            for (String name : transferMethodNames) {
+                TransferMethod transferMethod = new TransferMethod(name);
+                transferMethod.setOrganizationId(organizationId);
+                transferMethods.add(transferMethod);
             }
-            List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TransferMethod> existing = transferMethodRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
-            List<TransferMethod> newTransferMethods = new ArrayList<>();
-            if (transferMethodNames.size() != 0) {
-                for (String name : transferMethodNames) {
-                    TransferMethod newTransferMethod = new TransferMethod(name);
-                    newTransferMethod.setOrganizationId(organizationId);
-                    newTransferMethods.add(newTransferMethod);
-                }
-
-                newTransferMethods = transferMethodRepository.saveAll(newTransferMethods);
-            }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newTransferMethods);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
+            transferMethodRepository.saveAll(transferMethods);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(transferMethods, TransferMethodDTO.class);
     }
 
     /**
@@ -131,17 +124,17 @@ public class OrganizationTransferMethodService{
      */
     public TransferMethodDTO updateTransferMethod(Long organizationId, Long id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndDeletedAndName(organizationId,  transferMethodDTO.getName());
+        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndDeletedAndName(organizationId, transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Transfer Method", transferMethod.getName());
         }
-        Integer resultCount =  transferMethodRepository.updateMetadataName(transferMethodDTO.getName(), id, organizationId);
-        if(resultCount <=0){
+        Integer resultCount = transferMethodRepository.updateMetadataName(transferMethodDTO.getName(), id, organizationId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, transferMethodDTO.getName());
         }
         return transferMethodDTO;
@@ -149,13 +142,10 @@ public class OrganizationTransferMethodService{
 
     }
 
-    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
+    public List<TransferMethodDTO> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
-        Map<String, List<TransferMethod>> result = createTransferMethod(organizationId, transferMethodDTOS);
-        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, transferMethodDTOS);
-        if (!masterTransferMethodSuggestedByUnit.isEmpty()) {
-            result.put("SuggestedData", masterTransferMethodSuggestedByUnit);
-        }
+        List<TransferMethodDTO> result = createTransferMethod(organizationId, transferMethodDTOS);
+        transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, transferMethodDTOS);
         return result;
     }
 
