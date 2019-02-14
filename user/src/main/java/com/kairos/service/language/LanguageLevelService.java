@@ -4,6 +4,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageLevelGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,8 @@ public class LanguageLevelService {
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     public LanguageLevel addNewLanguageLevel(LanguageLevel languageLevel) {
         languageLevelGraphRepository.save(languageLevel);
@@ -52,6 +55,12 @@ public class LanguageLevelService {
     public Map<String, Object> createLanguageLevel(long countryId, LanguageLevel languageLevel) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
+
+            Boolean languageLevelExistInCountryByName = languageLevelGraphRepository.languageLevelExistInCountryByName(countryId, "(?i)" + languageLevel.getName(), -1L);
+            if (languageLevelExistInCountryByName) {
+                exceptionService.duplicateDataException("error.LanguageLevel.name.exist");
+            }
+
             languageLevel.setCountry(country);
             languageLevelGraphRepository.save(languageLevel);
             return languageLevel.retrieveDetails();
@@ -62,6 +71,12 @@ public class LanguageLevelService {
     public Map<String, Object> updateLanguageLevel(LanguageLevel languageLevel, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
+
+            Boolean languageLevelExistInCountryByName = languageLevelGraphRepository.languageLevelExistInCountryByName(countryId, "(?i)" + languageLevel.getName(), languageLevel.getId());
+            if (languageLevelExistInCountryByName) {
+                exceptionService.duplicateDataException("error.LanguageLevel.name.exist");
+            }
+
             LanguageLevel currentLanguageLevel = languageLevelGraphRepository.findOne(languageLevel.getId());
             currentLanguageLevel.setDescription(languageLevel.getDescription());
             currentLanguageLevel.setName(languageLevel.getName());

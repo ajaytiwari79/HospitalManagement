@@ -4,6 +4,7 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
+import com.kairos.persistence.model.country.default_data.CurrencyDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
     private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
     private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
-    private List<Map<String, Object>>currencies=new ArrayList<>();
+    private List<CurrencyDTO>currencies=new ArrayList<>();
     private List<Map<String, Object>>holidayMapList=new ArrayList<>();
     private List<FunctionDTO> functions = new ArrayList<FunctionDTO>();
     List<ActivityCategoryDTO> activityCategories;
@@ -82,11 +83,11 @@ public class CTARuleTemplateDefaultDataWrapper {
         this.employmentTypes = employmentTypes;
     }
 
-    public List<Map<String, Object>> getCurrencies() {
+    public List<CurrencyDTO> getCurrencies() {
         return currencies;
     }
 
-    public void setCurrencies(List<Map<String, Object>> currencies) {
+    public void setCurrencies(List<CurrencyDTO> currencies) {
         this.currencies = currencies;
     }
 

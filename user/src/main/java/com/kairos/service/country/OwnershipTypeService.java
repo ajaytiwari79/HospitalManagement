@@ -48,8 +48,8 @@ public class OwnershipTypeService {
     }
 
     public OwnershipTypeDTO updateOwnershipType(long countryId, OwnershipTypeDTO ownershipTypeDTO){
-        Boolean clinicTypeExistInCountryByName = ownershipTypeGraphRepository.ownershipTypeExistInCountryByName(countryId, "(?i)" + ownershipTypeDTO.getName(), ownershipTypeDTO.getId());
-        if (clinicTypeExistInCountryByName) {
+        Boolean ownershipTypeExistInCountryByName = ownershipTypeGraphRepository.ownershipTypeExistInCountryByName(countryId, "(?i)" + ownershipTypeDTO.getName(), ownershipTypeDTO.getId());
+        if (ownershipTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.OwnershipType.name.exist");
         }
         OwnershipType currentOwnershipType = ownershipTypeGraphRepository.findOne(ownershipTypeDTO.getId());

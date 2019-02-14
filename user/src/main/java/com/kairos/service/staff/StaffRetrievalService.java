@@ -28,7 +28,8 @@ import com.kairos.persistence.model.access_permission.query_result.AccessGroupSt
 import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.default_data.DayType;
-import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerType;
+import com.kairos.persistence.model.country.default_data.EngineerTypeDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -165,7 +166,7 @@ public class StaffRetrievalService {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
         List<Language> languages;
-        List<EngineerType> engineerTypes;
+        List<EngineerTypeDTO> engineerTypes;
         if (countryId != null) {
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
             languages = languageGraphRepository.getLanguageByCountryId(countryId);
@@ -314,7 +315,7 @@ public class StaffRetrievalService {
         List<StaffPersonalDetailDTO> staff = null;
         Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerType> engineerTypes = null;
+        List<EngineerTypeDTO> engineerTypes = null;
         Map<String, Object> map = new HashMap();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 //            staff = getStaffWithBasicInfo(id, allStaffRequired);
@@ -454,7 +455,7 @@ public class StaffRetrievalService {
         List<StaffPersonalDetailDTO> staff = null;
         Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerType> engineerTypes = null;
+        List<EngineerTypeDTO> engineerTypes = null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             staff = getStaffWithBasicInfo(id, allStaffRequired);
             roles = accessGroupService.getAccessGroups(id);

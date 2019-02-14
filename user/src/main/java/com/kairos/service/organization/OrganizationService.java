@@ -859,7 +859,7 @@ public class OrganizationService {
         unitData.put("organizationTimeSlotList", organizationTimeSlotList.get("timeSlots"));
 
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
+        List<CitizenStatusDTO> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
         unitData.put("clientStatusList", clientStatusList);
         List<Object> localAreaTagsList = new ArrayList<>();
         List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(unitId);

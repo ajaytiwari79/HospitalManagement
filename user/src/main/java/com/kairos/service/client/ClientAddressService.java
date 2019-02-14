@@ -7,7 +7,8 @@ import com.kairos.persistence.model.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.query_results.ClientAddressQueryResult;
 import com.kairos.persistence.model.client.query_results.ClientTempAddressQueryResult;
-import com.kairos.persistence.model.country.HousingType;
+import com.kairos.persistence.model.country.default_data.HousingType;
+import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.user.client.AccessToLocationGraphRepository;
@@ -136,7 +137,7 @@ public class ClientAddressService{
             logger.debug("Country null");
             response.put("zipCodeData", Collections.emptyList());
         }
-        List<Object> housingTypeList = housingTypeService.getHousingTypeByCountryId(countryId);
+        List<HousingTypeDTO> housingTypeList = housingTypeService.getHousingTypeByCountryId(countryId);
         response.put("typeOfHousingData", housingTypeList != null ? housingTypeList : Collections.EMPTY_LIST);
         return response;
 

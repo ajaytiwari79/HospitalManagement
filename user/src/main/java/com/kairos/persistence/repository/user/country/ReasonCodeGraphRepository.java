@@ -25,7 +25,7 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
     List<ReasonCodeResponseDTO> findReasonCodesByCountry(long countryId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} return  reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodeByCountryId(long countryId);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
@@ -36,11 +36,11 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
     ReasonCode findByCountryAndReasonCode(long countryId, long reasonCodeId);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodesByUnitIdAndReasonCodeType(long unitId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} return  reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodeByUnitId(long unitId);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
