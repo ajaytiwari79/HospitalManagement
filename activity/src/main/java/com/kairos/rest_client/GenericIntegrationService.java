@@ -730,6 +730,11 @@ public class GenericIntegrationService {
         });
     }
 
+    public DefaultKpiDataDTO getKpiFilterDefaultData(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, KPI_FILTER_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
+        });
+    }
+
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByUnitPositionId(Long unitId,LocalDate shiftDate, String type, Long unitPositionId,Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));

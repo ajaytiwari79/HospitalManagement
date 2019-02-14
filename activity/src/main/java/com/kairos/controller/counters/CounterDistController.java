@@ -269,8 +269,8 @@ public class CounterDistController {
     }
 
     @GetMapping(UNIT_URL+KPI_URL+"/kpi_default_data")
-    public ResponseEntity<Map<String,Object>> getDefaultKpiFilterDataOfUnit(@PathVariable Long unitId,@PathVariable Long countryId,@PathVariable Long kpiId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    public ResponseEntity<Map<String,Object>> getDefaultKpiFilterDataOfUnit(@PathVariable Long unitId,@PathVariable BigInteger kpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.getDefaultFilterDataOfKpi(kpiId,unitId,ConfLevel.UNIT));
     }
 
     @PutMapping(COUNTRY_URL+KPI_URL+"/save_kpi")

@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
@@ -29,8 +30,17 @@ import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.task_demand.MonthlyFrequency;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -43,6 +53,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +75,12 @@ public class CounterDistService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
+    @Inject
+    private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject
+    private PhaseMongoRepository phaseMongoRepository;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -718,13 +735,22 @@ public class CounterDistService extends MongoBaseService {
 
 
     //kpi default data and copy and save filter
-    public CounterDTO getDefaultDataOfKpi(BigInteger kpiId, Long refId, CounterDTO counterDTO, ConfLevel level) {
+    public DefaultKpiDataDTO getDefaultFilterDataOfKpi(BigInteger kpiId, Long refId, ConfLevel level) {
         CounterDTO counterDto = new CounterDTO();
         KPI kpi = counterRepository.getCounterByid(kpiId);
-
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
+        if (applicableKPIS.isEmpty()) {
+            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+        }
+        DefaultKpiDataDTO defaultKpiDataDTO = genericIntegrationService.getKpiFilterDefaultData(refId);
+        List<ShiftStatus> activityStatus=Arrays.asList(ShiftStatus.values());
+        List<DayOfWeek>dayOfWeeks=Arrays.asList(DayOfWeek.values());
+        List<TimeType> timeTypes=timeTypeMongoRepository.findAllByCountryId(defaultKpiDataDTO.getCountryId());
+        List<Long> unitIds=defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(organizationCommonDTO -> organizationCommonDTO.getId()).collect(toList());
+        List<Phase> phases=phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(unitIds);
+        List<ActivityDTO> activityDTOS=activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
         counterDto.setSelectedFilter(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
-        return counterDTO;
+        return defaultKpiDataDTO;
     }
 
     public TabKPIDTO saveKpiFilterData(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
@@ -745,7 +771,7 @@ public class CounterDistService extends MongoBaseService {
         }
         applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getCriteriaList(), true));
         applicableKPIS.get(0).setTitle(counterDTO.getTitle());
-        kpi.setTitle(counterDTO.getTitle());
+//        kpi.setTitle(counterDTO.getTitle());
         List<ApplicableKPI> updateApplicableKPI;
         if (!ConfLevel.STAFF.equals(level)) {
             updateApplicableKPI = counterRepository.getFilterBaseApplicableKPI(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF));

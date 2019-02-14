@@ -154,6 +154,7 @@ public final class ApiConstants {
     // /staff_by_employment_type
     public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";
     public static final String KPI_DEFAULT_DATA = "/kpi_default_data";
+    public static final String KPI_FILTER_DEFAULT_DATA ="/kpi_filter_default_data";
 
     //Scheduler
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";

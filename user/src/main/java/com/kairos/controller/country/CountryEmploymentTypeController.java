@@ -120,8 +120,14 @@ public class CountryEmploymentTypeController {
     @ApiOperation("get staff by employment type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getKpiDefaultData(@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiDefaultDate(staffEmploymentTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiDefaultData(staffEmploymentTypeDTO));
     }
 
+    @RequestMapping(value =UNIT_URL+"/kpi_filter_default_data", method = RequestMethod.GET)
+    @ApiOperation("get staff by employment type")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getKpifilterDefaultData(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiFilterDefaultData(unitId));
+    }
 
 }

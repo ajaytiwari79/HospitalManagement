@@ -5,10 +5,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.StaffRelationship;
-import com.kairos.persistence.model.staff.PartialLeave;
-import com.kairos.persistence.model.staff.StaffFavouriteFilter;
-import com.kairos.persistence.model.staff.StaffInformationQueryResult;
-import com.kairos.persistence.model.staff.StaffQueryResult;
+import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
@@ -375,6 +372,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employment)-[:"+BELONGS_TO+"]->(s:Staff) WHERE id(o)={0} RETURN s")
     List<Staff> getAllStaffByUnitId(long unitId);
 
+
+    @Query("MATCH(staff:Staff)-[: "+BELONGS_TO_STAFF+" ]-(unitPosition:UnitPosition{deleted:false})-[:"+IN_UNIT+"]-(organization:Organization) where id(organization) IN {0} " +
+            "RETURN id(staff) as id,staff.firstName  as firstName,staff.lastName as lastName, collect(DISTINCT id(organization)) as unitIds")
+    List<StaffKpiFilterQueryResult> getAllStaffIdAndNameByUnitId(List<Long> unitIds);
+
     @Query("MATCH (org:Organization) WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WITH staff, user\n" +
             "MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:IN_UNIT]-(o:Organization)\n" +
@@ -384,8 +386,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) WHERE id(user)={0} AND id(organization)={1}  RETURN staff")
     Staff findByUserId(Long userId, Long unitId);
-
-
 
 
     @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]-(user:User)where id(staff)={0} with staff,user\n" +

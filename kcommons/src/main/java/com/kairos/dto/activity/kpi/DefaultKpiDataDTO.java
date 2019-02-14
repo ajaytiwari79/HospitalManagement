@@ -10,8 +10,9 @@ public class DefaultKpiDataDTO {
     List<StaffKpiFilterDTO> staffKpiFilterDTOs;
     List<DayTypeDTO> dayTypeDTOS;
     List<TimeSlotDTO> timeSlotDTOS;
-    OrganizationCommonDTO organizationCommonDTOS;
-
+    List<OrganizationCommonDTO> organizationCommonDTOS;
+    List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS;
+    private Long countryId;
     public DefaultKpiDataDTO() {
     }
 
@@ -19,6 +20,15 @@ public class DefaultKpiDataDTO {
         this.staffKpiFilterDTOs = staffKpiFilterDTOs;
         this.dayTypeDTOS = dayTypeDTOS;
         this.timeSlotDTOS = timeSlotDTOS;
+    }
+
+    public DefaultKpiDataDTO(Long countryId,List<StaffKpiFilterDTO> staffKpiFilterDTOs, List<DayTypeDTO> dayTypeDTOS, List<TimeSlotDTO> timeSlotDTOS, List<OrganizationCommonDTO> organizationCommonDTOS,List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS) {
+        this.countryId=countryId;
+        this.staffKpiFilterDTOs = staffKpiFilterDTOs;
+        this.dayTypeDTOS = dayTypeDTOS;
+        this.timeSlotDTOS = timeSlotDTOS;
+        this.organizationCommonDTOS = organizationCommonDTOS;
+        this.employmentTypeKpiDTOS=employmentTypeKpiDTOS;
     }
 
     public List<StaffKpiFilterDTO> getStaffKpiFilterDTOs() {
@@ -51,5 +61,21 @@ public class DefaultKpiDataDTO {
 
     public void setOrganizationCommonDTOS(List<OrganizationCommonDTO> organizationCommonDTOS) {
         this.organizationCommonDTOS = organizationCommonDTOS;
+    }
+
+    public List<EmploymentTypeKpiDTO> getEmploymentTypeKpiDTOS() {
+        return employmentTypeKpiDTOS;
+    }
+
+    public void setEmploymentTypeKpiDTOS(List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS) {
+        this.employmentTypeKpiDTOS = employmentTypeKpiDTOS;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }
