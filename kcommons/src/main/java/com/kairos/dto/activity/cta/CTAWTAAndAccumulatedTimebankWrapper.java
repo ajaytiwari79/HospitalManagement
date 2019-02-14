@@ -10,18 +10,18 @@ import java.util.List;
  * @date - 8/8/18
  */
 
-public class CTAWTAWrapper {
+public class CTAWTAAndAccumulatedTimebankWrapper {
 
     private List<CTAResponseDTO> cta = new ArrayList<>();
     private List<WTAResponseDTO> wta = new ArrayList<>();
 
 
-    public CTAWTAWrapper(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta) {
+    public CTAWTAAndAccumulatedTimebankWrapper(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta) {
         this.cta = cta;
         this.wta = wta;
     }
 
-    public CTAWTAWrapper() {
+    public CTAWTAAndAccumulatedTimebankWrapper() {
     }
 
     public List<CTAResponseDTO> getCta() {

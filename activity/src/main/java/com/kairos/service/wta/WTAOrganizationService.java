@@ -2,7 +2,7 @@ package com.kairos.service.wta;
 
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -135,11 +135,11 @@ public class WTAOrganizationService extends MongoBaseService {
     }
 
 
-    public CTAWTAWrapper getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId){
+    public CTAWTAAndAccumulatedTimebankWrapper getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId){
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId,expertiseId);
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS,WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTA(unitId,expertiseId);
-        return new CTAWTAWrapper(ctaResponseDTOS,wtaResponseDTOS);
+        return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS,wtaResponseDTOS);
     }
 
 

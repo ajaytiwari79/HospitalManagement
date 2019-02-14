@@ -3,6 +3,7 @@ package com.kairos.controller.wta;
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.utils.response.ResponseHandler;
@@ -20,6 +21,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -183,7 +185,7 @@ public class WTAController {
 
     @ApiOperation(value = "get Wta By Ids")
     @GetMapping(value =  UNIT_URL + "/unitposition-cta-wta")
-    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<Long> upIds) {
+    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam Set<Long> upIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByUpIds(upIds));
     }
 
@@ -269,7 +271,13 @@ public class WTAController {
 
     @ApiOperation(value = "Create a New WTA at Organization")
     @PostMapping(value =  UNIT_URL+ "/wta")
-    public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId, @Validated @RequestBody @Valid WTADTO wta) {
+    public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId,@RequestBody @Valid WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(unitId, wta, false,false));
+    }
+
+    @ApiOperation(value = "Get unitposition cta wta and accumulated timebank")
+    @PostMapping(value =  UNIT_URL+ "/unitposition_cta_wta_and_accumulated_timebank")
+    public ResponseEntity<Map<String, Object>> getUnitpositionCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<UnitPositionLinesDTO>> positionLinesMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getUnitpositionCtaWtaAndAccumulatedTimebank(unitId, positionLinesMap));
     }
 }

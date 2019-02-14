@@ -5,12 +5,13 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
@@ -401,26 +402,26 @@ public class WTAService extends MongoBaseService {
         return wtaDefaultDataInfoDTO;
     }
 
-    public CTAWTAWrapper getWTACTAByUpIds(List<Long> unitPositionIds) {
+    public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByUpIds(Set<Long> unitPositionIds) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(unitPositionIds, new Date());
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementService.getCTAByUpIds(unitPositionIds);
-        return new CTAWTAWrapper(ctaResponseDTOS, wtaResponseDTOS);
+        return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
 
-    public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByOfUnitPosition(Long unitPositionId, LocalDate startDate) {
         WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, asDate(startDate));
         CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, asDate(startDate));
-        CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (Optional.ofNullable(wta).isPresent()) {
             WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());
-            ctawtaWrapper.setWta(Collections.singletonList(wtaResponseDTO));
+            ctawtaAndAccumulatedTimebankWrapper.setWta(Collections.singletonList(wtaResponseDTO));
         }
         if (Optional.ofNullable(cta).isPresent()) {
             CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId());
-            ctawtaWrapper.setCta(Collections.singletonList(ctaResponseDTO));
+            ctawtaAndAccumulatedTimebankWrapper.setCta(Collections.singletonList(ctaResponseDTO));
         }
-        return ctawtaWrapper;
+        return ctawtaAndAccumulatedTimebankWrapper;
     }
 
     public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> upIds) {
@@ -440,17 +441,17 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public CTAWTAWrapper assignCTAWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
-        CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
+    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (wtaId != null) {
             WTAResponseDTO wtaResponseDTO = assignWTATOUnitPosition(unitPositionId, wtaId, startDate);
-            ctawtaWrapper.setWta(Arrays.asList(wtaResponseDTO));
+            ctawtaAndAccumulatedTimebankWrapper.setWta(Arrays.asList(wtaResponseDTO));
         }
         if (ctaId != null) {
             CTAResponseDTO ctaResponseDTO = costTimeAgreementService.assignCTATOUnitPosition(unitPositionId, ctaId, startDate);
-            ctawtaWrapper.setCta(Arrays.asList(ctaResponseDTO));
+            ctawtaAndAccumulatedTimebankWrapper.setCta(Arrays.asList(ctaResponseDTO));
         }
-        return ctawtaWrapper;
+        return ctawtaAndAccumulatedTimebankWrapper;
 
     }
 
@@ -641,19 +642,19 @@ public class WTAService extends MongoBaseService {
         return ctaWtas;
     }
 
-    public CTAWTAWrapper assignCTAWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger oldwtaId, BigInteger ctaId, BigInteger oldctaId, LocalDate startDate) {
-        CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
+    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger oldwtaId, BigInteger ctaId, BigInteger oldctaId, LocalDate startDate) {
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (wtaId != null) {
             WTAResponseDTO wtaResponseDTO = assignWTATOUnitPosition(unitPositionId, wtaId, startDate);
-            ctawtaWrapper.setWta(Arrays.asList(wtaResponseDTO));
+            ctawtaAndAccumulatedTimebankWrapper.setWta(Arrays.asList(wtaResponseDTO));
             wtaRepository.disableOldWta(oldwtaId, startDate.minusDays(1));
         }
         if (ctaId != null) {
             CTAResponseDTO ctaResponseDTO = costTimeAgreementService.assignCTATOUnitPosition(unitPositionId, ctaId, startDate);
-            ctawtaWrapper.setCta(Arrays.asList(ctaResponseDTO));
+            ctawtaAndAccumulatedTimebankWrapper.setCta(Arrays.asList(ctaResponseDTO));
             costTimeAgreementRepository.disableOldCta(oldctaId, startDate.minusDays(1));
         }
-        return ctawtaWrapper;
+        return ctawtaAndAccumulatedTimebankWrapper;
 
     }
 
@@ -764,6 +765,11 @@ public class WTAService extends MongoBaseService {
             isCalculatedValueChanged = true;
         }
         return isCalculatedValueChanged;
+    }
+
+    public CTAWTAAndAccumulatedTimebankWrapper getUnitpositionCtaWtaAndAccumulatedTimebank(Long unitId,Map<Long, List<UnitPositionLinesDTO>> positionLinesMap){
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = getWTACTAByUpIds(positionLinesMap.keySet());
+        return ctawtaAndAccumulatedTimebankWrapper;
     }
 
 }

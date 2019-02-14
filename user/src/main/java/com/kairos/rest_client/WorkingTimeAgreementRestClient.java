@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
@@ -40,18 +40,18 @@ public class WorkingTimeAgreementRestClient {
     @Inject private
     ExceptionService exceptionService;
 
-    public CTAWTAWrapper getWTAByExpertise(Long expertiseId) {
+    public CTAWTAAndAccumulatedTimebankWrapper getWTAByExpertise(Long expertiseId) {
         String baseUrl = getBaseUrl(true);
         try {
             //HttpEntity<Long> request = new HttpEntity<>(expertiseId);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAWrapper>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/expertise/{expertiseId}/cta_wta",
                             HttpMethod.GET, null, typeReference, expertiseId);
 
-            RestTemplateResponseEnvelope<CTAWTAWrapper> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -118,18 +118,18 @@ public class WorkingTimeAgreementRestClient {
 
     }
 
-    public CTAWTAWrapper assignWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper assignWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
         String baseUrl = getBaseUrl(true);
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAWrapper>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}/?startDate="+startDate,
                             HttpMethod.POST, null, typeReference, unitPositionId,wtaId,ctaId);
 
-            RestTemplateResponseEnvelope<CTAWTAWrapper> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

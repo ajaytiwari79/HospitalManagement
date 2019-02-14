@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Service
@@ -72,7 +73,7 @@ public class GenericRestClient {
     }
 
 
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+    public <T, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit,id)+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         V responseData = null;
@@ -96,16 +97,18 @@ public class GenericRestClient {
     }
 
     public String getURIWithParam(List<NameValuePair> queryParam){
+        String queryParamString = "";
         try {
-            URIBuilder builder = new URIBuilder();
-            if(queryParam!=null && !queryParam.isEmpty()) {
+
+            if(isCollectionNotEmpty(queryParam)) {
+                URIBuilder builder = new URIBuilder();
                 builder.setParameters(queryParam);
+                queryParamString =  builder.build().toString();
             }
-            return builder.build().toString();
         } catch (URISyntaxException e) {
             exceptionService.internalServerError(e.getMessage());
         }
-        return null;
+        return queryParamString;
     }
 
     public static <T> String getURI(T t,String uri,Map<String,Object> queryParams,Object... pathParams){

@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -40,11 +41,11 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WorkingTimeAgreement checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
-    List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date);
+    List<WTAQueryResultDTO> getAllWTAByUpIds(Set<Long> upIds, Date date);
 
-    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> upIds);
+    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> unitPositionIds);
 
-    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds);
+    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> unitPositionIds);
 
     WTAQueryResultDTO getWTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
 
