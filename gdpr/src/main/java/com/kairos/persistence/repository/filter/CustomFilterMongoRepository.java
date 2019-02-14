@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.filter;
 
-public interface CustomFilterMongoRepository {
+interface CustomFilterMongoRepository {
 
 
    /* Map<String, AggregationOperation> getFilterCriteria(Long countryId,List<FilterType> filterTypes,FilterGroup  filterGroup);

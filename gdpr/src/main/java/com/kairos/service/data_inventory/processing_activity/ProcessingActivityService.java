@@ -134,14 +134,12 @@ public class ProcessingActivityService {
     }
 
 
-    public List<RelatedDataSubject> createRelatedDataProcessingActivity(Long organizationId, List<ProcessingActivityRelatedDataSubject> relatedDataSubjects){
+    private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long organizationId, List<ProcessingActivityRelatedDataSubject> relatedDataSubjects){
         List<RelatedDataSubject> dataSubjects =  new ArrayList<>();
         relatedDataSubjects.forEach( dataSubject -> {
             RelatedDataSubject relatedDataSubject = new RelatedDataSubject(dataSubject.getId(), dataSubject.getName());
             List<RelatedDataCategory> dataCategories = new ArrayList<>();
-            dataSubject.getDataCategories().forEach( dataCategory -> {
-                dataCategories.add(new RelatedDataCategory(dataCategory.getId(), dataCategory.getName(), ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategory.getDataElements(), RelatedDataElements.class)));
-            });
+            dataSubject.getDataCategories().forEach( dataCategory -> dataCategories.add(new RelatedDataCategory(dataCategory.getId(), dataCategory.getName(), ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategory.getDataElements(), RelatedDataElements.class))));
             relatedDataSubject.setDataCategories(dataCategories);
             dataSubjects.add(relatedDataSubject);
         });
@@ -235,6 +233,7 @@ public class ProcessingActivityService {
     }
 
 
+    @SuppressWarnings("unchecked")
     private List<ProcessingActivity> updateSubProcessingActivities(Long orgId, Set<Long> subProcessingActivityIds, Map<Long, ProcessingActivityDTO> subProcessingActivityMap) {
         List updatesSubProcessingActivities = new ArrayList();
         List<ProcessingActivity> subProcessingActivities = processingActivityRepository.findSubProcessingActivitiesByIdsAndOrganisationId(orgId, subProcessingActivityIds);
@@ -290,7 +289,7 @@ public class ProcessingActivityService {
     }
 
 
-    ProcessingActivityResponseDTO prepareProcessingActivityResponseData(ProcessingActivity processingActivity){
+    private ProcessingActivityResponseDTO prepareProcessingActivityResponseData(ProcessingActivity processingActivity){
         /*ProcessingActivityResponseDTO processingActivityResponseDTO = new ProcessingActivityResponseDTO();
         processingActivityResponseDTO.setId(processingActivityResponseDTO.getId());
         processingActivityResponseDTO.setName(processingActivity.getName());
@@ -348,8 +347,8 @@ public class ProcessingActivityService {
 
     }
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
@@ -359,8 +358,8 @@ public class ProcessingActivityService {
     }*/
 
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param processingActivityId
      * @param activityRelatedDataSubjects list of data subject which contain list of data category and data Element list
      * @return
@@ -378,8 +377,8 @@ public class ProcessingActivityService {
         return true;
     }*/
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param processingActivityId
      * @param assetId              - asset id linked with processing activity
      * @return
@@ -411,8 +410,7 @@ public class ProcessingActivityService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        List<ProcessingActivityRelatedDataSubject> mappedDataSubjectList = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), ProcessingActivityRelatedDataSubject.class);
-        return mappedDataSubjectList;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), ProcessingActivityRelatedDataSubject.class);
     }
   /*  public List<DataSubjectMappingResponseDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
 
@@ -437,8 +435,8 @@ public class ProcessingActivityService {
     }*/
 
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param processingActivityId
      * @param dataSubjectId
      * @return
@@ -465,8 +463,8 @@ public class ProcessingActivityService {
     }
 */
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param processingActivityId
      * @return
      */
@@ -476,8 +474,8 @@ public class ProcessingActivityService {
     }*/
 
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param processingActivityId
      * @param assetId
      * @return
@@ -529,8 +527,8 @@ public class ProcessingActivityService {
     }
 
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @param processingActivityId
      * @param processingActivityRiskDTO
      */
@@ -571,8 +569,8 @@ public class ProcessingActivityService {
 
     }
 */
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @return
      */
     //TODO

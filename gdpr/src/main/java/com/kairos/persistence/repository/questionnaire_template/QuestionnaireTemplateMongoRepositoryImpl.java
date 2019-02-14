@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.questionnaire_template;
 
-public class QuestionnaireTemplateMongoRepositoryImpl {
+class QuestionnaireTemplateMongoRepositoryImpl {
 
     /*@Inject
     private MongoTemplate mongoTemplate;

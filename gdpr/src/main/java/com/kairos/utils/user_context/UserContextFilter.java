@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Component
-public class UserContextFilter implements Filter {
+class UserContextFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(UserContextFilter.class);
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)

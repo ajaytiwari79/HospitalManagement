@@ -47,7 +47,7 @@ public class KairosGdprApplication {
     }
 
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         SpringApplication.run(KairosGdprApplication.class, args);
 
     }
@@ -113,19 +113,17 @@ public class KairosGdprApplication {
     @LoadBalanced
     @Bean(name ="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
     @Profile({"local", "test"})
     @Bean(name ="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
 }

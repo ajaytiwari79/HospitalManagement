@@ -64,7 +64,7 @@ public class AssessmentService{
     @Inject
     private AssessmentRepository assessmentRepository;
 
-    private static List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
+    private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
 
 
     /**
@@ -539,7 +539,7 @@ public class AssessmentService{
      * @param assetAttributeValue asset value corresponding to field
      * @param asset               asset to which value Assessment answer were filed by assignee
      */
-    public void saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName assetAttributeName, Object assetAttributeValue, Asset asset) {
+    private void saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName assetAttributeName, Object assetAttributeValue, Asset asset) {
         switch (assetAttributeName) {
             case NAME:
                 asset.setName((String) assetAttributeValue);
@@ -649,6 +649,7 @@ public class AssessmentService{
         }
     }
 
+    @SuppressWarnings("unchecked")
     private List<BigInteger> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
 
         List<BigInteger> entityIdList = new ArrayList<>();

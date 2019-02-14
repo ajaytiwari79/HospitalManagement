@@ -79,7 +79,7 @@ public class AssetTypeService{
      * @param subAssetTypesDto contain list of sub Asset DTOs
      * @return create new Sub Asset type ids
      */
-    public List<AssetType> buildSubAssetTypesListAndRiskAndLinkedToAssetType(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetTypeMD) {
+    private List<AssetType> buildSubAssetTypesListAndRiskAndLinkedToAssetType(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetTypeMD) {
 
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
@@ -195,9 +195,7 @@ public class AssetTypeService{
                 assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
             }
             if(assetType.isHasSubAsset()){
-                assetType.getSubAssetTypes().forEach( subAssetType -> {
-                    subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType));
-                });
+                assetType.getSubAssetTypes().forEach( subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
                 assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
             }
         return assetTypeRiskResponseDTO;
@@ -309,8 +307,8 @@ public class AssetTypeService{
     }
 
 
-    /**
-     * @param countryId
+    /*
+      @param countryId
      * @param assetTypeId
      * @param riskId
      * @return

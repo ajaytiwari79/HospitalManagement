@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.agreement_template;
 
 
-public class PolicyAgreementTemplateRepositoryImpl  {
+class PolicyAgreementTemplateRepositoryImpl  {
 
 
    /* @Autowired

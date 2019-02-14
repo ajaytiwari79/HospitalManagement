@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 @EnableAsync
 @Configuration
-public class AsyncConfiguration implements AsyncConfigurer {
+class AsyncConfiguration implements AsyncConfigurer {
 
 
     @Bean(name ="executorService",destroyMethod ="shutdown")

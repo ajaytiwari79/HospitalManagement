@@ -29,7 +29,7 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class AssessmentController {
+class AssessmentController {
 
 
     @Inject

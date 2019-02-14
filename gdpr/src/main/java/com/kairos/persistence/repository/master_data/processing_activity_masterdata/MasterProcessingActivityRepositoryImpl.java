@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata;
 
 
-public class MasterProcessingActivityRepositoryImpl {
+class MasterProcessingActivityRepositoryImpl {
 
 
     /*@Inject

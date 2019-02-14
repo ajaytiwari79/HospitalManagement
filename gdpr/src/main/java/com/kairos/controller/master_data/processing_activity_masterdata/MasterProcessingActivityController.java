@@ -25,7 +25,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 @Api(API_ORGANIZATION_COUNTRY_URL)
-public class MasterProcessingActivityController {
+class MasterProcessingActivityController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterProcessingActivityController.class);
 

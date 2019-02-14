@@ -5,7 +5,7 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public class SpringSecurityAuthorProviderConfig implements AuthorProvider {
+class SpringSecurityAuthorProviderConfig implements AuthorProvider {
 
 
     @Override

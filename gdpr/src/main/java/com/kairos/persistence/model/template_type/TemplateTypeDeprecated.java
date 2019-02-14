@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
  */
 
 
-public class TemplateTypeDeprecated {
+class TemplateTypeDeprecated {
 
 
     @NotBlank(message = "templateName cannot be empty ")

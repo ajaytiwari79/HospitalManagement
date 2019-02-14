@@ -3,7 +3,6 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;

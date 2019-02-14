@@ -100,8 +100,8 @@ public class MasterProcessingActivityService{
      * @param parentProcessingActivity required to get organization types ,sub types and Services category and Sub Service Category list for sub processing activity
      * @return return map of Sub processing activities list and ids of sub processing activity
      */
-    public List<MasterProcessingActivity> createNewSubProcessingActivity(Long countryId,
-                                                                         List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> createNewSubProcessingActivity(Long countryId,
+                                                                          List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
         List<String> checkDuplicateInSubProcess = new ArrayList<>();
         List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
@@ -166,7 +166,7 @@ public class MasterProcessingActivityService{
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return
      */
-    public List<MasterProcessingActivity> updateExistingAndCreateNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> updateExistingAndCreateNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
         checkForDuplicacyInName(subProcessingActivities);
         List<MasterProcessingActivityDTO> updateSubProcessingActivities = new ArrayList<>();
@@ -197,13 +197,11 @@ public class MasterProcessingActivityService{
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return map which contain list of ids and list of sub processing activities
      */
-    public List<MasterProcessingActivity> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
 
         Map<Long, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
-        subProcessingActivities.forEach(subProcess -> {
-            subProcessingActivityDTOList.put(subProcess.getId(), subProcess);
-        });
+        subProcessingActivities.forEach(subProcess -> subProcessingActivityDTOList.put(subProcess.getId(), subProcess));
         List<MasterProcessingActivity> subProcessingActivityList = parentProcessingActivity.getSubProcessingActivities();
         subProcessingActivityList.forEach(subProcess -> {
             MasterProcessingActivityDTO subProcessDto = subProcessingActivityDTOList.get(subProcess.getId());

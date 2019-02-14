@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.data_inventory.processing_activity;
 
-public class ProcessingActivityMongoRepositoryImpl {
+class ProcessingActivityMongoRepositoryImpl {
 
 
     /*@Inject

@@ -17,9 +17,9 @@ public class RiskDaoImpl {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     public List<RiskResponseDTO> getAllRiskOfOrganizationId(Long unitId){
         Query riskQuery = entityManager.createNamedQuery("getAllRiskData").setParameter(1, unitId);
-        List<RiskResponseDTO> risks = riskQuery.getResultList();
-        return risks;
+        return (List<RiskResponseDTO>) riskQuery.getResultList();
     }
 }

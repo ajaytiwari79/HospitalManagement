@@ -21,7 +21,7 @@ import java.io.InputStream;
 public class AWSBucketService {
 
 
-    Logger LOGGER = LoggerFactory.getLogger(AWSBucketService.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(AWSBucketService.class);
     @Inject
     private AmazonS3Client amazonS3Client;
 

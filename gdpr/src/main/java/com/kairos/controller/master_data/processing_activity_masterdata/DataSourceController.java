@@ -31,7 +31,7 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 @Api(API_ORGANIZATION_COUNTRY_URL)
-public class DataSourceController {
+class DataSourceController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceController.class);
 
