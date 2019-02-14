@@ -6,8 +6,7 @@ public class AccessGroupPermissionCounterDTO {
     private Long staffId;
     private Long countryId;
     private Boolean isCountryAdmin;
-    private Boolean staff;
-    private Boolean management;
+    private boolean management;
     private List<Long> accessGroupIds;
 
     public AccessGroupPermissionCounterDTO() {
@@ -48,14 +47,6 @@ public class AccessGroupPermissionCounterDTO {
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
-    }
-
-    public Boolean getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Boolean staff) {
-        this.staff = staff;
     }
 
     public Boolean getManagement() {

@@ -298,7 +298,6 @@ public class StaffRetrievalService {
         }
         UserAccessRoleDTO userAccessRoleDTO=accessGroupService.findUserAccessRole(unitId);
         staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
-        staffAccessGroupQueryResult.setStaff(userAccessRoleDTO.getStaff());
         staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;

@@ -316,8 +316,7 @@ public class CounterDataService {
 //    }
 
     public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId){
-        List<BigInteger> kpiIds = filters.getKpiIds();
-        List<KPI> kpis = counterRepository.getKPIsByIds(kpiIds);
+        List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
