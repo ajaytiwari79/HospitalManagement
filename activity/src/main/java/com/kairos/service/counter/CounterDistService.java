@@ -194,7 +194,7 @@ public class CounterDistService extends MongoBaseService {
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-        if(CollectionUtils.isEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds()) || !accessGroupPermissionCounterDTO.getCountryAdmin()){
+        if(!accessGroupPermissionCounterDTO.getCountryAdmin() && CollectionUtils.isEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds()) ){
             exceptionService.actionNotPermittedException("message.staff.invalid.unit");
         }
         Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
