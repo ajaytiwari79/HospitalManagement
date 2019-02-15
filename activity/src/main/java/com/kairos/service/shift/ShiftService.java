@@ -990,59 +990,32 @@ public class ShiftService extends MongoBaseService {
     private void removeOppositeStatus(ShiftActivity shiftActivity, ShiftStatus shiftStatus) {
         switch (shiftStatus) {
             case LOCK:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(UNLOCK);
-                    add(UNPUBLISH);
-                    add(REQUEST);
-                }});
+                shiftActivity.getStatus().removeAll(Arrays.asList(UNLOCK,UNPUBLISH,REQUEST));
                 shiftActivity.getStatus().add(LOCK);
                 break;
             case FIX:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(UNFIX);
-                    add(REQUEST);
-                }});
+                shiftActivity.getStatus().removeAll(Arrays.asList(UNFIX,REQUEST));
                 shiftActivity.getStatus().add(FIX);
                 break;
             case UNFIX:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(FIX);
-                    add(REQUEST);
-                }});
+                shiftActivity.getStatus().removeAll(Arrays.asList(FIX,REQUEST));
                 break;
             case APPROVE:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(REJECT);
-                    add(UNPUBLISH);
-                    add(REQUEST);
-                }});
+                shiftActivity.getStatus().removeAll(Arrays.asList(REJECT,UNPUBLISH,REQUEST));
                 shiftActivity.getStatus().add(APPROVE);
                 break;
             case REJECT:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(APPROVE);
-                    add(REQUEST);
-                }});
+            shiftActivity.getStatus().removeAll(Arrays.asList(APPROVE,REQUEST));
                 break;
             case UNLOCK:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(LOCK);
-                    add(REQUEST);
-                }});
+        shiftActivity.getStatus().removeAll(Arrays.asList(LOCK,REQUEST));
                 break;
             case PUBLISH:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(REQUEST);
-                    add(UNPUBLISH);
-                    add(REJECT);
-                }});
+        shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST,UNPUBLISH,REJECT));
                 shiftActivity.getStatus().add(PUBLISH);
                 break;
             case UNPUBLISH:
-                shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>() {{
-                    add(REQUEST);
-                    add(PUBLISH);
-                }});
+        shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST,PUBLISH));
                 break;
             case VALIDATE:
                 shiftActivity.getStatus().add(VALIDATE);
