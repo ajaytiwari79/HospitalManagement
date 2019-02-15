@@ -213,43 +213,45 @@ public class TimeBankCalculationService {
      * @param unitPosition
      */
     public void calculateScheduledAndDurationMinutes(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
-        if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())){
-            exceptionService.invalidRequestException("activity.end_date.less_than.start_date",shiftActivity.getActivityName());
-        }
-        int scheduledMinutes = 0;
-        int duration = 0;
-        int weeklyMinutes;
-        switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
-            case ENTERED_MANUALLY:
-                duration = shiftActivity.getDurationMinutes();
-                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                break;
-            case FIXED_TIME:
-                duration = activity.getTimeCalculationActivityTab().getFixedTimeValue().intValue();
-                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                break;
-            case ENTERED_TIMES:
-                duration = (int) new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime()).toDuration().getStandardMinutes();
-                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                break;
+        if(TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType())) {
+            if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
+                exceptionService.invalidRequestException("activity.end_date.less_than.start_date", shiftActivity.getActivityName());
+            }
+            int scheduledMinutes = 0;
+            int duration = 0;
+            int weeklyMinutes;
+            switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
+                case ENTERED_MANUALLY:
+                    duration = shiftActivity.getDurationMinutes();
+                    scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                    break;
+                case FIXED_TIME:
+                    duration = activity.getTimeCalculationActivityTab().getFixedTimeValue().intValue();
+                    scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                    break;
+                case ENTERED_TIMES:
+                    duration = (int) new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime()).toDuration().getStandardMinutes();
+                    scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                    break;
 
-            case AppConstants.FULL_DAY_CALCULATION:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType())) ? unitPosition.getFullTimeWeeklyMinutes() : unitPosition.getTotalWeeklyMinutes();
-                duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            case AppConstants.WEEKLY_HOURS:
-                duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            case AppConstants.FULL_WEEK:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) ? unitPosition.getFullTimeWeeklyMinutes() : unitPosition.getTotalWeeklyMinutes();
-                duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
+                case AppConstants.FULL_DAY_CALCULATION:
+                    weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType())) ? unitPosition.getFullTimeWeeklyMinutes() : unitPosition.getTotalWeeklyMinutes();
+                    duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                    scheduledMinutes = duration;
+                    break;
+                case AppConstants.WEEKLY_HOURS:
+                    duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                    scheduledMinutes = duration;
+                    break;
+                case AppConstants.FULL_WEEK:
+                    weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) ? unitPosition.getFullTimeWeeklyMinutes() : unitPosition.getTotalWeeklyMinutes();
+                    duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                    scheduledMinutes = duration;
+                    break;
+            }
+            shiftActivity.setDurationMinutes(duration);
+            shiftActivity.setScheduledMinutes(scheduledMinutes);
         }
-        shiftActivity.setDurationMinutes(duration);
-        shiftActivity.setScheduledMinutes(scheduledMinutes);
     }
 
 
