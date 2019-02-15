@@ -3,6 +3,7 @@ package com.kairos.service.data_inventory.asset;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
@@ -52,11 +53,9 @@ public class OrganizationOrganizationalSecurityMeasureService{
      * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
      * findByOrganizationIdAndNamesList()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long organizationId, List<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOs) {
+    public List<OrganizationalSecurityMeasureDTO> createOrganizationalSecurityMeasure(Long organizationId, List<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOs) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
         Set<String> orgSecurityMeasureNames = new HashSet<>();
-        if (!orgSecurityMeasureDTOs.isEmpty()) {
             for (OrganizationalSecurityMeasureDTO securityMeasure : orgSecurityMeasureDTOs) {
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
@@ -64,25 +63,20 @@ public class OrganizationOrganizationalSecurityMeasureService{
             List<String> nameInLowerCase = orgSecurityMeasureNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
-            List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
+            List<OrganizationalSecurityMeasure> previousOrganizationalSecurityMeasures = organizationalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousOrganizationalSecurityMeasures, orgSecurityMeasureNames);
+            List<OrganizationalSecurityMeasure> organizationalSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
 
                     OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
                     newOrganizationalSecurityMeasure.setOrganizationId(organizationId);
-                    newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
+                    organizationalSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
-                newOrgSecurityMeasures = organizationalSecurityMeasureRepository.saveAll(newOrgSecurityMeasures);
+              organizationalSecurityMeasureRepository.saveAll(organizationalSecurityMeasures);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newOrgSecurityMeasures);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
+           return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationalSecurityMeasures,OrganizationalSecurityMeasureDTO.class);
 
     }
 
@@ -105,7 +99,7 @@ public class OrganizationOrganizationalSecurityMeasureService{
      */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long organizationId, Long id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -154,13 +148,10 @@ public class OrganizationOrganizationalSecurityMeasureService{
     }
 
 
-    public Map<String, List<OrganizationalSecurityMeasure>> saveAndSuggestOrganizationalSecurityMeasures(Long countryId, Long organizationId, List<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOS) {
+    public List<OrganizationalSecurityMeasureDTO> saveAndSuggestOrganizationalSecurityMeasures(Long countryId, Long organizationId, List<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOS) {
 
-        Map<String, List<OrganizationalSecurityMeasure>> result = createOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureDTOS);
-        List<OrganizationalSecurityMeasure> masterOrganizationalSecurityMeasureSuggestedByUnit = organizationalSecurityMeasureService.saveSuggestedOrganizationalSecurityMeasuresFromUnit(countryId, orgSecurityMeasureDTOS);
-        if (!masterOrganizationalSecurityMeasureSuggestedByUnit.isEmpty()) {
-            result.put("SuggestedData", masterOrganizationalSecurityMeasureSuggestedByUnit);
-        }
+        List<OrganizationalSecurityMeasureDTO> result = createOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureDTOS);
+        organizationalSecurityMeasureService.saveSuggestedOrganizationalSecurityMeasuresFromUnit(countryId, orgSecurityMeasureDTOS);
         return result;
     }
 

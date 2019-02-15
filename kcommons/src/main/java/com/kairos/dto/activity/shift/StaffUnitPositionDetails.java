@@ -55,7 +55,6 @@ public class StaffUnitPositionDetails {
     private boolean published;
     private CTAResponseDTO costTimeAgreement;
 
-
     public StaffUnitPositionDetails() {
 
     }
@@ -307,4 +306,5 @@ public class StaffUnitPositionDetails {
     public void setEditable(Boolean editable) {
         this.editable = editable;
     }
+
 }

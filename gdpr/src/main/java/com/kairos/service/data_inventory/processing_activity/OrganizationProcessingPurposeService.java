@@ -4,6 +4,7 @@ package com.kairos.service.data_inventory.processing_activity;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -51,38 +52,30 @@ public class OrganizationProcessingPurposeService{
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public List<ProcessingPurposeDTO>  createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
-        Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
-        if (!processingPurposeDTOS.isEmpty()) {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 processingPurposesNames.add(processingPurpose.getName());
             }
             List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingPurpose> existing = processingPurposeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
+            List<ProcessingPurpose> previousProcessingPurposes = processingPurposeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            processingPurposesNames = ComparisonUtils.getNameListForMetadata(previousProcessingPurposes, processingPurposesNames);
 
-            List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
-            if (processingPurposesNames.size() != 0) {
+            List<ProcessingPurpose> processingPurposes = new ArrayList<>();
+            if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
 
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name);
-                    newProcessingPurpose.setOrganizationId(organizationId);
-                    newProcessingPurposes.add(newProcessingPurpose);
+                    ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
+                    processingPurpose.setOrganizationId(organizationId);
+                    processingPurposes.add(processingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeRepository.saveAll(newProcessingPurposes);
+               processingPurposeRepository.saveAll(processingPurposes);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newProcessingPurposes);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
+            return ObjectMapperUtils.copyPropertiesOfListByMapper(processingPurposes,ProcessingPurposeDTO.class);
     }
 
 
@@ -102,7 +95,7 @@ public class OrganizationProcessingPurposeService{
      */
     public ProcessingPurpose getProcessingPurpose(Long organizationId, Long id) {
 
-        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeletedFalse( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -148,13 +141,10 @@ public class OrganizationProcessingPurposeService{
 
     }
 
-    public Map<String, List<ProcessingPurpose>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public List<ProcessingPurposeDTO> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
-        Map<String, List<ProcessingPurpose>> result = createProcessingPurpose(organizationId, processingPurposeDTOS);
-        List<ProcessingPurpose> masterProcessingPurposeSuggestedByUnit = processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, processingPurposeDTOS);
-        if (!masterProcessingPurposeSuggestedByUnit.isEmpty()) {
-            result.put("SuggestedData", masterProcessingPurposeSuggestedByUnit);
-        }
+        List<ProcessingPurposeDTO> result = createProcessingPurpose(organizationId, processingPurposeDTOS);
+        processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, processingPurposeDTOS);
         return result;
     }
 
