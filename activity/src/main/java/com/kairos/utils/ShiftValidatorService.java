@@ -978,7 +978,7 @@ public class ShiftValidatorService {
 
                 }
             } else {
-                exceptionService.actionNotPermittedException("message.staffingLevel.activity");
+                exceptionService.actionNotPermittedException("message.staffingLevel.activity",shiftActivity.getActivityName());
             }
         }
     }

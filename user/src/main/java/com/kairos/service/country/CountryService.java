@@ -131,11 +131,12 @@ public class CountryService {
      */
     public CountryDTO getCountryById(Long id) {
         Country country = countryGraphRepository.findOne(id);
-        CountryDTO countryDTO = new CountryDTO(country.getId(),country.getName());
-        if(country!=null){
-            Currency currency = currencyService.getCurrencyByCountryId(id);
-            countryDTO.setCurrencyId(currency.getId());
+        if(country==null){
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", id);
         }
+        CountryDTO countryDTO = new CountryDTO(country.getId(),country.getName());
+        Currency currency = currencyService.getCurrencyByCountryId(id);
+        countryDTO.setCurrencyId(currency.getId());
         return countryDTO;
     }
 
@@ -587,5 +588,9 @@ public class CountryService {
     public Long getCountryIdByUnitId(long unitId){
         Organization parent=organizationService.fetchParentOrganization(unitId);
         return countryGraphRepository.getCountryIdByUnitId(parent.getId());
+    }
+
+    public boolean existsById(Long countryId){
+        return countryGraphRepository.existsByCountryId(countryId);
     }
 }

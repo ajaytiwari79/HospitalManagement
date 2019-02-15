@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
 public class MasterProcessingActivityRiskDTO {
 
     @NotNull(message = "Processing Activity Id can't be Null")
-    private BigInteger id;
+    private Long id;
 
     @Valid
     private List<BasicRiskDTO> risks=new ArrayList<>();
@@ -20,9 +19,9 @@ public class MasterProcessingActivityRiskDTO {
     @Valid
     private List<MasterProcessingActivityRiskDTO> subProcessingActivities=new ArrayList<>();
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public List<BasicRiskDTO> getRisks() { return risks; }
 

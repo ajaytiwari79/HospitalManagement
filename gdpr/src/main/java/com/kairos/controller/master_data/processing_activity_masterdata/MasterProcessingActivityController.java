@@ -14,13 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
+
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
@@ -77,7 +77,7 @@ class MasterProcessingActivityController {
 
     @ApiOperation(value = "Link risk with Processing Activity And Sub Processing Activity")
     @PutMapping("/master_processing_activity/{processingActivityId}/risk")
-    public ResponseEntity<Object> createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody MasterProcessingActivityRiskDTO masterProcessingActivityRiskDTO) {
+    public ResponseEntity<Object> createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long processingActivityId, @Valid @RequestBody MasterProcessingActivityRiskDTO masterProcessingActivityRiskDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(countryId, processingActivityId, masterProcessingActivityRiskDTO));
     }
 

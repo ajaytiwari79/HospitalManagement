@@ -1,12 +1,14 @@
 package com.kairos.controller.data_inventory.assessment;
 
 
+import com.kairos.dto.gdpr.assessment.AssessmentAnswerDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
-import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
+import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswer;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,12 +52,11 @@ class AssessmentController {
 
     }
 
-    /*@ApiOperation(value = "get Assessment  By Id")
+    @ApiOperation(value = "get Assessment  By Id")
     @GetMapping( "/assessment/{assessmentId}")
-    public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentById( unitId, assessmentId));
-    }*/
-
+    public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long unitId, @PathVariable Long assessmentId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentByUnitIdAndId( unitId, assessmentId));
+    }
 
     @ApiOperation(value = "get All launched Assessment Assign Staff Member")
     @GetMapping("/assessment/staff")
@@ -79,8 +79,8 @@ class AssessmentController {
 
     @ApiOperation(value = "save answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects ,@RequestParam AssessmentStatus status) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivity(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
+    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable Long assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerDTO> assessmentAnswerValueObjects , @RequestParam(required = true) AssessmentStatus status) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentAnswerByUnitIdAndAssessmentId(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
     }
 
     @ApiOperation(value = "get assessment scheduling frequency enum")
@@ -95,11 +95,10 @@ class AssessmentController {
     public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable Long assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
         if (!Optional.ofNullable(assessmentStatus).isPresent())
         {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Assessment Status "+assessmentStatus+" is invalid");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "please enter valid param");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.updateAssessmentStatus(unitId, assessmentId,assessmentStatus));
     }
-
 
 
 }
