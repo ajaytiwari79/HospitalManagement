@@ -7,17 +7,17 @@ import com.kairos.response.dto.common.RiskResponseDTO;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 
 @Entity
-@NamedNativeQuery(name = "getAllRiskData", resultClass = RiskResponseDTO.class, query = "select risk.id as id ,risk.name as name, risk.description as description, risk.risk_recommendation as riskRecommendation,  risk.is_reminder_active as isReminderActive,risk.days_to_reminder_before as daysToReminderBefore,/* risk.risk_level as riskLevel,*/PA.name as processingActivityName, PA.id as processingActivityId, PA.sub_processing_activity as isSubProcessing from riskmd risk inner join processing_activitymd_risks PAR ON PAR.risks_id = risk.id left join processing_activitymd PA ON PAR.processing_activitymd_id = PA.id where risk.organization_id = ?1 and risk.deleted = false", resultSetMapping = "getAllRiskData")
+@NamedNativeQuery(name = "getAllRiskData", resultClass = RiskResponseDTO.class, query = "Select RISk.id as id, RISK.name as name, RISK.description as description, RISK.risk_recommendation as riskRecommendation,RISK.is_reminder_active as isReminderActive,RISK.days_to_reminder_before as daysToReminderBefore,PA.name as processingActivityName, PA.id as processingActivityId, PA.sub_process_activity as isSubProcessingActivity from risk RISK left join master_processing_activity PA ON RISK.processing_activity_id = PA.id where RISK.organization_id = ?1 and RISK.deleted =false", resultSetMapping = "getAllRiskData")
 @SqlResultSetMapping(
         name = "getAllRiskData",
         classes = @ConstructorResult(
                 targetClass = RiskResponseDTO.class,
                 columns = {
-                        @ColumnResult(name = "id"),  @ColumnResult(name = "name"), @ColumnResult(name = "description"), @ColumnResult(name = "riskRecommendation"),  @ColumnResult(name = "isReminderActive"),  @ColumnResult(name = "daysToReminderBefore"),
-                        /*@ColumnResult(name = "riskLevel"),*/  @ColumnResult(name = "processingActivityName"),
-                        @ColumnResult(name = "processingActivityId"), @ColumnResult(name = "isSubProcessing")
+                        @ColumnResult(name = "id"),@ColumnResult(name = "name"), @ColumnResult(name = "description"), @ColumnResult(name = "riskRecommendation"),  @ColumnResult(name = "isReminderActive"),  @ColumnResult(name = "daysToReminderBefore"),
+                        @ColumnResult(name = "processingActivityName", type=String.class),@ColumnResult(name = "processingActivityId", type= BigInteger.class), @ColumnResult(name = "isSubProcessingActivity", type = boolean.class)
 
                 }
         )

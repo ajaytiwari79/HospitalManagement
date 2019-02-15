@@ -35,6 +35,7 @@ public class MasterProcessingActivity extends BaseEntity {
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "processingActivity_id")
     private List<Risk> risks  = new ArrayList<>();
 
     @ManyToOne
