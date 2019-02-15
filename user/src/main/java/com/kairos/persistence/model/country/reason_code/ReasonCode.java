@@ -9,6 +9,8 @@ import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.math.BigInteger;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 /**
@@ -27,24 +29,28 @@ public class ReasonCode extends UserBaseEntity {
     private Country country;
     @Relationship(type = BELONGS_TO)
     private Organization organization;
+    // this is only persist when we create any Absence type reason code
+    private BigInteger timeTypeId;
 
     public ReasonCode() {
         //Default Constructor
     }
-    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Country country) {
+    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Country country,BigInteger timeTypeId) {
         this.name = name;
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
         this.country = country;
+        this.timeTypeId=timeTypeId;
     }
 
-    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Organization organization) {
+    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Organization organization,BigInteger timeTypeId) {
         this.name = name;
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
         this.organization = organization;
+        this.timeTypeId=timeTypeId;
     }
 
     public String getName() {
@@ -95,5 +101,11 @@ public class ReasonCode extends UserBaseEntity {
         this.organization = organization;
     }
 
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
+    }
 
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
 }
