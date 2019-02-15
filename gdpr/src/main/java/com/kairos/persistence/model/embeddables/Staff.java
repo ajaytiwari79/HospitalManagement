@@ -2,6 +2,7 @@ package com.kairos.persistence.model.embeddables;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.data_inventory.assessment.SelectedChoice;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
@@ -11,7 +12,7 @@ import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
-public class Staff {
+public class Staff{
 
     @NotNull
     private Long staffId;
@@ -21,10 +22,9 @@ public class Staff {
     @NotBlank(message = "Staff Name can't be empty ")
     private String firstName;
 
-    public Long getId() { return staffId; }
+    public Long getStaffId() { return staffId; }
 
-    public void setId(Long staffId) { this.staffId = staffId; }
-
+    public void setStaffId(Long staffId) { this.staffId = staffId; }
 
     public String getLastName() {
         return lastName;

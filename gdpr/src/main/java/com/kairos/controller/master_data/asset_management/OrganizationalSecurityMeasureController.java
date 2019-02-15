@@ -42,11 +42,10 @@ class OrganizationalSecurityMeasureController {
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/organization_security")
     public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
-        if (CollectionUtils.isEmpty(orgSecurityMeasures.getRequestBody()))
-        {
+        if (CollectionUtils.isEmpty(orgSecurityMeasures.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId, orgSecurityMeasures.getRequestBody(),false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId, orgSecurityMeasures.getRequestBody(), false));
 
     }
 
@@ -67,14 +66,14 @@ class OrganizationalSecurityMeasureController {
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
     @DeleteMapping("/organization_security/{orgSecurityMeasureId}")
     public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable Long orgSecurityMeasureId) {
-          return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId));
 
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/organization_security/{orgSecurityMeasureId}")
     public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
-           return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId, orgSecurityMeasure));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId, orgSecurityMeasure));
     }
 
 
@@ -83,14 +82,11 @@ class OrganizationalSecurityMeasureController {
     public ResponseEntity<Object> updateSuggestedStatusOFOrgSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<Long> orgSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(orgSecurityMeasureIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Security Measure is Not Selected");
-        }else  if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateSuggestedStatusOfOrganizationalSecurityMeasures(countryId, orgSecurityMeasureIds, suggestedDataStatus));
     }
-
-
-
 
 
 }

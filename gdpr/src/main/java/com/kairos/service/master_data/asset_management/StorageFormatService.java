@@ -4,6 +4,7 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
@@ -43,9 +44,8 @@ public class StorageFormatService{
      * and if exist then simply add  StorageFormat to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
-    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS, boolean isSuggestion) {
+    public List<StorageFormatDTO> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<StorageFormat>> result = new HashMap<>();
         Set<String> storageFormatNames = new HashSet<>();
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
@@ -54,26 +54,24 @@ public class StorageFormatService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<StorageFormat> existing = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
+            List<StorageFormat> previousStorageFormates = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
+            storageFormatNames = ComparisonUtils.getNameListForMetadata(previousStorageFormates, storageFormatNames);
 
-            List<StorageFormat> newStorageFormats = new ArrayList<>();
+            List<StorageFormat> storageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-                    StorageFormat newStorageFormat = new StorageFormat(name,countryId);
+                    StorageFormat storageFormat = new StorageFormat(name,countryId);
                     if(isSuggestion){
-                        newStorageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                        newStorageFormat.setSuggestedDate(LocalDate.now());
+                        storageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        storageFormat.setSuggestedDate(LocalDate.now());
                     }else {
-                        newStorageFormat.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                        storageFormat.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                     }
-                    newStorageFormats.add(newStorageFormat);
+                    storageFormats.add(storageFormat);
                 }
-                newStorageFormats = storageFormatRepository.saveAll(newStorageFormats);
+                storageFormatRepository.saveAll(storageFormats);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newStorageFormats);
-            return result;
+           return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormats,StorageFormatDTO.class);
     }
 
 
@@ -150,10 +148,8 @@ public class StorageFormatService{
      * @param storageFormatDTOS
      * @return
      */
-    public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
-        Map<String, List<StorageFormat>> result = createStorageFormat(countryId, storageFormatDTOS,true);
-        return result.get(NEW_DATA_LIST);
-
+    public List<StorageFormatDTO> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
+        return createStorageFormat(countryId, storageFormatDTOS,true);
     }
 
 

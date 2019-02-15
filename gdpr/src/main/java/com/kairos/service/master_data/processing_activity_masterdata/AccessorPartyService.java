@@ -3,6 +3,7 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
@@ -19,12 +20,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
-
 
 @Service
-public class AccessorPartyService{
+public class AccessorPartyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessorPartyService.class);
 
@@ -36,43 +34,41 @@ public class AccessorPartyService{
 
 
     /**
+     * @param accessorPartyDTOS
      * @param countryId -countryId
-     * @param accessorParties
      * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
-    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties, boolean isSuggestion) {
+    public List<AccessorPartyDTO> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<AccessorParty>> result = new HashMap<>();
-        Set<String> accessorPartyNames = new HashSet<>();
-            for (AccessorPartyDTO accessorParty : accessorParties) {
-                accessorPartyNames.add(accessorParty.getName());
-            }
-            List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<AccessorParty> existing = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
-            List<AccessorParty> newAccessorPartyList = new ArrayList<>();
-            if (!accessorPartyNames.isEmpty()) {
-                for (String name : accessorPartyNames) {
-                    AccessorParty newAccessorParty = new AccessorParty(name,countryId);
-                    if(isSuggestion){
-                        newAccessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                        newAccessorParty.setSuggestedDate(LocalDate.now());
-                    }else{
-                        newAccessorParty.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
-                    }
-                    newAccessorPartyList.add(newAccessorParty);
+        Set<String> accessorPartyNames = new HashSet<>();
+        for (AccessorPartyDTO accessorParty : accessorPartyDTOS) {
+            accessorPartyNames.add(accessorParty.getName());
+        }
+        List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<AccessorParty> previousAccessorParties = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        accessorPartyNames = ComparisonUtils.getNameListForMetadata(previousAccessorParties, accessorPartyNames);
+
+        List<AccessorParty> accessorParties = new ArrayList<>();
+        if (!accessorPartyNames.isEmpty()) {
+            for (String name : accessorPartyNames) {
+                AccessorParty accessorParty = new AccessorParty(name, countryId);
+                if (isSuggestion) {
+                    accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    accessorParty.setSuggestedDate(LocalDate.now());
+                } else {
+                    accessorParty.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-                newAccessorPartyList = accessorPartyRepository.saveAll(newAccessorPartyList);
+                accessorParties.add(accessorParty);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newAccessorPartyList);
-            return result;
+            accessorPartyRepository.saveAll(accessorParties);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessorParties, AccessorPartyDTO.class);
     }
 
 
@@ -101,7 +97,7 @@ public class AccessorPartyService{
         Integer resultCount = accessorPartyRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Accessor Party deleted successfully for id :: {}", id);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -116,17 +112,17 @@ public class AccessorPartyService{
      */
     public AccessorPartyDTO updateAccessorParty(Long countryId, Long id, AccessorPartyDTO accessorPartyDTO) {
 
-        AccessorParty accessorParty = accessorPartyRepository.findByCountryIdAndName(countryId,  accessorPartyDTO.getName() );
+        AccessorParty accessorParty = accessorPartyRepository.findByCountryIdAndName(countryId, accessorPartyDTO.getName());
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
             }
             throw new DuplicateDataException("Name Already Exist");
         }
-        Integer resultCount =  accessorPartyRepository.updateMasterMetadataName(accessorPartyDTO.getName(), id, countryId);
-        if(resultCount <=0){
+        Integer resultCount = accessorPartyRepository.updateMasterMetadataName(accessorPartyDTO.getName(), id, countryId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }
         return accessorPartyDTO;
@@ -136,20 +132,17 @@ public class AccessorPartyService{
 
 
     /**
-     * @description method save Accessor Party suggested by unit
      * @param countryId
      * @param accessorPartyDTOS
      * @return
+     * @description method save Accessor Party suggested by unit
      */
-    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
-
-        Map<String, List<AccessorParty>> result = createAccessorParty(countryId, accessorPartyDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<AccessorPartyDTO> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
+        return createAccessorParty(countryId, accessorPartyDTOS, true);
     }
 
 
     /**
-     *
      * @param countryId
      * @param accessorPartyIds
      * @param suggestedDataStatus
@@ -157,10 +150,10 @@ public class AccessorPartyService{
      */
     public List<AccessorParty> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<Long> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = accessorPartyRepository.updateMetadataStatus(countryId, accessorPartyIds,suggestedDataStatus);
-        if(updateCount > 0){
+        Integer updateCount = accessorPartyRepository.updateMetadataStatus(countryId, accessorPartyIds, suggestedDataStatus);
+        if (updateCount > 0) {
             LOGGER.info("Accessor Parties are updated successfully with ids :: {}", accessorPartyIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyIds);
         }
         return accessorPartyRepository.findAllByIds(accessorPartyIds);

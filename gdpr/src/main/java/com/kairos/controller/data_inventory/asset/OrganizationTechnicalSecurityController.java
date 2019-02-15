@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,10 @@ class OrganizationTechnicalSecurityController {
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
+        if (CollectionUtils.isEmpty(securityMeasures.getRequestBody()))
+        {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,null);
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(unitId, securityMeasures.getRequestBody()));
 
     }
