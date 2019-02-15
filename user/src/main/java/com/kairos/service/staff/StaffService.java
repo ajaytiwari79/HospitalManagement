@@ -1554,10 +1554,11 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
+        Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), unit.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
         staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
-        staffEmploymentWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByUnitId(unitId));
+        staffEmploymentWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(),unitId));
         return staffEmploymentWrapper;
     }
 
