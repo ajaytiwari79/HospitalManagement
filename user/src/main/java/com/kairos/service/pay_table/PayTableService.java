@@ -427,7 +427,7 @@ public class PayTableService {
 
         }
         List<PayGradeResponse> payGradeResponses;
-        // user is updating in a unpublished payTable
+        //user is updating in a unpublished payTable
         payGradeResponses = (!payTable.isPublished()) ? updatePayGradeInUnpublishedPayTable(payTable, payGradeDTO, payGrade) :
                 updatePayGradeInPublishedPayTable(payTable, payGradeDTO, payGradeId);
         return payGradeResponses;
