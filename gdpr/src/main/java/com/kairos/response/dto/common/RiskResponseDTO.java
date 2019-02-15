@@ -73,7 +73,8 @@ public class RiskResponseDTO {
 
     public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
 
-    public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, int riskLevel, String processingActivityName, BigInteger processingActivityId, boolean isSubProcessing){
+
+    public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, int riskLevel, String processingActivityName, BigInteger processingActivityId, boolean isSubProcessingActivity){
         this.id = id;
         this.name = name;
         this.description = description;
@@ -81,7 +82,7 @@ public class RiskResponseDTO {
         this.isReminderActive = isReminderActive;
         this.daysToReminderBefore = daysToReminderBefore;
         this.riskLevel = RiskSeverity.values()[riskLevel];
-        this.processingActivity = new ProcessingActivityBasicDTO(processingActivityId, processingActivityName,isSubProcessing);
+        this.processingActivity = new ProcessingActivityBasicDTO(Long.valueOf(processingActivityId.toString()), processingActivityName,isSubProcessingActivity);
 
     }
 
