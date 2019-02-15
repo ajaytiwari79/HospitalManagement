@@ -469,6 +469,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Staff getStaffByOrganizationHub(Long currentUnitId,Long userId);
 
 
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) " +
+            "WHERE id(organization)={0} RETURN id(staff) as id ,staff.lastName as lastName  , staff.firstName as firstName , staff.email as email ")
+    List<Map> findAllStaffBasicDetailsByUnitId(Long unitId);
+
+
+
+
     //TODO not delete
 
 //    @Query("MATCH (org:Organization) WHERE id(org) IN {0}"+

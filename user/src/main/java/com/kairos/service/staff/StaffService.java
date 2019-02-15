@@ -81,6 +81,7 @@ import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
+import com.kairos.wrapper.staff.StaffEmploymentWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -265,7 +266,7 @@ public class StaffService {
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
         }
-        if (isNotNull(staffToUpdate.getContactDetail().getPrivateEmail())  && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
+        if (isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
             if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentOrganization.getId()) != null) {
                 exceptionService.duplicateDataException("message.email.alreadyExist", "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
             }
@@ -1540,4 +1541,25 @@ public class StaffService {
             staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
     }
+
+
+    /**
+     * @param unitId
+     * @return - login user staff id and list of staff present in unit
+     */
+    public StaffEmploymentWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
+
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+
+        }
+        Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), unit.getId());
+        StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
+        staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
+        staffEmploymentWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByUnitId(unitId));
+        return staffEmploymentWrapper;
+    }
+
+
 }
