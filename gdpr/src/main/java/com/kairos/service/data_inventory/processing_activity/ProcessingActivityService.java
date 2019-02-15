@@ -130,6 +130,7 @@ public class ProcessingActivityService {
             processingActivityRisk.setDescription(organizationLevelRiskDTO.getDescription());*/
             risks.add(ObjectMapperUtils.copyPropertiesByMapper(organizationLevelRiskDTO, Risk.class));
         });
+        risks.forEach(risk -> risk.setOrganizationId(orgId));
         return risks;
     }
 
@@ -188,6 +189,7 @@ public class ProcessingActivityService {
     private ProcessingActivity buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
         processingActivity = ObjectMapperUtils.copyPropertiesByMapper(processingActivityDTO, ProcessingActivity.class);
         processingActivity.setOrganizationId(organizationId);
+        processingActivity.getRisks().forEach(risk -> risk.setOrganizationId(organizationId));
        /* processingActivity.setName(processingActivityDTO.getName());
         processingActivity.setDescription(processingActivityDTO.getDescription());
         processingActivity.setOrganizationId(organizationId);
