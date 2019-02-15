@@ -1548,11 +1548,9 @@ public class StaffService {
      * @return - login user staff id and list of staff present in unit
      */
     public StaffEmploymentWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
-
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
-
         }
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), unit.getId());
