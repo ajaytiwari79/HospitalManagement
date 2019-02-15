@@ -153,4 +153,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("MATCH(country:Country{deleted:false,isEnabled:true}) where id(country)={0} RETURN country")
     Country findCountryById(Long countryId);
+
+    @Query("MATCH(country:Country{deleted:false}) WHERE id(country) = {0} RETURN case when count(country)>0 THEN TRUE ELSE FALSE END AS exists")
+    boolean existsByCountryId(Long countryId);
 }

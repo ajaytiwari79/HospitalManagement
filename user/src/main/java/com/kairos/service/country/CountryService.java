@@ -589,4 +589,8 @@ public class CountryService {
         Organization parent=organizationService.fetchParentOrganization(unitId);
         return countryGraphRepository.getCountryIdByUnitId(parent.getId());
     }
+
+    public boolean existsById(Long countryId){
+        return countryGraphRepository.existsByCountryId(countryId);
+    }
 }
