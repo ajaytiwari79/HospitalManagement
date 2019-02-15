@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Service
@@ -101,7 +100,7 @@ public class UnitService {
 
         OrganizationTypeAndSubType organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(organizationId);
 
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
+        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinessTypesByCountry(countryId);
         response.put("organizationTypes", organizationTypes);
         response.put("businessTypes", businessTypes);
         response.put("unitTypes", unitTypeGraphRepository.getAllUnitTypeOfCountry(countryId));

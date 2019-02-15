@@ -25,6 +25,7 @@ import com.kairos.persistence.model.client.query_results.ClientStaffQueryResult;
 import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
 import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
+import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -1068,7 +1069,7 @@ public class ClientService {
             return null;
         }
         Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
-        List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
+        List<CitizenStatusDTO> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
         clientData.put("clientStatusList", clientStatusList);
 
         CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(ClientService.class)

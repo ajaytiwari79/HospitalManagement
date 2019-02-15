@@ -27,16 +27,18 @@ public class BusinessType extends UserBaseEntity {
 
     @NotBlank(message = "error.BusinessType.name.notEmpty")
     private String name;
-
-
-
-    //@NotEmpty(message = "error.BusinessType.description.notEmpty") @NotNull(message = "error.BusinessType.description.notnull")
     private String description;
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     private boolean isEnabled = true;
+
+    public BusinessType() {
+    }
+
+    public BusinessType(@NotBlank(message = "error.BusinessType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -69,19 +71,5 @@ public class BusinessType extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
-    }
-
-    public BusinessType() {
-    }
-
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
     }
 }

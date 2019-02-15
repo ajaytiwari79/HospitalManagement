@@ -8,15 +8,15 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.Currency;
-import com.kairos.persistence.model.country.default_data.DayType;
-import com.kairos.persistence.model.country.RelationType;
+import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
@@ -131,11 +131,12 @@ public class CountryService {
      */
     public CountryDTO getCountryById(Long id) {
         Country country = countryGraphRepository.findOne(id);
-        CountryDTO countryDTO = new CountryDTO(country.getId(),country.getName());
-        if(country!=null){
-            Currency currency = currencyService.getCurrencyByCountryId(id);
-            countryDTO.setCurrencyId(currency.getId());
+        if(country==null){
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", id);
         }
+        CountryDTO countryDTO = new CountryDTO(country.getId(),country.getName());
+        Currency currency = currencyService.getCurrencyByCountryId(id);
+        countryDTO.setCurrencyId(currency.getId());
         return countryDTO;
     }
 
@@ -371,35 +372,37 @@ public class CountryService {
         return countryGraphRepository.getLevelsByCountry(countryId);
     }
 
-    public RelationType addRelationType(Long countryId, RelationType relationType) {
+    public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            logger.debug("Finding country by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
-
         }
+
+        Boolean relationTypeExistInCountryByName = countryGraphRepository.relationTypeExistInCountryByName(countryId, "(?i)" + relationTypeDTO.getName(), -1L);
+        if (relationTypeExistInCountryByName) {
+            exceptionService.duplicateDataException("error.RelationType.name.exist");
+        }
+
         List<RelationType> relationTypes = new ArrayList<RelationType>();
         //check if getRelationTypes is null then it will not add in array list.
         Optional.ofNullable(country.getRelationTypes()).ifPresent(relationTypesList -> relationTypes.addAll(relationTypesList));
-
+        RelationType relationType = new RelationType(relationTypeDTO.getName(), relationTypeDTO.getDescription());
         relationTypes.add(relationType);
         country.setRelationTypes(relationTypes);
         countryGraphRepository.save(country);
-        return relationType;
+        relationTypeDTO.setId(relationType.getId());
+        return relationTypeDTO;
     }
 
-    public List<RelationType> getRelationTypes(Long countryId) {
+    public List<RelationTypeDTO> getRelationTypes(Long countryId) {
         return countryGraphRepository.getRelationTypesByCountry(countryId);
     }
 
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {
         RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
         if (relationType == null) {
-            logger.debug("Finding relation type by id::" + relationTypeId);
             exceptionService.dataNotFoundByIdException("message.country.realtionType.id.notFound",relationTypeId);
-
         }
-
         relationType.setEnabled(false);
         relationTypeGraphRepository.save(relationType);
         return true;
@@ -413,6 +416,11 @@ public class CountryService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
+        boolean vehicleExistInCountryByName = countryGraphRepository.vehicleExistInCountryByName(countryId,"(?i)" + vehicle.getName(),-1L);
+        if(vehicleExistInCountryByName){
+            exceptionService.duplicateDataException("message.country.vehicle.name.alreadyExist" , vehicle.getName());
+        }
+
         country.addResources(vehicle);
         countryGraphRepository.save(country);
         return vehicle;
@@ -456,6 +464,10 @@ public class CountryService {
             exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
 
         }
+        boolean vehicleExistInCountryByName = countryGraphRepository.vehicleExistInCountryByName(countryId,"(?i)" + vehicle.getName(),-1L);
+        if(vehicleExistInCountryByName){
+            exceptionService.duplicateDataException("message.country.vehicle.name.alreadyExist" , vehicle.getName());
+        }
         vehicleToUpdate.setName(vehicle.getName());
         vehicleToUpdate.setDescription(vehicle.getDescription());
         vehicleToUpdate.setIcon(vehicle.getIcon());
@@ -485,7 +497,7 @@ public class CountryService {
         Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(activityTypeDTO->activityTypeDTO.getCategoryId()).collect(Collectors.toSet());
         List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
 
-         List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
+         List<CurrencyDTO> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
          TimeTypeDTO timeType= timeTypeRestClient.getAllTimeTypes(countryId).stream().filter(t->t.getTimeTypes().equals(TimeTypes.WORKING_TYPE.toValue())).findFirst().get();
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);

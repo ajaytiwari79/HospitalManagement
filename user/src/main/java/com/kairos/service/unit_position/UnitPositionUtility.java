@@ -30,6 +30,7 @@ public class UnitPositionUtility {
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
         unitPositionDetails.setHourlyCost(currentPositionLine.getHourlyCost());
+        unitPositionDetails.setPublished(unitPosition.getPublished());
         return unitPositionDetails;
     }
 

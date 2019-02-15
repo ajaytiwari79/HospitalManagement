@@ -4,6 +4,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,8 @@ public class LanguageService {
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     public List<Language> getAllLanguage(){
         return languageGraphRepository.findAll();
@@ -45,6 +48,12 @@ public class LanguageService {
     public Map<String, Object> createLanguage(long countryId, Language language){
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
+
+            Boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), -1L);
+            if (languageExistInCountryByName) {
+                exceptionService.duplicateDataException("error.Language.name.exist");
+            }
+
             language.setCountry(country);
             languageGraphRepository.save(language);
             return language.retrieveDetails();
@@ -54,6 +63,12 @@ public class LanguageService {
     public Map<String, Object> updateLanguage(Language language, long countryId){
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
+
+            Boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), language.getId());
+            if (languageExistInCountryByName) {
+                exceptionService.duplicateDataException("error.Language.name.exist");
+            }
+
             Language currentLanguage = languageGraphRepository.findOne(language.getId());
             currentLanguage.setDescription(language.getDescription());
             currentLanguage.setName(language.getName());
