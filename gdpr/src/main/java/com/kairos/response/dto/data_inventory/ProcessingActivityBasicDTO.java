@@ -3,25 +3,40 @@ package com.kairos.response.dto.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessingActivityBasicDTO {
 
-    private Long id;
-    private String name;
-    private boolean subProcess;
+    private Long processingActivityId;
+    private String processingActivityName;
+    private boolean isSubProcessingActivity;
 
-    public Long getId() { return id; }
+    public Long getProcessingActivityId() {
+        return processingActivityId;
+    }
 
-    public void setId(Long id) { this.id = id; }
+    public void setProcessingActivityId(Long processingActivityId) {
+        this.processingActivityId = processingActivityId;
+    }
 
-    public String getName() { return name; }
+    public String getProcessingActivityName() {
+        return processingActivityName;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public void setProcessingActivityName(String processingActivityName) {
+        this.processingActivityName = processingActivityName;
+    }
 
-    public boolean isSubProcess() { return subProcess; }
+    public boolean isSubProcessingActivity() {
+        return isSubProcessingActivity;
+    }
 
-    public void setSubProcess(boolean subProcess) {this.subProcess = subProcess;
+    public void setSubProcessingActivity(boolean subProcessingActivity) {
+        isSubProcessingActivity = subProcessingActivity;
+    }
+
+    public ProcessingActivityBasicDTO(Long processingActivityId, String processingActivityName, boolean isSubProcessingActivity) {
+        this.processingActivityId = processingActivityId;
+        this.processingActivityName = processingActivityName;
+        this.isSubProcessingActivity = isSubProcessingActivity;
     }
 }
