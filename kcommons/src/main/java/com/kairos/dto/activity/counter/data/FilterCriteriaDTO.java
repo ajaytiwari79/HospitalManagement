@@ -4,7 +4,10 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class FilterCriteriaDTO {
+    private Long countryId;
+    private boolean isCountryAdmin;
     private Long unitId;
+    private Long staffId;
     private List<FilterCriteria> filters;
     private List<BigInteger> kpiIds;
     private List<BigInteger> counterIds;
@@ -12,12 +15,16 @@ public class FilterCriteriaDTO {
     public FilterCriteriaDTO() {
     }
 
-    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds) {
+    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
         this.filters = filters;
         this.kpiIds = kpiIds;
+        this.countryId=countryId;
+        this.isCountryAdmin=isCountryAdmin;
     }
 
-    public FilterCriteriaDTO(Long unitId, List<BigInteger> kpiIds) {
+    public FilterCriteriaDTO(Long unitId, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
+        this.countryId=countryId;
+        this.isCountryAdmin=isCountryAdmin;
         this.unitId = unitId;
         this.kpiIds = kpiIds;
     }
@@ -54,4 +61,30 @@ public class FilterCriteriaDTO {
     public void setCounterIds(List<BigInteger> counterIds) {
         this.counterIds = counterIds;
     }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public boolean isCountryAdmin() {
+        return isCountryAdmin;
+    }
+
+    public void setCountryAdmin(boolean countryAdmin) {
+        isCountryAdmin = countryAdmin;
+    }
+
+    public Long getCountryId() {
+
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
 }

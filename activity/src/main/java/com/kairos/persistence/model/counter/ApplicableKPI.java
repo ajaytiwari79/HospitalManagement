@@ -16,6 +16,8 @@ public class ApplicableKPI extends MongoBaseEntity {
     private ConfLevel level;
     private String title;
     private ApplicableFilter applicableFilter;
+    // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
+    private boolean copy;
 
     public ApplicableKPI() {
 
@@ -30,7 +32,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.level = level;
     }
 
-    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title) {
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy) {
         this.activeKpiId = activeKpiId;
         this.baseKpiId = baseKpiId;
         this.countryId = countryId;
@@ -38,6 +40,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.staffId = staffId;
         this.level = level;
         this.applicableFilter=applicableFilter;
+        this.copy=copy;
         this.title=title;
     }
 

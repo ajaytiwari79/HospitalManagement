@@ -5,11 +5,15 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.TabKPIConf;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -29,6 +33,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 
 @Service
 public class CounterDataService {
@@ -315,19 +322,35 @@ public class CounterDataService {
 //
 //    }
 
-    public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId){
+    public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId,Long staffId){
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
-        if(filters.getFilters() != null)
-        filters.getFilters().forEach(filter -> {
-            filterBasedCriteria.put(filter.getType(), filter.getValues());
-        });
+        Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera=new HashMap<>();
+        if(filters.getFilters() != null && filters.getFilters().size()>1) {
+            filters.getFilters().forEach(filter -> {
+                filterBasedCriteria.put(filter.getType(), filter.getValues());
+            });
+        }else{
+            List<ApplicableKPI> staffApplicableKPIS=new ArrayList<>();
+            if(filters.isCountryAdmin()){
+                staffApplicableKPIS=counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
+            }else{
+                staffApplicableKPIS=counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
+            }
+            for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
+                Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
+                if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
+                    staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> {
+                        staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues());
+                    });
+                    staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
+                }
+            }
+        }
         for(BigInteger kpiId : filters.getKpiIds()){
-            Callable<CommonRepresentationData> data = () ->{
-                return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, organizationId, kpiMap.get(kpiId));
-            };
+            Callable<CommonRepresentationData> data = () ->counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId,filterBasedCriteria), organizationId, kpiMap.get(kpiId));
             Future<CommonRepresentationData> responseData = executorService.submit(data);
             kpiResults.add(responseData);
         }

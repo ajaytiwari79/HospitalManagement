@@ -13,10 +13,10 @@ public class StaffAccessGroupQueryResult {
 
     private Long staffId;
     private Long countryId;
-    private Boolean isCountryAdmin;
+    private boolean isCountryAdmin;
     private List<Long> accessGroupIds;
-    private Boolean staff;
-    private Boolean management;
+    private boolean staff;
+    private boolean management;
 
     public StaffAccessGroupQueryResult() {
         //Default Constructor
@@ -38,12 +38,28 @@ public class StaffAccessGroupQueryResult {
         this.countryId = countryId;
     }
 
-    public Boolean getCountryAdmin() {
+    public boolean isCountryAdmin() {
         return isCountryAdmin;
     }
 
-    public void setCountryAdmin(Boolean countryAdmin) {
+    public void setCountryAdmin(boolean countryAdmin) {
         isCountryAdmin = countryAdmin;
+    }
+
+    public boolean isStaff() {
+        return staff;
+    }
+
+    public void setStaff(boolean staff) {
+        this.staff = staff;
+    }
+
+    public boolean isManagement() {
+        return management;
+    }
+
+    public void setManagement(boolean management) {
+        this.management = management;
     }
 
     public List<Long> getAccessGroupIds() {
@@ -54,19 +70,5 @@ public class StaffAccessGroupQueryResult {
         this.accessGroupIds = accessGroupIds;
     }
 
-    public Boolean getStaff() {
-        return staff;
-    }
 
-    public void setStaff(Boolean staff) {
-        this.staff = staff;
-    }
-
-    public Boolean getManagement() {
-        return management;
-    }
-
-    public void setManagement(Boolean management) {
-        this.management = management;
-    }
 }

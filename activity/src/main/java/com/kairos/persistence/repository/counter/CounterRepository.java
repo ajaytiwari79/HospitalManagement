@@ -68,9 +68,14 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
-    public KPI getCounterByid(BigInteger counterId){
+    public KPI getKPIByid(BigInteger counterId){
         Query query = new Query(Criteria.where("id").is(counterId));
         return mongoTemplate.findOne(query, KPI.class);
+    }
+
+    public KPIDTO getKPIByKpiid(BigInteger counterId){
+        Query query = new Query(Criteria.where("id").is(counterId));
+        return mongoTemplate.findOne(query, KPIDTO.class);
     }
 
     public ApplicableKPI getKpiByTitleAndUnitId(String title,Long refId,ConfLevel level){
@@ -112,10 +117,14 @@ public class CounterRepository {
 
     //test cases..
     //getCounterListByType for testcases
-    public List<KPIDTO> getCounterListForReferenceId(Long refId, ConfLevel level){
+    public List<KPIDTO> getCounterListForReferenceId(Long refId, ConfLevel level,boolean copy){
         String refQueryField = getRefQueryField(level);
+        Criteria criteria=Criteria.where(refQueryField).is(refId).and("level").is(level);
+        if(copy){
+            criteria=criteria.and("copy").is(copy);
+        }
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
+          Aggregation.match(criteria),
           Aggregation.lookup("counter","activeKpiId","_id","kpi"),
            Aggregation.project().and("kpi._id").as("_id")
                    .and("kpi.title").as("title").and("kpi.counter").as("counter")
@@ -132,11 +141,15 @@ public class CounterRepository {
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
-    public List<ApplicableKPI> getFilterBaseApplicableKPI(List<BigInteger> kpiIds, List<ConfLevel> level){
+    public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiIds(List<BigInteger> kpiIds, List<ConfLevel> level){
         Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and("level").in(level).and("applicableFilter.modified").is(false));
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
+    public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiAndUnitId(Long unitId,List<BigInteger> kpiIds, List<ConfLevel> level){
+        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and("unitId").is(unitId).and("level").in(level).and("applicableFilter.modified").is(false));
+        return mongoTemplate.find(query, ApplicableKPI.class);
+    }
 
     //category CRUD
 
@@ -317,9 +330,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         String refQueryField = getRefQueryField(level);
         Query query=null;
         if(ConfLevel.STAFF.equals(level)){
-            query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").in(kpiIds).and("level").in(level));
+            query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds).and("level").in(level));
         }else{
-            query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").in(kpiIds).and("level").in(level));
+            query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds).and("level").in(level));
         }
         mongoTemplate.remove(query, ApplicableKPI.class);
     }
@@ -408,6 +421,17 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
        return result.getMappedResults().stream().map(o -> new BigInteger(o.get("kpiId").toString())).collect(Collectors.toList());
     }
 
+    public List<KPIDTO> getCopyKpiOfUnit(ConfLevel level,Long unitId,boolean copy){
+        Aggregation aggregation=Aggregation.newAggregation(
+        Aggregation.match(Criteria.where("unitId").is(unitId).and("level").is(level).and("copy").is(copy)),
+                Aggregation.lookup("counter","activeKpiId","_id","kpi"),
+                Aggregation.group("kpi._id","kpi.title","kpi.counter"),
+                Aggregation.project().and("_id").as("_id")
+                        .and("kpi.title").as("title").and("kpi.counter").as("counter")
+        );
+        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
+        return results.getMappedResults();
+    }
     public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(

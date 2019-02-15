@@ -284,13 +284,13 @@ public class CounterDistController {
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,  counterManagementService.copyKpiFilterData(countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
+    public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,  counterManagementService.copyKpiFilterData(tabId,countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.copyKpiFilterData(unitId,kpiId,counterDTO,ConfLevel.UNIT));
+    public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.copyKpiFilterData(tabId,unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/preview_kpi")

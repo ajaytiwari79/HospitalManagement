@@ -5,7 +5,7 @@ import java.util.List;
 public class AccessGroupPermissionCounterDTO {
     private Long staffId;
     private Long countryId;
-    private Boolean isCountryAdmin;
+    private boolean isCountryAdmin;
     private boolean management;
     private List<Long> accessGroupIds;
 
@@ -17,12 +17,20 @@ public class AccessGroupPermissionCounterDTO {
         this.accessGroupIds = accessGroupIds;
     }
 
-    public Boolean getCountryAdmin() {
+    public boolean isCountryAdmin() {
         return isCountryAdmin;
     }
 
-    public void setCountryAdmin(Boolean countryAdmin) {
+    public void setCountryAdmin(boolean countryAdmin) {
         isCountryAdmin = countryAdmin;
+    }
+
+    public boolean isManagement() {
+        return management;
+    }
+
+    public void setManagement(boolean management) {
+        this.management = management;
     }
 
     public List<Long> getAccessGroupIds() {
@@ -49,11 +57,5 @@ public class AccessGroupPermissionCounterDTO {
         this.staffId = staffId;
     }
 
-    public Boolean getManagement() {
-        return management;
-    }
 
-    public void setManagement(Boolean management) {
-        this.management = management;
-    }
 }
