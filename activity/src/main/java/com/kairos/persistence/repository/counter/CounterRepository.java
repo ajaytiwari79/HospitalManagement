@@ -73,9 +73,9 @@ public class CounterRepository {
         return mongoTemplate.findOne(query, KPI.class);
     }
 
-    public KPIDTO getKPIByKpiid(BigInteger counterId){
-        Query query = new Query(Criteria.where("id").is(counterId));
-        return mongoTemplate.findOne(query, KPIDTO.class);
+    public KPI getKPIByKpiid(BigInteger counterId){
+        Query query = new Query(Criteria.where("_id").is(counterId));
+        return mongoTemplate.findOne(query, KPI.class);
     }
 
     public ApplicableKPI getKpiByTitleAndUnitId(String title,Long refId,ConfLevel level){
@@ -127,7 +127,7 @@ public class CounterRepository {
           Aggregation.match(criteria),
           Aggregation.lookup("counter","activeKpiId","_id","kpi"),
            Aggregation.project().and("kpi._id").as("_id")
-                   .and("kpi.title").as("title").and("kpi.counter").as("counter")
+                   .and("kpi.title").as("title").and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
         return results.getMappedResults();

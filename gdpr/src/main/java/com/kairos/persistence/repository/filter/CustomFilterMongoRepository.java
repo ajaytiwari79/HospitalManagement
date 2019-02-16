@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.filter;
 public interface CustomFilterMongoRepository {
 
 
-   /* Map<String, AggregationOperation> getFilterCriteria(Long countryId,List<FilterType> filterTypes,FilterGroup  filterGroup);
+   /* Map<String, AggregationOperation> getDefaultFilters(Long countryId,List<FilterType> filterTypes,FilterGroup  filterGroup);
 
     void buildAggregationQuery(FilterType filterType, Map<String, AggregationOperation> aggregationOperations );
 

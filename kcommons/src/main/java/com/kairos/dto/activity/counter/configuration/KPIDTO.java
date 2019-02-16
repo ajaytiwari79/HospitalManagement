@@ -17,9 +17,9 @@ public class KPIDTO {
     private List<FilterType> filterTypes;
     private String calculationFormula;
     //applicable filter of kpi
-    private List<FilterCriteria> criteriaList;
+    private List<FilterCriteria> defaultFilters;
     //selected filer by staff
-    private List<FilterCriteria> selectedFilter;
+    private List<FilterCriteria> selectedFilters;
     public KPIDTO(){
 
     }
@@ -72,20 +72,20 @@ public class KPIDTO {
         this.calculationFormula = calculationFormula;
     }
 
-    public List<FilterCriteria> getCriteriaList() {
-        return criteriaList;
+    public List<FilterCriteria> getDefaultFilters() {
+        return defaultFilters;
     }
 
-    public void setCriteriaList(List<FilterCriteria> criteriaList) {
-        this.criteriaList = criteriaList;
+    public void setDefaultFilters(List<FilterCriteria> defaultFilters) {
+        this.defaultFilters = defaultFilters;
     }
 
-    public List<FilterCriteria> getSelectedFilter() {
-        return selectedFilter;
+    public List<FilterCriteria> getSelectedFilters() {
+        return selectedFilters;
     }
 
-    public void setSelectedFilter(List<FilterCriteria> selectedFilter) {
-        this.selectedFilter = selectedFilter;
+    public void setSelectedFilters(List<FilterCriteria> selectedFilters) {
+        this.selectedFilters = selectedFilters;
     }
 
     public List<FilterType> getFilterTypes() {

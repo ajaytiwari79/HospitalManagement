@@ -34,16 +34,16 @@ import com.kairos.dto.activity.counter.enums.LocationType;
 
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.counter.*;
-import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.utils.user_context.UserContext;
@@ -79,11 +79,11 @@ public class CounterDistService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
+    private TimeTypeService timeTypeService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
-    private ActivityMongoRepository activityMongoRepository;
+    private ActivityService activityService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -746,13 +746,12 @@ public class CounterDistService extends MongoBaseService {
     //kpi default data and copy and save filter
     public KPIDTO getDefaultFilterDataOfKpi(BigInteger kpiId, Long refId, ConfLevel level) {
         List<FilterCriteria> criteriaList=new ArrayList<>();
-        KPIDTO kpidto=new KPIDTO();
-        KPIDTO kpi = counterRepository.getKPIByKpiid(kpiId);
+        KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByKpiid(kpiId),KPIDTO.class);
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        DefaultKpiDataDTO defaultKpiDataDTO = genericIntegrationService.getKpiFilterDefaultData(refId);
+        DefaultKpiDataDTO defaultKpiDataDTO = genericIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level)?UserContext.getUserDetails().getLastSelectedOrganizationId():refId);
         if(kpi.getFilterTypes().contains(FilterType.EMPLOYMENT_TYPE)){
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
             defaultKpiDataDTO.getEmploymentTypeKpiDTOS().forEach( employmentTypeKpiDTO ->   {
@@ -774,14 +773,14 @@ public class CounterDistService extends MongoBaseService {
             });
             criteriaList.add(new FilterCriteria(FilterType.DAY_TYPE.value,FilterType.DAY_TYPE,(List)kpiFilterDefaultDataDTOS));
         }
-        if(kpi.getFilterTypes().contains(FilterType.UNIT_IDS)){
+        if(kpi.getFilterTypes().contains(FilterType.UNIT_IDS)&&ConfLevel.UNIT.equals(level)){
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
             defaultKpiDataDTO.getOrganizationCommonDTOS().forEach( organizationCommonDTO -> {
                 kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(organizationCommonDTO.getId(),organizationCommonDTO.getName()));
             });
                 criteriaList.add(new FilterCriteria(FilterType.UNIT_IDS.value,FilterType.UNIT_IDS,(List)kpiFilterDefaultDataDTOS));
         }
-        if(kpi.getFilterTypes().contains(FilterType.STAFF_IDS)){
+        if(kpi.getFilterTypes().contains(FilterType.STAFF_IDS)&&ConfLevel.UNIT.equals(level)){
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
             defaultKpiDataDTO.getStaffKpiFilterDTOs().forEach(staffKpiFilterDTO  -> {
                 kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(staffKpiFilterDTO.getId(),staffKpiFilterDTO.getFullName(),staffKpiFilterDTO.getUnitIds()));
@@ -805,7 +804,7 @@ public class CounterDistService extends MongoBaseService {
             criteriaList.add(new FilterCriteria(FilterType.DAYS_OF_WEEK.value,FilterType.DAYS_OF_WEEK,(List)kpiFilterDefaultDataDTOS));
         }
         if(kpi.getFilterTypes().contains(FilterType.TIME_TYPE)){
-            List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(defaultKpiDataDTO.getCountryId());
+            List<TimeType> timeTypes = timeTypeService.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
             timeTypes.forEach(timeType -> {
                 kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeType.getId().longValue(),timeType.getLabel()));
@@ -814,24 +813,27 @@ public class CounterDistService extends MongoBaseService {
         }
         List<Long> unitIds=defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(organizationCommonDTO -> organizationCommonDTO.getId()).collect(toList());
         if(kpi.getFilterTypes().contains(FilterType.PHASE)){
-            List<Phase> phases=phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(unitIds);
+            List<PhaseDefaultName> phases=Arrays.asList(PhaseDefaultName.values());
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
             phases.forEach(phase -> {
-                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(phase.getId().longValue(),phase.getName()));
+                kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(phase.toString(),phase.toString()));
             });
             criteriaList.add(new FilterCriteria(FilterType.PHASE.value,FilterType.PHASE,(List)kpiFilterDefaultDataDTOS));
         }
+        if(kpi.getFilterTypes().contains(FilterType.TIME_INTERVAL)){
+            criteriaList.add(new FilterCriteria(FilterType.TIME_INTERVAL.value,FilterType.TIME_INTERVAL,(List)new ArrayList<>()));
+        }
         if(kpi.getFilterTypes().contains(FilterType.ACTIVITY_IDS)){
-            List<ActivityDTO> activityDTOS=activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
+            List<ActivityDTO> activityDTOS=activityService.findAllActivityByDeletedFalseAndUnitId(unitIds);
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS =new ArrayList<>();
             activityDTOS.forEach(activityDTO ->   {
                 kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(activityDTO.getId().longValue(),activityDTO.getName(),activityDTO.getUnitId()));
             });
             criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_IDS.value,FilterType.ACTIVITY_IDS,(List)kpiFilterDefaultDataDTOS));
         }
-        kpidto.setCriteriaList(criteriaList);
-        kpidto.setSelectedFilter(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
-        return kpidto;
+        kpi.setDefaultFilters(criteriaList);
+        kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
+        return kpi;
     }
 
     public TabKPIDTO saveKpiFilterData(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
@@ -868,7 +870,7 @@ public class CounterDistService extends MongoBaseService {
         save(kpi);
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
-        tabKPIDTO.getKpi().setSelectedFilter(counterDTO.getSelectedFilter());
+        tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilter());
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilter(), Arrays.asList(kpi.getId()),accessGroupPermissionCounterDTO.getCountryId(),accessGroupPermissionCounterDTO.isCountryAdmin()), UserContext.getUserDetails().getLastSelectedOrganizationId(),accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
@@ -911,7 +913,7 @@ public class CounterDistService extends MongoBaseService {
         save(applicableKPIs);
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
-        tabKPIDTO.getKpi().setSelectedFilter(counterDTO.getSelectedFilter());
+        tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilter());
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilter(), Arrays.asList(copyKpi.getId()),accessGroupPermissionCounterDTO.getCountryId(),accessGroupPermissionCounterDTO.isCountryAdmin()), UserContext.getUserDetails().getLastSelectedOrganizationId(),accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(copyKpi.getId()));
         return tabKPIDTO;

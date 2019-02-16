@@ -263,9 +263,9 @@ public class CounterDistController {
 
     //save and copy kpi and default data of kpi
 
-    @GetMapping(COUNTRY_URL+UNIT_URL+KPI_URL+"/kpi_default_data")
-    public ResponseEntity<Map<String,Object>> getDefaultKpiFilterDataOfCountry(@PathVariable Long countryId,@PathVariable Long unitId,@PathVariable Long kpiId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    @GetMapping(COUNTRY_URL+KPI_URL+"/kpi_default_data")
+    public ResponseEntity<Map<String,Object>> getDefaultKpiFilterDataOfCountry(@PathVariable Long countryId,@PathVariable BigInteger kpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.getDefaultFilterDataOfKpi(kpiId,countryId,ConfLevel.COUNTRY));
     }
 
     @GetMapping(UNIT_URL+KPI_URL+"/kpi_default_data")

@@ -34,7 +34,7 @@ public class CounterFilterService {
 //                .setUnitId(null)
 //                .setCategoryId(filtersMap.get(FilterType.ACTIVITY_CATEGORY_TYPE))
 //                .setExpertiseCriteria(filtersMap.get(FilterType.EXPERTISE))
-//                .getFilterCriteria();
+//                .getDefaultFilters();
 //    }
 
     public List<AggregationOperation> getShiftFilterCriteria(Map<FilterType, List> filtersMap){
