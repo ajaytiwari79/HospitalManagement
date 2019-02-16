@@ -94,6 +94,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.activity.ActivityUtil.*;
@@ -472,7 +473,7 @@ public class ActivityService extends MongoBaseService {
         }
 
         if (activity.getRulesActivityTab().isBreakAllowed() != rulesActivityDTO.isBreakAllowed()) {
-            if (activity.getCompositeActivities().size() > 0 || activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(rulesActivityDTO.getActivityId())) {
+            if (isCollectionNotEmpty(activity.getCompositeActivities()) || activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(rulesActivityDTO.getActivityId())) {
                 exceptionService.actionNotPermittedException("error.activity.being.used", activity.getName());
             }
         }

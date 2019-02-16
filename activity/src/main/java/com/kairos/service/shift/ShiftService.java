@@ -217,14 +217,14 @@ public class ShiftService extends MongoBaseService {
         }
         Set<Long> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(ShiftActivityDTO::getAbsenceReasonCodeId).collect(Collectors.toSet());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), reasonCodeIds);
-        if(!staffAdditionalInfoDTO.getUnitPosition().isPublished()){
-            exceptionService.invalidRequestException("message.shift.not.published");
-        }
         if (staffAdditionalInfoDTO == null) {
             exceptionService.invalidRequestException("message.staff.notfound");
         }
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
             exceptionService.actionNotPermittedException("message.unit.position");
+        }
+        if(!staffAdditionalInfoDTO.getUnitPosition().isPublished()){
+            exceptionService.invalidRequestException("message.shift.not.published");
         }
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
@@ -959,7 +959,7 @@ public class ShiftService extends MongoBaseService {
         Set<BigInteger> allActivities = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
         List<Activity> activities = activityRepository.findAllPhaseSettingsByActivityIds(allActivities);
         Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getPhaseSettingsActivityTab));
-        if (!shifts.isEmpty() && objects[1] != null) {
+        if (isCollectionNotEmpty(shifts) && objects[1] != null) {
             Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
             StaffAccessGroupDTO staffAccessGroupDTO = genericIntegrationService.getStaffAccessGroupDTO(unitId);
@@ -983,6 +983,7 @@ public class ShiftService extends MongoBaseService {
                 }
             }
             save(shifts);
+            //timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         }
         return shiftActivityResponseDTOS;
     }
