@@ -892,6 +892,7 @@ public class CounterDistService extends MongoBaseService {
         save(applicableKPIS);
         save(kpi);
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
+        kpi.setTitle(counterDTO.getTitle());
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
         tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(kpi.getId()),accessGroupPermissionCounterDTO.getCountryId(),accessGroupPermissionCounterDTO.isCountryAdmin()), UserContext.getUserDetails().getLastSelectedOrganizationId(),accessGroupPermissionCounterDTO.getStaffId());
