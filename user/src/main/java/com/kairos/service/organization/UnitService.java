@@ -57,7 +57,7 @@ public class UnitService {
     @Inject
     private CompanyCreationService companyCreationService;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(UnitService.class);
 
 
     private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {

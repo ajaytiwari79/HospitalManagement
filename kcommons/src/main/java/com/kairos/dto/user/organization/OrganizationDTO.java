@@ -26,6 +26,7 @@ public class OrganizationDTO {
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;
     private Long countryId;
+    private boolean isParentOrganization;
 
 
     public Long getCountryId() {
@@ -131,6 +132,14 @@ public class OrganizationDTO {
 
     public void setOneTimeSyncPerformed(boolean oneTimeSyncPerformed) {
         isOneTimeSyncPerformed = oneTimeSyncPerformed;
+    }
+
+    public boolean isParentOrganization() {
+        return isParentOrganization;
+    }
+
+    public void setParentOrganization(boolean parentOrganization) {
+        isParentOrganization = parentOrganization;
     }
 }
 

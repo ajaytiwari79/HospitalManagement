@@ -25,6 +25,7 @@ import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task.TaskDemandDTO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -43,8 +44,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static java.lang.Math.toIntExact;
 import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -92,15 +92,8 @@ public class VisitatorService{
     private ExceptionService exceptionService;
 
 
-
-    public Map<String, Object> getVisitatorOrganizationHierarchy(long id) {
-      //  staffGraphRepository.findById(id);
-        return null;
-    }
-
     public Object getUnitProvidedServices(long unitId) {
-        Map<String, Object> services = genericIntegrationService.getOrganizationServices(unitId,ORGANIZATION);
-        //Map<String,Object> services = organizationServiceService.organizationServiceData(unitId,ORGANIZATION);
+        Map<String, Object> services = genericIntegrationService.getOrganizationServices(unitId, StringUtils.capitalize(ORGANIZATION));
         return services.get("selectedServices");
     }
 
@@ -211,9 +204,7 @@ public class VisitatorService{
     }
 
     private List<Map<String, Object>> getServiceHierarchy(long unitId){
-        //Map<String, Object> organizationServices = organizationServiceService.organizationServiceData(unitId, ORGANIZATION);
-        // Map<String, Object> organizationServices = organizationServiceService.organizationServiceData(unitId, ORGANIZATION);
-          Map<String, Object> organizationServices=genericIntegrationService.getOrganizationServices(unitId,ORGANIZATION);
+          Map<String, Object> organizationServices=genericIntegrationService.getOrganizationServices(unitId,StringUtils.capitalize(ORGANIZATION));
         List<Map<String, Object>> orgSelectedServices = (List<Map<String,Object>>) organizationServices.get("selectedServices");
         List<Map<String, Object>> mainServiceList = new ArrayList<>(orgSelectedServices.size());
         Map<String, Object> mainServiceMap;

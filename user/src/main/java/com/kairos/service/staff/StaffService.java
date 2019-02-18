@@ -89,7 +89,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -125,8 +124,6 @@ import static com.kairos.utils.FileUtil.createDirectory;
 @Transactional
 @Service
 public class StaffService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -174,15 +171,15 @@ public class StaffService {
     private AccessGroupService accessGroupService;
     @Inject
     private StaffFilterService staffFilterService;
-    @Autowired
+    @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Autowired
+    @Inject
     private ClientGraphRepository clientGraphRepository;
-    @Autowired
+    @Inject
     private TaskServiceRestClient taskServiceRestClient;
     @Inject
     private OrganizationService organizationService;
-    @Autowired
+    @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
@@ -219,6 +216,8 @@ public class StaffService {
     @Inject
     @Lazy
     private PasswordEncoder passwordEncoder;
+
+    private final Logger logger = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);

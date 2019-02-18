@@ -645,11 +645,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " RETURN parentOrganization as parent,data as childUnits")
     OrganizationHierarchyData getChildHierarchyByChildUnit(Long childUnitId);
 
-    // For Test Cases
-
-    @Query("MATCH (org:Organization{union:false,isKairosHub:false,isEnable:true})-[:" + COUNTRY + "]-(c:Country) WHERE id (c)={0}  RETURN org LIMIT 1")
-    Organization getOneParentUnitByCountry(Long countryId);
-
     //for getting Unions by Ids
 
     @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union) IN {0}  RETURN union")

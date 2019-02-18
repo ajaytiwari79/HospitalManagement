@@ -15,7 +15,9 @@ import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
+import com.kairos.enums.Hierarchy;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -70,14 +72,14 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 /**
  * Created by vipul on 5/12/17.
  */
 @Service
 @Transactional
 public class OrganizationActivityService extends MongoBaseService {
-    private final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
-
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -110,7 +112,6 @@ public class OrganizationActivityService extends MongoBaseService {
     private UnitSettingService unitSettingService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-
     @Inject
     private ActivityConfigurationService activityConfigurationService;
     @Inject
@@ -131,6 +132,7 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject private CostTimeAgreementService costTimeAgreementService;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         Activity activityCopied;
@@ -177,9 +179,9 @@ public class OrganizationActivityService extends MongoBaseService {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         BeanUtils.copyProperties(activity, activityDTO);
         Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        if(timeType.isPresent()){
+        /*if(timeType.isPresent()){
             activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
-        }
+        }*/
         return activityDTO;
 
     }
@@ -191,8 +193,8 @@ public class OrganizationActivityService extends MongoBaseService {
             if (Optional.ofNullable(activities.getActivityDTOList()).isPresent())
                 activityDetails.setAllActivities(activities.getActivityDTOList());
         }
-        List<ActivityTagDTO> act = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
-        activityDetails.setSelectedActivities(act);
+        List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
+        activityDetails.setSelectedActivities(activityTagDTOS);
         return activityDetails;
     }
 
@@ -211,8 +213,8 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
+        OrganizationDTO organizationDTO = genericIntegrationService.getOrganizationWithCountryId(unitId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
         //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
@@ -222,8 +224,8 @@ public class OrganizationActivityService extends MongoBaseService {
         if(!activity.getTags().isEmpty()){
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
-        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(organizationDTO.getCountryId());
+        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, organizationDTO.getCountryId());
         BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
         generalActivityTabWithTagDTO.setAddTimeTo(balanceSettingsActivityTab.getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(balanceSettingsActivityTab.getTimeTypeId());
@@ -237,7 +239,15 @@ public class OrganizationActivityService extends MongoBaseService {
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
         TimeType timeType= timeTypeMongoRepository.findOneById(balanceSettingsActivityTab.getTimeTypeId());
         if(timeType!=null){
-            generalActivityTabWithTagDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
+            boolean activityCanBeCopied = false;
+            List<Hierarchy>  hierarchies = timeType.getAcitivityCanBeCopiedForHierarchy();
+            if(isCollectionNotEmpty(hierarchies)) {
+                if((organizationDTO.isParentOrganization() && hierarchies.contains(Hierarchy.ORGANIZAION)) ||
+                        (!organizationDTO.isParentOrganization() && hierarchies.contains(Hierarchy.UNIT))){
+                    activityCanBeCopied = true;
+                }
+            }
+            generalActivityTabWithTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
         return activityTabsWrapper;

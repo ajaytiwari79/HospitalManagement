@@ -11,12 +11,8 @@ public final class ApiConstants {
     public static final String COUNTRY_URL = "/country/{countryId}";
     public static final String API_V1 = "/api/v1";
     public static final String API_ORGANIZATION_UNIT_URL = API_V1 + UNIT_URL;
-    public static final String API_CONTROL_PANEL_SETTINGS_URL = "/control_panel/settings";
-    public static final String API_CONTROL_PANEL_URL = API_V1 + UNIT_URL + API_CONTROL_PANEL_SETTINGS_URL;
     public static final String API_ABSENCE_PLANNING_URL = API_V1 + UNIT_URL + "/absence_planning";
-    public static final String API_INTEGRATION_URL = API_V1 + UNIT_URL + "/integration";
     public static final String API_NOTIFICATION_URL = API_V1 + "/notification";
-    public static final String WS_URL = "ws://localhost:8090" + API_V1 + "/kairos/ws";
     public static final String API_REQUEST_COMPONENT_URL = API_V1  + "/resourceComponent";
     public static final String API_ORGANIZATION_COUNTRY_URL = API_V1  + COUNTRY_URL;
     public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL + "/timeBank";
@@ -28,10 +24,8 @@ public final class ApiConstants {
     public static final String COUNTER_CONF_URL = "/counter/conf";
     public static final String COUNTER_DATA_URL = API_ORGANIZATION_UNIT_URL + "/counters/data";
     public static final String ORDER_URL = API_V1 + UNIT_URL + "/orders";
-    public static final String OPEN_SHIFT_URL = API_V1  + UNIT_URL + "/open_shift";
     public static final String COUNTRY_ACTIVITY_CONFIGURATION = COUNTRY_URL + "/activity_configuration";
     public static final String UNIT_ACTIVITY_CONFIGURATION = UNIT_URL + "/activity_configuration";
-    public static final String ACTIVITY_SHIFT_STATUS_SETTINGS_URL = UNIT_URL + "/activity_shift_status_settings";
     public static final String DASHBOARD_URL = "/dashboard_tab";
     public static final String COUNTERS = "/counters";
     public static final String CATEGORY = "/category";
@@ -117,7 +111,7 @@ public final class ApiConstants {
     public  static  final  String API_EXPERTISE_URL ="/expertise/{expertiseId}";
     public  static  final  String API_EXPERTISE_BREAK_URL ="/expertise/{expertiseId}/break";
 
-    public static final String GET_ORGANIZATION_WITH_COUNTRY_ID = "/getOrganisationWithCountryId";
+    public static final String GET_ORGANIZATION_WITH_COUNTRY_ID = "/getOrganizationWithCountryId";
     public static final String COMMON_DATA = "/common_data";
     public static final String ONE_TIME_SYNC = "/one_time_sync";
     public static final String AUTO_GENERATE_TASK_SETTINGS = "/auto_generate_task_settings";

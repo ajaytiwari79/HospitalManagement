@@ -2,6 +2,7 @@ package com.kairos.dto.activity.time_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.Hierarchy;
 import com.kairos.enums.TimeTypeEnum;
 
 import java.math.BigInteger;
@@ -21,7 +22,7 @@ public class TimeTypeDTO {
     private List<TimeTypeDTO> children = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
-    private boolean activityCanBeCopied;
+    private List<Hierarchy> acitivityCanBeCopiedForHierarchy;
 
     public TimeTypeDTO() {
     }
@@ -40,13 +41,13 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,boolean activityCanBeCopied) {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,List<Hierarchy> acitivityCanBeCopiedForHierarchy) {
         this.id = id;
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
         this.backgroundColor=backgroundColor;
-        this.activityCanBeCopied=activityCanBeCopied;
+        this.acitivityCanBeCopiedForHierarchy=acitivityCanBeCopiedForHierarchy;
     }
 
     public TimeTypeEnum getSecondLevelType() {
@@ -122,11 +123,11 @@ public class TimeTypeDTO {
         this.backgroundColor = backgroundColor;
     }
 
-    public boolean isActivityCanBeCopied() {
-        return activityCanBeCopied;
+    public List<Hierarchy> getAcitivityCanBeCopiedForHierarchy() {
+        return acitivityCanBeCopiedForHierarchy;
     }
 
-    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
-        this.activityCanBeCopied = activityCanBeCopied;
+    public void setAcitivityCanBeCopiedForHierarchy(List<Hierarchy> acitivityCanBeCopiedForHierarchy) {
+        this.acitivityCanBeCopiedForHierarchy = acitivityCanBeCopiedForHierarchy;
     }
 }

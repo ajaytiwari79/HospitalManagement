@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.activity;
 
 
+import com.kairos.enums.Hierarchy;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
-import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,11 +23,12 @@ public class TimeType extends MongoBaseEntity{
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
-    private boolean activityCanBeCopied;
+    private List<Hierarchy> acitivityCanBeCopiedForHierarchy;
+
 
     public TimeType() {}
 
-    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,boolean activityCanBeCopied) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,List<Hierarchy>  acitivityCanBeCopiedForHierarchy) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
@@ -35,7 +36,7 @@ public class TimeType extends MongoBaseEntity{
         this.leafNode = true;
         this.secondLevelType=secondLevelType;
         this.countryId=countryId;
-        this.activityCanBeCopied=activityCanBeCopied;
+        this.acitivityCanBeCopiedForHierarchy=acitivityCanBeCopiedForHierarchy;
     }
 
     public Long getCountryId() {
@@ -103,8 +104,6 @@ public class TimeType extends MongoBaseEntity{
         this.backgroundColor = backgroundColor;
     }
 
-
-
     public TimeTypeEnum getSecondLevelType() {
         return secondLevelType;
     }
@@ -113,11 +112,11 @@ public class TimeType extends MongoBaseEntity{
         this.secondLevelType = secondLevelType;
     }
 
-    public boolean isActivityCanBeCopied() {
-        return activityCanBeCopied;
+    public List<Hierarchy> getAcitivityCanBeCopiedForHierarchy() {
+        return acitivityCanBeCopiedForHierarchy;
     }
 
-    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
-        this.activityCanBeCopied = activityCanBeCopied;
+    public void setAcitivityCanBeCopiedForHierarchy(List<Hierarchy> acitivityCanBeCopiedForHierarchy) {
+        this.acitivityCanBeCopiedForHierarchy = acitivityCanBeCopiedForHierarchy;
     }
 }
