@@ -16,7 +16,7 @@ public class DefaultDataCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDataCreator.class);
 
     @Inject
-    ClauseTagRepository clauseTagRepository;
+    private ClauseTagRepository clauseTagRepository;
 
     @PostConstruct
     private void createDefaultClauseTag(){
