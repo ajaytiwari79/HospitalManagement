@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-public class DataSourceDeprecated {
+class DataSourceDeprecated {
 
 
     @NotBlank(message = "Name can't be empty")

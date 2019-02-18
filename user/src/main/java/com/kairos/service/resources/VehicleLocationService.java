@@ -1,6 +1,7 @@
 package com.kairos.service.resources;
 
 import com.kairos.persistence.model.user.resources.VehicleLocation;
+import com.kairos.persistence.model.user.resources.VehicleLocationDTO;
 import com.kairos.persistence.repository.user.resources.VehicleLocationRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -23,23 +24,32 @@ public class VehicleLocationService {
     @Inject
     private ExceptionService exceptionService;
 
-    public VehicleLocation createVehicleLocation(VehicleLocation vehicleLocation) {
-
-        return vehicleLocationRepository.save(vehicleLocation);
+    public VehicleLocationDTO createVehicleLocation(VehicleLocationDTO vehicleLocationDTO) {
+        Boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), -1L);
+        if (vehicleLocationExistByName) {
+            exceptionService.duplicateDataException("message.VehicleLocation.name.exist");
+        }
+        VehicleLocation vehicleLocation = new VehicleLocation(vehicleLocationDTO.getName(), vehicleLocationDTO.getDescription());
+        vehicleLocationRepository.save(vehicleLocation);
+        vehicleLocationDTO.setId(vehicleLocation.getId());
+        return vehicleLocationDTO;
     }
 
-    public VehicleLocation updateVehicleLocation(VehicleLocation vehicleLocation, Long vehicleLocationId) {
-
-        VehicleLocation existingVehicleLocation = vehicleLocationRepository.findOne(vehicleLocationId);
+    public VehicleLocationDTO updateVehicleLocation(VehicleLocationDTO vehicleLocationDTO) {
+        Boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), vehicleLocationDTO.getId());
+        if (vehicleLocationExistByName) {
+            exceptionService.duplicateDataException("message.VehicleLocation.name.exist");
+        }
+        VehicleLocation existingVehicleLocation = vehicleLocationRepository.findOne(vehicleLocationDTO.getId());
         if (Optional.ofNullable(existingVehicleLocation).isPresent()) {
-            existingVehicleLocation.setName(vehicleLocation.getName());
-            existingVehicleLocation.setDescription(vehicleLocation.getDescription());
-            return vehicleLocationRepository.save(existingVehicleLocation);
+            existingVehicleLocation.setName(vehicleLocationDTO.getName());
+            existingVehicleLocation.setDescription(vehicleLocationDTO.getDescription());
+            vehicleLocationRepository.save(existingVehicleLocation);
         } else {
             exceptionService.dataNotFoundByIdException("message.vehiclelocationservices.id.notFound");
 
         }
-        return null;
+        return vehicleLocationDTO;
     }
 
     /**
@@ -52,12 +62,13 @@ public class VehicleLocationService {
         if (Optional.ofNullable(vehicleLocation).isPresent()) {
             vehicleLocation.setEnabled(false);
             return vehicleLocationRepository.save(vehicleLocation) != null;
-        } else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.vehiclelocationservices.id.notFound");
+        }
+        return false;
     }
-return false;
-}
-    public List<VehicleLocation> getAllVehicleLocations() {
-        return vehicleLocationRepository.findAll();
+
+    public List<VehicleLocationDTO> getAllVehicleLocations() {
+        return vehicleLocationRepository.getVehicleLocation();
     }
 }

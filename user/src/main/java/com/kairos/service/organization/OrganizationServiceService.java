@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
@@ -11,7 +12,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -192,7 +192,7 @@ public class OrganizationServiceService{
             if (isSelected) {
                 logger.info("check if already exist-------> " + organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()));
                 if (organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
-                    organizationGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                    organizationGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 } else {
                     organizationGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
                 }
@@ -209,13 +209,13 @@ public class OrganizationServiceService{
             }
             if (isSelected) {
                 if (teamGraphRepository.countOfServices(id, organizationService.getId()) == 0) {
-                    teamGraphRepository.addServiceInTeam(id, organizationService.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                    teamGraphRepository.addServiceInTeam(id, organizationService.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 } else {
-                    teamGraphRepository.updateOrganizationService(id, organizationServiceId, true, DateUtil.getCurrentDate().getTime());
+                    teamGraphRepository.updateOrganizationService(id, organizationServiceId, true, DateUtils.getCurrentDate().getTime());
                 }
                 addDefaultCustomNameRelationShipOfServiceForTeam(organizationService.getId(), id);
             } else {
-                teamGraphRepository.updateOrganizationService(id, organizationServiceId, false, DateUtil.getCurrentDate().getTime());
+                teamGraphRepository.updateOrganizationService(id, organizationServiceId, false, DateUtils.getCurrentDate().getTime());
             }
 
         }

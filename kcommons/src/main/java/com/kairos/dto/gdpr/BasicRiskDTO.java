@@ -50,4 +50,7 @@ public class BasicRiskDTO {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public BasicRiskDTO() {
+    }
 }

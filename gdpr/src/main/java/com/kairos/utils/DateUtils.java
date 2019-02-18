@@ -24,8 +24,8 @@ import static java.time.temporal.TemporalAdjusters.firstInMonth;
  */
 public class DateUtils {
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    public static final String ONLY_DATE = "yyyy-MM-dd";
+    private static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String ONLY_DATE = "yyyy-MM-dd";
 
     private static final Logger logger = LoggerFactory.getLogger(com.kairos.commons.utils.DateUtils.class);
 
@@ -56,11 +56,11 @@ public class DateUtils {
         return localDateTimeToDate(startOfDay);
     }
 
-    public static Date localDateTimeToDate(LocalDateTime startOfDay) {
+    private static Date localDateTimeToDate(LocalDateTime startOfDay) {
         return Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static LocalDateTime dateToLocalDateTime(Date date) {
+    private static LocalDateTime dateToLocalDateTime(Date date) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
     }
 
@@ -85,11 +85,10 @@ public class DateUtils {
 
     public static LocalDateTime getSundayFromWeek(int week, int year) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime ldt = LocalDateTime.now()
+        return LocalDateTime.now()
                 .withYear(year)
                 .with(weekFields.weekOfYear(), week + 1)
                 .with(weekFields.dayOfWeek(), 1);
-        return ldt;
     }
 
     public static Date getFirstDayOfCurrentWeek() {
@@ -143,8 +142,7 @@ public class DateUtils {
     public static Date convertToOnlyDate(String receivedDate, String dateFormat) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date date = simpleDateFormat.parse(receivedDate);
-        return date;
+        return simpleDateFormat.parse(receivedDate);
     }
 
     @SuppressWarnings("deprecation")
@@ -242,7 +240,7 @@ public class DateUtils {
      * @return
      */
 
-    public static LocalDate getDateOfWeekInMonth(LocalDate date, int weekNumber, DayOfWeek dayOfWeek) {
+    private static LocalDate getDateOfWeekInMonth(LocalDate date, int weekNumber, DayOfWeek dayOfWeek) {
         return date.with(firstInMonth(dayOfWeek)).plusWeeks(weekNumber - 1);
     }
 
@@ -292,8 +290,7 @@ public class DateUtils {
     public static Date asDate(LocalTime localTime) {
         Instant instant = localTime.atDate(LocalDate.now()).
                 atZone(ZoneId.systemDefault()).toInstant();
-        Date time = Date.from(instant);
-        return time;
+        return Date.from(instant);
     }
 
     public static LocalDateTime asLocalDateTime(Date date) {
@@ -339,7 +336,7 @@ public class DateUtils {
         return isSameDay(cal1, cal2);
     }
 
-    public static boolean isSameDay(final Calendar cal1, final Calendar cal2) {
+    private static boolean isSameDay(final Calendar cal1, final Calendar cal2) {
         if (cal1 == null || cal2 == null) {
             throw new IllegalArgumentException("The date must not be null");
         }
@@ -380,8 +377,7 @@ public class DateUtils {
     private static long getTimeZoneUTCAndDSTOffset(Date date, TimeZone timeZone)
     {
         long timeZoneDSTOffset = 0;
-        if(timeZone.inDaylightTime(date))
-        {
+        if(timeZone.inDaylightTime(date)) {
             timeZoneDSTOffset = timeZone.getDSTSavings();
         }
 

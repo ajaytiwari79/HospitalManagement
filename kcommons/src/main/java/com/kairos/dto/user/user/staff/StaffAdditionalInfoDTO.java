@@ -41,6 +41,7 @@ public class StaffAdditionalInfoDTO {
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes;
 
+
     public StaffAdditionalInfoDTO() {
     }
 

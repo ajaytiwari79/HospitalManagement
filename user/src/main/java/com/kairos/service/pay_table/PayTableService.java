@@ -14,14 +14,13 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.pay_table.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import org.apache.commons.collections.CollectionUtils;
@@ -53,11 +52,9 @@ public class PayTableService {
     @Inject
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
+    private CountryService countryService;
+    @Inject
     private CountryGraphRepository countryGraphRepository;
-    @Inject
-    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
-    @Inject
-    private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
     @Inject
@@ -282,9 +279,7 @@ public class PayTableService {
             Set<PayGrade> payGrades = payGradesPayGroupAreaRelationShips.stream().map(PayGradePayGroupAreaRelationShip::getPayGrade).collect(Collectors.toSet());
             payGradeGraphRepository.saveAll(payGrades);
             Map<Long, PayGrade> longPayGradeMap = payGrades.stream().collect(Collectors.toMap(PayGrade::getPayGradeLevel, Function.identity(), (previous, current) -> current));
-            payGradesPayGroupAreaRelationShips.forEach(payGradesRelationShips -> {
-                payGradesRelationShips.setPayGrade(longPayGradeMap.get(payGradesRelationShips.getPayGrade().getPayGradeLevel()));
-            });
+            payGradesPayGroupAreaRelationShips.forEach(payGradesRelationShips -> payGradesRelationShips.setPayGrade(longPayGradeMap.get(payGradesRelationShips.getPayGrade().getPayGradeLevel())));
             payTableRelationShipGraphRepository.saveAll(payGradesPayGroupAreaRelationShips);
             payGradesObjects.addAll(payGrades);
         }
@@ -395,6 +390,8 @@ public class PayTableService {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreaIds);
+        List<PayGroupAreaDTO> payGroupAreaDTOS = payGradeGraphRepository.getPayGradeDataByIdAndPayGroupArea(payGrade.getId(), new ArrayList<>(payGroupAreaIds));
+        Map<Long, BigDecimal> payGradePublishedAmountMap = payGroupAreaDTOS.stream().collect(Collectors.toMap(PayGroupAreaDTO::getPayGroupAreaId, PayGroupAreaDTO::getPublishedAmount));
         // removing all previous Ids
         payGradeGraphRepository.removeAllPayGroupAreasFromPayGrade(payGrade.getId());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
@@ -408,6 +405,8 @@ public class PayTableService {
         }
         PayGradeResponse payGradeResponse =
                 new PayGradeResponse(payTable.getId(), payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), payGrade.isPublished());
+
+        payGradeResponse.getPayGroupAreas().forEach(current -> current.setPublishedAmount(payGradePublishedAmountMap.get(current.getPayGroupAreaId())));
         payGradeResponses.add(payGradeResponse);
         return payGradeResponses;
     }
@@ -430,7 +429,7 @@ public class PayTableService {
 
         }
         List<PayGradeResponse> payGradeResponses;
-        // user is updating in a unpublished payTable
+        //user is updating in a unpublished payTable
         payGradeResponses = (!payTable.isPublished()) ? updatePayGradeInUnpublishedPayTable(payTable, payGradeDTO, payGrade) :
                 updatePayGradeInPublishedPayTable(payTable, payGradeDTO, payGradeId);
         return payGradeResponses;
@@ -450,15 +449,16 @@ public class PayTableService {
         payTable.setEditable(false);
         payTableByMapper.setHasTempCopy(false);
         payTableGraphRepository.save(payTableByMapper);
+        Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreaIds);
+        List<PayGroupAreaDTO> payGroupAreaDTOS = payGradeGraphRepository.getPayGradeDataByIdAndPayGroupArea(payGradeId, new ArrayList<>(payGroupAreaIds));
+        Map<Long, BigDecimal> payGradePublishedAmountMap = payGroupAreaDTOS.stream().collect(Collectors.toMap(PayGroupAreaDTO::getPayGroupAreaId, PayGroupAreaDTO::getPublishedAmount));
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
             List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
 
             if (payGradeDTO.getPayGradeId().equals(currentPayGrade.getId())) {
                 // user has changed the value in  this pay Grade area of payTable
-                Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
-                List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
-
                 for (PayGroupAreaDTO currentPayGroupArea : payGradeDTO.getPayGroupAreas()) {
                     PayGroupArea payGroupArea = payGroupAreas.stream().filter(payGroupArea1 -> payGroupArea1.getId().equals(currentPayGroupArea.getPayGroupAreaId())).findFirst().get();
                     PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
@@ -477,6 +477,9 @@ public class PayTableService {
             payGradesObjects.add(newPayGrade);
             PayGradeResponse payGradeResponse =
                     new PayGradeResponse(payTableByMapper.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
+            if (currentPayGrade.getId().equals(payGradeId)) {
+                payGradeResponse.getPayGroupAreas().forEach(current -> current.setPublishedAmount(payGradePublishedAmountMap.get(current.getPayGroupAreaId())));
+            }
             payGradeResponses.add(payGradeResponse);
         }
         payTableByMapper.setPayGrades(payGradesObjects);
@@ -569,7 +572,7 @@ public class PayTableService {
             }
         }
         Long id = CollectionUtils.isEmpty(payGradeResponses) ? payTable.getId() : payGradeResponses.get(0).getPayTableId();
-        return new PayTableUpdateDTO(id, payTable.getName(),payTable.getPercentageValue());
+        return new PayTableUpdateDTO(id, payTable.getName(), payTable.getPercentageValue());
     }
 
     private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate) {

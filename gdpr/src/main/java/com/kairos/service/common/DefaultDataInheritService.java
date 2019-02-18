@@ -65,6 +65,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 @Service
 public class DefaultDataInheritService{
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDataInheritService.class);
@@ -128,7 +129,7 @@ public class DefaultDataInheritService{
     private DataCategoryService dataCategoryService;
 
 
-    private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
+    private final Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
     private Map<String, BigInteger> globalCategoryNameAndIdMap = new HashMap<>();
 
 
@@ -332,7 +333,7 @@ public class DefaultDataInheritService{
             ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivity.getName(), masterProcessingActivity.getDescription(), false);
             processingActivity.setSubProcessingActivity(isSubProcessingActivity);
             processingActivity.setOrganizationId(unitId);
-            if(!masterProcessingActivity.getSubProcessingActivities().isEmpty() && masterProcessingActivity.isHasSubProcessingActivity() == true) {
+            if(!masterProcessingActivity.getSubProcessingActivities().isEmpty() && masterProcessingActivity.isHasSubProcessingActivity()) {
                 processingActivity.setSubProcessingActivities(prepareProcessingActivityAndSubProcessingActivityBasicDataOnly(unitId, masterProcessingActivity.getSubProcessingActivities(), true));
             }
             processingActivityList.add(processingActivity);
@@ -483,7 +484,7 @@ public class DefaultDataInheritService{
         dataDisposalRepository.saveAll(dataDisposalsList);
         }
 
-    private <T extends Object> List<BaseEntity> prepareMetadataObjectList(Long unitId, List<T> metadataDTOList, Class entityClass) {
+    private <T> List<BaseEntity> prepareMetadataObjectList(Long unitId, List<T> metadataDTOList, Class entityClass) {
         List<BaseEntity> baseEntityList = new ArrayList<>();
         try {
             Class[] argumentType = { String.class, Long.class };

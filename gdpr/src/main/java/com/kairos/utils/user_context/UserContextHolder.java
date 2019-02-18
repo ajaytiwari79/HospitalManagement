@@ -2,8 +2,8 @@ package com.kairos.utils.user_context;
 
 import org.springframework.util.Assert;
 
-public class UserContextHolder {
-    private static final ThreadLocal<UserContext> userContext = new ThreadLocal<UserContext>();
+class UserContextHolder {
+    private static final ThreadLocal<UserContext> userContext = new ThreadLocal<>();
 
     public static UserContext getContext(){
         UserContext context = userContext.get();
@@ -21,7 +21,7 @@ public class UserContextHolder {
         userContext.set(context);
     }
 
-    public static UserContext createEmptyContext(){
+    private static UserContext createEmptyContext(){
         return new UserContext();
     }
 }

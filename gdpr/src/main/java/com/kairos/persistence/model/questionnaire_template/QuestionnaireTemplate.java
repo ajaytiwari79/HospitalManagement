@@ -111,8 +111,7 @@ public class QuestionnaireTemplate extends BaseEntity {
     @Override
     public void delete() {
         super.delete();
-        this.getSections().forEach( section -> {
-            section.delete();
-        });
+        this.getSections().forEach(QuestionnaireSection::delete);
     }
+
 }

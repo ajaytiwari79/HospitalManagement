@@ -13,6 +13,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
@@ -26,7 +27,7 @@ import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.payment_type.PaymentType;
+import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
@@ -56,7 +57,6 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.auth.RoleServiceUser;
@@ -72,13 +72,11 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -873,7 +871,7 @@ public class BootDataService {
     }
 
     private void createCurrency() {
-        com.kairos.persistence.model.country.Currency currency = new com.kairos.persistence.model.country.Currency();
+        Currency currency = new Currency();
         currency.setName("krone");
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);

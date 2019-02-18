@@ -11,14 +11,14 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
+class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
     private static final Logger log = LoggerFactory.getLogger(CustomJwtAccessTokenConverter.class);
 
     private static final String USER_DETAILS_KEY = "details";
 
     @Override
     public OAuth2Authentication extractAuthentication(Map<String, ?> map) {
-        log.debug("extractAuthentication additional information {} from token");
+        log.debug("extractAuthentication additional information {} from token",map);
         final OAuth2Authentication authentication =    super.extractAuthentication(map);
          Map<String, Object> additionalInfo = new HashMap<>();
           ObjectMapper mapper=new ObjectMapper();

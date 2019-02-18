@@ -1,6 +1,6 @@
 package com.kairos.controller.exception_handler;
 
-public class FieldErrorDTO {
+class FieldErrorDTO {
 
     private String fieldName;
     private String fieldError;

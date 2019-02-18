@@ -2,6 +2,7 @@ package com.kairos.controller.resources;
 
 
 import com.kairos.persistence.model.user.resources.VehicleLocation;
+import com.kairos.persistence.model.user.resources.VehicleLocationDTO;
 import com.kairos.service.resources.VehicleLocationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -28,14 +29,14 @@ public class VehicleLocationController {
 
     @RequestMapping(value = COUNTRY_URL + "/vehicleLocation", method = RequestMethod.POST)
     @ApiOperation("Create new Vehicel Location")
-    public ResponseEntity<Map<String, Object>> createVehicleLocation(@Validated @RequestBody VehicleLocation vehicleLocation, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vehicleLocationService.createVehicleLocation(vehicleLocation));
+    public ResponseEntity<Map<String, Object>> createVehicleLocation(@Validated @RequestBody VehicleLocationDTO vehicleLocationDTO, @PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vehicleLocationService.createVehicleLocation(vehicleLocationDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicleLocation/{vehicleLocationId}", method = RequestMethod.PUT)
     @ApiOperation("Update Vehicel Location")
-    public ResponseEntity<Map<String, Object>> updateVehicleLocation(@Validated @RequestBody VehicleLocation vehicleLocation, @PathVariable long vehicleLocationId, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,vehicleLocationService.updateVehicleLocation(vehicleLocation, vehicleLocationId));
+    public ResponseEntity<Map<String, Object>> updateVehicleLocation(@Validated @RequestBody VehicleLocationDTO vehicleLocationDTO,  @PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,vehicleLocationService.updateVehicleLocation(vehicleLocationDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicleLocation/{vehicleLocationId}", method = RequestMethod.DELETE)

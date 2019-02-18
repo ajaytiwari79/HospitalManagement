@@ -22,7 +22,7 @@ public class CounterDTO {
     //applicable filter of kpi
     private List<FilterCriteria> criteriaList;
     //selected filer by staff
-    private List<FilterCriteria> selectedFilter;
+    private List<FilterCriteria> selectedFilters;
     private Set<ModuleType> supportedModuleTypes;
 
     public CounterDTO() {
@@ -93,12 +93,12 @@ public class CounterDTO {
         this.supportedModuleTypes = supportedModuleTypes;
     }
 
-    public List<FilterCriteria> getSelectedFilter() {
-        return selectedFilter;
+    public List<FilterCriteria> getSelectedFilters() {
+        return selectedFilters;
     }
 
-    public void setSelectedFilter(List<FilterCriteria> selectedFilter) {
-        this.selectedFilter = selectedFilter;
+    public void setSelectedFilters(List<FilterCriteria> selectedFilters) {
+        this.selectedFilters = selectedFilters;
     }
 
     public String getCalculationFormula() {

@@ -47,8 +47,6 @@ public class QuestionnaireSection extends BaseEntity {
     @Override
     public void delete() {
         super.delete();
-        this.questions.forEach(question -> {
-            question.delete();
-        });
+        this.questions.forEach(BaseEntity::delete);
     }
 }

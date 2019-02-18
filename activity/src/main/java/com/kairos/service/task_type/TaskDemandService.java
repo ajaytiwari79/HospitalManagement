@@ -216,8 +216,8 @@ public class TaskDemandService extends MongoBaseService {
         Map<String, String> citizenDemandData = new HashMap<String, String>();
         List<TaskDemand> taskDemands = taskDemandMongoRepository.findAllByCitizenIdAndUnitIdAndRecurrencePattern(clientId,unitId, TaskDemand.RecurrencePattern.WEEKLY);
         for(TaskDemand taskDemand : taskDemands){
-            int weekDayFrequency = 0;
-            int weekEndFrequency = 0;
+            int weekDayFrequency = 1;
+            int weekEndFrequency = 1;
             if (taskDemand.getWeekdayFrequency() != null) {
                 switch (taskDemand.getWeekdayFrequency()) {
                     case ONE_WEEK:

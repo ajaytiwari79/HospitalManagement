@@ -177,8 +177,6 @@ public class PolicyAgreementTemplate extends BaseEntity {
     @Override
     public void delete() {
         super.delete();
-        this.getAgreementSections().forEach( agreementSection -> {
-            agreementSection.delete();
-        });
+        this.getAgreementSections().forEach(AgreementSection::delete);
     }
 }

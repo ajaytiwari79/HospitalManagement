@@ -96,7 +96,7 @@ public class TimeBankCalculationService {
         DailyTimeBankEntry dailyTimeBank = null;
 
         if (CollectionUtils.isNotEmpty(shifts)) {
-            Optional<AppliedFunctionDTO> appliedFunctionDTO=unitPosition.getAppliedFunctions().stream().filter(function->function.getAppliedDates().contains(DateUtils.asLocalDate(shifts.get(0).getStartDate()))).findFirst();
+            Optional<AppliedFunctionDTO> appliedFunctionDTO=unitPosition.getAppliedFunctions().stream().filter(function->function.getAppliedDates().contains(DateUtils.asLocalDate(interval.getStart().toDate()))).findFirst();
             Long functionId=null;
             if(appliedFunctionDTO.isPresent()){
                 functionId= appliedFunctionDTO.get().getId();
@@ -213,8 +213,8 @@ public class TimeBankCalculationService {
      * @param unitPosition
      */
     public void calculateScheduledAndDurationMinutes(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
-        if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())){
-            exceptionService.invalidRequestException("activity.end_date.less_than.start_date",shiftActivity.getActivityName());
+        if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
+            exceptionService.invalidRequestException("activity.end_date.less_than.start_date", shiftActivity.getActivityName());
         }
         int scheduledMinutes = 0;
         int duration = 0;
@@ -248,8 +248,11 @@ public class TimeBankCalculationService {
                 scheduledMinutes = duration;
                 break;
         }
+
         shiftActivity.setDurationMinutes(duration);
-        shiftActivity.setScheduledMinutes(scheduledMinutes);
+        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType())) {
+            shiftActivity.setScheduledMinutes(scheduledMinutes);
+        }
     }
 
 

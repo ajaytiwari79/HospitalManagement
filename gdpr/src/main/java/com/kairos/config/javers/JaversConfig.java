@@ -39,7 +39,7 @@ import javax.persistence.EntityManagerFactory;
 @EnableAspectJAutoProxy
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
-public class JaversConfig {
+class JaversConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(JaversConfig.class);
 

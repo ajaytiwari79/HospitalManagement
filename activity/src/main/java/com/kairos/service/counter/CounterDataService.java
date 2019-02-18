@@ -328,7 +328,7 @@ public class CounterDataService {
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera=new HashMap<>();
-        if(filters.getFilters() != null ) {
+        if(filters.getFilters() != null&&filters.getFilters().size()>1 ) {
             filters.getFilters().forEach(filter -> {
                 filterBasedCriteria.put(filter.getType(), filter.getValues());
             });

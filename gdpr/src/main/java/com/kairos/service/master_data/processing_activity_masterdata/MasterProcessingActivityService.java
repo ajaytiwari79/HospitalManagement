@@ -14,6 +14,7 @@ import com.kairos.persistence.model.embeddables.SubServiceCategory;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivityDeprecated;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
@@ -100,8 +101,8 @@ public class MasterProcessingActivityService{
      * @param parentProcessingActivity required to get organization types ,sub types and Services category and Sub Service Category list for sub processing activity
      * @return return map of Sub processing activities list and ids of sub processing activity
      */
-    public List<MasterProcessingActivity> createNewSubProcessingActivity(Long countryId,
-                                                                         List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> createNewSubProcessingActivity(Long countryId,
+                                                                          List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
         List<String> checkDuplicateInSubProcess = new ArrayList<>();
         List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
@@ -166,7 +167,7 @@ public class MasterProcessingActivityService{
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return
      */
-    public List<MasterProcessingActivity> updateExistingAndCreateNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> updateExistingAndCreateNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
         checkForDuplicacyInName(subProcessingActivities);
         List<MasterProcessingActivityDTO> updateSubProcessingActivities = new ArrayList<>();
@@ -197,13 +198,11 @@ public class MasterProcessingActivityService{
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return map which contain list of ids and list of sub processing activities
      */
-    public List<MasterProcessingActivity> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
 
         Map<Long, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
-        subProcessingActivities.forEach(subProcess -> {
-            subProcessingActivityDTOList.put(subProcess.getId(), subProcess);
-        });
+        subProcessingActivities.forEach(subProcess -> subProcessingActivityDTOList.put(subProcess.getId(), subProcess));
         List<MasterProcessingActivity> subProcessingActivityList = parentProcessingActivity.getSubProcessingActivities();
         subProcessingActivityList.forEach(subProcess -> {
             MasterProcessingActivityDTO subProcessDto = subProcessingActivityDTOList.get(subProcess.getId());
@@ -310,40 +309,21 @@ public class MasterProcessingActivityService{
      * @param processingActivityRiskDTO
      * @return
      */
-    public MasterProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(Long countryId, BigInteger processingActivityId, MasterProcessingActivityRiskDTO processingActivityRiskDTO) {
-
-//TODO
-  /*      MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.findByIdAndCountryId(countryId, processingActivityId);
+    public MasterProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(Long countryId, Long processingActivityId, MasterProcessingActivityRiskDTO processingActivityRiskDTO) {
+        MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.getMasterAssetByCountryIdAndId(countryId, processingActivityId);
         if (!Optional.ofNullable(masterProcessingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        List<MasterProcessingActivity> processingActivityList = new ArrayList<>();
-        processingActivityList.add(masterProcessingActivity);
-        Map<MasterProcessingActivity, List<BasicRiskDTO>> riskListCorrespondingToProcessingActivity = new HashMap<>();
         if (!processingActivityRiskDTO.getRisks().isEmpty()) {
-            riskListCorrespondingToProcessingActivity.put(masterProcessingActivity, processingActivityRiskDTO.getRisks());
-
+            List<Risk> processingActivityRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivityRiskDTO.getRisks(), Risk.class);
+            masterProcessingActivity.setRisks(processingActivityRisks);
         }
         if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {
-            Set<BigInteger> subProcessingActivityIds = new HashSet<>();
-            Map<BigInteger, List<BasicRiskDTO>> subProcessingActivityAndRiskDtoListMap = new HashMap<>();
-            processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivityRiskDTO -> {
-                subProcessingActivityIds.add(subProcessingActivityRiskDTO.getId());
-                subProcessingActivityAndRiskDtoListMap.put(subProcessingActivityRiskDTO.getId(), subProcessingActivityRiskDTO.getRisks());
+            processingActivityRiskDTO.getSubProcessingActivities().forEach( subProcessingActivity -> {
+                createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(countryId, subProcessingActivity.getId(),subProcessingActivity);
             });
-            List<MasterProcessingActivity> subProcessingActivityList = masterProcessingActivityRepository.findAllMasterSubProcessingActivityByIds(countryId, subProcessingActivityIds);
-            for (MasterProcessingActivity subProcessingActivity : subProcessingActivityList) {
-                if (!subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId()).isEmpty()) {
-                    riskListCorrespondingToProcessingActivity.put(subProcessingActivity, subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId()));
-                }
-            }
-            processingActivityList.addAll(subProcessingActivityList);
         }
-        if (!riskListCorrespondingToProcessingActivity.isEmpty()) {
-            Map<MasterProcessingActivity, List<Risk>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskListCorrespondingToProcessingActivity);
-            processingActivityList.forEach(processingActivity -> processingActivity.setRisks(riskIdListCorresponsingProcessingActivities.get(processingActivity).stream().map(Risk::getId).collect(Collectors.toList())));
-        }
-        masterProcessingActivityRepository.saveAll(getNextSequence(processingActivityList));*/
+        masterProcessingActivityRepository.save(masterProcessingActivity);
         return processingActivityRiskDTO;
     }
 

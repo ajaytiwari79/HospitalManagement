@@ -6,8 +6,8 @@ import com.kairos.dto.user.country.pay_table.FutureDate;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.Objects;
+
 
 /**
  * Created by prabjot on 21/12/17.
@@ -58,7 +58,7 @@ public class PayGroupAreaDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getDescription() {
@@ -108,4 +108,14 @@ public class PayGroupAreaDTO {
     public void setPayGroupAreaId(Long payGroupAreaId) {
         this.payGroupAreaId = payGroupAreaId;
     }
+
+    public PayGroupAreaDTO(@NotNull(message = "Name can not be null") String name, String description, Long municipalityId, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull Long levelId) {
+        this.name = name;
+        this.description = description;
+        this.municipalityId = municipalityId;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.levelId = levelId;
+    }
+
 }

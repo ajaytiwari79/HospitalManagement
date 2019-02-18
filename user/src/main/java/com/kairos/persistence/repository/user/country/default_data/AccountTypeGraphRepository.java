@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_CO
 public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountType, Long> {
 
     @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
-            "RETURN accountType")
+            "RETURN accountType ORDER BY accountType.creationDate  DESC")
     List<AccountType> getAllAccountTypeByCountryId(Long countryId);
 
     @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} AND accountType.name =~{1} AND id(accountType)<>{2} " +

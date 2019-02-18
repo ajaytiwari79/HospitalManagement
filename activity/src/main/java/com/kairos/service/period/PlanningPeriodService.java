@@ -614,8 +614,7 @@ public class PlanningPeriodService extends MongoBaseService {
             List<Shift> currentPhaseShifts = shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
             restoreFunctions(shiftStates, unitId, currentPhaseShifts);
             restoreAvailabilityCount(staffingLevels, staffingLevelStates);
-            shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
-            restoreShifts(shiftStates, shiftList, unitId);
+            restoreShifts(shiftStates, shiftList, unitId,planningPeriod);
         }
         return true;
     }
@@ -636,15 +635,16 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriodPhaseId;
     }
 
-    public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId) {
-        //Question:- Planning Period required or not(phase within particular lies or not)
-        List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
-        //shiftList is zero
-        restoreShifts(shiftStates, new ArrayList(), unitId);
-        return true;
-    }
+    //TODO currently not use
+//    public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId) {
+//        //Question:- Planning Period required or not(phase within particular lies or not)
+//        List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
+//        //shiftList is zero
+//        restoreShifts(shiftStates, new ArrayList(), unitId);
+//        return true;
+//    }
 
-    public void restoreShifts(List<ShiftState> shiftStates, List<Shift> shiftList, Long unitId) {
+    public void restoreShifts(List<ShiftState> shiftStates, List<Shift> shiftList, Long unitId,PlanningPeriod planningPeriod) {
         if (!shiftStates.isEmpty()) {
             List<Shift> shifts = new ArrayList<>();
             shiftStates.forEach(shiftState -> {
@@ -653,6 +653,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 shifts.add(shift);
             });
             save(shifts);
+            shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
             shiftService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
         }
     }

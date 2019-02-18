@@ -56,7 +56,7 @@ public class ProcessingActivity extends BaseEntity {
     private Long organizationId;
     private boolean active = true;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Risk> risks  = new ArrayList<Risk>();
+    private List<Risk> risks  = new ArrayList<>();
     private boolean suggested;
 
     public ProcessingActivity() {
@@ -172,7 +172,7 @@ public class ProcessingActivity extends BaseEntity {
         this.processingActivity = processingActivity;
     }
 
-    public List<ProcessingActivity> getSubProcessingActivities() {
+    private List<ProcessingActivity> getSubProcessingActivities() {
         return subProcessingActivities;
     }
 
@@ -264,13 +264,9 @@ public class ProcessingActivity extends BaseEntity {
     public void delete() {
         super.delete();
         this.setDeleted(true);
-        this.getRisks().forEach( processingActivityRisk -> {
-            processingActivityRisk.delete();
-        });
+        this.getRisks().forEach(BaseEntity::delete);
         if(!this.getSubProcessingActivities().isEmpty()) {
-            this.getSubProcessingActivities().forEach(subProcessingActivity -> {
-                subProcessingActivity.delete();
-            });
+            this.getSubProcessingActivities().forEach(ProcessingActivity::delete);
         }
 
     }

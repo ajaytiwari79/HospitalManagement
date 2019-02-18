@@ -91,7 +91,7 @@ public class OrganizationAssetTypeService{
     }
 
 
-    public List<AssetType> buildSubAssetTypeListAndRiskAndLinkedToAssetType(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, AssetType assetTypeMD) {
+    private List<AssetType> buildSubAssetTypeListAndRiskAndLinkedToAssetType(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, AssetType assetType) {
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
         List<Risk> subAssetRisks = new ArrayList<>();
@@ -99,7 +99,7 @@ public class OrganizationAssetTypeService{
             AssetType assetSubType = new AssetType(subAssetTypeDto.getName());
             assetSubType.setSubAssetType(true);
             assetSubType.setOrganizationId(unitId);
-            assetSubType.setAssetType(assetTypeMD);
+            assetSubType.setAssetType(assetType);
             assetSubType.setHasSubAsset(false);
             for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
                 Risk risk = new Risk(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel());
@@ -154,9 +154,7 @@ public class OrganizationAssetTypeService{
             assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
         }
         if (assetType.isHasSubAsset()) {
-            assetType.getSubAssetTypes().forEach(subAssetType -> {
-                subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType));
-            });
+            assetType.getSubAssetTypes().forEach(subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
             assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
         }
         return assetTypeRiskResponseDTO;
@@ -279,7 +277,7 @@ public class OrganizationAssetTypeService{
      * @return map of Sub asset Types List and Ids (List for rollback)
      * @description this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      */
-    private List<AssetType> updateSubAssetTypes(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, AssetType assetTypeMD) {
+    private List<AssetType> updateSubAssetTypes(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, AssetType assetType) {
         List<OrganizationLevelRiskDTO> newRiskOfSubAssetType = new ArrayList<>();
         Map<Long, AssetTypeOrganizationLevelDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
         Map<Long, OrganizationLevelRiskDTO> subAssetTypeExistingRiskDtoCorrespondingToIds = new HashMap<>();
@@ -300,7 +298,7 @@ public class OrganizationAssetTypeService{
             } else {
                 AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), unitId, SuggestedDataStatus.APPROVED);
                 assetSubType.setSubAssetType(true);
-                assetSubType.setAssetType(assetTypeMD);
+                assetSubType.setAssetType(assetType);
                 for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
                     Risk risk = new Risk(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel());
                     subAssetRisks.add(risk);
@@ -311,7 +309,7 @@ public class OrganizationAssetTypeService{
 
         });
 
-        assetTypeMD.getSubAssetTypes().forEach(subAssetType -> {
+        assetType.getSubAssetTypes().forEach(subAssetType -> {
             AssetTypeOrganizationLevelDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             subAssetType.setName(subAssetTypeDto.getName());
             if (!subAssetType.getRisks().isEmpty() && !subAssetTypeExistingRiskDtoCorrespondingToIds.isEmpty()) {
@@ -415,6 +413,7 @@ public class OrganizationAssetTypeService{
      * @return
      * @description create sub Asset tYpe and Asset type with basic detail on Save and Suggest of data from unit to country admin
      */
+    @SuppressWarnings("unchecked")
     private Map<String, AssetTypeBasicDTO> createAssetTypeAndSubAssetTypeWithBasicDetail(Long unitId, AssetTypeBasicDTO assetTypeBasicDTO) {
 
         AssetType assetType = new AssetType(assetTypeBasicDTO.getName());

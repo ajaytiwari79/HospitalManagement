@@ -23,7 +23,7 @@ public class Clause extends BaseEntity {
     @NotBlank
     private String title;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany
     private List<ClauseTag> tags  = new ArrayList<>();
 
     @NotNull
@@ -233,4 +233,6 @@ public class Clause extends BaseEntity {
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
     }
+
+
 }

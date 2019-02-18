@@ -68,8 +68,8 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
-    public KPI getKPIByid(BigInteger counterId){
-        Query query = new Query(Criteria.where("id").is(counterId));
+    public KPI getKPIByid(BigInteger kpiId){
+        Query query = new Query(Criteria.where("_id").is(kpiId));
         return mongoTemplate.findOne(query, KPI.class);
     }
 
@@ -423,7 +423,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     public List<KPIDTO> getCopyKpiOfUnit(ConfLevel level,Long unitId,boolean copy){
         Aggregation aggregation=Aggregation.newAggregation(
-        Aggregation.match(Criteria.where("unitId").is(unitId).and("level").is(level).and("copy").is(copy)),
+        Aggregation.match(Criteria.where("staffId").is(unitId).and("level").is(level).and("copy").is(copy)),
                 Aggregation.lookup("counter","activeKpiId","_id","kpi"),
                 Aggregation.group("kpi._id","kpi.title","kpi.counter"),
                 Aggregation.project().and("_id").as("_id")
@@ -498,6 +498,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         List<BigInteger> applicableKpis= results.getMappedResults().stream().map(s->new BigInteger(s.get("activeKpiId").toString())).collect(Collectors.toList());;
         return applicableKpis;
     }
+
+
 
     public List<TabKPIConf> findTabKPIIdsByKpiIdAndUnitOrCountry(List<BigInteger> kpiIds,Long refid,ConfLevel level){
         String refQueryField = getRefQueryField(level);

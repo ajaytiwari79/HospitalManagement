@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.questionnaire_template;
 
-public class QuestionnaireTemplateMongoRepositoryImpl {
+class QuestionnaireTemplateMongoRepositoryImpl {
 
     /*@Inject
     private MongoTemplate mongoTemplate;
@@ -175,7 +175,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
+    public QuestionnaireTemplate findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and("assetTypeId").is(assetTypeId).and("assetSubTypeId").in(subAssetTypeId)
@@ -185,7 +185,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl {
     }
 
     @Override
-    public QuestionnaireTemplate findQuestionnaireTemplateByUnitIdAssetTypeIdAndTemplateStatus(Long unitId, BigInteger assetTypeId) {
+    public QuestionnaireTemplate findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(Long unitId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and("assetTypeId").is(assetTypeId)
                 .and("assetSubTypeId").exists(false)

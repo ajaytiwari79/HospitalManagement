@@ -1,7 +1,7 @@
 package com.kairos.service.javers;
 
 
-import com.kairos.response.dto.common.JaversResponseMetadata;
+import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.InstanceId;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 
+@SuppressWarnings("unchecked")
 @Service
 public class JaversCommonService {
 
@@ -110,44 +111,44 @@ public class JaversCommonService {
     }
 
 
-    private JaversResponseMetadata findOne(Long id, Class clazz) {
+    private MetaDataCommonResponseDTO findOne(Long id, Class clazz) {
 
-        TypedQuery<JaversResponseMetadata> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name) from " + clazz.getSimpleName() + " t where t.id = :id", JaversResponseMetadata.class);
+        TypedQuery<MetaDataCommonResponseDTO> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name) from " + clazz.getSimpleName() + " t where t.id = :id", MetaDataCommonResponseDTO.class);
         query.setParameter("id", id);
         return query.getSingleResult();
     }
 
-    private  List<JaversResponseMetadata> findAllByIds(ArrayList<InstanceId> instanceIds, Class clazz) {
+    private  List<MetaDataCommonResponseDTO> findAllByIds(ArrayList<InstanceId> instanceIds, Class clazz) {
         List<Long> ids = new ArrayList<>();
         instanceIds.stream().map(InstanceId::getCdoId).forEach(o -> ids.add((long) o));
-        TypedQuery<JaversResponseMetadata> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name)  from " + clazz.getSimpleName() + " t where t.id in (:ids)", JaversResponseMetadata.class);
+        TypedQuery<MetaDataCommonResponseDTO> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name)  from " + clazz.getSimpleName() + " t where t.id in (:ids)", MetaDataCommonResponseDTO.class);
         query.setParameter("ids", ids);
         return query.getResultList();
     }
 
 
-    public List<Map<String, Object>> addChangedOrAuditValueObject(List<CdoSnapshot> valueObjectSnapShots) {
+    private List<Map<String, Object>> addChangedOrAuditValueObject(List<CdoSnapshot> valueObjectSnapShots) {
 
 
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
         for (CdoSnapshot snapShot : valueObjectSnapShots) {
             Map<String, Object> historyMap = new HashMap<>();
             List<String> changed = snapShot.getChanged();
-            for (int i = 0; i < changed.size(); i++) {
-                historyMap.put(changed.get(i), snapShot.getPropertyValue(changed.get(i)));
+            for (String s : changed) {
+                historyMap.put(s, snapShot.getPropertyValue(s));
             }
             auditHistoryListData.add(historyMap);
         }
         return auditHistoryListData;
     }
 
-    public List<Map<String, Object>> addChangedOrAuditValueObject(CdoSnapshot valueObjectSnapShot) {
+    private List<Map<String, Object>> addChangedOrAuditValueObject(CdoSnapshot valueObjectSnapShot) {
 
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
         Map<String, Object> historyMap = new HashMap<>();
         List<String> changed = valueObjectSnapShot.getChanged();
-        for (int i = 0; i < changed.size(); i++) {
-            historyMap.put(changed.get(i), valueObjectSnapShot.getPropertyValue(changed.get(i)));
+        for (String s : changed) {
+            historyMap.put(s, valueObjectSnapShot.getPropertyValue(s));
         }
         auditHistoryListData.add(historyMap);
         return auditHistoryListData;

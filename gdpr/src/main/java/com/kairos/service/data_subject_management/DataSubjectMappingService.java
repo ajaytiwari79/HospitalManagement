@@ -64,8 +64,7 @@ public class DataSubjectMappingService {
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
-        DataSubjectMappingResponseDTO  dataSubjectMappingResponse =  prepareDataSubjectMappingResponseDTO(dataSubjectMapping, true);
-        return dataSubjectMappingResponse;
+        return prepareDataSubjectMappingResponseDTO(dataSubjectMapping, true);
     }
 
 

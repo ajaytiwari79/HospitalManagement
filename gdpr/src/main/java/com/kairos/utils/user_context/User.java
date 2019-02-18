@@ -7,15 +7,15 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
-public class User implements Serializable{
-    protected Long id;
+class User implements Serializable{
+    private Long id;
 
-    protected String cprNumber;
+    private String cprNumber;
     private String userName;
-    protected String nickName;
-    protected String firstName;
-    protected String lastName;
-    protected Gender gender;
+    private String nickName;
+    private String firstName;
+    private String lastName;
+    private Gender gender;
     private String email;
 
     //uniqueness of user
@@ -25,7 +25,7 @@ public class User implements Serializable{
     @Size(min = 8, max = 50, message = "error.User.password.size")
     private String password;
 
-    protected int age;
+    private int age;
     private String accessToken;
     private List<String> roles;
 

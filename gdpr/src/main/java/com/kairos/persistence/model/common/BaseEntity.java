@@ -18,13 +18,13 @@ public abstract  class BaseEntity {
     protected Long id;
 
     @CreatedDate
-    protected Date createdAt;
+    private Date createdAt;
 
     @LastModifiedDate
-    protected Date updatedAt;
+    private Date updatedAt;
 
     @JsonIgnore
-    protected boolean deleted;
+    private boolean deleted;
 
 
     public Long getId() {

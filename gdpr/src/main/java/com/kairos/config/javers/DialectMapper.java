@@ -5,7 +5,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.repository.sql.DialectName;
 
-public class DialectMapper {
+class DialectMapper {
 
     public DialectName map(Dialect hibernateDialect) {
 
