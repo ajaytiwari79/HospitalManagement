@@ -263,6 +263,28 @@ public class QuestionnaireTemplateService {
 
     }
 
+    /**
+     * @param id
+     * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
+     * @description we get  section[ {} ] as query response from mongo on using group operation,
+     * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
+     * and filter section in application layer and send empty array of section []
+     */
+    public List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long id, boolean isUnitId) {
+        List<QuestionnaireTemplateResponseDTO> questionnaireTemplateResponseDTOS = new ArrayList<>();
+        List<QuestionnaireTemplate> questionnaireTemplates = isUnitId ?  questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(id) :
+                questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(id);;
+        questionnaireTemplates.forEach(questionnaireTemplate -> {
+            questionnaireTemplateResponseDTOS.add(prepareQuestionnaireTemplateResponseData(questionnaireTemplate));
+        });
+        /*templateResponseDTOs.forEach(template -> {
+            if (!Optional.ofNullable(template.getSections().get(0).getId()).isPresent()) {
+                template.setSections(new ArrayList<>());
+            }
+        });*/
+        return questionnaireTemplateResponseDTOS;
+    }
+
 
     public Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
 
