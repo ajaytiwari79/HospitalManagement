@@ -139,10 +139,8 @@ public class ShiftBreakService {
             }
             if (breakAvailabilitySettings.getStartAfterMinutes() == 0) { // this means no start restriction is set, so we are adding the break at start
                 workedShiftDuration = workedShiftDuration + (breakSettings.get(0).getShiftDurationInMinute() / 2);
-                currentlyAllottedDurationInMinute=workedShiftDuration;
             } else {
                 workedShiftDuration = workedShiftDuration + breakAvailabilitySettings.getStartAfterMinutes();
-                currentlyAllottedDurationInMinute=workedShiftDuration;
             }
             currentlyAllottedDurationInMinute=workedShiftDuration;
             endDateMillis = startDateMillis + (workedShiftDuration * ONE_MINUTE);
@@ -154,7 +152,7 @@ public class ShiftBreakService {
                 workedShiftDuration += breakAvailabilitySettings.getEndBeforeMinutes();
                 shiftDurationInMinute -= breakAvailabilitySettings.getEndBeforeMinutes();
                 restrictedEndDateMillis = mainShift.getEndDate().getTime() - breakAvailabilitySettings.getEndBeforeMinutes() * ONE_MINUTE;// reducing the end date for the rest calculation
-                shifts.add(getShiftByStartDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis)));
+                shifts.add(getShiftByStartDuration(mainShift,new Date(restrictedEndDateMillis),new Date(mainShift.getEndDate().getTime())));
                 lastBlockingShiftAdded=true;
             }
             for (int i = 0; i < numberOfBreakRequired; i++) {
@@ -173,7 +171,7 @@ public class ShiftBreakService {
                     // we have already added shift now we need to add break for remaining period
                     if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                         endDateMillis = startDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                        shifts.add(++itemsAddedFromBeginning,updateShift?getBreakAtCurrentDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis),breakActivity,allowedBreakDurationInMinute): getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true,null,allowedBreakDurationInMinute));
+                        shifts.add(++itemsAddedFromBeginning,getBreakAtCurrentDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis),breakActivity,allowedBreakDurationInMinute));
                         shiftDurationInMinute -=  allowedBreakDurationInMinute;
                         startDateMillis=endDateMillis;
                         lastBreakEndedOnInMillis=endDateMillis;
@@ -206,8 +204,7 @@ public class ShiftBreakService {
                             logger.info("GAP is not sufficient as required ");
                         }// we have already added shift now we need to add break for remaining period
                         endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                        shifts.add(++itemsAddedFromBeginning,updateShift?getBreakAtCurrentDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis),breakActivity,allowedBreakDurationInMinute):getShiftObject(
-                                breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true,null,allowedBreakDurationInMinute));
+                        shifts.add(++itemsAddedFromBeginning,getBreakAtCurrentDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis),breakActivity,allowedBreakDurationInMinute));
                         shiftDurationInMinute -= allowedBreakDurationInMinute;
                         workedShiftDuration += allowedBreakDurationInMinute;
                         currentlyAllottedDurationInMinute += allowedBreakDurationInMinute;
