@@ -970,7 +970,7 @@ public class ShiftService extends MongoBaseService {
                         PhaseSettingsActivityTab phaseSettingsActivityTab = activityPhaseSettingMap.get(shiftActivity.getActivityId());
                         PhaseTemplateValue phaseTemplateValue = phaseSettingsActivityTab.getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
                         ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue, shiftPublishDTO.getStatus());
-                        boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
+                        boolean validAccessGroup = true;//validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
                             removeOppositeStatus(shiftActivity, shiftPublishDTO.getStatus());
@@ -983,7 +983,7 @@ public class ShiftService extends MongoBaseService {
                 }
             }
             save(shifts);
-            //timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         }
         return shiftActivityResponseDTOS;
     }

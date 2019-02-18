@@ -8,6 +8,8 @@ import com.kairos.enums.shift.ShiftStatus;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * @author pradeep
  * @date - 13/9/18
@@ -113,11 +115,11 @@ public class ShiftActivityDTO {
     }
 
     public Set<ShiftStatus> getStatus() {
-        return status;
+        return isNull(status) ? new HashSet<>() : status;
     }
 
     public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
+        this.status = isNull(status) ? new HashSet<>() : status;
     }
 
     public String getBackgroundColor() {

@@ -64,6 +64,7 @@ import static com.kairos.dto.user.country.agreement.cta.CalculationFor.BONUS_HOU
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.util.stream.Collectors.toMap;
 
 
 /*
@@ -121,6 +122,9 @@ public class TimeBankCalculationService {
                                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
                                         dailyScheduledMin += shiftActivity.getScheduledMinutes();
                                         totalDailyPlannedMinutes += shiftActivity.getScheduledMinutes();
+                                        if(shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)){
+                                            totalPublishedDailyPlannedMinutes+=shiftActivity.getScheduledMinutes();
+                                        }
                                     } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                         for (CompensationTableInterval ctaInterval : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
                                             List<Interval> intervalOfCTAs = getCTAInterval(ctaInterval, interval.getStart());
@@ -501,7 +505,7 @@ public class TimeBankCalculationService {
         long presenceScheduledMin = getScheduledMinOfActivityByTimeType(presenceAbsenceTimeTypeMap.get("Presence"), shifts);
         long absenceScheduledMin = getScheduledMinOfActivityByTimeType(presenceAbsenceTimeTypeMap.get("Absence"), shifts);
         long totalTimeBankChange = dailyTimeBankEntries.stream().mapToLong(t -> t.getTotalTimeBankMin()).sum();
-        long accumulatedTimeBankBefore = dailyTimeBankEntry != null ? dailyTimeBankEntry.getAccumultedTimeBankMin() : 0;
+        long accumulatedTimeBankBefore = dailyTimeBankEntry.getAccumultedTimeBankMin();
         long totalTimeBank = accumulatedTimeBankBefore + totalTimeBankChange;
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = getVisualViewTimebankInterval(dailyTimeBankEntries, interval);
         return new TimeBankVisualViewDTO(totalTimeBank, presenceScheduledMin, absenceScheduledMin, totalTimeBankChange, timeBankIntervalDTOS, scheduledActivitiesDTOS, timeBankDistributionsDto);
@@ -1150,6 +1154,30 @@ public class TimeBankCalculationService {
         return scheduledMinutes;
     }
 
+    public Map<java.time.LocalDate, TimeBankByDateDTO> getAccumulatedTimebankDTO(Set<DateTimeInterval> planningPeriodIntervals, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate){
+        long accumulatedTimebank = 0;
+        java.time.LocalDate unitPositionStartDate = unitPositionWithCtaDetailsDTO.getStartDate();
+        Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k -> k.getDate(), v -> v));
+        Map<java.time.LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = new HashMap<>();
+        while (unitPositionStartDate.isBefore(endDate) || unitPositionStartDate.equals(endDate)) {
+            TimeBankByDateDTO timeBankByDateDTO = new TimeBankByDateDTO();
+            int totalTimeBankMinutes;
+            if (dateDailyTimeBankEntryMap.containsKey(unitPositionStartDate)) {
+                DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(unitPositionStartDate);
+                totalTimeBankMinutes = dailyTimeBankEntry.getTotalTimeBankMin();
+                accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
+            } else {
+                totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, startDate, unitPositionWithCtaDetailsDTO.getPositionLines()));
+            }
+            timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);
+            timeBankByDateDTO.setTimeBankChangeMinutes(totalTimeBankMinutes);
+            if(unitPositionStartDate.isAfter(startDate) || startDate.equals(unitPositionStartDate)) {
+                localDateTimeBankByDateDTOMap.put(unitPositionStartDate, timeBankByDateDTO);
+            }
+            unitPositionStartDate = unitPositionStartDate.plusDays(1);
+        }
+        return localDateTimeBankByDateDTOMap;
+    }
 
 
 
