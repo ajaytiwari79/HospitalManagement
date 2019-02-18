@@ -351,7 +351,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public void updateTimeBankAndAvailableCountOfStaffingLevel(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+     void updateTimeBankAndAvailableCountOfStaffingLevel(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift);
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
         boolean presenceTypeShift = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
@@ -361,7 +361,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public Shift saveShiftWithActivity( Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift,
+     Shift saveShiftWithActivity( Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift,
                                        StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift) {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
@@ -400,7 +400,7 @@ public class ShiftService extends MongoBaseService {
         return shift;
     }
 
-    public List<ShiftActivity> updateBreakInShift(Shift shift, boolean updateShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+     List<ShiftActivity> updateBreakInShift(Shift shift, boolean updateShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         shift.setStartDate(shift.getActivities().get(0).getStartDate());
         shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         List<ShiftActivity> breakActivities;
