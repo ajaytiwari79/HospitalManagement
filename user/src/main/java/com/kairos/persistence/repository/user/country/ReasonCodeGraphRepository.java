@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.COUNT
 public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCode, Long> {
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate DESC")
     List<ReasonCodeResponseDTO> findReasonCodesByCountry(long countryId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} return  reasonCode.name as name," +
