@@ -68,7 +68,8 @@ public class QuestionnaireSectionService {
         questionnaireTemplate.setSections(buildQuestionnaireSections(referenceId, isUnitId, templateSectionDTO.getSections(), questionnaireTemplate.getTemplateType()));
         questionnaireTemplate.setTemplateStatus(templateSectionDTO.getTemplateStatus());
         questionnaireTemplateRepository.save(questionnaireTemplate);
-        return ObjectMapperUtils.copyPropertiesByMapper(questionnaireTemplate, QuestionnaireTemplateResponseDTO.class);
+        //return ObjectMapperUtils.copyPropertiesByMapper(questionnaireTemplate, QuestionnaireTemplateResponseDTO.class);
+        return questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(referenceId, questionnaireTemplate.getId(),isUnitId);
     }
 
 
