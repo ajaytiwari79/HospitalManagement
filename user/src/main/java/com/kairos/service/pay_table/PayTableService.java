@@ -5,6 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
 import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
@@ -97,7 +98,8 @@ public class PayTableService {
     }
 
     public List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId) {
-        if (!countryService.existsById(countryId)) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", countryId);
         }
         return payTableGraphRepository.getOrganizationLevelWisePayGroupAreas(countryId);
