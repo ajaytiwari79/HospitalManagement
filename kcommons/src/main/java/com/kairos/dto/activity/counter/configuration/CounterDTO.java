@@ -6,6 +6,7 @@ import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
 public class CounterDTO {
     private BigInteger id;
     private CounterType type;
+    @NotBlank
     private String title;
     private boolean counter;
     private BigInteger primaryCounter;
