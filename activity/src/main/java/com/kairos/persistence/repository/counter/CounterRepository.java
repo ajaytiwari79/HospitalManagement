@@ -38,6 +38,11 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+
 /*
  * @author: mohit.shakya@oodlestechnologies.com
  * @dated: Jun/26/2018
@@ -124,10 +129,10 @@ public class CounterRepository {
             criteria=criteria.and("copy").is(copy);
         }
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(criteria),
-          Aggregation.lookup("counter","activeKpiId","_id","kpi"),
-           Aggregation.project().and("kpi._id").as("_id")
-                   .and("kpi.title").as("title").and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
+          match(criteria),
+          lookup("counter","activeKpiId","_id","kpi"),
+           project().and("kpi.title").as("title").and("kpi._id").as("_id")
+                   .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
         return results.getMappedResults();
@@ -141,15 +146,15 @@ public class CounterRepository {
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
-    public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiIds(List<BigInteger> kpiIds, List<ConfLevel> level){
-        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and("level").in(level).and("applicableFilter.modified").is(false));
+    public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiIdsOrUnitId(List<BigInteger> kpiIds, List<ConfLevel> level, Long unitId){
+        Criteria criteria=Criteria.where("baseKpiId").in(kpiIds).and("level").in(level).and("applicableFilter.modified").is(false);
+        if(isNotNull(unitId)){
+            criteria.and("unitId").is(unitId);
+        }
+        Query query = new Query(criteria);
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
-    public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiAndUnitId(Long unitId,List<BigInteger> kpiIds, List<ConfLevel> level){
-        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and("unitId").is(unitId).and("level").in(level).and("applicableFilter.modified").is(false));
-        return mongoTemplate.find(query, ApplicableKPI.class);
-    }
 
     //category CRUD
 
@@ -182,9 +187,9 @@ public class CounterRepository {
 
     public List<CategoryKPIMappingDTO> getKPIsMappingForCategories(List<BigInteger> categoryIds){
         Aggregation ag = Aggregation.newAggregation(
-                               Aggregation.match(Criteria.where("categoryId").in(categoryIds))
+                               match(Criteria.where("categoryId").in(categoryIds))
                 , Aggregation.group("categoryId").push("kpiId").as("kpiIds")
-                , Aggregation.project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
+                , project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
         );
         AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
         return results.getMappedResults();
@@ -194,11 +199,11 @@ public class CounterRepository {
     public List<CategoryKPIMappingDTO> getKPIsMappingForCategoriesForStaff(Set<BigInteger> kpiIds,Long refId,ConfLevel level){
         String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
         Aggregation ag = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where(queryField).is(refId).and("level").is(level)),
-                Aggregation.lookup("categoryKPIConf","_id","categoryId","category"),
-                Aggregation.match(Criteria.where("category.kpiId").in(kpiIds))
+                match(Criteria.where(queryField).is(refId).and("level").is(level)),
+                lookup("categoryKPIConf","_id","categoryId","category"),
+                match(Criteria.where("category.kpiId").in(kpiIds))
                 , Aggregation.group("id","name").push("category.kpiId").as("kpiId")
-                , Aggregation.project().and("id").as("categoryId").and("kpiId").arrayElementAt(0).as("kpiId").and("name").as("name")
+                , project().and("id").as("categoryId").and("kpiId").arrayElementAt(0).as("kpiId").and("name").as("name")
         );
         AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, KPICategory.class, CategoryKPIMappingDTO.class);
         return results.getMappedResults();
@@ -225,9 +230,9 @@ public class CounterRepository {
             criteria=Criteria.where("tabId").is(tabId).orOperator(Criteria.where("countryId").is(countryId).and("level")
                     .is(ConfLevel.COUNTRY).and("kpiValidity").in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("unitId").is(refId).and("level").is(level));
         }
-        Aggregation aggregation=Aggregation.newAggregation(Aggregation.match(criteria),
-                Aggregation.lookup("counter","kpiId","_id","kpis"),
-                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi"),
+        Aggregation aggregation=Aggregation.newAggregation(match(criteria),
+                lookup("counter","kpiId","_id","kpis"),
+                project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi"),
          Aggregation.sort(Sort.Direction.ASC,"priority"));
         AggregationResults<TabKPIDTO> results=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return results.getMappedResults();
@@ -241,9 +246,9 @@ public class CounterRepository {
             criteria=Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
         }
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(criteria),
-          Aggregation.lookup("counter","kpiId","_id","kpis"),
-          Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi")
+          match(criteria),
+          lookup("counter","kpiId","_id","kpis"),
+          project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi")
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return aggregationResults.getMappedResults();
@@ -259,9 +264,9 @@ public class CounterRepository {
                     in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("staffId").is(staffId).and("level").is(level));
         }
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(criteria),
-                Aggregation.lookup("counter","kpiId","_id","kpis"),
-                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi"),
+                match(criteria),
+                lookup("counter","kpiId","_id","kpis"),
+                project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi"),
                 Aggregation.sort(Sort.Direction.ASC,"priority")
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
@@ -357,8 +362,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     public List<BigInteger> getKPISOfAccessGroup(List<Long> accessGroupId,Long unitId,ConfLevel level){
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where("accessGroupId").in(accessGroupId).and("unitId").is(unitId).and("level").is(level)),
-           Aggregation.project().and("kpiId").as("kpiId").andExclude("_id")
+          match(Criteria.where("accessGroupId").in(accessGroupId).and("unitId").is(unitId).and("level").is(level)),
+           project().and("kpiId").as("kpiId").andExclude("_id")
         );
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
         List<Map> result= results.getMappedResults();
@@ -386,8 +391,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
             criteria=criteria.and("kpiId").in(kpiIds);
         }
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(criteria),
-                Aggregation.project("kpiId")
+                match(criteria),
+                project("kpiId")
                 );
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,OrgTypeKPIEntry.class, Map.class);
         return results.getMappedResults().stream().map(s ->new BigInteger(s.get("kpiId").toString())).collect(Collectors.toList());
@@ -414,8 +419,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
             criteria = criteria.and("kpiId").in(kpiIds);
         }
       Aggregation aggregation=Aggregation.newAggregation(
-              Aggregation.match(criteria),
-              Aggregation.project("kpiId")
+              match(criteria),
+              project("kpiId")
       );
        AggregationResults<Map> result=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
        return result.getMappedResults().stream().map(o -> new BigInteger(o.get("kpiId").toString())).collect(Collectors.toList());
@@ -423,10 +428,10 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     public List<KPIDTO> getCopyKpiOfUnit(ConfLevel level,Long unitId,boolean copy){
         Aggregation aggregation=Aggregation.newAggregation(
-        Aggregation.match(Criteria.where("staffId").is(unitId).and("level").is(level).and("copy").is(copy)),
-                Aggregation.lookup("counter","activeKpiId","_id","kpi"),
+        match(Criteria.where("staffId").is(unitId).and("level").is(level).and("copy").is(copy)),
+                lookup("counter","activeKpiId","_id","kpi"),
                 Aggregation.group("kpi._id","kpi.title","kpi.counter"),
-                Aggregation.project().and("_id").as("_id")
+                project().and("_id").as("_id")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
@@ -435,12 +440,12 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
-                Aggregation.lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
-                Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
-                Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
+                match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
+                match(Criteria.where("applicableKpi.staffId").is(staffId)),
+                lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
                 Aggregation.group("kpi._id","kpi.title","kpi.counter"),
-                Aggregation.project().and("_id").as("_id")
+                project().and("_id").as("_id")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,KPIDTO.class);
@@ -450,12 +455,12 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     public List<BigInteger> getAccessGroupKPIIds(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
-                Aggregation.lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
-                Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
-                Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
-                Aggregation.project().and("kpi").arrayElementAt(0).as("kpi"),
-                Aggregation.project("kpi._id")
+                match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
+                match(Criteria.where("applicableKpi.staffId").is(staffId)),
+                lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
+                project().and("kpi").arrayElementAt(0).as("kpi"),
+                project("kpi._id")
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
         return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
@@ -464,9 +469,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     public List<AccessGroupMappingDTO> getAccessGroupAndKpiId(Set<Long> accessGroupIds , ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
                 Aggregation.group("accessGroupId").push("kpiId").as("kpiIds"),
-                Aggregation.project().and("_id").as("accessGroupId").and("kpiIds").as("kpiIds")
+                project().and("_id").as("accessGroupId").and("kpiIds").as("kpiIds")
         );
         AggregationResults<AccessGroupMappingDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,AccessGroupMappingDTO.class);
         return results.getMappedResults();
@@ -492,8 +497,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
             criteria=criteria.and("activeKpiId").in(kpiIds);
         }
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(criteria),
-                Aggregation.project("activeKpiId"));
+                match(criteria),
+                project("activeKpiId"));
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,ApplicableKPI.class,Map.class);
         List<BigInteger> applicableKpis= results.getMappedResults().stream().map(s->new BigInteger(s.get("activeKpiId").toString())).collect(Collectors.toList());;
         return applicableKpis;
@@ -530,9 +535,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
    public List<KPIAccessPageDTO> getKPIAcceccPage(Long refId,ConfLevel level){
        String refQueryField = getRefQueryField(level);
        Aggregation aggregation=Aggregation.newAggregation(
-            Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
+            match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
             Aggregation.group("parentModuleId").push("$$ROOT").as("child"),
-            Aggregation.project().and("$_id").as("moduleId").and("child").as("child").and("child.enable").as("enable").and("child.defaultTab").as("defaultTab")
+            project().and("$_id").as("moduleId").and("child").as("child").and("child.enable").as("enable").and("child.defaultTab").as("defaultTab")
        );
        AggregationResults<KPIAccessPageDTO> results=mongoTemplate.aggregate(aggregation,KPIDashboard.class,KPIAccessPageDTO.class);
        return results.getMappedResults();
