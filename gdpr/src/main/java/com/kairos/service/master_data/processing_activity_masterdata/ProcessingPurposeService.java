@@ -1,11 +1,10 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-
-
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
@@ -28,7 +27,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class ProcessingPurposeService{
+public class ProcessingPurposeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPurposeService.class);
 
@@ -48,40 +47,36 @@ public class ProcessingPurposeService{
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS, boolean isSuggestion) {
+    public List<ProcessingPurposeDTO> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
-            for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
-                if (!StringUtils.isBlank(processingPurpose.getName())) {
-                    processingPurposesNames.add(processingPurpose.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
+            processingPurposesNames.add(processingPurpose.getName());
 
-            }
-            List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingPurpose> existing = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
+        }
+        List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<ProcessingPurpose> previousProcessingPurposes = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        processingPurposesNames = ComparisonUtils.getNameListForMetadata(previousProcessingPurposes, processingPurposesNames);
 
-            List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
-            if (!processingPurposesNames.isEmpty()) {
-                for (String name : processingPurposesNames) {
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId);
-                    if(isSuggestion){
-                        newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                        newProcessingPurpose.setSuggestedDate(LocalDate.now());
-                    }else{
-                        newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
-                    }
-                    newProcessingPurposes.add(newProcessingPurpose);
+        List<ProcessingPurpose> processingPurposes = new ArrayList<>();
+        if (!processingPurposesNames.isEmpty()) {
+            for (String name : processingPurposesNames) {
+                ProcessingPurpose processingPurpose = new ProcessingPurpose(name, countryId);
+                if (isSuggestion) {
+                    processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    processingPurpose.setSuggestedDate(LocalDate.now());
+                } else {
+                    processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-                newProcessingPurposes = processingPurposeRepository.saveAll(newProcessingPurposes);
+                processingPurposes.add(processingPurpose);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newProcessingPurposes);
-            return result; }
+            processingPurposeRepository.saveAll(processingPurposes);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingPurposes, ProcessingPurposeDTO.class);
+
+    }
 
 
     /**
@@ -115,7 +110,7 @@ public class ProcessingPurposeService{
         Integer resultCount = processingPurposeRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Processing Purpose deleted successfully for id :: {}", id);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -131,39 +126,36 @@ public class ProcessingPurposeService{
      * @return ProcessingPurpose updated object
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
-        ProcessingPurpose processingPurpose = processingPurposeRepository.findByCountryIdAndName( countryId,  processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeRepository.findByCountryIdAndName(countryId, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
             throw new DuplicateDataException("data  exist for  " + processingPurposeDTO.getName());
         } else {
-            Integer resultCount =  processingPurposeRepository.updateMasterMetadataName(processingPurposeDTO.getName(), id, countryId);
-            if(resultCount <=0){
+            Integer resultCount = processingPurposeRepository.updateMasterMetadataName(processingPurposeDTO.getName(), id, countryId);
+            if (resultCount <= 0) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
-            }else{
+            } else {
                 LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingPurposeDTO.getName());
             }
-             return processingPurposeDTO;
+            return processingPurposeDTO;
 
         }
     }
 
     /**
-     *
-     * @param countryId - country id
+     * @param countryId             - country id
      * @param processingPurposeDTOS - processing purpose suggested by unit
      * @return
      */
-    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
-        Map<String, List<ProcessingPurpose>> result = createProcessingPurpose(countryId, processingPurposeDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<ProcessingPurposeDTO> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+        return createProcessingPurpose(countryId, processingPurposeDTOS, true);
 
     }
 
 
     /**
-     *
      * @param countryId
      * @param processingPurposeIds
      * @param suggestedDataStatus
@@ -171,10 +163,10 @@ public class ProcessingPurposeService{
      */
     public List<ProcessingPurpose> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<Long> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = processingPurposeRepository.updateMetadataStatus(countryId, processingPurposeIds,suggestedDataStatus);
-        if(updateCount > 0){
+        Integer updateCount = processingPurposeRepository.updateMetadataStatus(countryId, processingPurposeIds, suggestedDataStatus);
+        if (updateCount > 0) {
             LOGGER.info("Processing Purposes are updated successfully with ids :: {}", processingPurposeIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", processingPurposeIds);
         }
         return processingPurposeRepository.findAllByIds(processingPurposeIds);

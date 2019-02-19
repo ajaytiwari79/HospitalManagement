@@ -3,8 +3,11 @@ package com.kairos.dto.activity.cta;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * @author pradeep
@@ -47,6 +50,6 @@ public class CTAWTAAndAccumulatedTimebankWrapper {
     }
 
     public void setUnitPositionLineAndTimebankMinuteMap(Map<Long, Map<Long, Long>> unitPositionLineAndTimebankMinuteMap) {
-        this.unitPositionLineAndTimebankMinuteMap = unitPositionLineAndTimebankMinuteMap;
+        this.unitPositionLineAndTimebankMinuteMap = isNull(unitPositionLineAndTimebankMinuteMap) ? new HashMap<>() : unitPositionLineAndTimebankMinuteMap;
     }
 }

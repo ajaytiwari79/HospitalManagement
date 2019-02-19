@@ -718,8 +718,8 @@ public class UnitPositionService {
                         positionLine.setCostTimeAgreement(cta);
                     }
                     //This is the Map of PositionLineId and accumulated timebank in minutes map
-                    Map<Long,Long> positionLineAndTimebankMinutes = ctawtaAndAccumulatedTimebankWrapper.getUnitPositionLineAndTimebankMinuteMap().get(u.getId());
-                    positionLine.setAccumulatedTimebankMinutes(positionLineAndTimebankMinutes.get(positionLine.getId()));
+                    Map<Long,Long> positionLineAndTimebankMinutes = ctawtaAndAccumulatedTimebankWrapper.getUnitPositionLineAndTimebankMinuteMap().getOrDefault(u.getId(),new HashMap<>());
+                    positionLine.setAccumulatedTimebankMinutes(positionLineAndTimebankMinutes.getOrDefault(positionLine.getId(),0l));
                 });
 
                 ctawtaAndAccumulatedTimebankWrapper.getWta().forEach(wta -> {

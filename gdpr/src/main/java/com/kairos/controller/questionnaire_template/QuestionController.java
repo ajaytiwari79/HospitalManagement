@@ -20,7 +20,7 @@ import static com.kairos.constants.ApiConstant.UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class QuestionController {
+class QuestionController {
 
 
     @Inject

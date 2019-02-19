@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.master_data.asset_management.org_security_measure;
 
 
-public class OrganizationalSecurityMeasureMongoRepositoryImpl{
+class OrganizationalSecurityMeasureMongoRepositoryImpl{
 
 
    /* @Inject

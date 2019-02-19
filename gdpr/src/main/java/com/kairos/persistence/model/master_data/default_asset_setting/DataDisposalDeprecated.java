@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-public class DataDisposalDeprecated {
+class DataDisposalDeprecated {
 
     @NotBlank(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")

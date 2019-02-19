@@ -29,18 +29,16 @@ public class RestClientUrlUtil {
     }
 
 
-    public static final String getBaseUrl(boolean hasUnitInUrl){
+    public static String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
-            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
+            return new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
         }else{
-            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
+            return new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).toString();
         }
 
     }
 
-    public static final String getBaseUrl(Long organizationId, Long unitId, Long countryId){
+    public static String getBaseUrl(Long organizationId, Long unitId, Long countryId){
         StringBuilder baseUrl=new StringBuilder(userServiceUrl+"organization/"+organizationId);
         if(Optional.ofNullable(unitId).isPresent()){
             return baseUrl.append("/unitId/").append(unitId).toString();
@@ -49,44 +47,37 @@ public class RestClientUrlUtil {
         }
     }
 
-    public static final String getBaseUrl(Long id,boolean hasUnitInUrl, Long parentOrganizationId){
+    public static String getBaseUrl(Long id, boolean hasUnitInUrl, Long parentOrganizationId){
         StringBuilder sb = new StringBuilder(userServiceUrl+"organization/").append(parentOrganizationId);
-            String baseUrl= hasUnitInUrl? sb.append("/unit/").append(id).toString() : sb.append("/country/").append(id).toString();
-            return baseUrl;
+        return hasUnitInUrl? sb.append("/unit/").append(id).toString() : sb.append("/country/").append(id).toString();
     }
 
 
-    public static final String getBaseUrl() {
+    public static String getBaseUrl() {
         return userServiceUrl;
     }
-    public static final String getDefaultSchedulerUrl(){
-        String baseUrl=new StringBuilder(userServiceUrl+"organization/123").toString();
-        return baseUrl;
+    public static String getDefaultSchedulerUrl(){
+        return new StringBuilder(userServiceUrl+"organization/123").toString();
     }
-    public static final String getPlannerBaseUrl(){
-        String baseUrl=new StringBuilder(plannerServiceUrl).toString();
-        return baseUrl;
+    public static String getPlannerBaseUrl(){
+        return new StringBuilder(plannerServiceUrl).toString();
 
     }
 
-    public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
+    public static String getBaseUrl(boolean hasUnitInUrl, Long id) {
         if (hasUnitInUrl) {
-            String baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-            return baseUrl;
+            return new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
         } else {
-            String baseUrl = new StringBuilder(userServiceUrl).toString();
-            return baseUrl;
+            return new StringBuilder(userServiceUrl).toString();
         }
     }
 
-    public final static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
+    public static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
         if (hasUnitInUrl) {
 
-            String baseUrl = new StringBuilder(schedulerServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-            return baseUrl;
+            return new StringBuilder(schedulerServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
         } else {
-            String baseUrl = schedulerServiceUrl;
-            return baseUrl;
+            return schedulerServiceUrl;
         }
     }
 

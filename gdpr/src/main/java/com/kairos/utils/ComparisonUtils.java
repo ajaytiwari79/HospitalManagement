@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 import java.lang.reflect.Method;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class ComparisonUtils {
 
 

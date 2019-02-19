@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import org.javers.core.metamodel.annotation.Value;
 
 import java.util.List;
 
@@ -83,5 +82,14 @@ public class QuestionnaireTemplateResponseDTO {
     }
 
     public QuestionnaireTemplateResponseDTO() {
+    }
+
+    public QuestionnaireTemplateResponseDTO(Long id, String name, String description, QuestionnaireTemplateType templateType, boolean isDefaultAssetTemplate, QuestionnaireTemplateStatus templateStatus) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.templateType = templateType;
+        this.isDefaultAssetTemplate = isDefaultAssetTemplate;
+        this.templateStatus = templateStatus;
     }
 }

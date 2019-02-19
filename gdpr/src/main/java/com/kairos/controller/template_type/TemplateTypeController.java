@@ -21,7 +21,7 @@ import static com.kairos.constants.ApiConstant.*;
 @RestController
 @Api(API_V1)
 @RequestMapping(API_V1)
-public class TemplateTypeController {
+class TemplateTypeController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateTypeController.class);

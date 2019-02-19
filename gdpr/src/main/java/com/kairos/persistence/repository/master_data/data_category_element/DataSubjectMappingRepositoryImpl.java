@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
 
-public class DataSubjectMappingRepositoryImpl  {
+class DataSubjectMappingRepositoryImpl  {
 
    /* @Inject
     private MongoTemplate mongoTemplate;

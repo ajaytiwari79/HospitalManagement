@@ -26,13 +26,14 @@ import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Service
 public class GenericRestClient {
-    private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
     @Autowired
+    private
     RestTemplate restTemplate;
     @Inject private ExceptionService exceptionService;
 
-    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
+    public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit,id);
 
         try {
@@ -56,7 +57,7 @@ public class GenericRestClient {
 
     }
 
-    public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
+    private static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
         switch (integrationOperation) {
             case CREATE:
                 return HttpMethod.POST;
@@ -72,7 +73,7 @@ public class GenericRestClient {
     }
 
 
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+    public <T, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit,id)+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
@@ -95,7 +96,7 @@ public class GenericRestClient {
     }
 
 
-    public String getURIWithParam(List<NameValuePair> queryParam){
+    private String getURIWithParam(List<NameValuePair> queryParam){
         try {
         URIBuilder builder = new URIBuilder();
             if(queryParam!=null && !queryParam.isEmpty()) {
@@ -111,13 +112,11 @@ public class GenericRestClient {
 
 
 
-    public static <T> String getURI(T t,String uri,Map<String,Object> queryParams){
+    private static <T> String getURI(T t, String uri, Map<String, Object> queryParams){
         URIBuilder builder = new URIBuilder();
 
         if(Optional.ofNullable(queryParams).isPresent()){
-            queryParams.entrySet().forEach(e->{
-                builder.addParameter(e.getKey(),e.getValue().toString());
-            });
+            queryParams.forEach((key, value) -> builder.addParameter(key, value.toString()));
         }
         try {
             uri= uri+builder.build().toString();

@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstant.UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class QuestionnaireTemplateController {
+class QuestionnaireTemplateController {
 
 
     @Inject
@@ -39,7 +39,7 @@ public class QuestionnaireTemplateController {
     @ApiOperation(value = "get all questionnaire template basic response ")
     @GetMapping(COUNTRY_URL + "/questionnaire_template")
     public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateByCountryIdOrOrganizationId(countryId, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(countryId, false));
     }
 
     @ApiOperation(value = "get questionnaire template With Sections by Id ")
@@ -102,7 +102,7 @@ public class QuestionnaireTemplateController {
     @ApiOperation(value = "get all questionnaire template of unit ")
     @GetMapping(UNIT_URL + "/questionnaire_template")
     public ResponseEntity<Object> getAllQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateByCountryIdOrOrganizationId(unitId, true));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(unitId, true));
     }
 
 }

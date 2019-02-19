@@ -34,6 +34,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.mongodb.client.result.DeleteResult;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -193,6 +194,9 @@ public class CounterDistService extends MongoBaseService {
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        if(!accessGroupPermissionCounterDTO.getCountryAdmin() && CollectionUtils.isEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds()) ){
+            exceptionService.actionNotPermittedException("message.staff.invalid.unit");
+        }
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<BigInteger> kpiIds = new ArrayList<>();
         if (!accessGroupPermissionCounterDTO.getCountryAdmin()) {

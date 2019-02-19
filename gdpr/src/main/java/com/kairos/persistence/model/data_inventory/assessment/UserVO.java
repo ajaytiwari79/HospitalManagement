@@ -15,7 +15,6 @@ public class UserVO {
     private String assessmentUserFirstName;
     private String assessmentUserLastName;
     private String assessmentUserEmail;
-    private Long countryId;
 
     public Long getUserId() {
         return userId;
@@ -49,7 +48,7 @@ public class UserVO {
         this.assessmentUserLastName = assessmentUserLastName;
     }
 
-    public String getAssessmentUserEmail() {
+    private String getAssessmentUserEmail() {
         return assessmentUserEmail;
     }
 
@@ -57,11 +56,15 @@ public class UserVO {
         this.assessmentUserEmail = assessmentUserEmail;
     }
 
-    public Long getCountryId() { return countryId; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
-
     public UserVO() {
+    }
+
+    public UserVO(Long userId, String assessmentUserName, String assessmentUserEmail , String assessmentUserFirstName , String assessmentUserLastName ){
+        this.userId = userId;
+        this.assessmentUserName = assessmentUserName;
+        this.assessmentUserEmail = assessmentUserEmail;
+        this.assessmentUserFirstName=assessmentUserFirstName;
+        this.assessmentUserLastName=assessmentUserLastName;
     }
 
     @Override
@@ -70,16 +73,13 @@ public class UserVO {
         if (o == null || getClass() != o.getClass()) return false;
         UserVO userVO = (UserVO) o;
         return Objects.equals(userId, userVO.userId) &&
-               /* Objects.equals(userName, userVO.userName) &&
-                Objects.equals(firstName, userVO.firstName) &&
-                Objects.equals(lastName, userVO.lastName) &&*/
-                Objects.equals(assessmentUserEmail, userVO.getAssessmentUserEmail());/* &&
-                Objects.equals(countryId, userVO.countryId);*/
+                Objects.equals(assessmentUserName, userVO.assessmentUserName) &&
+                Objects.equals(assessmentUserEmail, userVO.assessmentUserEmail);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(userId, assessmentUserName, assessmentUserFirstName, assessmentUserLastName, assessmentUserEmail, countryId);
+        return Objects.hash(userId, assessmentUserName, assessmentUserEmail);
     }
 }

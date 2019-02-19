@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.template_type;
 
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
