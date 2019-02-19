@@ -49,6 +49,7 @@ public class UnitPosition extends UserBaseEntity {
     private List<UnitPositionLine> unitPositionLines;
     private boolean mainUnitPosition;
     private float taxDeductionPercentage;
+    //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
 
     public UnitPosition() {

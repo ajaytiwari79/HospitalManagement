@@ -27,6 +27,7 @@ public interface CustomCostTimeAgreementRepository {
     Boolean isCTAExistWithSameNameInUnit(Long unitId, String name, BigInteger ctaId);
 
     List<CTAResponseDTO> getDefaultCTA(Long unitId, Long expertiseId);
+    List<CTAResponseDTO> getDefaultCTAOfExpertiseAndDate(Long unitId, Long expertiseId,LocalDate selectedDate);
 
     List<CTAResponseDTO> getVersionsCTA(List<Long> upIds);
 

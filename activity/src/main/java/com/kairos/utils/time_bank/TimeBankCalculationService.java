@@ -1167,7 +1167,7 @@ public class TimeBankCalculationService {
                 totalTimeBankMinutes = dailyTimeBankEntry.getTotalTimeBankMin();
                 accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
             } else {
-                totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, startDate, unitPositionWithCtaDetailsDTO.getPositionLines()));
+                totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, unitPositionStartDate, unitPositionWithCtaDetailsDTO.getPositionLines()));
             }
             timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);
             timeBankByDateDTO.setTimeBankChangeMinutes(totalTimeBankMinutes);
@@ -1179,6 +1179,28 @@ public class TimeBankCalculationService {
         return localDateTimeBankByDateDTOMap;
     }
 
+
+    //Todo We will use it later when we have the requirement of accumulated timebank by un
+    /*public Map<Long, Long> getAccumulatedTimebankByUnitPosition(List<DailyTimeBankEntry> dailyTimeBankEntries, java.time.LocalDate startDate, java.time.LocalDate endDate){
+        long accumulatedTimebank = 0;
+        java.time.LocalDate unitPositionStartDate = unitPositionWithCtaDetailsDTO.getStartDate();
+        Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k -> k.getDate(), v -> v));
+        Map<java.time.LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = new HashMap<>();
+        while (unitPositionStartDate.isBefore(endDate) || unitPositionStartDate.equals(endDate)) {
+            TimeBankByDateDTO timeBankByDateDTO = new TimeBankByDateDTO();
+            if (dateDailyTimeBankEntryMap.containsKey(unitPositionStartDate)) {
+                DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(unitPositionStartDate);
+                accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
+            }
+            timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);
+            if(unitPositionStartDate.isAfter(startDate) || startDate.equals(unitPositionStartDate)) {
+                localDateTimeBankByDateDTOMap.put(unitPositionStartDate, timeBankByDateDTO);
+            }
+            unitPositionStartDate = unitPositionStartDate.plusDays(1);
+        }
+        return localDateTimeBankByDateDTOMap;
+    }
+*/
 
 
 }

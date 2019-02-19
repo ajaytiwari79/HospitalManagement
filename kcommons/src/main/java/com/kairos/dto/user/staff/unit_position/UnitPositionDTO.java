@@ -72,6 +72,7 @@ public class UnitPositionDTO {
     private boolean mainUnitPosition;
     private float taxDeductionPercentage;
     private ExpertiseResponseDTO expertise;
+    //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
 
 

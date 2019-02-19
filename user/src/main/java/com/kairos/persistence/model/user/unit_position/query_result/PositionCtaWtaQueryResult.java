@@ -20,6 +20,15 @@ public class PositionCtaWtaQueryResult {
     private SeniorityLevelQueryResult applicableSeniorityLevel;
     private Organization union;
 
+
+    public PositionCtaWtaQueryResult(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta, Expertise expertise, SeniorityLevelQueryResult applicableSeniorityLevel, Organization union) {
+        this.cta = cta;
+        this.wta = wta;
+        this.expertise = expertise;
+        this.applicableSeniorityLevel = applicableSeniorityLevel;
+        this.union = union;
+    }
+
     public PositionCtaWtaQueryResult() {
         //Default Constructor
     }
