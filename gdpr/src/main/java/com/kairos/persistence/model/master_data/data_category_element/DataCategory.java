@@ -4,7 +4,7 @@ import com.kairos.persistence.model.common.BaseEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -19,7 +19,8 @@ public class DataCategory extends BaseEntity {
     private String name;
 
     // empty array to get rid of null pointer
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "data_category_id")
     private List<DataElement> dataElements=new ArrayList<>();
     private Long countryId;
     private Long organizationId;
