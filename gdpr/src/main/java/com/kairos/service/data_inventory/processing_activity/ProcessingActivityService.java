@@ -23,7 +23,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
@@ -501,15 +501,15 @@ public class ProcessingActivityService {
      * @description method filter data Category and there Corresponding data Element ,method filter data Category and remove Data category from data Category response List
      * similarly Data Elements are remove from data Element response list.
      */
-    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectMappingResponseDTO> dataSubjectList, Map<Long, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
+    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectResponseDTO> dataSubjectList, Map<Long, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
 
-        for (DataSubjectMappingResponseDTO dataSubjectMappingResponseDTO : dataSubjectList) {
+        for (DataSubjectResponseDTO dataSubjectResponseDTO : dataSubjectList) {
 
-            List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectMappingResponseDTO.getId());
+            List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectResponseDTO.getId());
             Map<Long, Set<Long>> dataElementsCorrespondingToDataCategory = new HashMap<>();
             //relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCorrespondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
             List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();
-            dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
+            dataSubjectResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 
                 if (dataElementsCorrespondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
                     List<DataElementDeprecated> dataElementBasicResponseDTOS = new ArrayList<>();
@@ -523,7 +523,7 @@ public class ProcessingActivityService {
                     dataCategoryResponseDTOS.add(dataCategoryResponseDTO);
                 }
             });
-            dataSubjectMappingResponseDTO.setDataCategories(dataCategoryResponseDTOS);
+            dataSubjectResponseDTO.setDataCategories(dataCategoryResponseDTOS);
         }
 
     }
