@@ -280,7 +280,7 @@ public class AccessGroupService {
         if (!unit.isParentOrganization()) {
             unit = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        return accessGroupRepository.getOrganizationAccessGroupByRole(unit.getId(), AccessGroupRole.MANAGEMENT.toString());
+        return accessGroupRepository.getAccessGroupsForUnit(unit.getId());
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
