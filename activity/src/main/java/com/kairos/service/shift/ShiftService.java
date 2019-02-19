@@ -449,7 +449,7 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type) {
+    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type,Boolean validatedByStaff,Boolean update,Long unitId) {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
         // change id from shift id if request come form detailed view and compect view
         if(isNotNull(shiftWithViolatedInfo.getShifts().get(0).getShiftId())){
@@ -487,8 +487,16 @@ public class ShiftService extends MongoBaseService {
         save(shiftViolatedRules);
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
         shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
-        shiftWithViolatedInfo.setShifts(Arrays.asList(shiftDTO));
         updateWTACounter(staffAdditionalInfoDTO, shiftWithViolatedInfo, shift);
+        if(isNotNull(update)&&update){
+            shiftDTO=updateShiftStateAfterValidate(shiftWithViolatedInfo.getShifts().get(0),shiftWithViolatedInfo.getShifts().get(0).getShiftId(),shiftWithViolatedInfo.getShifts().get(0).getShiftStatePhaseId());
+        }
+        if (isNotNull(validatedByStaff)&&!update) {
+            ShiftState  shiftState=null;
+            Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
+            shiftDTO=validateShiftStateAfterValiation(shiftWithViolatedInfo.getShifts().get(0),shiftState,validatedByStaff,actualPhases,shiftWithViolatedInfo.getShifts().get(0).getShiftId());
+        }
+        shiftWithViolatedInfo.setShifts(Arrays.asList(shiftDTO));
         return shiftWithViolatedInfo;
     }
 
@@ -1190,25 +1198,31 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = updateShift(shiftDTO, type, true);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
-            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
-            shiftDTO.setShiftStatePhaseId(shiftStatePhaseId);
-            ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
-            if (shiftState != null) {
-                shiftDTO.setId(shiftState.getId());
-                shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
-                shiftDTO.setValidated(shiftState.getValidated());
-                shiftDTO.setShiftId(shiftState.getShiftId());
-                shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
-            } else {
-                shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
-            }
-            shiftMongoRepository.save(shiftState);
+//            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
+            updateShiftStateAfterValidate(shiftDTO,shiftStateId,shiftStatePhaseId);
         }
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setDurationMinutes((int) shiftWithViolatedInfoDTO.getShifts().get(0).getInterval().getMinutes());
         return shiftWithViolatedInfoDTO;
     }
 
+    public ShiftDTO updateShiftStateAfterValidate(ShiftDTO shiftDTO,BigInteger shiftStateId,BigInteger shiftStatePhaseId){
+        shiftDTO.setShiftStatePhaseId(shiftStatePhaseId);
+        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftDTO.getId());
+        if (shiftState != null) {
+            shiftDTO.setId(shiftState.getId());
+            shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
+            shiftDTO.setValidated(shiftState.getValidated());
+            shiftDTO.setShiftId(shiftState.getShiftId());
+//            shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
+//            shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
+            shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        } else {
+            shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        }
+        shiftMongoRepository.save(shiftState);
+        return shiftDTO;
+    }
 
     public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
         UserAccessRoleDTO userAccessRoleDTO = genericIntegrationService.getAccessOfCurrentLoggedInStaff();
@@ -1218,7 +1232,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.shift.validation.access");
         }
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-        ShiftState shiftState;
+        ShiftState shiftState=null;
         ShiftDTO staffShiftDTO = null;
         //StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()),shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(),Collections.emptySet());
         if (!validatedByStaff) {
@@ -1229,54 +1243,60 @@ public class ShiftService extends MongoBaseService {
         BigInteger shiftStateId = shiftDTO.getId();
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = updateShift(shiftDTO, type, true);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
-            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
-            shiftState = shiftStateMongoRepository.findOne(shiftStateId);
-            if (shiftState == null) {
-                Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
-                if (shift != null) {
-                    shiftDTO.setId(null);
-                }
-            }
-            if (shiftState != null) {
-                shiftDTO.setId(shiftStateId);
-                shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
-                shiftDTO.setValidated(shiftState.getValidated());
-                shiftDTO.setShiftStatePhaseId(shiftState.getShiftStatePhaseId());
-                shiftDTO.setShiftId(shiftState.getShiftId());
-                shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
-
-            } else {
-                shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
-            }
-            List<BigInteger> activityIds = shiftState.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
-            List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-            Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            shiftState.setShiftId(shiftDTO.getShiftId());
-            shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
-            shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
-            shiftState.setValidated(LocalDate.now());
-            shiftState.setShiftStatePhaseId(actualPhases.getId());
-            shiftState.getActivities().forEach(a -> {
-                a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-                a.setActivityName(activityWrapperMap.get(a.getActivityId()).getActivity().getName());
-            });
-            save(shiftState);
-            if (validatedByStaff) {
-                shiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
-                shiftState.setShiftStatePhaseId(actualPhases.getId());
-                shiftState.setId(null);
-                shiftState.setValidated(null);
-                shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
-                save(shiftState);
-            }
-            shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
-            if (validatedByStaff) {
-                shiftDTO.setEditable(true);
-            }
-            shiftDTO.setDurationMinutes((int) shiftDTO.getInterval().getMinutes());
-        }
+//            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
+            shiftDTO=validateShiftStateAfterValiation(shiftDTO,shiftState,validatedByStaff,actualPhases,shiftStateId);
+                   }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         return shiftWithViolatedInfoDTO;
+    }
+
+    public ShiftDTO validateShiftStateAfterValiation(ShiftDTO shiftDTO,ShiftState shiftState,Boolean validatedByStaff,Phase actualPhases,BigInteger shiftStateId ){
+         shiftState = shiftStateMongoRepository.findOne(shiftStateId);
+        if (shiftState == null) {
+            Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+            if (shift != null) {
+                shiftDTO.setId(null);
+            }
+        }
+        if (shiftState != null) {
+            shiftDTO.setId(shiftStateId);
+            shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
+            shiftDTO.setValidated(shiftState.getValidated());
+            shiftDTO.setShiftStatePhaseId(shiftState.getShiftStatePhaseId());
+            shiftDTO.setShiftId(shiftState.getShiftId());
+            shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+
+        } else {
+            shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        }
+        List<BigInteger> activityIds = shiftState.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        shiftState.setShiftId(shiftDTO.getShiftId());
+        shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
+        shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
+        shiftState.setValidated(LocalDate.now());
+        shiftState.setShiftStatePhaseId(actualPhases.getId());
+        shiftState.getActivities().forEach(a -> {
+            a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+            a.setActivityName(activityWrapperMap.get(a.getActivityId()).getActivity().getName());
+        });
+        save(shiftState);
+        if (validatedByStaff) {
+            shiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
+            shiftState.setShiftStatePhaseId(actualPhases.getId());
+            shiftState.setId(null);
+            shiftState.setValidated(null);
+            shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+            save(shiftState);
+        }
+        shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
+        if (validatedByStaff) {
+            shiftDTO.setEditable(true);
+        }
+        shiftDTO.setDurationMinutes((int) shiftDTO.getInterval().getMinutes());
+
+        return shiftDTO;
     }
 
     public void validateRealTimeShift(Long unitId, ShiftDTO shiftDTO, Map<String, Phase> phaseMap) {
