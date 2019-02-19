@@ -147,6 +147,9 @@ public class ActivityIntegrationService {
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("selectedDate", selectedDate.toString()));
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_CTA_WTA_BY_EXPERTISE, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){}, expertiseId);
     }
+  public boolean verifyTimeType(BigInteger timeTypeId,Long countryId){
+      return genericRestClient.publishRequest(null,countryId,false,IntegrationOperation.GET,"/timeType/{timeTypeId}/verify/",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},timeTypeId);
+    }
 
 }
 

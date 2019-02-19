@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class DataSubjectMappingBasicResponseDTO {
+class DataSubjectBasicResponseDTO {
 
 
     private BigInteger id;

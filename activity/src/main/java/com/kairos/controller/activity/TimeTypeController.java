@@ -67,5 +67,11 @@ public class TimeTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.createDefaultTimeTypes(countryId));
     }
 
+    @ApiOperation("Verify that time type is exists or not")
+    @GetMapping(value = "/{timeTypeId}/verify")
+    public ResponseEntity<Map<String, Object>> verifyTimeType(@PathVariable BigInteger timeTypeId,@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.existsByIdAndCountryId(timeTypeId,countryId));
+    }
+
 
 }

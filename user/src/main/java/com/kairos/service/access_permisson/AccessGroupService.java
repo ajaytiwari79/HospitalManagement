@@ -906,7 +906,7 @@ public class AccessGroupService {
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.ABSENCE), ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
 
         return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
