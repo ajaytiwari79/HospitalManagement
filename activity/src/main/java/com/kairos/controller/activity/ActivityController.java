@@ -5,7 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.utils.response.ResponseHandler;
@@ -41,7 +41,7 @@ public class ActivityController {
     private ActivityService activityService;
     @Inject private TimeTypeService timeTypeService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
 
     @ApiOperation("Create Activity")
@@ -398,7 +398,7 @@ public class ActivityController {
     @GetMapping(value = "/check_rest_client")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTimeZone(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,genericIntegrationService.getStaff(countryId,14098L));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getStaff(countryId,14098L));
 
     }
 

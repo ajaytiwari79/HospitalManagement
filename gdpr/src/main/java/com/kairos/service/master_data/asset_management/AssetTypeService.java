@@ -67,12 +67,8 @@ public class AssetTypeService{
             assetType.setHasSubAsset(true);
             assetType.setSubAssetTypes(subAssetTypeList);
         }
-       /* for(BasicRiskDTO assetTypeRisk : assetTypeDto.getRisks())
-        {
-            Risk risk = new Risk(assetTypeRisk.getName(), assetTypeRisk.getDescription(), assetTypeRisk.getRiskRecommendation(), assetTypeRisk.getRiskLevel());
-            assetTypeRisks.add(risk);
-        }*/
         assetTypeRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDto.getRisks(), Risk.class);
+        assetTypeRisks.forEach(risk -> risk.setCountryId(countryId));
         assetType.setRisks(assetTypeRisks);
         assetTypeRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
@@ -93,14 +89,8 @@ public class AssetTypeService{
             AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
             assetSubType.setSubAssetType(true);
             assetSubType.setAssetType(assetType);
-           /* for(BasicRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks())
-            {
-                Risk risk = new Risk(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel() );
-                risk.setAssetType(assetSubType);
-                subAssetRisks.add(risk);
-            }*/
             subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), Risk.class);
-            assetSubType.setRisks(subAssetRisks);
+            subAssetRisks.forEach(risk -> risk.setCountryId(countryId));
             assetSubType.setRisks(subAssetRisks);
             subAssetTypes.add(assetSubType);
         }
@@ -157,7 +147,7 @@ public class AssetTypeService{
             }
             subAssetTypeNewRiskDto.get(subAssetType.getId()).forEach( newRisk -> {
                 Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel() );
-               // risk.setAssetType(subAssetType);
+                risk.setCountryId(countryId);
                 subAssetType.getRisks().add(risk);
             });
             subAssetTypes.add(subAssetType);
@@ -282,7 +272,8 @@ public class AssetTypeService{
         assetType.setName(assetTypeDto.getName());
         List<AssetType> subAssetTypeList = updateSubAssetTypes(countryId, assetTypeDto.getSubAssetTypes(), assetType);
         assetType.setSubAssetTypes(subAssetTypeList);
-        assetType = updateOrAddAssetTypeRisk(assetType,assetTypeDto);
+        updateOrAddAssetTypeRisk(assetType,assetTypeDto);
+        assetType.getRisks().forEach(risk -> risk.setCountryId(countryId));
         assetTypeRepository.save(assetType);
         return assetTypeDto;
 
@@ -290,6 +281,7 @@ public class AssetTypeService{
 
     private AssetType updateOrAddAssetTypeRisk(AssetType assetType, AssetTypeDTO assetTypeDto){
         List<BasicRiskDTO> newRisks = new ArrayList<>();
+        List<Risk> assetTypeRisks = assetType.getRisks();
         Map<Long, BasicRiskDTO> existingRiskDtoCorrespondingToIds = new HashMap<>();
         assetTypeDto.getRisks().forEach( assetTypeRiskDto -> {
             if (Optional.ofNullable(assetTypeRiskDto.getId()).isPresent()) {
@@ -310,8 +302,9 @@ public class AssetTypeService{
         }
         newRisks.forEach(newRisk -> {
             Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-            assetType.getRisks().add(risk);
+            assetTypeRisks.add(risk);
         });
+        assetType.setRisks(assetTypeRisks);
         return  assetType;
     }
 

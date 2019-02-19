@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
@@ -198,14 +198,14 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", unitPositionDTO.getEmploymentTypeId());
         }
         List<FunctionWithAmountQueryResult> functions = findAndValidateFunction(unitPositionDTO);
-        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage());
+        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage(),unitPositionDTO.getAccumulatedTimebankMinutes());
 
-        preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
+        preparePosition(unitPosition, unitPositionDTO);
         if ((unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO, -1)) {
             unitPosition.setMainUnitPosition(true);
         }
         unitPositionGraphRepository.save(unitPosition);
-        CTAWTAWrapper ctawtaWrapper = assignCTAAndWTAToUnitPosition(unitPosition, unitPositionDTO);
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToUnitPosition(unitPosition, unitPositionDTO);
         Long reasonCodeId = updateEmploymentEndDate(parentOrganization, unitPositionDTO, employment);
 
 
@@ -213,9 +213,9 @@ public class UnitPositionService {
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
         linkFunctions(functions, unitPosition.getUnitPositionLines().get(0), false, unitPositionDTO.getFunctions());
 
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
-        unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaWrapper.getCta().get(0));
-        unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaWrapper.getWta().get(0));
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
+        unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0));
+        unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0));
         setHourlyCost(unitPositionQueryResult);
         return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
     }
@@ -233,15 +233,15 @@ public class UnitPositionService {
         positionLineFunctionRelationRepository.saveAll(functionsUnitPositionLines);
     }
 
-    private CTAWTAWrapper assignCTAAndWTAToUnitPosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) {
-        CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.assignWTAToUnitPosition(unitPosition.getId(), unitPositionDTO.getWtaId(), unitPositionDTO.getCtaId(), unitPositionDTO.getStartDate());
-        if (ctawtaWrapper.getWta().isEmpty()) {
+    private CTAWTAAndAccumulatedTimebankWrapper assignCTAAndWTAToUnitPosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) {
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = workingTimeAgreementRestClient.assignWTAToUnitPosition(unitPosition.getId(), unitPositionDTO.getWtaId(), unitPositionDTO.getCtaId(), unitPositionDTO.getStartDate());
+        if (ctawtaAndAccumulatedTimebankWrapper.getWta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.wta.id");
         }
-        if (ctawtaWrapper.getCta().isEmpty()) {
+        if (ctawtaAndAccumulatedTimebankWrapper.getCta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.cta.id");
         }
-        return ctawtaWrapper;
+        return ctawtaAndAccumulatedTimebankWrapper;
     }
 
     private Long updateEmploymentEndDate(Organization organization, UnitPositionDTO unitPositionDTO, Employment employment) throws Exception {
@@ -340,24 +340,24 @@ public class UnitPositionService {
 
 
     private PositionLineChangeResultDTO calculativeValueChanged(UnitPositionDTO unitPositionDTO, UnitPositionLineEmploymentTypeRelationShip oldUnitPositionLineEmploymentTypeRelationShip, UnitPositionLine unitPositionLine,
-                                                                CTAWTAWrapper ctawtaWrapper, List<NameValuePair> changedParams) {
+                                                                CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams) {
         PositionLineChangeResultDTO changeResultDTO = new PositionLineChangeResultDTO(false);
 
-        if (!unitPositionDTO.getCtaId().equals(ctawtaWrapper.getCta().get(0).getId())) {
+        if (!unitPositionDTO.getCtaId().equals(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId())) {
             // CTA is changed
             changeResultDTO.setCtaId(unitPositionDTO.getCtaId());
-            changeResultDTO.setOldctaId(ctawtaWrapper.getCta().get(0).getId());
+            changeResultDTO.setOldctaId(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId());
             changedParams.add(new BasicNameValuePair("ctaId", unitPositionDTO.getCtaId() + ""));
-            changedParams.add(new BasicNameValuePair("oldctaId", ctawtaWrapper.getCta().get(0).getId() + ""));
+            changedParams.add(new BasicNameValuePair("oldctaId", ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId() + ""));
             changeResultDTO.setCalculativeChanged(true);
         }
-        if (!unitPositionDTO.getWtaId().equals(ctawtaWrapper.getWta().get(0).getId())) {
+        if (!unitPositionDTO.getWtaId().equals(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId())) {
             // wta is changed
             changeResultDTO.setWtaId(unitPositionDTO.getWtaId());
-            changeResultDTO.setOldwtaId(ctawtaWrapper.getWta().get(0).getId());
+            changeResultDTO.setOldwtaId(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId());
             changeResultDTO.setCalculativeChanged(true);
             changedParams.add(new BasicNameValuePair("wtaId", unitPositionDTO.getWtaId() + ""));
-            changedParams.add(new BasicNameValuePair("oldwtaId", ctawtaWrapper.getWta().get(0).getId() + ""));
+            changedParams.add(new BasicNameValuePair("oldwtaId", ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId() + ""));
         }
         if (unitPositionLine.getAvgDailyWorkingHours() != unitPositionDTO.getAvgDailyWorkingHours()
                 || unitPositionLine.getTotalWeeklyMinutes() != (unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60))) {
@@ -428,13 +428,13 @@ public class UnitPositionService {
         }
 
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("unitPositionId", unitPositionId + ""), new BasicNameValuePair("startDate", currentUnitPositionLine.getStartDate().toString()));
-        CTAWTAWrapper existingCtaWtaWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, APPLICABLE_CTA_WTA, param,
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
+        CTAWTAAndAccumulatedTimebankWrapper existingCtaWtaAndAccumulatedTimebankWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, APPLICABLE_CTA_WTA, param,
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>() {
                 });
-        if (existingCtaWtaWrapper.getCta().isEmpty()) {
+        if (existingCtaWtaAndAccumulatedTimebankWrapper.getCta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.unitPosition.ctamissing", unitPositionDTO.getStartDate(), unitPositionId);
         }
-        if(existingCtaWtaWrapper.getWta().isEmpty()){
+        if(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().isEmpty()){
             exceptionService.dataNotFoundByIdException("message.unitPosition.wtamissing", unitPositionDTO.getStartDate(), unitPositionId);
         }
 
@@ -448,8 +448,11 @@ public class UnitPositionService {
         UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
         List<NameValuePair> changedParams = new ArrayList<>();
         oldUnitPosition.setPublished(!saveAsDraft);
+        if(saveAsDraft){
+            oldUnitPosition.setAccumulatedTimebankMinutes(unitPositionDTO.getAccumulatedTimebankMinutes());
+        }
         oldUnitPosition.setTaxDeductionPercentage(unitPositionDTO.getTaxDeductionPercentage());
-        PositionLineChangeResultDTO changeResultDTO = calculativeValueChanged(unitPositionDTO, positionLineEmploymentTypeRelationShip, currentUnitPositionLine, existingCtaWtaWrapper, changedParams);
+        PositionLineChangeResultDTO changeResultDTO = calculativeValueChanged(unitPositionDTO, positionLineEmploymentTypeRelationShip, currentUnitPositionLine, existingCtaWtaAndAccumulatedTimebankWrapper, changedParams);
         /**
          *  Old unit position's calculative values is changed
          *  Old unit position is published so need to create a new  position line
@@ -484,26 +487,26 @@ public class UnitPositionService {
                 unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
 
-            CTAWTAWrapper newCTAWTAWrapper = null;
+            CTAWTAAndAccumulatedTimebankWrapper newCTAWTAAndAccumulatedTimebankWrapper = null;
             if (changeResultDTO.getCtaId() != null || changeResultDTO.getWtaId() != null) {
                 changedParams.add(new BasicNameValuePair("startDate", unitPositionDTO.getStartDate() + ""));
-                newCTAWTAWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.CREATE, APPLY_CTA_WTA, changedParams,
-                        new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
+                newCTAWTAAndAccumulatedTimebankWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.CREATE, APPLY_CTA_WTA, changedParams,
+                        new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>() {
                         }, unitPositionId);
             }
 
 
             if (changeResultDTO.getWtaId() != null) {
-                unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(newCTAWTAWrapper.getWta().get(0));
+                unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(newCTAWTAAndAccumulatedTimebankWrapper.getWta().get(0));
             } else {
-                unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(existingCtaWtaWrapper.getWta().get(0));
+                unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
             }
             if (changeResultDTO.getCtaId() != null) {
-                unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(newCTAWTAWrapper.getCta().get(0));
+                unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(newCTAWTAAndAccumulatedTimebankWrapper.getCta().get(0));
             } else {
-                unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaWrapper.getCta().get(0));
+                unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
             }
-            updateTimeBank(newCTAWTAWrapper.getCta().get(0).getId(), unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate(), unitPositionQueryResult.getPositionLines().get(0).getEndDate(), unitId);
+            updateTimeBank(newCTAWTAAndAccumulatedTimebankWrapper.getCta().get(0).getId(), unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate(), unitPositionQueryResult.getPositionLines().get(0).getEndDate(), unitId);
         }
         // calculative value is not changed it means only end date is updated.
         else {
@@ -512,8 +515,8 @@ public class UnitPositionService {
             oldUnitPosition.setLastWorkingDate(unitPositionDTO.getLastWorkingDate());
             unitPositionGraphRepository.save(oldUnitPosition);
             unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, currentUnitPositionLine);
-            unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(existingCtaWtaWrapper.getWta().get(0));
-            unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaWrapper.getCta().get(0));
+            unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
+            unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
         }
 
 
@@ -625,7 +628,7 @@ public class UnitPositionService {
     }
 
 
-    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) throws Exception {
+    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) throws Exception {
         CompletableFuture<Boolean> done = setDefaultData(unitPositionDTO, unitPosition);
         CompletableFuture.allOf(done).join();
         // UEP can be created for past dates from time care
@@ -697,28 +700,29 @@ public class UnitPositionService {
         List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization) ? unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) : unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId, unitId);
 
         List<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toList());
-        List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("upIds", unitPositionIds.toString().replace("[", "").replace("]", "")));
-        CTAWTAWrapper ctawtaWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_CTA_WTA_BY_UPIDS, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
-        });
+
         List<UnitPositionLinesQueryResult> positionLines = unitPositionGraphRepository.findAllPositionLines(unitPositionIds);
         List<UnitPositionLinesQueryResult> hourlyCostPerLine = unitPositionGraphRepository.findFunctionalHourlyCost(unitPositionIds);
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
         Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap = positionLines.stream().collect(Collectors.groupingBy(UnitPositionLinesQueryResult::getUnitPositionId));
-
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAAndAccumulatedTimebankByUnitPosition(positionLinesMap,unitId);
         unitPositionQueryResults.forEach(u -> {
             u.setPositionLines(positionLinesMap.get(u.getId()));
             u.getPositionLines().forEach(positionLine -> {
                 BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
                 positionLine.setHourlyCost(hourlyCost);
 
-                ctawtaWrapper.getCta().forEach(cta -> {
+                ctawtaAndAccumulatedTimebankWrapper.getCta().forEach(cta -> {
                     if ((positionLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(positionLine.getStartDate())) ||
                             positionLine.getEndDate() != null && (cta.getStartDate().isBefore(positionLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getStartDate()) || cta.getEndDate().equals(positionLine.getStartDate())))) {
                         positionLine.setCostTimeAgreement(cta);
                     }
+                    //This is the Map of PositionLineId and accumulated timebank in minutes map
+                    Map<Long,Long> positionLineAndTimebankMinutes = ctawtaAndAccumulatedTimebankWrapper.getUnitPositionLineAndTimebankMinuteMap().getOrDefault(u.getId(),new HashMap<>());
+                    positionLine.setAccumulatedTimebankMinutes(positionLineAndTimebankMinutes.getOrDefault(positionLine.getId(),0l));
                 });
 
-                ctawtaWrapper.getWta().forEach(wta -> {
+                ctawtaAndAccumulatedTimebankWrapper.getWta().forEach(wta -> {
                     LocalDate wtaStartDate = wta.getStartDate();
                     LocalDate wtaEndDate = wta.getEndDate();
                     if ((positionLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(positionLine.getStartDate())) ||
@@ -765,12 +769,12 @@ public class UnitPositionService {
         seniorityLevel.put("payGrade", Optional.ofNullable(unitPositionLine.getSeniorityLevel().getPayGrade()).isPresent() ? unitPositionLine.getSeniorityLevel().getPayGrade() : payGradeGraphRepository.getPayGradeBySeniorityLevelId(unitPositionLine.getSeniorityLevel().getId()));
         UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
                 , unitPositionLine.getWorkingDaysInWeek(), unitPositionLine.getTotalWeeklyMinutes() / 60, unitPositionLine.getAvgDailyWorkingHours(), unitPositionLine.getFullTimeWeeklyMinutes(), 0D,
-                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel, unitPosition.getId());
+                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel, unitPosition.getId(),unitPosition.getAccumulatedTimebankMinutes());
 
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
                 , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.isMainUnitPosition(),
-                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage());
+                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage(),unitPosition.getAccumulatedTimebankMinutes());
 
     }
 
@@ -860,11 +864,11 @@ public class UnitPositionService {
         if (expertise == null) {
             exceptionService.dataNotFoundByIdException("message.unitposition.expertise.notfound", expertiseId);
         }
-        CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
-        if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getCta())) {
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
+        if (!CollectionUtils.isNotEmpty(ctawtaAndAccumulatedTimebankWrapper.getCta())) {
             exceptionService.dataNotFoundByIdException("message.organization.cta.notfound", organization.getId());
         }
-        if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
+        if (!CollectionUtils.isNotEmpty(ctawtaAndAccumulatedTimebankWrapper.getWta())) {
             exceptionService.dataNotFoundByIdException("message.wta.notFound", organization.getId());
         }
         for (TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
@@ -872,7 +876,7 @@ public class UnitPositionService {
             if (staff == null) {
                 exceptionService.dataNotFoundByIdException("message.staff.externalid.notexist", timeCareEmploymentDTO.getPersonID());
             }
-            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaWrapper.getWta().get(0).getId(), ctawtaWrapper.getCta().get(0).getId(), organization.getId());
+            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId(), ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId(), organization.getId());
             createUnitPosition(organization.getId(), "Organization", unitEmploymentPosition, true, true);
         }
         return true;

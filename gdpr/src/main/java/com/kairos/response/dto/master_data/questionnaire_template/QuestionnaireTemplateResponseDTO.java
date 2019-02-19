@@ -83,4 +83,13 @@ public class QuestionnaireTemplateResponseDTO {
 
     public QuestionnaireTemplateResponseDTO() {
     }
+
+    public QuestionnaireTemplateResponseDTO(Long id, String name, String description, QuestionnaireTemplateType templateType, boolean isDefaultAssetTemplate, QuestionnaireTemplateStatus templateStatus) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.templateType = templateType;
+        this.isDefaultAssetTemplate = isDefaultAssetTemplate;
+        this.templateStatus = templateStatus;
+    }
 }

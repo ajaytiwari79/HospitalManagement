@@ -73,4 +73,10 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.riskAssociatedEntity = ?2 and QT.templateType = ?3 and QT.templateStatus = ?4 and QT.deleted = false")
     QuestionnaireTemplate findPublishedQuestionnaireTemplateByProcessingActivityAndByUnitId(Long orgId, QuestionnaireTemplateType riskAssociatedEntity, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus);
+
+    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.deleted = false")
+    List<QuestionnaireTemplate> getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(Long orgId);
+
+    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.countryId = ?1 and QT.deleted = false")
+    List<QuestionnaireTemplate> getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(Long countryId);
 }

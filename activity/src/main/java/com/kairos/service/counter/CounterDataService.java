@@ -12,7 +12,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
@@ -42,7 +42,7 @@ public class CounterDataService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private CounterRepository counterRepository;
     @Inject

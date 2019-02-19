@@ -21,7 +21,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -112,7 +112,7 @@ public class StaffingLevelService extends MongoBaseService {
     @Autowired
     com.fasterxml.jackson.databind.ObjectMapper objectMapper;
     @Autowired
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Autowired
     private ActivityMongoRepositoryImpl activityMongoRepositoryImpl;
     @Autowired
@@ -419,7 +419,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public Map<String, Object> getActivityTypesAndSkillsByUnitId(Long unitId) {
         OrganizationSkillAndOrganizationTypesDTO organizationSkillAndOrganizationTypesDTO =
-                genericIntegrationService.getOrganizationSkillOrganizationSubTypeByUnitId(unitId);
+                userIntegrationService.getOrganizationSkillOrganizationSubTypeByUnitId(unitId);
         /*logger.info("organization type and subtypes {},{}", organizationSkillAndOrganizationTypesDTO.getOrganizationTypeAndSubTypeDTO().getOrganizationSubTypes()
                 , organizationSkillAndOrganizationTypesDTO.getOrganizationTypeAndSubTypeDTO().getOrganizationTypes());*/
         List<ActivityTagDTO> activityTypeList = activityMongoRepository.findAllActivityByOrganizationGroupWithCategoryName(unitId, false);
@@ -437,7 +437,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public Map<String, Object> getPhaseAndDayTypesForStaffingLevel(Long unitId, Date proposedDate) {
         PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, proposedDate);
-        List<DayType> dayTypes = genericIntegrationService.getDayType(proposedDate);
+        List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
         Map<String, Object> mapOfPhaseAndDayType = new HashMap<>();
         mapOfPhaseAndDayType.put("phase", phase);
         mapOfPhaseAndDayType.put("dayType", dayTypes.isEmpty() ? dayTypes.get(0) : Collections.EMPTY_LIST);
@@ -699,7 +699,7 @@ public class StaffingLevelService extends MongoBaseService {
         shiftPlanningInfo.put("unitId", unitId);
         shiftPlanningInfo.put("activities", activityDTOS);
         List<Long> expertiesId = new ArrayList<>(activityDTOS.stream().flatMap(a -> a.getExpertises().stream()).collect(Collectors.toSet()));
-        shiftPlanningInfo.put("staffs", genericIntegrationService.getStaffInfo(unitId, expertiesId));
+        shiftPlanningInfo.put("staffs", userIntegrationService.getStaffInfo(unitId, expertiesId));
         submitShiftPlanningProblemToPlanner(shiftPlanningInfo);
     }
 

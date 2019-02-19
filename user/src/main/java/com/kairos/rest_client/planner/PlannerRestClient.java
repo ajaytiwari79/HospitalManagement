@@ -64,7 +64,8 @@ public class PlannerRestClient {
         }
     }
 
-    public static <T> String getURI(T t, IntegrationOperation integrationOperation, Object... pathParams) {
+    //Todo Not in Use right now
+   /* public static <T> String getURI(T t, IntegrationOperation integrationOperation, Object... pathParams) {
         String uri = "";
         if (t instanceof Staff) {
             uri = "staff/";
@@ -81,5 +82,5 @@ public class PlannerRestClient {
             uri = String.format("staff/%s/unitposition/%s/wta", pathParams);
         }
         return uri;
-    }
+    }*/
 }

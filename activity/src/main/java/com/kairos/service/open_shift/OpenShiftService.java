@@ -4,11 +4,10 @@ import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.enums.open_shift.OpenShiftAction;
 import com.kairos.persistence.model.open_shift.OpenShift;
@@ -58,7 +57,7 @@ public class OpenShiftService extends MongoBaseService {
     @Inject
     private OrderMongoRepository orderMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftService shiftService;
     @Inject
@@ -211,7 +210,7 @@ public class OpenShiftService extends MongoBaseService {
         Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
-            Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
+            Long unitPositionId = userIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
             UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId,startDate,endDate);
             data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
         }
@@ -247,7 +246,7 @@ public class OpenShiftService extends MongoBaseService {
             assignShiftToStaff(openShift, unitId, staffIds, order.get());
 
         } else if (OpenShiftAction.NOTIFY.name().equals(action)) {
-            List<String> emails = genericIntegrationService.getEmailsOfStaffByStaffIds(unitId, staffIds);
+            List<String> emails = userIntegrationService.getEmailsOfStaffByStaffIds(unitId, staffIds);
             String[] recievers = emails.toArray(new String[emails.size()]);
             mailService.sendMailWithAttachment(recievers, SHIFT_NOTIFICATION, SHIFT_NOTIFICATION_MESSAGE, null);
             List<OpenShiftNotification> openShiftNotifications = new ArrayList<>();
@@ -258,7 +257,7 @@ public class OpenShiftService extends MongoBaseService {
     }
 
     private boolean assignShiftToStaff(OpenShift openShift, Long unitId, List<Long> staffIds, Order order) {
-        List<StaffUnitPositionDetails> unitPositionDetails = genericIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
+        List<StaffUnitPositionDetails> unitPositionDetails = userIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
         unitPositionDetails.forEach(unitPositionDetail -> {
             if (!Optional.ofNullable(unitPositionDetail.getId()).isPresent() || openShift.getNoOfPersonRequired()<1 ||
                     openShift.getAssignedStaff().contains(unitPositionDetail.getStaffId()) ) {

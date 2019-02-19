@@ -48,7 +48,7 @@ public class DayTypeService {
     @Inject
     private OrganizationService organizationService;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger LOGGER = LoggerFactory.getLogger(DayTypeService.class);
 
     public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
 

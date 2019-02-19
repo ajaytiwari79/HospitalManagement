@@ -6,8 +6,6 @@ import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -16,17 +14,13 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +39,7 @@ import java.util.stream.Collectors;
 public class SickService {
     private static final Logger logger = LoggerFactory.getLogger(SickService.class);
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -64,7 +58,7 @@ public class SickService {
         if (unitId == null) {
             Long userId = UserContext.getUserDetails().getId();
             BasicNameValuePair sickSettingsRequired = new BasicNameValuePair("sickSettingsRequired", "YES");
-            List<StaffResultDTO> staffAndOrganizationDetails =genericIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
+            List<StaffResultDTO> staffAndOrganizationDetails = userIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
             if (!Optional.ofNullable(staffAndOrganizationDetails).isPresent() && staffAndOrganizationDetails.isEmpty()) {
                 exceptionService.actionNotPermittedException("message.staff.notfound");
             }
@@ -74,7 +68,7 @@ public class SickService {
             }
             userSickDataWrapper.setStaffOrganizations(staffAndOrganizationDetails);
         } else {
-            Set<BigInteger> sickTimeTypeIds =genericIntegrationService.getSickTimeTypeIds(unitId);
+            Set<BigInteger> sickTimeTypeIds = userIntegrationService.getSickTimeTypeIds(unitId);
             List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(sickTimeTypeIds, unitId);
             userSickDataWrapper.setActivities(activities);
         }

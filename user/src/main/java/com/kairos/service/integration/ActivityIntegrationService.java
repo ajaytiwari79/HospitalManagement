@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
@@ -13,6 +14,7 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -28,6 +30,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_UPIDS;
 
 
 @Service
@@ -132,6 +137,10 @@ public class ActivityIntegrationService {
     public void createTimeTypes(Long countryId){
         restClientForSchedulerMessages.publish(null,countryId, false, IntegrationOperation.CREATE, "/timeType/default",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
+    }
+
+    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap, Long unitId){
+        return genericRestClient.publishRequest(positionLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
     }
 
 }

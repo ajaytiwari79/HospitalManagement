@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -75,7 +76,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
-    public List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds) {
+    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
         query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate").include("parentId").include("organizationParentId");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);

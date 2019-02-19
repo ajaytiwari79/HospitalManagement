@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -31,7 +32,7 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getParentCTAByUpIds(List<Long> unitPositionIds);
 
-    List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds);
+    List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds);
 
     CTAResponseDTO getCTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
 

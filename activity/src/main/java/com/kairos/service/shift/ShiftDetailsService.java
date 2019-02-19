@@ -7,7 +7,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.http.NameValuePair;
@@ -34,7 +34,7 @@ public class ShiftDetailsService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
 
@@ -73,6 +73,6 @@ public class ShiftDetailsService extends MongoBaseService {
         Set<Long> absenceReasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", absenceReasonCodeIds.toString()));
-        return genericIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
+        return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
     }
 }

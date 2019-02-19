@@ -12,7 +12,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.phase.PhaseService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,8 +20,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -45,7 +43,7 @@ public class ShiftServiceUnitTest {
     @Mock
     private PhaseMongoRepository phaseMongoRepository;
     @Mock
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Mock
     private ShiftStateMongoRepository shiftStateMongoRepository;
     @Mock private PhaseService phaseService;
@@ -192,7 +190,7 @@ public class ShiftServiceUnitTest {
         shiftDTO.setShiftStatePhaseId(BigInteger.valueOf(69));
         shiftDTO.setShiftDate(LocalDate.of(2018,11,28));
         shiftDTO.setShiftId(BigInteger.valueOf(354));
-        when(genericIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
+        when(userIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
         when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
         try {

@@ -21,7 +21,7 @@ import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,7 @@ import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 @Service
 public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
 
@@ -87,7 +87,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         List<Long> unitIds = KPIUtils.getLongValue(filterBasedCriteria.getOrDefault(FilterType.UNIT_IDS, new ArrayList()));
         List<Long> employmentTypes = KPIUtils.getLongValue(filterBasedCriteria.getOrDefault(FilterType.EMPLOYMENT_TYPE, new ArrayList()));
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
-        DefaultKpiDataDTO defaultKpiDataDTO = genericIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
+        DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
         List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(dayTypeDTO -> dayTypeDTO.getId()).collect(Collectors.toList());
         List<Long> timeSlotIds = filterBasedCriteria.containsKey(FilterType.TIME_SLOT) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.TIME_SLOT)) : Arrays.asList(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getId());
         Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
