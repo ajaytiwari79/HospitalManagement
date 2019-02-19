@@ -451,6 +451,10 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type) {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
+        // change id from shift id if request come form detailed view and compect view
+        if(isNotNull(shiftWithViolatedInfo.getShifts().get(0).getShiftId())){
+            shift.setId(shiftWithViolatedInfo.getShifts().get(0).getShiftId());
+        }
         Date shiftStartDate = DateUtils.onlyDate(shift.getActivities().get(0).getStartDate());
         //reason code will be sanem for all shifts.
         Set<Long> reasonCodeIds = shiftWithViolatedInfo.getShifts().get(0).getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()).collect(Collectors.toSet());
@@ -1206,7 +1210,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public ShiftDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
+    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
         UserAccessRoleDTO userAccessRoleDTO = genericIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.validation.access");
@@ -1271,7 +1275,8 @@ public class ShiftService extends MongoBaseService {
             }
             shiftDTO.setDurationMinutes((int) shiftDTO.getInterval().getMinutes());
         }
-        return shiftDTO;
+        shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
+        return shiftWithViolatedInfoDTO;
     }
 
     public void validateRealTimeShift(Long unitId, ShiftDTO shiftDTO, Map<String, Phase> phaseMap) {
