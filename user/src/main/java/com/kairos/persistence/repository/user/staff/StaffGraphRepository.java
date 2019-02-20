@@ -472,7 +472,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) " +
             "WHERE id(organization)={0} " +
             "with staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF +"]-(unitPos:UnitPosition{deleted:false})-[: "+ IN_UNIT + "]-(organization:Organization) where id(organization)={1} " +
-            "RETURN collect( distinct { id:id(staff)  ,lastName:staff.lastName  ,firstName: staff.firstName ,email: staff.email} ) as staffList")
+            "RETURN collect( distinct { id:id(staff)  ,lastName:staff.lastName  ,firstName: staff.firstName ,email: staff.email , userName:staff.userName, access_token:staff.access_token ,user_id:staff.user_id} ) as staffList")
     List<Map> findAllStaffBasicDetailsByOrgIdAndUnitId(Long parentOrgId,Long unitId);
 
 
