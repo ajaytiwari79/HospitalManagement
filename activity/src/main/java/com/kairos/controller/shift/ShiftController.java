@@ -62,15 +62,15 @@ public class ShiftController {
     @ApiOperation("save Shift after validation")
     @PostMapping(value = "/shift/validated")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation( @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type));
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo, @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff, @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type, validatedByStaff, updateShiftState, unitId));
     }
 
     @ApiOperation("update a Shift of a staff")
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShift( @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift( shiftDTO, type,false));
+    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false));
     }
 
     @ApiOperation("delete a Shift of a staff")
@@ -169,10 +169,10 @@ public class ShiftController {
                                                                     @RequestParam(value = "startDate")
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
-                                                                    @RequestParam(value = "staffId",required = false) Long staffId,
-                                                                    @RequestParam(value = "expertiseId",required = false) Long expertiseId,
-                                                                    @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId,viewType,shiftFilterParam,expertiseId));
+                                                                    @RequestParam(value = "staffId", required = false) Long staffId,
+                                                                    @RequestParam(value = "expertiseId", required = false) Long expertiseId,
+                                                                    @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId, viewType, shiftFilterParam, expertiseId));
     }
 
 }
