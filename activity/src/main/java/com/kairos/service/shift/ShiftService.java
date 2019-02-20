@@ -449,9 +449,9 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type,Boolean validatedByStaff,boolean update,Long unitId) {
+    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type,Boolean validatedByStaff,boolean updateShiftState,Long unitId) {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
-        // change id from shift id if request come form detailed view and compect view
+        // replace id from shift id if request come form detailed view and compect view
         if(isNotNull(shiftWithViolatedInfo.getShifts().get(0).getShiftId())){
             shift.setId(shiftWithViolatedInfo.getShifts().get(0).getShiftId());
         }
@@ -488,13 +488,13 @@ public class ShiftService extends MongoBaseService {
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
         shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
         updateWTACounter(staffAdditionalInfoDTO, shiftWithViolatedInfo, shift);
-        if(update){
-            shiftDTO=updateShiftStateAfterValidate(shiftWithViolatedInfo.getShifts().get(0),shiftWithViolatedInfo.getShifts().get(0).getShiftId(),shiftWithViolatedInfo.getShifts().get(0).getShiftStatePhaseId());
+        if (updateShiftState) {
+            shiftDTO = updateShiftStateAfterValidatingWtaRule(shiftWithViolatedInfo.getShifts().get(0), shiftWithViolatedInfo.getShifts().get(0).getShiftId(), shiftWithViolatedInfo.getShifts().get(0).getShiftStatePhaseId());
         }
-        if (isNotNull(validatedByStaff)&&!update) {
-            ShiftState  shiftState=null;
+        if (isNotNull(validatedByStaff) && !updateShiftState) {
+            ShiftState shiftState = null;
             Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-            shiftDTO=validateShiftStateAfterValiation(shiftWithViolatedInfo.getShifts().get(0),shiftState,validatedByStaff,actualPhases,shiftWithViolatedInfo.getShifts().get(0).getId());
+            shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftWithViolatedInfo.getShifts().get(0), shiftState, validatedByStaff, actualPhases, shiftWithViolatedInfo.getShifts().get(0).getId());
         }
         shiftWithViolatedInfo.setShifts(Arrays.asList(shiftDTO));
         return shiftWithViolatedInfo;
@@ -1199,14 +1199,14 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = updateShift(shiftDTO, type, true);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
 //            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
-            updateShiftStateAfterValidate(shiftDTO,shiftStateId,shiftStatePhaseId);
+            updateShiftStateAfterValidatingWtaRule(shiftDTO,shiftStateId,shiftStatePhaseId);
         }
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setDurationMinutes((int) shiftWithViolatedInfoDTO.getShifts().get(0).getInterval().getMinutes());
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO updateShiftStateAfterValidate(ShiftDTO shiftDTO,BigInteger shiftStateId,BigInteger shiftStatePhaseId){
+    public ShiftDTO updateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, BigInteger shiftStateId, BigInteger shiftStatePhaseId){
         shiftDTO.setShiftStatePhaseId(shiftStatePhaseId);
         ShiftState shiftState = shiftStateMongoRepository.findOne(shiftDTO.getId());
         if (shiftState != null) {
@@ -1244,13 +1244,13 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = updateShift(shiftDTO, type, true);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
 //            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
-            shiftDTO=validateShiftStateAfterValiation(shiftDTO,shiftState,validatedByStaff,actualPhases,shiftStateId);
+            shiftDTO= validateShiftStateAfterValidatingWtaRule(shiftDTO,shiftState,validatedByStaff,actualPhases,shiftStateId);
                    }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO validateShiftStateAfterValiation(ShiftDTO shiftDTO,ShiftState shiftState,Boolean validatedByStaff,Phase actualPhases,BigInteger shiftStateId ){
+    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, ShiftState shiftState, Boolean validatedByStaff, Phase actualPhases, BigInteger shiftStateId ){
          shiftState = shiftStateMongoRepository.findOne(shiftStateId);
         if (shiftState == null) {
             Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
@@ -1277,9 +1277,9 @@ public class ShiftService extends MongoBaseService {
         shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
         shiftState.setValidated(LocalDate.now());
         shiftState.setShiftStatePhaseId(actualPhases.getId());
-        shiftState.getActivities().forEach(a -> {
-            a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-            a.setActivityName(activityWrapperMap.get(a.getActivityId()).getActivity().getName());
+        shiftState.getActivities().forEach(activity -> {
+            activity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+            activity.setActivityName(activityWrapperMap.get(activity.getActivityId()).getActivity().getName());
         });
         save(shiftState);
         if (validatedByStaff) {
