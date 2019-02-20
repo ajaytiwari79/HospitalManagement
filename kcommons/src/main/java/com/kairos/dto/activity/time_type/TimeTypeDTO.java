@@ -2,11 +2,13 @@ package com.kairos.dto.activity.time_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,7 +23,7 @@ public class TimeTypeDTO {
     private List<TimeTypeDTO> children = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
-    private boolean activityCanBeCopied;
+    private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
 
     public TimeTypeDTO() {
     }
@@ -40,13 +42,13 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,boolean activityCanBeCopied) {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.id = id;
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
         this.backgroundColor=backgroundColor;
-        this.activityCanBeCopied=activityCanBeCopied;
+        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
     }
 
     public TimeTypeEnum getSecondLevelType() {
@@ -122,11 +124,11 @@ public class TimeTypeDTO {
         this.backgroundColor = backgroundColor;
     }
 
-    public boolean isActivityCanBeCopied() {
-        return activityCanBeCopied;
+    public Set<OrganizationHierarchy> getActivityCanBeCopiedForOrganizationHierarchy() {
+        return activityCanBeCopiedForOrganizationHierarchy;
     }
 
-    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
-        this.activityCanBeCopied = activityCanBeCopied;
+    public void setActivityCanBeCopiedForOrganizationHierarchy(Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
+        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
     }
 }

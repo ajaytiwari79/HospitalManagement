@@ -8,7 +8,6 @@ public class ApiConstants {
     public static final String SOLVER_CONFIG_URL ="/solver_config";
     public static final String PLANNING_PROBLEM_URL ="/planning_problem";
     public static final String CONSTRAINT_URL ="/constraint";
-    public static final String API_ORGANIZATION_UNIT_URL = API_V1 + UNIT_URL;
     public static final String API_UNIT_URL = API_V1  + UNIT_URL;
     public static final String SHIFTPLANNING = "/shift_planning";
     public static final String API_PARENT_ORGANIZATION_COUNTRY_URL=API_V1+COUNTRY_URL;

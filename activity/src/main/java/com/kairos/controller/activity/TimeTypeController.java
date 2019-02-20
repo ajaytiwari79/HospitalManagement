@@ -24,14 +24,12 @@ public class TimeTypeController {
 
     @Inject private TimeTypeService timeTypeService;
 
-
     @ApiOperation("Create a TimeType")
     @PostMapping(value = "/")
     public ResponseEntity<Map<String, Object>> createTimeType(@RequestBody List<TimeTypeDTO> timeTypeDTOS,@PathVariable Long countryId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.createTimeType(timeTypeDTOS,countryId));
     }
-
 
     @ApiOperation("Update a TimeType")
     @PutMapping(value = "/")
@@ -47,13 +45,6 @@ public class TimeTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getAllTimeType(null,countryId));
     }
 
-
-  /*  @ApiOperation("getOne TimeType")
-    @GetMapping(value = "/{timeTypeId}")
-    public ResponseEntity<Map<String, Object>> getOneTimeType(@PathVariable BigInteger timeTypeId,@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getTimeTypeById(timeTypeId,countryId));
-    }*/
-
     @ApiOperation("Delete a TimeType")
     @DeleteMapping(value = "/{timeTypeId}")
     public ResponseEntity<Map<String, Object>> deleteTimeType(@PathVariable BigInteger timeTypeId,@PathVariable Long countryId) {
@@ -63,7 +54,6 @@ public class TimeTypeController {
     @ApiOperation("Create Default TimeTypes for a Country")
     @PostMapping(value = "/default")
     public ResponseEntity<Map<String, Object>> createDefaultTimeTypes(@PathVariable Long countryId) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.createDefaultTimeTypes(countryId));
     }
 

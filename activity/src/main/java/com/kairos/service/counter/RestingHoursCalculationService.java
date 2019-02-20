@@ -70,11 +70,6 @@ public class RestingHoursCalculationService implements CounterService {
         return staffRestingHours;
     }
 
-//    private List<BigInteger> getPresenceTimeTypeActivitiesIds(Long countryId) {
-//        List supportedTimeTypeIdList = timeTypeService.getTimeTypesByTimeTypesAndByCountryId(countryId, TimeTypes.WORKING_TYPE);
-//        return activityService.getActivitiesIdByTimeTypes(supportedTimeTypeIdList);
-//    }
-
     private List<CommonKpiDataUnit> getRestingHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, boolean averageDay, boolean kpi) {
         // TO BE USED FOR AVERAGE CALCULATION.
         double multiplicationFactor = 1;
