@@ -89,7 +89,7 @@ public class TimeBankKpiCalculationService implements  CounterService {
         List<BigInteger> phaseIds=filterBasedCriteria.containsKey(FilterType.PHASE)?KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PHASE)):new ArrayList<>();
         List<String> daysOfWeek=filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK)?filterBasedCriteria.get(FilterType.DAYS_OF_WEEK):Stream.of(DayOfWeek.values()).map(Enum::name).collect(Collectors.toList());
         List<Long> staffIds=filterBasedCriteria.containsKey(FilterType.STAFF_IDS)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
-        List<LocalDate> filterDates = filterBasedCriteria.containsKey(FilterType.TIME_INTERVAL)? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
         List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,new ArrayList<>(),organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);

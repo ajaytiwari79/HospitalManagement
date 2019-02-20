@@ -131,7 +131,7 @@ public class CounterRepository {
         Aggregation aggregation=Aggregation.newAggregation(
           match(criteria),
           lookup("counter","activeKpiId","_id","kpi"),
-           project().and("kpi.title").as("title").and("kpi._id").as("_id")
+           project().and("title").as("title").and("kpi._id").as("_id")
                    .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);

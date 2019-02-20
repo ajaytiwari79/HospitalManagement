@@ -157,9 +157,16 @@ public class CounterDistService extends MongoBaseService {
         }
         copyAndkpidtos.addAll(kpidtos);
         kpiIds = copyAndkpidtos.stream().map(kpidto -> kpidto.getId()).collect(Collectors.toSet());
+        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPI(new ArrayList(kpiIds),ConfLevel.STAFF,accessGroupPermissionCounterDTO.getStaffId());
+        Map<BigInteger,String> kpiIdAndTitleMap=applicableKPIS.stream().collect(Collectors.toMap(k->k.getActiveKpiId(),v->v.getTitle()));
         //dont delete
         // counterRepository.removeApplicableKPI(Arrays.asList(accessGroupPermissionCounterDTO.getStaffId()),kpiIds,refId,ConfLevel.STAFF);
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(kpiIds, refId, ConfLevel.UNIT);
+        copyAndkpidtos.forEach(kpidto -> {
+            if(kpiIdAndTitleMap.get(kpidto.getId())!=null){
+                kpidto.setTitle(kpiIdAndTitleMap.get(kpidto.getId()));
+            }
+        });
         return new StaffKPIGalleryDTO(categoryKPIMapping, copyAndkpidtos);
     }
 

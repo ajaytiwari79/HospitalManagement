@@ -16,7 +16,7 @@ public class KPIUtils {
     }
 
     public static List<LocalDate> getLocalDate(List<Object> objects){
-        return !(ObjectUtils.isCollectionEmpty(objects))?objects.stream().map(o->DateUtils.asLocalDate((String)o)).collect(Collectors.toList()) : new ArrayList<>();
+        return !(ObjectUtils.isCollectionEmpty(objects))?objects.stream().map(o->DateUtils.asLocalDate((String)o)).collect(Collectors.toList()) : Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
     }
 
     public static List<BigInteger> getBigIntegerValue(List<Object> objects){
