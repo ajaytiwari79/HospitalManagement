@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
@@ -12,14 +14,15 @@ import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.Hierarchy;
+import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
@@ -28,10 +31,7 @@ import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -41,8 +41,6 @@ import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.glide_time.GlideTimeSettingsService;
-import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
@@ -51,11 +49,6 @@ import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.unit_settings.TimeAttendanceGracePeriodService;
 import com.kairos.service.unit_settings.UnitSettingService;
-import com.kairos.service.user_service_data.UnitDataService;
-import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.wta.WTAService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -91,8 +84,6 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private ActivityCategoryRepository activityCategoryRepository;
     @Inject
-    private PlannerSyncService plannerSyncService;
-    @Inject
     private OrderService orderService;
     @Inject
     private ExceptionService exceptionService;
@@ -115,22 +106,15 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private ActivityConfigurationService activityConfigurationService;
     @Inject
-    private UnitDataService unitDataService;
-    @Inject
     private TimeAttendanceGracePeriodService timeAttendanceGracePeriodService;
     @Inject
     private PriorityGroupService priorityGroupService;
     @Inject
     private CounterRepository counterRepository;
     @Inject
-    private StaffActivitySettingRepository staffActivitySettingRepository;
+    private WTAService wtaService;
     @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
-    private GlideTimeSettingsService glideTimeSettingsService;
-    @Inject private WTAService wtaService;
-    @Inject private CostTimeAgreementService costTimeAgreementService;
-    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
+    private CostTimeAgreementService costTimeAgreementService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -146,20 +130,24 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
-            Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a->a.getActivityShiftStatusSettings().stream().flatMap(b->b.getAccessGroupIds().stream())).collect(Collectors.toSet());
-            Map<Long,Long> accessGroupIdsMap=genericIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
+            Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a -> a.getActivityShiftStatusSettings().stream().flatMap(b -> b.getAccessGroupIds().stream())).collect(Collectors.toSet());
+            Map<Long, Long> accessGroupIdsMap = genericIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
-                List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings=activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
-                List<ActivityShiftStatusSettings> activityShiftStatusSettings=new ArrayList<>();
-                Set<Long> agIds=new HashSet<>();
+                List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
+                List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
+                Set<Long> agIds = new HashSet<>();
                 PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
                         activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
                         activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
                 for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
-                    List<Long> accessGroupIds=new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
-                    accessGroupIds.forEach(a->{if(accessGroupIdsMap.get(a)!=null){agIds.add(accessGroupIdsMap.get(a));}});
-                    activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(),agIds));
+                    List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
+                    accessGroupIds.forEach(a -> {
+                        if (accessGroupIdsMap.get(a) != null) {
+                            agIds.add(accessGroupIdsMap.get(a));
+                        }
+                    });
+                    activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
                 }
                 phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
                 phaseTemplateValues.add(phaseTemplateValue);
@@ -178,8 +166,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         BeanUtils.copyProperties(activity, activityDTO);
-        Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        /*if(timeType.isPresent()){
+        /*Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType.isPresent()){
             activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
         }*/
         return activityDTO;
@@ -200,9 +188,20 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public Map<String, Object> getAllActivityByUnit(Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
+        OrganizationDTO organizationDTO = genericIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
+        for (ActivityTagDTO activityTagDTO : activities) {
+            boolean activityCanBeCopied = false;
+            Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
+            if (isCollectionNotEmpty(hierarchies)) {
+                if ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
+                        (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))) {
+                    activityCanBeCopied = true;
+                }
+            }
+            activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
+        }
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         response.put("activities", activities);
         response.put("activityCategories", activityCategories);
         return response;
@@ -220,8 +219,8 @@ public class OrganizationActivityService extends MongoBaseService {
         //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
         generalTab.setTags(null);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
-        if(!activity.getTags().isEmpty()){
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
+        if (!activity.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(organizationDTO.getCountryId());
@@ -237,18 +236,18 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
-        TimeType timeType= timeTypeMongoRepository.findOneById(balanceSettingsActivityTab.getTimeTypeId());
+        /*TimeType timeType= timeTypeMongoRepository.findOneById(balanceSettingsActivityTab.getTimeTypeId());
         if(timeType!=null){
             boolean activityCanBeCopied = false;
-            List<Hierarchy>  hierarchies = timeType.getAcitivityCanBeCopiedForHierarchy();
+            List<OrganizationHierarchy>  hierarchies = timeType.getAcitivityCanBeCopiedForHierarchy();
             if(isCollectionNotEmpty(hierarchies)) {
-                if((organizationDTO.isParentOrganization() && hierarchies.contains(Hierarchy.ORGANIZAION)) ||
-                        (!organizationDTO.isParentOrganization() && hierarchies.contains(Hierarchy.UNIT))){
+                if((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
+                        (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))){
                     activityCanBeCopied = true;
                 }
             }
             generalActivityTabWithTagDTO.setActivityCanBeCopied(activityCanBeCopied);
-        }
+        }*/
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
         return activityTabsWrapper;
     }
@@ -258,7 +257,7 @@ public class OrganizationActivityService extends MongoBaseService {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
-        activityCopied.setCountryParentId(activity.getCountryParentId()==null?activity.getId():activity.getCountryParentId());
+        activityCopied.setCountryParentId(activity.getCountryParentId() == null ? activity.getId() : activity.getCountryParentId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
@@ -305,13 +304,13 @@ public class OrganizationActivityService extends MongoBaseService {
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
-        if(!generalDTO.getTags().isEmpty()){
+        if (!generalDTO.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         }
-        activityService.updateBalanceSettingTab(generalDTO,activity);
-        activityService.updateNotesTabOfActivity(generalDTO,activity);
+        activityService.updateBalanceSettingTab(generalDTO, activity);
+        activityService.updateNotesTabOfActivity(generalDTO, activity);
         save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
@@ -321,7 +320,6 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
-        generalActivityTabWithTagDTO.setActivityCanBeCopied(generalDTO.isActivityCanBeCopied());
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
 
     }
@@ -378,8 +376,8 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
         //Checking the time type of activity whether it's eligible for copy or not
-        ActivityDTO eligibleForCopy=activityMongoRepository.eligibleForCopy(activityId);
-        if (eligibleForCopy==null || !eligibleForCopy.isActivityCanBeCopied()) {
+        ActivityDTO eligibleForCopy = activityMongoRepository.eligibleForCopy(activityId);
+        if (eligibleForCopy == null || !eligibleForCopy.isActivityCanBeCopied()) {
             exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
@@ -398,7 +396,7 @@ public class OrganizationActivityService extends MongoBaseService {
         orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
         UnitSettingDTO unitSettingDTO = unitSettingRepository.getMinOpenShiftHours(unitId);
-        orderAndActivityDTO.setMinOpenShiftHours(unitSettingDTO!=null ? unitSettingDTO.getOpenShiftPhaseSetting().getMinOpenShiftHours() : null);
+        orderAndActivityDTO.setMinOpenShiftHours(unitSettingDTO != null ? unitSettingDTO.getOpenShiftPhaseSetting().getMinOpenShiftHours() : null);
         orderAndActivityDTO.setCounters(counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT));
         return orderAndActivityDTO;
     }
@@ -423,50 +421,50 @@ public class OrganizationActivityService extends MongoBaseService {
             phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
             unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
             activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases);
-        List<Activity> existingActivities;
-        if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
-            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
-        } else {
-            existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
-        }
-
-        if (!existingActivities.isEmpty()) {
-            Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
-            Map<Long, Long> accessGroupIdsMap = genericIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
-            List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
-            for (Activity activity : existingActivities) {
-                logger.info("I am act {}", activity.getName());
-                List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-                for (int i = 0; i < phases.size(); i++) {
-                    List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
-                    List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
-                    Set<Long> agIds = new HashSet<>();
-                    PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
-                            activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
-                            activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
-                    for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
-                        List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
-                        accessGroupIds.forEach(a -> {
-                            if (accessGroupIdsMap.get(a) != null) {
-                                agIds.add(accessGroupIdsMap.get(a));
-                            }
-                        });
-                        activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
-                    }
-                    phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
-                    phaseTemplateValues.add(phaseTemplateValue);
-                }
-                activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
-                activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
+            List<Activity> existingActivities;
+            if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
+                existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+            } else {
+                existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
             }
-            save(activityCopiedList);
-            costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
-            wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
-            updateCompositeActivitiesIds(activityCopiedList);
-        }
+
+            if (!existingActivities.isEmpty()) {
+                Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
+                Map<Long, Long> accessGroupIdsMap = genericIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
+                List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
+                for (Activity activity : existingActivities) {
+                    logger.info("I am act {}", activity.getName());
+                    List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+                    for (int i = 0; i < phases.size(); i++) {
+                        List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
+                        List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
+                        Set<Long> agIds = new HashSet<>();
+                        PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
+                                activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
+                                activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
+                        for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
+                            List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
+                            accessGroupIds.forEach(a -> {
+                                if (accessGroupIdsMap.get(a) != null) {
+                                    agIds.add(accessGroupIdsMap.get(a));
+                                }
+                            });
+                            activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
+                        }
+                        phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
+                        phaseTemplateValues.add(phaseTemplateValue);
+                    }
+                    activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
+                    activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
+                }
+                save(activityCopiedList);
+                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
+                wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
+                updateCompositeActivitiesIds(activityCopiedList);
+            }
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
             timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-    }
+        }
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         return true;
@@ -500,15 +498,15 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<Activity> activities){
-        List<String> invalidActivities= ActivityUtil.verifyCompositeActivities(breakAllowed,activities);
-        if(invalidActivities.size()!=0){
+    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<Activity> activities) {
+        List<String> invalidActivities = ActivityUtil.verifyCompositeActivities(breakAllowed, activities);
+        if (invalidActivities.size() != 0) {
             List<String> errorMessages = new ArrayList<>(invalidActivities);
-            if(breakAllowed){
-                exceptionService.actionNotPermittedException("activities.not.support.break",errorMessages);
+            if (breakAllowed) {
+                exceptionService.actionNotPermittedException("activities.not.support.break", errorMessages);
             }
-            if(!breakAllowed){
-                exceptionService.actionNotPermittedException("activities.support.break",errorMessages);
+            if (!breakAllowed) {
+                exceptionService.actionNotPermittedException("activities.support.break", errorMessages);
             }
 
         }

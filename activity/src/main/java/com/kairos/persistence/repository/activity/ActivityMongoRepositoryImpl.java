@@ -108,22 +108,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
-
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                unwind("tags", true),
-                lookup("tag", "tags", "_id", "tags_data"),
-                unwind("tags_data", true),
-                group("$id")
-                        .first("$name").as("name")
-                        .first("$description").as("description")
-                        .first("$unitId").as("unitId")
-                        .first("rulesActivityTab").as("rulesActivityTab")
-                        .first("$parentId").as("parentId")
-                        .first("generalActivityTab").as("generalActivityTab")
-                        .first("timeType.activityCanBeCopied").as("activityCanBeCopied")
-                        .push("tags_data").as("tags")
+                lookup("tag", "tags", "_id", "tags"),
+                project( "name", "description", "unitId","rulesActivityTab","parentId","generalActivityTab","tags")
+                        .and("timeType.activityCanBeCopiedForHierarchy").arrayElementAt(0).as("activityCanBeCopiedForHierarchy")
 
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
@@ -134,9 +124,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                unwind("tags", true),
-                lookup("tag", "tags", "_id", "tags_data"),
-                unwind("tags_data", true),
+                //unwind("tags", true),
+                lookup("tag", "tags", "_id", "tags"),
+                project( "name","state", "description", "countryId","isParentActivity","generalActivityTab","tags")
+              /*  unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
                         .first("$state").as("state")
@@ -145,7 +136,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
                         .first("timeType.activityCanBeCopied").as("activityCanBeCopied")
-                        .push("tags_data").as("tags")
+                        .push("tags_data").as("tags")*/
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();

@@ -200,9 +200,13 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-        List<ActivityTagDTO> activities = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId),ActivityTagDTO.class);
+        List<ActivityTagDTO> activityTagDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId),ActivityTagDTO.class);
+        //In Country Module any Activity can be copied
+        activityTagDTOS.forEach(activityTagDTO -> {
+            activityTagDTO.setActivityCanBeCopied(true);
+        });
         List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
-        response.put("activities", activities);
+        response.put("activities", activityTagDTOS);
         response.put("activityCategories", acivitityCategories);
         return response;
     }
@@ -297,9 +301,7 @@ public class ActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
-        generalActivityTabWithTagDTO.setActivityCanBeCopied(generalDTO.isActivityCanBeCopied());
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
-
     }
 
     public ActivityTabsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
@@ -328,10 +330,6 @@ public class ActivityService extends MongoBaseService {
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activity.getBalanceSettingsActivityTab().getTimeTypeId(), countryId));
-        TimeType timeType=timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        /*if(timeType!=null){
-            generalActivityTabWithTagDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
-        }*/
         return activityTabsWrapper;
     }
 
@@ -355,7 +353,6 @@ public class ActivityService extends MongoBaseService {
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
-        //generalActivityTabDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
         updateActivityCategory(activity, countryId);
         return activity.getBalanceSettingsActivityTab();
     }

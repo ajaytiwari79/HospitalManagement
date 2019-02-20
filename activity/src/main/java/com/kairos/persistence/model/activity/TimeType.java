@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.activity;
 
 
-import com.kairos.enums.Hierarchy;
+import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "time_Type")
 public class TimeType extends MongoBaseEntity{
@@ -23,12 +24,12 @@ public class TimeType extends MongoBaseEntity{
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
-    private List<Hierarchy> acitivityCanBeCopiedForHierarchy;
+    private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
 
 
     public TimeType() {}
 
-    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,List<Hierarchy>  acitivityCanBeCopiedForHierarchy) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
@@ -36,7 +37,7 @@ public class TimeType extends MongoBaseEntity{
         this.leafNode = true;
         this.secondLevelType=secondLevelType;
         this.countryId=countryId;
-        this.acitivityCanBeCopiedForHierarchy=acitivityCanBeCopiedForHierarchy;
+        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
     }
 
     public Long getCountryId() {
@@ -112,11 +113,11 @@ public class TimeType extends MongoBaseEntity{
         this.secondLevelType = secondLevelType;
     }
 
-    public List<Hierarchy> getAcitivityCanBeCopiedForHierarchy() {
-        return acitivityCanBeCopiedForHierarchy;
+    public Set<OrganizationHierarchy> getActivityCanBeCopiedForOrganizationHierarchy() {
+        return activityCanBeCopiedForOrganizationHierarchy;
     }
 
-    public void setAcitivityCanBeCopiedForHierarchy(List<Hierarchy> acitivityCanBeCopiedForHierarchy) {
-        this.acitivityCanBeCopiedForHierarchy = acitivityCanBeCopiedForHierarchy;
+    public void setActivityCanBeCopiedForOrganizationHierarchy(Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
+        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
     }
 }
