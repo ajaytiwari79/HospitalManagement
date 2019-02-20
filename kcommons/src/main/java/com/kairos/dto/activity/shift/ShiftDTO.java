@@ -68,6 +68,7 @@ public class ShiftDTO {
     private int plannedMinutes;
     private boolean multipleActivity;
     private BigInteger planningPeriodId;
+    private BigInteger phaseId;
 
     public ShiftDTO() {
         //default Const
@@ -410,6 +411,14 @@ public class ShiftDTO {
 
     public void setPlanningPeriodId(BigInteger planningPeriodId) {
         this.planningPeriodId = planningPeriodId;
+    }
+
+    public BigInteger getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(BigInteger phaseId) {
+        this.phaseId = phaseId;
     }
 
     @Override
