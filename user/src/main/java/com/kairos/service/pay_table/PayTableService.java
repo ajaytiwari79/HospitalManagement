@@ -196,7 +196,6 @@ public class PayTableService {
             }
         }
         PayTable payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), payTableId);
-
         if (Optional.ofNullable(payTableToValidate).isPresent() ) {
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         }
