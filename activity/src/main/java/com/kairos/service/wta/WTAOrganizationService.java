@@ -8,7 +8,6 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;

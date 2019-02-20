@@ -68,4 +68,6 @@ public interface CustomShiftMongoRepository {
     void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark);
 
     List<Shift> findAllShiftByIntervalAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
+
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositionAndByactivityIds(Long unitPositionId, Date startDate, Date endDate,Set<BigInteger> activityIds);
 }

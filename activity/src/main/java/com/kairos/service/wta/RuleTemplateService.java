@@ -16,7 +16,6 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;

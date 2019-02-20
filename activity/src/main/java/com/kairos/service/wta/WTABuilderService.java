@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.wta.templates;
+package com.kairos.service.wta;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -8,6 +8,7 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;

@@ -20,7 +20,6 @@ import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.model.wta.templates.template_types.ChildCareDaysCheckWTATemplate;
 import com.kairos.persistence.model.wta.templates.template_types.SeniorDaysPerYearWTATemplate;
 import com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate;

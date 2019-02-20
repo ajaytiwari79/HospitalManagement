@@ -77,6 +77,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.plusDays;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
@@ -536,23 +538,23 @@ public class ShiftValidatorService {
         return updatedShifts;
     }
 
-    public static DateTimeInterval getIntervalByNumberOfWeeks(ShiftWithActivityDTO shift, int numberOfWeeks, LocalDate validationStartDate) {
+    public static DateTimeInterval getIntervalByNumberOfWeeks(Date startDate, int numberOfWeeks, LocalDate validationStartDate) {
         if (numberOfWeeks == 0 || validationStartDate == null) {
             throwException("message.ruleTemplate.weeks.notNull");
         }
         DateTimeInterval dateTimeInterval;
         LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
-        if (validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(shift.getStartDate()))) {
+        if (validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(startDate))) {
             while (true) {
                 dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
-                if (dateTimeInterval.contains(shift.getStartDate())) {
+                if (dateTimeInterval.contains(startDate)) {
                     break;
                 }
                 validationStartDate = endDate;
                 endDate = validationStartDate.plusWeeks(numberOfWeeks);
             }
         } else {
-            dateTimeInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
+            dateTimeInterval = new DateTimeInterval(startDate, plusDays(startDate,1));
         }
         return dateTimeInterval;
     }
@@ -667,7 +669,7 @@ public class ShiftValidatorService {
                 case VETO_AND_STOP_BRICKS:
                     VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) ruleTemplate;
                     validateRuleTemplate(vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate());
-                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate()));
+                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift.getStartDate(), vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate()));
 
                     break;
                 case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
