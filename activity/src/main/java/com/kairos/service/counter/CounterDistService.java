@@ -853,6 +853,7 @@ public class CounterDistService extends MongoBaseService {
             criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_IDS.value, FilterType.ACTIVITY_IDS, (List) kpiFilterDefaultDataDTOS));
         }
         kpi.setDefaultFilters(criteriaList);
+        kpi.setTitle(applicableKPIS.get(0).getTitle());
         if(isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
             kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
         }
