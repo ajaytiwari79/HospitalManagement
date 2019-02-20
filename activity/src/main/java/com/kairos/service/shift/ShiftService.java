@@ -449,7 +449,7 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type,Boolean validatedByStaff,Boolean update,Long unitId) {
+    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type,Boolean validatedByStaff,boolean update,Long unitId) {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
         // change id from shift id if request come form detailed view and compect view
         if(isNotNull(shiftWithViolatedInfo.getShifts().get(0).getShiftId())){
@@ -488,7 +488,7 @@ public class ShiftService extends MongoBaseService {
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
         shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
         updateWTACounter(staffAdditionalInfoDTO, shiftWithViolatedInfo, shift);
-        if(isNotNull(update)&&update){
+        if(update){
             shiftDTO=updateShiftStateAfterValidate(shiftWithViolatedInfo.getShifts().get(0),shiftWithViolatedInfo.getShifts().get(0).getShiftId(),shiftWithViolatedInfo.getShifts().get(0).getShiftStatePhaseId());
         }
         if (isNotNull(validatedByStaff)&&!update) {

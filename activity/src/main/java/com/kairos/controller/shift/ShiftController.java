@@ -62,7 +62,7 @@ public class ShiftController {
     @ApiOperation("save Shift after validation")
     @PostMapping(value = "/shift/validated")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation( @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,@RequestParam(value = "validatedByStaff",required = false) Boolean validatedByStaff,@RequestParam(value = "update",required = false) Boolean update) {
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation( @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,@RequestParam(value = "validatedByStaff",required = false) Boolean validatedByStaff,@RequestParam(value = "update",required = false) boolean update) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type,validatedByStaff,update,unitId));
     }
 
