@@ -7,7 +7,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -30,7 +30,7 @@ public class ShiftDetailsServiceUnitTest {
     @Mock
     private ShiftMongoRepository shiftMongoRepository;
     @Mock
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Mock
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @InjectMocks
@@ -71,7 +71,7 @@ public class ShiftDetailsServiceUnitTest {
         List<NameValuePair> requestParam = new ArrayList<>();
         Set<Long> reasonCodeIds= new HashSet<Long>(){{add(4l);}};
         requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", reasonCodeIds.toString()));
-        when(genericIntegrationService.getUnitInfoAndReasonCodes(unitId,requestParam)).thenReturn(reasonCodeWrapper);
+        when(userIntegrationService.getUnitInfoAndReasonCodes(unitId,requestParam)).thenReturn(reasonCodeWrapper);
         when(shiftMongoRepository.findAllShiftsByIds(shiftIds)).thenReturn(Arrays.asList(shiftWithActivityDTO));
         List<ShiftViolatedRules> shiftViolatedRules =new ArrayList<>();
         when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds)).thenReturn(shiftViolatedRules);

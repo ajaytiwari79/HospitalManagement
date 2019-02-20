@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -69,13 +70,19 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
+    public List<CTAResponseDTO> getDefaultCTAOfExpertiseAndDate(Long unitId, Long expertiseId,LocalDate selectedDate) {
+        Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false).and("unitPositionId").exists(false).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate)));
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
+    }
+
+    @Override
     public List<CTAResponseDTO> getDefaultCTA(Long unitId, Long expertiseId) {
         Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false).and("unitPositionId").exists(false));
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
     @Override
-    public List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds) {
+    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
         query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate").include("parentId").include("organizationParentId");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);

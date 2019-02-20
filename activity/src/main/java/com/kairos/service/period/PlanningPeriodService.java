@@ -86,7 +86,7 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private StaffingLevelStateMongoRepository staffingLevelStateMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
@@ -519,7 +519,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     unitPositionIds.add(unitPositionId);
                 }
             }
-            unitPositionIdWithFunctionIdShiftDateMap = genericIntegrationService.getUnitPositionIdWithFunctionIdShiftDateMap(unitId, unitPositionIds);
+            unitPositionIdWithFunctionIdShiftDateMap = userIntegrationService.getUnitPositionIdWithFunctionIdShiftDateMap(unitId, unitPositionIds);
         }
         return unitPositionIdWithFunctionIdShiftDateMap;
     }
@@ -704,6 +704,6 @@ public class PlanningPeriodService extends MongoBaseService {
 
             }
         }
-        genericIntegrationService.restoreFunctionsWithDatesByUnitPositionIds(unitPositionIdWithShiftDateFunctionIdMap,unitId);
+        userIntegrationService.restoreFunctionsWithDatesByUnitPositionIds(unitPositionIdWithShiftDateFunctionIdMap,unitId);
     }
 }

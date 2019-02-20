@@ -1,7 +1,7 @@
 package com.kairos.service.fls_visitour.schedule;
 
 import com.kairos.dto.activity.task.TaskAppointmentSuggestionDTO;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.service.exception.ExceptionService;
@@ -52,7 +52,7 @@ public class SchedulerImpl implements  Scheduler{
     private ExceptionService exceptionService;
 
     @Autowired
-    GenericIntegrationService genericIntegrationService;
+    UserIntegrationService userIntegrationService;
 
 
     /*
@@ -264,7 +264,7 @@ exceptionService.runtimeException("message.exception.runtime",flsCallResponse.me
                 taskAppointmentSuggestionDTO.setCost(appointment.getCost());
                 taskAppointmentSuggestionDTO.setStaffId(Long.parseLong(appointment.getFMExtID()));
 
-                 StaffDTO staffDTO = genericIntegrationService.getStaff(Long.parseLong(appointment.getFMExtID()));
+                 StaffDTO staffDTO = userIntegrationService.getStaff(Long.parseLong(appointment.getFMExtID()));
 
                //Staff staff = staffGraphRepository.findById(Long.parseLong(appointment.getFMExtID()));
                 taskAppointmentSuggestionDTO.setFirstName(staffDTO.getFirstName());

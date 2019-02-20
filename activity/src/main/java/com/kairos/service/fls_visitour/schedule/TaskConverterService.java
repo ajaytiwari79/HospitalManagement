@@ -1,6 +1,6 @@
 package com.kairos.service.fls_visitour.schedule;
 
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.dto.user.client.Client;
 import com.kairos.persistence.model.task.SkillExpertise;
 import com.kairos.persistence.model.task.Task;
@@ -16,7 +16,6 @@ import io.jsonwebtoken.lang.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -42,7 +41,7 @@ public class TaskConverterService {
     ExceptionService exceptionService;
 
     @Inject
-    GenericIntegrationService genericIntegrationService;
+    UserIntegrationService userIntegrationService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskConverterService.class);
 
@@ -59,7 +58,7 @@ public class TaskConverterService {
 
         /*Map<String,Object> citizenDetails=taskServiceRestClient.getCitizenDetails(task.getCitizenId());*/
        // Client client = clientGraphRepository.findById(task.getCitizenId());
-        Client client = genericIntegrationService.getClient(task.getCitizenId());
+        Client client = userIntegrationService.getClient(task.getCitizenId());
 
 
         Map<String, Object> callMetaData = new HashMap<>();

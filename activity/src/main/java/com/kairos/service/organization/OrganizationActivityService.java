@@ -31,7 +31,7 @@ import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepo
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.ActivityUtil;
@@ -109,7 +109,7 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private UnitSettingService unitSettingService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     @Inject
     private ActivityConfigurationService activityConfigurationService;
@@ -145,7 +145,7 @@ public class OrganizationActivityService extends MongoBaseService {
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
             Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a->a.getActivityShiftStatusSettings().stream().flatMap(b->b.getAccessGroupIds().stream())).collect(Collectors.toSet());
-            Map<Long,Long> accessGroupIdsMap=genericIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
+            Map<Long,Long> accessGroupIdsMap= userIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
                 List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings=activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
@@ -198,7 +198,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public Map<String, Object> getAllActivityByUnit(Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
@@ -211,7 +211,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
@@ -293,7 +293,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
 
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
@@ -317,7 +317,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
    /* public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
+        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -328,7 +328,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }*/
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long unitId) {
-        List<DayType> dayTypes = genericIntegrationService.getDayTypes(unitId);
+        List<DayType> dayTypes = userIntegrationService.getDayTypes(unitId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
         List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();
@@ -336,7 +336,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
-        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
         List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
@@ -345,7 +345,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long unitId) {
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
-        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -422,7 +422,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
         if (!existingActivities.isEmpty()) {
             Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
-            Map<Long, Long> accessGroupIdsMap = genericIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
+            Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
             for (Activity activity : existingActivities) {
                 logger.info("I am act {}", activity.getName());

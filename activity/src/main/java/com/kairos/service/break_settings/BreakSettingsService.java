@@ -11,7 +11,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class BreakSettingsService extends MongoBaseService {
     @Inject
     private UnitSettingRepository unitSettingRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
 
@@ -54,7 +54,7 @@ public class BreakSettingsService extends MongoBaseService {
     }
 
     public BreakSettingAndActivitiesWrapper getBreakSettings(Long countryId, Long expertiseId) {
-        Expertise expertise = genericIntegrationService.getExpertise(countryId, expertiseId);
+        Expertise expertise = userIntegrationService.getExpertise(countryId, expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.duplicateDataException("error.expertise.notfound");
         }

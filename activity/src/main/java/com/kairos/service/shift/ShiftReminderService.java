@@ -16,7 +16,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserRestClientForScheduler;
@@ -49,7 +49,7 @@ public class ShiftReminderService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private SchedulerServiceRestClient schedulerServiceRestClient;
     @Inject
@@ -121,7 +121,7 @@ public class ShiftReminderService extends MongoBaseService {
         }
         Activity activity = activityMongoRepository.findOne(shiftActivity.get().getActivityId());
 
-        StaffDTO staffDTO = genericIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
@@ -132,7 +132,7 @@ public class ShiftReminderService extends MongoBaseService {
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {
             LOGGER.info("next email on {} to staff {}", nextTriggerDateTime, staffDTO.getFirstName());
-            List<SchedulerPanelDTO> schedulerPanelRestDTOS = genericIntegrationService.registerNextTrigger(shift.getUnitId(), Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)));
+            List<SchedulerPanelDTO> schedulerPanelRestDTOS = userIntegrationService.registerNextTrigger(shift.getUnitId(), Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)));
 
         }
 

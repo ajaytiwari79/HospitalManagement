@@ -1,15 +1,9 @@
 package com.kairos.service.attendence_setting;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
-import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
@@ -22,7 +16,7 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
@@ -38,8 +32,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.enums.phase.PhaseType.ACTUAL;
-
 
 @Service
 public class TimeAndAttendanceService extends MongoBaseService {
@@ -48,7 +40,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     private TimeAndAttendanceRepository timeAndAttendanceRepository;
 
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
@@ -68,7 +60,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     @Inject private ShiftStateService shiftStateService;
 
     public TimeAndAttendanceDTO getAttendanceSetting() {
-        List<StaffResultDTO> staffAndUnitId = genericIntegrationService.getStaffIdsByUserId(UserContext.getUserDetails().getId());
+        List<StaffResultDTO> staffAndUnitId = userIntegrationService.getStaffIdsByUserId(UserContext.getUserDetails().getId());
         TimeAndAttendance timeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(staffAndUnitId.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()),LocalDate.now().minusDays(1));
         SickSettingsDTO sickSettings = sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
         return (Optional.ofNullable(timeAndAttendance).isPresent()) ? new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), sickSettings) : new TimeAndAttendanceDTO(null, sickSettings);
@@ -78,7 +70,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         TimeAndAttendanceDTO timeAndAttendanceDTO = null;
         TimeAndAttendance timeAndAttendance = null;
         Long userId = UserContext.getUserDetails().getId();
-        List<StaffResultDTO> staffAndOrganizationIds = genericIntegrationService.getStaffIdsByUserId(userId);
+        List<StaffResultDTO> staffAndOrganizationIds = userIntegrationService.getStaffIdsByUserId(userId);
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }

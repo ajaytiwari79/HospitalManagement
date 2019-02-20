@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -26,12 +27,13 @@ public interface CustomCostTimeAgreementRepository {
     Boolean isCTAExistWithSameNameInUnit(Long unitId, String name, BigInteger ctaId);
 
     List<CTAResponseDTO> getDefaultCTA(Long unitId, Long expertiseId);
+    List<CTAResponseDTO> getDefaultCTAOfExpertiseAndDate(Long unitId, Long expertiseId,LocalDate selectedDate);
 
     List<CTAResponseDTO> getVersionsCTA(List<Long> upIds);
 
     List<CTAResponseDTO> getParentCTAByUpIds(List<Long> unitPositionIds);
 
-    List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds);
+    List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds);
 
     CTAResponseDTO getCTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
 

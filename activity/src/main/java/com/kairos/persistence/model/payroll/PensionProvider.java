@@ -15,8 +15,6 @@ public class PensionProvider extends MongoBaseEntity {
     private String name;
     private String paymentNumber;
     private Long countryId;
-    private Long staffId;
-    private Long organizationId;
 
     public PensionProvider() {
         //Default Constructor
@@ -53,19 +51,4 @@ public class PensionProvider extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
-    }
 }

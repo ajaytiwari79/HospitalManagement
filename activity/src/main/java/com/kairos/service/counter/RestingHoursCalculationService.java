@@ -17,7 +17,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class RestingHoursCalculationService implements CounterService {
     @Inject
     private ActivityService activityService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     public double getTotalRestingHours(List<Shift> shifts, long initTs, long endTs, boolean dayOffAllowed) {
         //all shifts should be sorted on startDate
@@ -57,7 +57,7 @@ public class RestingHoursCalculationService implements CounterService {
     public Map<Long, Double> calculateRestingHours(List<Long> staffIds, Long organizationId, LocalDateTime startDate, LocalDateTime endDate) {
         Map<Long, Double> staffRestingHours = new HashMap<>();
         //currently not use
-//        Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
+//        Long countryId = userIntegrationService.getCountryIdOfOrganization(organizationId);
 //        List<BigInteger> activityIds = getPresenceTimeTypeActivitiesIds(countryId);
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds,startDate, endDate);
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
@@ -84,7 +84,7 @@ public class RestingHoursCalculationService implements CounterService {
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentTypes,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS= userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), organizationId, DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1));
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();

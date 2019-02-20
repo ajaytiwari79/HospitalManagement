@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.pay_out;
 
-import com.kairos.persistence.model.pay_out.PayOut;
+import com.kairos.persistence.model.pay_out.PayOutPerShift;
 
 import java.util.Date;
 import java.util.List;
@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface CustomPayOutRepository {
 
-    PayOut findLastPayoutByUnitPositionId(Long unitPositionId, Date date);
+    PayOutPerShift findLastPayoutByUnitPositionId(Long unitPositionId, Date date);
 
-    List<PayOut> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionId, Date startDate);
+    List<PayOutPerShift> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionId, Date startDate);
 
     void updatePayOut(Long unitPositionId,int payOut);
 }
