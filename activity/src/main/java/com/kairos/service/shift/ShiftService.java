@@ -451,7 +451,7 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type, Boolean validatedByStaff, boolean updateShiftState, Long unitId) {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
-        // replace id from shift id if request come form detailed view and compect view
+        // replace id from shift id if request come form detailed view and compact view
         if (isNotNull(shiftWithViolatedInfo.getShifts().get(0).getShiftId())) {
             shift.setId(shiftWithViolatedInfo.getShifts().get(0).getShiftId());
         }
