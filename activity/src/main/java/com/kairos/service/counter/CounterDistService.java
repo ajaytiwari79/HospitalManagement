@@ -238,9 +238,9 @@ public class CounterDistService extends MongoBaseService {
         if (!accessGroupPermissionCounterDTO.isCountryAdmin()) {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }
-        List<KPIDTO> copyKpidtos = counterRepository.getCopyKpiOfUnit(ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId(), true);
-        if(isCollectionNotEmpty(copyKpidtos)){
-            kpiIds.addAll(copyKpidtos.stream().map(kpidto -> kpidto.getId()).collect(toList()));
+        List<KPIDTO> copyKpiDtos = counterRepository.getCopyKpiOfUnit(ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId(), true);
+        if(isCollectionNotEmpty(copyKpiDtos)){
+            kpiIds.addAll(copyKpiDtos.stream().map(kpidto -> kpidto.getId()).collect(toList()));
         }
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
