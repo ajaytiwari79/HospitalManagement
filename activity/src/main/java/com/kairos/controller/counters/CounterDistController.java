@@ -249,13 +249,13 @@ public class CounterDistController {
     //defalut setting for unit and staff
 
     @PostMapping(COUNTER_UNIT_DIST_URL+"/default_kpi_setting")
-    public ResponseEntity<Map<String, Object>> createDefaluSettingForUnit(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
+    public ResponseEntity<Map<String, Object>> createDefalutSettingForUnit(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
             counterManagementService.createDefaultKpiSetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @PostMapping(COUNTER_UNIT_DIST_URL+"/staff_default_kpi_setting")
-    public ResponseEntity<Map<String, Object>> createDefaluSettingForStaff(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
+    public ResponseEntity<Map<String, Object>> createDefalutSettingForStaff(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
         counterManagementService.createDefaultStaffKPISetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
@@ -274,32 +274,32 @@ public class CounterDistController {
     }
 
     @PutMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
-    public ResponseEntity<Map<String,Object>> saveKpiDateOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> saveKpiDataOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.saveKpiFilterData(tabId,countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
     @PutMapping(UNIT_URL+KPI_URL+"/save_kpi")
-    public ResponseEntity<Map<String,Object>> saveKpiDateOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId, @PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> saveKpiDataOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId, @PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.saveKpiFilterData(tabId,unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDateOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> copyKpiDataOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,  counterManagementService.copyKpiFilterData(tabId,countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDateOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> copyKpiDataOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.copyKpiFilterData(tabId,unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/preview_kpi")
-    public ResponseEntity<Map<String,Object>> kpiPreviewDateOfUnit(@PathVariable BigInteger kpiId,@PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria){
+    public ResponseEntity<Map<String,Object>> kpiPreviewDataOfUnit(@PathVariable BigInteger kpiId,@PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.getKpiPreviewWithFilter(kpiId,unitId,filterCriteria,ConfLevel.UNIT));
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/preview_kpi")
-    public ResponseEntity<Map<String,Object>> kpiPreviewDateOfCountry(@PathVariable BigInteger kpiId,@PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria){
+    public ResponseEntity<Map<String,Object>> kpiPreviewDataOfCountry(@PathVariable BigInteger kpiId,@PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.getKpiPreviewWithFilter(kpiId,countryId,filterCriteria,ConfLevel.COUNTRY));
     }
 }
