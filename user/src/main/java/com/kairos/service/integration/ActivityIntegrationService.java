@@ -134,5 +134,9 @@ public class ActivityIntegrationService {
         });
     }
 
+    public boolean verifyTimeType(BigInteger timeTypeId,Long countryId){
+      return genericRestClient.publishRequest(null,countryId,false,IntegrationOperation.GET,"/timeType/{timeTypeId}/verify/",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},timeTypeId);
+    }
+
 }
 

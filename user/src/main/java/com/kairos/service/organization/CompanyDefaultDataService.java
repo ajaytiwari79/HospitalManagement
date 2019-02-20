@@ -64,7 +64,7 @@ public class CompanyDefaultDataService {
                 //asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
-                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForSubUnit(unit,parentId));
+                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefaultDataForSubUnit(unit,parentId));
                 asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,unit.getId()));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
@@ -90,7 +90,7 @@ public class CompanyDefaultDataService {
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
-        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForUnit(organization,countryId));
+        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefaultDataForUnit(organization,countryId));
         asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,organization.getId()));
         futureList.forEach(data -> {
             try {

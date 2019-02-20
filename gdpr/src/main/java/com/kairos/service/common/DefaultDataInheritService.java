@@ -12,7 +12,7 @@ import com.kairos.persistence.model.data_inventory.asset.AssetDeprecated;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
+import com.kairos.persistence.model.master_data.data_category_element.DataSubject;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
@@ -43,13 +43,13 @@ import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.data_subject_management.DataCategoryService;
-import com.kairos.service.data_subject_management.DataSubjectMappingService;
+import com.kairos.service.data_subject_management.DataSubjectService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import org.apache.commons.collections.CollectionUtils;
@@ -103,7 +103,7 @@ public class DefaultDataInheritService{
     @Inject
     private TransferMethodRepository transferMethodMongoRepository;
     @Inject
-    private DataSubjectMappingService dataSubjectMappingService;
+    private DataSubjectService dataSubjectService;
     @Inject
     private DataCategoryRepository dataCategoryRepository;
 
@@ -241,7 +241,7 @@ public class DefaultDataInheritService{
             return true;
         };*/
         Callable<Boolean> dataSubjectTask = () -> {
-            List<DataSubjectMappingResponseDTO> dataSubjectMappingDTOS = dataSubjectMappingService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
+            List<DataSubjectResponseDTO> dataSubjectMappingDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
             copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
             return true;
         };
@@ -359,12 +359,12 @@ public class DefaultDataInheritService{
     }
 
 
-    private void copyDataSubjectAndDataCategoryFromCountry(Long unitId, List<DataSubjectMappingResponseDTO> dataSubjectMappingResponseDTOS) {
-        if (CollectionUtils.isNotEmpty(dataSubjectMappingResponseDTOS)) {
-            List<DataSubjectMapping> dataSubjects = new ArrayList<>();
-            for (DataSubjectMappingResponseDTO dataSubjectDTO : dataSubjectMappingResponseDTOS) {
-                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName(), dataSubjectDTO.getDescription());
-                dataSubjectMapping.setOrganizationId(unitId);
+    private void copyDataSubjectAndDataCategoryFromCountry(Long unitId, List<DataSubjectResponseDTO> dataSubjectResponseDTOS) {
+        if (CollectionUtils.isNotEmpty(dataSubjectResponseDTOS)) {
+            List<DataSubject> dataSubjects = new ArrayList<>();
+            for (DataSubjectResponseDTO dataSubjectDTO : dataSubjectResponseDTOS) {
+                DataSubject dataSubject = new DataSubject(dataSubjectDTO.getName(), dataSubjectDTO.getDescription());
+                dataSubject.setOrganizationId(unitId);
                 if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
                     List<DataCategory> dataCategories = new ArrayList<>();
                     dataSubjectDTO.getDataCategories().forEach( dataCategory ->{
@@ -380,9 +380,9 @@ public class DefaultDataInheritService{
                         dataCategories.add(newDataCategory);
                     });
                     dataCategoryRepository.saveAll(dataCategories);
-                    dataSubjectMapping.setDataCategories(dataCategories);
+                    dataSubject.setDataCategories(dataCategories);
                 }
-                dataSubjects.add(dataSubjectMapping);
+                dataSubjects.add(dataSubject);
             }
             dataSubjectRepository.saveAll(dataSubjects);
         }

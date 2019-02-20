@@ -147,7 +147,7 @@ public class MasterProcessingActivityService{
                 processingActivity.setSubProcessingActivities(subProcessingActivities);
 
             }
-            processingActivity = getMetadataOfMasterProcessingActivity(masterProcessingActivityDto, processingActivity);
+            getMetadataOfMasterProcessingActivity(masterProcessingActivityDto, processingActivity);
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
             processingActivity.setName(masterProcessingActivityDto.getName());
             try {
@@ -316,6 +316,7 @@ public class MasterProcessingActivityService{
         }
         if (!processingActivityRiskDTO.getRisks().isEmpty()) {
             List<Risk> processingActivityRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivityRiskDTO.getRisks(), Risk.class);
+            processingActivityRisks.forEach(risk -> risk.setCountryId(countryId));
             masterProcessingActivity.setRisks(processingActivityRisks);
         }
         if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {

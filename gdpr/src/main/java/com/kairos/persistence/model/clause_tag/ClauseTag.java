@@ -22,6 +22,11 @@ public class ClauseTag extends BaseEntity {
     public ClauseTag() {
     }
 
+    public ClauseTag(@NotBlank(message = "Name cannot be  empty") String name, boolean defaultTag) {
+        this.name = name;
+        this.defaultTag = defaultTag;
+    }
+
     public boolean isDefaultTag() { return defaultTag; }
 
     public void setDefaultTag(boolean defaultTag) { this.defaultTag = defaultTag; }

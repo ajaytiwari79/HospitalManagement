@@ -3,6 +3,7 @@ package com.kairos.service.questionnaire_template;
 
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -229,19 +231,58 @@ public class QuestionnaireTemplateService {
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
         }
-        return ObjectMapperUtils.copyPropertiesByMapper(questionnaireTemplate, QuestionnaireTemplateResponseDTO.class);
+        return prepareQuestionnaireTemplateResponseData(questionnaireTemplate);
+
     }
 
     /**
-     * @param referenceId
+     * This method is used to prepare Questionnaire template Response object from actual entity object
+     */
+    QuestionnaireTemplateResponseDTO prepareQuestionnaireTemplateResponseData(QuestionnaireTemplate questionnaireTemplate) {
+        QuestionnaireTemplateResponseDTO questionnaireTemplateResponseDTO = new QuestionnaireTemplateResponseDTO(questionnaireTemplate.getId(), questionnaireTemplate.getName(), questionnaireTemplate.getDescription(), questionnaireTemplate.getTemplateType(), questionnaireTemplate.isDefaultAssetTemplate(), questionnaireTemplate.getTemplateStatus());
+        if(Optional.ofNullable(questionnaireTemplate.getAssetType()).isPresent()) {
+            questionnaireTemplateResponseDTO.setAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetType().getName(), questionnaireTemplate.getAssetType().isSubAssetType()));
+        }
+        if(Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
+            questionnaireTemplateResponseDTO.setAssetSubType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetSubType().getId(), questionnaireTemplate.getAssetSubType().getName(), questionnaireTemplate.getAssetSubType().isSubAssetType()));
+        }
+        questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
+
+        return questionnaireTemplateResponseDTO;
+    }
+
+        /**
+         * @param referenceId
+         * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
+         * @description we get  section[ {} ] as query response from mongo on using group operation,
+         * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
+         * and filter section in application layer and send empty array of section []
+         */
+    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateByCountryIdOrOrganizationId(Long referenceId, boolean isUnitId) {
+        return isUnitId ? questionnaireTemplateRepository.getAllQuestionnaireTemplateByOrganizationId(referenceId) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateByCountryId(referenceId);
+
+    }
+
+    /**
+     * @param id
      * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
      * @description we get  section[ {} ] as query response from mongo on using group operation,
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateByCountryIdOrOrganizationId(Long referenceId, boolean isUnitId) {
-        return isUnitId ? questionnaireTemplateRepository.getAllQuestionnaireTemplateByOrganizationId(referenceId) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateByCountryId(referenceId);
-
+    public List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long id, boolean isUnitId) {
+        List<QuestionnaireTemplateResponseDTO> questionnaireTemplateResponseDTOS = new ArrayList<>();
+        List<QuestionnaireTemplate> questionnaireTemplates = isUnitId ?  questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(id) :
+                questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(id);;
+        questionnaireTemplates.forEach(questionnaireTemplate -> {
+            questionnaireTemplateResponseDTOS.add(prepareQuestionnaireTemplateResponseData(questionnaireTemplate));
+        });
+        /*templateResponseDTOs.forEach(template -> {
+            if (!Optional.ofNullable(template.getSections().get(0).getId()).isPresent()) {
+                template.setSections(new ArrayList<>());
+            }
+        });*/
+        return questionnaireTemplateResponseDTOS;
     }
 
 

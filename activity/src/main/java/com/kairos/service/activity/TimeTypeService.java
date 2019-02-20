@@ -287,8 +287,14 @@ public class TimeTypeService extends MongoBaseService {
         return true;
     }
 
+
     public  List<TimeType> getAllTimeTypesByCountryId(Long countryId) {
         return timeTypeMongoRepository.findAllTimeTypeByCountryId(countryId);
+    }
+
+
+    public Boolean existsByIdAndCountryId(BigInteger id, Long countryId){
+        return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id,countryId);
     }
 
 }
