@@ -494,7 +494,7 @@ public class ShiftService extends MongoBaseService {
         if (isNotNull(validatedByStaff)&&!update) {
             ShiftState  shiftState=null;
             Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-            shiftDTO=validateShiftStateAfterValiation(shiftWithViolatedInfo.getShifts().get(0),shiftState,validatedByStaff,actualPhases,shiftWithViolatedInfo.getShifts().get(0).getShiftId());
+            shiftDTO=validateShiftStateAfterValiation(shiftWithViolatedInfo.getShifts().get(0),shiftState,validatedByStaff,actualPhases,shiftWithViolatedInfo.getShifts().get(0).getId());
         }
         shiftWithViolatedInfo.setShifts(Arrays.asList(shiftDTO));
         return shiftWithViolatedInfo;
@@ -1214,8 +1214,8 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
             shiftDTO.setValidated(shiftState.getValidated());
             shiftDTO.setShiftId(shiftState.getShiftId());
-//            shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
-//            shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
+            shiftDTO.setStartDate(shiftState.getActivities().get(0).getStartDate());
+            shiftDTO.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
             shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
         } else {
             shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
