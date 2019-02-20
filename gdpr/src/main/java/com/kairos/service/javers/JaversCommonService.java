@@ -1,7 +1,7 @@
 package com.kairos.service.javers;
 
 
-import com.kairos.response.dto.common.JaversResponseMetadata;
+import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.InstanceId;
@@ -111,17 +111,17 @@ public class JaversCommonService {
     }
 
 
-    private JaversResponseMetadata findOne(Long id, Class clazz) {
+    private MetaDataCommonResponseDTO findOne(Long id, Class clazz) {
 
-        TypedQuery<JaversResponseMetadata> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name) from " + clazz.getSimpleName() + " t where t.id = :id", JaversResponseMetadata.class);
+        TypedQuery<MetaDataCommonResponseDTO> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name) from " + clazz.getSimpleName() + " t where t.id = :id", MetaDataCommonResponseDTO.class);
         query.setParameter("id", id);
         return query.getSingleResult();
     }
 
-    private  List<JaversResponseMetadata> findAllByIds(ArrayList<InstanceId> instanceIds, Class clazz) {
+    private  List<MetaDataCommonResponseDTO> findAllByIds(ArrayList<InstanceId> instanceIds, Class clazz) {
         List<Long> ids = new ArrayList<>();
         instanceIds.stream().map(InstanceId::getCdoId).forEach(o -> ids.add((long) o));
-        TypedQuery<JaversResponseMetadata> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name)  from " + clazz.getSimpleName() + " t where t.id in (:ids)", JaversResponseMetadata.class);
+        TypedQuery<MetaDataCommonResponseDTO> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.JaversVO(t.id,t.name)  from " + clazz.getSimpleName() + " t where t.id in (:ids)", MetaDataCommonResponseDTO.class);
         query.setParameter("ids", ids);
         return query.getResultList();
     }

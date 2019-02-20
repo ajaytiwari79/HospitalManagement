@@ -23,7 +23,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
@@ -130,6 +130,7 @@ public class ProcessingActivityService {
             processingActivityRisk.setDescription(organizationLevelRiskDTO.getDescription());*/
             risks.add(ObjectMapperUtils.copyPropertiesByMapper(organizationLevelRiskDTO, Risk.class));
         });
+        risks.forEach(risk -> risk.setOrganizationId(orgId));
         return risks;
     }
 
@@ -155,7 +156,7 @@ public class ProcessingActivityService {
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
-        processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!processingActivity.isActive()) {
             exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
@@ -188,6 +189,7 @@ public class ProcessingActivityService {
     private ProcessingActivity buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
         processingActivity = ObjectMapperUtils.copyPropertiesByMapper(processingActivityDTO, ProcessingActivity.class);
         processingActivity.setOrganizationId(organizationId);
+        processingActivity.getRisks().forEach(risk -> risk.setOrganizationId(organizationId));
        /* processingActivity.setName(processingActivityDTO.getName());
         processingActivity.setDescription(processingActivityDTO.getDescription());
         processingActivity.setOrganizationId(organizationId);
@@ -197,7 +199,7 @@ public class ProcessingActivityService {
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getId(), processingActivityDTO.getManagingDepartment().getName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getId(), processingActivityDTO.getProcessOwner().getFirstName(),processingActivityDTO.getProcessOwner().getLastName()));
-        processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(processingActivityDTO.getResponsibilityType(), organizationId, false));
+        processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityDTO.getResponsibilityType(), organizationId, false));
         processingActivity.setTransferMethods(transferMethodRepository.findAllByIds(processingActivityDTO.getTransferMethods()));
         processingActivity.setProcessingPurposes(processingPurposeRepository.findAllByIds(processingActivityDTO.getProcessingPurposes()));
         processingActivity.setDataSources(dataSourceRepository.findAllByIds(processingActivityDTO.getDataSources()));
@@ -254,7 +256,7 @@ public class ProcessingActivityService {
      */
     public boolean deleteProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId, unitId);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId, unitId);
         processingActivity.delete();
         processingActivityRepository.save(processingActivity);
         return true;
@@ -406,7 +408,7 @@ public class ProcessingActivityService {
      */
     public List<ProcessingActivityRelatedDataSubject> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId,unitId);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId,unitId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -499,15 +501,15 @@ public class ProcessingActivityService {
      * @description method filter data Category and there Corresponding data Element ,method filter data Category and remove Data category from data Category response List
      * similarly Data Elements are remove from data Element response list.
      */
-    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectMappingResponseDTO> dataSubjectList, Map<Long, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
+    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectResponseDTO> dataSubjectList, Map<Long, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
 
-        for (DataSubjectMappingResponseDTO dataSubjectMappingResponseDTO : dataSubjectList) {
+        for (DataSubjectResponseDTO dataSubjectResponseDTO : dataSubjectList) {
 
-            List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectMappingResponseDTO.getId());
+            List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectResponseDTO.getId());
             Map<Long, Set<Long>> dataElementsCorrespondingToDataCategory = new HashMap<>();
             //relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCorrespondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
             List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();
-            dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
+            dataSubjectResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 
                 if (dataElementsCorrespondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
                     List<DataElementDeprecated> dataElementBasicResponseDTOS = new ArrayList<>();
@@ -521,7 +523,7 @@ public class ProcessingActivityService {
                     dataCategoryResponseDTOS.add(dataCategoryResponseDTO);
                 }
             });
-            dataSubjectMappingResponseDTO.setDataCategories(dataCategoryResponseDTOS);
+            dataSubjectResponseDTO.setDataCategories(dataCategoryResponseDTOS);
         }
 
     }

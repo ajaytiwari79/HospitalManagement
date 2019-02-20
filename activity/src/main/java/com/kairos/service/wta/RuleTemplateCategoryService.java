@@ -17,7 +17,7 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     @Inject
     private CTARuleTemplateRepository ctaRuleTemplateRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Autowired
     private ExceptionService excpExceptionService;
     @Inject
@@ -64,7 +64,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
      */
     //TODO need to modified this method
     public RuleTemplateAndCategoryResponseDTO createRuleTemplateCategory(long countryId, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
-        CountryDTO country = genericIntegrationService.getCountryById(countryId);
+        CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -119,7 +119,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
 
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
-        CountryDTO country = genericIntegrationService.getCountryById(countryId);
+        CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (country == null) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -213,7 +213,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
 
     public RuleTemplateCategoryRequestDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
-        CountryDTO country = genericIntegrationService.getCountryById(countryId);
+        CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }

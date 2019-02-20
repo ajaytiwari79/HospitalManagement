@@ -118,7 +118,7 @@ public class PolicyAgreementTemplateService{
      */
     public String uploadCoverPageLogo(Long referenceId, boolean isUnitId, Long agreementTemplateId, MultipartFile coverPageLogo) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted( agreementTemplateId,referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId,referenceId);
+        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse( agreementTemplateId,referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId,referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
@@ -194,7 +194,7 @@ public class PolicyAgreementTemplateService{
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
     public AgreementTemplateSectionResponseDTO getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(Long referenceId, boolean isUnitId, Long agreementTemplateId) {
-        PolicyAgreementTemplate template = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted( agreementTemplateId,referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, referenceId);
+        PolicyAgreementTemplate template = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse( agreementTemplateId,referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, referenceId);
         if (!Optional.ofNullable(template).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
@@ -332,7 +332,7 @@ public class PolicyAgreementTemplateService{
      */
     public boolean deletePolicyAgreementTemplate(Long referenceId, boolean isUnitId, Long templateId) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
+        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }

@@ -57,7 +57,7 @@ public interface CustomGenericRepository<T extends BaseEntity> extends JpaReposi
     Integer deleteByIdAndOrganizationId(Long id, Long orgId);
 
     @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.id = ?1 and EN.organizationId = ?2 and EN.deleted = false")
-    T findByIdAndOrganizationIdAndDeleted(Long id, Long orgId);
+    T findByIdAndOrganizationIdAndDeletedFalse(Long id, Long orgId);
 
 
     @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = false and lower(EN.name) = lower(?2)")

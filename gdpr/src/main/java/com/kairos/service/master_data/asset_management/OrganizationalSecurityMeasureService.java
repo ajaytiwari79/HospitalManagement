@@ -4,6 +4,7 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
@@ -45,11 +46,9 @@ public class OrganizationalSecurityMeasureService{
      * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS, boolean isSuggestion) {
+    public  List<OrganizationalSecurityMeasureDTO> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
         Set<String> orgSecurityMeasureNames = new HashSet<>();
-
             for (OrganizationalSecurityMeasureDTO securityMeasure : securityMeasureDTOS) {
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
@@ -57,27 +56,24 @@ public class OrganizationalSecurityMeasureService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
-            List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
+            List<OrganizationalSecurityMeasure> previousOrgSecurityMeasures = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousOrgSecurityMeasures, orgSecurityMeasureNames);
+            List<OrganizationalSecurityMeasure> orgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
-                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId);
+                    OrganizationalSecurityMeasure orgSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId);
                         if(isSuggestion){
-                            newOrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                            newOrganizationalSecurityMeasure.setSuggestedDate(LocalDate.now());
+                            orgSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                            orgSecurityMeasure.setSuggestedDate(LocalDate.now());
                         }else {
-                            newOrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                            orgSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                         }
-                    newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
+                    orgSecurityMeasures.add(orgSecurityMeasure);
 
                 }
-                newOrgSecurityMeasures = organizationalSecurityMeasureRepository.saveAll(newOrgSecurityMeasures);
+              organizationalSecurityMeasureRepository.saveAll(orgSecurityMeasures);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newOrgSecurityMeasures);
-            return result;
-
+            return ObjectMapperUtils.copyPropertiesOfListByMapper(orgSecurityMeasures, OrganizationalSecurityMeasureDTO.class);
     }
 
     /**
@@ -156,9 +152,8 @@ public class OrganizationalSecurityMeasureService{
      * @param organizationalSecurityMeasureDTOS
      * @return
      */
-    public List<OrganizationalSecurityMeasure> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
-        Map<String, List<OrganizationalSecurityMeasure>> result = createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<OrganizationalSecurityMeasureDTO> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
+        return createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
     }
 
 

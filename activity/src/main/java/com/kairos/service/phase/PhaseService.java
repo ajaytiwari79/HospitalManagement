@@ -11,7 +11,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class PhaseService extends MongoBaseService {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     @Inject
     private ExceptionService exceptionService;
@@ -69,7 +69,7 @@ public class PhaseService extends MongoBaseService {
      *@Author vipul
      */
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = genericIntegrationService.getOrganizationWithoutAuth(unitId);
+        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
             exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
@@ -78,7 +78,7 @@ public class PhaseService extends MongoBaseService {
 
 
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = genericIntegrationService.getOrganizationWithoutAuth(unitId);
+        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
             exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
@@ -86,7 +86,7 @@ public class PhaseService extends MongoBaseService {
     }
 
     public Map<String, List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = genericIntegrationService.getOrganizationWithoutAuth(unitId);
+        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
             exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
@@ -114,7 +114,7 @@ public class PhaseService extends MongoBaseService {
         LocalDate currentDate = LocalDate.now();
         LocalDate proposedDate = DateUtils.getLocalDateFromDate(date);
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
-        OrganizationDTO unitOrganization = genericIntegrationService.getOrganization();
+        OrganizationDTO unitOrganization = userIntegrationService.getOrganization();
         if (!Optional.ofNullable(unitOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
@@ -246,7 +246,7 @@ public class PhaseService extends MongoBaseService {
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
-        OrganizationDTO organization = genericIntegrationService.getOrganization();
+        OrganizationDTO organization = userIntegrationService.getOrganization();
 
         if (organization == null) {
             exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
@@ -280,7 +280,7 @@ public class PhaseService extends MongoBaseService {
      * @return phase
      */
     public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date startDate,Date endDate){
-        String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
+        String timeZone= userIntegrationService.getTimeZoneByUnitId(unitId);
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.TENTATIVE.toString());
         LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
@@ -307,7 +307,7 @@ public class PhaseService extends MongoBaseService {
      * @return
      */
     public Map<Date,Phase> getPhasesByDates(Long unitId, Set<LocalDateTime> dates) {
-        String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
+        String timeZone= userIntegrationService.getTimeZoneByUnitId(unitId);
         Map<Date,Phase> localDatePhaseStatusMap=new HashMap<>();
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), v->v));

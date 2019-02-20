@@ -43,7 +43,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.rule_validator.task.MergeTaskSpecification;
 import com.kairos.rule_validator.task.TaskDaySpecification;
@@ -151,7 +151,7 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     @Inject
     private EnvConfig envConfig;
@@ -657,7 +657,7 @@ public class TaskService extends MongoBaseService {
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
             exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
         }
-        OrganizationStaffWrapper organizationStaffWrapper = genericIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
+        OrganizationStaffWrapper organizationStaffWrapper = userIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
@@ -705,7 +705,7 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId(),Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId(),Collections.emptySet());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
@@ -1096,7 +1096,7 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
-        Map<String, String> flsCredential = genericIntegrationService.getFLS_Credentials(organizationId);
+        Map<String, String> flsCredential = userIntegrationService.getFLS_Credentials(organizationId);
        /* Visitour visitour = visitourGraphRepository.findByOrganizationId(organizationId);
         Map<String, String> credentials = new HashMap<>();
         String url = (visitour != null) ? visitour.getServerName() : "";
@@ -1558,7 +1558,7 @@ public class TaskService extends MongoBaseService {
     public Task assignGivenTaskToUser(BigInteger taskId) {
         Task pickTask = taskMongoRepository.findOne(taskId);
         Long userId = UserContext.getUserDetails().getId();
-        StaffDTO staffDTO = genericIntegrationService.getStaffByUser(userId);
+        StaffDTO staffDTO = userIntegrationService.getStaffByUser(userId);
         List<Long> assignedStaffIds = pickTask.getAssignedStaffIds();
         if (!assignedStaffIds.contains(staffDTO.getId())) assignedStaffIds.add(staffDTO.getId());
         pickTask.setAssignedStaffIds(assignedStaffIds);
@@ -1573,7 +1573,7 @@ public class TaskService extends MongoBaseService {
         boolean preferredEmployees = taskType.getEmployees().contains(PREFERRED_EMPLOYEES);
         TaskSpecification<Task> taskStaffSpecification = new TaskStaffTypeSpecification(excludeEmployees, preferredEmployees);
 
-        List<DayType> dayTypes = genericIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
+        List<DayType> dayTypes = userIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
 
         Set<Day> days = new HashSet<>();
         for (DayType dayType : dayTypes) {

@@ -31,16 +31,16 @@ public class AssessmentRepositoryImpl implements CustomAssessmentRepository {
 
         LOGGER.debug("findByOrgIdAndQuestionnaireTemplateIdAndAssessmentStatusNewOrInProgress()   method call");
         try {
-            TypedQuery<Assessment> query = entityManager.createQuery("Select As.name from Assessment As " +
-                    "where As.deleted = false and As.assessmentStatus in :assessmentStatus and As.organizationId = :orgId" +
-                    " and As.questionnaireTemplate.id :questionnaireTemplateId", Assessment.class);
+            TypedQuery<Assessment> query = entityManager.createQuery("Select assessment from Assessment assessment " +
+                    " where assessment.deleted = false and assessment.assessmentStatus in (:assessmentStatus) and assessment.organizationId = :orgId " +
+                    " and assessment.questionnaireTemplate.id = :questionnaireTemplateId", Assessment.class);
             query.setParameter("questionnaireTemplateId", questionnaireTemplateId);
             query.setParameter("orgId", orgId);
             query.setParameter("assessmentStatus", assessmentStatusList);
             return query.getResultList();
 
         } catch (Exception e) {
-            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method findPublishedRiskTemplateByAssociatedEntityAndOrgId()   cause {}", e.getCause());
+            LOGGER.info(" Error in QuestionnaireTemplateRepositoryImpl  method findByOrgIdAndQuestionnaireTemplateIdAndAssessmentStatusNewOrInProgress()   cause {}", e.getCause());
             throw new JpaCustomDatabaseException(e.getMessage());
         }
     }

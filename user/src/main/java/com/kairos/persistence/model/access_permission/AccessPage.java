@@ -34,7 +34,7 @@ public class AccessPage extends UserBaseEntity {
 
 
     @Relationship(type = SUB_PAGE)
-    List<AccessPage> subPages;
+    private List<AccessPage> subPages;
 
     private int sequence;
 

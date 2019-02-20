@@ -35,13 +35,14 @@ public class MasterProcessingActivity extends BaseEntity {
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "processingActivity_id")
     private List<Risk> risks  = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name="masterProcessingActivity_id")
     private MasterProcessingActivity masterProcessingActivity;
 
-    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL)
     private List<MasterProcessingActivity> subProcessingActivities = new ArrayList<>();
 
     private Long countryId;

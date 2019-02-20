@@ -3,6 +3,7 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
@@ -24,7 +25,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class DataSourceService{
+public class DataSourceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceService.class);
 
@@ -37,43 +38,40 @@ public class DataSourceService{
 
     /**
      * @param countryId
-     * @param dataSources
+     * @param dataSourceDTOS
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSourceDTO> dataSources , boolean isSuggestion) {
+    public List<DataSourceDTO> createDataSource(Long countryId, List<DataSourceDTO> dataSourceDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
-            for (DataSourceDTO dataSource : dataSources) {
-                dataSourceNames.add(dataSource.getName());
-            }
-            List<String> nameInLowerCase = dataSourceNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<DataSource> existing = dataSourceRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
+        for (DataSourceDTO dataSource : dataSourceDTOS) {
+            dataSourceNames.add(dataSource.getName());
+        }
+        List<String> nameInLowerCase = dataSourceNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<DataSource> previousDataSources = dataSourceRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        dataSourceNames = ComparisonUtils.getNameListForMetadata(previousDataSources, dataSourceNames);
 
-            List<DataSource> newDataSources = new ArrayList<>();
-            if (!dataSourceNames.isEmpty()) {
-                for (String name : dataSourceNames) {
-                    DataSource newDataSource = new DataSource(name,countryId);
-                if(isSuggestion){
-                    newDataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                    newDataSource.setSuggestedDate(LocalDate.now());
-                }else{
-                    newDataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+        List<DataSource> dataSources = new ArrayList<>();
+        if (!dataSourceNames.isEmpty()) {
+            for (String name : dataSourceNames) {
+                DataSource dataSource = new DataSource(name, countryId);
+                if (isSuggestion) {
+                    dataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    dataSource.setSuggestedDate(LocalDate.now());
+                } else {
+                    dataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-                    newDataSources.add(newDataSource);
+                dataSources.add(dataSource);
 
-                }
-                newDataSources = dataSourceRepository.saveAll(newDataSources);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newDataSources);
-            return result;
+            dataSourceRepository.saveAll(dataSources);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(dataSources, DataSourceDTO.class);
     }
 
     /**
@@ -105,7 +103,7 @@ public class DataSourceService{
         Integer resultCount = dataSourceRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Data Source deleted successfully for id :: {}", id);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -120,17 +118,17 @@ public class DataSourceService{
      */
     public DataSourceDTO updateDataSource(Long countryId, Long id, DataSourceDTO dataSourceDTO) {
 
-        DataSource dataSource = dataSourceRepository.findByCountryIdAndName(countryId,  dataSourceDTO.getName());
+        DataSource dataSource = dataSourceRepository.findByCountryIdAndName(countryId, dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataSourceDTO.getName());
         }
-        Integer resultCount =  dataSourceRepository.updateMasterMetadataName(dataSourceDTO.getName(), id, countryId);
-        if(resultCount <=0){
+        Integer resultCount = dataSourceRepository.updateMasterMetadataName(dataSourceDTO.getName(), id, countryId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataSourceDTO.getName());
         }
         return dataSourceDTO;
@@ -139,20 +137,18 @@ public class DataSourceService{
 
 
     /**
-     * @description method save Data Source suggested by unit
      * @param countryId
      * @param dataSourceDTOS
      * @return
+     * @description method save Data Source suggested by unit
      */
-    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
+    public List<DataSourceDTO> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
 
-        Map<String, List<DataSource>> result = createDataSource(countryId, dataSourceDTOS, true);
-        return result.get(NEW_DATA_LIST);
+        return createDataSource(countryId, dataSourceDTOS, true);
     }
 
 
     /**
-     *
      * @param countryId
      * @param dataSourceIds
      * @param suggestedDataStatus
@@ -160,10 +156,10 @@ public class DataSourceService{
      */
     public List<DataSource> updateSuggestedStatusOfDataSourceList(Long countryId, Set<Long> dataSourceIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = dataSourceRepository.updateMetadataStatus(countryId, dataSourceIds,suggestedDataStatus);
-        if(updateCount > 0){
+        Integer updateCount = dataSourceRepository.updateMetadataStatus(countryId, dataSourceIds, suggestedDataStatus);
+        if (updateCount > 0) {
             LOGGER.info("Data Sources are updated successfully with ids :: {}", dataSourceIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", dataSourceIds);
         }
         return dataSourceRepository.findAllByIds(dataSourceIds);

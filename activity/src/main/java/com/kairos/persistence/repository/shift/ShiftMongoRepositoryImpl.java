@@ -475,6 +475,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.plannedTimeId' : 1,\n" +
                 "        'activities.remarks' : 1,\n" +
+                "        'activities.status' : 1,\n" +
                 "        'activities.activityName':1,\n" +
                 "'activities.activity':{  \n" +
                 "            '$arrayElemAt':[  \n" +

@@ -278,4 +278,8 @@ public class TimeTypeService extends MongoBaseService {
 
         return true;
     }
+
+    public Boolean existsByIdAndCountryId(BigInteger id, Long countryId){
+        return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id,countryId);
+    }
 }

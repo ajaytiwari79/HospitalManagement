@@ -81,7 +81,7 @@ public class QuestionnaireTemplate extends BaseEntity {
         this.assetSubType = assetSubType;
     }
 
-    private List<QuestionnaireSection> getSections() {
+    public List<QuestionnaireSection> getSections() {
         return sections;
     }
 
@@ -113,4 +113,5 @@ public class QuestionnaireTemplate extends BaseEntity {
         super.delete();
         this.getSections().forEach(QuestionnaireSection::delete);
     }
+
 }

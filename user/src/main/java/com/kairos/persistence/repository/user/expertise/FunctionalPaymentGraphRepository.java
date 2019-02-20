@@ -98,4 +98,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "WITH functionalPayment,functions,seniorityLevel,fpm,expertise,collect(id(pga)) as payGroupAreasIds, COLLECT({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction \n" +
             "RETURN id(functionalPayment) as id ,functionalPayment.published as published,functionalPayment.startDate as startDate, functionalPayment.endDate as endDate, functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreasIds:payGroupAreasIds,seniorityLevelFunction:seniorityLevelFunction}) as functionalPaymentMatrices")
     List<FunctionalPaymentQueryResult> getFunctionalPaymentData(List<Long> functionalPaymentIds);
+
+    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN functionalPayment ORDER BY functionalPayment.startDate DESC LIMIT 1 ")
+    FunctionalPayment findByExpertiseId(Long expertiseId);
 }

@@ -39,6 +39,7 @@ public class UnitPositionQueryResult {
     private boolean mainUnitPosition;
     private String unitName;
     private float taxDeductionPercentage;
+    private long accumulatedTimebankMinutes;
 
     public UnitPositionQueryResult() {
         //Default Constructor
@@ -59,7 +60,7 @@ public class UnitPositionQueryResult {
     }
 
     public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id,Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
-                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage) {
+                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage,long accumulatedTimebankMinutes) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -75,6 +76,7 @@ public class UnitPositionQueryResult {
         this.mainUnitPosition=mainUnitPosition;
         this.positionLines=positionLines;
         this.taxDeductionPercentage=taxDeductionPercentage;
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
 
     }
 
@@ -249,5 +251,13 @@ public class UnitPositionQueryResult {
 
     public void setTaxDeductionPercentage(float taxDeductionPercentage) {
         this.taxDeductionPercentage = taxDeductionPercentage;
+    }
+
+    public long getAccumulatedTimebankMinutes() {
+        return accumulatedTimebankMinutes;
+    }
+
+    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 }

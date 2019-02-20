@@ -3,7 +3,7 @@ package com.kairos.enums.gdpr;
 public enum AssetAttributeName {
 
 
-    NAME("name"), DESCRIPTION("description"), HOSTING_LOCATION("hostingLocation"), MANAGING_DEPARTMENT("managingDepartment"), ASSET_OWNER("assetOwner"), STORAGE_FORMAT("storageFormats"),
+    NAME("name"), DESCRIPTION("description"), HOSTING_LOCATION("hostingLocation"), STORAGE_FORMAT("storageFormats"),
     ORGANIZATION_SECURITY_MEASURES("orgSecurityMeasures"), TECHNICAL_SECURITY_MEASURES("technicalSecurityMeasures"), PROCESSING_ACTIVITIES("Processing Activities"), HOSTING_PROVIDER("hostingProvider"),
     HOSTING_TYPE("hostingType"), DATA_DISPOSAL("dataDisposal"), ASSET_TYPE("assetType"), ASSET_SUB_TYPE("assetSubTypes"),  DATA_RETENTION_PERIOD("dataRetentionPeriod");
 

@@ -632,7 +632,7 @@ public class ExpertiseService {
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             //expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
-            expertiseGraphRepository.linkToUnitPositions(parentExpertise.getId(),expertiseId);
+            //expertiseGraphRepository.linkToUnitPositions(parentExpertise.getId(),expertiseId);
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
             parentExpertise.setHistory(true);

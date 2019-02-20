@@ -159,13 +159,7 @@ public class CountryController {
     @ApiOperation("Get country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountry(@PathVariable Long countryId) {
-        if (countryId != null) {
-            if (countryService.getCountryById(countryId) != null) {
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-            }
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+             return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryById(countryId));
     }
 
     @RequestMapping(value = "/countryId/{countryId}", method = RequestMethod.GET)

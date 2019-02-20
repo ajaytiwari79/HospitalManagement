@@ -3,19 +3,19 @@ package com.kairos.response.dto.common;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties
-public class JaversResponseMetadata {
+public class MetaDataCommonResponseDTO {
 
     private Long id;
 
     private String name;
 
 
-    public JaversResponseMetadata(Long id, String name) {
+    public MetaDataCommonResponseDTO(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public JaversResponseMetadata() {
+    public MetaDataCommonResponseDTO() {
     }
 
     public Long getId() { return id; }

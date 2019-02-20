@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class DataSubjectMapping extends BaseEntity {
+public class DataSubject extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -25,18 +25,23 @@ public class DataSubjectMapping extends BaseEntity {
     private List<OrganizationType> organizationTypes = new ArrayList<>();
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany
+    @JoinTable(
+            name="DataSubjectCategories",
+            joinColumns = @JoinColumn( name="data_subject_id"),
+            inverseJoinColumns = @JoinColumn( name="data_category_id")
+    )
     private List<DataCategory> dataCategories=new ArrayList<>();
     private Long countryId;
     private Long organizationId;
 
 
 
-    public DataSubjectMapping() {
+    public DataSubject() {
     }
 
-    public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
-                              List<DataCategory> dataCategories) {
+    public DataSubject(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
+                       List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
         this.organizationTypes = organizationTypes;
@@ -45,14 +50,14 @@ public class DataSubjectMapping extends BaseEntity {
     }
 
 
-    public DataSubjectMapping(@NotBlank(message = "error.message.name.notNull.orEmpty")
+    public DataSubject(@NotBlank(message = "error.message.name.notNull.orEmpty")
                                @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
         this.dataCategories = dataCategories;
     }
 
-    public DataSubjectMapping(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
+    public DataSubject(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
         this.name = name;
         this.description=description;
     }
