@@ -197,13 +197,9 @@ public class PayTableService {
         }
         PayTable payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), payTableId);
 
-        if (Optional.ofNullable(payTableToValidate).isPresent() && payTableToValidate.getEndDateMillis() == null) {
-            payTableToValidate.setEndDateMillis(payTableDTO.getStartDateMillis().minusDays(1));
-            payTableGraphRepository.save(payTableToValidate);
-        } else {
+        if (Optional.ofNullable(payTableToValidate).isPresent() ) {
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         }
-
         payTable.setName(payTableDTO.getName().trim());
         payTable.setShortName(payTableDTO.getShortName());
         payTable.setDescription(payTableDTO.getDescription());
