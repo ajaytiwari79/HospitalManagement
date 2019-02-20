@@ -157,13 +157,13 @@ public class CounterDistService extends MongoBaseService {
         }
         copyAndkpidtos.addAll(kpidtos);
         kpiIds = copyAndkpidtos.stream().map(kpidto -> kpidto.getId()).collect(Collectors.toSet());
-        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPI(new ArrayList(kpiIds),ConfLevel.STAFF,accessGroupPermissionCounterDTO.getStaffId());
-        Map<BigInteger,String> kpiIdAndTitleMap=applicableKPIS.stream().collect(Collectors.toMap(k->k.getActiveKpiId(),v->v.getTitle()));
+        List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(kpiIds), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
+        Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(k -> k.getActiveKpiId(), v -> v.getTitle()));
         //dont delete
         // counterRepository.removeApplicableKPI(Arrays.asList(accessGroupPermissionCounterDTO.getStaffId()),kpiIds,refId,ConfLevel.STAFF);
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(kpiIds, refId, ConfLevel.UNIT);
         copyAndkpidtos.forEach(kpidto -> {
-            if(kpiIdAndTitleMap.get(kpidto.getId())!=null){
+            if (kpiIdAndTitleMap.get(kpidto.getId()) != null) {
                 kpidto.setTitle(kpiIdAndTitleMap.get(kpidto.getId()));
             }
         });
@@ -239,9 +239,16 @@ public class CounterDistService extends MongoBaseService {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }
         List<KPIDTO> copyKpiDtos = counterRepository.getCopyKpiOfUnit(ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId(), true);
-        if(isCollectionNotEmpty(copyKpiDtos)){
+        if (isCollectionNotEmpty(copyKpiDtos)) {
             kpiIds.addAll(copyKpiDtos.stream().map(kpidto -> kpidto.getId()).collect(toList()));
         }
+        List<ApplicableKPI> applicableKPIS;
+        if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(), ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
+        } else {
+            applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(kpiIds), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
+        }
+        Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(k -> k.getActiveKpiId(), v -> v.getTitle()));
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
         filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
@@ -251,6 +258,9 @@ public class CounterDistService extends MongoBaseService {
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filters, unitId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
+            if (kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()) != null) {
+                tabKPIDTO.getKpi().setTitle(kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()));
+            }
         });
         return tabKPIDTOS;
     }
@@ -297,10 +307,20 @@ public class CounterDistService extends MongoBaseService {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
+        List<ApplicableKPI> applicableKPIS;
+        if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(), ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
+        } else {
+            applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(kpiIds), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
+        }
+        Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(k -> k.getActiveKpiId(), v -> v.getTitle()));
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(unitId, kpiIds, accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin()), unitId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
+            if (kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()) != null) {
+                tabKPIDTO.getKpi().setTitle(kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()));
+            }
         });
         return tabKPIDTOS;
     }
@@ -767,7 +787,7 @@ public class CounterDistService extends MongoBaseService {
     //kpi default data and copy and save filter
     public KPIDTO getDefaultFilterDataOfKpi(BigInteger kpiId, Long refId, ConfLevel level) {
         List<FilterCriteria> criteriaList = new ArrayList<>();
-        KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByKpiid(kpiId), KPIDTO.class);
+        KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
@@ -854,7 +874,7 @@ public class CounterDistService extends MongoBaseService {
         }
         kpi.setDefaultFilters(criteriaList);
         kpi.setTitle(applicableKPIS.get(0).getTitle());
-        if(isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
+        if (isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
             kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
         }
         return kpi;
@@ -884,10 +904,10 @@ public class CounterDistService extends MongoBaseService {
         applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), true));
         List<ApplicableKPI> updateApplicableKPI = new ArrayList<>();
         if (ConfLevel.COUNTRY.equals(level)) {
-            updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF),null);
+            updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF), null);
         }
         if (ConfLevel.UNIT.equals(level)) {
-            updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF),refId);
+            updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF), refId);
         }
         for (ApplicableKPI applicableKPI : updateApplicableKPI) {
             applicableKPI.setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), false));
