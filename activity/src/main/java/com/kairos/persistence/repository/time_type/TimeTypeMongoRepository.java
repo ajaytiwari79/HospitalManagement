@@ -60,4 +60,6 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
 
     @Query(value = "{ deleted:false, countryId:?0 , secondLevelType:?1 }")
     List<TimeType> findAllByDeletedFalseAndCountryIdAndTimeType(Long countryId, String timeType);
+
+    boolean existsByIdAndCountryIdAndDeletedFalse(BigInteger id, Long countryId);
 }
