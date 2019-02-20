@@ -171,10 +171,11 @@ public class TimeBankCalculationService {
             int timeBankMinWithoutCta = dailyScheduledMin - contractualMin;
             dailyTimeBank.setStaffId(unitPosition.getStaffId());
             dailyTimeBank.setTimeBankMinWithoutCta(timeBankMinWithoutCta);
+            int deltaAccumulatedTimebankMinutes = 0;
             if(someShiftPublish) {
-                int deltaAccumulatedTimebankMinutes = totalPublishedDailyPlannedMinutes - contractualMin;
-                dailyTimeBank.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes);
+                deltaAccumulatedTimebankMinutes = totalPublishedDailyPlannedMinutes - contractualMin;
             }
+            dailyTimeBank.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes);
             dailyTimeBank.setTimeBankMinWithCta(ctaTimeBankMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
             dailyTimeBank.setContractualMin(contractualMin);
             dailyTimeBank.setScheduledMin(dailyScheduledMin);
