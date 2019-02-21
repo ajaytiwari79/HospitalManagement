@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -17,9 +18,13 @@ public class RiskDaoImpl {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     public List<RiskResponseDTO> getAllRiskOfOrganizationId(Long unitId){
-        Query riskQuery = entityManager.createNamedQuery("getAllRiskData").setParameter(1, unitId);
-        List<RiskResponseDTO> risks = riskQuery.getResultList();
-        return risks;
+        Query assetTypeRiskQuery = entityManager.createNamedQuery("getAllAssetTypeRiskData").setParameter(1, unitId);
+        Query processingActivityRiskQuery = entityManager.createNamedQuery("getAllProcessingActivityRiskData").setParameter(1, unitId);
+        List<RiskResponseDTO> allRisks = new ArrayList<>();
+        allRisks.addAll( assetTypeRiskQuery.getResultList());
+        allRisks.addAll(processingActivityRiskQuery.getResultList());
+        return allRisks;
     }
 }

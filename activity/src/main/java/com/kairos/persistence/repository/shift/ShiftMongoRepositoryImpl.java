@@ -259,6 +259,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         //query.limit(1);
         return mongoTemplate.find(query,Shift.class);
     }
+
     @Override
     public void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId){
         Query query=new Query(Criteria.where("planningPeriodId").is(planningPeriodId).and("phaseId").is(phaseId));
@@ -475,6 +476,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.plannedTimeId' : 1,\n" +
                 "        'activities.remarks' : 1,\n" +
+                "        'activities.status' : 1,\n" +
                 "        'activities.activityName':1,\n" +
                 "'activities.activity':{  \n" +
                 "            '$arrayElemAt':[  \n" +

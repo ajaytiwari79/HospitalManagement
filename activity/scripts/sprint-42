@@ -1,0 +1,2 @@
+//To set existing property in time type domain
+db.time_Type.updateMany({},{$set:{"activityCanBeCopiedForOrganizationHierarchy" : [ ]}})

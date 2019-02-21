@@ -47,6 +47,14 @@ public class GroupController {
 
     }
 
+    @ApiOperation(value = "Delete Group of Organization by groupId and also delete teams in group")
+    @RequestMapping(value = "/{groupId}", method = RequestMethod.DELETE)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteGroupAndTeamsOfGroupByGroupId(@PathVariable Long unitId, @PathVariable Long groupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                groupService.deleteGroupAndTeamsOfGroupByGroupId(groupId));
+    }
+
     @ApiOperation(value = "Add Group to Organization")
     @RequestMapping(method = RequestMethod.POST)
    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

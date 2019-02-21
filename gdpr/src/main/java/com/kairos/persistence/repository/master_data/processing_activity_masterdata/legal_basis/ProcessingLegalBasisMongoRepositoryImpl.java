@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis;
 
-public class ProcessingLegalBasisMongoRepositoryImpl {
+class ProcessingLegalBasisMongoRepositoryImpl {
 
     /*@Inject
     private MongoTemplate mongoTemplate;

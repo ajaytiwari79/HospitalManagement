@@ -7,7 +7,7 @@ import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.After;
@@ -31,7 +31,7 @@ public class ExpertiseNightWorkerSettingServiceUnitTest {
     ExpertiseNightWorkerSettingService expertiseNightWorkerSettingService;
     @Mock private ExceptionService exceptionService;
     @Mock private ShiftMongoRepository shiftMongoRepository;
-    @Mock private GenericIntegrationService genericIntegrationService;
+    @Mock private UserIntegrationService userIntegrationService;
     @Mock private ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
     @Mock private MongoBaseService mongoBaseService;
     @Mock private MongoTemplate mongoTemplate;

@@ -10,11 +10,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prabjot on 20/12/17.
@@ -29,7 +29,7 @@ public class PayGroupAreaController {
 
     @PostMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area")
     public ResponseEntity<Map<String, Object>> savePayGroupArea(@PathVariable Long countryId,
-                                                                @Validated @RequestBody PayGroupAreaDTO payGroupAreaDTO) {
+                                                                @Validated @RequestBody List<PayGroupAreaDTO> payGroupAreaDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payGroupAreaService.savePayGroupArea(countryId, payGroupAreaDTO));
     }
 

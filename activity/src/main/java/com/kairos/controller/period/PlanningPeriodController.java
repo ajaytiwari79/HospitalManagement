@@ -89,13 +89,14 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.restoreShiftToPreviousPhase(periodId,unitId));
     }
 
-    @ApiOperation(value = "restore shift data based on shiftIds and phase")
-    @PutMapping(value = "/phase/{phaseId}/restore_shifts")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
-
-    }
+    //TODO currently not use
+//    @ApiOperation(value = "restore shift data based on shiftIds and phase")
+//    @PutMapping(value = "/phase/{phaseId}/restore_shifts")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
+//
+//    }
     @ApiOperation(value = "Migrate Planning Period")
     @PostMapping(value="/migrate_planning_period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

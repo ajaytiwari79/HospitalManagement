@@ -14,6 +14,7 @@ public class RelatedDataCategory  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private
     Long id;
 
 

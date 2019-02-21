@@ -4,6 +4,7 @@ package com.kairos.service.resources;
  * Created by oodles on 17/10/16.
  */
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -13,7 +14,6 @@ import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRe
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ import java.text.ParseException;
 import java.time.*;
 import java.util.*;
 
-import static com.kairos.utils.DateUtil.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Calls ResourceGraphRepository to perform CRUD operation on Resources.
@@ -166,7 +166,7 @@ public class ResourceService {
         Resource resource = new Resource(vehicle, resourceDTO.getRegistrationNumber(), resourceDTO.getNumber(),
                 resourceDTO.getModelDescription(), resourceDTO.getCostPerKM(), resourceDTO.getFuelType());
         if(!StringUtils.isBlank(resourceDTO.getDecommissionDate())){
-            LocalDateTime decommissionDate = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(resourceDTO.getDecommissionDate(),
+            LocalDateTime decommissionDate = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(resourceDTO.getDecommissionDate(),
                     MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault()).
                     withHour(0).withMinute(0).withSecond(0).withNano(0);
             resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
@@ -196,7 +196,7 @@ public class ResourceService {
         resource.setCostPerKM(resourceDTO.getCostPerKM());
         resource.setFuelType(resourceDTO.getFuelType());
         if(!StringUtils.isBlank(resourceDTO.getDecommissionDate())){
-            LocalDateTime decommissionDate = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(resourceDTO.getDecommissionDate(),
+            LocalDateTime decommissionDate = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(resourceDTO.getDecommissionDate(),
                     MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault()).
                     withHour(0).withMinute(0).withSecond(0).withNano(0);
             resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
@@ -219,7 +219,7 @@ public class ResourceService {
             ResourceUnAvailability resourceUnAvailability = new ResourceUnAvailability(unavailabilityDTO.isFullDay()).
                     setUnavailability(unavailabilityDTO, unavailabilityDate);
             try {
-                LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDate,
+                LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(unavailabilityDate,
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 ResourceUnavailabilityRelationship resourceUnavailabilityRelationship = new ResourceUnavailabilityRelationship(resource,
                         resourceUnAvailability, startDateIncludeTime.getMonth().getValue(), startDateIncludeTime.getYear());
@@ -248,13 +248,13 @@ public class ResourceService {
             resourceUnAvailability.setEndTime(null);
         } else {
             if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getStartTime())){
-                LocalDateTime timeFrom = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getStartTime(),
+                LocalDateTime timeFrom = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(unavailabilityDTO.getStartTime(),
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 resourceUnAvailability.setStartTime(timeFrom.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             }
 
             if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getEndTime())){
-                LocalDateTime timeTo = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getEndTime(),
+                LocalDateTime timeTo = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(unavailabilityDTO.getEndTime(),
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 resourceUnAvailability.setEndTime(timeTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             }

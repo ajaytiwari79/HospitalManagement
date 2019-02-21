@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.data_inventory.Assessment;
 
-public class AssessmentMongoRepositoryImpl  {
+class AssessmentMongoRepositoryImpl  {
 
 
     /*@Inject

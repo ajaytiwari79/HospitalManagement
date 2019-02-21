@@ -13,12 +13,18 @@ public class ClauseTag extends BaseEntity {
     private String name;
     private boolean defaultTag;
     private Long countryId;
+    private Long organizationId;
 
     public ClauseTag(@NotBlank(message = "Name cannot be  empty") String name) {
         this.name = name;
     }
 
     public ClauseTag() {
+    }
+
+    public ClauseTag(@NotBlank(message = "Name cannot be  empty") String name, boolean defaultTag) {
+        this.name = name;
+        this.defaultTag = defaultTag;
     }
 
     public boolean isDefaultTag() { return defaultTag; }
@@ -40,4 +46,8 @@ public class ClauseTag extends BaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 }

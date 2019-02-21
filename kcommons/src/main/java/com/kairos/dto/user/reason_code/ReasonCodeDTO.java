@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.validation.constraints.NotBlank;
+import java.math.BigInteger;
 
 /**
  * Created by pavan on 23/3/18.
@@ -21,6 +22,8 @@ public class ReasonCodeDTO {
     private String code;
     private String description;
     private ReasonCodeType reasonCodeType;
+    //this is only persist when we create any Absence type reason code
+    private BigInteger timeTypeId;
 
     public ReasonCodeDTO() {
         //Default Constructor
@@ -29,6 +32,15 @@ public class ReasonCodeDTO {
     public ReasonCodeDTO(Long id, @NotBlank(message = "message.reasonCode.name.notEmpty") String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public ReasonCodeDTO(Long id,String name, String code, String description, ReasonCodeType reasonCodeType,BigInteger timeTypeId) {
+        this.id=id;
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.reasonCodeType = reasonCodeType;
+        this.timeTypeId=timeTypeId;
     }
 
     public Long getId() {
@@ -71,12 +83,12 @@ public class ReasonCodeDTO {
         this.reasonCodeType = reasonCodeType;
     }
 
-    public ReasonCodeDTO(Long id,String name, String code, String description, ReasonCodeType reasonCodeType) {
-        this.id=id;
-        this.name = name;
-        this.code = code;
-        this.description = description;
-        this.reasonCodeType = reasonCodeType;
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose;
 
-public class ProcessingPurposeMongoRepositoryImpl  {
+class ProcessingPurposeMongoRepositoryImpl  {
 
 
     /*@Inject

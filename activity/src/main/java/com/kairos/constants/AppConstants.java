@@ -218,4 +218,11 @@ public class AppConstants {
     //for use timeslot in timeslot kpi
     public static final String NIGHT = "Night";
 
+    //Timebank Ruletemplate not valid reason
+    public static final String DAYTYPE_IS_NOT_VALID = "Daytype is not valid";
+    public static final String ACCOUNT_TYPE_IS_NOT_VALID = "Account type is not valid";
+    public static final String ACTIVITY_IS_NOT_VALID = "Activity is not valid";
+    public static final String PHASE_IS_NOT_VALID = "phase is not valid";
+    public static final String EMPLOYMENT_IS_NOT_VALID = "Employment is not valid";
+
 }

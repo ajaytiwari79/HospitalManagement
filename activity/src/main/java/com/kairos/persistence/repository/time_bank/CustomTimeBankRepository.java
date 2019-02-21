@@ -17,4 +17,7 @@ public interface CustomTimeBankRepository {
     List<DailyTimeBankEntry> findLastTimeBankByUnitPositionIds(List<Long> unitPositionId, Date date);
 
     void updateAccumulatedTimeBank(Long unitPositionId,int timeBank);
+
+    List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate);
+    List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdsAndBetweenDates(List<Long> unitPositionIds, Date startDate, Date endDate);
 }

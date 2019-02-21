@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-public class ResponsibilityTypeDeprecated {
+class ResponsibilityTypeDeprecated {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")

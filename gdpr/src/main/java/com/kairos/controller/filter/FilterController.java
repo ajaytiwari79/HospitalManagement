@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 @Api(API_ORGANIZATION_COUNTRY_URL)
-public class FilterController {
+class FilterController {
 
 
     @Inject

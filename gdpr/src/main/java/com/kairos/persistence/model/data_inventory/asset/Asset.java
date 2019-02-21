@@ -23,53 +23,35 @@ public class Asset extends BaseEntity {
     private String description;
     private Long countryId;
     private String hostingLocation;
-
     @Embedded
     private ManagingOrganization managingDepartment;
-
     @Embedded
     private Staff assetOwner;
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<StorageFormat> storageFormats  = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<OrganizationalSecurityMeasure> orgSecurityMeasures  = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     private List<TechnicalSecurityMeasure> technicalSecurityMeasures  = new ArrayList<>();
-
     @OneToOne
     private HostingProvider hostingProvider;
-
     @OneToOne
     private HostingType hostingType;
-
     @OneToOne
     private DataDisposal dataDisposal;
-
     @OneToOne
     private AssetType assetType;
-
     @OneToOne
     private AssetType subAssetType;
-
    /* private Set<BigInteger> processingActivityIds;
     private Set<BigInteger> subProcessingActivityIds;*/
     private Integer dataRetentionPeriod;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
     private boolean suggested;
-
     private AssetAssessor assetAssessor;
+    private Long organizationId;
 
-
-    public Asset() {
-    }
-
-    public Asset(Long id ) {
-        this.id = id;
-    }
 
     public Asset(String name, String description, String hostingLocation, ManagingOrganization managingDepartment, Staff assetOwner) {
         this.name = name;
@@ -85,6 +67,19 @@ public class Asset extends BaseEntity {
         this.description = description;
         this.active = active;
     }
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+
+    public Asset() {
+    }
+
+    public Asset(Long id ) {
+        this.id = id;
+    }
+
+
 
     public boolean isSuggested() { return suggested; }
 

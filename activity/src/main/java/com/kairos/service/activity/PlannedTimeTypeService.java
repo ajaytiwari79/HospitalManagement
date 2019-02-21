@@ -4,7 +4,7 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -27,14 +27,14 @@ public class PlannedTimeTypeService extends MongoBaseService {
     private Logger logger = LoggerFactory.getLogger(PlannedTimeTypeService.class);
 
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
     public void verifyCountry(Long countryId) {
-        CountryDTO country = genericIntegrationService.getCountryById(countryId);
+        CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Country not found by Id while creating Planned Time type in country" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);

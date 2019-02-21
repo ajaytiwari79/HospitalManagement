@@ -3,20 +3,18 @@ package com.kairos.response.dto.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessingActivityBasicDTO {
 
-    private BigInteger processingActivityId;
+    private Long processingActivityId;
     private String processingActivityName;
     private boolean isSubProcessingActivity;
 
-    public BigInteger getProcessingActivityId() {
+    public Long getProcessingActivityId() {
         return processingActivityId;
     }
 
-    public void setProcessingActivityId(BigInteger processingActivityId) {
+    public void setProcessingActivityId(Long processingActivityId) {
         this.processingActivityId = processingActivityId;
     }
 
@@ -36,12 +34,9 @@ public class ProcessingActivityBasicDTO {
         isSubProcessingActivity = subProcessingActivity;
     }
 
-    public ProcessingActivityBasicDTO() {
-    }
-
-    public ProcessingActivityBasicDTO(BigInteger processingActivityId, String processingActivityName, boolean subProcessingActivity) {
+    public ProcessingActivityBasicDTO(Long processingActivityId, String processingActivityName, boolean isSubProcessingActivity) {
         this.processingActivityId = processingActivityId;
         this.processingActivityName = processingActivityName;
-        this.isSubProcessingActivity = subProcessingActivity;
+        this.isSubProcessingActivity = isSubProcessingActivity;
     }
 }

@@ -3,6 +3,7 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
@@ -42,10 +43,9 @@ public class DataDisposalService{
      * and if exist then simply add  data disposal to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
-    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
+    public List<DataDisposalDTO> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
 
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<DataDisposal>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
         for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
             dataDisposalsNames.add(dataDisposal.getName());
@@ -54,25 +54,23 @@ public class DataDisposalService{
                 .collect(Collectors.toList());
 
         //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataDisposal> existing = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-        List<DataDisposal> newDataDisposals = new ArrayList<>();
+        List<DataDisposal> previousDataDisposals = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        dataDisposalsNames = ComparisonUtils.getNameListForMetadata(previousDataDisposals, dataDisposalsNames);
+        List<DataDisposal> dataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposal newDataDisposal = new DataDisposal(name, countryId);
-                if(isSuggestion){
-                    newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                    newDataDisposal.setSuggestedDate(LocalDate.now());
-                }else {
-                    newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                DataDisposal dataDisposal = new DataDisposal(name, countryId);
+                if (isSuggestion) {
+                    dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    dataDisposal.setSuggestedDate(LocalDate.now());
+                } else {
+                    dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-                newDataDisposals.add(newDataDisposal);
+                dataDisposals.add(dataDisposal);
             }
-            newDataDisposals = dataDisposalRepository.saveAll(newDataDisposals);
+            dataDisposalRepository.saveAll(dataDisposals);
         }
-        result.put(EXISTING_DATA_LIST, existing);
-        result.put(NEW_DATA_LIST, newDataDisposals);
-        return result;
+       return ObjectMapperUtils.copyPropertiesOfListByMapper(dataDisposals,DataDisposalDTO.class);
 
     }
 
@@ -146,9 +144,8 @@ public class DataDisposalService{
      * @return
      * @description method save data disposal suggested by unit
      */
-    public List<DataDisposal> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
-        Map<String, List<DataDisposal>> result = createDataDisposal(countryId, dataDisposalDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<DataDisposalDTO> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+        return createDataDisposal(countryId, dataDisposalDTOS, true);
     }
 
 

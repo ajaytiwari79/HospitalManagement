@@ -23,6 +23,8 @@ public class QuestionnaireTemplateResponseDTO {
     private List<QuestionnaireSectionResponseDTO> sections;
 
 
+
+
     public Long getId() {
         return id;
     }
@@ -79,6 +81,9 @@ public class QuestionnaireTemplateResponseDTO {
         this.sections = sections;
     }
 
+    public QuestionnaireTemplateResponseDTO() {
+    }
+
     public QuestionnaireTemplateResponseDTO(Long id, String name, String description, QuestionnaireTemplateType templateType, boolean isDefaultAssetTemplate, QuestionnaireTemplateStatus templateStatus) {
         this.id = id;
         this.name = name;
@@ -86,12 +91,5 @@ public class QuestionnaireTemplateResponseDTO {
         this.templateType = templateType;
         this.isDefaultAssetTemplate = isDefaultAssetTemplate;
         this.templateStatus = templateStatus;
-    }
-
-    public QuestionnaireTemplateResponseDTO(Long id) {
-        this.id = id;
-    }
-
-    public QuestionnaireTemplateResponseDTO() {
     }
 }

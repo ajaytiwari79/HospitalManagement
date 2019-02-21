@@ -146,7 +146,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Organization with countryId")
-    @GetMapping(UNIT_URL+"/getOrganisationWithCountryId")
+    @GetMapping(UNIT_URL+"/getOrganizationWithCountryId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationWithCountryId(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

@@ -19,20 +19,19 @@ public class AssetType extends BaseEntity {
     @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
+    private Long organizationId;
     private boolean subAssetType;
     private boolean hasSubAsset;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Risk> risks  = new ArrayList<Risk>();
-
+    @JoinColumn(name = "assetType_id")
+    private List<Risk> risks  = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name="assetType_id")
     private AssetType assetType;
-
     @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<AssetType> subAssetTypes=new ArrayList<AssetType>();
+    private List<AssetType> subAssetTypes= new ArrayList<>();
 
 
 
@@ -79,9 +78,7 @@ public class AssetType extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;
@@ -95,9 +92,11 @@ public class AssetType extends BaseEntity {
         this.assetType = assetType;
     }
 
-    public List<AssetType> getSubAssetTypes() {
-        return subAssetTypes;
-    }
+    public List<AssetType> getSubAssetTypes() { return subAssetTypes; }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public void setSubAssetTypes(List<AssetType> subAssetTypes) {
         this.subAssetTypes = subAssetTypes;
@@ -108,22 +107,16 @@ public class AssetType extends BaseEntity {
 
     List<Risk> getRiskOfAssetTypeAndSubAssetType(){
         List<Risk> risks = this.getRisks();
-        this.getSubAssetTypes().forEach( subAssetType -> {
-            risks.addAll(subAssetType.getRisks());
-        });
+        this.getSubAssetTypes().forEach( subAssetType -> risks.addAll(subAssetType.getRisks()));
         return risks;
     }
 
     @Override
     public void delete() {
         this.setDeleted(true);
-        this.getRisks().forEach( assetTypeRisk -> {
-            assetTypeRisk.delete();
-        });
+        this.getRisks().forEach(BaseEntity::delete);
         if(!this.getSubAssetTypes().isEmpty()) {
-            this.getSubAssetTypes().forEach(subAssetType -> {
-                subAssetType.delete();
-            });
+            this.getSubAssetTypes().forEach(AssetType::delete);
         }
     }
 }

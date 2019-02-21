@@ -449,7 +449,7 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createDefalutDataForSubUnit(unit, parentOrganization.getId());
+        reasonCodeService.createDefaultDataForSubUnit(unit, parentOrganization.getId());
         //accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
@@ -507,7 +507,6 @@ public class CompanyCreationService {
             }
             contactAddress.setCity(zipCode.getName());
             contactAddress.setZipCode(zipCode);
-            contactAddress.setCity(zipCode.getName());
         }
         if (addressDTO.getMunicipalityId() != null) {
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId(), 0);

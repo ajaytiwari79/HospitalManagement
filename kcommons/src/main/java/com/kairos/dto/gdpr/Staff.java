@@ -13,21 +13,13 @@ public class Staff {
 
     @NotNull
     private Long staffId;
-
-
     private String lastName;
-
     @NotBlank(message = "Staff Name can't be empty ")
     private String firstName;
 
+    public Long getStaffId() { return staffId; }
 
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
+    public void setStaffId(Long staffId) { this.staffId = staffId; }
 
     public String getLastName() {
         return lastName;
@@ -46,23 +38,6 @@ public class Staff {
         this.lastName = lastName;
         this.firstName = firstName;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Staff staff = (Staff) o;
-        return Objects.equals(staffId, staff.staffId) &&
-                Objects.equals(lastName, staff.lastName) &&
-                Objects.equals(firstName, staff.firstName);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(staffId, lastName, firstName);
-    }
-
     public Staff() {
     }
 }

@@ -29,7 +29,7 @@ public class ResponseHandler {
     }
 
     public static <T> ResponseEntity<ResponseDTO<T>> generateResponseDTO(HttpStatus status, boolean isSuccess, T responsObj){
-        ResponseDTO<T> responseDTO = new ResponseDTO<T>(status.value(), isSuccess, responsObj);
+        ResponseDTO<T> responseDTO = new ResponseDTO<>(status.value(), isSuccess, responsObj);
         return new ResponseEntity<>(responseDTO, status);
     }
 

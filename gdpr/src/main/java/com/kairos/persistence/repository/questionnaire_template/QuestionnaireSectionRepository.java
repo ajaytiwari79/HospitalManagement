@@ -11,10 +11,10 @@ import javax.transaction.Transactional;
 
 @Repository
 //@JaversSpringDataAuditable
-public interface QuestionnaireSectionRepository extends JpaRepository<QuestionnaireSection, Long> {
+public interface QuestionnaireSectionRepository extends JpaRepository<QuestionnaireSection, Long>  {
 
-    @Query(value = "SELECT qs FROM QuestionnaireSection qs WHERE qs.id = ?1 and qs.deleted = ?2")
-    QuestionnaireSection findByIdAndDeleted(Long id, boolean deleted);
+    @Query(value = "SELECT qs FROM QuestionnaireSection qs WHERE qs.id = ?1 and qs.deleted = false")
+    QuestionnaireSection findByIdAndDeletedFalse(Long id);
 
     @Modifying
     @Transactional

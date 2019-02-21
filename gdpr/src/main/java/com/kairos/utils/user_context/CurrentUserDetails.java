@@ -3,9 +3,9 @@ package com.kairos.utils.user_context;
 public class CurrentUserDetails {
     private Long id;
     private String userName;
-    protected String nickName;
-    protected String firstName;
-    protected String lastName;
+    private String nickName;
+    private String firstName;
+    private String lastName;
     private String email;
     private boolean passwordUpdated;
     private  int age;

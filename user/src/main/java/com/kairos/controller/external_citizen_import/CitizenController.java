@@ -1,8 +1,8 @@
 package com.kairos.controller.external_citizen_import;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.external_citizen_import.AuthService;
 import com.kairos.service.external_citizen_import.CitizenService;
-import com.kairos.utils.DateUtil;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +52,10 @@ public class CitizenController {
      */
     @RequestMapping(value = "/grants", method = RequestMethod.GET)
     public String getCitizenGrants(){
-        logger.info("Start syncing grants---------> "+ DateUtil.getCurrentDate());
+        logger.info("Start syncing grants---------> "+ DateUtils.getCurrentDate());
         authService.kmdAuth();
         citizenService.getCitizenGrantsFromKMD();
-        logger.info("End syncing grants---------> "+DateUtil.getCurrentDate());
+        logger.info("End syncing grants---------> "+DateUtils.getCurrentDate());
         return "Citizen Grants Sync";
     }
 

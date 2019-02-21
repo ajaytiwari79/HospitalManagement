@@ -13,14 +13,14 @@ public class UserContext {
     public static final String COUNTRY_ID  = "country-id";
 
 
-    private static final ThreadLocal<String> correlationId= new InheritableThreadLocal<String>();
+    private static final ThreadLocal<String> correlationId= new InheritableThreadLocal<>();
     private static final ThreadLocal<String> authToken= new InheritableThreadLocal<>();
-    private static final ThreadLocal<String> userId = new InheritableThreadLocal<String>();
-    private static final ThreadLocal<Long> orgId = new InheritableThreadLocal<Long>();
-    private static final ThreadLocal<Long> unitId = new InheritableThreadLocal<Long>();
-    private static final ThreadLocal<String> tabId = new InheritableThreadLocal<String>();
-    private static final ThreadLocal<Long> countryId = new InheritableThreadLocal<Long>();
-    private static final ThreadLocal<CurrentUserDetails> userDetails = new InheritableThreadLocal<CurrentUserDetails>();
+    private static final ThreadLocal<String> userId = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> orgId = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> unitId = new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> tabId = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> countryId = new InheritableThreadLocal<>();
+    private static final ThreadLocal<CurrentUserDetails> userDetails = new InheritableThreadLocal<>();
 
     public static String getCorrelationId() { return correlationId.get(); }
     public static void setCorrelationId(String cid) {correlationId.set(cid);}

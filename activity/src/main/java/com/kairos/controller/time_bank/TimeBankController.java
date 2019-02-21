@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class TimeBankController {
     @ApiOperation("Update time bank after applying function")
     @PutMapping("/update_time_bank")
     public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnFunctionChange(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnFunctionChange(shiftStartDate,staffAdditionalInfoDTO));
     }
 
     @ApiOperation("Update time bank after modification of unitPositionLine")
@@ -100,6 +101,14 @@ public class TimeBankController {
     public ResponseEntity<Map<String,Object>> deleteDuplicateEntry(){
         timeBankService.deleteDuplicateEntry();
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
+
+    //As discussed with Shiv kumar API name should be get_timebank_metadata
+    @ApiOperation("Get accumulated timebank and delta timebank")
+    @GetMapping("/get_timebank_metadata")
+    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDeltaDTO(unitPositionId,unitId,startDate,endDate));
     }
 
 

@@ -15,12 +15,14 @@ public class ResponsibilityType extends BaseEntity {
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     private Long countryId;
-
     private SuggestedDataStatus suggestedDataStatus;
-
     private LocalDate suggestedDate;
+    private Long organizationId;
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }
 

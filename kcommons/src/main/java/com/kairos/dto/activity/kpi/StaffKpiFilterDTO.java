@@ -8,6 +8,7 @@ public class StaffKpiFilterDTO {
     private Long id;
     private String firstName;
     private String lastName;
+    List<Long> unitIds;
     private Long unitId;
     private String unitName;
     private List<UnitPositionWithCtaDetailsDTO> unitPosition;
@@ -63,5 +64,13 @@ public class StaffKpiFilterDTO {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public List<Long> getUnitIds() {
+        return unitIds;
+    }
+
+    public void setUnitIds(List<Long> unitIds) {
+        this.unitIds = unitIds;
     }
 }

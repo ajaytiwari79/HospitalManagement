@@ -17,7 +17,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import java.io.IOException;
 
 @Configuration
-public class IntegrationTestConfig {
+class IntegrationTestConfig {
 
 
     @Value("${spring.test.authorization}")

@@ -1,5 +1,6 @@
 package com.kairos.service.client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -18,7 +19,6 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -394,7 +394,7 @@ public class ClientBatchService {
                 if (connectToOrganization) {
                     if (client != null) {
                         logger.info("Creating relationship : " + client.getId());
-                        relation = new ClientOrganizationRelation(client, currentOrganization, DateUtil.getCurrentDate().getTime());
+                        relation = new ClientOrganizationRelation(client, currentOrganization, DateUtils.getCurrentDate().getTime());
                         relationService.createRelation(relation);
 
                         Map<String, Object> clientInfo = new HashMap<>();

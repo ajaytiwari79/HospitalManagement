@@ -22,27 +22,19 @@ public class MasterAsset extends BaseEntity {
     private  String name;
     @NotBlank(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
-
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
-
     @ElementCollection
     private List <ServiceCategory> organizationServices = new ArrayList<>();
-
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
-
     private Long countryId;
-
     @OneToOne(fetch = FetchType.EAGER)
-    private AssetType assetTypeMD;
-
+    private AssetType assetType;
     @OneToOne(fetch = FetchType.EAGER)
     private AssetType subAssetType;
-
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
@@ -125,11 +117,11 @@ public class MasterAsset extends BaseEntity {
     public MasterAsset setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
 
     public AssetType getAssetType() {
-        return assetTypeMD;
+        return assetType;
     }
 
     public void setAssetType(AssetType assetType) {
-        this.assetTypeMD = assetType;
+        this.assetType = assetType;
     }
 
     public AssetType getSubAssetType() {

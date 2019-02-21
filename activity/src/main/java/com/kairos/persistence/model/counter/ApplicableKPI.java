@@ -1,9 +1,11 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class ApplicableKPI extends MongoBaseEntity {
     private BigInteger activeKpiId;
@@ -12,6 +14,10 @@ public class ApplicableKPI extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private String title;
+    private ApplicableFilter applicableFilter;
+    // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
+    private boolean copy;
 
     public ApplicableKPI() {
 
@@ -24,6 +30,18 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+    }
+
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy) {
+        this.activeKpiId = activeKpiId;
+        this.baseKpiId = baseKpiId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+        this.applicableFilter=applicableFilter;
+        this.copy=copy;
+        this.title=title;
     }
 
     public BigInteger getActiveKpiId() {
@@ -72,6 +90,22 @@ public class ApplicableKPI extends MongoBaseEntity {
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
+    }
+
+    public ApplicableFilter getApplicableFilter() {
+        return applicableFilter;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setApplicableFilter(ApplicableFilter applicableFilter) {
+        this.applicableFilter = applicableFilter;
     }
 
 }

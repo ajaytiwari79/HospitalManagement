@@ -31,6 +31,8 @@ public class UnitPositionUtility {
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
         unitPositionDetails.setHourlyCost(currentPositionLine.getHourlyCost());
         unitPositionDetails.setPublished(unitPosition.getPublished());
+        unitPositionDetails.setEditable(unitPosition.getEditable());
+        unitPositionDetails.setAccumulatedTimebankMinutes(unitPosition.getAccumulatedTimebankMinutes());
         return unitPositionDetails;
     }
 

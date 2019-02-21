@@ -19,7 +19,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.joda.time.Interval;
@@ -44,7 +44,7 @@ public class PriorityGroupRulesDataGetterService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private PriorityGroupRepository priorityGroupRepository;
     @Inject
@@ -101,7 +101,7 @@ public class PriorityGroupRulesDataGetterService {
         staffIncludeFilterDTO.setMaxOpenShiftDate(maxDateLong);
         staffIncludeFilterDTO.setExpertiseIds(priorityGroupDTO.getExpertiseIds());
         staffIncludeFilterDTO.setEmploymentTypeIds(priorityGroupDTO.getEmploymentTypeIds());
-        return genericIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
+        return userIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
 
     }
     public List<Shift> getShifts(PriorityGroupDTO priorityGroupDTO, LocalDate maxDate, LocalDate minDate,List<Long> commonUnitPositionIds) {

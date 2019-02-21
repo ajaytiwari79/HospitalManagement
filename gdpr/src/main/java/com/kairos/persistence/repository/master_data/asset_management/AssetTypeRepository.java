@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.master_data.asset_management;
 
 
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-////@JaversSpringDataAuditable
+@JaversSpringDataAuditable
 public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
 
     @Query(value = "SELECT at FROM AssetType at WHERE at.countryId = ?2 and at.deleted = false and lower(at.name) = lower(?1) and at.subAssetType = ?3")
@@ -66,7 +67,7 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     AssetType findByIdAndCountryIdAndAssetTypeAndDeleted(Long id, Long assetTypeId, Long countryId);
 
     @Query(value = "SELECT at FROM AssetType at WHERE at.deleted = false and at.id = ?1")
-    AssetType findByIdAndDeleted(Long id);
+    AssetType findByIdAndDeletedFalse(Long id);
 
     @Query(value = "SELECT at FROM AssetType at WHERE at.id IN (?1) and at.deleted = false and at.subAssetType = ?2")
     List<AssetType>  findAllByIds(List<Long> ids, boolean subAssetType);

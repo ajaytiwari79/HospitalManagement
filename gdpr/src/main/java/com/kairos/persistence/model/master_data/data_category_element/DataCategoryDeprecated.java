@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DataCategoryDeprecated {
+class DataCategoryDeprecated {
 
     @NotBlank(message = "Name cannot be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")

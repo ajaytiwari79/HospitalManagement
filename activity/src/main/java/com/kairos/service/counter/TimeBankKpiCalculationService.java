@@ -22,7 +22,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.Interval;
@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class TimeBankKpiCalculationService implements  CounterService {
     private static final Logger logger = LoggerFactory.getLogger(TimeBankKpiCalculationService.class);
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
@@ -89,10 +89,10 @@ public class TimeBankKpiCalculationService implements  CounterService {
         List<BigInteger> phaseIds=filterBasedCriteria.containsKey(FilterType.PHASE)?KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PHASE)):new ArrayList<>();
         List<String> daysOfWeek=filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK)?filterBasedCriteria.get(FilterType.DAYS_OF_WEEK):Stream.of(DayOfWeek.values()).map(Enum::name).collect(Collectors.toList());
         List<Long> staffIds=filterBasedCriteria.containsKey(FilterType.STAFF_IDS)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
-        List<LocalDate> filterDates = filterBasedCriteria.containsKey(FilterType.TIME_INTERVAL)? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
         List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,new ArrayList<>(),organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS= userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         Map<Long,List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap=staffKpiFilterDTOS.stream().collect(Collectors.groupingBy(k->k.getUnitId(),Collectors.toList()));
         Map<Long,Set<DateTimeInterval>> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)),phaseIds);
         Map<Long,List<DailyTimeBankEntry>> unitPositionAndDailyTimeBank=getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getUnitPosition().stream().map(unitPositionWithCtaDetailsDTO -> unitPositionWithCtaDetailsDTO.getId())).collect(Collectors.toList()),filterDates.get(0),filterDates.get(1),daysOfWeek);

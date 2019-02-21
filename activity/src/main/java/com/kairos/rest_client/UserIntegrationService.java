@@ -68,7 +68,7 @@ import static com.kairos.constants.ApiConstants.*;
 
 @Service
 @Transactional
-public class GenericIntegrationService {
+public class UserIntegrationService {
     @Inject
     GenericRestClient genericRestClient;
     @Inject
@@ -727,6 +727,11 @@ public class GenericIntegrationService {
 
     public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, KPI_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
+        });
+    }
+
+    public DefaultKpiDataDTO getKpiFilterDefaultData(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, KPI_FILTER_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
         });
     }
 

@@ -1,5 +1,6 @@
 package com.kairos.utils;
 
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -20,7 +21,7 @@ public class ApiResponse {
         this.httpStatus = httpStatus;
         this.status = httpStatus.value();
         this.isSuccess = isSuccess;
-        this.timeStamp = DateUtil.getCurrentDate().getTime();
+        this.timeStamp = DateUtils.getCurrentDate().getTime();
         this.data = data;
         return new ResponseEntity<ApiResponse>(this, httpStatus);
     }

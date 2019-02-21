@@ -11,7 +11,7 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "Question title  can't be  empty")
     private String question;
@@ -32,17 +32,11 @@ public class QuestionDTO {
 
     public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
-    public BigInteger getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+    public void setId(Long id) { this.id = id; }
 
-    public String getQuestion() {
-        return question.trim();
-    }
+    public String getQuestion() { return question.trim(); }
 
     public void setQuestion(String question) {
         this.question = question;

@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<FunctionalPayment, Long> {
     @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0}" +
-            " RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.published as published, " +
+            " RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.percentageValue as percentageValue,functionalPayment.published as published, " +
             " functionalPayment.paymentUnit as paymentUnit ORDER BY startDate ASC")
     List<FunctionalPaymentDTO> getFunctionalPaymentOfExpertise(Long expertiseId);
 
@@ -83,7 +83,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} " +
             "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) "+
-            "SET rel.amount=toString(toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100)) ")
+            "SET functionalPayment.percentageValue={1}, rel.amount=toString(toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100)) ")
     void updateFunctionalAmount(List<Long> functionalPaymentIds, String percentageValue);
 
 
@@ -98,4 +98,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "WITH functionalPayment,functions,seniorityLevel,fpm,expertise,collect(id(pga)) as payGroupAreasIds, COLLECT({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction \n" +
             "RETURN id(functionalPayment) as id ,functionalPayment.published as published,functionalPayment.startDate as startDate, functionalPayment.endDate as endDate, functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreasIds:payGroupAreasIds,seniorityLevelFunction:seniorityLevelFunction}) as functionalPaymentMatrices")
     List<FunctionalPaymentQueryResult> getFunctionalPaymentData(List<Long> functionalPaymentIds);
+
+    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN functionalPayment ORDER BY functionalPayment.startDate DESC LIMIT 1 ")
+    FunctionalPayment findByExpertiseId(Long expertiseId);
 }

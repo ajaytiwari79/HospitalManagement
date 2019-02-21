@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 public class MasterProcessingActivityRiskResponseDTO {
 
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private Boolean mainParent;
     private List<RiskBasicResponseDTO> risks=new ArrayList<>();
@@ -26,7 +25,7 @@ public class MasterProcessingActivityRiskResponseDTO {
     public MasterProcessingActivityRiskResponseDTO() {
     }
 
-    public MasterProcessingActivityRiskResponseDTO(BigInteger id, String name, boolean mainParent, List<RiskBasicResponseDTO> risks, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
+    public MasterProcessingActivityRiskResponseDTO(Long id, String name, boolean mainParent, List<RiskBasicResponseDTO> risks, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
         this.id = id;
         this.name = name;
         this.mainParent = mainParent;
@@ -47,13 +46,13 @@ public class MasterProcessingActivityRiskResponseDTO {
 
     public void setProcessingActivities(List<MasterProcessingActivityRiskResponseDTO> processingActivities) { this.processingActivities = processingActivities; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
     public Boolean getMainParent() { return mainParent; }
 
     public void setMainParent(Boolean mainParent) { this.mainParent = mainParent; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

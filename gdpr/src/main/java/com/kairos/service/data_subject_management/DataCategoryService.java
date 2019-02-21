@@ -19,7 +19,7 @@ import java.util.*;
 @Service
 public class DataCategoryService{
 
-    private Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
 
     @Inject
     private ExceptionService exceptionService;
@@ -160,8 +160,7 @@ public class DataCategoryService{
      * @return return list of Data Category with data Elements
      */
     public List<DataCategory> getAllDataCategoriesByIds(Set<Long> ids) {
-        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByIds(ids);
-        return dataCategories;
+        return dataCategoryRepository.getAllDataCategoriesByIds(ids);
     }
 
 }

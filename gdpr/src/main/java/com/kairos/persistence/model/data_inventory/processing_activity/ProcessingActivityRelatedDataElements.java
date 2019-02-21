@@ -7,8 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-
-public class ProcessingActivityRelatedDataElements {
+class ProcessingActivityRelatedDataElements {
 
 
     @NotNull

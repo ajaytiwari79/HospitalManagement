@@ -6,8 +6,8 @@ import org.joda.time.DateTimeZone;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResponseEnvelope {
-    final Long time_stamp = new DateTime( DateTimeZone.UTC).getMillis();
+class ResponseEnvelope {
+    private final Long time_stamp = new DateTime( DateTimeZone.UTC).getMillis();
 
     private  boolean success;
     private Object data;

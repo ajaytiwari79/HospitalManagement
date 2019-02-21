@@ -20,8 +20,17 @@ public class PayGradeResponse {
     private Boolean published;
     private List<PayGroupAreaDTO> payGroupAreas;
 
+
     public PayGradeResponse() {
         //default
+    }
+
+    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payGroupAreas, Boolean published) {
+        this.payTableId = payTableId;
+        this.payGradeLevel = payGradeLevel;
+        this.payGradeId = payGradeId;
+        this.payGroupAreas = payGroupAreas;
+        this.published = published;
     }
 
     public PayGradeResponse(Long payTableId) {
@@ -67,14 +76,4 @@ public class PayGradeResponse {
     public void setPublished(Boolean published) {
         this.published = published;
     }
-
-    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payGroupAreas, Boolean published) {
-        this.payTableId = payTableId;
-        this.payGradeLevel = payGradeLevel;
-        this.payGradeId = payGradeId;
-        this.payGroupAreas = payGroupAreas;
-        this.published = published;
-    }
-
-
 }

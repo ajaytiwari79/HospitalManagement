@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class FunctionalPaymentService {
 
-    private Logger logger = LoggerFactory.getLogger(FunctionalPaymentService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(FunctionalPaymentService.class);
     private ExpertiseGraphRepository expertiseGraphRepository;
     private ExceptionService exceptionService;
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
@@ -264,6 +264,11 @@ public class FunctionalPaymentService {
         functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
 
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
+        FunctionalPayment oldFunctionalPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
+        if(oldFunctionalPayment!=null && functionalPaymentDTO.getStartDate().isAfter(oldFunctionalPayment.getStartDate()) && oldFunctionalPayment.getEndDate()==null){
+            exceptionService.actionNotPermittedException("message.publishDate.notlessthan_or_equals.parent_startDate");
+        }
+
         if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
             if (parentFunctionalPayment.getStartDate().isEqual(functionalPaymentDTO.getStartDate()) || parentFunctionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate())){
                 exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan_or_equals.parent_startDate");
@@ -288,6 +293,7 @@ public class FunctionalPaymentService {
         for (FunctionalPayment functionalPayment : functionalPaymentList) {
             if (endDate == null) {
                 if (functionalPayment.getStartDate().isAfter(startDate.minusDays(1))) {
+                    functionalPayment.setPercentageValue(percentageValue);
                     toUpdateInExisting.add(functionalPayment);
                 } else if (functionalPayment.getStartDate().isBefore(startDate)) {
                     toBreakInNewList.add(functionalPayment);
@@ -329,6 +335,7 @@ public class FunctionalPaymentService {
                             functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
                     functionalPayment.setParentFunctionalPayment(existing);
                     functionalPayment.setPublished(functionalPaymentQueryResult.isPublished());
+                    functionalPayment.setPercentageValue(percentageValue);
                     updateMatrixInFunctionalPayment(functionalPaymentQueryResult.getFunctionalPaymentMatrices(), functionalPayment, percentageValue);
                     functionalPaymentListAfterDate.add(functionalPayment);
                 }
