@@ -15,7 +15,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 public class ShiftAndActivityDurationKpiService implements CounterService {
 
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
 
@@ -76,7 +76,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         List<BigInteger> activitiesIds = KPIUtils.getBigIntegerValue(filterBasedCriteria.getOrDefault(FilterType.ACTIVITY_IDS, new ArrayList<>()));
         List<Long> employmentTypes = KPIUtils.getLongValue(filterBasedCriteria.getOrDefault(FilterType.EMPLOYMENT_TYPE, new ArrayList()));
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, new ArrayList<>(), employmentTypes, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));

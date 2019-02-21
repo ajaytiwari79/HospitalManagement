@@ -25,6 +25,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private long accumultedTimeBankMin;
     private LocalDate date;
     private List<TimeBankCTADistribution> timeBankCTADistributionList;
+    private int deltaAccumulatedTimebankMinutes;
 
 
     public DailyTimeBankEntry(Long unitPositionId, Long staffId, LocalDate date) {
@@ -118,5 +119,11 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.contractualMin = contractualMin;
     }
 
+    public int getDeltaAccumulatedTimebankMinutes() {
+        return deltaAccumulatedTimebankMinutes;
+    }
 
+    public void setDeltaAccumulatedTimebankMinutes(int deltaAccumulatedTimebankMinutes) {
+        this.deltaAccumulatedTimebankMinutes = deltaAccumulatedTimebankMinutes;
+    }
 }

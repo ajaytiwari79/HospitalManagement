@@ -53,6 +53,8 @@ public class StaffUnitPositionDetails {
     private Boolean history;
     private Boolean editable;
     private boolean published;
+    //This is the Intial value of accumulatedTimebank
+    private long accumulatedTimebankMinutes;
     private CTAResponseDTO costTimeAgreement;
 
     public StaffUnitPositionDetails() {
@@ -307,4 +309,11 @@ public class StaffUnitPositionDetails {
         this.editable = editable;
     }
 
+    public long getAccumulatedTimebankMinutes() {
+        return accumulatedTimebankMinutes;
+    }
+
+    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
+        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
 }

@@ -8,6 +8,7 @@ import com.kairos.dto.activity.kpi.EmploymentTypeKpiDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
@@ -35,6 +36,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.staff.StaffRetrievalService;
+import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -286,8 +288,15 @@ public class EmploymentTypeService {
         Organization organization = organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organization.isParentOrganization()), StaffKpiFilterDTO.class);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
-        List<Long> unitIds = isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
+        List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
+        Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.toList()));
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
+                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
+        ).collect(Collectors.toList());
+
+//        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
+        List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
         List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
         return new DefaultKpiDataDTO(staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS);
     }

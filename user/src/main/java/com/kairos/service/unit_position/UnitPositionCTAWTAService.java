@@ -4,6 +4,7 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
+import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
@@ -26,6 +27,7 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -73,17 +75,14 @@ public class UnitPositionCTAWTAService {
     private ExceptionService exceptionService;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject private ActivityIntegrationService activityIntegrationService;
 
-    public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId, LocalDate selectedDate) throws Exception {
-        PositionCtaWtaQueryResult positionCtaWtaQueryResult = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_CTA_WTA_BY_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCtaWtaQueryResult>>() {
-        }, expertiseId);
+    public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId, LocalDate selectedDate){
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate);
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
         SeniorityLevel appliedSeniorityLevel = unitPositionService.getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
-        positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
         //SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
         //positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
-        positionCtaWtaQueryResult.setUnion(currentExpertise.get().getUnion());
-
         SeniorityLevelQueryResult seniorityLevel = null;
         if (appliedSeniorityLevel != null) {
             seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
@@ -93,8 +92,7 @@ public class UnitPositionCTAWTAService {
             List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate.toString(), appliedSeniorityLevel.getId(), unitId);
             seniorityLevel.setFunctions(functionDTOs);
         }
-        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
-        return positionCtaWtaQueryResult;
+        return new PositionCtaWtaQueryResult(ctawtaAndAccumulatedTimebankWrapper.getCta(),ctawtaAndAccumulatedTimebankWrapper.getWta(),currentExpertise.get().retrieveBasicDetails(),seniorityLevel,currentExpertise.get().getUnion());
     }
 
     //TODO this must be moved to activity

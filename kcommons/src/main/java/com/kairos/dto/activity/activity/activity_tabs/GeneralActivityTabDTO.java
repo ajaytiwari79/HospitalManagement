@@ -40,7 +40,6 @@ public class GeneralActivityTabDTO {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;
-    private boolean activityCanBeCopied;
 
     public GeneralActivityTabDTO() {
         // dc
@@ -259,13 +258,6 @@ public class GeneralActivityTabDTO {
         this.endDate = endDate;
     }
 
-    public boolean isActivityCanBeCopied() {
-        return activityCanBeCopied;
-    }
-
-    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
-        this.activityCanBeCopied = activityCanBeCopied;
-    }
 
     @Override
     public String toString() {

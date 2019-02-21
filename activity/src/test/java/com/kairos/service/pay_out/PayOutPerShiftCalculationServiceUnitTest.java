@@ -18,10 +18,10 @@ import com.kairos.commons.utils.DateTimeInterval;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class PayOutCalculationServiceUnitTest {
+public class PayOutPerShiftCalculationServiceUnitTest {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(PayOutCalculationServiceUnitTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(PayOutPerShiftCalculationServiceUnitTest.class);
 
     @InjectMocks
     PayOutCalculationService payOutCalculationService;
@@ -56,7 +56,7 @@ public class PayOutCalculationServiceUnitTest {
     public void calculatePayOut(){
         /*when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
-        PayOut payOut = new PayOut(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+        PayOutPerShift payOut = new PayOutPerShift(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
         Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
         Assert.assertEquals(payOut.getScheduledMin(),1020);

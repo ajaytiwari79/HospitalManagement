@@ -4,17 +4,17 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.math.BigInteger;
 
-public class PayOutCTADistribution {
+public class PayOutPerShiftCTADistribution {
 
     private String ctaName;
     private int minutes;
     private BigInteger ctaRuleTemplateId;
 
 
-    public PayOutCTADistribution() {
+    public PayOutPerShiftCTADistribution() {
     }
 
-    public PayOutCTADistribution(String ctaName, int minutes,BigInteger ctaRuleTemplateId) {
+    public PayOutPerShiftCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId) {
         this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
@@ -50,7 +50,7 @@ public class PayOutCTADistribution {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        PayOutCTADistribution that = (PayOutCTADistribution) o;
+        PayOutPerShiftCTADistribution that = (PayOutPerShiftCTADistribution) o;
 
         return new EqualsBuilder()
                 .append(ctaName, that.ctaName)

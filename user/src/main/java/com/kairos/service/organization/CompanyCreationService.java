@@ -507,7 +507,6 @@ public class CompanyCreationService {
             }
             contactAddress.setCity(zipCode.getName());
             contactAddress.setZipCode(zipCode);
-            contactAddress.setCity(zipCode.getName());
         }
         if (addressDTO.getMunicipalityId() != null) {
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId(), 0);

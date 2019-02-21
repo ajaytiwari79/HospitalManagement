@@ -68,7 +68,7 @@ import static com.kairos.constants.ApiConstants.*;
 
 @Service
 @Transactional
-public class GenericIntegrationService {
+public class UserIntegrationService {
     @Inject
     GenericRestClient genericRestClient;
     @Inject

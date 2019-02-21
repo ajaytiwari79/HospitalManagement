@@ -22,10 +22,8 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
-import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
-import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -53,7 +51,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.exception.ExceptionService;
@@ -82,10 +80,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.enums.shift.ShiftFilterParam.EXPERTISE;
-import static com.kairos.enums.shift.ShiftFilterParam.INDIVIDUAL_VIEW;
-import static com.kairos.enums.shift.ShiftFilterParam.OPEN_SHIFT;
-import static com.kairos.enums.shift.ViewType.INDIVIDUAL;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -122,7 +116,7 @@ public class ShiftValidatorService {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private StaffingLevelService staffingLevelService;
 
@@ -135,7 +129,7 @@ public class ShiftValidatorService {
 
 
     public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
-        String timeZone = genericIntegrationService.getTimeZoneByUnitId(unitId);
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
         DateTimeInterval graceInterval = null;
         Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         if (validatedByStaff) {

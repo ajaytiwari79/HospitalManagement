@@ -6,7 +6,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffEmploymentTypeSpecification;
 import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
@@ -30,7 +30,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private ActivityMongoRepository activityMongoRepository;
-    @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject private UserIntegrationService userIntegrationService;
     @Inject private LocaleService localeService;
     @Inject private ActivityService activityService;
 
@@ -89,7 +89,7 @@ public class StaffActivitySettingService extends MongoBaseService {
         }
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
-        List<StaffDTO> staffExpertiseWrappers= genericIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
+        List<StaffDTO> staffExpertiseWrappers= userIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
         Map<Long,StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getId,v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){
