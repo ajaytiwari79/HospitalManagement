@@ -26,7 +26,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @RestController
 public class ReasonCodeController {
     @Inject
-    ReasonCodeService reasonCodeService;
+    private ReasonCodeService reasonCodeService;
 
 
     //Reason Code

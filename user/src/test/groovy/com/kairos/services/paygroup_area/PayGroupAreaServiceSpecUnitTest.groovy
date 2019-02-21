@@ -4,15 +4,16 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository
 import com.kairos.service.pay_group_area.PayGroupAreaService
 import org.junit.Before
+import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.MockitoAnnotations;
-import spock.lang.Specification
+import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnitRunner
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.when
 
-class PayGroupAreaServiceSpecUnitTest extends Specification {
+@RunWith(MockitoJUnitRunner.class)
+class PayGroupAreaServiceSpecUnitTest {
 
     @InjectMocks
     private PayGroupAreaService payGroupAreaService;

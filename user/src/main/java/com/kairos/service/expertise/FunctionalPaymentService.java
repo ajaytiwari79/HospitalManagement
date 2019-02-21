@@ -352,8 +352,8 @@ public class FunctionalPaymentService {
         List<FunctionalPaymentMatrix> list = new ArrayList<>();
         List<Function> functions = getFunctionList(functionalPaymentMatrixQueryResults);
         List<SeniorityLevel> seniorityLevels = getSeniorityLevelList(functionalPaymentMatrixQueryResults);
+       FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
        for (FunctionalPaymentMatrixQueryResult functionalPaymentMatrixQueryResult:functionalPaymentMatrixQueryResults){
-           FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
            functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrix,functionalPaymentMatrixQueryResult, seniorityLevels, functions,percentageValue);
            functionalPaymentMatrixQueryResult.setId(functionalPaymentMatrix.getId());
            list.add(functionalPaymentMatrix);
