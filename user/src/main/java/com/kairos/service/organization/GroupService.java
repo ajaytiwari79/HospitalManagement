@@ -56,7 +56,7 @@ public class GroupService  {
         if (currentOrganization == null) {
             return null;
         }
-        boolean groupExistInOrganizationByName = organizationGraphRepository.groupExistInOrganizationByName(unitId, group.getName(), group.getId()!=null? group.getId() : -1);
+        boolean groupExistInOrganizationByName = organizationGraphRepository.groupExistInOrganizationByName(unitId,"(?i)" +  group.getName(), group.getId()!=null? group.getId() : -1);
         if (groupExistInOrganizationByName) {
             exceptionService.duplicateDataException("message.organization.group.exists");
         }
@@ -67,6 +67,17 @@ public class GroupService  {
         queryResult.setType(GROUP_LABEL);
         queryResult.setName(group.getName());
         return queryResult;
+    }
+
+    public boolean deleteGroupAndTeamsOfGroupByGroupId(long  groupId) {
+        Group group = groupGraphRepository.findOne(groupId);
+        if (group != null) {
+            group.setEnabled(false);
+            groupGraphRepository.save(group);
+        } else {
+            exceptionService.dataNotFoundByIdException("message.organization.group.id.notFound");
+        }
+        return true;
     }
 
     public List<Map<String, Object>> getGroupAvailableService(Long groupId) {
@@ -102,7 +113,6 @@ public class GroupService  {
             throw new InternalError("Group can not be null");
         }
         objectToUpdate.setName(group.getName());
-        objectToUpdate.setDescription(group.getDescription());
         groupGraphRepository.save(group);
         return group;
     }
