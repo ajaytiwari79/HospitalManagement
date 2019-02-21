@@ -83,6 +83,7 @@ public class CounterDistService extends MongoBaseService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private ActivityService activityService;
+    @Inject
     private UserIntegrationService userIntegrationService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);

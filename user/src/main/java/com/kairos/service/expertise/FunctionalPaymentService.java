@@ -266,7 +266,7 @@ public class FunctionalPaymentService {
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
         FunctionalPayment oldFunctionalPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
         if(oldFunctionalPayment!=null && functionalPaymentDTO.getStartDate().isAfter(oldFunctionalPayment.getStartDate()) && oldFunctionalPayment.getEndDate()==null){
-            exceptionService.actionNotPermittedException("message.publishDate.notlessthan_or_equals.parent_startDate");
+            exceptionService.actionNotPermittedException("message.already.active");
         }
 
         if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
