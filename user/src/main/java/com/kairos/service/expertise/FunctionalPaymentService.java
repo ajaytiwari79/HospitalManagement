@@ -352,13 +352,13 @@ public class FunctionalPaymentService {
         List<FunctionalPaymentMatrix> list = new ArrayList<>();
         List<Function> functions = getFunctionList(functionalPaymentMatrixQueryResults);
         List<SeniorityLevel> seniorityLevels = getSeniorityLevelList(functionalPaymentMatrixQueryResults);
-       FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
        for (FunctionalPaymentMatrixQueryResult functionalPaymentMatrixQueryResult:functionalPaymentMatrixQueryResults){
+           FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
            functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrix,functionalPaymentMatrixQueryResult, seniorityLevels, functions,percentageValue);
            functionalPaymentMatrixQueryResult.setId(functionalPaymentMatrix.getId());
            list.add(functionalPaymentMatrix);
        }
-       functionalPaymentMatrixRepository.save(functionalPaymentMatrix);
+       functionalPaymentMatrixRepository.saveAll(list);
        functionalPayment.setFunctionalPaymentMatrices(list);
        functionalPaymentGraphRepository.save(functionalPayment);
     }
@@ -393,17 +393,17 @@ public class FunctionalPaymentService {
                 exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
         }
-        functionalPaymentMatrix.getSeniorityLevelFunction().add(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue).get(0));
+        functionalPaymentMatrix.getSeniorityLevelFunction().addAll(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue));
         return functionalPaymentMatrix;
     }
 
     private List<SeniorityLevelFunction> getSeniorityLevelFunctionList(List<SeniorityLevelFunctionQR> seniorityLevelFunctionQRS, List<SeniorityLevel> seniorityLevels, List<Function> functions,BigDecimal percentageValue) {
         List<SeniorityLevelFunction> seniorityLevelFunctions = new ArrayList<>();
+        SeniorityLevelFunction seniorityLevelFunction = new SeniorityLevelFunction();
         seniorityLevelFunctionQRS.forEach(currentSRLevelFunction -> {
             List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
             SeniorityLevel seniorityLevel = seniorityLevels.stream().
                     filter(seniorityLevel1 -> seniorityLevel1.getId().equals(currentSRLevelFunction.getSeniorityLevelId())).findAny().get();
-            SeniorityLevelFunction seniorityLevelFunction = new SeniorityLevelFunction();
             seniorityLevelFunction.setSeniorityLevel(seniorityLevel);
 
             currentSRLevelFunction.getFunctions().forEach(currentFunction -> {
