@@ -1,2 +1,92 @@
 //To set existing property in time type domain
 db.time_Type.updateMany({},{$set:{"activityCanBeCopiedForOrganizationHierarchy" : [ ]}})
+
+//
+db.getCollection('counter').update({"type":"RESTING_HOURS_PER_PRESENCE_DAY"},{"$set":{
+     "filterTypes" : [
+        "STAFF_IDS",
+        "EMPLOYMENT_TYPE",
+        "TIME_INTERVAL",
+        "UNIT_IDS"
+    ],
+	"calculationFormula" : ""}})
+
+
+db.getCollection('counter').update({"type":"PLANNED_HOURS"},{"$set":{
+     "filterTypes" : [
+        "STAFF_IDS",
+        "EMPLOYMENT_TYPE",
+        "TIME_INTERVAL",
+        "UNIT_IDS",
+        "ACTIVITY_STATUS",
+        "TIME_TYPE"
+    ],
+	"calculationFormula" : ""}})
+
+
+db.getCollection('counter').update({"type":"CONTRACTUAL_AND_PLANNED_HOURS"},{"$set":{
+     "filterTypes" : [
+        "STAFF_IDS",
+        "EMPLOYMENT_TYPE",
+        "TIME_INTERVAL",
+        "UNIT_IDS"
+    ],
+"calculationFormula" : ""}})
+
+db.getCollection('counter').update({"type":"TIMEBANK"},{"$set":{
+     "filterTypes" : [
+        "STAFF_IDS",
+	"PHASE",
+	"DAYS_OF_WEEK",
+        "TIME_INTERVAL",
+        "UNIT_IDS"
+    ],
+"calculationFormula" : ""}})
+
+db.getCollection('counter').update({"type":"SHIFT_AND_ACTIVITY_DURATION"},{"$set":{
+     "filterTypes" : [
+        "STAFF_IDS",
+	"DAYS_OF_WEEK",
+        "EMPLOYMENT_TYPE",
+        "TIME_INTERVAL",
+	"ACTIVITY_IDS",
+        "UNIT_IDS"
+    ],
+"calculationFormula" : ""}})
+
+db.getCollection('counter').update({"type":"DAYTYPE_AND_TIMESLOT"},{"$set":{
+     "filterTypes" : [
+        "STAFF_IDS",
+        "EMPLOYMENT_TYPE",
+        "TIME_INTERVAL",
+        "UNIT_IDS",
+	"DAY_TYPE",
+	"TIME_SLOT"
+    ],
+"calculationFormula" : ""}})
+
+
+
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"1"},{"$set":{"title":"Resting Hours Per Presence Day"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"16"},{"$set":{"title":"Planned Hours"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"17"},{"$set":{"title":"Contractual And Planned Hours Of Staff"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"18"},{"$set":{"title":"TimeBank For Units"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"19"},{"$set":{"title":"Duration Of Shift And Activity"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"20"},{"$set":{"title":"DayType And TimeSlot"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"2"},{"$set":{"title":"Scheduled Hours-Net"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"3"},{"$set":{"title":"Total KM Driven Per Day"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"4"},{"$set":{"title":"Total Tasks Unplanned"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"5"},{"$set":{"title":"TimeBank For Units"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"6"},{"$set":{"title":"Tasks per staff"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"7"},{"$set":{"title":"Road time in percent of working time"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"8"},{"$set":{"title":"Total task time in percent of working time"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"9"},{"$set":{"title":"Tasks completed within time"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"10"},{"$set":{"title":"Breaks within 11 to 13 from Mon-Thu"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"11"},{"$set":{"title":"Flexi Time Percent"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"12"},{"$set":{"title":"Flex Time Task time"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"13"},{"$set":{"title":"Total Distance Driven Per Staff"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"14"},{"$set":{"title":"Task Efficiency"}})
+db.getCollection('applicableKPI').updateMany({"baseKpiId":"15"},{"$set":{"title":"working time"}})
+
+
+

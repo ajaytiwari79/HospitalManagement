@@ -445,7 +445,7 @@ public class CounterDistService extends MongoBaseService {
             staffids.forEach(staffId -> {
                 accessGroupKPIConf.getKpiIds().forEach(kpiId -> {
                     if (staffIdKpiMap.get(staffId).get(kpiId) == null) {
-                        applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, null, staffId, ConfLevel.STAFF, kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter(), kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
+                        applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, staffId, ConfLevel.STAFF, kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter(), kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
                         staffIdKpiMap.get(staffId).put(kpiId, kpiId);
                     }
                 });
@@ -498,7 +498,7 @@ public class CounterDistService extends MongoBaseService {
             });
             kpiIds.stream().forEach(kpiId -> {
                 if (staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).get(kpiId) == null) {
-                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, null, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF));
+                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF));
                     staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).put(kpiId, kpiId);
                 }
             });
