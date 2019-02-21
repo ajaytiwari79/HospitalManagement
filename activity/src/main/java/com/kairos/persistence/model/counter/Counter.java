@@ -3,6 +3,7 @@ package com.kairos.persistence.model.counter;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -22,8 +23,11 @@ public class Counter extends MongoBaseEntity {
     private BigInteger primaryCounter; //to directly identify the base counters child
     private BigInteger parentCounter;  //to identify parent counter
     private BigInteger categoryId;
+    private List<FilterType> filterTypes;
     private List<FilterCriteria> criteriaList;
     private Set<ModuleType> supportedModuleTypes;
+    //calculation formula of per KPI
+    private String calculationFormula;
 
     public Counter() {
     }
@@ -106,5 +110,21 @@ public class Counter extends MongoBaseEntity {
 
     public void setParentCounter(BigInteger parentCounter) {
         this.parentCounter = parentCounter;
+    }
+
+    public List<FilterType> getFilterTypes() {
+        return filterTypes;
+    }
+
+    public void setFilterTypes(List<FilterType> filterTypes) {
+        this.filterTypes = filterTypes;
+    }
+
+    public String getCalculationFormula() {
+        return calculationFormula;
+    }
+
+    public void setCalculationFormula(String calculationFormula) {
+        this.calculationFormula = calculationFormula;
     }
 }
