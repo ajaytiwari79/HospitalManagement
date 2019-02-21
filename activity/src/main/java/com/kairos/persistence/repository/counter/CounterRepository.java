@@ -144,7 +144,7 @@ public class CounterRepository {
         String refQueryField = getRefQueryField(level);
         Criteria criteria = Criteria.where(refQueryField).is(refId).and("level").is(level);
         if (isCollectionNotEmpty(kpiIds)) {
-            criteria.and("baseKpiId").in(kpiIds);
+            criteria.and("activeKpiId").in(kpiIds);
         }
         Query query = new Query(criteria);
         return mongoTemplate.find(query, ApplicableKPI.class);
