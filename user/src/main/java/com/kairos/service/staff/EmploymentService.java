@@ -171,7 +171,6 @@ public class EmploymentService {
         objectToUpdate.setSendNotificationBy(staffEmploymentDetail.getSendNotificationBy());
         objectToUpdate.setCopyKariosMailToLogin(staffEmploymentDetail.isCopyKariosMailToLogin());
         //objectToUpdate.setEmployedSince(DateConverter.parseDate(staffEmploymentDetail.getEmployedSince()).getTime());
-        objectToUpdate.setVisitourId(staffEmploymentDetail.getVisitourId());
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffEmploymentDetail.getTimeCareExternalId());
         staffGraphRepository.save(objectToUpdate);
@@ -192,7 +191,6 @@ public class EmploymentService {
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
         map.put("email", user.getEmail());
         map.put("profilePic", (isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
-        map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId", staff.getExternalId());
         LocalDate dateOfBirth = (user.getDateOfBirth());

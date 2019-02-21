@@ -324,7 +324,6 @@ public class OrganizationService {
             Map<String, Object> groupInfo = new HashMap<>();
             groupInfo.put("name", group.getName());
             groupInfo.put("id", group.getId());
-            groupInfo.put("description", group.getDescription());
             response.put("generalTabInfo", groupInfo);
             response.put("otherData", Collections.emptyMap());
         } else if (TEAM.equalsIgnoreCase(type)) {
@@ -335,8 +334,6 @@ public class OrganizationService {
             Map<String, Object> teamInfo = new HashMap<>();
             teamInfo.put("name", team.getName());
             teamInfo.put("id", team.getId());
-            teamInfo.put("description", team.getDescription());
-            teamInfo.put("visitourId", team.getVisitourId());
             response.put("generalTabInfo", teamInfo);
             response.put("otherData", Collections.emptyMap());
         }

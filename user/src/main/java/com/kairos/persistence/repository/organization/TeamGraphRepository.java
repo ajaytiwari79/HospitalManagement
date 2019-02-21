@@ -20,11 +20,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
-    @Query("MATCH (group:Group)-[:HAS_TEAM]->(team:Team) where id(group)={0} with team\n" +
-            "optional match (team)-[:TEAM_HAS_LOCATION]->(contactAddress:ContactAddress) with contactAddress,team\n" +
-            "optional Match (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with zipCode,contactAddress,team\n" +
-            "return collect({id:id(team),name:team.name,visitourId:team.visitourId,contactAddress:case when contactAddress is null then [] else {id:id(contactAddress),city:contactAddress.city,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber,houseNumber:contactAddress.houseNumber,province:contactAddress.province,country:contactAddress.country,regionName:contactAddress.regionName,\n" +
-            "municipalityName:contactAddress.municipalityName} end}) as teams")
+    @Query("MATCH (group:Group {isEnabled:true})-[:"+HAS_TEAM+"]->(team:Team {isEnabled:true}) where id(group)={0} with team\n" +
+            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_LOCATION+"]->(contactAddress:ContactAddress) with contactAddress,team\n" +
+            "OPTIONAL MATCH (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with zipCode,contactAddress,team\n" +
+            "OPTIONAL MATCH (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with zipCode,contactAddress,team,municipality \n"+
+            "RETURN COLLECT({id:id(team), name:team.name, hasAddressOfUnit:team.hasAddressOfUnit, contactAddress: CASE WHEN contactAddress IS NULL THEN [] ELSE {id:id(contactAddress),city:contactAddress.city,street:contactAddress.street,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber,houseNumber:contactAddress.houseNumber,province:contactAddress.province,country:contactAddress.country,regionName:contactAddress.regionName,\n" +
+            "municipalityId:id(municipality),municipalityName:municipality.name} END}) as teams")
     List<Map<String,Object>> getTeams(long groupId);
 
     @Query("MATCH (t:Team)-[:"+TEAM_HAS_MEMBER+"]->(u:Staff) where id(t)={0} return u")
@@ -167,10 +168,15 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:skill.name,description:skill.description,isSelected:case when r is null then false else true end,isEdited:true,staff:staff.staff})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByTeam(long unitId, List<Long> staffId);
 
-    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} with organization  Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
+    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group {isEnabled:true})-[:" + HAS_TEAM + "]->(team:Team {isEnabled:true}) where id(team)={0} with organization  Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
     Long getCountryByTeamId(Long teamId);
 
-    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} return id(organization)")
+    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group {isEnabled:true})-[:" + HAS_TEAM + "]->(team:Team {isEnabled:true}) where id(team)={0} return id(organization)")
     Long getOrganizationIdByTeam(Long teamId);
+
+    @Query("MATCH(organization:Organization)-[:" + HAS_GROUP + "]->(group:Group {isEnabled:true})-[:" + HAS_TEAM + "]->(team:Team {isEnabled:true}) WHERE id(organization)={0} AND id(group)={1} AND id(team)<>{2} AND team.name =~{3}  " +
+            " WITH count(team) as totalCount " +
+            " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
+    Boolean teamExistInOrganizationAndGroupByName(Long organizationId, Long groupId, Long teamId, String teamName);
 }

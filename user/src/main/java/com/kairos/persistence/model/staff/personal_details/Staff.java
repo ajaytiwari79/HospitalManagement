@@ -69,8 +69,6 @@ public class Staff extends UserBaseEntity {
     private StaffStatusEnum currentStatus;
     private Long inactiveFrom;
     private long organizationId;
-    private long visitourId;
-    private String visitourTeamId;
     private Language language;
     // Visitour Speed Profile
     private Integer speedPercent;
@@ -171,14 +169,6 @@ public class Staff extends UserBaseEntity {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public long getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(long visitourId) {
-        this.visitourId = visitourId;
     }
 
     public String getPassword() {
@@ -299,14 +289,6 @@ public class Staff extends UserBaseEntity {
 
     public void setEngineerType(EngineerType engineerType) {
         this.engineerType = engineerType;
-    }
-
-    public String getVisitourTeamId() {
-        return visitourTeamId;
-    }
-
-    public void setVisitourTeamId(String visitourTeamId) {
-        this.visitourTeamId = visitourTeamId;
     }
 
     public String getManacoId() {
