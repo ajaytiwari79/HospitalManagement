@@ -108,4 +108,11 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.applicableFilter = applicableFilter;
     }
 
+    public boolean isCopy() {
+        return copy;
+    }
+
+    public void setCopy(boolean copy) {
+        this.copy = copy;
+    }
 }

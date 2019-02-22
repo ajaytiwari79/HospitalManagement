@@ -151,7 +151,7 @@ public class CounterRepository {
     }
 
     public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiIdsOrUnitId(List<BigInteger> kpiIds, List<ConfLevel> level, Long unitId) {
-        Criteria criteria = Criteria.where("baseKpiId").in(kpiIds).and("level").in(level).and("applicableFilter.modified").is(false);
+        Criteria criteria = Criteria.where("baseKpiId").in(kpiIds).and("level").in(level).orOperator(Criteria.where("applicableFilter").exists(false),Criteria.where("applicableFilter.modified").is(false));
         if (isNotNull(unitId)) {
             criteria.and("unitId").is(unitId);
         }
