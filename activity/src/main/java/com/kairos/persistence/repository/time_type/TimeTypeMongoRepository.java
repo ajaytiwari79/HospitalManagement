@@ -29,7 +29,7 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     List<TimeType> findAllChildByParentId(BigInteger id, Long countryId);
 
     @Query("{countryId:?0,deleted : false}")
-    List<TimeType> findAllByCountryId(Long countryId);
+    List<TimeType> findAllTimeTypeByCountryId(Long countryId);
 
     @Query("{countryId:?0, deleted : false, timeTypes: ?1}")
     List<TimeType> findByTimeTypeEnumAndCountryId(Long countryId, TimeTypes timeTypeEnum);

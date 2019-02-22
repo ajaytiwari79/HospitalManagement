@@ -18,6 +18,7 @@ public final class ApiConstants {
     public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL + "/timeBank";
     public static final String PAYOUT_URL = API_ORGANIZATION_UNIT_URL + "/payOut";
     public static final String COUNTER_DIST_URL = "/counter/dist";
+    public static final String KPI_URL = "/kpi/{kpiId}";
     public static final String COUNTER_COUNTRY_DIST_URL = COUNTRY_URL + COUNTER_DIST_URL;
     public static final String COUNTER_UNIT_DIST_URL = UNIT_URL + COUNTER_DIST_URL;
     public static final String COUNTER_STAFF_UNIT_DIST_URL = UNIT_URL + STAFF_URL + COUNTER_DIST_URL;
@@ -147,6 +148,7 @@ public final class ApiConstants {
     // /staff_by_employment_type
     public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";
     public static final String KPI_DEFAULT_DATA = "/kpi_default_data";
+    public static final String KPI_FILTER_DEFAULT_DATA ="/kpi_filter_default_data";
 
     //Scheduler
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";

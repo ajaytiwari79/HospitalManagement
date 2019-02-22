@@ -4,6 +4,8 @@ package com.kairos.dto.user.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+
 /**
  * Created by vipul on 20/9/17.
  */
@@ -12,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class OrganizationCommonDTO {
     private String name;
     private Long id;
+    List<OrganizationCommonDTO> children;
 
     public OrganizationCommonDTO() {
 
@@ -22,6 +25,13 @@ public class OrganizationCommonDTO {
         this.id = id;
     }
 
+    public List<OrganizationCommonDTO> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<OrganizationCommonDTO> children) {
+        this.children = children;
+    }
 
     public Long getId() {
         return id;

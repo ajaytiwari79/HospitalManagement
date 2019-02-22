@@ -1077,4 +1077,8 @@ public class ActivityService extends MongoBaseService {
         return true;
     }
 
+    public List<ActivityDTO> findAllActivityByDeletedFalseAndUnitId(List<Long> unitIds) {
+     return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
+    }
+
 }

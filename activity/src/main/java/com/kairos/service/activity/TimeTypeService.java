@@ -159,7 +159,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public Map<String, List<TimeType>> getPresenceAbsenceTimeType(Long countryId) {
-        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllTimeTypeByCountryId(countryId);
         Map<BigInteger, List<TimeType>> timeTypeMap = timeTypes.stream().filter(t -> t.getUpperLevelTimeTypeId() != null).collect(Collectors.groupingBy(TimeType::getUpperLevelTimeTypeId, Collectors.toList()));
         Map<String, List<TimeType>> presenceAbsenceTimeTypeMap = new HashMap<>();
         timeTypes.forEach(t -> {
@@ -193,7 +193,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public List<TimeTypeDTO> getAllTimeTypeByCountryId(Long countryId) {
-        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllTimeTypeByCountryId(countryId);
         List<TimeTypeDTO> timeTypeDTOS = new ArrayList<>(timeTypes.size());
         timeTypes.forEach(t -> {
             TimeTypeDTO timeTypeDTO = new TimeTypeDTO(t.getId(), t.getTimeTypes().toValue(), t.getUpperLevelTimeTypeId());
@@ -265,7 +265,6 @@ public class TimeTypeService extends MongoBaseService {
         TimeType vetoTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.EMPTY_SET);
         TimeType stopBrickTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.EMPTY_SET);
         TimeType availableTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.EMPTY_SET);
-
         nonWorkingTimeTypes.add(volunteerTimeType);
         nonWorkingTimeTypes.add(timeBankOffTimeType);
         nonWorkingTimeTypes.add(unPaidBreakTimeType);
@@ -286,7 +285,14 @@ public class TimeTypeService extends MongoBaseService {
         return true;
     }
 
+
+    public  List<TimeType> getAllTimeTypesByCountryId(Long countryId) {
+        return timeTypeMongoRepository.findAllTimeTypeByCountryId(countryId);
+    }
+
+
     public Boolean existsByIdAndCountryId(BigInteger id, Long countryId){
         return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id,countryId);
     }
+
 }

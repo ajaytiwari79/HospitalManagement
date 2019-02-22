@@ -23,7 +23,7 @@ public class Clause extends BaseEntity {
     @NotBlank
     private String title;
 
-    @OneToMany
+    @ManyToMany
     private List<ClauseTag> tags  = new ArrayList<>();
 
     @NotNull

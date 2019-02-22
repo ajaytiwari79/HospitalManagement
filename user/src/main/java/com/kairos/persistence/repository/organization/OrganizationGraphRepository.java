@@ -783,5 +783,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Long getHubIdByOrganizationId(Long organizationId);
 
 
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
+    List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
+
 }
 
