@@ -9,6 +9,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class TimeTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private ActivityCategoryService activityCategoryService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -221,6 +224,10 @@ public class TimeTypeService extends MongoBaseService {
     public boolean deleteTimeType(BigInteger timeTypeId, Long countryId) {
         List<Activity> activity = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
+        boolean reasonCodeExists=userIntegrationService.isReasonCodeLinkedToTimeType(countryId,timeTypeId);
+        if(reasonCodeExists){
+            exceptionService.actionNotPermittedException("message.timetype.linked.reason_code");
+        }
         if (activity.isEmpty() && timeTypes.isEmpty()) {
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
             if (timeType != null && timeType.getUpperLevelTimeTypeId() == null) {
