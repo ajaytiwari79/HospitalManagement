@@ -444,10 +444,10 @@ public class CounterDistService extends MongoBaseService {
             });
             staffids.forEach(staffId -> {
                 accessGroupKPIConf.getKpiIds().forEach(kpiId -> {
+                    ApplicableFilter applicableFilter = null;
                     if (staffIdKpiMap.get(staffId).get(kpiId) == null) {
-                        ApplicableFilter applicableFilter=null;
-                        if(isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())){
-                            applicableFilter=new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(),false);
+                        if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
+                            applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                         }
                         applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
                         staffIdKpiMap.get(staffId).put(kpiId, kpiId);
@@ -576,9 +576,9 @@ public class CounterDistService extends MongoBaseService {
         unitIds.forEach(unitId -> {
             orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
                 if (unitIdKpiMap.get(unitId).get(kpiId) == null) {
-                    ApplicableFilter applicableFilter=null;
-                    if(isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())){
-                        applicableFilter=new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(),false);
+                    ApplicableFilter applicableFilter = null;
+                    if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
+                        applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                     }
                     applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
                     unitIdKpiMap.get(unitId).put(kpiId, kpiId);
@@ -639,9 +639,9 @@ public class CounterDistService extends MongoBaseService {
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKpis.stream().collect(Collectors.toMap(k -> k.getActiveKpiId(), v -> v));
         applicableKpis.forEach(applicableKPI -> {
             defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
-                ApplicableFilter applicableFilter=null;
-                if(isNotNull(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter())){
-                    applicableFilter=new ApplicableFilter(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter().getCriteriaList(),false);
+                ApplicableFilter applicableFilter = null;
+                if (kpiIdAndApplicableKpi.containsKey(applicableKPI) && isNotNull(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter())) {
+                    applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter().getCriteriaList(), false);
                 }
                 applicableKPIS.add(new ApplicableKPI(applicableKPI.getActiveKpiId(), applicableKPI.getBaseKpiId(), null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getTitle(), false));
             });
@@ -758,11 +758,11 @@ public class CounterDistService extends MongoBaseService {
         });
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         applicableKpiIds.forEach(kpiId -> {
-            ApplicableFilter applicableFilter=null;
-            if(isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())){
-                applicableFilter=new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(),false);
+            ApplicableFilter applicableFilter = null;
+            if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
+                applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
             }
-            applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT,applicableFilter,kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
+            applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
         });
         //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
         if (!applicableKPISToSave.isEmpty()) {
