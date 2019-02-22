@@ -95,7 +95,11 @@ public class ClauseService{
         List<TemplateType> templateTypes = templateTypeRepository.findAllById(clauseDto.getTemplateTypes());
         if (Optional.ofNullable(clause).isPresent()) {
             if (isUnitId) {
-                ObjectMapperUtils.copyProperties(clauseDto, clause);
+                clause.setTitle(clauseDto.getTitle());
+                clause.setDescription(clauseDto.getDescription());
+                clause.setTags(clauseTags);
+                clause.setTemplateTypes(templateTypes);
+                //ObjectMapperUtils.copyProperties(clauseDto, clause);
             } else {
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
                 clause.setTitle(masterClauseDTO.getTitle());
