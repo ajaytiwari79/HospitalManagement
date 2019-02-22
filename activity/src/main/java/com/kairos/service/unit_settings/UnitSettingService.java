@@ -2,6 +2,7 @@ package com.kairos.service.unit_settings;
 
 
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
@@ -9,7 +10,9 @@ import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 
@@ -37,6 +40,10 @@ public class UnitSettingService extends MongoBaseService {
     private UnitSettingRepository unitSettingRepository;
     @Inject
     private PhaseService phaseService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
+    @Inject
+    private TimeTypeService timeTypeService;
 
     public UnitAgeSetting createDefaultNightWorkerSettings(Long unitId) {
         UnitAgeSetting unitAgeSetting = new UnitAgeSetting(AppConstants.YOUNGER_AGE, AppConstants.OLDER_AGE, unitId);
@@ -126,5 +133,10 @@ public class UnitSettingService extends MongoBaseService {
         unitSetting.setFlexibleTimeSettings(flexibleTimeSettings);
         save(unitSetting);
         return flexibleTimeSettingDTO;
+    }
+
+    public List<TimeTypeDTO> getAllTimeTypes(Long unitId) {
+        Long countryId=userIntegrationService.getCountryId(unitId);
+        return timeTypeService.getAllTimeType(null,countryId);
     }
 }
