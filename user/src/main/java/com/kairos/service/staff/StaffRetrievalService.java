@@ -177,7 +177,7 @@ public class StaffRetrievalService {
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
 
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
-        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, parentOrganization.getId()));
+        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, unit.getId()));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
         return personalInfo;
