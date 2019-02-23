@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
@@ -254,6 +255,20 @@ public class StaffService {
             userGraphRepository.save(user);
         } else {
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
+        }
+        return true;
+    }
+
+    public boolean updatePasswordByManagement(Long staffId,PasswordUpdateByAdminDTO passwordUpdateDTO) {
+        Staff staff = staffGraphRepository.findByStaffId(staffId);
+
+        if(staff!=null && Arrays.equals(passwordUpdateDTO.getConfirmPassword(),passwordUpdateDTO.getNewPassword())){
+            User userForStaff = staff.getUser();
+            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
+            userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            userGraphRepository.save(userForStaff);
+        }else{
+             exceptionService.dataNotMatchedException("message.staff.notfound");
         }
         return true;
     }

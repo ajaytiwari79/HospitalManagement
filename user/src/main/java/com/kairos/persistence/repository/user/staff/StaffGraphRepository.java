@@ -475,7 +475,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN collect( distinct { id:id(staff)  ,lastName:staff.lastName  ,firstName: staff.firstName ,email: staff.email , userName:staff.userName, access_token:staff.access_token ,user_id:staff.user_id} ) as staffList")
     List<Map> findAllStaffBasicDetailsByOrgIdAndUnitId(Long parentOrgId,Long unitId);
 
-
+    @Query(" MATCH (staff:Staff)-[r:BELONGS_TO]->(user:User) where id(staff)={0} return staff,r,user")
+    Staff findByStaffId(Long staffId);
 
 
     //TODO not delete
