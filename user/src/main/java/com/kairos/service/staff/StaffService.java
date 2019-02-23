@@ -262,7 +262,7 @@ public class StaffService {
     public boolean updatePasswordByManagement(Long staffId,PasswordUpdateByAdminDTO passwordUpdateDTO) {
         Staff staff = staffGraphRepository.findByStaffId(staffId);
 
-        if(staff!=null && Arrays.equals(passwordUpdateDTO.getConfirmPassword(),passwordUpdateDTO.getNewPassword())){
+        if(staff!=null){
             User userForStaff = staff.getUser();
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
