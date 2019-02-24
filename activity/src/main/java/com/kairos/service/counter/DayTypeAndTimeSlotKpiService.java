@@ -89,7 +89,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
                         DateTimeInterval dateTimeIntervalOfHolidayType = new DateTimeInterval(startDateOfHolidayType, endDateOfHolidayType).overlap(dateTimeInterval);
                         DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
                         if(isNotNull(dateTimeIntervalOfHolidayType) && dateTimeIntervalOfHolidayType.overlaps(shiftInterval)) {
-                            totalMilliSeconds += dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
+                            totalMilliSeconds += dateTimeIntervalOfHolidayType.overlap(shiftInterval).getMilliSeconds();
                         }
                     }
                 }
