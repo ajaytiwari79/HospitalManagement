@@ -401,8 +401,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.findAndModify(new Query(new Criteria("activities.id").is(shiftActivityId)), update, Shift.class);
     }
     @Override
-    public List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
-        Criteria criteria=Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("disabled").is(false)
+    public List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds,List<Long> unitIds,List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
+        Criteria criteria=Criteria.where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").gte(startDate).lte(endDate);
         List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
         aggregationOperation.add(new MatchOperation(criteria));
@@ -411,7 +411,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(match(Criteria.where("activities.status").in(shiftActivityStatus)));
         }
         if(CollectionUtils.isNotEmpty(timeTypeIds)){
-            aggregationOperation.add(lookup("activities","activities._id","_id","activity"));
+            aggregationOperation.add(lookup("activities","activities.activityId","_id","activity"));
             aggregationOperation.add(unwind("activity"));
             aggregationOperation.add(match(Criteria.where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
