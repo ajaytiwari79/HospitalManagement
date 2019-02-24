@@ -423,8 +423,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
-        Criteria criteria=Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("disabled").is(false)
+    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds,List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
+        Criteria criteria=Criteria.where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").gte(startDate).lte(endDate);
         List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
         aggregationOperation.add(new MatchOperation(criteria));
