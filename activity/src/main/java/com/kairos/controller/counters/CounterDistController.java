@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -274,22 +275,22 @@ public class CounterDistController {
     }
 
     @PutMapping(COUNTRY_URL+KPI_URL+"/save_kpi")
-    public ResponseEntity<Map<String,Object>> saveKpiDataOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> saveKpiDataOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@Validated  @RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.saveKpiFilterData(tabId,countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
     @PutMapping(UNIT_URL+KPI_URL+"/save_kpi")
-    public ResponseEntity<Map<String,Object>> saveKpiDataOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId, @PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> saveKpiDataOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId, @PathVariable BigInteger kpiId,@Validated @RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.saveKpiFilterData(tabId,unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
     @PostMapping(COUNTRY_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDataOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> copyKpiDataOfCountry(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long countryId,@PathVariable BigInteger kpiId,@Validated @RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,  counterManagementService.copyKpiFilterData(tabId,countryId,kpiId,counterDTO,ConfLevel.COUNTRY));
     }
 
     @PostMapping(UNIT_URL+KPI_URL+"/copy_kpi")
-    public ResponseEntity<Map<String,Object>> copyKpiDataOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId,@PathVariable BigInteger kpiId, @RequestBody CounterDTO counterDTO){
+    public ResponseEntity<Map<String,Object>> copyKpiDataOfUnit(@RequestParam(value = "tabId",required=false) String tabId,@PathVariable Long unitId,@PathVariable BigInteger kpiId,@Validated @RequestBody CounterDTO counterDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,counterManagementService.copyKpiFilterData(tabId,unitId,kpiId,counterDTO,ConfLevel.UNIT));
     }
 
