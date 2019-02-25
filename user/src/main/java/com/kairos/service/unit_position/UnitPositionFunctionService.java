@@ -137,12 +137,12 @@ public class UnitPositionFunctionService {
         hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines, UnitPositionLineFunctionQueryResult.class);
         for (UnitPositionLineFunctionQueryResult unitPositionLineFunctionQueryResult : hourlyCostByUnitPositionLines) {
             BigDecimal hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYearConst : nonLeapYearConst;
-            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount().divide(hourlyCostCalculationFactor,3,RoundingMode.CEILING));
-            unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost().divide(hourlyCostCalculationFactor,3,RoundingMode.CEILING));
+            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount().divide(hourlyCostCalculationFactor,2,RoundingMode.CEILING));
+            unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost().divide(hourlyCostCalculationFactor,2,RoundingMode.CEILING));
             List<FunctionDTO> functionList = unitPositionLineFunctionQueryResult.getFunctions();
             functionList = functionList.stream().filter(functionDTO -> functionDTO.getAmount()!=null).collect(Collectors.toList());
             for (FunctionDTO functionDTO : functionList) {
-                functionDTO.setAmount(functionDTO.getAmount().divide(hourlyCostCalculationFactor,3, RoundingMode.CEILING));
+                functionDTO.setAmount(functionDTO.getAmount().divide(hourlyCostCalculationFactor,2, RoundingMode.CEILING));
             }
             unitPositionLineFunctionQueryResult.setFunctions(functionList);
         }
