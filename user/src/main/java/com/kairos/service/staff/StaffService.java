@@ -1514,7 +1514,7 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-            if (isNotNull(staff.getAccess_token())) {
+            if (isNull(staff.getAccess_token())) {
                 addStaffInChatServer(staff);
             }
         });
