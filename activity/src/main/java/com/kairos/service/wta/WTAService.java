@@ -8,6 +8,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
+import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
@@ -103,6 +104,8 @@ public class WTAService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private TimeBankService timeBankService;
+
+    @Inject private WorkTimeAgreementBalancesCalculaionService workTimeAgreementBalancesCalculaionService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -773,6 +776,10 @@ public class WTAService extends MongoBaseService {
        /* Map<Long,Map<Long,Long>> accumulatedTimebankMap = timeBankService.getAccumulatedTimebankByUnitPositions(positionLinesMap);
         ctawtaAndAccumulatedTimebankWrapper.setUnitPositionLineAndTimebankMinuteMap(accumulatedTimebankMap);
         */return ctawtaAndAccumulatedTimebankWrapper;
+    }
+
+    public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long unitPositionId,LocalDate startDate,LocalDate endDate){
+       return workTimeAgreementBalancesCalculaionService.getWorktimeAgreementBalance(unitPositionId,startDate,endDate);
     }
 
 }

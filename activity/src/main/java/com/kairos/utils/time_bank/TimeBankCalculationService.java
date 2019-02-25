@@ -171,18 +171,19 @@ public class TimeBankCalculationService {
             int timeBankMinWithoutCta = dailyScheduledMin - contractualMin;
             dailyTimeBank.setStaffId(unitPosition.getStaffId());
             dailyTimeBank.setTimeBankMinWithoutCta(timeBankMinWithoutCta);
+            int deltaAccumulatedTimebankMinutes = 0;
             if(someShiftPublish) {
-                int deltaAccumulatedTimebankMinutes = totalPublishedDailyPlannedMinutes - contractualMin;
-                dailyTimeBank.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes);
+                deltaAccumulatedTimebankMinutes = totalPublishedDailyPlannedMinutes - contractualMin;
             }
+            dailyTimeBank.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes);
             dailyTimeBank.setTimeBankMinWithCta(ctaTimeBankMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
             dailyTimeBank.setContractualMin(contractualMin);
             dailyTimeBank.setScheduledMin(dailyScheduledMin);
             dailyTimeBank.setTotalTimeBankMin(totalDailyTimebank);
             dailyTimeBank.setTimeBankCTADistributionList(getBlankTimeBankDistribution(unitPosition.getCtaRuleTemplates(), ctaTimeBankMinMap));
         }else {
-            if(dailyTimeBankEntryMap.containsKey(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()))){
-                dailyTimeBank = dailyTimeBankEntryMap.get(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()));
+            if(dailyTimeBankEntryMap.containsKey(unitPosition.getId() + "-" + DateUtils.getLocalDate(interval.getStart().getMillis()))){
+                dailyTimeBank = dailyTimeBankEntryMap.get(unitPosition.getId() + "-" + DateUtils.getLocalDate(interval.getStart().getMillis()));
                 dailyTimeBank.setDeleted(true);
             }
         }
@@ -278,25 +279,31 @@ public class TimeBankCalculationService {
      */
     public boolean validateCTARuleTemplate(Map<Long,DayTypeDTO> dayTypeDTOMap ,CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,DateTimeInterval shiftInterval,BigInteger plannedTimeId) {
         String reasonForNotValid=null;
-        if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null) {
+        boolean valid = true;
+        if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null){
+            valid = false;
             reasonForNotValid = ACCOUNT_TYPE_IS_NOT_VALID;
         }
-        if (isNotNull(reasonForNotValid) && CollectionUtils.isEmpty(ruleTemplate.getEmploymentTypes()) || !ruleTemplate.getEmploymentTypes().contains(unitPositionDetails.getEmploymentType().getId())){
+        if (valid && CollectionUtils.isEmpty(ruleTemplate.getEmploymentTypes()) || !ruleTemplate.getEmploymentTypes().contains(unitPositionDetails.getEmploymentType().getId())) {
+            valid = false;
             reasonForNotValid = EMPLOYMENT_IS_NOT_VALID;
         }
-        if (isNotNull(reasonForNotValid) && (CollectionUtils.isEmpty(ruleTemplate.getPhaseInfo()) || !(ruleTemplate.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent()))) {
+        if (valid && (CollectionUtils.isEmpty(ruleTemplate.getPhaseInfo()) || !(ruleTemplate.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent()))) {
+            valid = false;
             reasonForNotValid = PHASE_IS_NOT_VALID;
         }
-        if(!(isNotNull(reasonForNotValid) && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
+        if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
+            valid = false;
             reasonForNotValid = ACTIVITY_IS_NOT_VALID;
         }
-        if(!(isNotNull(reasonForNotValid) && validateDayType(shiftInterval,ruleTemplate,dayTypeDTOMap))){
+        if(!(valid && validateDayType(shiftInterval,ruleTemplate,dayTypeDTOMap))){
+            valid=false;
             reasonForNotValid = DAYTYPE_IS_NOT_VALID;
         }
-        if(isNotNull(reasonForNotValid)){
+        if(!valid){
             LOGGER.debug("rule template {} is not valid reason {}",ruleTemplate.getName(),reasonForNotValid);
         }
-        return isNotNull(reasonForNotValid);
+        return valid;
     }
 
     private boolean validateDayType(DateTimeInterval shiftInterval, CTARuleTemplateDTO ruleTemplateDTO, Map<Long, DayTypeDTO> dayTypeDTOMap) {

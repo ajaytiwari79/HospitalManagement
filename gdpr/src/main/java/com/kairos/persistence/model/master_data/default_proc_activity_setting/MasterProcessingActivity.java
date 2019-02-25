@@ -42,7 +42,7 @@ public class MasterProcessingActivity extends BaseEntity {
     @JoinColumn(name="masterProcessingActivity_id")
     private MasterProcessingActivity masterProcessingActivity;
 
-    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL)
     private List<MasterProcessingActivity> subProcessingActivities = new ArrayList<>();
 
     private Long countryId;

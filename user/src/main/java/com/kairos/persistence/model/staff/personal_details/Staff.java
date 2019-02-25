@@ -26,9 +26,25 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 public class Staff extends UserBaseEntity {
 
+    @Relationship(type = HAS_CONTACT_DETAIL)
+    private ContactDetail contactDetail;
+    //address tab
+    @Relationship(type = HAS_CONTACT_ADDRESS)
+    private ContactAddress contactAddress;
+
+    @Relationship(type = SECONDARY_CONTACT_ADDRESS)
+    private ContactAddress secondaryContactAddress;
+
+    @Relationship(type = BELONGS_TO)
+    private User user;
+
+    private EngineerType engineerType;
+
+    @Relationship(type = HAS_FAVOURITE_FILTERS)
+    private List<StaffFavouriteFilter> staffFavouriteFilterList;
+
     private String generalNote;
     private String reqFromPerson;
-
     private String cardNumber;
     private boolean copyKariosMailToLogin;
     private String sendNotificationBy;
@@ -49,32 +65,11 @@ public class Staff extends UserBaseEntity {
     private String familyName;
     private String signature;
     private String password;
-
     private String nationalInsuranceNumber;
     private StaffStatusEnum currentStatus;
     private Long inactiveFrom;
-    long organizationId;
-    private long visitourId;
-
-    private String visitourTeamId;
+    private long organizationId;
     private Language language;
-
-
-    @Relationship(type = HAS_CONTACT_DETAIL)
-    private ContactDetail contactDetail;
-    //address tab
-    @Relationship(type = HAS_CONTACT_ADDRESS)
-    private ContactAddress contactAddress;
-
-    @Relationship(type = SECONDARY_CONTACT_ADDRESS)
-    private ContactAddress secondaryContactAddress;
-
-    @Relationship(type = BELONGS_TO)
-    User user;
-
-    EngineerType engineerType;
-
-
     // Visitour Speed Profile
     private Integer speedPercent;
     private Integer workPercent;
@@ -86,18 +81,13 @@ public class Staff extends UserBaseEntity {
     private Float costHourOvertime;
     private Integer capacity;
     private Long kmdExternalId;
-
-    @Relationship(type = HAS_FAVOURITE_FILTERS)
-    private List<StaffFavouriteFilter> staffFavouriteFilterList;
     private String careOfName;
 
-    private String access_token;
-    private String user_id;
-
-
-
+    private String access_token; // specially required for chat server only
+    private String user_id; //specially required for chat server only
 
     public Staff() {
+        //Default Constructor
     }
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
@@ -112,6 +102,7 @@ public class Staff extends UserBaseEntity {
     public Staff(String firstName) {
         this.firstName = firstName;
     }
+
     public ContactAddress getContactAddress() {
         return contactAddress;
     }
@@ -178,14 +169,6 @@ public class Staff extends UserBaseEntity {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public long getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(long visitourId) {
-        this.visitourId = visitourId;
     }
 
     public String getPassword() {
@@ -306,14 +289,6 @@ public class Staff extends UserBaseEntity {
 
     public void setEngineerType(EngineerType engineerType) {
         this.engineerType = engineerType;
-    }
-
-    public String getVisitourTeamId() {
-        return visitourTeamId;
-    }
-
-    public void setVisitourTeamId(String visitourTeamId) {
-        this.visitourTeamId = visitourTeamId;
     }
 
     public String getManacoId() {

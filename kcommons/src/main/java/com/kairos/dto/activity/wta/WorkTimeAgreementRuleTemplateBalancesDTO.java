@@ -4,16 +4,25 @@ import java.util.List;
 
 public class WorkTimeAgreementRuleTemplateBalancesDTO {
 
-    private String wtaRuleTemplateName;
+    private String name;
     private String timeTypeColor;
     private List<IntervalBalance> intervalBalances;
 
-    public String getWtaRuleTemplateName() {
-        return wtaRuleTemplateName;
+    public WorkTimeAgreementRuleTemplateBalancesDTO() {
     }
 
-    public void setWtaRuleTemplateName(String wtaRuleTemplateName) {
-        this.wtaRuleTemplateName = wtaRuleTemplateName;
+    public WorkTimeAgreementRuleTemplateBalancesDTO(String name, String timeTypeColor, List<IntervalBalance> intervalBalances) {
+        this.name = name;
+        this.timeTypeColor = timeTypeColor;
+        this.intervalBalances = intervalBalances;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTimeTypeColor() {

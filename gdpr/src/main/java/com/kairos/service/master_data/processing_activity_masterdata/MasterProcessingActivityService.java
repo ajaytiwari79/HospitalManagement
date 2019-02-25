@@ -16,6 +16,7 @@ import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
@@ -354,19 +355,33 @@ public class MasterProcessingActivityService{
      * @return -method return list of Processing Activity and Risks linked with them
      */
     public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityWithSubProcessingActivitiesAndRisks(Long countryId) {
-       //TODO
-        /* List<MasterProcessingActivityRiskResponseDTO> masterProcessingActivityRiskResponseDTOS = masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(countryId);
-        masterProcessingActivityRiskResponseDTOS.forEach(masterProcessingActivity -> {
-            if (!Optional.ofNullable(masterProcessingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
-                masterProcessingActivity.setProcessingActivities(new ArrayList<>());
+        List<MasterProcessingActivity> masterProcessingActivities = masterProcessingActivityRepository.findAllByCountryId(countryId);
+        List<MasterProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS =  prepareMasterProcessingActivityRiskResponseDTOData(masterProcessingActivities, true);
+        return processingActivityRiskResponseDTOS;
+    }
+
+    private List<MasterProcessingActivityRiskResponseDTO> prepareMasterProcessingActivityRiskResponseDTOData(List<MasterProcessingActivity> processingActivities,boolean isParentProcessingActivity){
+        List<MasterProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = new ArrayList<>();
+        for(MasterProcessingActivity processingActivity : processingActivities){
+            List<MasterProcessingActivityRiskResponseDTO> subProcessingActivityRiskResponseDTOS = new ArrayList<>();
+            MasterProcessingActivityRiskResponseDTO masterProcessingActivityRiskResponseDTO = new MasterProcessingActivityRiskResponseDTO();
+            masterProcessingActivityRiskResponseDTO.setId(processingActivity.getId());
+            masterProcessingActivityRiskResponseDTO.setMainParent(isParentProcessingActivity);
+            masterProcessingActivityRiskResponseDTO.setName(processingActivity.getName());
+            if(!isParentProcessingActivity) {
+                masterProcessingActivityRiskResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
             }
-            masterProcessingActivity.getProcessingActivities().add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true, masterProcessingActivity.getRisks(),masterProcessingActivity.getSuggestedDate(),masterProcessingActivity.getSuggestedDataStatus()));
-            masterProcessingActivity.setMainParent(true);
-            masterProcessingActivity.setRisks(new ArrayList<>());
-        });*/
-        return new ArrayList<>();
-
-
+            List<MasterProcessingActivity> subProcessingActivities = processingActivity.getSubProcessingActivities();
+            if(!subProcessingActivities.isEmpty()){
+                subProcessingActivityRiskResponseDTOS = prepareMasterProcessingActivityRiskResponseDTOData(subProcessingActivities, false);
+            }
+            if(isParentProcessingActivity) {
+                subProcessingActivityRiskResponseDTOS.add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivityRiskResponseDTO.getId(), masterProcessingActivityRiskResponseDTO.getName(), masterProcessingActivityRiskResponseDTO.getMainParent(),ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class),masterProcessingActivityRiskResponseDTO.getSuggestedDate(),masterProcessingActivityRiskResponseDTO.getSuggestedDataStatus()));
+                masterProcessingActivityRiskResponseDTO.setProcessingActivities(subProcessingActivityRiskResponseDTOS);
+            }
+            processingActivityRiskResponseDTOS.add(masterProcessingActivityRiskResponseDTO);
+        }
+        return processingActivityRiskResponseDTOS;
     }
 
 

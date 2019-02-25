@@ -3,6 +3,7 @@ package com.kairos.wrapper.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.ActivityStateEnum;
+import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -12,6 +13,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 16/12/17.
@@ -36,7 +38,7 @@ public class ActivityTagDTO {
     private List<Long> dayTypes= new ArrayList<>();
     private RulesActivityTab rulesActivityTab;
     private Boolean activityCanBeCopied=false;
-
+    private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
     private Long parentId;
     private ActivityStateEnum state;
 
@@ -197,6 +199,14 @@ public class ActivityTagDTO {
 
     public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
         this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
+    }
+
+    public Set<OrganizationHierarchy> getActivityCanBeCopiedForOrganizationHierarchy() {
+        return activityCanBeCopiedForOrganizationHierarchy;
+    }
+
+    public void setActivityCanBeCopiedForOrganizationHierarchy(Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
+        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

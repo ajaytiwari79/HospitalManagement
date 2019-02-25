@@ -1,8 +1,15 @@
 package com.kairos.service.wta;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
+import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
+import com.kairos.dto.user.expertise.CareDaysDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -13,6 +20,8 @@ import com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +34,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.utils.ShiftValidatorService.*;
 
 
@@ -37,6 +48,10 @@ public class WorkTimeAgreementBalancesCalculaionService {
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private ExceptionService exceptionService;
+
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
 
     public DateTimeInterval getIntervalByRuletemplates(Map<BigInteger,ActivityWrapper> activityWrapperMap,List<WTABaseRuleTemplate> WTARuleTemplates, LocalDate startDate) {
@@ -47,12 +62,10 @@ public class WorkTimeAgreementBalancesCalculaionService {
                     VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) ruleTemplate;
                     validateRuleTemplate(vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate());
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(asDate(startDate), vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate()));
-
                     break;
                 case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByActivity(activityWrapperMap, asDate(startDate), seniorDaysPerYearWTATemplate.getActivityIds()));
-                    break;
                     break;
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
@@ -60,7 +73,7 @@ public class WorkTimeAgreementBalancesCalculaionService {
                     break;
                 case WTA_FOR_CARE_DAYS:
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
-                    interval = interval.addInterval(getIntervalByWTACareDaysRuleTemplate(startDate, wtaForCareDays));
+                    interval = interval.addInterval(getIntervalByWTACareDaysRuleTemplate(startDate, wtaForCareDays,activityWrapperMap));
                    break;
             }
         }
@@ -93,7 +106,21 @@ public class WorkTimeAgreementBalancesCalculaionService {
         return activityIds;
     }
 
-    public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitPositionId,LocalDate startDate,LocalDate endDate){
+    public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long unitPositionId,LocalDate startDate,LocalDate endDate){
+        return getDeafl(startDate,endDate);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,startDate,ORGANIZATION,unitPositionId,new HashSet<>());
+        if (staffAdditionalInfoDTO == null) {
+            exceptionService.invalidRequestException("message.staff.notfound");
+        }
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+            exceptionService.actionNotPermittedException("message.unit.position");
+        }
+        if(!staffAdditionalInfoDTO.getUnitPosition().isPublished()){
+            exceptionService.invalidRequestException("message.shift.not.published");
+        }
+        if (staffAdditionalInfoDTO.getUnitId() == null) {
+            exceptionService.invalidRequestException("message.staff.unit", staffAdditionalInfoDTO.getId(), unitId);
+        }
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDates(unitPositionId,asDate(startDate),asDate(endDate));
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
         Set<BigInteger> activityIds = getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
@@ -106,22 +133,141 @@ public class WorkTimeAgreementBalancesCalculaionService {
             switch (ruleTemplate.getWtaTemplateType()) {
                 case VETO_AND_STOP_BRICKS:
                     VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) ruleTemplate;
-                    WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = getVeto
-                    workTimeAgreementRuleTemplateBalances.add()
+                    workTimeAgreementRuleTemplateBalances.add(getVetoRuleTemplateBalance(vetoAndStopBricksWTATemplate,shiftWithActivityDTOS,activityWrapperMap,startDate,endDate));
                     break;
                 case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
+                    workTimeAgreementRuleTemplateBalances.add(getseniorDayRuleTemplateBalance(seniorDaysPerYearWTATemplate,shiftWithActivityDTOS,activityWrapperMap,startDate,endDate,staffAdditionalInfoDTO.getStaffAge()));
                     break;
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
+                    workTimeAgreementRuleTemplateBalances.add(getchildCareDayRuleTemplateBalance(childCareDaysCheckWTATemplate,shiftWithActivityDTOS,activityWrapperMap,startDate,endDate,staffAdditionalInfoDTO.getStaffAge()));
                     break;
                 case WTA_FOR_CARE_DAYS:
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
+                    workTimeAgreementRuleTemplateBalances.add(getWtaForCareDayRuleTemplateBalance(wtaForCareDays,shiftWithActivityDTOS,activityWrapperMap,startDate,endDate));
                     break;
             }
         }
     }
 
+
+    private WorkTimeAgreementRuleTemplateBalancesDTO getVetoRuleTemplateBalance(VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap,LocalDate startDate,LocalDate endDate){
+        if(isNull(endDate)){
+            endDate = startDate;
+        }
+        List<IntervalBalance> intervalBalances = new ArrayList<>();
+        while (startDate.isBefore(endDate) || startDate.equals(endDate)){
+            if(!containsInInterval(intervalBalances,startDate)){
+                DateTimeInterval dateTimeInterval = getIntervalByNumberOfWeeks(asDate(startDate), vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate())
+                float scheduledActivityCount = 0;
+                for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
+                    for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
+                        if((activity.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(activity.getStartDate()))){
+                            if(vetoAndStopBricksWTATemplate.getStopBrickActivityId().equals(activity.getActivityId())) {
+                                scheduledActivityCount = scheduledActivityCount + 0.5f;
+                            }else if(vetoAndStopBricksWTATemplate.getVetoActivityId().equals(activity.getActivityId())){
+                                scheduledActivityCount++;
+                            }
+                        }
+                    }
+                }
+                intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(),scheduledActivityCount,vetoAndStopBricksWTATemplate.getTotalBlockingPoints()-scheduledActivityCount,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate()))
+            }
+            startDate = startDate.plusDays(1);
+        }
+        return new WorkTimeAgreementRuleTemplateBalancesDTO("","",intervalBalances);
+    }
+
+    private WorkTimeAgreementRuleTemplateBalancesDTO getseniorDayRuleTemplateBalance(SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap,LocalDate startDate,LocalDate endDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        if(isNull(endDate)){
+            endDate = startDate;
+        }
+        List<IntervalBalance> intervalBalances = new ArrayList<>();
+        while (startDate.isBefore(endDate) || startDate.equals(endDate)){
+            if(!containsInInterval(intervalBalances,startDate)) {
+                DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), seniorDaysPerYearWTATemplate.getActivityIds());
+                float scheduledActivityCount = getShiftsActivityCountByInterval(dateTimeInterval,shiftWithActivityDTOS,new HashSet<>(seniorDaysPerYearWTATemplate.getActivityIds()));
+                CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), staffAdditionalInfoDTO.getStaffAge());
+                intervalBalances.add(new IntervalBalance(seniorDaysPerYearWTATemplate.,scheduledActivityCount,seniorDaysPerYearWTATemplate.getTotalBlockingPoints()-activityCount,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate()));
+            }
+        }
+        return new WorkTimeAgreementRuleTemplateBalancesDTO("","",intervalBalances);
+    }
+
+    private WorkTimeAgreementRuleTemplateBalancesDTO getchildCareDayRuleTemplateBalance(ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap,LocalDate startDate,LocalDate endDate){
+        if(isNull(endDate)){
+            endDate = startDate;
+        }
+        List<IntervalBalance> intervalBalances = new ArrayList<>();
+        while (startDate.isBefore(endDate) || startDate.equals(endDate)){
+
+        }
+        return new WorkTimeAgreementRuleTemplateBalancesDTO("","",intervalBalances);
+    }
+
+    private WorkTimeAgreementRuleTemplateBalancesDTO getWtaForCareDayRuleTemplateBalance(WTAForCareDays wtaForCareDays,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap,LocalDate startDate,LocalDate endDate,int staffAge){
+        if(isNull(endDate)){
+            endDate = startDate;
+        }
+        List<IntervalBalance> intervalBalances = new ArrayList<>();
+        while (startDate.isBefore(endDate) || startDate.equals(endDate)){
+
+        }
+        return new WorkTimeAgreementRuleTemplateBalancesDTO("","",intervalBalances);
+    }
+
+    private int getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Set<BigInteger> activityIds){
+        int activityCount = 0;
+        for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
+            for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
+                if((activity.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())){
+                    activityCount++;
+                }
+            }
+        }
+        return activityCount;
+    }
+
+
+
+
+    private boolean containsInInterval(List<IntervalBalance> intervalBalances,LocalDate startDate){
+        boolean contains = false;
+        for (IntervalBalance intervalBalance : intervalBalances) {
+            if(intervalBalance.getStartDate().equals(startDate) || intervalBalance.getEndDate().equals(startDate) || (intervalBalance.getStartDate().isBefore(startDate) && intervalBalance.getEndDate().isAfter(startDate))){
+                contains = true;
+            }
+        }
+        return false;
+    }
+
+    private WorkTimeAgreementBalance getDeafl(LocalDate startDate,LocalDate endDate){
+        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = new ArrayList<>(4);
+        List<IntervalBalance> intervalBalances = new ArrayList<>();
+        intervalBalances.add(new IntervalBalance(5,2,3, LocalDate.of(2019,02,12),LocalDate.of(2019,02,18)));
+        if(isNotNull(endDate)) {
+            intervalBalances.add(new IntervalBalance(5, 2, 3, LocalDate.of(2019, 02, 12), LocalDate.of(2019, 02, 18)));
+        }
+        workTimeAgreementRuleTemplateBalances.add(new WorkTimeAgreementRuleTemplateBalancesDTO("XYZ","#FF4500",intervalBalances));
+        workTimeAgreementRuleTemplateBalances.add(new WorkTimeAgreementRuleTemplateBalancesDTO("ABC","\t#FFD700",intervalBalances));
+        return new WorkTimeAgreementBalance(workTimeAgreementRuleTemplateBalances);
+    }
+
+    public static DateTimeInterval getIntervalByWTACareDaysRuleTemplate(LocalDate startDate, WTAForCareDays wtaForCareDays,Map<BigInteger,ActivityWrapper> activityWrapperMap) {
+        LocalDate shiftDate = startDate;
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(asDate(startDate), asDate(startDate.plusDays(1)));
+        for (ActivityCareDayCount activityCareDayCount : wtaForCareDays.getCareDayCounts()) {
+            if (activityWrapperMap.containsKey(activityCareDayCount.getActivityId())) {
+                Optional<CutOffInterval> cutOffIntervalOptional = activityWrapperMap.get(activityCareDayCount.getActivityId()).getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate)) && (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
+                if (cutOffIntervalOptional.isPresent()) {
+                    CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
+                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()), DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
+                }
+            }
+        }
+        return dateTimeInterval;
+    }
 
 
 }

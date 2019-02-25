@@ -4,33 +4,44 @@ import java.time.LocalDate;
 
 public class IntervalBalance {
 
-    private int total;
-    private int scheduled;
-    private int available;
+    private float total;
+    private float scheduled;
+    private float available;
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public int getTotal() {
+    public IntervalBalance() {
+    }
+
+    public IntervalBalance(float total, float scheduled, float available, LocalDate startDate, LocalDate endDate) {
+        this.total = total;
+        this.scheduled = scheduled;
+        this.available = available;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public float getTotal() {
         return total;
     }
 
-    public void setTotal(int total) {
+    public void setTotal(float total) {
         this.total = total;
     }
 
-    public int getScheduled() {
+    public float getScheduled() {
         return scheduled;
     }
 
-    public void setScheduled(int scheduled) {
+    public void setScheduled(float scheduled) {
         this.scheduled = scheduled;
     }
 
-    public int getAvailable() {
+    public float getAvailable() {
         return available;
     }
 
-    public void setAvailable(int available) {
+    public void setAvailable(float available) {
         this.available = available;
     }
 

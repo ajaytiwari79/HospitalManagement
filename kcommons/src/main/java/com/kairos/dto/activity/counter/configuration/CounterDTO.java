@@ -6,6 +6,7 @@ import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -13,11 +14,17 @@ import java.util.Set;
 public class CounterDTO {
     private BigInteger id;
     private CounterType type;
+    @NotBlank(message = "error.name.notnull")
     private String title;
     private boolean counter;
     private BigInteger primaryCounter;
     private BigInteger categoryId;
+    //calculation formula of per KPI
+    private String calculationFormula;
+    //applicable filter of kpi
     private List<FilterCriteria> criteriaList;
+    //selected filer by staff
+    private List<FilterCriteria> selectedFilters;
     private Set<ModuleType> supportedModuleTypes;
 
     public CounterDTO() {
@@ -86,5 +93,22 @@ public class CounterDTO {
 
     public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
         this.supportedModuleTypes = supportedModuleTypes;
+    }
+
+    public List<FilterCriteria> getSelectedFilters() {
+        return selectedFilters;
+    }
+
+    public void setSelectedFilters(List<FilterCriteria> selectedFilters) {
+        this.selectedFilters = selectedFilters;
+    }
+
+    public String getCalculationFormula() {
+
+        return calculationFormula;
+    }
+
+    public void setCalculationFormula(String calculationFormula) {
+        this.calculationFormula = calculationFormula;
     }
 }

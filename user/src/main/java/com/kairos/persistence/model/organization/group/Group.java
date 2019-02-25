@@ -26,11 +26,8 @@ public class Group extends UserBaseEntity {
     private String name;
     private boolean isEnabled =true;
 
-    private String description;
-
     @Relationship(type = HAS_TEAM,direction = OUTGOING)
     private List<Team> teamList = new ArrayList<>();
-
 
     @Relationship(type = GROUP_HAS_SKILLS)
     private List<Skill> skillList;
@@ -92,14 +89,6 @@ public class Group extends UserBaseEntity {
 
     public void setTeamList(List<Team> teamList) {
         this.teamList = teamList;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Group(String name, List<Team> teamList) {

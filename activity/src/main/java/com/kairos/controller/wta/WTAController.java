@@ -280,4 +280,14 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getUnitpositionCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<UnitPositionLinesDTO>> positionLinesMap) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getUnitpositionCtaWtaAndAccumulatedTimebank(unitId, positionLinesMap));
     }
+
+
+    @ApiOperation(value = "Get WorktimeAgreement balance by unitPostionId")
+    @GetMapping(value =  UNIT_URL+ "/get_worktimeAgreement_balance")
+    public ResponseEntity<Map<String, Object>> getWorktimeAgreementBalance(@PathVariable long unitId ,
+                                                                           @RequestParam Long unitPositionId,
+                                                                           @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
+                                                                           @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWorktimeAgreementBalance(unitId, unitPositionId,startDate,endDate));
+    }
 }

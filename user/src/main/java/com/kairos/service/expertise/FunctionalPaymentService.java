@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class FunctionalPaymentService {
 
-    private Logger LOGGER = LoggerFactory.getLogger(FunctionalPaymentService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(FunctionalPaymentService.class);
     private ExpertiseGraphRepository expertiseGraphRepository;
     private ExceptionService exceptionService;
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
@@ -264,6 +264,11 @@ public class FunctionalPaymentService {
         functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
 
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
+        FunctionalPayment oldFunctionalPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
+        if(oldFunctionalPayment!=null && functionalPaymentDTO.getStartDate().isAfter(oldFunctionalPayment.getStartDate()) && oldFunctionalPayment.getEndDate()==null){
+            exceptionService.actionNotPermittedException("message.already.active");
+        }
+
         if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
             if (parentFunctionalPayment.getStartDate().isEqual(functionalPaymentDTO.getStartDate()) || parentFunctionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate())){
                 exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan_or_equals.parent_startDate");

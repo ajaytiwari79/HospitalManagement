@@ -11,16 +11,19 @@ import javax.validation.constraints.NotBlank;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeamDTO {
 
+    private Long id;
     @NotBlank(message = "error.name.notnull")
     private String name;
-
-    private String description;
-
-    private String visitourId;
-
     private AddressDTO contactAddress;
-
     private boolean hasAddressOfUnit;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -46,19 +49,4 @@ public class TeamDTO {
         this.contactAddress = contactAddress;
     }
 
-    public String getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(String visitourId) {
-        this.visitourId = visitourId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

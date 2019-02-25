@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
@@ -90,7 +91,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -126,8 +126,6 @@ import static com.kairos.utils.FileUtil.createDirectory;
 @Transactional
 @Service
 public class StaffService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -175,15 +173,15 @@ public class StaffService {
     private AccessGroupService accessGroupService;
     @Inject
     private StaffFilterService staffFilterService;
-    @Autowired
+    @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Autowired
+    @Inject
     private ClientGraphRepository clientGraphRepository;
-    @Autowired
+    @Inject
     private TaskServiceRestClient taskServiceRestClient;
     @Inject
     private OrganizationService organizationService;
-    @Autowired
+    @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
@@ -221,6 +219,8 @@ public class StaffService {
     @Lazy
     private PasswordEncoder passwordEncoder;
 
+    private final Logger logger = LoggerFactory.getLogger(StaffService.class);
+
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -255,6 +255,20 @@ public class StaffService {
             userGraphRepository.save(user);
         } else {
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
+        }
+        return true;
+    }
+
+    public boolean updatePasswordByManagement(Long staffId,PasswordUpdateByAdminDTO passwordUpdateDTO) {
+        Staff staff = staffGraphRepository.findByStaffId(staffId);
+
+        if(staff!=null){
+            User userForStaff = staff.getUser();
+            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
+            userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            userGraphRepository.save(userForStaff);
+        }else{
+             exceptionService.dataNotMatchedException("message.staff.notfound");
         }
         return true;
     }
@@ -1553,10 +1567,10 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
-        Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), unit.getId());
+        Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
         staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
-        staffEmploymentWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(),unitId));
+        staffEmploymentWrapper.setStaffList(new ArrayList<>(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(),unitId).get(0).values()));
         return staffEmploymentWrapper;
     }
 

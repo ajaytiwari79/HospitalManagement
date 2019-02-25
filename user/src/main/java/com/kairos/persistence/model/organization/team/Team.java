@@ -24,10 +24,6 @@ public class Team extends UserBaseEntity {
 
     private String name;
 
-    private String visitourId;
-
-    private String description;
-
     /**
      * Specifies if team's address is same as unit's address
      */
@@ -81,14 +77,6 @@ public class Team extends UserBaseEntity {
         return contactAddress;
     }
 
-    public String getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(String visitourId) {
-        this.visitourId = visitourId;
-    }
-
     public boolean isHasAddressOfUnit() {
         return hasAddressOfUnit;
     }
@@ -108,19 +96,10 @@ public class Team extends UserBaseEntity {
     public Team() {
     }
 
-    public Team(String name, boolean hasAddressOfUnit, String description, String visitourId, ContactAddress contactAddress) {
+    public Team(String name, boolean hasAddressOfUnit, ContactAddress contactAddress) {
         this.name = name;
         this.hasAddressOfUnit = hasAddressOfUnit;
-        this.description = description;
-        this.visitourId = visitourId;
         this.contactAddress = contactAddress;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
