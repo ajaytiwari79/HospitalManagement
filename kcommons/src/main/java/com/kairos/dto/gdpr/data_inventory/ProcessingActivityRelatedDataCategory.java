@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
@@ -21,7 +20,7 @@ public class ProcessingActivityRelatedDataCategory {
     private String name;
 
     @NotEmpty
-    private List<ProcessingActivityRelatedDataElements> dataElements;
+    private List<ProcessingActivityRelatedDataElements> dataElements= new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -45,5 +44,8 @@ public class ProcessingActivityRelatedDataCategory {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ProcessingActivityRelatedDataCategory() {
     }
 }

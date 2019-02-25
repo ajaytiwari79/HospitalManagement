@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,7 +36,7 @@ public class RelatedDataSubject  {
     }
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<RelatedDataCategory> dataCategories;
+    private List<RelatedDataCategory> dataCategories = new ArrayList<>();
 
     public List<RelatedDataCategory> getDataCategories() {
         return dataCategories;

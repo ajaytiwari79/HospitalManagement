@@ -36,7 +36,7 @@ public class ProcessingActivityResponseDTO {
     private Boolean active;
     private Boolean suggested;
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects = new ArrayList<>();
 
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
