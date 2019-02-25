@@ -284,8 +284,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) \n" +
             "WITH  unitPosition,positionLine,expertise,fpm,slf,function,functionalPayment,hourlyCost\n" +
             "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function) \n" +
-            "WITH functionalPayment,positionLine,hourlyCost, sum(toInteger(rel.amount)) as totalCostOfFunctions WITH positionLine, hourlyCost+totalCostOfFunctions as hourlyCost,functionalPayment\n" +
-            "RETURN id(positionLine) as id,  CASE WHEN functionalPayment.paymentUnit='MONTHLY' THEN toString(hourlyCost*12)   ELSE toString(hourlyCost) END as hourlyCost ")
+            "WITH functionalPayment,positionLine,hourlyCost, sum(toInteger(rel.amount)) as totalCostOfFunctions WITH positionLine,CASE WHEN functionalPayment.paymentUnit='MONTHLY' THEN totalCostOfFunctions*12+hourlyCost ELSE totalCostOfFunctions+hourlyCost END as hourlyCost,functionalPayment\n" +
+            "RETURN id(positionLine) as id, toString(hourlyCost) as hourlyCost ")
     List<UnitPositionLinesQueryResult> findFunctionalHourlyCost(List<Long> unitPositionIds);
 
 
@@ -318,7 +318,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(fpm)-[: "+SENIORITY_LEVEL_FUNCTIONS+" ]->(slf:SeniorityLevelFunction)-[: "+FOR_SENIORITY_LEVEL+" ]->(seniorityLevel)   \n" +
             " WITH  positionLine,fpm,slf,function,functionalPayment,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(slf)-[rel: "+HAS_FUNCTIONAL_AMOUNT +"]-(function)   \n" +
-            "WITH  positionLine,COLLECT(DISTINCT {id:id(function),amount:rel.amount,name:function.name}) AS functions,basePayGradeAmount, sum(toInteger(rel.amount)) as totalCostOfFunctions\n" +
+            "WITH  positionLine,COLLECT(DISTINCT {id:id(function),amount:rel.amount,name:function.name}) AS functions,basePayGradeAmount,CASE WHEN functionalPayment.paymentUnit='MONTHLY' THEN sum(toInteger(rel.amount))*12 ELSE sum(toInteger(rel.amount)) END  as totalCostOfFunctions\n" +
             "RETURN  \n" +
             "positionLine.startDate AS startDate,toString(basePayGradeAmount) AS basePayGradeAmount,functions,toString(basePayGradeAmount+totalCostOfFunctions) AS hourlyCost ")
     List<UnitPositionLineFunctionQueryResult> getFunctionalHourlyCostByUnitPositionId(Long unitId, Long unitPositionId);
