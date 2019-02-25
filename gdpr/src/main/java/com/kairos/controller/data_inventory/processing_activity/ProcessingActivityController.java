@@ -75,12 +75,11 @@ class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId));
     }
 
-//TODO
-   /* @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
+    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
-    }*/
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityWithBasicDetailForAsset(unitId));
+    }
 
 
     @ApiOperation(value = "updated status of processing activity")
