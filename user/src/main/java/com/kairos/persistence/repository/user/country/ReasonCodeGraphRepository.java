@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY;
 
 /**
  * Created by pavan on 23/3/18.

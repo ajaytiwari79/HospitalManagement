@@ -21,7 +21,10 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -354,10 +357,9 @@ public class ProcessingActivityService {
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
-    //TODO
-    /*public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
-        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubProcessingActivities(unitId);
-    }*/
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityWithBasicDetailForAsset(Long unitId) {
+        return processingActivityRepository.getAllProcessingActivityWithBasicDetailForAsset(unitId);
+    }
 
 
     /*
@@ -576,20 +578,38 @@ public class ProcessingActivityService {
      * @return
      */
     //TODO
-   /* public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
-        List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = processingActivityMongoRepository.getAllProcessingActivityAndSubProcessWithRisksByUnitId(unitId);
-        processingActivityRiskResponseDTOS.forEach(processingActivity -> {
-            if (!Optional.ofNullable(processingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
-                processingActivity.setProcessingActivities(new ArrayList<>());
+    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
+        List<ProcessingActivity> processingActivities = processingActivityRepository.findAllByOrganizationId(unitId);
+        List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS =  prepareProcessingActivityRiskResponseDTOData(processingActivities, true);
+        return processingActivityRiskResponseDTOS;
+    }
+
+    private List<ProcessingActivityRiskResponseDTO> prepareProcessingActivityRiskResponseDTOData(List<ProcessingActivity> processingActivities, boolean isParentProcessingActivity){
+        List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = new ArrayList<>();
+        for(ProcessingActivity processingActivity : processingActivities){
+            List<ProcessingActivityRiskResponseDTO> subProcessingActivityRiskResponseDTOS = new ArrayList<>();
+            ProcessingActivityRiskResponseDTO processingActivityRiskResponseDTO = new ProcessingActivityRiskResponseDTO();
+            processingActivityRiskResponseDTO.setId(processingActivity.getId());
+            processingActivityRiskResponseDTO.setMainParent(isParentProcessingActivity);
+            processingActivityRiskResponseDTO.setName(processingActivity.getName());
+            if(!isParentProcessingActivity) {
+                processingActivityRiskResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
             }
-            processingActivity.getProcessingActivities().add(0, new ProcessingActivityRiskResponseDTO(processingActivity.getId(), processingActivity.getName(), true, processingActivity.getRisks()));
-            processingActivity.setMainParent(true);
-        });
+            List<ProcessingActivity> subProcessingActivities = processingActivity.getSubProcessingActivities();
+            if(!subProcessingActivities.isEmpty()){
+                subProcessingActivityRiskResponseDTOS = prepareProcessingActivityRiskResponseDTOData(subProcessingActivities, false);
+            }
+            if(isParentProcessingActivity) {
+                subProcessingActivityRiskResponseDTOS.add(0, new ProcessingActivityRiskResponseDTO(processingActivityRiskResponseDTO.getId(), processingActivityRiskResponseDTO.getName(), processingActivityRiskResponseDTO.getMainParent(),ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class)));
+                processingActivityRiskResponseDTO.setProcessingActivities(subProcessingActivityRiskResponseDTOS);
+            }
+            processingActivityRiskResponseDTOS.add(processingActivityRiskResponseDTO);
+        }
         return processingActivityRiskResponseDTOS;
     }
 
 
-    public List<AssessmentBasicResponseDTO> getAssessmentListByProcessingActivityId(Long unitId, BigInteger processingActivityId) {
+  /*  public List<AssessmentBasicResponseDTO> getAssessmentListByProcessingActivityId(Long unitId, BigInteger processingActivityId) {
         return assessmentMongoRepository.findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(unitId, processingActivityId);
     }*/
 

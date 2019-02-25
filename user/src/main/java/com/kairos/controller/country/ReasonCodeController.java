@@ -90,6 +90,13 @@ public class ReasonCodeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesByUnitId(unitId,reasonCodeType));
 
     }
+    @ApiOperation(value = "Check if any reason code exists with the provided time type Id")
+    @GetMapping(value = COUNTRY_URL + "/reason_codes/link_with_time_type/{timeTypeId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> anyReasonCodeLinkedWithTimeType(@PathVariable BigInteger timeTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.anyReasonCodeLinkedWithTimeType(timeTypeId));
+
+    }
 
     @ApiOperation(value = "Check if any reason code exists with the provided time type Id")
     @GetMapping(value = COUNTRY_URL + "/reason_codes/link_with_time_type/{timeTypeId}")

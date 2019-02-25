@@ -75,12 +75,11 @@ class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId));
     }
 
-//TODO
-   /* @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
+    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
-    }*/
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityWithBasicDetailForAsset(unitId));
+    }
 
 
     @ApiOperation(value = "updated status of processing activity")
@@ -152,7 +151,7 @@ class ProcessingActivityController {
     @PutMapping("/processing_activity/{processingActivityId}/risk")
     public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ProcessingActivityRiskDTO processingActivityRiskDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTO));
-    }
+    }*/
 
     @ApiOperation(value = "Get All Processing Activities with Risks")
     @GetMapping("/processing_activity/risk")
@@ -161,7 +160,7 @@ class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "unlink  risk form Processing activity and Sub Processing Activity")
+   /* @ApiOperation(value = "unlink  risk form Processing activity and Sub Processing Activity")
     @DeleteMapping("/processing_activity/{processingActivityId}/risk/{riskId}")
     public ResponseEntity<Object> unLinkRiskfromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));

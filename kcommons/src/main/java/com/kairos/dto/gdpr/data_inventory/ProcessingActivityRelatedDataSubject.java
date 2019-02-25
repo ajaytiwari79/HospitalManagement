@@ -4,7 +4,7 @@ package com.kairos.dto.gdpr.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,7 +18,7 @@ public class ProcessingActivityRelatedDataSubject {
     @NotNull
     private String name;
 
-    private List<ProcessingActivityRelatedDataCategory> dataCategories;
+    private List<ProcessingActivityRelatedDataCategory> dataCategories = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -42,5 +42,8 @@ public class ProcessingActivityRelatedDataSubject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ProcessingActivityRelatedDataSubject() {
     }
 }

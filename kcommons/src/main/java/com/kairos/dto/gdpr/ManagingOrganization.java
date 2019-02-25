@@ -25,7 +25,7 @@ public class ManagingOrganization {
     public void setName(String name) { this.name = name; }
 
 
-    public ManagingOrganization(Long id, String name, String email) {
+    public ManagingOrganization(Long id, String name) {
         this.id = id;
         this.name = name;
     }
