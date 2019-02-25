@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -26,7 +27,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @RestController
 public class ReasonCodeController {
     @Inject
-    ReasonCodeService reasonCodeService;
+    private ReasonCodeService reasonCodeService;
 
 
     //Reason Code
@@ -87,6 +88,13 @@ public class ReasonCodeController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getReasonCodesByUnitId(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType ,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesByUnitId(unitId,reasonCodeType));
+
+    }
+    @ApiOperation(value = "Check if any reason code exists with the provided time type Id")
+    @GetMapping(value = COUNTRY_URL + "/reason_codes/link_with_time_type/{timeTypeId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> anyReasonCodeLinkedWithTimeType(@PathVariable BigInteger timeTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.anyReasonCodeLinkedWithTimeType(timeTypeId));
 
     }
 

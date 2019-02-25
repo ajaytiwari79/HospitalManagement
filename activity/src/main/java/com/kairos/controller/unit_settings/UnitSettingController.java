@@ -86,4 +86,10 @@ public class UnitSettingController {
     public ResponseEntity<Map<String,Object>> updateFlexibleTime(@PathVariable Long unitId, @RequestBody FlexibleTimeSettingDTO flexibleTimeSettingDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.updateFlexibleTime(unitId,flexibleTimeSettingDTO));
     }
+
+    @ApiOperation("get All time type")
+    @GetMapping("/time_type")
+    public ResponseEntity<Map<String,Object>> getAllTimeTypes(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.getAllTimeTypes(unitId));
+    }
 }
