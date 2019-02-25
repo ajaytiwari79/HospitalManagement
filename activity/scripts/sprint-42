@@ -89,4 +89,7 @@ db.getCollection('applicableKPI').updateMany({"baseKpiId":"14"},{"$set":{"title"
 db.getCollection('applicableKPI').updateMany({"baseKpiId":"15"},{"$set":{"title":"working time"}})
 
 
+db.applicableKPI.remove({"unitId":{$exists:false},"level":"STAFF"})
+db.tabKPIConf.remove({})
+db.accessGroupKPIEntry.remove({})
 
