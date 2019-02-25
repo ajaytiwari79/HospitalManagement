@@ -154,9 +154,9 @@ public class ShiftCopyService extends MongoBaseService {
         int counter = 0;
         LocalDate shiftStartDate = copyShiftDTO.getStartDate();
         LocalDate shiftLastDate = copyShiftDTO.getEndDate();
-        List<DayOfWeek> dayOfWeeks = (isCollectionNotEmpty(copyShiftDTO.getSelectedDays())) ? copyShiftDTO.getSelectedDays().stream().map(day -> DayOfWeek.valueOf(day.toString())).collect(Collectors.toList()) : new ArrayList<>();
         List<LocalDate> shiftCreationlocalDates = new ArrayList<>();
         if (isCollectionNotEmpty(copyShiftDTO.getSelectedDays())) {
+            List<DayOfWeek> dayOfWeeks =  copyShiftDTO.getSelectedDays().stream().map(day -> DayOfWeek.valueOf(day.toString())).collect(Collectors.toList()) ;
             while (shiftLastDate.isAfter(shiftStartDate) || shiftLastDate.equals(shiftStartDate)) {
                 if (dayOfWeeks.contains(shiftStartDate.getDayOfWeek())) {
                     shiftCreationlocalDates.add(shiftStartDate);
