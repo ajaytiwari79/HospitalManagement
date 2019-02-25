@@ -73,7 +73,6 @@ public class ShiftActivity {
         this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
-        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.breakReplaced=breakReplaced;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {

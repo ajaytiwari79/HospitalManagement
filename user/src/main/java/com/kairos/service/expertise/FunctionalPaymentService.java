@@ -314,6 +314,13 @@ public class FunctionalPaymentService {
         if (CollectionUtils.isNotEmpty(toBreakInNewList)) {
             List<FunctionalPaymentQueryResult> functionalPaymentQueryResultList=functionalPaymentGraphRepository.getFunctionalPaymentData(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
             List<FunctionalPaymentQueryResult> functionalPaymentQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(functionalPaymentQueryResultList,FunctionalPaymentQueryResult.class);
+            List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrices=new ArrayList<>();
+            //Map<List<Long>,List<FunctionalPaymentMatrixQueryResult>> payGroupAreaWiseMap=constructMapOfFunctionalPaymentMatrixQueryResult(functionalPaymentQueryResults);
+            functionalPaymentQueryResults.forEach(functionalPaymentQueryResult -> {
+                    functionalPaymentQueryResult.getFunctionalPaymentMatrices().forEach(functionalPaymentMatrixQueryResult -> {
+
+                    });
+            });
             List<FunctionalPayment> functionalPayments = functionalPaymentGraphRepository.findAllById(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
             Map<Long, FunctionalPayment> functionalPaymentMap = functionalPayments.stream().collect(Collectors.toMap(FunctionalPayment::getId, Functions.identity()));
             List<FunctionalPayment> functionalPaymentListBeforeDate = new ArrayList<>();
@@ -418,5 +425,16 @@ public class FunctionalPaymentService {
         });
         return seniorityLevelFunctions;
     }
+
+//    private Map<List<Long>,List<FunctionalPaymentMatrixQueryResult>> constructMapOfFunctionalPaymentMatrixQueryResult(List<FunctionalPaymentQueryResult> functionalPaymentQueryResults){
+//        Map<List<Long>,List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap=new HashMap<>();
+//            functionalPaymentQueryResults.forEach(functionalPaymentQueryResult -> {
+//                    functionalPaymentQueryResult.getFunctionalPaymentMatrices().forEach(functionalPaymentMatrixQueryResult -> {
+//                        if(payGroupAreaWiseMap.containsKey(functionalPaymentMatrixQueryResult.getPayGroupAreasIds())){
+//                            payGroupAreaWiseMap.get(functionalPaymentMatrixQueryResult.getPayGroupAreasIds()).addAll(fun)
+//                        }
+//                    });
+//            });
+//    }
 
 }
