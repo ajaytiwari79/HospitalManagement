@@ -901,8 +901,8 @@ public class CounterDistService extends MongoBaseService {
         if (!accessGroupPermissionCounterDTO.isManagement()) {
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
-        if (isNotNull(tabId)&& !accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            level =ConfLevel.STAFF;
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            level = ConfLevel.STAFF;
             refId = accessGroupPermissionCounterDTO.getStaffId();
         }
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
@@ -946,7 +946,7 @@ public class CounterDistService extends MongoBaseService {
         if (!accessGroupPermissionCounterDTO.isManagement()) {
             exceptionService.actionNotPermittedException("message.kpi.permission");
         }
-        if (isNotNull(tabId)&& !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
             level = ConfLevel.STAFF;
             refId = accessGroupPermissionCounterDTO.getStaffId();
         }

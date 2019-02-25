@@ -37,29 +37,29 @@ public class PlannedHoursCalculationService implements CounterService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
 
-    private List<CommonKpiDataUnit> getPlannedHoursKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi){
+    private List<CommonKpiDataUnit> getPlannedHoursKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi) {
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
-        Set<BigInteger> timeTypeIds=new HashSet<>();
-        List<Long> staffIds=(filterBasedCriteria.get(FilterType.STAFF_IDS) != null)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
-        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
-        List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
-        List<String> shiftActivityStatus=(filterBasedCriteria.get(FilterType.ACTIVITY_STATUS)!=null)?filterBasedCriteria.get(FilterType.ACTIVITY_STATUS):new ArrayList<>();
-        List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
-        if(filterBasedCriteria.get(FilterType.TIME_TYPE)!=null&&isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE))) {
-              if(filterBasedCriteria.get(FilterType.TIME_TYPE).get(0) instanceof String){
-                  timeTypeIds=timeTypeMongoRepository.findTimeTypeIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
-              }else{
-                  timeTypeIds=timeTypeMongoRepository.findAllTimeTypeIdsByTimeTypeIds(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
-                  timeTypeIds.addAll(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
-              }
+        Set<BigInteger> timeTypeIds = new HashSet<>();
+        List<Long> staffIds = (filterBasedCriteria.get(FilterType.STAFF_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
+        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) != null) ? KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
+        List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
+        List<String> shiftActivityStatus = (filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) != null) ? filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) : new ArrayList<>();
+        List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
+        if (filterBasedCriteria.get(FilterType.TIME_TYPE) != null && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE))) {
+            if (filterBasedCriteria.get(FilterType.TIME_TYPE).get(0) instanceof String) {
+                timeTypeIds = timeTypeMongoRepository.findTimeTypeIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
+            } else {
+                timeTypeIds = timeTypeMongoRepository.findAllTimeTypeIdsByTimeTypeIds(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
+                timeTypeIds.addAll(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
+            }
         }
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentType,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS= userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName,(p1, p2) -> p1));
-        List<CommonKpiDataUnit> basicChartKpiDateUnits=shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()),isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(organizationId), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
-        basicChartKpiDateUnits.forEach(kpiData->{
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentType, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName, (p1, p2) -> p1));
+        List<CommonKpiDataUnit> basicChartKpiDateUnits = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
+        basicChartKpiDateUnits.forEach(kpiData -> {
             kpiData.setLabel(staffIdAndNameMap.get(kpiData.getRefId()));
-            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(),  Arrays.asList(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(),DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit)kpiData).getValue())))));
+            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(), Arrays.asList(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(), DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit) kpiData).getValue())))));
         });
         return kpiDataUnits;
     }
@@ -67,13 +67,13 @@ public class PlannedHoursCalculationService implements CounterService {
 
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
-        List<CommonKpiDataUnit> dataList= getPlannedHoursKpiData(organizationId,filterBasedCriteria,true);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+        List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, true);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
-        List<CommonKpiDataUnit> dataList= getPlannedHoursKpiData(organizationId,filterBasedCriteria,false);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList,new KPIAxisData(AppConstants.STAFF,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+        List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, false);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 }
