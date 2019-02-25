@@ -17,7 +17,7 @@ public interface PlanningPeriodMongoRepository extends MongoBaseRepository<Plann
     @Query(value = "{deleted:false,id:?0 ,unitId:?1 }")
     PlanningPeriod findByIdAndUnitId(BigInteger id, Long unitId);
 
-    @Query("{deleted:false,unitId:?0,startDate: {$lt: ?2},endDate:{$gt:?1}}")
+    @Query("{deleted:false,unitId:?0,startDate: {$lte: ?2},endDate:{$gte:?1}}")
     List<PlanningPeriod> findAllByUnitIdAndBetweenDates(Long unitId,Date startDate,Date endDate);
 
     @Query("{deleted:false,unitId:{$in:?0},startDate: {$lt: ?2},endDate:{$gt:?1}}")
