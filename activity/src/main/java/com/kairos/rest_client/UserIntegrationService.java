@@ -746,6 +746,11 @@ public class UserIntegrationService {
         }, unitPositionId);
     }
 
+    public boolean isReasonCodeLinkedToTimeType(Long countryId,BigInteger timeTypeId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, REASON_CODE_LINK_WITH_TIME_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        },timeTypeId);
+    }
+
 
 }
 

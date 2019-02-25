@@ -152,6 +152,7 @@ public final class ApiConstants {
 
     //Scheduler
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";
+    public static final String REASON_CODE_LINK_WITH_TIME_TYPE = "/reason_codes/link_with_time_type/{timeTypeId}";
 
 
 
