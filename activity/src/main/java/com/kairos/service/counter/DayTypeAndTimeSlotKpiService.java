@@ -88,8 +88,8 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
                         Date endDateOfHolidayType = isNotNull(countryHolidayCalenderDTO.getEndTime()) ? DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate(), countryHolidayCalenderDTO.getEndTime()) : asDateEndOfDay(countryHolidayCalenderDTO.getHolidayDate());
                         DateTimeInterval dateTimeIntervalOfHolidayType = new DateTimeInterval(startDateOfHolidayType, endDateOfHolidayType).overlap(dateTimeInterval);
                         DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
-                        if(isNotNull(dateTimeIntervalOfHolidayType) && dateTimeIntervalOfHolidayType.overlaps(shiftInterval)) {
-                            totalMilliSeconds += dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
+                        if (isNotNull(dateTimeIntervalOfHolidayType) && dateTimeIntervalOfHolidayType.overlaps(shiftInterval)) {
+                            totalMilliSeconds += dateTimeIntervalOfHolidayType.overlap(shiftInterval).getMilliSeconds();
                         }
                     }
                 }
@@ -97,6 +97,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         }
         return DateUtils.getHoursFromTotalMilliSeconds(totalMilliSeconds);
     }
+
     //use for return hours of timeslot
     private Map<Long, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlot(List<Long> staffIds, List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap) {
         Map<Long, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = new HashMap<>();
@@ -120,7 +121,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         Set<DayOfWeek> daysOfWeek = new HashSet<>();
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         List<Long> staffIds = KPIUtils.getLongValue(filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS, new ArrayList<>()));
-        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) != null) ? KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
         List<Long> unitIds = KPIUtils.getLongValue(filterBasedCriteria.getOrDefault(FilterType.UNIT_IDS, new ArrayList()));
         List<Long> employmentTypes = KPIUtils.getLongValue(filterBasedCriteria.getOrDefault(FilterType.EMPLOYMENT_TYPE, new ArrayList()));
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
@@ -144,14 +145,14 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         }
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, new ArrayList<>(), dayOfWeeksNo, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         // filter staffIds if given staff has shift
         staffIds = shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId()).distinct().collect(Collectors.toList());
         Map<Long, String> staffIdAndNameMap = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         //TODO change start time and end time when use filter currently we only take day time
         TimeSlotDTO timeSlotDTO = defaultKpiDataDTO.getTimeSlotDTOS().stream().filter(timeSlotDto -> timeSlotIds.contains(timeSlotDto.getId())).findFirst().get();
         Map<Long, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = getTotalHoursOfTimeSlot(staffIds, shiftWithActivityDTOS, timeSlotDTO, dayTypeIds, daysTypeIdAndDayTypeMap);
-        staffIdAndTotalHours.keySet().forEach(s -> kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(s),  staffIdAndTotalHours.get(s))));
+        staffIdAndTotalHours.keySet().forEach(s -> kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(s), staffIdAndTotalHours.get(s))));
         return kpiDataUnits;
     }
 
@@ -159,12 +160,12 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList,new KPIAxisData(AppConstants.STAFF,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 }

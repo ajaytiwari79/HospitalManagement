@@ -14,7 +14,7 @@ import java.util.Set;
 public class CounterDTO {
     private BigInteger id;
     private CounterType type;
-    @NotBlank
+    @NotBlank(message = "error.name.notnull")
     private String title;
     private boolean counter;
     private BigInteger primaryCounter;
