@@ -182,8 +182,8 @@ public class TimeBankCalculationService {
             dailyTimeBank.setTotalTimeBankMin(totalDailyTimebank);
             dailyTimeBank.setTimeBankCTADistributionList(getBlankTimeBankDistribution(unitPosition.getCtaRuleTemplates(), ctaTimeBankMinMap));
         }else {
-            if(dailyTimeBankEntryMap.containsKey(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()))){
-                dailyTimeBank = dailyTimeBankEntryMap.get(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()));
+            if(dailyTimeBankEntryMap.containsKey(unitPosition.getId() + "-" + DateUtils.getLocalDate(interval.getStart().getMillis()))){
+                dailyTimeBank = dailyTimeBankEntryMap.get(unitPosition.getId() + "-" + DateUtils.getLocalDate(interval.getStart().getMillis()));
                 dailyTimeBank.setDeleted(true);
             }
         }
