@@ -353,17 +353,17 @@ public class FunctionalPaymentService {
     }
 
    private void updateMatrixInFunctionalPayment(List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrixQueryResults, FunctionalPayment functionalPayment,BigDecimal percentageValue) {
-        List<FunctionalPaymentMatrix> list = new ArrayList<>();
+        List<FunctionalPaymentMatrix> functionalPaymentMatrices = new ArrayList<>();
         List<Function> functions = getFunctionList(functionalPaymentMatrixQueryResults);
         List<SeniorityLevel> seniorityLevels = getSeniorityLevelList(functionalPaymentMatrixQueryResults);
         for (FunctionalPaymentMatrixQueryResult functionalPaymentMatrixQueryResult:functionalPaymentMatrixQueryResults){
            FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
            functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrix,functionalPaymentMatrixQueryResult, seniorityLevels, functions,percentageValue);
            functionalPaymentMatrixQueryResult.setId(functionalPaymentMatrix.getId());
-           list.add(functionalPaymentMatrix);
+            functionalPaymentMatrices.add(functionalPaymentMatrix);
        }
-       functionalPaymentMatrixRepository.saveAll(list);
-       functionalPayment.setFunctionalPaymentMatrices(list);
+       functionalPaymentMatrixRepository.saveAll(functionalPaymentMatrices);
+       functionalPayment.setFunctionalPaymentMatrices(functionalPaymentMatrices);
        functionalPaymentGraphRepository.save(functionalPayment);
     }
 
