@@ -779,7 +779,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long unitPositionId,LocalDate startDate,LocalDate endDate){
-       return workTimeAgreementBalancesCalculaionService.getWorktimeAgreementBalance(unitPositionId,startDate,endDate);
+       return workTimeAgreementBalancesCalculaionService.getWorktimeAgreementBalance(unitId,unitPositionId,startDate,endDate);
     }
 
 }
