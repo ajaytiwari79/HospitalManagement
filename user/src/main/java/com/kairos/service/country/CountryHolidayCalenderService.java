@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 /**
  * Created by oodles on 20/9/16.
  */
@@ -54,7 +56,7 @@ public class CountryHolidayCalenderService {
         DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
         if (calender!=null){
             if (dayType!=null){
-                if(dayType.isHolidayType()&&!LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime())&&countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())){
+                if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
                     exceptionService.actionNotPermittedException("start_date.less.from.end_date");
                 }
                 dayType.setColorCode(countryHolidayCalenderDTO.getColorCode());
@@ -111,7 +113,7 @@ public class CountryHolidayCalenderService {
             if (countryHolidayCalenderDTO != null) {
                 DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
                 if(dayType!=null){
-                    if(dayType.isHolidayType()&&!LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime())&&countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())){
+                    if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
                         exceptionService.actionNotPermittedException("start_date.less.from.end_date");
                     }
                     countryHolidayCalender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
