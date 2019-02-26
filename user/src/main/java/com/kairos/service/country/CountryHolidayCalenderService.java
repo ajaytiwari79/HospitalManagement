@@ -8,12 +8,14 @@ import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,8 @@ public class CountryHolidayCalenderService {
     private DayTypeGraphRepository dayTypeGraphRepository ;
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
 
 
@@ -50,6 +54,9 @@ public class CountryHolidayCalenderService {
         DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
         if (calender!=null){
             if (dayType!=null){
+                if(dayType.isHolidayType()&&!LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime())&&countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())){
+                    exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+                }
                 dayType.setColorCode(countryHolidayCalenderDTO.getColorCode());
                 calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
                 calender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());
@@ -105,6 +112,9 @@ public class CountryHolidayCalenderService {
             if (countryHolidayCalenderDTO != null) {
                 DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
                 if(dayType!=null){
+                    if(dayType.isHolidayType()&&!LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime())&&countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())){
+                        exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+                    }
                     countryHolidayCalender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
                     countryHolidayCalender.setDescription(countryHolidayCalenderDTO.getDescription());
                     countryHolidayCalender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());

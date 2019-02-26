@@ -893,11 +893,9 @@ public  class DateUtils {
         return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
-    public static LocalDate getLocaDateWithFormatters(LocalDate localDate){
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String text = localDate.format(formatters);
-        LocalDate parsedDate = LocalDate.parse(text, formatters);
-        return parsedDate;
+    public static String getLocaDateStringByPattern(LocalDate localDate,String pattern){
+        DateTimeFormatter formatters = DateTimeFormatter.ofPattern(pattern);
+        return localDate.format(formatters);
 
     }
 }

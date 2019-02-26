@@ -38,6 +38,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 @Service
 public class TimeBankKpiCalculationService implements CounterService {
     private static final Logger logger = LoggerFactory.getLogger(TimeBankKpiCalculationService.class);
@@ -87,7 +89,7 @@ public class TimeBankKpiCalculationService implements CounterService {
     private List<CommonKpiDataUnit> getTimeBankForUnitKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi) {
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         List<BigInteger> phaseIds = filterBasedCriteria.containsKey(FilterType.PHASE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PHASE)) : new ArrayList<>();
-        List<String> daysOfWeek = filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK) ? filterBasedCriteria.get(FilterType.DAYS_OF_WEEK) : Stream.of(DayOfWeek.values()).map(Enum::name).collect(Collectors.toList());
+        List<String> daysOfWeek = filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAYS_OF_WEEK)) ? filterBasedCriteria.get(FilterType.DAYS_OF_WEEK) : Stream.of(DayOfWeek.values()).map(Enum::name).collect(Collectors.toList());
         List<Long> staffIds = filterBasedCriteria.containsKey(FilterType.STAFF_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
         List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) != null) ? KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
         List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
