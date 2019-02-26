@@ -339,11 +339,11 @@ public class ShiftValidatorService {
             boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK);
             if (notValid) {
                 try {
-                    ShiftActivityDTO updateShiftActivit = shiftDTO.getActivities().get(i);
-                    if (updateShiftActivit == null || updateShiftActivit.getStartDate().equals(shift.getStartDate()) || updateShiftActivit.getEndDate().equals(shift.getEndDate())) {
+                    ShiftActivityDTO updateShiftActivity = shiftDTO.getActivities().get(i);
+                    if (updateShiftActivity == null || updateShiftActivity.getStartDate().equals(shift.getStartDate()) || updateShiftActivity.getEndDate().equals(shift.getEndDate())) {
                         exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {
+                } catch (IndexOutOfBoundsException e) {
                     exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
                 }
 

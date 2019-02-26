@@ -221,6 +221,10 @@ public class ShiftService extends MongoBaseService {
         if (staffAdditionalInfoDTO == null) {
             exceptionService.invalidRequestException("message.staff.notfound");
         }
+        if (!staffAdditionalInfoDTO.getUnitPosition().isPublished()) {
+            exceptionService.invalidRequestException("message.shift.not.published");
+        }
+
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
             exceptionService.actionNotPermittedException("message.unit.position");
         }
