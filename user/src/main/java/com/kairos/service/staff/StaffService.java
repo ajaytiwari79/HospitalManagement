@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
@@ -115,6 +116,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
@@ -254,6 +256,20 @@ public class StaffService {
             userGraphRepository.save(user);
         } else {
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
+        }
+        return true;
+    }
+
+    public boolean updatePasswordByManagement(Long staffId,PasswordUpdateByAdminDTO passwordUpdateDTO) {
+        Staff staff = staffGraphRepository.findByStaffId(staffId);
+
+        if(staff!=null){
+            User userForStaff = staff.getUser();
+            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
+            userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            userGraphRepository.save(userForStaff);
+        }else{
+             exceptionService.dataNotMatchedException("message.staff.notfound");
         }
         return true;
     }
@@ -1499,7 +1515,7 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-            if (isNotNull(staff.getAccess_token())) {
+            if (isNull(staff.getAccess_token())) {
                 addStaffInChatServer(staff);
             }
         });

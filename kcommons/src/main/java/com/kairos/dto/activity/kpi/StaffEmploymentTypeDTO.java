@@ -13,11 +13,6 @@ public class StaffEmploymentTypeDTO {
     public StaffEmploymentTypeDTO() {
     }
 
-    public StaffEmploymentTypeDTO(List<Long> unitIds, List<Long> employmentTypeIds) {
-        this.unitIds = unitIds;
-        this.employmentTypeIds = employmentTypeIds;
-
-    }
 
     public StaffEmploymentTypeDTO(List<Long> staffIds,List<Long> unitIds, List<Long> employmentTypeIds, Long organizationId, String startDate,String endDate) {
         this.staffIds=staffIds;
