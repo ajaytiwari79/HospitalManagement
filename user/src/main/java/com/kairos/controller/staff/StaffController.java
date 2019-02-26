@@ -68,15 +68,7 @@ public class StaffController {
     @Inject
     private SkillService skillService;
     @Inject
-    private StaffAddressService staffAddressService;
-    @Inject
-    private OrganizationServiceService organizationServiceService;
-    @Inject
     private EmploymentTypeService employmentTypeService;
-    @Inject
-    private UnitPositionService unitPositionService;
-    @Inject
-    private VRPClientService vrpClientService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject
@@ -140,26 +132,6 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, personalInfo);
     }
-
-
-    @RequestMapping(value = "/{staffId}/address", method = RequestMethod.PUT)
-    @ApiOperation("update address")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveAddress(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody AddressDTO address) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffAddressService.saveAddress(staffId, address, unitId));
-    }
-
-    @RequestMapping(value = "/{staffId}/address", method = RequestMethod.GET)
-    @ApiOperation("update address")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAddress(@PathVariable long unitId, @PathVariable long staffId, @RequestParam("type") String type) {
-        Map<String, Object> response = staffAddressService.getAddress(unitId, staffId, type);
-        if (response == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
-    }
-
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.POST)
     @ApiOperation("update employments of staff")
