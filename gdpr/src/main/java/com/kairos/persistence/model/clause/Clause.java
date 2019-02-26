@@ -50,7 +50,7 @@ public class Clause extends BaseEntity {
     //private List<Long> organizationList;
     private Long parentClauseId;
 
-    @OneToMany
+    @ManyToMany
     private List<TemplateType> templateTypes  = new ArrayList<>();
 
     @Transient
