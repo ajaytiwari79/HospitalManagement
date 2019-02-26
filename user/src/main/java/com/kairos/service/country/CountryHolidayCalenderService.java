@@ -26,7 +26,7 @@ import java.util.Map;
 @Service
 @Transactional
 public class CountryHolidayCalenderService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CountryHolidayCalenderService.class);
 
     List<CountryHolidayCalender> countryHolidayCalenderList;
 
@@ -49,7 +49,7 @@ public class CountryHolidayCalenderService {
      * @return
      */
     public CountryHolidayCalenderDTO updateCountryCalender(CountryHolidayCalenderDTO countryHolidayCalenderDTO){
-        logger.info("Data Received: "+countryHolidayCalenderDTO);
+        LOGGER.info("Data Received: "+countryHolidayCalenderDTO);
         CountryHolidayCalender calender = countryHolidayCalenderGraphRepository.findOne(countryHolidayCalenderDTO.getId());
         DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
         if (calender!=null){
@@ -65,10 +65,9 @@ public class CountryHolidayCalenderService {
                 calender.setStartTime(countryHolidayCalenderDTO.getStartTime());
                 calender.setEndTime(countryHolidayCalenderDTO.getEndTime());
                 CountryHolidayCalender calender1  =countryHolidayCalenderGraphRepository.save(calender);
-                logger.info("Updated title: "+calender1.getHolidayTitle()+"\n Desc: "+calender1.getDescription());
+                LOGGER.info("Updated title: "+calender1.getHolidayTitle()+"\n Desc: "+calender1.getDescription());
             }
-            logger.info("dayType not found");
-
+            LOGGER.info("dayType not found");
         }else {
             countryHolidayCalenderDTO = null;
         }
