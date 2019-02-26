@@ -894,8 +894,7 @@ public  class DateUtils {
     }
 
     public static String getLocaDateStringByPattern(LocalDate localDate,String pattern){
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern(pattern);
-        return localDate.format(formatters);
+        return localDate.format(DateTimeFormatter.ofPattern(pattern));
 
     }
 }
