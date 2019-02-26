@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.risk_management;
 
-public class RiskMongoRepositoryImpl  {
+class RiskMongoRepositoryImpl  {
 
 
    /* @Inject

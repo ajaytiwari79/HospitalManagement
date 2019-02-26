@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @Configuration
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-public class SpringMailConfig implements ApplicationContextAware, EnvironmentAware {
+class SpringMailConfig implements ApplicationContextAware, EnvironmentAware {
 
     private ApplicationContext applicationContext;
     private Environment environment;

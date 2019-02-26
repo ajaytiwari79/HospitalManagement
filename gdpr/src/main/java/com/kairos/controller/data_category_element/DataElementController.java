@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class DataElementController {
+class DataElementController {
 
 
     @Inject

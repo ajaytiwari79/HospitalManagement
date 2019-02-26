@@ -13,7 +13,7 @@ import javax.inject.Inject;
 
 
 @Configuration
-public class AWSS3BucketConfig {
+class AWSS3BucketConfig {
 
 
     @Inject

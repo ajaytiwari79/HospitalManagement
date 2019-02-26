@@ -4,12 +4,14 @@ package com.kairos.persistence.repository.master_data.processing_activity_master
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@JaversSpringDataAuditable
 public interface ProcessingLegalBasisRepository extends CustomGenericRepository<ProcessingLegalBasis> {
 
     @Query(value = "SELECT new com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO(LB.id, LB.name, LB.organizationId, LB.suggestedDataStatus, LB.suggestedDate )  FROM ProcessingLegalBasis LB WHERE LB.countryId = ?1 and LB.deleted = false order by createdAt desc")

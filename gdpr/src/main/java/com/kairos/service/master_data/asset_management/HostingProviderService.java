@@ -1,10 +1,9 @@
 package com.kairos.service.master_data.asset_management;
 
 
-
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
@@ -25,7 +24,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class HostingProviderService{
+public class HostingProviderService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingProviderService.class);
 
@@ -44,38 +43,35 @@ public class HostingProviderService{
      * and if exist then simply add  HostingProvider to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS, boolean isSuggestion) {
-    //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<HostingProvider>> result = new HashMap<>();
+    public List<HostingProviderDTO> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS, boolean isSuggestion) {
+        //TODO still need to optimize we can get name of list in string from here
         Set<String> hostingProviderNames = new HashSet<>();
+        for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
+            hostingProviderNames.add(hostingProvider.getName());
+        }
+        List<String> nameInLowerCase = hostingProviderNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
 
-            for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
-                hostingProviderNames.add(hostingProvider.getName());
-            }
-            List<String> nameInLowerCase = hostingProviderNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<HostingProvider> existing = hostingProviderRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
-            List<HostingProvider> newHostingProviders = new ArrayList<>();
-            if (!hostingProviderNames.isEmpty()) {
-                for (String name : hostingProviderNames) {
-                    HostingProvider newHostingProvider = new HostingProvider(name, countryId);
-                    if(isSuggestion){
-                        newHostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                        newHostingProvider.setSuggestedDate(LocalDate.now());
-                    }else {
-                        newHostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
-                    }
-                    newHostingProviders.add(newHostingProvider);
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<HostingProvider> previousHostingProviders = hostingProviderRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
+        hostingProviderNames = ComparisonUtils.getNameListForMetadata(previousHostingProviders, hostingProviderNames);
+        List<HostingProvider> hostingProviders = new ArrayList<>();
+        if (!hostingProviderNames.isEmpty()) {
+            for (String name : hostingProviderNames) {
+                HostingProvider hostingProvider = new HostingProvider(name, countryId);
+                if (isSuggestion) {
+                    hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    hostingProvider.setSuggestedDate(LocalDate.now());
+                } else {
+                    hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
                 }
-
-                newHostingProviders = hostingProviderRepository.saveAll(newHostingProviders);
+                hostingProviders.add(hostingProvider);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newHostingProviders);
-            return result;
+
+           hostingProviderRepository.saveAll(hostingProviders);
+        }
+
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingProviders, HostingProviderDTO.class);
 
     }
 
@@ -114,7 +110,7 @@ public class HostingProviderService{
         Integer resultCount = hostingProviderRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Hosting Provider deleted successfully for id :: {}", id);
-        }else{
+        } else {
             throw new DataNotFoundByIdException("No data found");
         }
         return true;
@@ -131,17 +127,17 @@ public class HostingProviderService{
      */
     public HostingProviderDTO updateHostingProvider(Long countryId, Long id, HostingProviderDTO hostingProviderDTO) {
         //TODO What actually this code is doing?
-        HostingProvider hostingProvider = hostingProviderRepository.findByCountryIdAndName(countryId,   hostingProviderDTO.getName());
+        HostingProvider hostingProvider = hostingProviderRepository.findByCountryIdAndName(countryId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
             throw new DuplicateDataException("data  exist for  " + hostingProviderDTO.getName());
         }
-        Integer resultCount =  hostingProviderRepository.updateMasterMetadataName(hostingProviderDTO.getName(), id, countryId);
-        if(resultCount <=0){
+        Integer resultCount = hostingProviderRepository.updateMasterMetadataName(hostingProviderDTO.getName(), id, countryId);
+        if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
-        }else{
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }
         return hostingProviderDTO;
@@ -150,15 +146,15 @@ public class HostingProviderService{
 
 
     /**
-     **
+     * *
+     *
      * @param countryId
      * @param hostingProviderDTOS
      * @return
      * @description method save Hosting provider suggested by unit
      */
-    public List<HostingProvider> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
-        Map<String, List<HostingProvider>> result = createHostingProviders(countryId, hostingProviderDTOS, true);
-        return result.get(NEW_DATA_LIST);
+    public List<HostingProviderDTO> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+        return createHostingProviders(countryId, hostingProviderDTOS, true);
     }
 
 
@@ -171,9 +167,9 @@ public class HostingProviderService{
     public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, Set<Long> hostingProviderIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = hostingProviderRepository.updateMetadataStatus(countryId, hostingProviderIds, suggestedDataStatus);
-        if(updateCount > 0){
+        if (updateCount > 0) {
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingProviderIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingProviderIds);
         }
         return hostingProviderRepository.findAllByIds(hostingProviderIds);

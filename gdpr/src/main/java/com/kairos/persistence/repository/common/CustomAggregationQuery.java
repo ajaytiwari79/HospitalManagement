@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.common;
 
 
-public class CustomAggregationQuery {
+class CustomAggregationQuery {
 
 
     public static String processingActivityWithSubProcessingNonDeletedData() {

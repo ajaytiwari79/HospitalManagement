@@ -1,6 +1,5 @@
 package com.kairos.service.cta;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -13,7 +12,7 @@ import com.kairos.persistence.model.wta.OrganizationType;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
@@ -43,7 +42,7 @@ public class CountryCTAService extends MongoBaseService {
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
     @Inject private ExceptionService exceptionService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject private UserIntegrationService userIntegrationService;
     @Inject private ActivityService activityService;
     @Inject private CostTimeAgreementService costTimeAgreementService;
     @Inject private PhaseMongoRepository phaseMongoRepository;
@@ -64,7 +63,7 @@ public class CountryCTAService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
+        CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  false, true,ctaBasicDetailsDTO,null);
@@ -89,7 +88,7 @@ public class CountryCTAService extends MongoBaseService {
         if(CollectionUtils.isNotEmpty(collectiveTimeAgreementDTO.getUnitIds())){
             requestParam.add(new BasicNameValuePair("unitIds", collectiveTimeAgreementDTO.getUnitIds().toString().replace("[", "").replace("]", "")));
         }
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(0L,requestParam);
+        CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(0L,requestParam);
 
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
@@ -233,7 +232,7 @@ public class CountryCTAService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
+        CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         updateCostTimeAgreement.setId(costTimeAgreement.getId());

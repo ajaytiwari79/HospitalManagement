@@ -42,6 +42,20 @@ public class AddressDTO {
     private boolean updateHouseholdAddress;
     private boolean primary;
 
+    public AddressDTO() {
+    }
+
+    public AddressDTO(Long id, String street, String houseNumber, String city, String municipalityName, Long zipCodeId, String regionName, Long municipalityId) {
+        this.id = id;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.city = city;
+        this.municipalityName = municipalityName;
+        this.zipCodeId = zipCodeId;
+        this.regionName = regionName;
+        this.municipalityId = municipalityId;
+    }
+
     public String getLocationName() {
         return locationName;
     }

@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.organization.*;
@@ -34,7 +35,6 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.StaffUnionWrapper;
 import io.jsonwebtoken.lang.Assert;
@@ -50,7 +50,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 /**
  * Created by vipul on 13/2/18.
@@ -150,9 +149,9 @@ public class UnionService {
 
         }
         if (joined)
-            organizationGraphRepository.addUnionInOrganization(organizationId, unionId, DateUtil.getCurrentDate().getTime());
+            organizationGraphRepository.addUnionInOrganization(organizationId, unionId, DateUtils.getCurrentDate().getTime());
         else
-            organizationGraphRepository.removeUnionFromOrganization(organizationId, unionId, DateUtil.getCurrentDate().getTime());
+            organizationGraphRepository.removeUnionFromOrganization(organizationId, unionId, DateUtils.getCurrentDate().getTime());
 
         return joined;
     }

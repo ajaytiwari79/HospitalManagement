@@ -1,5 +1,6 @@
 package com.kairos.service.client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -22,7 +23,6 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.patient.PatientRelative;
 import com.kairos.dto.user.patient.PatientWrapper;
 import com.kairos.dto.user.staff.CurrentAddress;
-import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -296,7 +296,7 @@ public class ExternalClientService {
             int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
             if (count == 0) {
                 logger.debug("Creating Existing Client relationship from KMD : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDate().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDate().getTime());
                 relationService.createRelation(relation);
             }
             saveAddressDetails(patientWrapper, client, unitId);

@@ -7,21 +7,38 @@ import com.kairos.response.dto.common.RiskResponseDTO;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 
 @Entity
-@NamedNativeQuery(name = "getAllRiskData", resultClass = RiskResponseDTO.class, query = "select risk.id as id ,risk.name as name, risk.description as description, risk.risk_recommendation as riskRecommendation,  risk.is_reminder_active as isReminderActive,risk.days_to_reminder_before as daysToReminderBefore,/* risk.risk_level as riskLevel,*/PA.name as processingActivityName, PA.id as processingActivityId, PA.sub_processing_activity as isSubProcessing from riskmd risk inner join processing_activitymd_risks PAR ON PAR.risks_id = risk.id left join processing_activitymd PA ON PAR.processing_activitymd_id = PA.id where risk.organization_id = ?1 and risk.deleted = false", resultSetMapping = "getAllRiskData")
-@SqlResultSetMapping(
-        name = "getAllRiskData",
-        classes = @ConstructorResult(
-                targetClass = RiskResponseDTO.class,
-                columns = {
-                        @ColumnResult(name = "id"),  @ColumnResult(name = "name"), @ColumnResult(name = "description"), @ColumnResult(name = "riskRecommendation"),  @ColumnResult(name = "isReminderActive"),  @ColumnResult(name = "daysToReminderBefore"),
-                        /*@ColumnResult(name = "riskLevel"),*/  @ColumnResult(name = "processingActivityName"),
-                        @ColumnResult(name = "processingActivityId"), @ColumnResult(name = "isSubProcessing")
-
-                }
+@SqlResultSetMappings({
+        @SqlResultSetMapping(
+                name = "getAllAssetTypeRisks",
+                classes = @ConstructorResult(
+                        targetClass = RiskResponseDTO.class,
+                        columns = {
+                                @ColumnResult(name = "id"),@ColumnResult(name = "name"), @ColumnResult(name = "description"), @ColumnResult(name = "riskRecommendation"),  @ColumnResult(name = "isReminderActive"),  @ColumnResult(name = "daysToReminderBefore"),@ColumnResult(name = "riskLevel"),
+                                @ColumnResult(name = "assetTypeId", type= BigInteger.class),@ColumnResult(name = "assetTypeName", type=String.class), @ColumnResult(name = "isSubAssetType", type = boolean.class)
+                        }
+                )
+        ),
+        @SqlResultSetMapping(
+                name = "getAllProcessingActivityRisks",
+                classes = @ConstructorResult(
+                        targetClass = RiskResponseDTO.class,
+                        columns = {
+                                @ColumnResult(name = "id"),@ColumnResult(name = "name"), @ColumnResult(name = "description"), @ColumnResult(name = "riskRecommendation"),  @ColumnResult(name = "isReminderActive"),  @ColumnResult(name = "daysToReminderBefore"),@ColumnResult(name = "riskLevel"),
+                                @ColumnResult(name = "processingActivityName", type=String.class),@ColumnResult(name = "processingActivityId", type= BigInteger.class), @ColumnResult(name = "isSubProcessingActivity", type = boolean.class)
+                        }
+                )
         )
-)
+})
+
+@NamedNativeQueries({
+        @NamedNativeQuery(name = "getAllProcessingActivityRiskData",resultSetMapping = "getAllProcessingActivityRisks",resultClass = RiskResponseDTO.class, query = "Select RISK.id as id, RISK.name as name, RISK.description as description, RISK.risk_recommendation as riskRecommendation,RISK.is_reminder_active as isReminderActive,RISK.days_to_reminder_before as daysToReminderBefore,RISK.risk_level as riskLevel, PA.name as processingActivityName, PA.id as processingActivityId, PA.sub_process_activity as isSubProcessingActivity from risk RISK inner join master_processing_activity PA ON RISK.processing_activity_id = PA.id where RISK.organization_id = ?1 and RISK.deleted =false"),
+        @NamedNativeQuery(name = "getAllAssetTypeRiskData",resultSetMapping = "getAllAssetTypeRisks",  resultClass = RiskResponseDTO.class, query = "Select RISK.id as id, RISK.name as name, RISK.description as description, RISK.risk_recommendation as riskRecommendation,RISK.is_reminder_active as isReminderActive,RISK.days_to_reminder_before as daysToReminderBefore,RISK.risk_level as riskLevel, AT.name as assetTypeName, AT.id as assetTypeId, AT.sub_asset_type as isSubAssetType from risk RISK inner join asset_type AT ON RISK.asset_type_id = AT.id where RISK.organization_id = ?1 and RISK.deleted =false")
+})
+
+
 public class Risk extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -37,12 +54,11 @@ public class Risk extends BaseEntity {
     // private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
+    private Long organizationId;
 
-    public Risk() {
-    }
 
     public Risk(Long countryId, @NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
+                                             @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -58,6 +74,14 @@ public class Risk extends BaseEntity {
         this.riskRecommendation = riskRecommendation;
         this.riskLevel = riskLevel;
     }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+    public Risk() {
+    }
+
 
     public Risk(Long id){
         this.id= id;

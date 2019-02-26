@@ -5,6 +5,7 @@ package com.kairos.service.data_inventory.processing_activity;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -50,37 +51,29 @@ public class OrganizationProcessingLegalBasisService{
      * and if exist then simply add  ProcessingLegalBasis to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingLegalBasis using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long organizationId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
+    public List<ProcessingLegalBasisDTO> createProcessingLegalBasis(Long organizationId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
 
-        Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
         Set<String> legalBasisNames = new HashSet<>();
-        if (!legalBasisDTOList.isEmpty()) {
             for (ProcessingLegalBasisDTO legalBasis : legalBasisDTOList) {
                 legalBasisNames.add(legalBasis.getName());
             }
             List<String> nameInLowerCase = legalBasisNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingLegalBasis> existing = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
+            List<ProcessingLegalBasis> previousLegalBasis = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            legalBasisNames = ComparisonUtils.getNameListForMetadata(previousLegalBasis, legalBasisNames);
 
-            List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
-            if (legalBasisNames.size() != 0) {
+            List<ProcessingLegalBasis> processingLegalBases = new ArrayList<>();
+            if (!legalBasisNames.isEmpty()) {
                 for (String name : legalBasisNames) {
-                    ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis(name);
-                    newProcessingLegalBasis.setOrganizationId(organizationId);
-                    newProcessingLegalBasisList.add(newProcessingLegalBasis);
+                    ProcessingLegalBasis legalBasis = new ProcessingLegalBasis(name);
+                    legalBasis.setOrganizationId(organizationId);
+                    processingLegalBases.add(legalBasis);
                 }
 
-                newProcessingLegalBasisList = processingLegalBasisRepository.saveAll(newProcessingLegalBasisList);
+                 processingLegalBasisRepository.saveAll(processingLegalBases);
             }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
-
+           return ObjectMapperUtils.copyPropertiesOfListByMapper(processingLegalBases,ProcessingLegalBasisDTO.class);
     }
 
 
@@ -100,7 +93,7 @@ public class OrganizationProcessingLegalBasisService{
      */
     public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, Long id) {
 
-        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -145,13 +138,10 @@ public class OrganizationProcessingLegalBasisService{
 
     }
 
-    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasis(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
+    public List<ProcessingLegalBasisDTO> saveAndSuggestProcessingLegalBasis(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
 
-        Map<String, List<ProcessingLegalBasis>> result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
-        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasisFromUnit(countryId, processingLegalBasisDTOS);
-        if (!masterProcessingLegalBasisSuggestedByUnit.isEmpty()) {
-            result.put("SuggestedData", masterProcessingLegalBasisSuggestedByUnit);
-        }
+        List<ProcessingLegalBasisDTO> result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
+        processingLegalBasisService.saveSuggestedProcessingLegalBasisFromUnit(countryId, processingLegalBasisDTOS);
         return result;
     }
 

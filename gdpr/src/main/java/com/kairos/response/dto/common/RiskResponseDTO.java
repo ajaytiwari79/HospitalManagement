@@ -73,38 +73,28 @@ public class RiskResponseDTO {
 
     public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
 
-    public RiskResponseDTO(BigInteger id, String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, RiskSeverity riskLevel, AssetTypeDTO assetType, ProcessingActivityBasicDTO processingActivity) {
+
+    public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, int riskLevel, String processingActivityName, BigInteger processingActivityId, boolean isSubProcessingActivity){
         this.id = id;
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
         this.isReminderActive = isReminderActive;
         this.daysToReminderBefore = daysToReminderBefore;
-        this.riskLevel = riskLevel;
-        this.assetType = assetType;
-        this.processingActivity = processingActivity;
+        this.riskLevel = RiskSeverity.values()[riskLevel];
+        this.processingActivity = new ProcessingActivityBasicDTO(Long.valueOf(processingActivityId.toString()), processingActivityName,isSubProcessingActivity);
+
     }
 
-    public RiskResponseDTO(BigInteger id, String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, RiskSeverity riskLevel, String processingActivityName, BigInteger processingActivityId, boolean isSubProcessing) {
+    public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, int riskLevel,  BigInteger assetTypeId,String assetTypeName,boolean isSubAssetType){
         this.id = id;
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
         this.isReminderActive = isReminderActive;
         this.daysToReminderBefore = daysToReminderBefore;
-        this.riskLevel = riskLevel;
-        this.processingActivity = new ProcessingActivityBasicDTO(processingActivityId, processingActivityName,isSubProcessing);
-    }
-
-    public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore,/*, int riskLevel*/ String processingActivityName, BigInteger processingActivityId, boolean isSubProcessing){
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.riskRecommendation = riskRecommendation;
-        this.isReminderActive = isReminderActive;
-        this.daysToReminderBefore = daysToReminderBefore;
-        //this.riskLevel = RiskSeverity.valueOf(riskLevel);
-         this.processingActivity = new ProcessingActivityBasicDTO(processingActivityId, processingActivityName,isSubProcessing);
+        this.riskLevel = RiskSeverity.values()[riskLevel];
+        this.assetType = new AssetTypeDTO(Long.valueOf(assetTypeId.toString()),assetTypeName,isSubAssetType);
     }
 
     public RiskResponseDTO(){

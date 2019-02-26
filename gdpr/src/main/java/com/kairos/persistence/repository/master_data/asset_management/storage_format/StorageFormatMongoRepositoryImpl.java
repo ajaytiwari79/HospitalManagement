@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.asset_management.storage_format;
 
-public class StorageFormatMongoRepositoryImpl  {
+class StorageFormatMongoRepositoryImpl  {
 
 
    /* @Inject

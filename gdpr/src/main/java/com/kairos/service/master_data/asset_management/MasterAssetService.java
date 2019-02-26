@@ -107,9 +107,7 @@ public class MasterAssetService{
             });
         } else {
             AssetType previousAssetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType( masterAssetDTO.getAssetType().getName(), countryId, false);
-            Optional.ofNullable(previousAssetType).ifPresent(assetType -> {
-                exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType.getName());
-            });
+            Optional.ofNullable(previousAssetType).ifPresent(assetType -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType.getName()));
             AssetType assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
             Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeDto -> {
 
@@ -139,9 +137,7 @@ public class MasterAssetService{
             masterAsset.setAssetType(assetType);
         }else {
             AssetType previousAssetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType( masterAssetDTO.getAssetType().getName(), countryId, false);
-            Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> {
-                exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType1.getName());
-            });
+            Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType1.getName()));
             assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
         }
             Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeBasicDTO -> {

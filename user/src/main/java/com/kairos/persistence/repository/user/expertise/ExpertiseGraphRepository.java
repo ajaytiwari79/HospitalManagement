@@ -102,6 +102,11 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=true ")
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
 
+    @Query("MATCH(oldExpertise:Expertise)<-[:"+HAS_EXPERTISE_IN+"]-(up:UnitPosition) WHERE id(oldExpertise) = {0} WITH up as unitPositions " +
+            "MATCH(newExpertise:Expertise) WHERE id(newExpertise) = {1} " +
+            "CREATE UNIQUE (newExpertise)<-[:"+HAS_EXPERTISE_IN+"]-(unitPositions)")
+    void linkToUnitPositions(Long oldExpertiseId,Long newExpertiseId);
+
 
     @Query("MATCH (e:Expertise)-[:" + VERSION_OF + "]->(expertise:Expertise) WHERE id(e) = {0}" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +

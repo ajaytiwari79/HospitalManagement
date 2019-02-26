@@ -17,7 +17,7 @@ import static com.kairos.constants.ApiConstant.*;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
-public class DefaultDataInheritController {
+class DefaultDataInheritController {
 
 
     @Inject

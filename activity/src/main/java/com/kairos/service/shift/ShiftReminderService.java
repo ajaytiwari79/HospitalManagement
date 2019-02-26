@@ -16,7 +16,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserRestClientForScheduler;
@@ -43,21 +43,21 @@ import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
 @Service
 public class ShiftReminderService extends MongoBaseService {
     @Inject
-    ActivityMongoRepository activityMongoRepository;
+    private ActivityMongoRepository activityMongoRepository;
     @Inject
     private MailService mailService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private SchedulerServiceRestClient schedulerServiceRestClient;
-    @Inject private
-    UserRestClientForScheduler userRestClientForScheduler;
     @Inject
-    ActivityToSchedulerQueueService activityToSchedulerQueueService;
+    private UserRestClientForScheduler userRestClientForScheduler;
+    @Inject
+    private ActivityToSchedulerQueueService activityToSchedulerQueueService;
 
-    private final static Logger logger = LoggerFactory.getLogger(ShiftReminderService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
 
     public void updateReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
         // TODO Find better approach
@@ -75,7 +75,7 @@ public class ShiftReminderService extends MongoBaseService {
                 if (firstReminderDateTime != null) {
                     scheduledJobs.add(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, currentShift.getId(), firstReminderDateTime, true, null));
                 } else {
-                    logger.info("Unable to get notify time for shift {}", shift.getId());
+                    LOGGER.info("Unable to get notify time for shift {}", shift.getId());
                 }
             }
         });
@@ -112,16 +112,16 @@ public class ShiftReminderService extends MongoBaseService {
     public void sendReminderViaEmail(KairosSchedulerExecutorDTO jobDetails) {
         Shift shift = shiftMongoRepository.findShiftByShiftActivityId(jobDetails.getEntityId());
         if (!Optional.ofNullable(shift).isPresent()) {
-            logger.info("Unable to find shift by id {}", jobDetails.getEntityId());
+            LOGGER.info("Unable to find shift by id {}", jobDetails.getEntityId());
         }
         Optional<ShiftActivity> shiftActivity = shift.getActivities().stream().filter(currentShiftActivity ->
                 currentShiftActivity.getId().equals(jobDetails.getEntityId())).findAny();
         if (!shiftActivity.isPresent()) {
-            logger.info("Unable to find current shift Activity by id {}", jobDetails.getEntityId());
+            LOGGER.info("Unable to find current shift Activity by id {}", jobDetails.getEntityId());
         }
         Activity activity = activityMongoRepository.findOne(shiftActivity.get().getActivityId());
 
-        StaffDTO staffDTO = genericIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
@@ -131,15 +131,15 @@ public class ShiftReminderService extends MongoBaseService {
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {
-            logger.info("next email on {} to staff {}", nextTriggerDateTime, staffDTO.getFirstName());
-            List<SchedulerPanelDTO> schedulerPanelRestDTOS = genericIntegrationService.registerNextTrigger(shift.getUnitId(),Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)));
+            LOGGER.info("next email on {} to staff {}", nextTriggerDateTime, staffDTO.getFirstName());
+            List<SchedulerPanelDTO> schedulerPanelRestDTOS = userIntegrationService.registerNextTrigger(shift.getUnitId(), Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)));
 
         }
 
 
     }
 
-    LocalDateTime calculateNextTrigger(Activity activity, LocalDateTime lastTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
+    private LocalDateTime calculateNextTrigger(Activity activity, LocalDateTime lastTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
         LocalDateTime nextTriggerDateTime = null;
         for (ActivityReminderSettings current : activity.getCommunicationActivityTab().getActivityReminderSettings()) {
 
@@ -166,10 +166,10 @@ public class ShiftReminderService extends MongoBaseService {
                     nextTriggerDateTime = DateUtils.addDurationInLocalDateTime(lastTriggerDateTime, current.getRepeatReminder().getTimeValue(), current.getRepeatReminder().getDurationType(), 1);
                     break;
                 }
-                /** if directly send reminder is greater than current value
-                 *remaining days 3
-                 * "sendReminder":2,
-                 **/
+                /* if directly send reminder is greater than current value
+                 remaining days 3
+                  "sendReminder":2,
+                 */
                 if (current.getSendReminder().getDurationType() == durationType && remainingUnit >= current.getSendReminder().getTimeValue()) {
                     nextTriggerDateTime = DateUtils.substractDurationInLocalDateTime(shiftDateTime, current.getSendReminder().getTimeValue(), current.getSendReminder().getDurationType());
                     break;
@@ -182,11 +182,10 @@ public class ShiftReminderService extends MongoBaseService {
                 break;
             } else {
                 nextTriggerDateTime = lastTriggerDateTime;
-                if (durationType==DurationType.DAYS && current.getSendReminder().getDurationType() == DurationType.MINUTES){
+                if (durationType == DurationType.DAYS && current.getSendReminder().getDurationType() == DurationType.MINUTES) {
 
-                    nextTriggerDateTime = nextTriggerDateTime.plusMinutes(remainingUnit*24*60);
-                }
-                else if (current.getSendReminder().getDurationType() == DurationType.MINUTES) {
+                    nextTriggerDateTime = nextTriggerDateTime.plusMinutes(remainingUnit * 24 * 60);
+                } else if (current.getSendReminder().getDurationType() == DurationType.MINUTES) {
                     nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
                 }
             }

@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
@@ -79,9 +80,9 @@ import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
+import com.kairos.wrapper.staff.StaffEmploymentWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -90,7 +91,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -116,6 +116,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
@@ -126,8 +127,6 @@ import static com.kairos.utils.FileUtil.createDirectory;
 @Transactional
 @Service
 public class StaffService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -175,15 +174,15 @@ public class StaffService {
     private AccessGroupService accessGroupService;
     @Inject
     private StaffFilterService staffFilterService;
-    @Autowired
+    @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Autowired
+    @Inject
     private ClientGraphRepository clientGraphRepository;
-    @Autowired
+    @Inject
     private TaskServiceRestClient taskServiceRestClient;
     @Inject
     private OrganizationService organizationService;
-    @Autowired
+    @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
@@ -221,13 +220,15 @@ public class StaffService {
     @Lazy
     private PasswordEncoder passwordEncoder;
 
+    private final Logger logger = LoggerFactory.getLogger(StaffService.class);
+
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             return null;
         }
         createDirectory(IMAGES_PATH);
-        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
@@ -259,6 +260,20 @@ public class StaffService {
         return true;
     }
 
+    public boolean updatePasswordByManagement(Long staffId,PasswordUpdateByAdminDTO passwordUpdateDTO) {
+        Staff staff = staffGraphRepository.findByStaffId(staffId);
+
+        if(staff!=null){
+            User userForStaff = staff.getUser();
+            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
+            userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            userGraphRepository.save(userForStaff);
+        }else{
+             exceptionService.dataNotMatchedException("message.staff.notfound");
+        }
+        return true;
+    }
+
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
@@ -266,7 +281,7 @@ public class StaffService {
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
         }
-        if (isNotNull(staffToUpdate.getContactDetail().getPrivateEmail())  && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
+        if (isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
             if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentOrganization.getId()) != null) {
                 exceptionService.duplicateDataException("message.email.alreadyExist", "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
             }
@@ -332,7 +347,7 @@ public class StaffService {
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
         // Set if user is female and pregnant
         User user = userGraphRepository.getUserByStaffId(staffId);
@@ -369,7 +384,7 @@ public class StaffService {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
         for (Expertise currentExpertise : expertise) {
-            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(staff, currentExpertise, 0, DateUtil.getCurrentDate());
+            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(staff, currentExpertise, 0, DateUtils.getCurrentDate());
             staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
         staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
@@ -545,7 +560,7 @@ public class StaffService {
                     staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
                     staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
+                        createEmployment(parent, unit, staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
                     }
                 }
             }
@@ -810,7 +825,7 @@ public class StaffService {
         staff.setUser(user);
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
+        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
         StaffDTO staffDTO = new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
         return staffDTO;
@@ -996,7 +1011,7 @@ public class StaffService {
         staff.setUser(user);
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
-        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+        employment.setStartDateMillis(DateUtils.getCurrentDateMillis());
         organization.getEmployments().add(employment);
         organizationGraphRepository.save(organization);
         if (accessGroupId != null) {
@@ -1500,7 +1515,7 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-            if (isNotNull(staff.getAccess_token())) {
+            if (isNull(staff.getAccess_token())) {
                 addStaffInChatServer(staff);
             }
         });
@@ -1541,4 +1556,24 @@ public class StaffService {
             staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
     }
+
+
+    /**
+     * @param unitId
+     * @return - login user staff id and list of staff present in unit
+     */
+    public StaffEmploymentWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+        }
+        Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
+        Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
+        StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
+        staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
+        staffEmploymentWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(),unitId));
+        return staffEmploymentWrapper;
+    }
+
+
 }

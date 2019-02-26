@@ -6,7 +6,7 @@ package com.kairos.service.staff_settings;
 
 import com.kairos.persistence.model.staff_settings.StaffOpenShiftBlockSetting;
 import com.kairos.persistence.repository.staff_settings.StaffOpenShiftBlockSettingRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
@@ -21,13 +21,13 @@ import static java.time.temporal.TemporalAdjusters.previousOrSame;
 public class StaffOpenShiftBlockSettingService extends MongoBaseService {
 
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private StaffOpenShiftBlockSettingRepository staffOpenShiftBlockSettingRepository;
     @Inject private ExceptionService exceptionService;
 
     public boolean savePersonalizedSettings(Long unitId, StaffPreferencesDTO staffPreferencesDTO) {
-        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        Long staffId= userIntegrationService.getStaffIdByUserId(unitId);
         StaffOpenShiftBlockSetting staffOpenShiftBlockSetting=staffOpenShiftBlockSettingRepository.findByStaffId(staffId).orElse(new StaffOpenShiftBlockSetting(staffId));
 
         switch (staffPreferencesDTO.getShiftBlockType()) {

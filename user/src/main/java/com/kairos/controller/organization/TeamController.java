@@ -43,6 +43,13 @@ import static com.kairos.constants.AppConstants.TEAM;
 
         }
 
+        @ApiOperation(value = "Delete Team By TeamId")
+        @RequestMapping(value = "team/{teamId}", method = RequestMethod.DELETE)
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> deleteTeamByTeamId(@PathVariable Long unitId, @PathVariable Long teamId) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.deleteTeamByTeamId(teamId));
+        }
 
         //Skills
         @ApiOperation(value = "Get Team Available Skills")

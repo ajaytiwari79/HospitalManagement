@@ -11,15 +11,9 @@ public class DataDisposalDTO {
 
     private Long id;
 
-    @NotBlank(message = "Name can't be empty")
-    @Pattern(message = "Number and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
-    private Long organizationId;
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public Long getId() { return id; }
 

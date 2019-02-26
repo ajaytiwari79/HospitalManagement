@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 
 
-public class AccessorPartyDeprecated {
+class AccessorPartyDeprecated {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")

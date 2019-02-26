@@ -33,7 +33,7 @@ import java.util.Map;
 
 @ControllerAdvice
 @Order(1)
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
 

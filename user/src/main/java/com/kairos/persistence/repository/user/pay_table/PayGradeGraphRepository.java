@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.pay_table;
 
+import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.pay_table.PayTableMatrixQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -37,6 +38,9 @@ public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, L
             "return payGrade")
     List<PayGrade> getAllPayGradesById(Set<Long> payGradeIds);
 
-    @Query("Match(pg:PayGrade)-[:"+HAS_BASE_PAY_GRADE+"]-(sl:SeniorityLevel) where id(sl)={0} return pg")
+    @Query("Match(pg:PayGrade)-[:" + HAS_BASE_PAY_GRADE + "]-(sl:SeniorityLevel) where id(sl)={0} return pg")
     PayGrade getPayGradeBySeniorityLevelId(Long id);
+
+    @Query("MATCH(payGrade:PayGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false}) WHERE id(payGrade)={0} AND id(pga) IN {1} RETURN id(pga) as payGroupAreaId, rel.payGroupAreaAmount AS publishedAmount")
+    List<PayGroupAreaDTO> getPayGradeDataByIdAndPayGroupArea(Long payGradeId, List<Long> payGroupAreaIds);
 }

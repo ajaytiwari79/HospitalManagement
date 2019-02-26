@@ -15,10 +15,13 @@ public class ProcessingPurpose extends BaseEntity {
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
     @Pattern(message = "Number and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     private Long countryId;
-
     private SuggestedDataStatus suggestedDataStatus;
+    private Long organizationId;
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     private LocalDate suggestedDate;
 

@@ -1,6 +1,7 @@
 package com.kairos.service.skill;
 
 import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationLevel;
@@ -36,7 +37,6 @@ import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateConverter;
-import com.kairos.utils.DateUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,17 +304,17 @@ public class SkillService {
 
             if (isSelected) {
                 if (organizationGraphRepository.isSkillAlreadyExist(id, skillId) == 0) {
-                    organizationGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                    organizationGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 } else {
-                    organizationGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                    organizationGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 }
             } else {
-                organizationGraphRepository.removeSkillFromOrganization(id, skillId, DateUtil.getCurrentDate().getTime());
+                organizationGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getCurrentDate().getTime());
             }
             return getAllAvailableSkills(id, type);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            long createdDate = DateUtil.getCurrentDate().getTime();
+            long createdDate = DateUtils.getCurrentDate().getTime();
             if (isSelected) {
                 teamGraphRepository.addSkillInTeam(id, skillId, visitourId, createdDate, createdDate, true);
             } else {
@@ -453,10 +453,10 @@ public class SkillService {
         }
         List<Map<String, Object>> response;
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE, true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtil.getCurrentDate().getTime());
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
             response = Collections.emptyList();
         }
         /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
@@ -503,7 +503,7 @@ public class SkillService {
 
         }
 
-        long lastModificationDate = DateUtil.getCurrentDate().getTime();
+        long lastModificationDate = DateUtils.getCurrentDate().getTime();
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, Skill.SkillLevel.ADVANCE, true);
         } else {

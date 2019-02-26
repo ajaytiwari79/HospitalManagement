@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.data_inventory.processing_activity;
 
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-////@JaversSpringDataAuditable
+@JaversSpringDataAuditable
 public interface ProcessingActivityRepository extends CustomGenericRepository<ProcessingActivity> {
 
     @Query(value = "Select PA from ProcessingActivity PA where PA.organizationId = ?1 and PA.id IN (?2) and PA.deleted = false")

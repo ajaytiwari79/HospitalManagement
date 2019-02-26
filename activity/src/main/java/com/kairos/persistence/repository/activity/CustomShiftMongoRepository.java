@@ -61,11 +61,11 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds);
 
-    List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
+    List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
-    List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<BigInteger> activitiesIds, List<Integer>  dayOfWeeks, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate);
 
-    void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark);
+    void updateRemarkInShiftActivity(BigInteger shiftActivityId, String remark);
 
     List<Shift> findAllShiftByIntervalAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
 }

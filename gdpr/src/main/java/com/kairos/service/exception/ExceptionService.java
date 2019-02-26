@@ -40,5 +40,4 @@ public class ExceptionService extends CommonsExceptionUtil {
     public void runtimeException(String message, Object... params) {
         throw new RuntimeException(convertMessage(message, params));
     }
-
 }

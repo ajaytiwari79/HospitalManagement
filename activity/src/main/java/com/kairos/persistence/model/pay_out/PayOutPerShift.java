@@ -11,7 +11,7 @@ import java.util.List;
 *  Date-27/01/2018
 *
 * */
-public class PayOut extends MongoBaseEntity{
+public class PayOutPerShift extends MongoBaseEntity{
 
     private Long unitPositionId;
     private Long staffId;
@@ -26,10 +26,10 @@ public class PayOut extends MongoBaseEntity{
     private long payoutBeforeThisDate;
     private LocalDate date;
     private boolean paidOut;
-    private List<PayOutCTADistribution> payOutCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions;
 
 
-    public PayOut(BigInteger shiftId,Long unitPositionId, Long staffId, LocalDate date,Long unitId) {
+    public PayOutPerShift(BigInteger shiftId, Long unitPositionId, Long staffId, LocalDate date, Long unitId) {
         this.shiftId = shiftId;
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
@@ -72,19 +72,19 @@ public class PayOut extends MongoBaseEntity{
         this.shiftId = shiftId;
     }
 
-    public List<PayOutCTADistribution> getPayOutCTADistributions() {
-        return payOutCTADistributions;
+    public List<PayOutPerShiftCTADistribution> getPayOutPerShiftCTADistributions() {
+        return payOutPerShiftCTADistributions;
     }
 
-    public void setPayOutCTADistributions(List<PayOutCTADistribution> payOutCTADistributions) {
-        this.payOutCTADistributions = payOutCTADistributions;
+    public void setPayOutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions) {
+        this.payOutPerShiftCTADistributions = payOutPerShiftCTADistributions;
     }
 
 
-    public PayOut() {
+    public PayOutPerShift() {
     }
 
-    public PayOut(Long unitPositionId, Long staffId, long totalPayOutMin, LocalDate date) {
+    public PayOutPerShift(Long unitPositionId, Long staffId, long totalPayOutMin, LocalDate date) {
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.totalPayOutMin = totalPayOutMin;

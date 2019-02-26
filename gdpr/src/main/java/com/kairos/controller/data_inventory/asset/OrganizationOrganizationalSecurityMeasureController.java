@@ -7,6 +7,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class OrganizationOrganizationalSecurityMeasureController {
+class OrganizationOrganizationalSecurityMeasureController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationOrganizationalSecurityMeasureController.class);
@@ -34,6 +35,10 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/organization_security")
     public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
+
+        if (CollectionUtils.isEmpty(orgSecurityMeasures.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(unitId, orgSecurityMeasures.getRequestBody()));
 
     }

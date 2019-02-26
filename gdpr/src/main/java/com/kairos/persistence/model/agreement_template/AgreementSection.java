@@ -34,7 +34,12 @@ public class AgreementSection extends BaseEntity {
 
     private Integer orderedIndex;
     private Long countryId;
+    private Long organizationId;
 
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public boolean isAgreementSubSection() { return isAgreementSubSection; }
 
@@ -50,9 +55,7 @@ public class AgreementSection extends BaseEntity {
         return agreementSubSections;
     }
 
-    public void setAgreementSubSections(List<AgreementSection> agreementSubSections) {
-        this.agreementSubSections = agreementSubSections;
-    }
+    public void setAgreementSubSections(List<AgreementSection> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
 
     public AgreementSection getAgreementSection() {
         return agreementSection;
@@ -72,7 +75,7 @@ public class AgreementSection extends BaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    public List<ClauseCkEditorVO> getClauses() {
+    private List<ClauseCkEditorVO> getClauses() {
         return clauses;
     }
 
@@ -94,14 +97,10 @@ public class AgreementSection extends BaseEntity {
     @Override
     public void delete() {
         super.delete();
-        this.getClauses().forEach( clause -> {
-            clause.setDeleted(false);
-        });
+        this.getClauses().forEach( clause -> clause.setDeleted(false));
         this.agreementSubSections.forEach(subSection -> {
             subSection.delete();
-            subSection.getClauses().forEach( subSectionClause -> {
-                subSectionClause.setDeleted(false);
-            });
+            subSection.getClauses().forEach( subSectionClause -> subSectionClause.setDeleted(false));
         });
     }
 }

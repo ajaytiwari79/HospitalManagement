@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.*;
 
 @Configuration
 @Import({SwaggerConfig.class})
-public class InterceptorRegister extends WebMvcConfigurerAdapter {
+class InterceptorRegister extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

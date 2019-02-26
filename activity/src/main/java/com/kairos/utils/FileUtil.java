@@ -18,19 +18,25 @@ public class FileUtil {
 
     private FileUtil(){}
 
-    public static void writeFile(String path, MultipartFile multipartFile) throws IOException {
-        InputStream inputStream = multipartFile.getInputStream();
-        byte[] buf = new byte[1024];
-        FileOutputStream fileOutputStream = new FileOutputStream(new File(path));
-        int numRead = 0;
-        while ((numRead = inputStream.read(buf)) >= 0) {
-            fileOutputStream.write(buf, 0, numRead);
-        }
-        if(inputStream!=null){
-            inputStream.close();
-        }
-        if(fileOutputStream!=null){
-            fileOutputStream.close();
+    public static void writeFile(String path, MultipartFile multipartFile) {
+        InputStream inputStream = null;
+        FileOutputStream fileOutputStream;
+        try {
+            inputStream = multipartFile.getInputStream();
+            byte[] buf = new byte[1024];
+            fileOutputStream = new FileOutputStream(new File(path));
+            int numRead = 0;
+            while ((numRead = inputStream.read(buf)) >= 0) {
+                fileOutputStream.write(buf, 0, numRead);
+            }
+            if(inputStream!=null){
+                inputStream.close();
+            }
+            if(fileOutputStream!=null){
+                fileOutputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

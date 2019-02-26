@@ -25,11 +25,11 @@ import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task.TaskDemandDTO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +43,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static java.lang.Math.toIntExact;
 import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -79,27 +78,21 @@ public class VisitatorService{
     TaskMongoRepository taskMongoRepository;
     @Inject
     PlannerService plannerService;
-    @Autowired
+    @Inject
     TasksMergingService tasksMergingService;
 
 
     @Inject
-    GenericIntegrationService genericIntegrationService;
+    UserIntegrationService userIntegrationService;
 
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
-    @Autowired
+    @Inject
     private ExceptionService exceptionService;
 
 
-
-    public Map<String, Object> getVisitatorOrganizationHierarchy(long id) {
-      //  staffGraphRepository.findById(id);
-        return null;
-    }
-
     public Object getUnitProvidedServices(long unitId) {
-        Map<String, Object> services = genericIntegrationService.getOrganizationServices(unitId,ORGANIZATION);
+        Map<String, Object> services = userIntegrationService.getOrganizationServices(unitId,StringUtils.capitalize(ORGANIZATION));
         //Map<String,Object> services = organizationServiceService.organizationServiceData(unitId,ORGANIZATION);
         return services.get("selectedServices");
     }
@@ -125,7 +118,7 @@ public class VisitatorService{
         }*/
 
         List<Long> citizenIds = taskDemandIdList.stream().map(demand -> demand.getCitizenId()).collect(Collectors.toList());
-        clientList = genericIntegrationService.getCitizensByIdsInList(citizenIds);
+        clientList = userIntegrationService.getCitizensByIdsInList(citizenIds);
 
         return clientList;
     }
@@ -188,7 +181,7 @@ public class VisitatorService{
 
         Map<String, Object> organizationResult = new HashMap();
 
-        Map<String, Object> response=genericIntegrationService.getUnitVisitationInfo();
+        Map<String, Object> response= userIntegrationService.getUnitVisitationInfo();
         Map<String, Object> unitData =(Map<String, Object>)response.get("unitData");
         List<TaskPackage> taskPackageList = taskPackageMongoRepository.findAllByUnitIdAndIsDeleted(unitId,false);
         unitData.put("taskPackageList", CollectionUtils.isNotEmpty(taskPackageList) ? taskPackageList : Collections.EMPTY_LIST);
@@ -211,9 +204,7 @@ public class VisitatorService{
     }
 
     private List<Map<String, Object>> getServiceHierarchy(long unitId){
-        //Map<String, Object> organizationServices = organizationServiceService.organizationServiceData(unitId, ORGANIZATION);
-        // Map<String, Object> organizationServices = organizationServiceService.organizationServiceData(unitId, ORGANIZATION);
-          Map<String, Object> organizationServices=genericIntegrationService.getOrganizationServices(unitId,ORGANIZATION);
+          Map<String, Object> organizationServices=userIntegrationService.getOrganizationServices(unitId,StringUtils.capitalize(ORGANIZATION));
         List<Map<String, Object>> orgSelectedServices = (List<Map<String,Object>>) organizationServices.get("selectedServices");
         List<Map<String, Object>> mainServiceList = new ArrayList<>(orgSelectedServices.size());
         Map<String, Object> mainServiceMap;
@@ -245,7 +236,7 @@ public class VisitatorService{
 
     public Map<String, Object> createTaskDemand( long unitId, long clientId, TaskDemandDTO taskDemandDTO) {
         logger.info("taskDemand to create  " + taskDemandDTO);
-        ClientStaffInfoDTO  clientStaffInfoDTO=genericIntegrationService.getClientStaffInfo(clientId);
+        ClientStaffInfoDTO  clientStaffInfoDTO= userIntegrationService.getClientStaffInfo(clientId);
 
         if (clientStaffInfoDTO.getClientId() == null) {
             logger.info("No Citizen Found with Id " + clientId);
@@ -373,7 +364,7 @@ public class VisitatorService{
             }
 
             //Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
-            ClientStaffInfoDTO clientStaffInfoDTO = genericIntegrationService.getStaffInfo();
+            ClientStaffInfoDTO clientStaffInfoDTO = userIntegrationService.getStaffInfo();
             updatedTaskDemand.setCreatedAt(existingTaskDemand.getCreatedAt());
             updatedTaskDemand.setCitizenId(existingTaskDemand.getCitizenId());
             updatedTaskDemand.setUnitId(existingTaskDemand.getUnitId());
@@ -495,7 +486,7 @@ public class VisitatorService{
 
         if(taskDemand.getRecurrencePattern()== TaskDemand.RecurrencePattern.WEEKLY){
             if (taskDemand.getWeekdaySupplierId() > 0 && taskDemand.getWeekdayFrequency() != null && taskDemand.getWeekdayVisits() != null) {
-                Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
+                Map<String,Object> organizaionInfo= userIntegrationService.getTaskDemandSupplierInfo();
                 //anilm2 comments code
                 //Organization weekdaySupplier = organizationGraphRepository.findById(taskDemand.getWeekdaySupplierId());
                 //taskDemandMap.put("weekdaySupplier", weekdaySupplier.getName());
@@ -517,7 +508,7 @@ public class VisitatorService{
                /* Organization weekendSupplier = organizationGraphRepository.findById(taskDemand.getWeekendSupplierId());
                 taskDemandMap.put("weekendSupplierId", weekendSupplier.getId());
                 taskDemandMap.put("weekendSupplier", weekendSupplier.getName());*/
-                Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
+                Map<String,Object> organizaionInfo= userIntegrationService.getTaskDemandSupplierInfo();
 
 
                 taskDemandMap.putAll(organizaionInfo);
@@ -535,7 +526,7 @@ public class VisitatorService{
            /* Organization weekdaySupplier = organizationGraphRepository.findById(taskDemand.getWeekdaySupplierId());
             taskDemandMap.put("weekdaySupplier", weekdaySupplier.getName());
             taskDemandMap.put("weekdaySupplierId", weekdaySupplier.getId());*/
-            Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
+            Map<String,Object> organizaionInfo= userIntegrationService.getTaskDemandSupplierInfo();
             taskDemandMap.putAll(organizaionInfo);
             List<TaskDemandVisit> taskDemandVisits = taskDemand.getWeekdayVisits();
             taskDemandVisits.forEach(taskDemandVisit -> taskDemandVisit.setVisitCount(toIntExact(taskDemand.getDailyFrequency())));
@@ -555,7 +546,7 @@ public class VisitatorService{
            /* Organization weekdaySupplier = organizationGraphRepository.findById(taskDemand.getWeekdaySupplierId());
             taskDemandMap.put("weekdaySupplier", weekdaySupplier.getName());
             taskDemandMap.put("weekdaySupplierId", weekdaySupplier.getId());*/
-            Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
+            Map<String,Object> organizaionInfo= userIntegrationService.getTaskDemandSupplierInfo();
 
             taskDemandMap.putAll(organizaionInfo);
 
@@ -588,7 +579,7 @@ public class VisitatorService{
         taskDemandMap.put("recurrencePattern", taskDemand.getRecurrencePattern());
         //taskDemandMap.put("citizenHouseholds", clientService.getPeopleInHousehold(taskDemand.getCitizenId()));
         if(Optional.ofNullable(taskDemand.getLastModifiedByStaffId()).isPresent() && taskDemand.getLastModifiedByStaffId() != 0){
-            Map<String, Object> staffAndCitizenHouseholds = genericIntegrationService.getStaffAndCitizenHouseholds(taskDemand.getCitizenId(),taskDemand.getLastModifiedByStaffId());
+            Map<String, Object> staffAndCitizenHouseholds = userIntegrationService.getStaffAndCitizenHouseholds(taskDemand.getCitizenId(),taskDemand.getLastModifiedByStaffId());
             logger.info("staffAndCitizenHouseholds "+staffAndCitizenHouseholds);
             taskDemandMap.put("lastModifiedBy", staffAndCitizenHouseholds.get("lastModifiedBy"));
             taskDemandMap.put("citizenHouseholds", staffAndCitizenHouseholds.get("citizenHouseholds"));
@@ -614,7 +605,7 @@ public class VisitatorService{
             }
 
         //used rest template to get citizen details from user micro service
-        Map<String,Object> citizenDetails=genericIntegrationService.getClientDetails(citizenId);
+        Map<String,Object> citizenDetails= userIntegrationService.getClientDetails(citizenId);
 
        /* Client citizen = clientGraphRepository.findById(citizenId);
 

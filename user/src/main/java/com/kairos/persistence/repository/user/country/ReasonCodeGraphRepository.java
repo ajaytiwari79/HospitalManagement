@@ -8,11 +8,11 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY;
 
 /**
  * Created by pavan on 23/3/18.
@@ -21,11 +21,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.COUNT
 public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCode, Long> {
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate DESC")
     List<ReasonCodeResponseDTO> findReasonCodesByCountry(long countryId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} return  reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodeByCountryId(long countryId);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
@@ -36,11 +36,11 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
     ReasonCode findByCountryAndReasonCode(long countryId, long reasonCodeId);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodesByUnitIdAndReasonCodeType(long unitId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} return  reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate  DESC")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodeByUnitId(long unitId);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
@@ -52,6 +52,9 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
 
     @Query("MATCH(reasonCode:ReasonCode{deleted:false}) WHERE id(reasonCode) IN {0} RETURN  reasonCode")
     List<ReasonCode> findByIds(Set<Long> reasonCodeIds);
+
+    @Query("MATCH(reasonCode:ReasonCode{deleted:false}) where reasonCode.timeTypeId=toString({0}) RETURN CASE WHEN COUNT(reasonCode)>0 THEN TRUE ELSE FALSE END AS result")
+    boolean existsByTimeTypeIdAndDeletedFalse(BigInteger timeTypeId);
 
 
 }

@@ -21,7 +21,7 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class ProcessingActivityController {
+class ProcessingActivityController {
 
 
     @Inject
@@ -67,7 +67,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/processing_activity/{processingActivityId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long processingActivityId) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long processingActivityId) throws ClassNotFoundException{
 
         if (processingActivityId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");

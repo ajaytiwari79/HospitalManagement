@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigInteger;
+
 /**
  * Created by pavan on 23/3/18.
  */
@@ -17,9 +19,18 @@ public class ReasonCodeResponseDTO {
     private String code;
     private String description;
     private ReasonCodeType reasonCodeType;
+    private BigInteger timeTypeId;
 
     public ReasonCodeResponseDTO() {
         //Default Constructor
+    }
+
+    public ReasonCodeResponseDTO(Long id, String name, String code, String description, ReasonCodeType reasonCodeType) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.reasonCodeType = reasonCodeType;
     }
 
     public Long getId() {
@@ -62,11 +73,11 @@ public class ReasonCodeResponseDTO {
         this.reasonCodeType = reasonCodeType;
     }
 
-    public ReasonCodeResponseDTO(Long id, String name, String code, String description, ReasonCodeType reasonCodeType) {
-        this.id = id;
-        this.name = name;
-        this.code = code;
-        this.description = description;
-        this.reasonCodeType = reasonCodeType;
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
     }
 }

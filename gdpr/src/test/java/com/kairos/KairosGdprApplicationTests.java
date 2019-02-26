@@ -1,5 +1,5 @@
 package com.kairos;
 
-public class KairosGdprApplicationTests {
+class KairosGdprApplicationTests {
 
 }

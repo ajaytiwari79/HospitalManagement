@@ -11,13 +11,13 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ProcessingActivityBasicResponseDTO {
+class ProcessingActivityBasicResponseDTO {
 
     private BigInteger id;
     private String name;
     private String description;
     private ManagingOrganization managingDepartment;
-    List<ProcessingActivityBasicResponseDTO> subProcessingActivities=new ArrayList<>();
+    private List<ProcessingActivityBasicResponseDTO> subProcessingActivities=new ArrayList<>();
     private Boolean suggested;
 
 

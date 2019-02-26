@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class DataSubjectMappingDeprecated {
+class DataSubjectMappingDeprecated {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")

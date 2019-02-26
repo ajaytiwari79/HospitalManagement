@@ -5,7 +5,7 @@ import com.kairos.dto.activity.payroll_system.PayRollSystemDTO;
 import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.payroll_system.PayRollSystem;
 import com.kairos.persistence.repository.payroll_system.PayRollSystemRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class PayRollSystemService {
     @Inject
     private PayRollSystemRepository payRollSystemRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private ExceptionService exceptionService;
 

@@ -1,5 +1,6 @@
 package com.kairos.service.client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
@@ -24,7 +25,6 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.utils.DateUtil;
 import com.kairos.utils.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -637,7 +637,7 @@ public class ClientExtendedService{
         if (accessToLocation == null) {
             return null;
         }
-        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if (new File(IMAGES_PATH).isDirectory()) {
@@ -668,7 +668,7 @@ public class ClientExtendedService{
     }
 
     private String writeFile(MultipartFile multipartFile) {
-        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if (new File(IMAGES_PATH).isDirectory()) {
@@ -702,7 +702,7 @@ public class ClientExtendedService{
             return null;
         }
 
-        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if (new File(IMAGES_PATH).isDirectory()) {

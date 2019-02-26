@@ -4,12 +4,14 @@ package com.kairos.persistence.repository.master_data.asset_management.hosting_t
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@JaversSpringDataAuditable
 public interface HostingTypeRepository extends CustomGenericRepository<HostingType> {
 
     @Query(value = "SELECT new com.kairos.response.dto.common.HostingTypeResponseDTO(ht.id, ht.name, ht.organizationId, ht.suggestedDataStatus, ht.suggestedDate )  FROM HostingType ht WHERE ht.countryId = ?1 and ht.deleted = false order by createdAt desc")

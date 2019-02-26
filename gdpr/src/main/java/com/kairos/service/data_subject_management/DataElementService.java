@@ -96,7 +96,7 @@ public class DataElementService{
 
 
 
-    public Set<String> checkForDuplicacyInName(List<DataElementDTO> dataElementDTOs) {
+    private Set<String> checkForDuplicacyInName(List<DataElementDTO> dataElementDTOs) {
 
         Set<String> dataElementNames = new HashSet<>();
         List<String> dataElementNamesLowerCase = new ArrayList<>();
@@ -112,8 +112,8 @@ public class DataElementService{
 
 
 
-    /**
-     * @param countryId
+    /*
+      @param countryId
      * @return get country data elements
      */
    /* public List<DataElement> getAllDataElementByCountryId(Long countryId) {
@@ -121,8 +121,8 @@ public class DataElementService{
     }*/
 
 
-    /**
-     * @param unitId
+    /*
+      @param unitId
      * @return get organizational data elements
      */
    /* public List<DataElement> getAllDataElementByUnitId(Long unitId) {

@@ -14,7 +14,7 @@ public class AssetTypeDTO {
     @NotBlank
     private String assetTypeName;
 
-    boolean isSubAssetType;
+    private boolean isSubAssetType;
 
     public Long getAssetTypeId() {
         return assetTypeId;

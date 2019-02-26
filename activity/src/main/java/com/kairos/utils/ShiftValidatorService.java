@@ -22,10 +22,8 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
-import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
-import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -53,7 +51,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
-import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.exception.ExceptionService;
@@ -79,12 +77,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.enums.shift.ShiftFilterParam.EXPERTISE;
-import static com.kairos.enums.shift.ShiftFilterParam.INDIVIDUAL_VIEW;
-import static com.kairos.enums.shift.ShiftFilterParam.OPEN_SHIFT;
-import static com.kairos.enums.shift.ViewType.INDIVIDUAL;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -121,7 +116,7 @@ public class ShiftValidatorService {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
+    private UserIntegrationService userIntegrationService;
     @Inject
     private StaffingLevelService staffingLevelService;
 
@@ -134,7 +129,7 @@ public class ShiftValidatorService {
 
 
     public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
-        String timeZone = genericIntegrationService.getTimeZoneByUnitId(unitId);
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
         DateTimeInterval graceInterval = null;
         Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         if (validatedByStaff) {
@@ -163,9 +158,6 @@ public class ShiftValidatorService {
 
 
     public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean byUpdate, boolean byTandAPhase) {
-        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-            exceptionService.actionNotPermittedException("message.wta.notFound");
-        }
         if (wtaQueryResultDTO.getEndDate() != null && wtaQueryResultDTO.getEndDate().isBefore(DateUtils.asLocalDate(shift.getEndDate()))) {
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
@@ -197,19 +189,17 @@ public class ShiftValidatorService {
             activitySpecification = activitySpecification.and(shiftTimeLessThan);
         }
         List<Long> dayTypeIds = shift.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getActivity().getRulesActivityTab().getDayTypes().stream()).collect(Collectors.toList());
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(dayTypeIds)) {
+        if (isCollectionNotEmpty(dayTypeIds)) {
             Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
             Set<DayOfWeek> validDays = getValidDays(dayTypeDTOMap, dayTypeIds);
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getStartDate());
             activitySpecification = activitySpecification.and(activityDayTypeSpec);
         }
-        //TODO
         activitySpecification.validateRules(shift);
 
 
         //ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
-        return shiftWithViolatedInfoDTO;
+        return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
     }
 
     private void validateAbsenceReasonCodeRule(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
@@ -348,11 +338,11 @@ public class ShiftValidatorService {
             boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK);
             if (notValid) {
                 try {
-                    ShiftActivityDTO updateShiftActivit = shiftDTO.getActivities().get(i);
-                    if (updateShiftActivit == null || updateShiftActivit.getStartDate().equals(shift.getStartDate()) || updateShiftActivit.getEndDate().equals(shift.getEndDate())) {
+                    ShiftActivityDTO updateShiftActivity = shiftDTO.getActivities().get(i);
+                    if (updateShiftActivity == null || updateShiftActivity.getStartDate().equals(shift.getStartDate()) || updateShiftActivity.getEndDate().equals(shift.getEndDate())) {
                         exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {
+                } catch (IndexOutOfBoundsException e) {
                     exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
                 }
 
@@ -903,7 +893,7 @@ public class ShiftValidatorService {
         if (isVerificationRequired(checkOverStaffing, staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff(), staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement(),
                 phaseSettings)) {
             Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
-            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
+            Date endDate= DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate);
             if (CollectionUtils.isEmpty(staffingLevels)) {
                 exceptionService.actionNotPermittedException("message.staffingLevel.absent");
@@ -981,7 +971,7 @@ public class ShiftValidatorService {
 
                 }
             } else {
-                exceptionService.actionNotPermittedException("message.staffingLevel.activity");
+                exceptionService.actionNotPermittedException("message.staffingLevel.activity",shiftActivity.getActivityName());
             }
         }
     }

@@ -11,14 +11,15 @@ import java.util.List;
  */
 
 public class FilterCriteria {
-    @JsonProperty(value = "name")
+    private String name;
     private FilterType type;
     private List<Object> values;
 
     public FilterCriteria() {
     }
 
-    public FilterCriteria(FilterType type, List<Object> values){
+    public FilterCriteria(String name,FilterType type, List<Object> values){
+        this.name=name;
         this.values = values;
         this.type = type;
     }
@@ -37,5 +38,13 @@ public class FilterCriteria {
 
     public void setValues(List<Object> values) {
         this.values = values;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

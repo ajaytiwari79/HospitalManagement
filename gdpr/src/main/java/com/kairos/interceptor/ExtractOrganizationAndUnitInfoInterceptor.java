@@ -19,16 +19,17 @@ import java.util.Optional;
  * Created by anil on 10/8/17.
  */
 
-public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapter {
+class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapter {
     private static final Logger log = LoggerFactory.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean preHandle(
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler) {
 
-        if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
+        if(request.getRequestURI().contains("swagger-ui")) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
