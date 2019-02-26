@@ -315,9 +315,7 @@ public class FunctionalPaymentService {
             List<FunctionalPaymentQueryResult> functionalPaymentQueryResultList=functionalPaymentGraphRepository.getFunctionalPaymentData(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
             List<FunctionalPaymentQueryResult> functionalPaymentQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(functionalPaymentQueryResultList,FunctionalPaymentQueryResult.class);
             Map<Set<Long>,List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap=constructMapOfFunctionalPaymentMatrixQueryResult(functionalPaymentQueryResults);
-            functionalPaymentQueryResults.forEach(functionalPaymentQueryResult -> {
-                functionalPaymentQueryResult.setFunctionalPaymentMatrices(getMatrixFromPayGroupAreaWiseMap(payGroupAreaWiseMap));
-            });
+            functionalPaymentQueryResults.forEach(functionalPaymentQueryResult -> functionalPaymentQueryResult.setFunctionalPaymentMatrices(getMatrixFromPayGroupAreaWiseMap(payGroupAreaWiseMap)));
             List<FunctionalPayment> functionalPayments = functionalPaymentGraphRepository.findAllById(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
             Map<Long, FunctionalPayment> functionalPaymentMap = functionalPayments.stream().collect(Collectors.toMap(FunctionalPayment::getId, Functions.identity()));
             List<FunctionalPayment> functionalPaymentListBeforeDate = new ArrayList<>();
@@ -439,11 +437,7 @@ public class FunctionalPaymentService {
     }
 
     private List<FunctionalPaymentMatrixQueryResult> getMatrixFromPayGroupAreaWiseMap(Map<Set<Long>,List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap){
-        List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrixQueryResults=new ArrayList<>();
-        payGroupAreaWiseMap.forEach((k,v)->{
-            functionalPaymentMatrixQueryResults.add(new FunctionalPaymentMatrixQueryResult(k,v));
-        });
-        return functionalPaymentMatrixQueryResults;
+        return payGroupAreaWiseMap.entrySet().stream().map(setListEntry->new FunctionalPaymentMatrixQueryResult(setListEntry.getKey(),setListEntry.getValue())).collect(Collectors.toList());
     }
 
 }
