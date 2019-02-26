@@ -167,6 +167,7 @@ public class ReasonCodeService {
         }
         return true;
     }
+
     public boolean anyReasonCodeLinkedWithTimeType(BigInteger timeTypeId){
         return reasonCodeGraphRepository.existsByTimeTypeIdAndDeletedFalse(timeTypeId);
     }
