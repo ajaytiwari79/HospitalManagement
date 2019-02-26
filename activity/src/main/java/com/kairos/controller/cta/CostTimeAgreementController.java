@@ -273,14 +273,5 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 countryCTAService.createCostTimeAgreementInOrganization(unitId,collectiveTimeAgreementDTO));
     }
-
-    @ApiOperation(value = "update phase in cta")
-    @PostMapping(value = "/update_phase_in_cta")
-    public ResponseEntity<Map<String, Object>> updatePhaseInCTA()  {
-        costTimeAgreementService.updateExistingPhaseIdOfCTA();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
-
-
 }
 

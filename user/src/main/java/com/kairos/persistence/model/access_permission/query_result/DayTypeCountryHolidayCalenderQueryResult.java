@@ -23,7 +23,7 @@ public class DayTypeCountryHolidayCalenderQueryResult {
     private boolean holidayType;
     private boolean isEnabled = true;
     private boolean allowTimeSettings = false;
-    List<CountryHolidayCalendarQueryResult> countryHolidayCalenders;
+    private List<CountryHolidayCalendarQueryResult> countryHolidayCalenders;
 
 
     // Constructor
