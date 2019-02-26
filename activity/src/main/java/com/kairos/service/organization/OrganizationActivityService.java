@@ -23,6 +23,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
@@ -32,6 +33,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -115,6 +117,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private WTAService wtaService;
     @Inject
     private CostTimeAgreementService costTimeAgreementService;
+    @Inject
+    private TimeTypeMongoRepository timeTypeMongoRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -193,11 +197,9 @@ public class OrganizationActivityService extends MongoBaseService {
         for (ActivityTagDTO activityTagDTO : activities) {
             boolean activityCanBeCopied = false;
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
-            if (isCollectionNotEmpty(hierarchies)) {
-                if ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
-                        (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))) {
+            if ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
+                        (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
                     activityCanBeCopied = true;
-                }
             }
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
@@ -236,18 +238,6 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
-        /*TimeType timeType= timeTypeMongoRepository.findOneById(balanceSettingsActivityTab.getTimeTypeId());
-        if(timeType!=null){
-            boolean activityCanBeCopied = false;
-            List<OrganizationHierarchy>  hierarchies = timeType.getAcitivityCanBeCopiedForHierarchy();
-            if(isCollectionNotEmpty(hierarchies)) {
-                if((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
-                        (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))){
-                    activityCanBeCopied = true;
-                }
-            }
-            generalActivityTabWithTagDTO.setActivityCanBeCopied(activityCanBeCopied);
-        }*/
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
         return activityTabsWrapper;
     }
@@ -376,18 +366,24 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
         //Checking the time type of activity whether it's eligible for copy or not
-        ActivityDTO eligibleForCopy = activityMongoRepository.eligibleForCopy(activityId);
-        if (eligibleForCopy == null || !eligibleForCopy.isActivityCanBeCopied()) {
+        TimeType timeType = timeTypeMongoRepository.findOneById(activityFromDatabase.get().getBalanceSettingsActivityTab().getTimeTypeId());
+        OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
+        Set<OrganizationHierarchy> hierarchies = timeType.getActivityCanBeCopiedForOrganizationHierarchy();
+        if ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
+                (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
+            Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
+            activityCopied.setName(activityDTO.getName().trim());
+            activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
+            activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
+            activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
+            activityCopied.setState(ActivityStateEnum.DRAFT);
+            save(activityCopied);
+            activityDTO.setId(activityCopied.getId());
+            activityDTO.setActivityCanBeCopied(true);
+            activityDTO.setUnitId(unitId);
+        } else {
             exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
         }
-        Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
-        activityCopied.setName(activityDTO.getName().trim());
-        activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
-        activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
-        activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
-        activityCopied.setState(ActivityStateEnum.DRAFT);
-        save(activityCopied);
-        activityDTO.setId(activityCopied.getId());
         return activityDTO;
     }
 
