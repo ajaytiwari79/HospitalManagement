@@ -643,6 +643,7 @@ public class StaffRetrievalService {
             Long functionId = null;
             if (Optional.ofNullable(shiftDate).isPresent()) {
                 functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
+                staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(),shiftDate));
             }
             unitPosition.setCountryId(countryId);
             unitPosition.setUnitTimeZone(organization.getTimeZone());

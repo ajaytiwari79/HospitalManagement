@@ -193,6 +193,7 @@ public class ShiftCopyService extends MongoBaseService {
         statusMap.put("success", successfullyCopiedShifts);
         statusMap.put("error", errorInCopyingShifts);
         if (!newShifts.isEmpty()) {
+
             save(newShifts);
             timeBankService.updateDailyTimeBankEntries(newShifts, staffUnitPosition,dataWrapper.getDayTypes());
             payOutService.savePayOuts(staffUnitPosition, newShifts, null, activityMap, dataWrapper.getDayTypes());

@@ -77,8 +77,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.DateUtils.plusDays;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
@@ -544,9 +543,9 @@ public class ShiftValidatorService {
         }
         DateTimeInterval dateTimeInterval;
         LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
-        if (validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(startDate))) {
+        if (validationStartDate.minusDays(1).isBefore(asLocalDate(startDate))) {
             while (true) {
-                dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
+                dateTimeInterval = new DateTimeInterval(asDate(validationStartDate), asDateEndOfDay(endDate));
                 if (dateTimeInterval.contains(startDate)) {
                     break;
                 }
