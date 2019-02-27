@@ -54,7 +54,7 @@ public class StaffAddressService {
     @Inject
     private ExceptionService exceptionService;
 
-    public void saveAddress(Staff staff, List<AddressDTO> addressDTOs) {
+     void saveAddress(Staff staff, List<AddressDTO> addressDTOs) {
         List<ContactAddress> contactAddresses = contactAddressGraphRepository.findAllById(addressDTOs.stream().map(AddressDTO::getId).collect(Collectors.toList()));
         Map<Long, ContactAddress> contactAddressMap = contactAddresses.stream().collect(Collectors.toMap(ContactAddress::getId, Function.identity()));
         List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOs.stream().map(AddressDTO::getZipCodeValue).collect(Collectors.toList()));
@@ -219,8 +219,8 @@ public class StaffAddressService {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("primaryStaffAddress", getContactAddress(staff.getContactAddress()));
-        response.put("secondaryStaffAddress", getContactAddress(staff.getSecondaryContactAddress()));
+        response.put("primaryAddress", getContactAddress(staff.getContactAddress()));
+        response.put("secondaryAddress", getContactAddress(staff.getSecondaryContactAddress()));
         response.put("distanceFromWork", distance);
 
         if (countryId != null) {
@@ -245,7 +245,7 @@ public class StaffAddressService {
         return contactAddressDTO;
     }
 
-    public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
+     ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
         if (Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
