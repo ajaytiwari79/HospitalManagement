@@ -40,7 +40,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
         flsVisitourChangeService.registerReceiver("visitourChange");
-        payRollSystemService.createDefaultPayRollSystemList();
+       // payRollSystemService.createDefaultPayRollSystemList();
 
     }
 }

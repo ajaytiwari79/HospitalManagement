@@ -62,4 +62,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     boolean wtaExistsByUnitPositionIdAndDates(Long unitPositionId,Date startDate,Date endDate);
     boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId,Date startDate,Date endDate);
 
+    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate);
+
 }

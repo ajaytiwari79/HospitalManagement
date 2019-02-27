@@ -82,6 +82,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 match(Criteria.where("deleted").is(false).and("countryId").is(countryId)),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
                 project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "countryParentWTA", "organizationParentId", "tags", "startDate", "endDate", "expiryDate", "ruleTemplates")
+
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
@@ -275,6 +276,18 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         Criteria endDateCriteria = Criteria.where("endDate").exists(false).and("startDate").lte(startDate);
         Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(wtaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
+    }
+
+    @Override
+    public List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                project("name", "description", "disabled",  "startDate", "endDate", "expiryDate", "ruleTemplates", "unitPositionId")
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
     }
 
 }
