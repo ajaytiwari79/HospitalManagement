@@ -152,16 +152,16 @@ public class ShiftCopyService extends MongoBaseService {
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
         int counter = 0;
-        LocalDate shiftStartDate = copyShiftDTO.getStartDate();
-        LocalDate shiftLastDate = copyShiftDTO.getEndDate();
+        LocalDate copyShiftStartDate = copyShiftDTO.getStartDate();
+        LocalDate copyShiftEndDate = copyShiftDTO.getEndDate();
         List<LocalDate> shiftCreationlocalDates = new ArrayList<>();
         if (isCollectionNotEmpty(copyShiftDTO.getSelectedDays())) {
-            List<DayOfWeek> dayOfWeeks =  copyShiftDTO.getSelectedDays().stream().map(day -> DayOfWeek.valueOf(day.toString())).collect(Collectors.toList()) ;
-            while (shiftLastDate.isAfter(shiftStartDate) || shiftLastDate.equals(shiftStartDate)) {
-                if (dayOfWeeks.contains(shiftStartDate.getDayOfWeek())) {
-                    shiftCreationlocalDates.add(shiftStartDate);
+            Set<DayOfWeek> dayOfWeeks =  copyShiftDTO.getSelectedDays().stream().map(day -> DayOfWeek.valueOf(day.toString())).collect(Collectors.toSet()) ;
+            while (copyShiftEndDate.isAfter(copyShiftStartDate) || copyShiftEndDate.equals(copyShiftStartDate)) {
+                if (dayOfWeeks.contains(copyShiftStartDate.getDayOfWeek())) {
+                    shiftCreationlocalDates.add(copyShiftStartDate);
                 }
-                shiftStartDate = shiftStartDate.plusDays(1);
+                copyShiftStartDate = copyShiftStartDate.plusDays(1);
             }
         } else {
             shiftCreationlocalDates.add(copyShiftDTO.getStartDate());
