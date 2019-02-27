@@ -359,25 +359,14 @@ public class UnionService {
         if (!sectorIDsCreated.isEmpty()) {
             organizationGraphRepository.createUnionSectorRelationShip(sectorIDsCreated, unionId);
         }
-        if (publish) {
-            validateAddress(unionData.getMainAddress());
-            union.setBoardingCompleted(true);
-            unionData.setState(UnionState.PUBLISHED);
-        }
-
-
         ContactAddress address = null;
-        ZipCode zipCode;
-        Municipality municipality;
         boolean zipCodeUpdated = false;
         boolean municipalityUpdated = false;
         UnionDataQueryResult unionDataQueryResult = unionDataQueryResults.get(0);
 
         if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
             exceptionService.invalidRequestException("message.publish.address.missing");
-
         } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
-
             if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
                 zipCodeUpdated = !unionDataQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
             }
@@ -388,6 +377,10 @@ public class UnionService {
             Long municipalityIdDB = Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent() ? unionDataQueryResult.getMunicipality().getId() : null;
             address = getAddress(unionData.getMainAddress(), zipCodeUpdated, municipalityUpdated, Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent() ?
                     unionDataQueryResult.getAddress().getId() : null, zipCodeIdDB, municipalityIdDB);
+            if(publish){
+                union.setBoardingCompleted(true);
+                unionData.setState(UnionState.PUBLISHED);
+            }
         }
 
         union.setName(unionData.getName());
