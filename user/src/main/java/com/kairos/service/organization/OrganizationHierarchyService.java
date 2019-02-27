@@ -203,21 +203,20 @@ public class OrganizationHierarchyService {
         return filterAndFavouriteFilter;
     }
 
-    private void setUnitPermission(List<QueryResult> resultQueryResults, Long parentOrgId, boolean countryAdmin) {
-        List<Long> organizationIds = resultQueryResults.stream().flatMap(s -> s.getChildren().stream().map(QueryResult::getId)).collect(toList());
+    private void setUnitPermission(List<QueryResult> organizationHierarchy, Long parentOrgId, boolean countryAdmin) {
+        List<Long> organizationIds = organizationHierarchy.stream().flatMap(s -> s.getChildren().stream().map(QueryResult::getId)).collect(toList());
         organizationIds.add(parentOrgId);
         if (!countryAdmin) {
             List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), organizationIds, parentOrgId);
             Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
-            setPermissionInChildren(resultQueryResults, unitPermissionMap, false);
+            setPermissionInChildren(organizationHierarchy, unitPermissionMap, false);
         } else {
-            setPermissionInChildren(resultQueryResults, null, true);
+            setPermissionInChildren(organizationHierarchy, null, true);
         }
-
     }
 
-    private void setPermissionInChildren(List<QueryResult> organizationHierarchyList, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin) {
-        organizationHierarchyList.forEach(unit -> {
+    private void setPermissionInChildren(List<QueryResult> organizationHierarchy, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin) {
+        organizationHierarchy.forEach(unit -> {
             unit.setHasPermission(countryAdmin ? true : unitPermissionMap.get(unit.getId()));
             setPermissionInChildren(unit.getChildren(), unitPermissionMap, countryAdmin);
         });
