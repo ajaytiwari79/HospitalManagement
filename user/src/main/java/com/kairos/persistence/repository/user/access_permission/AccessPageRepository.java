@@ -450,8 +450,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(up)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup) " +
             "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, List<Long> organizationIds, Long parentOrgId);
-
-
 }
 
 
