@@ -216,8 +216,8 @@ public class OrganizationHierarchyService {
 
     }
 
-    private void setPermissionInChildren(List<QueryResult> resultQueryResults, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin) {
-        resultQueryResults.forEach(unit -> {
+    private void setPermissionInChildren(List<QueryResult> organizationHierarchyList, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin) {
+        organizationHierarchyList.forEach(unit -> {
             unit.setHasPermission(countryAdmin ? true : unitPermissionMap.get(unit.getId()));
             setPermissionInChildren(unit.getChildren(), unitPermissionMap, countryAdmin);
         });
