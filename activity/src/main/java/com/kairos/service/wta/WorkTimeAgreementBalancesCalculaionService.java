@@ -1,15 +1,11 @@
 package com.kairos.service.wta;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
-import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Activity;
@@ -40,8 +36,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.plusDays;
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -382,20 +377,5 @@ public class WorkTimeAgreementBalancesCalculaionService {
         return dateTimeInterval;
     }
 
-    public static DateTimeInterval getIntervalByNumberOfWeeks(Date startDate, int numberOfWeeks, LocalDate validationStartDate, LocalDate planningPeriodEndDate) {
-        if (numberOfWeeks == 0 || validationStartDate == null) {
-            throwException("message.ruleTemplate.weeks.notNull");
-        }
-        DateTimeInterval dateTimeInterval = null;
-        while (validationStartDate.isBefore(planningPeriodEndDate) || validationStartDate.equals(planningPeriodEndDate)) {
-            dateTimeInterval = new DateTimeInterval(asDate(validationStartDate), asDate(validationStartDate.plusWeeks(numberOfWeeks)));
-            if (dateTimeInterval.contains(startDate)) {
-                break;
-            }
-            validationStartDate = validationStartDate.plusWeeks(numberOfWeeks);
-
-        }
-        return dateTimeInterval;
-    }
 
 }

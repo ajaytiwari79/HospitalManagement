@@ -95,7 +95,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
-            DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift().getStartDate(), numberOfWeeks, validationStartDate);
+            DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift().getStartDate(), numberOfWeeks, validationStartDate,infoWrapper.getLastPlanningPeriodEndDate());
             int totalVeto = 0;
             int totalStopBricks = 0;
             List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());

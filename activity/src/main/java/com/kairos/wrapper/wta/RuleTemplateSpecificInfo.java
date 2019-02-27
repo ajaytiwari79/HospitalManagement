@@ -11,6 +11,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,12 @@ public class RuleTemplateSpecificInfo {
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
     private List<CareDaysDTO> childCareDays;
     private List<CareDaysDTO> seniorCareDays;
+    private LocalDate lastPlanningPeriodEndDate;
 
 
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -55,6 +57,7 @@ public class RuleTemplateSpecificInfo {
         this.staffAge = staffAge;
         this.childCareDays = childCareDays;
         this.seniorCareDays = seniorCareDays;
+        this.lastPlanningPeriodEndDate = lastPlanningPeriodEndDate;
     }
 
 
@@ -168,5 +171,13 @@ public class RuleTemplateSpecificInfo {
 
     public void setPlanningPeriod(DateTimeInterval planningPeriod) {
         this.planningPeriod = planningPeriod;
+    }
+
+    public LocalDate getLastPlanningPeriodEndDate() {
+        return lastPlanningPeriodEndDate;
+    }
+
+    public void setLastPlanningPeriodEndDate(LocalDate lastPlanningPeriodEndDate) {
+        this.lastPlanningPeriodEndDate = lastPlanningPeriodEndDate;
     }
 }

@@ -259,7 +259,6 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> getDefaultCTA(@PathVariable Long unitId,@PathVariable Long expertiseId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultCTA(unitId,expertiseId));
     }
-
     /**
      *
      * @param unitId
@@ -273,8 +272,5 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 countryCTAService.createCostTimeAgreementInOrganization(unitId,collectiveTimeAgreementDTO));
     }
-
-
-
 }
 
