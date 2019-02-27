@@ -174,9 +174,4 @@ public class QueryResult {
     public void setHasPermission(boolean hasPermission) {
         this.hasPermission = hasPermission;
     }
-    public Stream<QueryResult> flatList() {
-        return Stream.concat(
-                Stream.of(this),
-                children.stream().flatMap(QueryResult::flatList));
-    }
 }
