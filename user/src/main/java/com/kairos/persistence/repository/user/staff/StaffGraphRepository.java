@@ -474,7 +474,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN distinct id(staff) as id ,staff.lastName as lastName  , staff.firstName as firstName , staff.email as email , staff.userName as userName ,staff.access_token as access_token ,staff.user_id as user_id")
     List<Map> findAllStaffBasicDetailsByOrgIdAndUnitId(Long parentOrgId,Long unitId);
 
-
     @Query(" MATCH (staff:Staff)-[r:BELONGS_TO]->(user:User) where id(staff)={0} return staff,r,user")
     Staff findByStaffId(Long staffId);
 

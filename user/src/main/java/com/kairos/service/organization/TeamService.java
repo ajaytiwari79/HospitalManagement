@@ -145,6 +145,7 @@ public class TeamService {
                 contactAddress.setMunicipality(municipality);
                 contactAddress.setLongitude(organizationContactAddress.getContactAddress().getLongitude());
                 contactAddress.setProvince(organizationContactAddress.getContactAddress().getProvince());
+                contactAddress.setRegionName(organizationContactAddress.getContactAddress().getRegionName());
                 contactAddress.setCity(organizationContactAddress.getContactAddress().getCity());
                 contactAddress.setCountry(organizationContactAddress.getContactAddress().getCountry());
                 contactAddress.setZipCode(zipCode);
@@ -171,7 +172,7 @@ public class TeamService {
         Map<String, Object> response = new HashMap<>();
         response.put("id", team.getId());
         response.put("name", team.getName());
-        response.put("contactAddress", new AddressDTO(contactAddress.getId(), contactAddress.getStreet(), contactAddress.getHouseNumber(),contactAddress.getCity(), municipality.getName(), zipCode.getId(), contactAddress.getRegionName(), municipality.getId()));
+        response.put("contactAddress", new AddressDTO(contactAddress.getId(), contactAddress.getStreet(), contactAddress.getHouseNumber(),contactAddress.getCity(), municipality.getName(), zipCode.getId(), contactAddress.getRegionName(), contactAddress.getProvince(), municipality.getId()));
         return response;
     }
 

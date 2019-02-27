@@ -1,13 +1,16 @@
 package com.kairos.dto.activity.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
@@ -319,5 +322,15 @@ public class ShiftActivityDTO {
 
     public void setPlannedMinutes(int plannedMinutes) {
         this.plannedMinutes = plannedMinutes;
+    }
+
+    @JsonIgnore
+    public LocalDate getStartLocalDate(){
+        return asLocalDate(this.startDate);
+    }
+
+    @JsonIgnore
+    public LocalDate getEndLocalDate(){
+        return asLocalDate(this.endDate);
     }
 }

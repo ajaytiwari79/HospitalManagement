@@ -113,7 +113,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
                 project( "name", "description", "unitId","rulesActivityTab","parentId","generalActivityTab","tags")
-                        .and("timeType.activityCanBeCopiedForHierarchy").arrayElementAt(0).as("activityCanBeCopiedForHierarchy")
+                        .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
 
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);

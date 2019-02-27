@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, BigInteger> ,CustomTimeTypeMongoRepository {
@@ -53,7 +54,7 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     boolean timeTypeAlreadyExistsByLabelAndCountryId(BigInteger timeTypeId,String timeTypeName, Long countryId);
 
     @Query("{id:{$in:?0},deleted : false}")
-    List<TimeType> findAllByTimeTypeIds(List<BigInteger> id);
+    List<TimeType> findAllByTimeTypeIds(Set<BigInteger> id);
 
     @Query("{upperLevelTimeTypeId:{ $in:?0},deleted : false}")
     List<TimeType> findAllChildTimeTypeByParentId(List<BigInteger> timeTypeIds);

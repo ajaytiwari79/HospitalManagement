@@ -2,7 +2,7 @@ package com.kairos.controller.wta;
 
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.service.wta.WTABuilderService;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.service.wta.RuleTemplateService;
 import com.kairos.utils.response.ResponseHandler;
