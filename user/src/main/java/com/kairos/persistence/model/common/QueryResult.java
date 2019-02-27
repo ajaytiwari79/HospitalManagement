@@ -5,6 +5,7 @@ import com.kairos.enums.OrganizationLevel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Created by prabjot on 14/11/16.
@@ -27,6 +28,7 @@ public class QueryResult {
     private Boolean union;
     private OrganizationLevel organizationLevel;
     private Long hubId;
+    private boolean hasPermission;
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
@@ -163,5 +165,18 @@ public class QueryResult {
 
     public void setHubId(Long hubId) {
         this.hubId = hubId;
+    }
+
+    public boolean isHasPermission() {
+        return hasPermission;
+    }
+
+    public void setHasPermission(boolean hasPermission) {
+        this.hasPermission = hasPermission;
+    }
+    public Stream<QueryResult> flatList() {
+        return Stream.concat(
+                Stream.of(this),
+                children.stream().flatMap(QueryResult::flatList));
     }
 }
