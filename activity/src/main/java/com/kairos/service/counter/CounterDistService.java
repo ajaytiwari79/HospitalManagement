@@ -970,14 +970,13 @@ public class CounterDistService extends MongoBaseService {
         List<ApplicableKPI> applicableKPIs = new ArrayList<>();
         if (ConfLevel.COUNTRY.equals(level) || accessGroupPermissionCounterDTO.isCountryAdmin()) {
             applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), refId, null, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
-        }
-        if (ConfLevel.UNIT.equals(level)) {
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), null, refId, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
-        }
-        if (ConfLevel.STAFF.equals(level)) {
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
-        }
+        }else if (ConfLevel.UNIT.equals(level)) {
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+       }
+// else if (ConfLevel.STAFF.equals(level)) {
+//            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+//        }
         if (isNotNull(tabId)) {
             tabKPIConf = new TabKPIConf(tabId, copyKpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), level, new KPIPosition(0, 0), KPIValidity.BASIC, LocationType.FIX, calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX));
             save(tabKPIConf);
