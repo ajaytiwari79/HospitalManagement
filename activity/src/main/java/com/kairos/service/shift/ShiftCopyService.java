@@ -29,7 +29,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.utils.ShiftValidatorService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -48,8 +47,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.utils.ShiftValidatorService.convertMessage;
-import static com.kairos.utils.ShiftValidatorService.getValidDays;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 import static java.util.stream.Collectors.groupingBy;
 
 /**

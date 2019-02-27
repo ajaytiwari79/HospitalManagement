@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
-import static com.kairos.utils.ShiftValidatorService.*;
+import static com.kairos.service.shift.ShiftValidatorService.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
 @Service

@@ -4,7 +4,7 @@ import com.kairos.enums.Day;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.utils.ShiftValidatorService;
+import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 

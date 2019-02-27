@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
-import javax.inject.Inject;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
@@ -8,7 +7,6 @@ import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,12 +15,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.utils.ShiftValidatorService.getCareDays;
-import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
 /**

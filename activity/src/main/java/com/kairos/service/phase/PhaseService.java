@@ -2,15 +2,21 @@ package com.kairos.service.phase;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -48,6 +54,8 @@ public class PhaseService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private ActivityConfigurationRepository activityConfigurationRepository;
+
 
 
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
@@ -380,4 +388,35 @@ public class PhaseService extends MongoBaseService {
     public List<PhaseDTO> getDefaultPhasesByUnit(Long unitId) {
         return phaseMongoRepository.findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(unitId);
     }
+
+    public Map<BigInteger, PhaseTemplateValue> constructMapOfActivityAndPhaseTemplateValue(Phase phase, List<ActivityWrapper> activities) {
+        Map<BigInteger, PhaseTemplateValue> phaseTemplateValueMap = new HashMap<>();
+        for (ActivityWrapper activityWrapper : activities) {
+            for (PhaseTemplateValue phaseTemplateValue : activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()) {
+                if (phaseTemplateValue.getPhaseId().equals(phase.getId())) {
+                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(), phaseTemplateValue);
+                    break;
+                }
+            }
+        }
+        return phaseTemplateValueMap;
+    }
+
+    public BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
+        }
+        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
+                : getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
+    }
+
+    private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
+        if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
+            plannedTypeId = plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+        }
+        return plannedTypeId;
+
+    }
+
 }
