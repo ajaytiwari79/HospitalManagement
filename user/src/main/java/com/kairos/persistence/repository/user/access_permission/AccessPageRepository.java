@@ -444,7 +444,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             )
     List<AccessGroup> fetchAccessGroupsOfStaffPermission(Long userId);
 
-
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(parentOrg:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup),(unit:Organization) " +
+            "WHERE  id(user) = {0} AND id(unit) IN {1} AND id(parentOrg) = {2}\n" +
+            "OPTIONAL MATCH(employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit)\n" +
+            "OPTIONAL MATCH(up)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup) " +
+            "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
+    List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, List<Long> organizationIds, Long parentOrgId);
 }
 
 

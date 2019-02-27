@@ -22,6 +22,11 @@ public class AccessPageQueryResult {
     private String moduleId;
     private Long parentId;
     private int sequence;
+    private List<AccessPageQueryResult> children = new ArrayList<>();
+
+    public AccessPageQueryResult() {
+        //Default Constructor
+    }
 
     public String getModuleId() {
         return moduleId;
@@ -30,8 +35,6 @@ public class AccessPageQueryResult {
     public void setModuleId(String moduleId) {
         this.moduleId = moduleId;
     }
-
-    private List<AccessPageQueryResult> children = new ArrayList<>();
 
     public List<AccessPageQueryResult> getChildren() {
         return children;
