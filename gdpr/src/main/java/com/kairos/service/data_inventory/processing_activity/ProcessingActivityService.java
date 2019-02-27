@@ -609,9 +609,6 @@ public class ProcessingActivityService {
     }
 
 
-  /*  public List<AssessmentBasicResponseDTO> getAssessmentListByProcessingActivityId(Long unitId, BigInteger processingActivityId) {
-        return assessmentMongoRepository.findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(unitId, processingActivityId);
-    }*/
 
 
     /**

@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
+import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -27,6 +28,9 @@ class AssetController {
 
     @Inject
     private AssetService assetService;
+
+    @Inject
+    private AssessmentService assessmentService;
 
 
     @ApiOperation(value = "create asset for organization with basic detail")
@@ -97,11 +101,11 @@ class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllActiveAsset(unitId));
     }
 
-    /*@ApiOperation(value = "Get Previous Assessments Launched for Asset")
+    @ApiOperation(value = "Get Previous Assessments Launched for Asset")
     @GetMapping("/asset/{assetId}/assesssment")
-    public ResponseEntity<Object> getAllAssessmentLaunchedForAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssessmentListByAssetId(unitId, assetId));
-    }*/
+    public ResponseEntity<Object> getAllAssessmentLaunchedForAssetById(@PathVariable Long unitId, @PathVariable Long assetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentListByAssetId(unitId, assetId));
+    }
 
 
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.assessment.*;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -36,6 +37,7 @@ import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTem
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
 import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
@@ -760,5 +762,36 @@ public class AssessmentService {
                 break;
         }
     }
+
+    public List<AssessmentBasicResponseDTO> getAssessmentListByProcessingActivityId(Long unitId, Long processingActivityId) {
+        List<Assessment> assessments = assessmentRepository.findAllProcessingActivityAssessmentByActivityIdAndUnitId(unitId, processingActivityId);
+        return prepareAssessmentResponseDTO(assessments);
+    }
+
+    /*
+    @param unitId
+    @param assetId
+    @return
+    * @description get all Previous Assessment Launched for Asset
+     */
+    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, Long assetId) {
+        List<Assessment> assessments =  assessmentRepository.findAllAssetAssessmentByAssetIdAndUnitId(unitId, assetId);
+        return prepareAssessmentResponseDTO(assessments);
+    }
+
+    private List<AssessmentBasicResponseDTO> prepareAssessmentResponseDTO(List<Assessment> assessments){
+        List<AssessmentBasicResponseDTO> assessmentBasicResponseDTOList = new ArrayList<>();
+        assessments.forEach(assessment -> {
+            AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(),assessment.getName(),assessment.getEndDate(),assessment.getCompletedDate(),assessment.getStartDate(),assessment.getComment(),assessment.getAssessmentStatus(),assessment.getAssessmentLaunchedDate(),assessment.getAssessmentSchedulingFrequency());
+            assessmentBasicResponseDTO.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessment.getApprover(), Staff.class));
+            assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessment.getAssigneeList(), Staff.class));
+            assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
+            assessmentBasicResponseDTOList.add(assessmentBasicResponseDTO);
+        });
+        return assessmentBasicResponseDTOList;
+    }
+
+
+
 
 }

@@ -77,4 +77,19 @@ public class AssessmentBasicResponseDTO {
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
+
+    public AssessmentBasicResponseDTO() {
+    }
+
+    public AssessmentBasicResponseDTO(Long id, String name, LocalDate endDate, LocalDate completedDate, LocalDate startDate, String comment, AssessmentStatus assessmentStatus, LocalDate assessmentLaunchedDate, AssessmentSchedulingFrequency assessmentSchedulingFrequency) {
+        this.id = id;
+        this.name = name;
+        this.endDate = endDate;
+        this.completedDate = completedDate;
+        this.startDate = startDate;
+        this.comment = comment;
+        this.assessmentStatus = assessmentStatus;
+        this.assessmentLaunchedDate = assessmentLaunchedDate;
+        this.assessmentSchedulingFrequency = assessmentSchedulingFrequency;
+    }
 }
