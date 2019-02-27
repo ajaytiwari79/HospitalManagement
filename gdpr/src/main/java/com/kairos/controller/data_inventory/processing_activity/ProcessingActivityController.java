@@ -3,6 +3,7 @@ package com.kairos.controller.data_inventory.processing_activity;
 
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
+import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -26,6 +27,9 @@ class ProcessingActivityController {
 
     @Inject
     private ProcessingActivityService processingActivityService;
+
+    @Inject
+    private AssessmentService assessmentService;
 
 
     @ApiOperation(value = "create Processing activity ")
@@ -164,14 +168,14 @@ class ProcessingActivityController {
     @DeleteMapping("/processing_activity/{processingActivityId}/risk/{riskId}")
     public ResponseEntity<Object> unLinkRiskfromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));
-    }
+    }*/
 
     @ApiOperation(value = "Get Previous Assessments Launched for Processing Activity")
     @GetMapping("/processing_activity/{processingActivityId}/assesssment")
-    public ResponseEntity<Object> getAllAssessmentLaunchedForProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAssessmentListByProcessingActivityId(unitId, processingActivityId));
+    public ResponseEntity<Object> getAllAssessmentLaunchedForProcessingActivityById(@PathVariable Long unitId, @PathVariable Long processingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentListByProcessingActivityId(unitId, processingActivityId));
     }
-*/
+
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
     @PostMapping(COUNTRY_URL + "/processing_activity/suggest")
     public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {

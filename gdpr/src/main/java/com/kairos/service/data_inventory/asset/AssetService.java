@@ -356,15 +356,7 @@ public class AssetService {
     }
 
 
-    *//**
-     * @param unitId
-     * @param assetId
-     * @return
-     * @description get all Previous Assessment Launched for Asset
-     *//*
-    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, BigInteger assetId) {
-        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(unitId, assetId);
-    }*/
+
 
 
     /**
