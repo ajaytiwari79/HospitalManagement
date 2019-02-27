@@ -35,6 +35,16 @@ public class DayTypeDTO {
         this.allowTimeSettings = allowTimeSettings;
     }
 
+    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings,String colorCode) {
+        this.id = id;
+        this.name = name;
+        this.validDays = validDays;
+        this.countryHolidayCalenderData = countryHolidayCalenderData;
+        this.holidayType = holidayType;
+        this.allowTimeSettings = allowTimeSettings;
+        this.colorCode=colorCode;
+    }
+
     public boolean isAllowTimeSettings() {
         return allowTimeSettings;
     }

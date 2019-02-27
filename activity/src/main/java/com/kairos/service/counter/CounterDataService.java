@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
@@ -60,7 +61,7 @@ public class CounterDataService {
     private TimeBankRepository timeBankRepository;
 
     //FIXME: DO NOT REMOVE will be uncommented once representation model confirmed.
-    public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
+    public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId) {
 //        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
 //        List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
 //        Set<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toSet());
@@ -322,22 +323,22 @@ public class CounterDataService {
 //
 //    }
 
-    public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId,Long staffId){
+    public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
-        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
+        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
-        Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera=new HashMap<>();
-        if(filters.getFilters() != null&&filters.getFilters().size()>1 ) {
+        Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
+        if (filters.getFilters() != null && isCollectionNotEmpty(filters.getFilters())) {
             filters.getFilters().forEach(filter -> {
                 filterBasedCriteria.put(filter.getType(), filter.getValues());
             });
-        }else{
-            List<ApplicableKPI> staffApplicableKPIS=new ArrayList<>();
-            if(filters.isCountryAdmin()){
-                staffApplicableKPIS=counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
-            }else{
-                staffApplicableKPIS=counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
+        } else {
+            List<ApplicableKPI> staffApplicableKPIS = new ArrayList<>();
+            if (filters.isCountryAdmin()) {
+                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
+            } else {
+                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
             }
             for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
                 Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
@@ -349,18 +350,18 @@ public class CounterDataService {
                 }
             }
         }
-        for(BigInteger kpiId : filters.getKpiIds()){
-            Callable<CommonRepresentationData> data = () ->counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId,filterBasedCriteria), organizationId, kpiMap.get(kpiId));
+        for (BigInteger kpiId : filters.getKpiIds()) {
+            Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId));
             Future<CommonRepresentationData> responseData = executorService.submit(data);
             kpiResults.add(responseData);
         }
         List<CommonRepresentationData> kpisData = new ArrayList();
-        for(Future<CommonRepresentationData> data : kpiResults){
+        for (Future<CommonRepresentationData> data : kpiResults) {
             try {
                 kpisData.add(data.get());
-            } catch(InterruptedException ex){
+            } catch (InterruptedException ex) {
                 ex.printStackTrace();
-            } catch(ExecutionException ex){
+            } catch (ExecutionException ex) {
                 ex.printStackTrace();
             }
         }
