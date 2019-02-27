@@ -45,7 +45,7 @@ public class AddressDTO {
     public AddressDTO() {
     }
 
-    public AddressDTO(Long id, String street, String houseNumber, String city, String municipalityName, Long zipCodeId, String regionName, Long municipalityId) {
+    public AddressDTO(Long id, String street, String houseNumber, String city, String municipalityName, Long zipCodeId, String regionName, String province, Long municipalityId) {
         this.id = id;
         this.street = street;
         this.houseNumber = houseNumber;
@@ -53,6 +53,7 @@ public class AddressDTO {
         this.municipalityName = municipalityName;
         this.zipCodeId = zipCodeId;
         this.regionName = regionName;
+        this.province = province;
         this.municipalityId = municipalityId;
     }
 
