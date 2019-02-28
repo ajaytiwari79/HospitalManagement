@@ -295,4 +295,17 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
         return results.getMappedResults();
     }
+
+    @Override
+    public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriod(Long unitId) {
+        Aggregation aggregation=newAggregation(
+                match(Criteria.where("unitId").is(unitId)),
+                sort(Sort.Direction.ASC, "startDate"),
+                group("unitId").first("startDate").as("startDate").last("endDate").as("endDate"),
+                project().and("startDate").as("startDate").and("endDate").as("endDate")
+        );
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
+        return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
+    }
+
 }

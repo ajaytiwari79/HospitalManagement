@@ -15,6 +15,7 @@ import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -55,6 +56,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
@@ -146,6 +148,8 @@ public class ActivityService extends MongoBaseService {
     private MongoSequenceRepository mongoSequenceRepository;
     @Inject
     private GlideTimeSettingsService glideTimeSettingsService;
+    @Inject
+    private PlanningPeriodService planningPeriodService;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -751,8 +755,8 @@ public class ActivityService extends MongoBaseService {
         }
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
-
-        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes());
+        PlanningPeriodDTO planningPeriodDTO=planningPeriodService.getStartDateAndEndDateOfPlanningPeriod(unitId);
+        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(),planningPeriodDTO.getStartDate(),planningPeriodDTO.getEndDate());
     }
 
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
