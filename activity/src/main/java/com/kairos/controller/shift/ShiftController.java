@@ -49,6 +49,8 @@ public class ShiftController {
     private ShiftDetailsService shiftDetailsService;
     @Inject
     private ShiftStateService shiftStateService;
+    @Inject private ShiftValidatorService shiftValidatorService;
+    @Inject private ShiftStatusService shiftStatusService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -84,7 +86,7 @@ public class ShiftController {
     @PutMapping(value = "/shift/update_status")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateStatusOfShifts(@PathVariable Long unitId, @RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateStatusOfShifts(unitId, shiftPublishDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateStatusOfShifts(unitId, shiftPublishDTO));
     }
 
     @ApiOperation("copy shifts from 1 employee to others")
@@ -137,7 +139,7 @@ public class ShiftController {
     @ApiOperation("validate shift by detail view")
     @PostMapping("/shift/validate_shift_by_details_view")
     public ResponseEntity<Map<String, Object>> validateShiftByDetailsView(@PathVariable Long unitId, @RequestParam String type, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam Boolean validatedByStaff) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.validateShift(shiftDTO, validatedByStaff, unitId, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftValidatorService.validateShift(shiftDTO, validatedByStaff, unitId, type));
     }
 
     @ApiOperation("get a Shift detail by id")

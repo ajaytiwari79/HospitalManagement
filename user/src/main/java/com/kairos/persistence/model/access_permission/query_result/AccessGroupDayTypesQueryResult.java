@@ -7,9 +7,9 @@ import java.util.List;
 
 @QueryResult
 public class AccessGroupDayTypesQueryResult {
-    AccessGroup accessGroup;
+    private AccessGroup accessGroup;
     //List<DayType> dayTypes;
-    List<DayTypeCountryHolidayCalenderQueryResult> dayTypes;
+    private List<DayTypeCountryHolidayCalenderQueryResult> dayTypes;
 
     public AccessGroup getAccessGroup() {
         return accessGroup;

@@ -446,12 +446,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.deleteTimeSlot(timeSlotId, timeSlotSetId));
     }
 
-    @ApiOperation(value = "Get Organization Hierarchy")
-    @GetMapping("/hierarchy")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationHierarchy(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.generateHierarchyMinimum(organizationId));
-    }
 
     @ApiOperation(value = "Get Organization Hierarchy")
     @GetMapping("/organization_flow/hierarchy")

@@ -66,6 +66,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ONE_DAY_MINUTES;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.stream.Collectors.*;
 
 
@@ -121,7 +122,7 @@ public class TimeBankService extends MongoBaseService {
 
 
     public boolean updateTimeBankForMultipleShifts(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Date startDate, Date endDate) {
-        shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         List<DailyTimeBankEntry> updatedDailyTimeBankEntries = new ArrayList<>();
         List<DailyTimeBankEntry> dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTO, startDate, endDate, staffAdditionalInfoDTO.getUnitId());
         updatedDailyTimeBankEntries.addAll(dailyTimeBankEntries);
@@ -368,7 +369,7 @@ public class TimeBankService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.cta.notFound");
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         List<DailyTimeBankEntry> dailyTimeBanks = renewDailyTimeBank(staffAdditionalInfoDTO, startDate,endDate,staffAdditionalInfoDTO.getUnitId());
         if (!dailyTimeBanks.isEmpty()) {
             save(dailyTimeBanks);
@@ -400,7 +401,7 @@ public class TimeBankService extends MongoBaseService {
                 exceptionService.dataNotFoundException("message.cta.notFound");
             }
             staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-            shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+            setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTO,shift));
             ctaResponseDTOMap.put(shiftDate,ctaResponseDTO);
         }
@@ -453,7 +454,7 @@ public class TimeBankService extends MongoBaseService {
                 CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
                 if(Optional.ofNullable(ctaResponseDTO).isPresent() && CollectionUtils.isNotEmpty(ctaResponseDTO.getRuleTemplates())){
                     staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                    shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                    setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     staffAdditionalInfoDTOMap.put(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO);
                     if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId())) {
                         dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()),shift));
@@ -617,7 +618,7 @@ public class TimeBankService extends MongoBaseService {
                 DateTime endDate = new DateTime(shift.getEndDate()).plusDays(1).withTimeAtStartOfDay();
                 if (isNotNull(ctaResponseDTO)) {
                     staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                    shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                    setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     while (startDate.isBefore(endDate)) {
                         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftDateMap.getOrDefault(staffAdditionalInfoDTO.getUnitPosition().getId() + "-" + DateUtils.asLocalDate(startDateTime), new ArrayList<>());
                         Interval interval = new Interval(startDate, startDate.plusDays(1));

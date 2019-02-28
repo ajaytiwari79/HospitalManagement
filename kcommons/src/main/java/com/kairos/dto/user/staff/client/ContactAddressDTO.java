@@ -2,21 +2,30 @@ package com.kairos.dto.user.staff.client;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by pavan on 27/2/18.
  */
 public class ContactAddressDTO {
-
+    @NotBlank(message = "message.houseNumber.null")
     private String houseNumber;
     private Integer floorNumber;
+    @NotBlank(message = "message.street.null")
     private String street;
+    @NotNull(message = "message.zipCodeId.null")
     private Long zipCodeId;
+    @NotBlank(message = "message.city.null")
     private String city;
+    @NotNull(message = "message.municipality.null")
     private Long municipalityId;
+    @NotBlank(message = "message.region.null")
     private String regionName;
     private String country;
     private Float latitude;
     private Float longitude;
+    @NotBlank(message = "message.province.null")
     private String province;
     private String streetUrl;
     private Boolean addressProtected;

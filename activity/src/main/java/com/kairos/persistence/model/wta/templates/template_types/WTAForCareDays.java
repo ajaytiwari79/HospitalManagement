@@ -13,7 +13,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.utils.ShiftValidatorService.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getShiftsByIntervalAndActivityIds;
+
 
 /**
  * @author pradeep

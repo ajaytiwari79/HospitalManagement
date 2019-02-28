@@ -86,6 +86,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.enums.Day.EVERYDAY;
 
 /*
  *Created By Pavan on 13/11/18
@@ -407,8 +408,11 @@ public class StaffRetrievalService {
             if (CollectionUtils.isNotEmpty(dayTypeList)) {
                 for (DayTypeCountryHolidayCalenderQueryResult dayType : dayTypeList) {
                     if (!dayType.isHolidayType()) {
+                        if(isNull(dayType.getValidDays())){
+                            exceptionService.dataNotMatchedException("message.day_type.absent",accessGroupDayTypes.getAccessGroup().getName());
+                        }
                         List<String> validDays = dayType.getValidDays().stream().map(day -> day.name()).collect(Collectors.toList());
-                        if (validDays.contains(loginDay.toString()) || validDays.contains("EVERYDAY")) {
+                        if (validDays.contains(loginDay.toString()) || validDays.contains(EVERYDAY)) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
@@ -642,6 +646,7 @@ public class StaffRetrievalService {
             Long functionId = null;
             if (Optional.ofNullable(shiftDate).isPresent()) {
                 functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
+                staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(),shiftDate));
             }
             unitPosition.setCountryId(countryId);
             unitPosition.setUnitTimeZone(organization.getTimeZone());

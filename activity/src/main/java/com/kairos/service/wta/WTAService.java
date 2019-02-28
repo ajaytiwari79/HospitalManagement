@@ -8,6 +8,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
+import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
@@ -20,7 +21,6 @@ import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.model.wta.templates.template_types.ChildCareDaysCheckWTATemplate;
 import com.kairos.persistence.model.wta.templates.template_types.SeniorDaysPerYearWTATemplate;
 import com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate;
@@ -104,6 +104,8 @@ public class WTAService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private TimeBankService timeBankService;
+
+    @Inject private WorkTimeAgreementBalancesCalculaionService workTimeAgreementBalancesCalculaionService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -774,6 +776,10 @@ public class WTAService extends MongoBaseService {
        /* Map<Long,Map<Long,Long>> accumulatedTimebankMap = timeBankService.getAccumulatedTimebankByUnitPositions(positionLinesMap);
         ctawtaAndAccumulatedTimebankWrapper.setUnitPositionLineAndTimebankMinuteMap(accumulatedTimebankMap);
         */return ctawtaAndAccumulatedTimebankWrapper;
+    }
+
+    public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long unitPositionId,LocalDate startDate,LocalDate endDate){
+       return workTimeAgreementBalancesCalculaionService.getWorktimeAgreementBalance(unitId,unitPositionId,startDate,endDate);
     }
 
 }

@@ -1,17 +1,14 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.utils.ShiftValidatorService;
+import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.time.Duration;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftWithActivityDTO> {

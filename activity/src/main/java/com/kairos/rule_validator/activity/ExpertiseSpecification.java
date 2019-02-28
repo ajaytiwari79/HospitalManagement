@@ -4,18 +4,14 @@ import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.utils.ShiftValidatorService.convertMessage;
-import static com.kairos.utils.ShiftValidatorService.throwException;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
 /**
  * Created by vipul on 31/1/18.

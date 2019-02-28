@@ -934,11 +934,7 @@ public class ActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        //Checking the time type of activity whether it's eligible for copy or not
-        ActivityDTO eligibleForCopy = activityMongoRepository.eligibleForCopy(activityId);
-        if (eligibleForCopy==null || !eligibleForCopy.isActivityCanBeCopied()) {
-            exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
-        }
+
         Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(), Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());

@@ -43,6 +43,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 /**
@@ -172,7 +173,7 @@ public class ShiftSickService extends MongoBaseService {
                     exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
                 }
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                 List<ShiftActivity> breakActivities = shiftService.updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
                 if (!breakActivities.isEmpty()) {
                     shift.setActivities(breakActivities);
@@ -307,7 +308,7 @@ public class ShiftSickService extends MongoBaseService {
                         exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
                     }
                     staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                    shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                    setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
                 }
             }

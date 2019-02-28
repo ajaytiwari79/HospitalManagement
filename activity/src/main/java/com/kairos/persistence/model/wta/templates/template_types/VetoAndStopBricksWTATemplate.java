@@ -6,8 +6,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.validation.constraints.NotNull;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.kairos.utils.ShiftValidatorService.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
 /**
@@ -95,7 +95,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
-            DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
+            DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift().getStartDate(), numberOfWeeks, validationStartDate,infoWrapper.getLastPlanningPeriodEndDate());
             int totalVeto = 0;
             int totalStopBricks = 0;
             List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());

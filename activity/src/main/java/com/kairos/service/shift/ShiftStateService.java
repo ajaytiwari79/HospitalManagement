@@ -2,6 +2,7 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.phase.Phase;
@@ -136,5 +137,30 @@ public class ShiftStateService {
             }
         }
         return timeAndAttendanceShiftStates;
+    }
+
+    public ShiftDTO updateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, BigInteger shiftStateId, BigInteger shiftStatePhaseId) {
+        shiftDTO.setShiftStatePhaseId(shiftStatePhaseId);
+        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
+        if (shiftState != null) {
+            shiftDTO.setId(shiftState.getId());
+            shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
+            shiftDTO.setValidated(shiftState.getValidated());
+            shiftDTO.setShiftId(shiftState.getShiftId());
+            shiftDTO.setPhaseId(shiftState.getPhaseId());
+            shiftDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
+            shiftDTO.setEndDate(shiftDTO.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
+        }
+        shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        shiftMongoRepository.save(shiftState);
+        return shiftDTO;
+    }
+
+    public List<ShiftState> checkAndCreateRealtimeAndDraftState(List<Shift> shifts, List<ShiftState> shiftStates, Map<String, Phase> phaseMap) {
+        List<ShiftState> newShiftStates = new ArrayList<>();
+        newShiftStates = createRealTimeShiftState(newShiftStates, shiftStates, shifts, phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
+        newShiftStates.addAll(createDraftShiftState(newShiftStates, shifts, phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
+        if (!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
+        return newShiftStates;
     }
 }
