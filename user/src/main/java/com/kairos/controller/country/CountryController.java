@@ -2,8 +2,7 @@ package com.kairos.controller.country;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
-import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
-import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
@@ -900,7 +899,7 @@ public class CountryController {
     @ApiOperation(value = "Create Expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
+    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody ExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
     }
 
@@ -922,7 +921,7 @@ public class CountryController {
     @ApiOperation(value = "Update expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody @Validated ExpertiseUpdateDTO expertise) {
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody @Validated ExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(countryId, expertise));
     }
 
