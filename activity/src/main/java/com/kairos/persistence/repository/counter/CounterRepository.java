@@ -35,6 +35,7 @@ import org.springframework.stereotype.Repository;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -85,7 +86,7 @@ public class CounterRepository {
 
     public ApplicableKPI getKpiByTitleAndUnitId(String title, Long refId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where("title").is(title).and(refQueryField).is(refId).and("level").is(level));
+        Query query = new Query(Criteria.where("title").is(title).regex(Pattern.compile("^" + title + "$", Pattern.CASE_INSENSITIVE)).and(refQueryField).is(refId).and("level").is(level));
         return mongoTemplate.findOne(query, ApplicableKPI.class);
     }
 
@@ -340,11 +341,11 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     public void removeApplicableKPI(List<Long> refIds, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
-        Query query = null;
+        Query query ;
         if (ConfLevel.STAFF.equals(level)) {
             query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds).and("level").in(level));
         } else {
-            query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds).and("level").in(level));
+            query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds));
         }
         mongoTemplate.remove(query, ApplicableKPI.class);
     }

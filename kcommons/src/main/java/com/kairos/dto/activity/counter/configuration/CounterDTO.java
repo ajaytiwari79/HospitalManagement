@@ -48,11 +48,11 @@ public class CounterDTO {
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = title.trim();
     }
 
     public boolean isCounter() {
