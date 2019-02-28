@@ -17,6 +17,8 @@ public class StaffAccessGroupQueryResult {
     private List<Long> accessGroupIds;
     private boolean staff;
     private boolean management;
+    private Long unitId;
+    private boolean hasPermission;
 
     public StaffAccessGroupQueryResult() {
         //Default Constructor
@@ -70,5 +72,19 @@ public class StaffAccessGroupQueryResult {
         this.accessGroupIds = accessGroupIds;
     }
 
+    public Long getUnitId() {
+        return unitId;
+    }
 
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public boolean isHasPermission() {
+        return hasPermission;
+    }
+
+    public void setHasPermission(boolean hasPermission) {
+        this.hasPermission = hasPermission;
+    }
 }

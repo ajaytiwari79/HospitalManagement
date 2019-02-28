@@ -39,6 +39,8 @@ import static org.mockito.Mockito.when;
 public class ShiftServiceUnitTest {
     @InjectMocks
     private ShiftService shiftService;
+    @InjectMocks
+    private ShiftValidatorService shiftValidatorService;
 
     @Mock
     private PhaseMongoRepository phaseMongoRepository;
@@ -194,7 +196,7 @@ public class ShiftServiceUnitTest {
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
         when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
         try {
-            shiftService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
+            shiftValidatorService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
         }catch (Exception e){
         thrown=false;
         }
