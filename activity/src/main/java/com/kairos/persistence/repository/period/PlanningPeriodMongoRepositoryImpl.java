@@ -142,8 +142,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     public List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
 
-       // Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
-       // Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
+        // Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        // Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         ProjectionOperation projectionOperation = Aggregation.project().
                 and("id").as("id").
                 andInclude("name").
@@ -152,9 +152,9 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("phaseFlippingDate").
                 and("current_phase_data.name").as("currentPhase").
                 and("next_phase_data.name").as("nextPhase");
-        Criteria criteria=Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId).and("startDate").gte(startLocalDate);
-        if(endLocalDate!=null){
-            criteria=criteria.and("endDate").lte(endLocalDate);
+        Criteria criteria = Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId).and("startDate").gte(startLocalDate);
+        if (endLocalDate != null) {
+            criteria = criteria.and("endDate").lte(endLocalDate);
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
@@ -260,7 +260,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                         and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod)),
                 lookup("phases", "currentPhaseId", "_id", "phase"),
-                project("phase._id","phase.name")
+                project("phase._id", "phase.name")
         );
         AggregationResults<Phase> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, Phase.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
@@ -269,18 +269,19 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     @Override
     public List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates) {
-        Criteria [] criteriaList=new Criteria[localDates.size()];
-        int i=0;
-        for(LocalDate localDate:localDates){
-            criteriaList[i++]=Criteria.where("startDate").lte(localDate).and("endDate").gte(localDate);
+        Criteria[] criteriaList = new Criteria[localDates.size()];
+        int i = 0;
+        for (LocalDate localDate : localDates) {
+            criteriaList[i++] = Criteria.where("startDate").lte(localDate).and("endDate").gte(localDate);
         }
-        Criteria criteria =Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).orOperator(criteriaList);
-        Query query=new Query(criteria);
+        Criteria criteria = Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).orOperator(criteriaList);
+        Query query = new Query(criteria);
         List<PlanningPeriod> results = mongoTemplate.find(query, PlanningPeriod.class);
         return results;
     }
+
     @Override
-    public List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate){
+    public List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate, Date requestedEndDate) {
         ProjectionOperation projectionOperation = Aggregation.project().
                 and("id").as("id").
                 andInclude("name").
@@ -289,22 +290,22 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 and("current_phase_data.name").as("currentPhase").
                 and("current_phase_data._id").as("currentPhaseId");
         Aggregation aggregation = newAggregation(
-        match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").lte(requestedEndDate).and("endDate").gte(requestedStartDate)),
-                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),projectionOperation
-         );
-        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").lte(requestedEndDate).and("endDate").gte(requestedStartDate)),
+                lookup("phases", "currentPhaseId", "_id", "current_phase_data"), projectionOperation
+        );
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return results.getMappedResults();
     }
 
     @Override
     public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriod(Long unitId) {
-        Aggregation aggregation=newAggregation(
+        Aggregation aggregation = newAggregation(
                 match(Criteria.where("unitId").is(unitId)),
                 sort(Sort.Direction.ASC, "startDate"),
                 group("unitId").first("startDate").as("startDate").last("endDate").as("endDate"),
                 project().and("startDate").as("startDate").and("endDate").as("endDate")
         );
-        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
     }
 
