@@ -124,23 +124,15 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private TimeAndAttendanceRepository timeAndAttendanceRepository;
     @Inject
-    private ApplicationContext applicationContext;
-    @Inject
     private PhaseService phaseService;
     @Inject
     private TimeBankService timeBankService;
     @Inject
-    private TimeBankRepository timeBankRepository;
-    @Inject
     private PayOutService payOutService;
-    @Inject
-    private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
-    @Inject
-    private WTAService wtaService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -150,51 +142,21 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private StaffWTACounterRepository wtaCounterRepository;
     @Inject
-    private BreakSettingMongoRepository breakSettingMongoRepository;
-    @Inject
-    private WorkingTimeAgreementMongoRepository wtaMongoRepository;
-    @Inject
-    private PhaseSettingsService phaseSettingsService;
-    @Inject
-    private PhaseSettingsRepository phaseSettingsRepository;
-    @Inject
-    private LocaleService localeService;
-    @Inject
     private ShiftValidatorService shiftValidatorService;
     @Inject
-    private ShiftTemplateRepository shiftTemplateRepository;
-    @Inject
-    private IndividualShiftTemplateRepository individualShiftTemplateRepository;
-    @Inject
     private ActivityConfigurationRepository activityConfigurationRepository;
-    @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
-    private ActivityService activityService;
-    @Inject
-    private OrganizationActivityService organizationActivityService;
-    @Inject
     private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
-    private UnitDataService unitDataService;
-    @Inject
-    private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject
     private ShiftStateMongoRepository shiftStateMongoRepository;
     @Inject
-    private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
-    @Inject
     private ShiftBreakService shiftBreakService;
     @Inject
-    private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
-    @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject
-    private TimeAndAttendanceService timeAndAttendanceService;
     @Inject
     private ShiftReminderService shiftReminderService;
     @Inject
