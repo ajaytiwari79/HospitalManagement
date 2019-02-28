@@ -30,6 +30,7 @@ public class ShiftTemplateActivity {
     private boolean haltBreak;
     private BigInteger plannedTimeId;
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
+    private Long absenceReasonCodeId;
 
     public BigInteger getActivityId() {
         return activityId;
@@ -149,5 +150,13 @@ public class ShiftTemplateActivity {
 
     public void setStatus(Set<ShiftStatus> status) {
         this.status = status;
+    }
+
+    public Long getAbsenceReasonCodeId() {
+        return absenceReasonCodeId;
+    }
+
+    public void setAbsenceReasonCodeId(Long absenceReasonCodeId) {
+        this.absenceReasonCodeId = absenceReasonCodeId;
     }
 }
