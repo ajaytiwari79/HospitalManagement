@@ -48,7 +48,7 @@ public class CounterDTO {
     }
 
     public String getTitle() {
-        return title.trim();
+        return title;
     }
 
     public void setTitle(String title) {

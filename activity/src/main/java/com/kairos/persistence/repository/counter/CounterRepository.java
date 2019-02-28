@@ -152,7 +152,7 @@ public class CounterRepository {
     }
 
     public List<ApplicableKPI> getFilterBaseApplicableKPIByKpiIdsOrUnitId(List<BigInteger> kpiIds, List<ConfLevel> level, Long unitId) {
-        Criteria criteria = Criteria.where("baseKpiId").in(kpiIds).and("level").in(level).orOperator(Criteria.where("applicableFilter").exists(false),Criteria.where("applicableFilter.modified").is(false));
+        Criteria criteria = Criteria.where("baseKpiId").in(kpiIds).and("level").in(level).orOperator(Criteria.where("applicableFilter").exists(false), Criteria.where("applicableFilter.modified").is(false));
         if (isNotNull(unitId)) {
             criteria.and("unitId").is(unitId);
         }
@@ -341,12 +341,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     public void removeApplicableKPI(List<Long> refIds, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
-        Query query ;
-        if (ConfLevel.STAFF.equals(level)) {
-            query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds).and("level").in(level));
-        } else {
-            query = new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds));
-        }
+        Query query = ConfLevel.STAFF.equals(level) ? new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds).and("level").in(level)) :
+                new Query(Criteria.where(refQueryField).in(refIds).and("baseKpiId").in(kpiIds));
         mongoTemplate.remove(query, ApplicableKPI.class);
     }
 
