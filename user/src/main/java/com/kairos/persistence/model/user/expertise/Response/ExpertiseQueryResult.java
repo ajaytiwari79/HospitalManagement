@@ -13,6 +13,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by vipul on 28/3/18.
@@ -41,6 +42,7 @@ public class ExpertiseQueryResult {
     private Sector sector;
     private Map<String,Object> unionRepresentative;// in case of expertise at unit level only
     private Location unionLocation;// in case of expertise at unit level only
+    private Set<Long> supportedUnits;
 
     public ExpertiseQueryResult() {
         //default  const
@@ -205,5 +207,13 @@ public class ExpertiseQueryResult {
 
     public void setUnionLocation(Location unionLocation) {
         this.unionLocation = unionLocation;
+    }
+
+    public Set<Long> getSupportedUnits() {
+        return supportedUnits;
+    }
+
+    public void setSupportedUnits(Set<Long> supportedUnits) {
+        this.supportedUnits = supportedUnits;
     }
 }

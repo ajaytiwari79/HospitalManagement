@@ -251,12 +251,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 
-    @Query("MATCH(org:Organization) where id(org) IN {0}\n" +
-            "WITH COLLECT(org) as organizations\n" +
-            "WITH HEAD(organizations) as firstUnit, TAIL(organizations) as organizations\n" +
-            "MATCH (firstUnit)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true})\n" +
-            "WHERE ALL(org in organizations WHERE (org)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os))\n" +
-            "MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false,published:true}) WHERE expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP() \n" +
-            "RETURN DISTINCT id(expertise) AS id, expertise.name AS name")
-    List<ExpertiseQueryResult> findAllExpertiseByServiceIds(Set<Long> unitIds);
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Organization) WHERE expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP()\n" +
+            "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnits")
+    List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 }
