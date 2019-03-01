@@ -298,9 +298,9 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     @Override
-    public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriod(Long unitId) {
+    public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
         Aggregation aggregation = newAggregation(
-                match(Criteria.where("unitId").is(unitId)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 sort(Sort.Direction.ASC, "startDate"),
                 group("unitId").first("startDate").as("startDate").last("endDate").as("endDate"),
                 project().and("startDate").as("startDate").and("endDate").as("endDate")

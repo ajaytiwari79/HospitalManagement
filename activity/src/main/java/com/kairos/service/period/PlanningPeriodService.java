@@ -708,7 +708,7 @@ public class PlanningPeriodService extends MongoBaseService {
         userIntegrationService.restoreFunctionsWithDatesByUnitPositionIds(unitPositionIdWithShiftDateFunctionIdMap, unitId);
     }
 
-    public PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriod(Long unitId) {
-        return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriod(unitId);
+    public PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
+        return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
     }
 }
