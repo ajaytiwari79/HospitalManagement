@@ -146,6 +146,28 @@ public class DataCategoryService{
 
 
     /**
+     * @param countryId
+     * @return void
+     */
+    public void findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(Long countryId, Long unitId) {
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryIdNotLinkedWithDataSubject(countryId);
+        List<DataCategory> unitLevelDataCategories = new ArrayList<>();
+        dataCategories.forEach(dataCategory -> {
+            DataCategory unitLevelDataCategory = new DataCategory();
+            unitLevelDataCategory.setName(dataCategory.getName());
+            List<DataElement> unitLevelDataElements = new ArrayList<>();
+            dataCategory.getDataElements().forEach(dataElement -> {
+                unitLevelDataElements.add(new DataElement(unitId,dataElement.getName()));
+            });
+            unitLevelDataCategory.setOrganizationId(unitId);
+            unitLevelDataCategory.setDataElements(unitLevelDataElements);
+            unitLevelDataCategories.add(unitLevelDataCategory);
+        });
+        dataCategoryRepository.saveAll(unitLevelDataCategories);
+    }
+
+
+    /**
      * @param unitId
      * @return return list of Data Category with data Elements
      */
