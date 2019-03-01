@@ -10,6 +10,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.basic_details.*;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.employment.UnitPositionLinesDTO;
@@ -104,6 +105,8 @@ public class WTAService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private TimeBankService timeBankService;
+    @Inject
+    private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
 
     @Inject private WorkTimeAgreementBalancesCalculaionService workTimeAgreementBalancesCalculaionService;
 
@@ -429,19 +432,21 @@ public class WTAService extends MongoBaseService {
     }
 
     public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> upIds) {
+        Long countryId=userIntegrationService.getCountryIdOfOrganization(unitId);
         List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(upIds);
         List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(upIds);
         List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyPropertiesOfListByMapper(currentWTAList, WTAResponseDTO.class);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getUnitPositionId(), Collectors.toList()));
         parentWTA.forEach(currentWTA -> {
             List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyPropertiesOfListByMapper(verionWTAMap.get(currentWTA.getUnitPositionId()), WTAResponseDTO.class);
+            ruleTemplateService.assignCategoryToRuleTemplate(categoryList,  currentWTA.getRuleTemplates());
             if (versionWTAs != null && !versionWTAs.isEmpty()) {
                 currentWTA.setVersions(versionWTAs);
             }
         });
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
-        WTATableSettingWrapper wtaTableSettingWrapper = new WTATableSettingWrapper(parentWTA, tableConfiguration);
-        return wtaTableSettingWrapper;
+        return new WTATableSettingWrapper(parentWTA, tableConfiguration);
     }
 
 
