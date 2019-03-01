@@ -47,6 +47,11 @@ public class DataElement extends BaseEntity {
         this.countryId = countryId;
     }
 
+    public DataElement(Long organizationId,String name ) {
+        this.organizationId = organizationId;
+        this.name = name;
+    }
+
     public DataElement(String name) {
         this.name = name;
     }

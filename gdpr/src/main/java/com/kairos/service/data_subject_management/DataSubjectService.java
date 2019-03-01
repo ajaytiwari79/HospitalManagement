@@ -39,23 +39,23 @@ public class DataSubjectService {
 
     /**
      * @param countryId
-     * @param dataSubjectMappingDto request body of Data Subject ANd Mapping
+     * @param dataSubjectDto request body of Data Subject ANd Mapping
      * @return Data Subject which contain list of data category ids
      */
-    public MasterDataSubjectDTO addDataSubjectAndMapping(Long countryId, MasterDataSubjectDTO dataSubjectMappingDto) {
+    public MasterDataSubjectDTO addDataSubjectAndMapping(Long countryId, MasterDataSubjectDTO dataSubjectDto) {
 
-        DataSubject previousDataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
+        DataSubject previousDataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectDto.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectDto.getName());
         }
-        DataSubject dataSubject = new DataSubject(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription());
-        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMappingDto.getOrganizationTypes(), OrganizationType.class));
-        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMappingDto.getOrganizationSubTypes(), OrganizationSubType.class));
-        dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectMappingDto.getDataCategories()));
+        DataSubject dataSubject = new DataSubject(dataSubjectDto.getName(), dataSubjectDto.getDescription());
+        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
+        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationSubTypes(), OrganizationSubType.class));
+        dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectDto.getDataCategories()));
         dataSubject.setCountryId(countryId);
         dataSubjectRepository.save(dataSubject);
-        dataSubjectMappingDto.setId(dataSubject.getId());
-        return dataSubjectMappingDto;
+        dataSubjectDto.setId(dataSubject.getId());
+        return dataSubjectDto;
 
     }
 
@@ -69,16 +69,16 @@ public class DataSubjectService {
 
 
     private DataSubjectResponseDTO prepareDataSubjectResponseDTO(DataSubject dataSubject, boolean isMasterData){
-        DataSubjectResponseDTO dataSubjectMappingResponse = new DataSubjectResponseDTO();
-        dataSubjectMappingResponse.setId(dataSubject.getId());
-        dataSubjectMappingResponse.setName(dataSubject.getName());
-        dataSubjectMappingResponse.setDescription(dataSubject.getDescription());
+        DataSubjectResponseDTO dataSubjectResponse = new DataSubjectResponseDTO();
+        dataSubjectResponse.setId(dataSubject.getId());
+        dataSubjectResponse.setName(dataSubject.getName());
+        dataSubjectResponse.setDescription(dataSubject.getDescription());
         if(isMasterData) {
-            dataSubjectMappingResponse.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getOrganizationTypes(), OrganizationTypeDTO.class));
-            dataSubjectMappingResponse.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+            dataSubjectResponse.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getOrganizationTypes(), OrganizationTypeDTO.class));
+            dataSubjectResponse.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
         }
-        dataSubjectMappingResponse.setDataCategories(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getDataCategories(), DataCategory.class));
-        return dataSubjectMappingResponse;
+        dataSubjectResponse.setDataCategories(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getDataCategories(), DataCategory.class));
+        return dataSubjectResponse;
     }
 
     /**
@@ -86,37 +86,37 @@ public class DataSubjectService {
      * @return list of DataSubject With Data category List
      */
     public List<DataSubjectResponseDTO> getAllDataSubjectWithDataCategoryByCountryId(Long countryId, boolean isMasterData) {
-        List<DataSubjectResponseDTO> dataSubjectMappingResponseList = new ArrayList<>();
+        List<DataSubjectResponseDTO> dataSubjectResponseList = new ArrayList<>();
         List<DataSubject> dataSubjects =  dataSubjectRepository.getAllDataSubjectByCountryId(countryId);
         for(DataSubject dataSubject : dataSubjects){
-            dataSubjectMappingResponseList.add(prepareDataSubjectResponseDTO(dataSubject, isMasterData));
+            dataSubjectResponseList.add(prepareDataSubjectResponseDTO(dataSubject, isMasterData));
         }
-        return dataSubjectMappingResponseList;
+        return dataSubjectResponseList;
     }
 
 
     /**
      * @param countryId
      * @param dataSubjectId         id of data SubjectMapping model
-     * @param dataSubjectMappingDto request body for updating Data Subject Mapping Object
+     * @param dataSubjectDto request body for updating Data Subject Mapping Object
      * @return updated Data SubjectMapping object
      */
-    public MasterDataSubjectDTO updateDataSubjectAndMapping(Long countryId, Long dataSubjectId, MasterDataSubjectDTO dataSubjectMappingDto) {
-        DataSubject dataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
+    public MasterDataSubjectDTO updateDataSubjectAndMapping(Long countryId, Long dataSubjectId, MasterDataSubjectDTO dataSubjectDto) {
+        DataSubject dataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectDto.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectDto.getName());
         }
         dataSubject = dataSubjectRepository.getDataSubjectByCountryIdAndId(countryId, dataSubjectId);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", dataSubjectId);
         }
-        dataSubject.setName(dataSubjectMappingDto.getName());
-        dataSubject.setDescription(dataSubjectMappingDto.getDescription());
-        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMappingDto.getOrganizationTypes(), OrganizationType.class));
-        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMappingDto.getOrganizationSubTypes(), OrganizationSubType.class));
-        dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectMappingDto.getDataCategories()));
+        dataSubject.setName(dataSubjectDto.getName());
+        dataSubject.setDescription(dataSubjectDto.getDescription());
+        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
+        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationSubTypes(), OrganizationSubType.class));
+        dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectDto.getDataCategories()));
         dataSubjectRepository.save(dataSubject);
-        return dataSubjectMappingDto;
+        return dataSubjectDto;
     }
 
 

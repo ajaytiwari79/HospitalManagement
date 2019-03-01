@@ -142,8 +142,7 @@ public class DefaultDataInheritService{
                 orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
         assetTypeService.findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(countryId, unitId);
-        //List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryService.getAllDataCategoryWithDataElementByCountryId(countryId);
-        //copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
+        dataCategoryService.findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(countryId, unitId);
 
 
         List<Callable<Boolean>> callables = new ArrayList<>();
@@ -241,8 +240,8 @@ public class DefaultDataInheritService{
             return true;
         };*/
         Callable<Boolean> dataSubjectTask = () -> {
-            List<DataSubjectResponseDTO> dataSubjectMappingDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
-            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
+            List<DataSubjectResponseDTO> dataSubjectDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
+            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectDTOS);
             return true;
         };
         Callable<Boolean> clauseTask = () -> {
