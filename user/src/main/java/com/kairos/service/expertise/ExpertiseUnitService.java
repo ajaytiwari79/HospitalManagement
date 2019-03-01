@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -97,6 +98,10 @@ public class ExpertiseUnitService {
         staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(unitId, expertiseId);
         staffGraphRepository.assignStaffAsUnionRepresentativeOfExpertise(staffId, expertiseId);
         return true;
+    }
+
+    public List<ExpertiseQueryResult> findAllExpertiseForUnits(Set<Long> unitIds) {
+        return expertiseGraphRepository.findAllExpertiseByServiceIds(unitIds);
     }
 
 }

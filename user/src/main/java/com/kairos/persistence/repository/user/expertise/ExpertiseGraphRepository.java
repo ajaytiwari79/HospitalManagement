@@ -11,6 +11,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -249,4 +250,13 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (expertise:Expertise{deleted:false}) WHERE id(expertise) = {0}" +
             "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
+
+    @Query("MATCH(org:Organization) where id(org) IN {0}\n" +
+            "WITH COLLECT(org) as organizations\n" +
+            "WITH HEAD(organizations) as firstUnit, TAIL(organizations) as organizations\n" +
+            "MATCH (firstUnit)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true})\n" +
+            "WHERE ALL(org in organizations WHERE (org)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os))\n" +
+            "MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false,published:true}) WHERE expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP() \n" +
+            "RETURN DISTINCT id(expertise) AS id, expertise.name AS name")
+    List<ExpertiseQueryResult> findAllExpertiseByServiceIds(Set<Long> unitIds);
 }
