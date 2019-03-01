@@ -33,7 +33,7 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     @Query(value = "SELECT at FROM AssetType at WHERE at.countryId = ?1 and at.subAssetType = false and at.deleted = false")
     List<AssetType> getAllAssetTypes(Long countryId);
 
-    @Query(value = "SELECT at FROM AssetType at LEFT JOIN MasterAsset MA ON at.id = MA.assetType.id WHERE at.countryId = ?1 and at.subAssetType = false and at.deleted = false and MA.id = NULL")
+    @Query(value = "SELECT at FROM AssetType at LEFT JOIN MasterAsset MA ON at.id = MA.assetType.id WHERE at.countryId = ?1 and at.subAssetType = false and at.deleted = false and MA.id IS NULL")
     List<AssetType> getAllAssetTypesNotAssociatedWithAsset(Long countryId);
 
 
