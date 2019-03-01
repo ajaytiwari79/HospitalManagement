@@ -20,6 +20,8 @@ public class AssetTypeRiskResponseDTO {
     private Boolean hasSubAsset;
     private List<AssetTypeRiskResponseDTO> subAssetTypes=new ArrayList<>();
 
+    public AssetTypeRiskResponseDTO() {
+    }
 
     public Long getId() { return id; }
 
