@@ -85,6 +85,7 @@ import com.kairos.utils.event.ShiftNotificationEvent;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.DateTime;
@@ -536,16 +537,16 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = phaseService.constructMapOfActivityAndPhaseTemplateValue(phase, activities);
 
         List<ShiftActivityDTO> shiftActivities = shiftValidatorService.findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
-
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(), staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap, shiftActivityIdsDTO);
         shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities, phase, staffAdditionalInfoDTO.getUserAccessRoleDTO());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
-        Optional<ActivityWrapper> absenceTypeOfActivityWrapperOptional = activities.stream().filter(activityWrapper -> (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))).findAny();
-        if (absenceTypeOfActivityWrapperOptional.isPresent()) {
-            shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(absenceTypeOfActivityWrapperOptional.get(), shiftDTO, staffAdditionalInfoDTO);
+        ActivityWrapper activityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(),activityWrapperMap);
+        if(isNotNull(activityWrapper)) {
+            shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO);
         } else {
-            Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+
             Activity firstActivity = activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()).getActivity();
             boolean shiftExists = shiftMongoRepository.findShiftBetweenDurationByUnitPositionNotEqualToShiftId(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getStaffUserId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate(), ShiftType.PRESENCE);
             if (shiftExists) {
@@ -596,8 +597,8 @@ public class ShiftService extends MongoBaseService {
 
                 }
             }
+            shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         }
-        shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
         return shiftWithViolatedInfoDTO;
     }
@@ -992,5 +993,16 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.actionNotPermittedException("please.select.valid.criteria");
         }
         return object;
+    }
+
+    private ActivityWrapper getAbsenceTypeOfActivityIfPresent(List<ShiftActivityDTO> shiftActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap){
+        ActivityWrapper activityWrapper = null;
+        for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
+            if(FULL_WEEK.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+                activityWrapper = activityWrapperMap.get(shiftActivityDTO.getActivityId());
+            }
+        }
+        return activityWrapper;
+
     }
 }
