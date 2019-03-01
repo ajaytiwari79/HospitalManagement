@@ -39,14 +39,13 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
-import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
 @Service
-public class WorkTimeAgreementBalancesCalculaionService {
+public class WorkTimeAgreementBalancesCalculationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkTimeAgreementBalancesCalculaionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkTimeAgreementBalancesCalculationService.class);
 
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
