@@ -42,7 +42,7 @@ public class ExpertiseQueryResult {
     private Sector sector;
     private Map<String,Object> unionRepresentative;// in case of expertise at unit level only
     private Location unionLocation;// in case of expertise at unit level only
-    private Set<Long> supportedUnits;
+    private Set<Long> supportedUnitIds;
 
     public ExpertiseQueryResult() {
         //default  const
@@ -209,11 +209,11 @@ public class ExpertiseQueryResult {
         this.unionLocation = unionLocation;
     }
 
-    public Set<Long> getSupportedUnits() {
-        return supportedUnits;
+    public Set<Long> getSupportedUnitIds() {
+        return supportedUnitIds;
     }
 
-    public void setSupportedUnits(Set<Long> supportedUnits) {
-        this.supportedUnits = supportedUnits;
+    public void setSupportedUnitIds(Set<Long> supportedUnitIds) {
+        this.supportedUnitIds = supportedUnitIds;
     }
 }

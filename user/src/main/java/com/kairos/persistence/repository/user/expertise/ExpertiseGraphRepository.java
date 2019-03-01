@@ -252,6 +252,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Organization) WHERE expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP()\n" +
-            "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnits")
+            "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 }
