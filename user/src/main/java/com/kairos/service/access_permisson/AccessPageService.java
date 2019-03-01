@@ -462,4 +462,8 @@ public class AccessPageService {
     public AccessPageLanguageDTO getLanguageDataByModuleId(String moduleId, Long languageId){
         return accessPageRepository.findLanguageSpecificDataByModuleIdAndLanguageId(moduleId,languageId);
     }
+
+    public List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds){
+       return accessPageRepository.getAccessPermission(userId,  organizationIds);
+    }
 }
