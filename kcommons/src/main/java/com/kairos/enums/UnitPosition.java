@@ -7,7 +7,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 public enum UnitPosition {
-    STAFF_WITH_UNIT_POSITION("Staff with Unit Position");
+    STAFF_WITH_EMPLOYMENT("Staff With Employment"),
+    STAFF_WITHOUT_EMPLOYMENT("Staff WithOut Employment");
     public String value;
 
     UnitPosition(String value) {
