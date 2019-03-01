@@ -32,8 +32,8 @@ class DataSubjectController {
 
     @ApiOperation("create  data Subject mapping ")
     @PostMapping(COUNTRY_URL+"/data_subject")
-    public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectMappingDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.addDataSubjectAndMapping(countryId, dataSubjectMappingDto));
+    public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.addDataSubjectAndMapping(countryId, dataSubjectDto));
     }
 
     @ApiOperation("delete data Subject mapping by id ")
@@ -56,8 +56,8 @@ class DataSubjectController {
 
     @ApiOperation("update data Subject ")
     @PutMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long dataSubjectId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectMappingDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.updateDataSubjectAndMapping(countryId, dataSubjectId, dataSubjectMappingDto));
+    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long dataSubjectId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.updateDataSubjectAndMapping(countryId, dataSubjectId, dataSubjectDto));
     }
 
 

@@ -241,8 +241,8 @@ public class DefaultDataInheritService{
             return true;
         };*/
         Callable<Boolean> dataSubjectTask = () -> {
-            List<DataSubjectResponseDTO> dataSubjectMappingDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
-            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
+            List<DataSubjectResponseDTO> dataSubjectDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
+            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectDTOS);
             return true;
         };
         Callable<Boolean> clauseTask = () -> {
