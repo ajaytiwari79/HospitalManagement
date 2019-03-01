@@ -300,9 +300,19 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public List<WTABaseRuleTemplateDTO> getwtaRuletemplates(BigInteger wtaId) {
+    public List<WTABaseRuleTemplateDTO> getwtaRuletemplates(Long unitId,BigInteger wtaId) {
         WTAQueryResultDTO wtaQueryResult = wtaRepository.getOne(wtaId);
-        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class).getRuleTemplates();
+        if(wtaQueryResult==null){
+            exceptionService.dataNotFoundByIdException("message.wta.notFound");
+        }
+        Long countryId=userIntegrationService.getCountryIdOfOrganization(unitId);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
+        if (categoryList == null) {
+            exceptionService.dataNotFoundByIdException("message.category.null-list");
+        }
+        WTAResponseDTO wtaResponseDTO=ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class);
+        ruleTemplateService.assignCategoryToRuleTemplate(categoryList,  wtaResponseDTO.getRuleTemplates());
+        return wtaResponseDTO.getRuleTemplates();
     }
 
     public boolean removeWta(BigInteger wtaId) {
