@@ -20,7 +20,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.employment.Position;
-import com.kairos.persistence.model.staff.employment.EmploymentQueryResult;
+import com.kairos.persistence.model.staff.employment.PositionQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentReasonCodeQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -217,7 +217,7 @@ public class UnitPositionService {
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0));
         setHourlyCost(unitPositionQueryResult);
-        return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd()));
+        return new PositionWrapper(unitPositionQueryResult, new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd()));
     }
 
     private void linkFunctions(List<FunctionWithAmountQueryResult> functions, UnitPositionLine positionLine, boolean update, Set<FunctionsDTO> functionDTOS) {
@@ -444,7 +444,7 @@ public class UnitPositionService {
         }
 
         UnitPositionLineEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentUnitPositionLine.getId());
-        EmploymentQueryResult employmentQueryResult;
+        PositionQueryResult positionQueryResult;
         UnitPositionQueryResult unitPositionQueryResult;
         List<NameValuePair> changedParams = new ArrayList<>();
         oldUnitPosition.setPublished(!saveAsDraft);
@@ -518,14 +518,14 @@ public class UnitPositionService {
         Position position = positionService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
                 unitPositionDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
         Long reasonCodeId = Optional.ofNullable(position.getReasonCode()).isPresent() ? position.getReasonCode().getId() : null;
-        employmentQueryResult = new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd());
+        positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd());
         // Deleting All shifts after position end date
         if (unitPositionDTO.getEndDate() != null) {
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, unitPositionDTO.getEndDate(), unitPositionDTO.getStaffId());
         }
         setHourlyCost(unitPositionQueryResult);
         //plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
-        return new PositionWrapper(unitPositionQueryResult, employmentQueryResult);
+        return new PositionWrapper(unitPositionQueryResult, positionQueryResult);
 
     }
 
@@ -570,7 +570,7 @@ public class UnitPositionService {
         positionLine.setEndDate(unitPositionDTO.getEndDate());
     }
 
-    public EmploymentQueryResult removePosition(long positionId, Long unitId) throws Exception {
+    public PositionQueryResult removePosition(long positionId, Long unitId) throws Exception {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unitposition.id.notexist", positionId);
@@ -583,7 +583,7 @@ public class UnitPositionService {
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
         Position position = positionService.updateEmploymentEndDate(unit, staffId);
         //plannerSyncService.publishUnitPosition(unitId, unitPosition, null, IntegrationOperation.DELETE);
-        return new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis());
+        return new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis());
     }
 
 
@@ -690,7 +690,7 @@ public class UnitPositionService {
         Position position = employmentReasonCode.getPosition();
 
         Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent() ? employmentReasonCode.getReasonCode().getId() : null;
-        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd(), position.getMainEmploymentStartDate(), position.getMainEmploymentEndDate(), position.isMainEmployment());
+        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd(), position.getMainEmploymentStartDate(), position.getMainEmploymentEndDate(), position.isMainEmployment());
 
         List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization) ? unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) : unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId, unitId);
 
@@ -733,7 +733,7 @@ public class UnitPositionService {
                 }
             });
         });
-        return new EmploymentUnitPositionDTO(employmentQueryResult, unitPositionQueryResults);
+        return new EmploymentUnitPositionDTO(positionQueryResult, unitPositionQueryResults);
 
     }
 

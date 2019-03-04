@@ -9,7 +9,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.employment.Position;
-import com.kairos.persistence.model.staff.employment.EmploymentQueryResult;
+import com.kairos.persistence.model.staff.employment.PositionQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
@@ -166,7 +166,7 @@ public class UnitPositionJobService {
         unitPositionGraphRepository.saveAll(unitPositions);
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
-        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnEmploymentEnd());
+        PositionQueryResult employmentUpdated = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnEmploymentEnd());
         return new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
 
     }

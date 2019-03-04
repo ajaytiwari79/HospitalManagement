@@ -11,7 +11,7 @@ import java.time.LocalDate;
  */
 
 @QueryResult
-public class EmploymentQueryResult {
+public class PositionQueryResult {
 
     private Long id;
     private String name;
@@ -25,7 +25,7 @@ public class EmploymentQueryResult {
     private Long reasonCodeId;
     private Long accessGroupIdOnEmploymentEnd;
 
-    public EmploymentQueryResult(Long id, Long startDateMillis, Long endDateMillis, Long reasonCodeId, Long accessGroupIdOnEmploymentEnd, LocalDate mainEmploymentStartDate, LocalDate mainEmploymentEndDate, boolean mainEmployment) {
+    public PositionQueryResult(Long id, Long startDateMillis, Long endDateMillis, Long reasonCodeId, Long accessGroupIdOnEmploymentEnd, LocalDate mainEmploymentStartDate, LocalDate mainEmploymentEndDate, boolean mainEmployment) {
         this.id = id;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
@@ -58,16 +58,16 @@ public class EmploymentQueryResult {
 
 
 
-    public EmploymentQueryResult() {
+    public PositionQueryResult() {
 
     }
-    public EmploymentQueryResult(Long id, Long startDateMillis, Long endDateMillis) {
+    public PositionQueryResult(Long id, Long startDateMillis, Long endDateMillis) {
         this.id = id;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
 
     }
-    public EmploymentQueryResult(Long id, Long startDateMillis, Long endDateMillis , Long reasonCodeId, Long accessGroupIdOnEmploymentEnd) {
+    public PositionQueryResult(Long id, Long startDateMillis, Long endDateMillis , Long reasonCodeId, Long accessGroupIdOnEmploymentEnd) {
         this.id = id;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;

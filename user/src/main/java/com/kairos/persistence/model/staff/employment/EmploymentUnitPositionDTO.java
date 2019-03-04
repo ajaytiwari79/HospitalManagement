@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class EmploymentUnitPositionDTO {
 
-    private EmploymentQueryResult employment;
+    private PositionQueryResult employment;
     private List<UnitPositionQueryResult> unitPositions;
 
-    public EmploymentQueryResult getEmployment() {
+    public PositionQueryResult getEmployment() {
         return employment;
     }
 
@@ -20,13 +20,13 @@ public class EmploymentUnitPositionDTO {
 
     }
 
-    public EmploymentUnitPositionDTO(EmploymentQueryResult employment, List<UnitPositionQueryResult> unitPositions) {
+    public EmploymentUnitPositionDTO(PositionQueryResult employment, List<UnitPositionQueryResult> unitPositions) {
         this.employment = employment;
         this.unitPositions = unitPositions;
 
     }
 
-    public void setEmployment(EmploymentQueryResult employment) {
+    public void setEmployment(PositionQueryResult employment) {
         this.employment = employment;
     }
 
