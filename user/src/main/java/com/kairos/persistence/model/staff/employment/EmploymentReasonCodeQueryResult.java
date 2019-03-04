@@ -8,15 +8,15 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  */
 @QueryResult
 public class EmploymentReasonCodeQueryResult {
-    private Employment employment;
+    private Position position;
     private ReasonCode reasonCode;
 
-    public Employment getEmployment() {
-        return employment;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setEmployment(Employment employment) {
-        this.employment = employment;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public ReasonCode getReasonCode() {

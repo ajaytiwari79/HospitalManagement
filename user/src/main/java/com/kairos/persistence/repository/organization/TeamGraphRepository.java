@@ -70,7 +70,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("Match (team:Team) where id(team)={0} with team\n" +
             "MATCH (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization,team\n" +
-            "Match (employment:Employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitEmployment)-[:"+ APPLICABLE_IN_UNIT +"]->(organization) with employment,team\n" +
+            "Match (employment:Position)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitEmployment)-[:"+ APPLICABLE_IN_UNIT +"]->(organization) with employment,team\n" +
             "Match (staff:Staff) where (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) OR (employment)-[:"+BELONGS_TO+"]->(staff) with staff,team\n" +
             "optional Match (team)-[r:"+TEAM_HAS_MEMBER+"]->(staff) with r,staff\n" +
             "return distinct {id:id(staff),firstName:staff.firstName+\" \" +staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,isSelected:case when r is null then false else r.isEnabled end,profilePic: {1} + staff.profilePic} as data order by data.firstName")

@@ -16,9 +16,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 public class EmploymentAccessPageRelation extends UserBaseEntity {
 
     @StartNode
-    AccessPermission accessPermission;
+    private AccessPermission accessPermission;
     @EndNode
-    AccessPage accessPage;
+    private AccessPage accessPage;
     private boolean isRead;
     private boolean isWrite;
     private boolean isEnabled = true;

@@ -13,7 +13,7 @@ import java.util.List;
 @QueryResult
 public class ExpiredEmploymentsQueryResult {
 
-    private Employment employment;
+    private Position position;
     private List<AccessGroup> accessGroups;
     private List<Organization> organizations;
     private List<UnitPermission> unitPermissions;
@@ -28,12 +28,12 @@ public class ExpiredEmploymentsQueryResult {
     }
 
 
-    public Employment getEmployment() {
-        return employment;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setEmployment(Employment employment) {
-        this.employment = employment;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public List<AccessGroup> getAccessGroups() {

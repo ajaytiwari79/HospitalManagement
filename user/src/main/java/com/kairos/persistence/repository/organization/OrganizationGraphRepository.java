@@ -251,7 +251,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,companyCategory\n" +
             "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
             "OPTIONAL MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) WITH level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory  ORDER BY org.name\n" +
-            "OPTIONAL MATCH (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
+            "OPTIONAL MATCH (emp:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:" + HAS_ACCESS_GROUP + "]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})\n" +
             "OPTIONAL MATCH (emp)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]-(u:User)\n" +
             "WITH COLLECT(u) as unitManagers, COLLECT(ag) as accessGroups,level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
@@ -306,7 +306,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
 
     @Query("MATCH (root:Organization) WHERE id(root)={0} WITH root " +
-            "MATCH (root)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(user)={1} WITH employment " +
+            "MATCH (root)-[:HAS_POSITIONS]->(employment:Position)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(user)={1} WITH employment " +
             "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) WHERE id(unit)={2} WITH unitPermission " +
             "MATCH (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WITH accessPermission " +
             "MATCH (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage{moduleId:{3}}) WITH COLLECT(r.isRead) as read " +
@@ -608,7 +608,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,companyCategory\n" +
             "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
             "OPTIONAL MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) WITH level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory  ORDER BY org.name\n" +
-            "OPTIONAL MATCH (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
+            "OPTIONAL MATCH (emp:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:" + HAS_ACCESS_GROUP + "]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})\n" +
             "OPTIONAL MATCH (emp)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]-(u:User)\n" +
             "WITH COLLECT(u) as unitManagers, COLLECT(ag) as accessGroups,level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
@@ -783,7 +783,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Long getHubIdByOrganizationId(Long organizationId);
 
 
-    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(employment:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
 }

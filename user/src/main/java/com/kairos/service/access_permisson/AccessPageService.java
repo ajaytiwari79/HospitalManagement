@@ -8,7 +8,7 @@ import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.staff.employment.Position;
 import com.kairos.persistence.model.staff.employment.EmploymentAccessPageRelation;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
@@ -19,7 +19,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
@@ -57,7 +57,7 @@ public class AccessPageService {
     @Inject
     EmploymentPageGraphRepository employmentPageGraphRepository;
     @Inject
-    private EmploymentGraphRepository employmentGraphRepository;
+    private PositionGraphRepository positionGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -327,24 +327,24 @@ public class AccessPageService {
                                                      Map<Long,List<StaffPermissionQueryResult>> accessPermissionByGroup,Long parentOrganizationId){
 
         Staff staff;
-        Employment employment;
+        Position position;
         if(organization.isParentOrganization()){
             CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
             staff = new Staff();
             staff.setFirstName(currentUserDetails.getFirstName());
             staff.setLastName(currentUserDetails.getLastName());
             staff.setEmail(currentUserDetails.getEmail());
-            employment = new Employment();
-            employment.setStaff(staff);
+            position = new Position();
+            position.setStaff(staff);
             User user = userGraphRepository.findOne(userId);
             staff.setUser(user);
         } else {
             staff = staffGraphRepository.getStaffByUserId(userId,parentOrganizationId);
-            employment = employmentGraphRepository.findEmployment(parentOrganizationId,staff.getId());
+            position = positionGraphRepository.findPosition(parentOrganizationId,staff.getId());
         }
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
-        employment.getUnitPermissions().add(unitPermission);
+        position.getUnitPermissions().add(unitPermission);
 
         Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = accessPermissionByGroup.entrySet();
         Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
@@ -373,11 +373,11 @@ public class AccessPageService {
             unitEmpAccessRelationships.add(unitEmpAccessRelationship);
         }
         if(organization.isParentOrganization()){
-            organization.getEmployments().add(employment);
+            organization.getPositions().add(position);
             organizationGraphRepository.save(organization);
         } else {
-            employment.getUnitPermissions().add(unitPermission);
-            employmentGraphRepository.save(employment);
+            position.getUnitPermissions().add(unitPermission);
+            positionGraphRepository.save(position);
         }
         unitEmpAccessGraphRepository.saveAll(unitEmpAccessRelationships);
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
@@ -398,11 +398,6 @@ public class AccessPageService {
         return false;
     }
 
-
-    // For Test Cases
-    public AccessPage getOneMainModule(){
-        return accessPageRepository.getOneMainModule();
-    }
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId){
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForCountry(countryId);

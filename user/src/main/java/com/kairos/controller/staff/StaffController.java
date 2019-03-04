@@ -4,7 +4,6 @@ import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDetail;
@@ -12,18 +11,13 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.access_permisson.AccessGroupService;
-import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
-import com.kairos.service.unit_position.UnitPositionCTAWTAService;
 import com.kairos.service.unit_position.UnitPositionJobService;
-import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
-import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentWrapper;
@@ -45,7 +39,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 
@@ -62,7 +55,7 @@ public class StaffController {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
-    private EmploymentService employmentService;
+    private PositionService positionService;
     @Inject
     private ApiExternalStaffService apiExternalStaffService;
     @Inject
@@ -79,7 +72,7 @@ public class StaffController {
     @ApiOperation("update staff employment details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveEmploymentInfo(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody StaffEmploymentDetail staffEmploymentDetail) {
-        Map<String, Object> response = employmentService.saveEmploymentDetail(unitId, staffId, staffEmploymentDetail);
+        Map<String, Object> response = positionService.saveEmploymentDetail(unitId, staffId, staffEmploymentDetail);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
         } else {
@@ -141,7 +134,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) employmentDetail.get("roleId"));
         boolean isCreated = (boolean) employmentDetail.get("isCreated");
         long unitId = Long.parseLong((String) employmentDetail.get("organizationId"));
-        Map<String, Object> response = employmentService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
+        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -154,7 +147,7 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmployments(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {
         Map<String, Object> responseData = new HashMap<String, Object>(2);
-        responseData.put("employments", employmentService.getEmployments(staffId, unitId, type));
+        responseData.put("employments", positionService.getEmployments(staffId, unitId, type));
         responseData.put("employmentTypes", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
@@ -164,7 +157,7 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addPartialLeave(@PathVariable long staffId, @PathVariable long unitId,
                                                                @Validated @RequestBody PartialLeaveDTO partialLeaveDTO, @RequestParam("type") String type) throws ParseException {
-        Map<String, Object> updatedObj = employmentService.addPartialLeave(staffId, unitId, type, partialLeaveDTO);
+        Map<String, Object> updatedObj = positionService.addPartialLeave(staffId, unitId, type, partialLeaveDTO);
         if (updatedObj == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -175,7 +168,7 @@ public class StaffController {
     @ApiOperation("get partial leaves of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPartialLeaves(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) throws ParseException {
-        Map<String, Object> response = employmentService.getPartialLeaves(staffId, unitId, type);
+        Map<String, Object> response = positionService.getPartialLeaves(staffId, unitId, type);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -186,7 +179,7 @@ public class StaffController {
     @ApiOperation("get workplaces of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getWorkPlace(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {
-        List<Map<String, Object>> workPlaces = employmentService.getWorkPlaces(staffId, unitId, type);
+        List<Map<String, Object>> workPlaces = positionService.getWorkPlaces(staffId, unitId, type);
         if (workPlaces == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
         }
@@ -198,7 +191,7 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> editWorkPlace(@PathVariable long staffId, @RequestBody Map<String, Object> data) {
         List<Long> teamIds = (List<Long>) data.get("teamIds");
-        Staff staff = employmentService.editWorkPlace(staffId, teamIds);
+        Staff staff = positionService.editWorkPlace(staffId, teamIds);
         if (staff == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
         }
@@ -398,11 +391,11 @@ public class StaffController {
                 staffService.getAllStaff());
     }
 
-    @RequestMapping(value = "/{staffId}/deleteStaff/{employmentId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{staffId}/deleteStaff/{positionId}", method = RequestMethod.DELETE)
     @ApiOperation("Permanent Delete staff node, don't invoke this method")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteStaffById(@PathVariable Long staffId, @PathVariable Long employmentId) {
-        Boolean status = staffService.deleteStaffById(staffId, employmentId);
+    public ResponseEntity<Map<String, Object>> deleteStaffById(@PathVariable Long staffId, @PathVariable Long positionId) {
+        Boolean status = staffService.deleteStaffById(staffId, positionId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 status);
 
@@ -609,13 +602,13 @@ public class StaffController {
     @ApiOperation(value = "update and set main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> updateMainEmployment(@PathVariable long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirmMainEmploymentOverriding) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.updateMainEmployment(unitId, staffId, employmentDTO, confirmMainEmploymentOverriding));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.updateMainEmployment(unitId, staffId, employmentDTO, confirmMainEmploymentOverriding));
     }
 
     @ApiOperation(value = "remove main employment")
     @RequestMapping(value = "/{staffId}/remove_main_employment", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> removeMainEmployment(@PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.removeMainEmployment(staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.removeMainEmployment(staffId));
     }
 
 

@@ -4,7 +4,7 @@ package com.kairos.service.scheduler;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.service.staff.EmploymentService;
+import com.kairos.service.staff.PositionService;
 import com.kairos.service.unit_position.UnitPositionJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
 public class SchedulerToUserQueueService implements JobQueueExecutor {
 
     @Inject
-    private EmploymentService employmentService;
+    private PositionService positionService;
     @Inject
     private IntegrationJobsExecutorService integrationJobService;
     @Inject
@@ -31,7 +31,7 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 integrationJobService.runJob(job);
                 break;
             case EMPLOYMENT_END:
-                employmentService.endEmploymentProcess(job.getId(),job.getUnitId(),job.getEntityId().longValue(),DateUtils.getLocalDatetimeFromLong(job.getOneTimeTriggerDateMillis()));
+                positionService.endEmploymentProcess(job.getId(),job.getUnitId(),job.getEntityId().longValue(),DateUtils.getLocalDatetimeFromLong(job.getOneTimeTriggerDateMillis()));
                 break;
             case QUESTIONAIRE_NIGHTWORKER:
                 logger.info("Questionaire nightworker----------------->"+job.getId());

@@ -19,7 +19,7 @@ import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
-import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.staff.employment.Position;
 import com.kairos.persistence.model.staff.employment.EmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentReasonCodeQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
@@ -44,7 +44,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeR
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
@@ -61,7 +61,7 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
-import com.kairos.service.staff.EmploymentService;
+import com.kairos.service.staff.PositionService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.wrapper.PositionWrapper;
@@ -143,11 +143,11 @@ public class UnitPositionService {
     @Inject
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
-    private EmploymentService employmentService;
+    private PositionService positionService;
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
-    private EmploymentGraphRepository employmentGraphRepository;
+    private PositionGraphRepository positionGraphRepository;
     @Inject
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
@@ -177,12 +177,12 @@ public class UnitPositionService {
         Organization organization = organizationService.getOrganizationDetail(unitPositionDTO.getUnitId(), type);
         Organization parentOrganization = organization.isParentOrganization() ? organization : organizationService.getParentOfOrganization(organization.getId());
 
-        Employment employment = employmentGraphRepository.findEmploymentByStaff(unitPositionDTO.getStaffId());
-        if (!Optional.ofNullable(employment).isPresent()) {
+        Position position = positionGraphRepository.findByStaffId(unitPositionDTO.getStaffId());
+        if (!Optional.ofNullable(position).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", unitPositionDTO.getStaffId());
         }
-        if (employment.getStartDateMillis() != null) {
-            if (unitPositionDTO.getStartDate().isBefore(DateUtils.getDateFromEpoch(employment.getStartDateMillis()))) {
+        if (position.getStartDateMillis() != null) {
+            if (unitPositionDTO.getStartDate().isBefore(DateUtils.getDateFromEpoch(position.getStartDateMillis()))) {
                 exceptionService.actionNotPermittedException("message.staff.data.employmentdate.lessthan");
             }
         }
@@ -201,12 +201,12 @@ public class UnitPositionService {
         UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage(),unitPositionDTO.getAccumulatedTimebankMinutes());
 
         preparePosition(unitPosition, unitPositionDTO);
-        if ((unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO, -1)) {
+        if ((unitPositionDTO.isMainUnitPosition()) && positionService.eligibleForMainUnitPosition(unitPositionDTO, -1)) {
             unitPosition.setMainUnitPosition(true);
         }
         unitPositionGraphRepository.save(unitPosition);
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToUnitPosition(unitPosition, unitPositionDTO);
-        Long reasonCodeId = updateEmploymentEndDate(parentOrganization, unitPositionDTO, employment);
+        Long reasonCodeId = updateEmploymentEndDate(parentOrganization, unitPositionDTO, position);
 
 
         UnitPositionLineEmploymentTypeRelationShip relationShip = new UnitPositionLineEmploymentTypeRelationShip(unitPosition.getUnitPositionLines().get(0), employmentType, unitPositionDTO.getEmploymentTypeCategory());
@@ -217,7 +217,7 @@ public class UnitPositionService {
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0));
         setHourlyCost(unitPositionQueryResult);
-        return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
+        return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd()));
     }
 
     private void linkFunctions(List<FunctionWithAmountQueryResult> functions, UnitPositionLine positionLine, boolean update, Set<FunctionsDTO> functionDTOS) {
@@ -244,9 +244,9 @@ public class UnitPositionService {
         return ctawtaAndAccumulatedTimebankWrapper;
     }
 
-    private Long updateEmploymentEndDate(Organization organization, UnitPositionDTO unitPositionDTO, Employment employment) throws Exception {
-        Employment employment1 = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(), unitPositionDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
-        return Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment1.getReasonCode().getId() : null;
+    private Long updateEmploymentEndDate(Organization organization, UnitPositionDTO unitPositionDTO, Position position) throws Exception {
+        Position position1 = positionService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(), unitPositionDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
+        return Optional.ofNullable(position.getReasonCode()).isPresent() ? position1.getReasonCode().getId() : null;
 
     }
 
@@ -439,7 +439,7 @@ public class UnitPositionService {
         }
 
         EmploymentType employmentType = employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(), 0).orElse(null);
-        if (unitPositionDTO.isMainUnitPosition() && employmentService.eligibleForMainUnitPosition(unitPositionDTO, unitPositionId)) {
+        if (unitPositionDTO.isMainUnitPosition() && positionService.eligibleForMainUnitPosition(unitPositionDTO, unitPositionId)) {
             oldUnitPosition.setMainUnitPosition(true);
         }
 
@@ -518,11 +518,11 @@ public class UnitPositionService {
         }
 
 
-        Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
+        Position position = positionService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
                 unitPositionDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(unitPositionDTO.getEndDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupId());
-        Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment.getReasonCode().getId() : null;
-        employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
-        // Deleting All shifts after employment end date
+        Long reasonCodeId = Optional.ofNullable(position.getReasonCode()).isPresent() ? position.getReasonCode().getId() : null;
+        employmentQueryResult = new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd());
+        // Deleting All shifts after position end date
         if (unitPositionDTO.getEndDate() != null) {
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, unitPositionDTO.getEndDate(), unitPositionDTO.getStaffId());
         }
@@ -584,9 +584,9 @@ public class UnitPositionService {
 
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
-        Employment employment = employmentService.updateEmploymentEndDate(unit, staffId);
+        Position position = positionService.updateEmploymentEndDate(unit, staffId);
         //plannerSyncService.publishUnitPosition(unitId, unitPosition, null, IntegrationOperation.DELETE);
-        return new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis());
+        return new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis());
     }
 
 
@@ -689,11 +689,11 @@ public class UnitPositionService {
 
         User user = userGraphRepository.getUserByStaffId(staffId);
 
-        EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
-        Employment employment = employmentReasonCode.getEmployment();
+        EmploymentReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
+        Position position = employmentReasonCode.getPosition();
 
         Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent() ? employmentReasonCode.getReasonCode().getId() : null;
-        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd(), employment.getMainEmploymentStartDate(), employment.getMainEmploymentEndDate(), employment.isMainEmployment());
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnEmploymentEnd(), position.getMainEmploymentStartDate(), position.getMainEmploymentEndDate(), position.isMainEmployment());
 
         List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization) ? unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) : unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId, unitId);
 

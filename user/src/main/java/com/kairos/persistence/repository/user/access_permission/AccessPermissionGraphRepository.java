@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 /**
  * Created by prabjot on 3/1/17.
  */
@@ -16,8 +18,8 @@ public interface AccessPermissionGraphRepository extends Neo4jBaseRepository<Acc
     List<AccessPermission> findAll();
 
     @Query("Match (organization:Organization),(staff:Staff),(accessGroup:AccessGroup),(accessPage:AccessPage) where id(organization)={0} AND id(staff)={1} AND id(accessGroup)={2} AND id(accessPage)={3} with organization,staff,accessGroup,accessPage\n" +
-            "Match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitPermission) with unitEmployment,accessGroup,accessPage\n" +
-            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with accessPermission,accessPage\n" +
-            "Match (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage) SET r.isRead={4},r.isWrite={5} return r")
+            "Match (organization)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+BELONGS_TO+"]->(staff)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitEmployment:UnitPermission) with unitEmployment,accessGroup,accessPage\n" +
+            "Match (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitEmployment:UnitPermission)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup) with accessPermission,accessPage\n" +
+            "Match (accessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage) SET r.isRead={4},r.isWrite={5} return r")
     Map<String,Object> setPagePermissionToUser(long unitId, long staffId, long groupId, long accessPageId, boolean read, boolean write);
 }

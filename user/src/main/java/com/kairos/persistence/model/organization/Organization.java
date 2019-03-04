@@ -21,7 +21,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
-import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.staff.employment.Position;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
@@ -132,14 +132,14 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = ORGANIZATION_HAS_TAG)
     private List<Tag> tags;
 
-    @Relationship(type = HAS_EMPLOYMENTS)
-    private List<Employment> employments = new ArrayList<>();
+    @Relationship(type = HAS_POSITIONS)
+    private List<Position> positions = new ArrayList<>();
 
     @Relationship(type = HAS_LOCAL_AREA_TAGS)
     private List<LocalAreaTag> localAreaTags = new ArrayList<>();
 
     @Relationship(type = HAS_BILLING_ADDRESS)
-    ContactAddress billingAddress;
+    private ContactAddress billingAddress;
 
     @NotNull(message = "error.Organization.ContactAddress.notnull")
     @Relationship(type = CONTACT_DETAIL)
@@ -229,7 +229,7 @@ public class Organization extends UserBaseEntity {
     private List<Location> locations = new ArrayList<>();
 
     @Relationship(type=HAS_SECTOR)
-    private List<Sector> sectors = new ArrayList();
+    private List<Sector> sectors = new ArrayList<>();
 
 
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
@@ -275,7 +275,6 @@ public class Organization extends UserBaseEntity {
         this.country = country;
         this.id = id;
         this.accountType = accountType;
-        this.companyType = companyType;
         this.boardingCompleted = boardingCompleted;
         this.workcentre = workcentre;
         this.groupList = groupList;
@@ -485,12 +484,12 @@ public class Organization extends UserBaseEntity {
         this.contactDetail = contactDetail;
     }
 
-    public List<Employment> getEmployments() {
-        return java.util.Optional.ofNullable(employments).orElse(new ArrayList<>());
+    public List<Position> getPositions() {
+        return java.util.Optional.ofNullable(positions).orElse(new ArrayList<>());
     }
 
-    public void setEmployments(List<Employment> employments) {
-        this.employments = employments;
+    public void setPositions(List<Position> positions) {
+        this.positions = positions;
     }
 
     public List<PublicPhoneNumber> getPublicPhoneNumberList() {

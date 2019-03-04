@@ -8,7 +8,7 @@ import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.staff.employment.Position;
 import com.kairos.persistence.model.staff.employment.EmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
@@ -18,7 +18,7 @@ import com.kairos.persistence.model.user.unit_position.query_result.UnitPosition
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
@@ -44,7 +44,7 @@ public class UnitPositionJobService {
     @Inject private KafkaProducer kafkaProducer;
     @Inject private UnitPositionEmploymentTypeRelationShipGraphRepository unitPositionEmploymentTypeRelationShipGraphRepository;
     @Inject private OrganizationGraphRepository organizationGraphRepository;
-    @Inject private EmploymentGraphRepository employmentGraphRepository;
+    @Inject private PositionGraphRepository positionGraphRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject private UserToSchedulerQueueService userToSchedulerQueueService;
@@ -147,26 +147,26 @@ public class UnitPositionJobService {
             }
         }
 
-        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-        if (employment.getMainEmploymentEndDate() != null) {
-            Long mainEmploymentEndDate = DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate());
+        Position position = positionGraphRepository.findByStaffId(staffId);
+        if (position.getMainEmploymentEndDate() != null) {
+            Long mainEmploymentEndDate = DateUtils.getLongFromLocalDate(position.getMainEmploymentEndDate());
             if (endDateMillis > mainEmploymentEndDate) {
                 exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
             }
         }
 
-        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, employment.getEndDateMillis(), unit.getId(), employment.getId(),
+        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
                 unit.getTimeZone());
 
-        employment.setEndDateMillis(endDateMillis);
-        employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+        position.setEndDateMillis(endDateMillis);
+        positionGraphRepository.deletePositionReasonCodeRelation(staffId);
 
-        employment.setReasonCode(reasonCode.get());
-        employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+        position.setReasonCode(reasonCode.get());
+        position.setAccessGroupIdOnEmploymentEnd(accessGroupId);
         unitPositionGraphRepository.saveAll(unitPositions);
-        employmentGraphRepository.save(employment);
+        positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
-        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), employment.getReasonCode().getId(), employment.getAccessGroupIdOnEmploymentEnd());
+        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnEmploymentEnd());
         return new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
 
     }

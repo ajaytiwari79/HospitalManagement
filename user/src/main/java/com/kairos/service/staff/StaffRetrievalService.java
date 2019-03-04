@@ -113,7 +113,7 @@ public class StaffRetrievalService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private EmploymentService employmentService;
+    private PositionService positionService;
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
@@ -176,7 +176,7 @@ public class StaffRetrievalService {
             languages = Collections.emptyList();
             engineerTypes = Collections.emptyList();
         }
-        personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
+        personalInfo.put("employmentInfo", positionService.retrieveEmploymentDetails(staffEmploymentDTO));
 
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
         personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, unit.getId()));
