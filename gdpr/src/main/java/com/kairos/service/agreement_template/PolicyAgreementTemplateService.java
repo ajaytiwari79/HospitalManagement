@@ -205,21 +205,21 @@ public class PolicyAgreementTemplateService{
         List<Long> serviceCategoryIds = new ArrayList<>();
         List<Long> subServiceCategoryIds = new ArrayList<>();
         if(!isUnitId) {
-            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO();
+            //organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO();
             organizationTypeIds = template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList());
             organizationSubTypeIds = template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList());
             serviceCategoryIds = template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList());
             subServiceCategoryIds = template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList());
             organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds);
         }
-        List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
-        List<ClauseBasicResponseDTO> clauseListForTemplate =  new ArrayList<>();
+        List<UnitLevelClauseResponseDTO> clauseListForUnitLevelPolicyAgreementTemplate = new ArrayList<>();
+        List<ClauseBasicResponseDTO> clauseListForMasterPolicyAgreementTemplate =  new ArrayList<>();
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(template.getAgreementSections(),AgreementSectionResponseDTO.class);
         if(isUnitId){
-            clauseListForUnitLevelTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitId(referenceId), UnitLevelClauseResponseDTO.class);
+            clauseListForUnitLevelPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitId(referenceId), UnitLevelClauseResponseDTO.class);
             //agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByOrganizationIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class) ;
         }else{
-            clauseListForTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds, template.getTemplateType().getId()),ClauseBasicResponseDTO.class);
+            clauseListForMasterPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds, template.getTemplateType().getId()),ClauseBasicResponseDTO.class);
             //agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByCountryIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class);
         }
 
@@ -245,8 +245,8 @@ public class PolicyAgreementTemplateService{
                 clauseBasicResponseDTO.setLinkedWithOtherTemplate(true);
             }
         });*/
-        agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelTemplate);
-        agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
+        agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelPolicyAgreementTemplate);
+        agreementTemplateResponse.setClauseListForTemplate(clauseListForMasterPolicyAgreementTemplate);
         agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
         agreementTemplateResponse.setAgreementSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
