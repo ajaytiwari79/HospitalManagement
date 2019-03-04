@@ -15,8 +15,10 @@ public class AgreementSection extends BaseEntity {
 
 
     @NotBlank(message = "Section Title cannot be empty")
+    @Column(columnDefinition = "text")
     private String title;
 
+    @Column(columnDefinition = "text")
     private String titleHtml;
 
     private boolean isAgreementSubSection;
