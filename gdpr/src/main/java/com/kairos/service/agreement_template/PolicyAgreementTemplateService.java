@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -203,13 +204,13 @@ public class PolicyAgreementTemplateService{
         List<Long> organizationSubTypeIds = new ArrayList<>();
         List<Long> serviceCategoryIds = new ArrayList<>();
         List<Long> subServiceCategoryIds = new ArrayList<>();
-        /*if(!isUnitId) {
+        if(!isUnitId) {
             organizationTypeIds = template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList());
             organizationSubTypeIds = template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList());
             serviceCategoryIds = template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList());
             subServiceCategoryIds = template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList());
-            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds);
-        }*/
+            //organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds);
+        }
         List<UnitLevelClauseResponseDTO> clauseListForUnitLevelPolicyAgreementTemplate = new ArrayList<>();
         List<ClauseBasicResponseDTO> clauseListForMasterPolicyAgreementTemplate =  new ArrayList<>();
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = prepareAgreementSectionResponseDTO(template.getAgreementSections());
