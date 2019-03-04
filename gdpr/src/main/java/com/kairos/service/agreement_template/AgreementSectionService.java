@@ -74,6 +74,10 @@ public class AgreementSectionService{
         if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getAgreementSections())) {
             checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getAgreementSections());
             List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getAgreementSections());
+            agreementSections.forEach(agreementSection -> {
+                agreementSection.linkSubSectionsWithParentSectionAndCountryOrUnitId(isUnitId, referenceId);
+
+            });
             policyAgreementTemplate.setAgreementSections(agreementSections);
         }
         policyAgreementTemplate.setSignatureComponentAdded(agreementTemplateSectionDTO.isSignatureComponentAdded());
