@@ -229,7 +229,6 @@ public class PositionService {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO;
 
         boolean flsSyncStatus = false;
-        List<AccessPageQueryResult> accessPageQueryResults;
         Map<String, Object> response = new HashMap<>();
         UnitPermission unitPermission = null;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;

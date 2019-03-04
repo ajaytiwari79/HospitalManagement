@@ -457,9 +457,6 @@ public class UnitPositionService {
          **/
         if (changeResultDTO.isCalculativeChanged()) {
 
-            // List<UnitPosition> oldUnitPositions
-            //       = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
-            //validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
             if (currentUnitPositionLine.getStartDate().isEqual(unitPositionDTO.getStartDate())) {
                 //both are of same start Date only set  data
                 updateCurrentPositionLine(currentUnitPositionLine, unitPositionDTO);
