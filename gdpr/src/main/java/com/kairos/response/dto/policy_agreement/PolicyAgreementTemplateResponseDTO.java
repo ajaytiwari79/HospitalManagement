@@ -22,7 +22,6 @@ public class PolicyAgreementTemplateResponseDTO {
     private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
-    private List<AgreementSectionResponseDTO> agreementSections;
 
     private TemplateTypeResponseDTO templateType;
 
@@ -61,14 +60,6 @@ public class PolicyAgreementTemplateResponseDTO {
     public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
     public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
-
-    public List<AgreementSectionResponseDTO> getAgreementSections() {
-        return agreementSections;
-    }
-
-    public void setAgreementSections(List<AgreementSectionResponseDTO> agreementSections) {
-        this.agreementSections = agreementSections;
-    }
 
     public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
