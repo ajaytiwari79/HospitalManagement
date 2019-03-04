@@ -1198,7 +1198,7 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setShiftId(shiftState.getShiftId());
             shiftDTO.setPhaseId(shiftState.getPhaseId());
             shiftDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
-            shiftDTO.setEndDate(shiftDTO.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
+            shiftDTO.setEndDate(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
         }
         shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
         shiftMongoRepository.save(shiftState);
