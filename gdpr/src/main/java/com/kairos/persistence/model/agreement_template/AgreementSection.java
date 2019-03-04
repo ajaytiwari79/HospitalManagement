@@ -39,6 +39,7 @@ public class AgreementSection extends BaseEntity {
     private Long organizationId;
 
 
+
     public Long getOrganizationId() { return organizationId; }
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
@@ -77,7 +78,7 @@ public class AgreementSection extends BaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    private List<ClauseCkEditorVO> getClauses() {
+    public List<ClauseCkEditorVO> getClauses() {
         return clauses;
     }
 
@@ -103,6 +104,20 @@ public class AgreementSection extends BaseEntity {
         this.agreementSubSections.forEach(subSection -> {
             subSection.delete();
             subSection.getClauses().forEach( subSectionClause -> subSectionClause.setDeleted(false));
+        });
+    }
+
+
+    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isUnitId, Long referenceId){
+        this.agreementSubSections.forEach(subSection ->{
+            if(isUnitId){
+                this.setOrganizationId(referenceId);
+                subSection.setOrganizationId(referenceId);
+            }else{
+                this.setCountryId(referenceId);
+                subSection.setCountryId(referenceId);
+            }
+            subSection.setAgreementSection(this);
         });
     }
 }
