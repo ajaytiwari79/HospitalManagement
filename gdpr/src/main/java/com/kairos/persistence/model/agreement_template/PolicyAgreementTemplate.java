@@ -15,7 +15,8 @@ public class PolicyAgreementTemplate extends BaseEntity {
 
     @NotBlank(message = "Name cannot be empty")
     private String name;
-    @NotBlank(message = "Description cannot be empty")
+
+    @Column(columnDefinition = "text")
     private String description;
     private Long countryId;
     @ElementCollection
@@ -38,6 +39,8 @@ public class PolicyAgreementTemplate extends BaseEntity {
     private boolean signatureComponentAdded;
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
+
+    @Column(columnDefinition = "text")
     private String  signatureHtml;
     @Embedded
     private CoverPage coverPageData = new CoverPage();

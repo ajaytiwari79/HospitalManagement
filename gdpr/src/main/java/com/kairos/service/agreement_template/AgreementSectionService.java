@@ -71,9 +71,13 @@ public class AgreementSectionService{
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }
-        if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getSections())) {
-            checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getSections());
-            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getSections());
+        if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getAgreementSections())) {
+            checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getAgreementSections());
+            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getAgreementSections());
+            agreementSections.forEach(agreementSection -> {
+                agreementSection.linkSubSectionsWithParentSectionAndCountryOrUnitId(isUnitId, referenceId);
+
+            });
             policyAgreementTemplate.setAgreementSections(agreementSections);
         }
         policyAgreementTemplate.setSignatureComponentAdded(agreementTemplateSectionDTO.isSignatureComponentAdded());

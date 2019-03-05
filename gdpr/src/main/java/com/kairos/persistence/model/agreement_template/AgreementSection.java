@@ -15,8 +15,10 @@ public class AgreementSection extends BaseEntity {
 
 
     @NotBlank(message = "Section Title cannot be empty")
+    @Column(columnDefinition = "text")
     private String title;
 
+    @Column(columnDefinition = "text")
     private String titleHtml;
 
     private boolean isAgreementSubSection;
@@ -35,6 +37,7 @@ public class AgreementSection extends BaseEntity {
     private Integer orderedIndex;
     private Long countryId;
     private Long organizationId;
+
 
 
     public Long getOrganizationId() { return organizationId; }
@@ -75,7 +78,7 @@ public class AgreementSection extends BaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    private List<ClauseCkEditorVO> getClauses() {
+    public List<ClauseCkEditorVO> getClauses() {
         return clauses;
     }
 
@@ -101,6 +104,20 @@ public class AgreementSection extends BaseEntity {
         this.agreementSubSections.forEach(subSection -> {
             subSection.delete();
             subSection.getClauses().forEach( subSectionClause -> subSectionClause.setDeleted(false));
+        });
+    }
+
+
+    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isUnitId, Long referenceId){
+        this.agreementSubSections.forEach(subSection ->{
+            if(isUnitId){
+                this.setOrganizationId(referenceId);
+                subSection.setOrganizationId(referenceId);
+            }else{
+                this.setCountryId(referenceId);
+                subSection.setCountryId(referenceId);
+            }
+            subSection.setAgreementSection(this);
         });
     }
 }

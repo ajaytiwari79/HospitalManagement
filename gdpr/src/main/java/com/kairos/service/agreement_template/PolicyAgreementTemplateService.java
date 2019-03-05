@@ -4,10 +4,10 @@ package com.kairos.service.agreement_template;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
+import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
+import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.model.embeddables.*;
@@ -199,28 +199,25 @@ public class PolicyAgreementTemplateService{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
-        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO=null;
+       // OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO=null;
         List<Long> organizationTypeIds = new ArrayList<>();
         List<Long> organizationSubTypeIds = new ArrayList<>();
         List<Long> serviceCategoryIds = new ArrayList<>();
         List<Long> subServiceCategoryIds = new ArrayList<>();
         if(!isUnitId) {
-            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO();
             organizationTypeIds = template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList());
             organizationSubTypeIds = template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList());
             serviceCategoryIds = template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList());
             subServiceCategoryIds = template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList());
-            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds);
+            //organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds);
         }
-        List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
-        List<ClauseBasicResponseDTO> clauseListForTemplate =  new ArrayList<>();
-        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(template.getAgreementSections(),AgreementSectionResponseDTO.class);
+        List<UnitLevelClauseResponseDTO> clauseListForUnitLevelPolicyAgreementTemplate = new ArrayList<>();
+        List<ClauseBasicResponseDTO> clauseListForMasterPolicyAgreementTemplate =  new ArrayList<>();
+        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = prepareAgreementSectionResponseDTO(template.getAgreementSections());
         if(isUnitId){
-            clauseListForUnitLevelTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitId(referenceId), UnitLevelClauseResponseDTO.class);
-            //agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByOrganizationIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class) ;
+            clauseListForUnitLevelPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitId(referenceId), UnitLevelClauseResponseDTO.class);
         }else{
-            clauseListForTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds, template.getTemplateType().getId()),ClauseBasicResponseDTO.class);
-            //agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByCountryIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class);
+            clauseListForMasterPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds, template.getTemplateType().getId()),ClauseBasicResponseDTO.class);
         }
 
         //List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId, isUnitId, agreementTemplateId);
@@ -245,8 +242,8 @@ public class PolicyAgreementTemplateService{
                 clauseBasicResponseDTO.setLinkedWithOtherTemplate(true);
             }
         });*/
-        agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelTemplate);
-        agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
+        agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelPolicyAgreementTemplate);
+        agreementTemplateResponse.setClauseListForTemplate(clauseListForMasterPolicyAgreementTemplate);
         agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
         agreementTemplateResponse.setAgreementSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
@@ -256,6 +253,19 @@ public class PolicyAgreementTemplateService{
         agreementTemplateResponse.setSignatureComponentRightAlign(template.isSignatureComponentRightAlign());
         agreementTemplateResponse.setSignatureHtml(template.getSignatureHtml());
         return agreementTemplateResponse;
+    }
+
+    public List<AgreementSectionResponseDTO> prepareAgreementSectionResponseDTO(List<AgreementSection> agreementSections){
+        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = new ArrayList<>();
+        agreementSections.forEach(agreementSection -> {
+            AgreementSectionResponseDTO agreementSectionResponseDTO = new AgreementSectionResponseDTO(agreementSection.getId(), agreementSection.getTitle(), agreementSection.getTitleHtml(), agreementSection.getOrderedIndex());
+            agreementSectionResponseDTO.setClauses(ObjectMapperUtils.copyPropertiesOfListByMapper(agreementSection.getClauses(), ClauseCkEditorVO.class));
+            if(!agreementSection.getAgreementSubSections().isEmpty()) {
+                agreementSectionResponseDTO.setAgreementSubSections(prepareAgreementSectionResponseDTO(agreementSection.getAgreementSubSections()));
+            }
+            agreementSectionResponseDTOS.add(agreementSectionResponseDTO);
+        });
+        return agreementSectionResponseDTOS;
     }
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
