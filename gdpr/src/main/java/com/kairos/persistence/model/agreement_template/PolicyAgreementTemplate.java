@@ -18,20 +18,28 @@ public class PolicyAgreementTemplate extends BaseEntity {
 
     @Column(columnDefinition = "text")
     private String description;
+
     private Long countryId;
+
     @ElementCollection
     private List<AccountType> accountTypes;
+
     @OneToMany(cascade = CascadeType.ALL)
     @OrderColumn
     private List<AgreementSection> agreementSections=new ArrayList<>();
+
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
+
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
     @ElementCollection
     private List <ServiceCategory> organizationServices = new ArrayList<>();
+
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
     @OneToOne
     private TemplateType templateType;
     private boolean coverPageAdded;
