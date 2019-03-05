@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
@@ -59,6 +60,7 @@ public class CTARuleTemplateDTO {
     private List<LocalDate> publicHolidays;
     private BigInteger ruleTemplateCategoryId;
     private String ruleTemplateCategoryName;
+    private UserInfo lastModifiedBy;
 
     public CTARuleTemplateDTO() {
     }
@@ -307,7 +309,13 @@ public class CTARuleTemplateDTO {
         this.calculationFor = calculationFor;
     }
 
+    public UserInfo getLastModifiedBy() {
+        return lastModifiedBy;
+    }
 
+    public void setLastModifiedBy(UserInfo lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
     public CTARuleTemplateDTO(String name, String description, String payrollType, String payrollSystem) {
         this.name = name;
