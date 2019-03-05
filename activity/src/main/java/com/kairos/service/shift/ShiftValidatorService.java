@@ -645,7 +645,7 @@ public class ShiftValidatorService {
         Date shiftsStartDate = shiftDTOS.get(0).getActivities().get(0).getStartDate();
         Date shiftsEndDate = shiftDTOS.get(shiftDTOS.size() - 1).getActivities().get(shiftDTOS.get(shiftDTOS.size() - 1).getActivities().size() - 1).getEndDate();
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTOS.get(0).getUnitPositionId(), shiftsStartDate, shiftsEndDate);
-        if (!shifts.isEmpty()) {
+        if (shifts.stream().filter(shift->!shift.getId().equals(shiftDTOS.get(0).getId())).findAny().isPresent()) {
             exceptionService.duplicateDataException("message.shift.date.startandend", shiftsStartDate, shiftsEndDate);
         }
     }
