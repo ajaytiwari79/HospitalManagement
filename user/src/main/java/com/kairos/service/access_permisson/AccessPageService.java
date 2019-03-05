@@ -463,7 +463,7 @@ public class AccessPageService {
         return accessPageRepository.findLanguageSpecificDataByModuleIdAndLanguageId(moduleId,languageId);
     }
 
-    public List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, List<Long> organizationIds, Long parentOrgId){
-       return accessPageRepository.getAccessPermission(userId,  organizationIds, parentOrgId);
+    public List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds){
+       return accessPageRepository.getAccessPermission(userId,  organizationIds);
     }
 }

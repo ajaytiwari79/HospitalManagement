@@ -57,11 +57,12 @@ public class ShiftActivityDTO {
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
     private int plannedMinutes;
 
-    public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
+        this.absenceReasonCodeId=absenceReasonCodeId;
     }
 
     public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {

@@ -170,7 +170,7 @@ public class StaffingLevelController {
 
     @PostMapping(value = "/updated_staffing_level")
     @ApiOperation("get staffing level if Updated")
-    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
+    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody @Valid List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
     }

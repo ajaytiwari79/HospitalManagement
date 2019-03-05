@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -51,6 +52,8 @@ public class StaffPersonalDetail {
     private boolean pregnant;
     private Long employmentTypeId;
     private List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise;
+    private AddressDTO primaryAddress;
+    private AddressDTO secondaryAddress;
 
     public StaffPersonalDetail() {
         //Default Constructor
@@ -272,6 +275,22 @@ public class StaffPersonalDetail {
         this.sectorWiseExpertise = sectorWiseExpertise;
     }
 
+    public AddressDTO getPrimaryAddress() {
+        return primaryAddress;
+    }
+
+    public void setPrimaryAddress(AddressDTO primaryAddress) {
+        this.primaryAddress = primaryAddress;
+        this.primaryAddress.setPrimary(true);
+    }
+
+    public AddressDTO getSecondaryAddress() {
+        return secondaryAddress;
+    }
+
+    public void setSecondaryAddress(AddressDTO secondaryAddress) {
+        this.secondaryAddress = secondaryAddress;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -295,4 +314,5 @@ public class StaffPersonalDetail {
 
         return Objects.hash(id, firstName, contactDetail, currentStatus, expertiseIds, expertiseWithExperience, cprNumber, familyName, gender, sectorWiseExpertise);
     }
+
 }

@@ -63,43 +63,45 @@ public class StaffExpertiseUnitTest {
     AccessGroupService accessGroupService;
     @Mock
     OrganizationService organizationService;
+    @Mock
+    private StaffAddressService staffAddressService;
 
-     List<Long> expertiseIds= new ArrayList<>();
+    List<Long> expertiseIds = new ArrayList<>();
 
-     StaffPersonalDetail staffPersonalDetail=new StaffPersonalDetail();
-     StaffPersonalDetail staffPersonalDetailResult=new StaffPersonalDetail();
-     List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise=new ArrayList<>();
-     List<StaffExpertiseQueryResult> staffExpertiseQueryResults=new ArrayList<>();
-     public List<Expertise> expertiseList;
-     public Staff staff;
+    StaffPersonalDetail staffPersonalDetail = new StaffPersonalDetail();
+    StaffPersonalDetail staffPersonalDetailResult = new StaffPersonalDetail();
+    List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise = new ArrayList<>();
+    List<StaffExpertiseQueryResult> staffExpertiseQueryResults = new ArrayList<>();
+    public List<Expertise> expertiseList;
+    public Staff staff;
     public UserAccessRoleDTO userAccessRoleDTO;
 
-   @Before
-    public void setUp(){
+    @Before
+    public void setUp() {
 
 
     }
 
     @Test
     public void saveStaffPersonalDetails() throws ParseException {
-        userAccessRoleDTO=new UserAccessRoleDTO();
+        userAccessRoleDTO = new UserAccessRoleDTO();
         userAccessRoleDTO.setManagement(true);
-        expertiseList=new ArrayList<>();
-        staff=new Staff();
+        expertiseList = new ArrayList<>();
+        staff = new Staff();
         staff.setId(1956L);
-        User user=new User();
+        User user = new User();
         user.setCprNumber("1103843142");
-        ContactDetail contactDetail=new ContactDetail();
+        ContactDetail contactDetail = new ContactDetail();
         contactDetail.setId(22071L);
         contactDetail.setPrivatePhone("9876767767");
         contactDetail.setPrivateEmail("abc@kairosplanning.com");
         staff.setContactDetail(contactDetail);
-        List<Long> expertiseIds= new ArrayList<>();
+        List<Long> expertiseIds = new ArrayList<>();
         expertiseIds.add(23234L);
         expertiseIds.add(23238L);
-        List<StaffExperienceInExpertiseDTO> expertiseWithExperience=new ArrayList<>();
-        StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO1=new StaffExperienceInExpertiseDTO(189030L,"A EXP",23234L,24,DateUtils.asDate(LocalDate.of(2007,11,15)));
-        StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO2=new StaffExperienceInExpertiseDTO(185502L,"B EXP",23238L,24,DateUtils.asDate(LocalDate.of(2007,11,15)));
+        List<StaffExperienceInExpertiseDTO> expertiseWithExperience = new ArrayList<>();
+        StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO1 = new StaffExperienceInExpertiseDTO(189030L, "A EXP", 23234L, 24, DateUtils.asDate(LocalDate.of(2007, 11, 15)));
+        StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO2 = new StaffExperienceInExpertiseDTO(185502L, "B EXP", 23238L, 24, DateUtils.asDate(LocalDate.of(2007, 11, 15)));
         expertiseWithExperience.add(staffExperienceInExpertiseDTO1);
         expertiseWithExperience.add(staffExperienceInExpertiseDTO2);
         staffPersonalDetail.setFirstName("Jasmin");
@@ -113,21 +115,20 @@ public class StaffExpertiseUnitTest {
         staffPersonalDetail.setExpertiseWithExperience(expertiseWithExperience);
 
 
-
-        Expertise expertise1=new Expertise();
+        Expertise expertise1 = new Expertise();
         expertise1.setId(23234L);
         expertise1.setName("A EXP");
 
-        Expertise expertise2=new Expertise();
+        Expertise expertise2 = new Expertise();
         expertise2.setId(23238L);
         expertise2.setName("B EXP");
 
-        List<SeniorityLevel> seniorityLevels=new ArrayList<>();
-        SeniorityLevel seniorityLevel=new SeniorityLevel();
+        List<SeniorityLevel> seniorityLevels = new ArrayList<>();
+        SeniorityLevel seniorityLevel = new SeniorityLevel();
         seniorityLevel.setFrom(0);
         seniorityLevel.setTo(2);
 
-        SeniorityLevel seniorityLevel1=new SeniorityLevel();
+        SeniorityLevel seniorityLevel1 = new SeniorityLevel();
         seniorityLevel1.setFrom(2);
         seniorityLevel1.setTo(4);
         seniorityLevels.add(seniorityLevel);
@@ -139,35 +140,30 @@ public class StaffExpertiseUnitTest {
         expertiseList.add(expertise2);
 
 
-
-
-
-
-
-        SectorAndStaffExpertiseQueryResult sectorAndStaffExpertiseQueryResult=new SectorAndStaffExpertiseQueryResult();
+        SectorAndStaffExpertiseQueryResult sectorAndStaffExpertiseQueryResult = new SectorAndStaffExpertiseQueryResult();
         sectorAndStaffExpertiseQueryResult.setId(1542L);
         sectorAndStaffExpertiseQueryResult.setName("Sector1");
 
-        StaffExpertiseQueryResult staffExpertiseQueryResult1=new StaffExpertiseQueryResult();
+        StaffExpertiseQueryResult staffExpertiseQueryResult1 = new StaffExpertiseQueryResult();
         staffExpertiseQueryResult1.setId(189030L);
         staffExpertiseQueryResult1.setName("A EXP");
         staffExpertiseQueryResult1.setExpertiseId(23234L);
         staffExpertiseQueryResult1.setRelevantExperienceInMonths(132);
         staffExpertiseQueryResult1.setNextSeniorityLevelInMonths(null);
         staffExpertiseQueryResult1.setSeniorityLevel(seniorityLevel);
-        staffExpertiseQueryResult1.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007,11,15)));
+        staffExpertiseQueryResult1.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007, 11, 15)));
         staffExpertiseQueryResult1.setUnitPositionExists(true);
         staffExpertiseQueryResult1.setSeniorityLevels(seniorityLevels);
 
 
-        StaffExpertiseQueryResult staffExpertiseQueryResult2=new StaffExpertiseQueryResult();
+        StaffExpertiseQueryResult staffExpertiseQueryResult2 = new StaffExpertiseQueryResult();
         staffExpertiseQueryResult2.setId(185502L);
         staffExpertiseQueryResult2.setName("B EXP");
         staffExpertiseQueryResult2.setExpertiseId(23238L);
         staffExpertiseQueryResult2.setRelevantExperienceInMonths(132);
         staffExpertiseQueryResult2.setNextSeniorityLevelInMonths(null);
         staffExpertiseQueryResult2.setSeniorityLevel(seniorityLevel1);
-        staffExpertiseQueryResult2.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007,11,15)));
+        staffExpertiseQueryResult2.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007, 11, 15)));
         staffExpertiseQueryResult2.setUnitPositionExists(true);
         staffExpertiseQueryResult2.setSeniorityLevels(seniorityLevels);
         staffExpertiseQueryResults.add(staffExpertiseQueryResult1);
@@ -190,7 +186,7 @@ public class StaffExpertiseUnitTest {
         when(expertiseGraphRepository.findAllById(expertiseIds)).thenReturn(expertiseList);
         when(userGraphRepository.getUserByStaffId(1956L)).thenReturn(user);
         when(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(1956L)).thenReturn(sectorWiseExpertise);
-        StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L,staffPersonalDetail,20123);
+        StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L, staffPersonalDetail, 20123);
         staffPersonalDetail1.setSectorWiseExpertise(sectorWiseExpertise);
         assertEquals(staffPersonalDetail1, staffPersonalDetailResult);
     }

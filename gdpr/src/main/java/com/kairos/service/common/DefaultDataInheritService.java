@@ -18,6 +18,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateDeprecated;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.model.risk_management.RiskDeprecated;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
@@ -140,10 +141,8 @@ public class DefaultDataInheritService{
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
-       /* List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(countryId);
-        List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryService.getAllDataCategoryWithDataElementByCountryId(countryId);
-        saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
-        copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);*/
+        assetTypeService.findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(countryId, unitId);
+        dataCategoryService.findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(countryId, unitId);
 
 
         List<Callable<Boolean>> callables = new ArrayList<>();
@@ -241,8 +240,8 @@ public class DefaultDataInheritService{
             return true;
         };*/
         Callable<Boolean> dataSubjectTask = () -> {
-            List<DataSubjectResponseDTO> dataSubjectMappingDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
-            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
+            List<DataSubjectResponseDTO> dataSubjectDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
+            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectDTOS);
             return true;
         };
         Callable<Boolean> clauseTask = () -> {
@@ -252,23 +251,23 @@ public class DefaultDataInheritService{
         };
 
 
-//        callables.add(technicalSecurityMeasureTask);
-//        callables.add(storageFormatTask);
-//        callables.add(orgSecurityMeasureTask);
-//        callables.add(accessorPartyTask);
-//        callables.add(dataSourceTask);
-//        callables.add(legalBasisTask);
-//        callables.add(processingPurposeTask);
-//        callables.add(responsibilityTypeTask);
-//        callables.add(transferMethodTask);
- //       callables.add(processingActivityTask);
-//        callables.add(questionniareTemplateTask);
-//        callables.add(assetTask);
+        callables.add(technicalSecurityMeasureTask);
+        callables.add(storageFormatCreationTask);
+        callables.add(orgSecurityMeasureTask);
+        callables.add(accessorPartyTask);
+        callables.add(dataSourceTask);
+        callables.add(legalBasisTask);
+        callables.add(processingPurposeTask);
+        callables.add(responsibilityTypeTask);
+        callables.add(transferMethodTask);
+        callables.add(processingActivityTask);
+        /*callables.add(questionniareTemplateTask);
+        callables.add(assetTask);*/
         callables.add(dataSubjectTask);
- //       callables.add(clauseTask);
-        //callables.add(dataDisposalCreationlTask);
-        /*callables.add(hostingProviderCreationTask);
-        callables.add(hostingTypeCreationTask);*/
+        callables.add(clauseTask);
+        callables.add(dataDisposalCreationlTask);
+        callables.add(hostingProviderCreationTask);
+        callables.add(hostingTypeCreationTask);
         asynchronousService.executeAsynchronously(callables);
         return true;
     }
@@ -309,10 +308,10 @@ public class DefaultDataInheritService{
                         tags.add(tag);
                     }
                 });
+                clauseTagRepository.saveAll(tags);
                 clause.setTags(tags);
                 clauseList.add(clause);
             });
-           // clauseTagRepository.saveAll(clauseTags);
             clauseRepository.saveAll(clauseList);
         }
 
@@ -540,10 +539,19 @@ public class DefaultDataInheritService{
 
 
     private void saveAssetTypeAndAssetSubType(Long unitId, List<AssetTypeRiskResponseDTO> assetTypeDTOS) {
-
+        List<AssetType> assetTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeDTOS)) {
-            List<AssetType> assetTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTOS, AssetType.class);
-            assetTypes = updateOrganizationIdAndCountryIdOfAssetTypeAndMetaData(assetTypes, unitId);
+            assetTypeDTOS.forEach( assetTypeDTO -> {
+                AssetType assetType = new AssetType();
+                assetType.setId(assetTypeDTO.getId());
+                assetType.setName(assetTypeDTO.getName());
+                assetType.setSubAssetType(assetTypeDTO.getHasSubAsset());
+                assetType.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTO.getRisks(), Risk.class));
+                assetType.setSubAssetTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTO.getSubAssetTypes(), AssetType.class));
+                assetTypes.add(assetType);
+            });
+            //List<AssetType> assetTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTOS, AssetType.class);
+            updateOrganizationIdAndCountryIdOfAssetTypeAndMetaData(assetTypes, unitId);
             assetTypeRepository.saveAll(assetTypes);
 
         }

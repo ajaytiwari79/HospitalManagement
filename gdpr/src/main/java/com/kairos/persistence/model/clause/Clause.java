@@ -20,15 +20,18 @@ import java.util.UUID;
 @Entity
 public class Clause extends BaseEntity {
 
-    @NotBlank
+    // TODO provide validation messages
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String title;
 
     @ManyToMany
     private List<ClauseTag> tags  = new ArrayList<>();
 
+    // Mandatory or not to be discussed with Ulrik
     @NotNull
+    @Column(columnDefinition = "text")
     private String description;
-
+//TODO @Valid
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
 
@@ -60,6 +63,8 @@ public class Clause extends BaseEntity {
     @Transient
     private String descriptionHtml;
 
+
+    // TODO  check usability and setter and value generator
     @Nullable
     private UUID tempClauseId;
 
