@@ -10,6 +10,7 @@ import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
+import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
@@ -152,6 +153,7 @@ public class PolicyAgreementTemplateService{
             policyAgreementTemplateResponseDTO.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
             policyAgreementTemplateResponseDTO.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategoryDTO.class));
             policyAgreementTemplateResponseDTO.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategoryDTO.class));
+            policyAgreementTemplateResponseDTO.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getAccountTypes(), AccountTypeVO.class));
             policyAgreementTemplateResponseDTOS.add(policyAgreementTemplateResponseDTO);
         });
         return policyAgreementTemplateResponseDTOS;
@@ -270,14 +272,14 @@ public class PolicyAgreementTemplateService{
         return agreementTemplateResponse;
     }
 
-    public List<AgreementSectionResponseDTO> prepareAgreementSectionResponseDTO(List<AgreementSection> agreementSections){
+    public List<AgreementSectionResponseDTO> prepareAgreementSectionResponseDTO(List<? extends AgreementSection> agreementSections){
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = new ArrayList<>();
         agreementSections.forEach(agreementSection -> {
             AgreementSectionResponseDTO agreementSectionResponseDTO = new AgreementSectionResponseDTO(agreementSection.getId(), agreementSection.getTitle(), agreementSection.getTitleHtml(), agreementSection.getOrderedIndex());
             agreementSectionResponseDTO.setClauses(ObjectMapperUtils.copyPropertiesOfListByMapper(agreementSection.getClauses(), ClauseCkEditorVO.class));
-           /* if(!agreementSection.getAgreementSubSections().isEmpty()) {
+            if(!agreementSection.getAgreementSubSections().isEmpty()) {
                 agreementSectionResponseDTO.setAgreementSubSections(prepareAgreementSectionResponseDTO(agreementSection.getAgreementSubSections()));
-            }*/
+            }
             agreementSectionResponseDTOS.add(agreementSectionResponseDTO);
         });
         return agreementSectionResponseDTOS;
