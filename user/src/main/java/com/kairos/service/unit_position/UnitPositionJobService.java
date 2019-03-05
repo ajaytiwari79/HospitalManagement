@@ -130,7 +130,7 @@ public class UnitPositionJobService {
         Long endDateMillis = DateUtils.getIsoDateInLong(employmentEndDate);
         LocalDate unitPositionStartDateMax = unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
         if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(unitPositionStartDateMax)) {
-            exceptionService.actionNotPermittedException("message.employmentdata.greaterthan.unitpositiondate", unitPositionStartDateMax);
+            exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", unitPositionStartDateMax);
 
         }
         List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis));
