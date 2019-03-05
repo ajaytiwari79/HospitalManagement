@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class PayRollSettingController {
+public class PayrollSettingController {
 
    @Inject
    PayrollSettingService payrollSettingService;
@@ -34,7 +34,7 @@ public class PayRollSettingController {
 
     }
 
-    @ApiOperation(value = "get PayRoll Period")
+    @ApiOperation(value = "get year of PayRoll Period")
     @GetMapping(value="/payroll_period_dates")
     public ResponseEntity<Map<String, Object>> getLocalDatesOfPayRollPeriod(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payrollSettingService.getLocalDatesOfPayrollPeriod(unitId));
@@ -43,22 +43,29 @@ public class PayRollSettingController {
 
     @ApiOperation(value = "get PayRoll Period")
     @GetMapping(value="/payroll_period")
-    public ResponseEntity<Map<String, Object>> getPayRollPeriodOfUnit(@PathVariable Long unitId, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam("durationType") DurationType durationType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payrollSettingService.getPayrollPeriodByUnitIdAndDateAndDurationType(unitId,startDate,durationType));
+    public ResponseEntity<Map<String, Object>> getPayRollPeriodOfUnit(@PathVariable Long unitId, @RequestParam(value = "year") Integer year, @RequestParam("durationType") DurationType durationType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payrollSettingService.getPayrollPeriodByUnitIdAndDateAndDurationType(unitId,year,durationType));
 
     }
 
     @ApiOperation(value = "update PayRoll Period")
     @PutMapping(value="/payroll_period")
-    public ResponseEntity<Map<String, Object>> updatePayRollPeriod(@PathVariable Long unitId, @RequestBody  PlanningPeriodDTO planningPeriodDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    public ResponseEntity<Map<String, Object>> updatePayRollPeriod(@PathVariable Long unitId, @RequestBody  PayrollSettingDTO payrollSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payrollSettingService.updatePayrollPeriod(payrollSettingDTO,unitId));
 
     }
 
-    @ApiOperation(value = "delete PayRoll Period")
+    @ApiOperation(value = "update old PayRoll Period and create new payroll period on break payroll table")
+    @PutMapping(value="/break_payroll_period")
+    public ResponseEntity<Map<String, Object>> breakPayRollPeriod(@PathVariable Long unitId, @RequestBody PayrollSettingDTO payrollSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payrollSettingService.breakPayrollPeriodOfUnit(unitId,payrollSettingDTO));
+
+    }
+
+    @ApiOperation(value = "update PayRoll Period")
     @DeleteMapping(value="/payroll_period")
-    public ResponseEntity<Map<String, Object>> deletePayRollPeriod(@PathVariable Long unitId, @RequestBody PlanningPeriodDTO planningPeriodDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    public ResponseEntity<Map<String, Object>> deleteDraftPayRollPeriod(@PathVariable Long unitId, @RequestBody  PayrollSettingDTO payrollSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payrollSettingService.deleteDraftPayrollPeriod(payrollSettingDTO,unitId));
 
     }
 }

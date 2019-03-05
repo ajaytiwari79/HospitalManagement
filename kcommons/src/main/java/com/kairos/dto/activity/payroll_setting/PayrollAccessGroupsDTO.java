@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.payroll_setting;
 
-public class PayRollAccessGroupSettingDTO {
+public class PayrollAccessGroupsDTO {
     private String name;
     private Long accessGroupId;
     //grace period of access group for pay roll

@@ -897,4 +897,12 @@ public  class DateUtils {
         return localDate.format(DateTimeFormatter.ofPattern(pattern));
 
     }
+
+    public static LocalDate getlastDayOfYear(Integer year){
+        return LocalDate.of(year,1,1).with(TemporalAdjusters.lastDayOfYear());
+    }
+
+    public static LocalDate getFirstDayOfYear(Integer year){
+        return LocalDate.of(year,1,1);
+    }
 }

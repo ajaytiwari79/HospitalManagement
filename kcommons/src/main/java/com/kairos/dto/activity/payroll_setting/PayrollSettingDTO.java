@@ -8,11 +8,14 @@ import java.util.List;
 
 public class PayrollSettingDTO {
     private BigInteger id;
+    // use when break table
+    private BigInteger parentPayrollId;
     private boolean published;
     private Long unitId;
     private LocalDate startDate;
-    private List<PayRollPeriodSettingDTO> payrollPeriods;
-    private List<PayRollAccessGroupSettingDTO> accessGroupsPriority;
+    private LocalDate endDate;
+    private List<PayrollPeriodDTO> payrollPeriods;
+    private List<PayrollAccessGroupsDTO> accessGroupsPriority;
     private DurationType durationType;
 
     public BigInteger getId() {
@@ -39,11 +42,11 @@ public class PayrollSettingDTO {
         this.unitId = unitId;
     }
 
-    public List<PayRollPeriodSettingDTO> getPayrollPeriods() {
+    public List<PayrollPeriodDTO> getPayrollPeriods() {
         return payrollPeriods;
     }
 
-    public void setPayrollPeriods(List<PayRollPeriodSettingDTO> payrollPeriods) {
+    public void setPayrollPeriods(List<PayrollPeriodDTO> payrollPeriods) {
         this.payrollPeriods = payrollPeriods;
     }
 
@@ -63,11 +66,27 @@ public class PayrollSettingDTO {
         this.startDate = startDate;
     }
 
-    public List<PayRollAccessGroupSettingDTO> getAccessGroupsPriority() {
+    public List<PayrollAccessGroupsDTO> getAccessGroupsPriority() {
         return accessGroupsPriority;
     }
 
-    public void setAccessGroupsPriority(List<PayRollAccessGroupSettingDTO> accessGroupsPriority) {
+    public void setAccessGroupsPriority(List<PayrollAccessGroupsDTO> accessGroupsPriority) {
         this.accessGroupsPriority = accessGroupsPriority;
+    }
+
+    public BigInteger getParentPayrollId() {
+        return parentPayrollId;
+    }
+
+    public void setParentPayrollId(BigInteger parentPayrollId) {
+        this.parentPayrollId = parentPayrollId;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

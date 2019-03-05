@@ -17,11 +17,19 @@ public interface PayrollSettingMongoRepository extends MongoBaseRepository<Payro
     @Query(value = "{'payrollPeriods.startDate':?1,deleted:false,published:true,unitId:?0 }")
     PayrollSetting findPayrollPeriodByStartDate(Long unitId,LocalDate startDate);
 
-    @Query(value = "{deleted:false,published:true,unitId:?0,_id:?1 }")
+    @Query(value = "{deleted:false,unitId:?0,_id:?1 }")
     PayrollSetting findPayrollPeriodById(Long unitId,BigInteger id);
+
+    @Query(value = "{deleted:false,unitId:?0,published:false }")
+    PayrollSetting findDraftPayrollPeriodByUnitId(Long unitId);
+
 
     @Query(value = "{deleted:false,unitId:?0 }")
     List<PayrollSetting> findAllByunitId(Long unitId);
+
+    @Query(value = "{deleted:false,unitId:?0,_id:?1,published:false}",delete = true)
+    Long removeDraftpayrollPeriod(Long unitId,BigInteger id);
+
 
     @Query(value = "{'payrollPeriods.startDate':?1,deleted:false,unitId:?0,durationType:?2 }")
     List<PayrollSettingDTO> findAllPayrollPeriodByStartDate(Long unitId, LocalDate startDate,DurationType durationType);

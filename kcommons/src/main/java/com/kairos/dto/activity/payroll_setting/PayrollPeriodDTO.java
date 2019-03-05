@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class PayRollPeriodSettingDTO {
+public class PayrollPeriodDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     //pay roll deadline date
     private LocalDateTime deadlineDate;
-    private List<PayRollAccessGroupSettingDTO> payrollAccessGroups;
+    private List<PayrollAccessGroupsDTO> payrollAccessGroups;
 
     public LocalDate getStartDate() {
         return startDate;
@@ -35,11 +35,11 @@ public class PayRollPeriodSettingDTO {
         this.deadlineDate = deadlineDate;
     }
 
-    public List<PayRollAccessGroupSettingDTO> getPayrollAccessGroups() {
+    public List<PayrollAccessGroupsDTO> getPayrollAccessGroups() {
         return payrollAccessGroups;
     }
 
-    public void setPayrollAccessGroups(List<PayRollAccessGroupSettingDTO> payrollAccessGroups) {
+    public void setPayrollAccessGroups(List<PayrollAccessGroupsDTO> payrollAccessGroups) {
         this.payrollAccessGroups = payrollAccessGroups;
     }
 }

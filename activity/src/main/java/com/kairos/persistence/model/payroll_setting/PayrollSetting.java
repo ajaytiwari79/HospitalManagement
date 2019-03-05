@@ -3,11 +3,13 @@ package com.kairos.persistence.model.payroll_setting;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public class PayrollSetting extends MongoBaseEntity {
     private boolean published;
     private Long unitId;
+    private BigInteger parentPayrollId;
     private List<PayrollPeriod> payrollPeriods;
     private DurationType durationType;
     private List<PayrollAccessGroups> accessGroupsPriority;
@@ -61,5 +63,13 @@ public class PayrollSetting extends MongoBaseEntity {
 
     public void setAccessGroupsPriority(List<PayrollAccessGroups> accessGroupsPriority) {
         this.accessGroupsPriority = accessGroupsPriority;
+    }
+
+    public BigInteger getParentPayrollId() {
+        return parentPayrollId;
+    }
+
+    public void setParentPayrollId(BigInteger parentPayrollId) {
+        this.parentPayrollId = parentPayrollId;
     }
 }
