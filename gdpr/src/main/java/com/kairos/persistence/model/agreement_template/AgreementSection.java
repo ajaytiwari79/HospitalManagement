@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class AgreementSection extends BaseEntity {
@@ -16,57 +17,40 @@ public class AgreementSection extends BaseEntity {
 
     @NotBlank(message = "Section Title cannot be empty")
     @Column(columnDefinition = "text")
-    private String title;
+    protected String title;
 
     @Column(columnDefinition = "text")
-    private String titleHtml;
-
-    private boolean isAgreementSubSection;
+    protected String titleHtml;
 
     @OrderColumn
     @ElementCollection
-    private List<ClauseCkEditorVO> clauses=new ArrayList<>();
+    protected List<ClauseCkEditorVO> clauses=new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "agreementSection")
-    private List<AgreementSection> agreementSubSections =new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "agreementSection_id")
-    private AgreementSection agreementSection;
-
-    private Integer orderedIndex;
-    private Long countryId;
-    private Long organizationId;
+    private List<AgreementSubSection> agreementSubSections =new ArrayList<>();
 
 
+    protected Integer orderedIndex;
+    protected Long countryId;
+    protected Long organizationId;
+
+    public List<AgreementSubSection> getAgreementSubSections() {
+        return agreementSubSections.stream().filter(subSection -> subSection.isDeleted() == false).collect(Collectors.toList());
+    }
+
+    public void setAgreementSubSections(List<AgreementSubSection> agreementSubSections) {
+        this.agreementSubSections = agreementSubSections;
+    }
 
     public Long getOrganizationId() { return organizationId; }
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public boolean isAgreementSubSection() { return isAgreementSubSection; }
-
-    public void setAgreementSubSection(boolean agreementSubSection) { this.isAgreementSubSection = agreementSubSection; }
 
     public Long getCountryId() { return countryId; }
 
     public String getTitle() { return title; }
 
     public void setTitle(String title) { this.title = title; }
-
-    public List<AgreementSection> getAgreementSubSections() {
-        return agreementSubSections;
-    }
-
-    public void setAgreementSubSections(List<AgreementSection> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
-
-    public AgreementSection getAgreementSection() {
-        return agreementSection;
-    }
-
-    public void setAgreementSection(AgreementSection agreementSection) {
-        this.agreementSection = agreementSection;
-    }
 
     public void setCountryId(Long countryId) { this.countryId = countryId; }
 
@@ -79,7 +63,7 @@ public class AgreementSection extends BaseEntity {
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
     public List<ClauseCkEditorVO> getClauses() {
-        return clauses;
+        return clauses.stream().filter(clause -> clause.isDeleted() == false).collect(Collectors.toList());
     }
 
     public void setClauses(List<ClauseCkEditorVO> clauses) {
@@ -89,11 +73,10 @@ public class AgreementSection extends BaseEntity {
     public AgreementSection(){ }
 
 
-    public AgreementSection(@NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex, boolean isAgreementSubSection, String titleHtml)
+    public AgreementSection(@NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex, String titleHtml)
     {
         this.title=title;
         this.orderedIndex=orderedIndex;
-        this.isAgreementSubSection = isAgreementSubSection;
         this.titleHtml=titleHtml;
     }
 

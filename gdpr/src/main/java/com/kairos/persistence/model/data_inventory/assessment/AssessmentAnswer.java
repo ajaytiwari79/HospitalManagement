@@ -18,7 +18,7 @@ public class AssessmentAnswer {
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private Long questionId;
     private String attributeName;
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne(cascade = CascadeType.ALL)
     private SelectedChoice value;
     private QuestionType questionType;
 
