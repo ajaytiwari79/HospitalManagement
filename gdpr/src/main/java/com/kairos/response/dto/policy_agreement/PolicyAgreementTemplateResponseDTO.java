@@ -98,5 +98,10 @@ public class PolicyAgreementTemplateResponseDTO {
 
     }
 
-
+    public PolicyAgreementTemplateResponseDTO(Long id, String name, String description, TemplateTypeResponseDTO templateType) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.templateType = templateType;
+    }
 }
