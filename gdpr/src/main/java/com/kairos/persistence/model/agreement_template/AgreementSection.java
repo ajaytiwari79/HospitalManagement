@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class AgreementSection extends BaseEntity {
@@ -34,7 +35,7 @@ public class AgreementSection extends BaseEntity {
     protected Long organizationId;
 
     public List<AgreementSubSection> getAgreementSubSections() {
-        return agreementSubSections;
+        return agreementSubSections.stream().filter(subSection -> subSection.isDeleted() == false).collect(Collectors.toList());
     }
 
     public void setAgreementSubSections(List<AgreementSubSection> agreementSubSections) {
@@ -62,7 +63,7 @@ public class AgreementSection extends BaseEntity {
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
     public List<ClauseCkEditorVO> getClauses() {
-        return clauses;
+        return clauses.stream().filter(clause -> clause.isDeleted() == false).collect(Collectors.toList());
     }
 
     public void setClauses(List<ClauseCkEditorVO> clauses) {
