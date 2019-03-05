@@ -33,7 +33,6 @@ public class StaffCreationDTO {
     private String privatePhone;
     private String workEmail;
     private String userName;
-    @NotNull(message = "error.staff.externalid.notnull")
     private Long externalId;
 
     @NotNull(message = "error.staff.accessGroup.id.notnull")
@@ -175,7 +174,7 @@ public class StaffCreationDTO {
         this.currentStatus = currentStatus;
     }
 
-    public StaffCreationDTO(@NotNull(message = "error.staff.firstname.notnull") String firstName, @NotNull(message = "error.staff.lastname.notnull") String lastName, @NotNull(message = "error.staff.cprNumber.notnull") String cprNumber, String familyName, @Email(message = "error.email.valid") String privateEmail, Gender gender, String userName, @NotNull(message = "error.staff.externalid.notnull") Long externalId, @NotNull(message = "error.staff.accessGroup.id.notnull") Long accessGroupId) {
+    public StaffCreationDTO(@NotNull(message = "error.staff.firstname.notnull") String firstName, @NotNull(message = "error.staff.lastname.notnull") String lastName, @NotNull(message = "error.staff.cprNumber.notnull") String cprNumber, String familyName, @Email(message = "error.email.valid") String privateEmail, Gender gender, String userName,  Long externalId, @NotNull(message = "error.staff.accessGroup.id.notnull") Long accessGroupId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprNumber = cprNumber;
