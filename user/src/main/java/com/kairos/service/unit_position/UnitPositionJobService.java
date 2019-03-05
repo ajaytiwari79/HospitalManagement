@@ -148,13 +148,6 @@ public class UnitPositionJobService {
         }
 
         Position position = positionGraphRepository.findByStaffId(staffId);
-        if (position.getMainEmploymentEndDate() != null) {
-            Long mainEmploymentEndDate = DateUtils.getLongFromLocalDate(position.getMainEmploymentEndDate());
-            if (endDateMillis > mainEmploymentEndDate) {
-                exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
-            }
-        }
-
         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
                 unit.getTimeZone());
 

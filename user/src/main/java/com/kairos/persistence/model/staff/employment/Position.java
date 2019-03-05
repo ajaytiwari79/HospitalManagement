@@ -32,11 +32,6 @@ public class Position extends UserBaseEntity {
     private Staff staff;
     private Long endDateMillis;
     private Long startDateMillis;
-    @Convert(LocalDateConverter.class)
-    private LocalDate mainEmploymentStartDate;
-    @Convert(LocalDateConverter.class)
-    private LocalDate mainEmploymentEndDate;
-    private boolean mainEmployment;
     private Long accessGroupIdOnEmploymentEnd;
     @Relationship(type = HAS_REASON_CODE)
     private ReasonCode reasonCode;
@@ -114,29 +109,4 @@ public class Position extends UserBaseEntity {
     public EmploymentStatus getEmploymentStatus() {
         return employmentStatus;
     }
-
-    public LocalDate getMainEmploymentStartDate() {
-        return mainEmploymentStartDate;
-    }
-
-    public void setMainEmploymentStartDate(LocalDate mainEmploymentStartDate) {
-        this.mainEmploymentStartDate = mainEmploymentStartDate;
-    }
-
-    public LocalDate getMainEmploymentEndDate() {
-        return mainEmploymentEndDate;
-    }
-
-    public void setMainEmploymentEndDate(LocalDate mainEmploymentEndDate) {
-        this.mainEmploymentEndDate = mainEmploymentEndDate;
-    }
-
-    public boolean isMainEmployment() {
-        return mainEmployment;
-    }
-
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
-    }
-
 }

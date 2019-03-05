@@ -17,26 +17,9 @@ public class PositionQueryResult {
     private String name;
     private Long startDateMillis;
     private Long endDateMillis;
-    @Convert(LocalDateConverter.class)
-    private LocalDate mainEmploymentStartDate;
-    @Convert(LocalDateConverter.class)
-    private LocalDate mainEmploymentEndDate;
-    private boolean mainEmployment;
     private Long reasonCodeId;
     private Long accessGroupIdOnEmploymentEnd;
 
-    public PositionQueryResult(Long id, Long startDateMillis, Long endDateMillis, Long reasonCodeId, Long accessGroupIdOnEmploymentEnd, LocalDate mainEmploymentStartDate, LocalDate mainEmploymentEndDate, boolean mainEmployment) {
-        this.id = id;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
-        this.reasonCodeId = reasonCodeId;
-        this.mainEmploymentStartDate = mainEmploymentStartDate;
-        this.mainEmploymentEndDate = mainEmploymentEndDate;
-        this.mainEmployment = mainEmployment;
-
-
-    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
@@ -104,29 +87,5 @@ public class PositionQueryResult {
 
     public void setEndDateMillis(Long endDateMillis) {
         this.endDateMillis = endDateMillis;
-    }
-
-    public LocalDate getMainEmploymentStartDate() {
-        return mainEmploymentStartDate;
-    }
-
-    public void setMainEmploymentStartDate(LocalDate mainEmploymentStartDate) {
-        this.mainEmploymentStartDate = mainEmploymentStartDate;
-    }
-
-    public LocalDate getMainEmploymentEndDate() {
-        return mainEmploymentEndDate;
-    }
-
-    public void setMainEmploymentEndDate(LocalDate mainEmploymentEndDate) {
-        this.mainEmploymentEndDate = mainEmploymentEndDate;
-    }
-
-    public boolean isMainEmployment() {
-        return mainEmployment;
-    }
-
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
     }
 }

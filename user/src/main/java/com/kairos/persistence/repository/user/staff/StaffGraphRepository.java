@@ -6,7 +6,6 @@ import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;

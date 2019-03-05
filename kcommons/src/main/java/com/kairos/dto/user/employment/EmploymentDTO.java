@@ -16,10 +16,7 @@ public class EmploymentDTO {
     private String endDate;
     private Long reasonCodeId;
     private Long accessGroupIdOnEmploymentEnd;
-    @NotNull(message = "Main employment start date can't be null")
-    private LocalDate mainEmploymentStartDate;
-    private LocalDate mainEmploymentEndDate;
-    private boolean mainEmployment;
+
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
     }
@@ -42,30 +39,5 @@ public class EmploymentDTO {
     }
     public void setEndDate(String endDate) {
         this.endDate = endDate;
-    }
-
-    public LocalDate getMainEmploymentStartDate() {
-        return mainEmploymentStartDate;
-    }
-
-    public void setMainEmploymentStartDate(LocalDate mainEmploymentStartDate) {
-        this.mainEmploymentStartDate = mainEmploymentStartDate;
-    }
-
-    public LocalDate getMainEmploymentEndDate() {
-        return mainEmploymentEndDate;
-    }
-
-    public void setMainEmploymentEndDate(LocalDate mainEmploymentEndDate) {
-        this.mainEmploymentEndDate = mainEmploymentEndDate;
-    }
-
-
-    public boolean isMainEmployment() {
-        return mainEmployment;
-    }
-
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
     }
 }
