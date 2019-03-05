@@ -598,20 +598,6 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffByStaffIncludeFilterForPriorityGroups(staffIncludeFilterDTO, unitId));
     }
 
-
-    @ApiOperation(value = "update and set main emloyment setting")
-    @RequestMapping(value = "/{staffId}/main_employment", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateMainEmployment(@PathVariable long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirmMainEmploymentOverriding) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.updateMainEmployment(unitId, staffId, employmentDTO, confirmMainEmploymentOverriding));
-    }
-
-    @ApiOperation(value = "remove main employment")
-    @RequestMapping(value = "/{staffId}/remove_main_employment", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> removeMainEmployment(@PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.removeMainEmployment(staffId));
-    }
-
-
     @RequestMapping(value = "/emails", method = RequestMethod.POST)
     @ApiOperation("get email addresses of staffs")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

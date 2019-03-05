@@ -51,7 +51,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
 
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} set position.startDateMillis = {1}")
-    void updatePositionStartDateOfStaff(Long staffId, Long endDateMillis);
+    void updatePositionStartDateOfStaff(Long staffId, Long startDateMillis);
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO + "]-(position:Position)" +
             " MATCH(position)-[r:"+ HAS_REASON_CODE +"]-(reasonCode:ReasonCode) WHERE id(staff)={0} delete r")

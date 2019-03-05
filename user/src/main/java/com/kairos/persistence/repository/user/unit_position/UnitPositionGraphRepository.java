@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.user.unit_position;
 
 
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
@@ -140,9 +139,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} and ( up.startDate > {1} or up.startDate is null)  return up")
     List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, LocalDate startDate);
-
-    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} MATCH(staff)<-[:" + BELONGS_TO + "]-(position:Position) return min(up.startDate) as earliestUnitPositionstartDate, position.startDate as employmentstartDate")
-    EmploymentUnitPositionQueryResult getEarliestUnitPositionStartDateAndEmploymentByStaffId(Long staffId);
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition) where id(up)={0} return id(staff) as staffId")
     Long getStaffIdFromUnitPosition(Long unitPositionId);

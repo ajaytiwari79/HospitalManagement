@@ -24,7 +24,6 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "MATCH (organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff) WITH position\n" +
             "MATCH (position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(accessPermission:AccessPermission) WITH unitPermission\n" +
             "OPTIONAL MATCH (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) WHERE id(unit)={2} WITH r,unitPermission\n" +
-            "OPTIONAL MATCH (unitPermission)-[:" + HAS_WAGES + "]->(wage:Wage) WITH wage,unitPermission,r\n" +
             "RETURN {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,weeklyHours:unitPermission.weeklyHours,fullTime:unitPermission.fullTime,employmentType:unitPermission.employmentType,employmentType:unitPermission.employmentType,employmentNo:unitPermission.employmentNumber,isHistory:case when r is NULL then false else true end,wages:case when wage is NULL then [] else collect({id:id(wage),startDate:wage.startDate,endDate:wage.endDate,salary:wage.salary}) end} as data")
     List<Map<String, Object>> getUnitPermissionsInAllUnits(long staffId, long parentOrganizationId, long childOrganizationId);
 

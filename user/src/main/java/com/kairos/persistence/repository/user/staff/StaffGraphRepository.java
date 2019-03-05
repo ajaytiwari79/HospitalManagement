@@ -371,14 +371,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN  id(o) AS unitId, staffData AS staffList")
     List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
 
-
-    @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]-(user:User)WHERE id(staff)={0} WITH staff,user\n" +
-            "MATCH (user)-[:"+BELONGS_TO+"]-(staffs:Staff)WHERE id(staffs)<>{0} WITH staffs,user\n " +
-            "MATCH (staffs)-[:"+BELONGS_TO+"]-(position:Position) WITH staffs,user,position\n" +
-            "WHERE (position.mainEmploymentEndDate IS NULL OR position.mainEmploymentEndDate>={1}) AND ((position.mainEmploymentStartDate IS NOT NULL) AND({2} IS NULL OR position.mainEmploymentStartDate<={2})) WITH user,position,staffs\n" +
-            "MATCH (position)-[:"+ HAS_POSITIONS +"]-(organization:Organization) RETURN position,organization.name AS organizationName")
-    List<MainEmploymentQueryResult> getAllMainEmploymentByStaffId(Long staffId, Long mainEmploymentStartDate, Long mainEmploymentEndDate );
-
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) WHERE id(expertise)={1} AND id(staff) IN {2}\n" +
             "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) WHERE id(organization)={0}   \n" +
             "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
@@ -457,31 +449,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query(" MATCH (staff:Staff)-[r:"+BELONGS_TO+"]->(user:User) WHERE id(staff)={0} RETURN staff,r,user")
     Staff findByStaffId(Long staffId);
-
-
-    //TODO not delete
-
-//    @Query("MATCH (org:Organization) WHERE id(org) IN {0}"+
-//            "MATCH (org)-[:"+IN_UNIT+"]-(up:UnitPosition)-[:"+BELONGS_TO_STAFF+"]-(staff:Staff)"+
-//            "MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
-//            "WHERE  date(positionLine.startDate) <= date({2}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({1}))"+
-//            "CASE WHEN {3} is null THEN staff ELSE WHERE id(staff) in {3} END AS staff"+
-//           " RETURN DISTINCT id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName")
-//    List<StaffPersonalDetailDTO> getStaffsByUnitIds(List<Long> unitIds,String startDate,String endDate,List<Long> staffIds);
-
-//
-//    @Query("MATCH (organization:Organization)-[:"+HAS_POSITIONS+"]-(employment:Position)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE id(organization)={0}\n" +
-//            "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]-(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
-//            "WHERE  date(positionLine.startDate) <= date({2}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({1}))"+
-//            " RETURN DISTINCT id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName")
-//    List<StaffPersonalDetailDTO> getStaffsByUnitId(Long unitId,String startDate,String endDate);
-//
-//    @Query("MATCH (org:Organization),(emptype:EmploymentType) WHERE id(emptype) IN {1} AND id(org) = {0}"+
-//            "MATCH (org)-[:"+HAS_POSITIONS+"]-(emp:Position)-[:"+BELONGS_TO+"]-(staff:Staff)"+
-//            "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]-(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
-//            "WHERE  date(positionLine.startDate) <= date({3}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({2}))"+
-//            "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(emptype) RETURN DISTINCT id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName")
-//    List<StaffPersonalDetailDTO> getStaffsByUnitIdAndEmploymentType(Long unitId, List<Long> employmentType,String startDate,String endDate);
 
 }
 

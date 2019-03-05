@@ -105,7 +105,7 @@ import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPo
 @Service
 
 public class UnitPositionService {
-    private final Logger logger = LoggerFactory.getLogger(UnitPositionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnitPositionService.class);
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -113,11 +113,7 @@ public class UnitPositionService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private UnitPermissionGraphRepository unitPermissionGraphRepository;
-    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
-    @Inject
-    private StaffService staffService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject
@@ -127,15 +123,11 @@ public class UnitPositionService {
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
-    private TimeBankRestClient timeBankRestClient;
-    @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
     private UnitPositionEmploymentTypeRelationShipGraphRepository unitPositionEmploymentTypeRelationShipGraphRepository;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject
-    private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
     @Inject
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
@@ -145,32 +137,22 @@ public class UnitPositionService {
     @Inject
     private PositionService positionService;
     @Inject
-    private DayTypeGraphRepository dayTypeGraphRepository;
-    @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
-    private PlannerSyncService plannerSyncService;
-    @Inject
     private ExceptionService exceptionService;
-    @Inject
-    private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
     private ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
-    private UserToSchedulerQueueService userToSchedulerQueueService;
-    @Inject
     private GenericRestClient genericRestClient;
-
     @Inject
     private AsynchronousService asynchronousService;
     @Inject
     private UnitPositionLineFunctionRelationShipGraphRepository positionLineFunctionRelationRepository;
-    @Inject
-    private TimeSlotGraphRepository timeSlotGraphRepository;
+
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
