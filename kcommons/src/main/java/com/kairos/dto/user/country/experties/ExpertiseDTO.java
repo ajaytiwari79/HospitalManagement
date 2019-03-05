@@ -37,11 +37,7 @@ public class ExpertiseDTO {
     private SeniorityLevelDTO seniorityLevel;
     private List<Long> tags;
     private boolean published;
-
-    // @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
-
-    // @NotNull(message="message.sector.null")
     private SectorDTO sector;
 
 
@@ -153,19 +149,6 @@ public class ExpertiseDTO {
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
     }
-
-    @AssertTrue(message = "'start date' must be less than 'end date'.")
-    public boolean isValid() {
-        if (!Optional.ofNullable(this.startDateMillis).isPresent() && Optional.ofNullable(this.endDateMillis).isPresent()) {
-            return false;
-        } else if (Optional.ofNullable(this.startDateMillis).isPresent() && (Optional.ofNullable(this.endDateMillis).isPresent())) {
-            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            return !endDateAsUtc.isBefore(startDateAsUtc);
-        }
-        return true;
-    }
-
     public SectorDTO getSector() {
         return sector;
     }
@@ -180,5 +163,17 @@ public class ExpertiseDTO {
 
     public void setUnion(UnionIDNameDTO union) {
         this.union = union;
+    }
+
+    @AssertTrue(message = "'start date' must be less than 'end date'.")
+    public boolean isValid() {
+        if (!Optional.ofNullable(this.startDateMillis).isPresent() && Optional.ofNullable(this.endDateMillis).isPresent()) {
+            return false;
+        } else if (Optional.ofNullable(this.startDateMillis).isPresent() && (Optional.ofNullable(this.endDateMillis).isPresent())) {
+            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            return !endDateAsUtc.isBefore(startDateAsUtc);
+        }
+        return true;
     }
 }

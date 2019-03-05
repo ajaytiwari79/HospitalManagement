@@ -143,7 +143,7 @@ public class ExpertiseService {
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
                     getSector(expertiseDTO.getSector(), country));
-            prepareExpertiseWhileCreate(expertise, expertiseDTO, country, true);
+            prepareExpertiseWhileCreate(expertise, expertiseDTO, country);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
@@ -264,7 +264,7 @@ public class ExpertiseService {
     }
 
 
-    private void prepareExpertiseWhileCreate(Expertise expertise, ExpertiseDTO expertiseDTO, Country country, boolean create) {
+    private void prepareExpertiseWhileCreate(Expertise expertise, ExpertiseDTO expertiseDTO, Country country) {
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
@@ -286,7 +286,7 @@ public class ExpertiseService {
             expertise.setUnion(getUnion(unionIDNameDTO.getId(), unionIDNameDTO.getName(), country));
         });
         SeniorityLevel seniorityLevel = null;
-        if (expertiseDTO.getSeniorityLevel() != null || create) {
+        if (expertiseDTO.getSeniorityLevel() != null) {
             seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
                     expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
             seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
@@ -385,8 +385,7 @@ public class ExpertiseService {
             expertiseResponseDTO.getUnion().setId(copiedExpertise.getUnion().getId());
 
         } else {
-
-            prepareExpertiseWhileCreate(currentExpertise, expertiseDTO, country, false);
+            prepareExpertiseWhileCreate(currentExpertise, expertiseDTO, country);
             // update in current expertise :)
             if (seniorityLevelToUpdate.isPresent()) {
                 validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
