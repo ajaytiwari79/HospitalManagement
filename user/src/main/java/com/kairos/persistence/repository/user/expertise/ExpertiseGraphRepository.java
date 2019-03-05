@@ -194,7 +194,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
 
 
-    @Query("MATCH (o:Organization)-[r:" + PROVIDE_SERVICE + "{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)={0}\n" +
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE +"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)={0}\n" +
             " MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = {1}\n" +
             " MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]->(os) RETURN toString(id(expertise)) as id, expertise.name as value ," +
             "expertise.startDateMillis as startDateMillis ,expertise.endDateMillis as endDateMillis ORDER BY startDateMillis")

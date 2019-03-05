@@ -23,7 +23,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseDTO {
     private Long id;
-    @NotBlank(message = "Expertise name is required")
+    @NotBlank(message = "error.Expertise.name.notEmpty")
     private String name;
     private String description;
     private Date startDateMillis;
@@ -165,7 +165,7 @@ public class ExpertiseDTO {
         this.union = union;
     }
 
-    @AssertTrue(message = "'start date' must be less than 'end date'.")
+    @AssertTrue(message = "message.start_date.less_than.end_date")
     public boolean isValid() {
         if (!Optional.ofNullable(this.startDateMillis).isPresent() && Optional.ofNullable(this.endDateMillis).isPresent()) {
             return false;
