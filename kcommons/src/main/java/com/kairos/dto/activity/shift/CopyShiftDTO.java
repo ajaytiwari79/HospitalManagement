@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class CopyShiftDTO {
-    List<BigInteger> shiftIds;
-    List<Long> staffIds;
+    private List<BigInteger> shiftIds;
+    private List<Long> staffIds;
     private Long expertiseId;
     private LocalDate startDate;
     private LocalDate endDate;

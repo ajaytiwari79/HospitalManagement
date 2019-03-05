@@ -27,22 +27,21 @@ public class ExpertiseDTO {
     private String name;
     private String description;
 
-    //   @NotNull(message = "Start date can't be null")
+    @NotNull(message = "Start date can't be null")
     private Date startDateMillis;
 
     private Date endDateMillis;
 
-    //  @NotNull(message = "Level can not be null")
+    @NotNull(message = "Level can not be null")
     private Long organizationLevelId;
 
-    //  @NotNull(message = "services can not be null")
+    @NotNull(message = "services can not be null")
     private Set<Long> organizationServiceIds;
 
-    //  @NotNull(message = "union can not be null")
-    /*  private Long unionId;*/
+    @NotNull(message = "union can not be null")
     private UnionIDNameDTO union;
 
-    //  @NotNull(message = "FullTime Weekly Minutes can not be null")
+    @NotNull(message = "FullTime Weekly Minutes can not be null")
     private Integer fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 

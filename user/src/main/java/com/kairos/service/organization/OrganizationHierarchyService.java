@@ -88,13 +88,13 @@ public class OrganizationHierarchyService {
 
         if (accessPageService.isHubMember(UserContext.getUserDetails().getId())) {
             resultQueryResults.add(treeStructureService.getTreeStructure(list));
-            setUnitPermission(resultQueryResults, parentOrgId, true);
+            setUnitPermission(resultQueryResults, true);
 
         } else {
             for (QueryResult queryResult : list) {
                 resultQueryResults.add(treeStructureService.getTreeStructure(Arrays.asList(queryResult)));
             }
-            setUnitPermission(resultQueryResults, parentOrgId, false);
+            setUnitPermission(resultQueryResults, false);
         }
         return resultQueryResults;
     }
@@ -203,11 +203,10 @@ public class OrganizationHierarchyService {
         return filterAndFavouriteFilter;
     }
 
-    private void setUnitPermission(List<QueryResult> organizationHierarchy, Long parentOrgId, boolean countryAdmin) {
-        List<Long> organizationIds = organizationHierarchy.stream().flatMap(s -> s.getChildren().stream().map(QueryResult::getId)).collect(toList());
-        organizationIds.add(parentOrgId);
+    private void setUnitPermission(List<QueryResult> organizationHierarchy,boolean countryAdmin) {
         if (!countryAdmin) {
-            List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), organizationIds, parentOrgId);
+            Set<Long> organizationIds=new HashSet<>();
+            List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), getAllUnitIds(organizationHierarchy,organizationIds));
             Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
             setPermissionInChildren(organizationHierarchy, unitPermissionMap, false);
         } else {
@@ -220,6 +219,13 @@ public class OrganizationHierarchyService {
             unit.setHasPermission(countryAdmin ? true : unitPermissionMap.get(unit.getId()));
             setPermissionInChildren(unit.getChildren(), unitPermissionMap, countryAdmin);
         });
+    }
+    private Set<Long> getAllUnitIds(List<QueryResult> organizationHierarchy,Set<Long> organizationIds){
+        organizationHierarchy.forEach(unit->{
+            organizationIds.add(unit.getId());
+            getAllUnitIds(unit.getChildren(),organizationIds);
+        });
+        return organizationIds;
     }
 
 }

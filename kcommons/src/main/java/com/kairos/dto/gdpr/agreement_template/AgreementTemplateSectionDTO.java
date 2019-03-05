@@ -2,10 +2,8 @@ package com.kairos.dto.gdpr.agreement_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +19,7 @@ public class AgreementTemplateSectionDTO {
     private boolean includeContentPage;
     private CoverPageVO coverPageData;
     @Valid
-    private List<AgreementSectionDTO> sections=new ArrayList<>();
+    private List<AgreementSectionDTO> agreementSections =new ArrayList<>();
 
 
     public boolean isCoverPageAdded() { return coverPageAdded; }
@@ -32,9 +30,13 @@ public class AgreementTemplateSectionDTO {
 
     public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
 
-    public List<AgreementSectionDTO> getSections() { return sections; }
+    public List<AgreementSectionDTO> getAgreementSections() {
+        return agreementSections;
+    }
 
-    public void setSections(List<AgreementSectionDTO> sections) { this.sections = sections; }
+    public void setAgreementSections(List<AgreementSectionDTO> agreementSections) {
+        this.agreementSections = agreementSections;
+    }
 
     public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
 

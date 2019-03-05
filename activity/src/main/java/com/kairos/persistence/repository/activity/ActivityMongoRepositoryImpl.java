@@ -45,6 +45,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
         ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime")
                 .and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart")
+                .and("balanceSettingsActivityTab").as("balanceSettingsActivityTab")
                 .and("id").as("id").and("name").as("name")
                 .and("activity_type_category.id").as("categoryId").and("activity_type_category.name")
                 .as("categoryName");

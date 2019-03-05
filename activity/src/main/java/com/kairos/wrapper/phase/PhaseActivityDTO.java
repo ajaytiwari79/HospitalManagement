@@ -8,6 +8,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +24,15 @@ public class PhaseActivityDTO {
     private List<PhaseDTO> applicablePhases;
     private List<PhaseDTO> actualPhases;
     private List<ReasonCodeDTO> reasonCodes;
+    private LocalDate planningPeriodStartDate;
+    private LocalDate planningPeriodEndDate;
 
     public PhaseActivityDTO() {
         //Default Constructor
     }
 
     public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
-                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes) {
+                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes,LocalDate planningPeriodStartDate,LocalDate planningPeriodEndDate) {
         this.activities = activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
@@ -38,6 +41,8 @@ public class PhaseActivityDTO {
         this.applicablePhases = applicablePhases;
         this.actualPhases = actualPhases;
         this.reasonCodes = reasonCodes;
+        this.planningPeriodStartDate=planningPeriodStartDate;
+        this.planningPeriodEndDate=planningPeriodEndDate;
     }
     
     public List<ActivityWithCompositeDTO> getActivities() {
@@ -103,4 +108,21 @@ public class PhaseActivityDTO {
     public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
         this.reasonCodes = reasonCodes;
     }
+
+    public LocalDate getPlanningPeriodStartDate() {
+        return planningPeriodStartDate;
+    }
+
+    public void setPlanningPeriodStartDate(LocalDate planningPeriodStartDate) {
+        this.planningPeriodStartDate = planningPeriodStartDate;
+    }
+
+    public LocalDate getPlanningPeriodEndDate() {
+        return planningPeriodEndDate;
+    }
+
+    public void setPlanningPeriodEndDate(LocalDate planningPeriodEndDate) {
+        this.planningPeriodEndDate = planningPeriodEndDate;
+    }
 }
+

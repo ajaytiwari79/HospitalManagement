@@ -172,6 +172,31 @@ public class AssetTypeService{
         return assetTypesWithAllData;
     }
 
+    public void findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(Long countryId, Long unitId){
+        List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypesNotAssociatedWithAsset(countryId);
+        List unitLevelAssetTypes = prepareAssetTypeDataForUnitLevel(assetTypes, unitId, false);
+        assetTypeRepository.saveAll(unitLevelAssetTypes);
+    }
+
+
+    List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType){
+        List<AssetType> unitLevelAssetTypes = new ArrayList<>();
+        assetTypes.forEach(assetType -> {
+            AssetType unitLevelAssetType = new AssetType();
+            unitLevelAssetType.setName(assetType.getName());
+            unitLevelAssetType.setHasSubAsset(assetType.isHasSubAsset());
+            unitLevelAssetType.setSubAssetType(assetType.isSubAssetType());
+            unitLevelAssetType.setOrganizationId(unitId);
+            unitLevelAssetType.setCountryId(null);
+            unitLevelAssetType.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assetType.getRisks(), Risk.class));
+            if(!isSubAssetType) {
+                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true));
+            }
+            unitLevelAssetTypes.add(unitLevelAssetType);
+        });
+            return unitLevelAssetTypes;
+    }
+
     /**
      *  THis method is used to build response of asset type and asset sub type. This method used recursion
      *  to prepare the data of asset sub type.

@@ -11,6 +11,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -98,14 +99,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
 
 
-    @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:Expertise) WHERE id(expertise)={0} \n" +
-            " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=true ")
-    void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
-
-    @Query("MATCH(oldExpertise:Expertise)<-[:"+HAS_EXPERTISE_IN+"]-(up:UnitPosition) WHERE id(oldExpertise) = {0} WITH up as unitPositions " +
-            "MATCH(newExpertise:Expertise) WHERE id(newExpertise) = {1} " +
-            "CREATE UNIQUE (newExpertise)<-[:"+HAS_EXPERTISE_IN+"]-(unitPositions)")
-    void linkToUnitPositions(Long oldExpertiseId,Long newExpertiseId);
 
 
     @Query("MATCH (e:Expertise)-[:" + VERSION_OF + "]->(expertise:Expertise) WHERE id(e) = {0}" +
@@ -209,8 +202,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
 
     @Query("MATCH(organizationType:OrganizationType) WHERE id(organizationType)={1}\n" +
-            "MATCH(organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService)\n" +
-            " MATCH(os)<-[:SUPPORTS_SERVICES]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
+            "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
+            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
             "RETURN distinct id(expertise) as id,expertise.name as name")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
@@ -260,4 +253,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (expertise:Expertise{deleted:false}) WHERE id(expertise) = {0}" +
             "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
+
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Organization) WHERE expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP()\n" +
+            "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
+    List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 }
