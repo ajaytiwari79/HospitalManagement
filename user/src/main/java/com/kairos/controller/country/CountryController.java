@@ -899,7 +899,7 @@ public class CountryController {
     @ApiOperation(value = "Create Expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId,  @RequestBody ExpertiseDTO expertise) {
+    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody ExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
     }
 
