@@ -646,7 +646,7 @@ public class ExpertiseService {
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
         } else if (!Optional.ofNullable(expertise.getStartDateMillis()).isPresent()) {
-            exceptionService.invalidRequestException("message.startDateMilles.null");
+            exceptionService.invalidRequestException("message.startDateMillis.null");
         } else if (!Optional.ofNullable(expertise.getBreakPaymentSetting()).isPresent()) {
             exceptionService.invalidRequestException("message.breakPaymentType.null");
         } else if (!Optional.ofNullable(expertise.getUnion()).isPresent()) {
