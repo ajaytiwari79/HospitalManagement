@@ -36,8 +36,8 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
-import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
+import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.StaffEmploymentDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;

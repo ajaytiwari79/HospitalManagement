@@ -30,7 +30,7 @@ import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.employment.Position;
+import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;

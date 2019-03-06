@@ -1,10 +1,6 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
-import com.kairos.config.neo4j.converter.LocalDateConverter;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
-import java.time.LocalDate;
 
 /**
  * Created by yatharth on 13/4/18.
@@ -18,7 +14,7 @@ public class PositionQueryResult {
     private Long startDateMillis;
     private Long endDateMillis;
     private Long reasonCodeId;
-    private Long accessGroupIdOnEmploymentEnd;
+    private Long accessGroupIdOnPositionEnd;
 
 
     public Long getReasonCodeId() {
@@ -31,12 +27,12 @@ public class PositionQueryResult {
 
 
 
-    public Long getAccessGroupIdOnEmploymentEnd() {
-        return accessGroupIdOnEmploymentEnd;
+    public Long getAccessGroupIdOnPositionEnd() {
+        return accessGroupIdOnPositionEnd;
     }
 
-    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
-        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    public void setAccessGroupIdOnPositionEnd(Long accessGroupIdOnPositionEnd) {
+        this.accessGroupIdOnPositionEnd = accessGroupIdOnPositionEnd;
     }
 
 
@@ -50,11 +46,11 @@ public class PositionQueryResult {
         this.endDateMillis = endDateMillis;
 
     }
-    public PositionQueryResult(Long id, Long startDateMillis, Long endDateMillis , Long reasonCodeId, Long accessGroupIdOnEmploymentEnd) {
+    public PositionQueryResult(Long id, Long startDateMillis, Long endDateMillis , Long reasonCodeId, Long accessGroupIdOnPositionEnd) {
         this.id = id;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
-        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+        this.accessGroupIdOnPositionEnd = accessGroupIdOnPositionEnd;
         this.reasonCodeId = reasonCodeId;
     }
     public Long getId() {

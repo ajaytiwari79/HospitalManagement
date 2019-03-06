@@ -23,7 +23,7 @@ import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.PartialLeave;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
-import com.kairos.persistence.model.staff.employment.*;
+import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -573,8 +573,8 @@ public class PositionService {
             currentElement = 0;
             List<Long> orgIds = organizations.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
-            accessGroupRepository.createAccessGroupUnitRelation(orgIds, position.getAccessGroupIdOnEmploymentEnd());
-            AccessGroup accessGroupDB = accessGroupRepository.findById(position.getAccessGroupIdOnEmploymentEnd()).get();
+            accessGroupRepository.createAccessGroupUnitRelation(orgIds, position.getAccessGroupIdOnPositionEnd());
+            AccessGroup accessGroupDB = accessGroupRepository.findById(position.getAccessGroupIdOnPositionEnd()).get();
 
 
             for (Organization organziation : expiredEmploymentsQueryResult.getOrganizations()) {
@@ -656,7 +656,7 @@ public class PositionService {
             position.setReasonCode(reasonCode);
         }
         if (Optional.ofNullable(accessGroupId).isPresent()) {
-            position.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+            position.setAccessGroupIdOnPositionEnd(accessGroupId);
         }
         positionGraphRepository.save(position);
 

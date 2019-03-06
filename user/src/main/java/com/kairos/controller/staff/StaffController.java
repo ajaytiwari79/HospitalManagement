@@ -5,8 +5,8 @@ import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
-import com.kairos.persistence.model.staff.employment.StaffEmploymentDetail;
+import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.StaffEmploymentDetail;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.QueryParam;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -575,8 +574,8 @@ public class StaffController {
 
         String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
         Long reasonCodeId = employmentDTO.getReasonCodeId();
-        Long accessGroupId = employmentDTO.getAccessGroupIdOnEmploymentEnd();
-        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, employmentEndDate, unitId, reasonCodeId, accessGroupId);
+        Long accessGroupId = employmentDTO.getAccessGroupIdOnPositionEnd();
+        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, employmentEndDate, reasonCodeId, accessGroupId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

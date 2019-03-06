@@ -222,10 +222,10 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
 
-    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
-        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitEmploymentPositionId);
+    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitPositionId) {
+        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitEmploymentPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
 
         }
         return costTimeAgreementRepository.getOneCtaById(unitPosition.getCostTimeAgreementId());

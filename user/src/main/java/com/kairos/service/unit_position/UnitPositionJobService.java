@@ -7,10 +7,9 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.employment.Position;
-import com.kairos.persistence.model.staff.employment.PositionQueryResult;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.PositionQueryResult;
+import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
@@ -124,20 +123,17 @@ public class UnitPositionJobService {
         // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId, Long accessGroupId) throws Exception {
-
-        Organization unit = organizationGraphRepository.findOne(unitId);
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long reasonCodeId, Long accessGroupId) {
         Long endDateMillis = DateUtils.getIsoDateInLong(employmentEndDate);
-        LocalDate unitPositionStartDateMax = unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
-        if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(unitPositionStartDateMax)) {
+        String unitPositionStartDateMax=unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
+        if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(unitPositionStartDateMax))) {
             exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", unitPositionStartDateMax);
 
         }
-        List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis));
+        List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
         Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(reasonCodeId, 0);
         if (!reasonCode.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", reasonCodeId);
-
         }
 
         for (UnitPosition unitPosition : unitPositions) {
@@ -148,18 +144,18 @@ public class UnitPositionJobService {
         }
 
         Position position = positionGraphRepository.findByStaffId(staffId);
-        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
-                unit.getTimeZone());
+//        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
+//                unit.getTimeZone());
 
         position.setEndDateMillis(endDateMillis);
         positionGraphRepository.deletePositionReasonCodeRelation(staffId);
 
         position.setReasonCode(reasonCode.get());
-        position.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+        position.setAccessGroupIdOnPositionEnd(accessGroupId);
         unitPositionGraphRepository.saveAll(unitPositions);
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
-        PositionQueryResult employmentUpdated = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnEmploymentEnd());
+        PositionQueryResult employmentUpdated = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
         return new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
 
     }

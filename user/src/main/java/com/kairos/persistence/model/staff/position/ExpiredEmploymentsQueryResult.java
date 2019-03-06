@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.access_permission.AccessGroup;

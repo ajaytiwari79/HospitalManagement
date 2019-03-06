@@ -1,6 +1,5 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
-import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -8,9 +7,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +29,7 @@ public class Position extends UserBaseEntity {
     private Staff staff;
     private Long endDateMillis;
     private Long startDateMillis;
-    private Long accessGroupIdOnEmploymentEnd;
+    private Long accessGroupIdOnPositionEnd;
     @Relationship(type = HAS_REASON_CODE)
     private ReasonCode reasonCode;
 
@@ -44,12 +41,12 @@ public class Position extends UserBaseEntity {
     }
 
 
-    public Long getAccessGroupIdOnEmploymentEnd() {
-        return accessGroupIdOnEmploymentEnd;
+    public Long getAccessGroupIdOnPositionEnd() {
+        return accessGroupIdOnPositionEnd;
     }
 
-    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
-        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    public void setAccessGroupIdOnPositionEnd(Long accessGroupIdOnPositionEnd) {
+        this.accessGroupIdOnPositionEnd = accessGroupIdOnPositionEnd;
     }
 
     public ReasonCode getReasonCode() {

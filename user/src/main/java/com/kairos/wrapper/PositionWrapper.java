@@ -1,7 +1,7 @@
 package com.kairos.wrapper;
 
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
-import com.kairos.persistence.model.staff.employment.PositionQueryResult;
+import com.kairos.persistence.model.staff.position.PositionQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 
 import java.util.List;

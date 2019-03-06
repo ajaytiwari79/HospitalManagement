@@ -21,7 +21,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
-import com.kairos.persistence.model.staff.employment.Position;
+import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
 import com.kairos.persistence.model.user.region.LocalAreaTag;

@@ -8,8 +8,8 @@ import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.employment.Position;
-import com.kairos.persistence.model.staff.employment.EmploymentAccessPageRelation;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.EmploymentAccessPageRelation;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -247,7 +247,7 @@ public class AccessPageService {
     // TODO Uncomment and integrate
     /*public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long organizationId, Long userId){
         List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,organizationId);
-        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupIdOnEmploymentEnd));
+        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupIdOnPositionEnd));
         Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
         Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
         List<StaffPermissionQueryResult> allPermissions = new ArrayList<>();

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 

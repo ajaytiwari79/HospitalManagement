@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
 
 import org.springframework.data.neo4j.annotation.QueryResult;

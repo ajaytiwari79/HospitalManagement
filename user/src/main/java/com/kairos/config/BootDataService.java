@@ -20,7 +20,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
-import com.kairos.persistence.model.staff.employment.Position;
+import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;

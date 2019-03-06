@@ -137,21 +137,21 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "return unitPosition,employmentRel,employmentType")
     List<UnitPositionLineEmploymentTypeRelationShip> findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(Long parentOrganizationId);
 
-    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} and ( up.startDate > {1} or up.startDate is null)  return up")
-    List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, LocalDate startDate);
+    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} AND ( up.endDate IS NULL OR DATE(up.endDate) > DATE({1}))  return up")
+    List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, String endDate);
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition) where id(up)={0} return id(staff) as staffId")
     Long getStaffIdFromUnitPosition(Long unitPositionId);
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return max(up.startDate) as maxStartDate")
-    LocalDate getMaxUnitPositionStartDate(Long staffId);
+    String getMaxUnitPositionStartDate(Long staffId);
 
     @Query("MATCH(org:Organization)<-[:"+IN_UNIT+"]-(unitPosition:UnitPosition{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WHERE id(staff)={0} AND id(org)={1}\n" +
             "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)  \n" +
             "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "RETURN id(unitPosition) as id,unitPosition.startDate as startDate, unitPosition.endDate as endDate,unitPosition.mainUnitPosition as mainUnitPosition,unitPosition.accumulatedTimebankMinutes as accumulatedTimebankMinutes \n" +
-            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.taxDeductionPercentage as taxDeductionPercentage,unitPosition.editable as editable,unitPosition.published as published,\n" +
+            "RETURN id(unitPosition) as id,unitPosition.startDate as startDate, unitPosition.endDate as endDate,unitPosition.mainUnitPosition as mainUnitPosition,unitPosition.accumulatedTimebankMinutes as accumulatedTimebankMinutes, \n" +
+            "CASE WHEN reasonCode IS NULL THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.taxDeductionPercentage as taxDeductionPercentage,unitPosition.editable as editable,unitPosition.published as published,\n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org)  as unitId,{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId,Long unitId);
 

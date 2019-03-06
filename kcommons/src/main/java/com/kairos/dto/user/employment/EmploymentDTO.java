@@ -1,11 +1,6 @@
 package com.kairos.dto.user.employment;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 /**
  * Created by yatharth on 19/4/18.
@@ -15,14 +10,14 @@ public class EmploymentDTO {
     @NotNull
     private String endDate;
     private Long reasonCodeId;
-    private Long accessGroupIdOnEmploymentEnd;
+    private Long accessGroupIdOnPositionEnd;
 
-    public Long getAccessGroupIdOnEmploymentEnd() {
-        return accessGroupIdOnEmploymentEnd;
+    public Long getAccessGroupIdOnPositionEnd() {
+        return accessGroupIdOnPositionEnd;
     }
 
-    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
-        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    public void setAccessGroupIdOnPositionEnd(Long accessGroupIdOnPositionEnd) {
+        this.accessGroupIdOnPositionEnd = accessGroupIdOnPositionEnd;
     }
 
 
