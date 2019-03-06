@@ -67,7 +67,7 @@ public class StaffController {
     private UnitPositionJobService unitPositionJobService;
 
 
-    @RequestMapping(value = "/{staffId}/employment_details", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
     @ApiOperation("update staff employment details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveEmploymentInfo(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody StaffEmploymentDetail staffEmploymentDetail) {
@@ -125,14 +125,14 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, personalInfo);
     }
 
-    @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.POST)
+    @RequestMapping(value = "/{staffId}/unit_permission", method = RequestMethod.POST)
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> employmentDetail) {
+    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> unitPermissionDetails) {
 
-        long accessGroupId = Long.parseLong((String) employmentDetail.get("roleId"));
-        boolean isCreated = (boolean) employmentDetail.get("isCreated");
-        long unitId = Long.parseLong((String) employmentDetail.get("organizationId"));
+        long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
+        boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
+        long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));
         Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
@@ -568,7 +568,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffByExperties(unitId, expertiesIds));
     }
 
-    @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{staffId}/position", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
     public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) {
         EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, unitId,positionDTO);

@@ -267,9 +267,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (position)-[:" + BELONGS_TO + "]-(s:Staff) RETURN  id(ag) AS accessGroupId,collect(id(s)) AS staffIds ")
     List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId);
 
+    //TODO HARISH Please check this query. it can be optimized
     @Query("MATCH (org:Organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(ag:AccessGroup) WHERE id(org)={0} and id(ag) IN {1} \n" +
-            "WITH ag,org  MATCH(ag)-[:" + HAS_ACCESS_GROUP + "]-(up:UnitPermission) WITH up,ag MATCH(up)-[:" + HAS_UNIT_PERMISSIONS + "]-(position:Position) WITH ag,emp\n" +
-            "MATCH (emp)-[:" + BELONGS_TO + "]-(s:Staff)\n" +
+            "WITH ag,org  MATCH(ag)-[:" + HAS_ACCESS_GROUP + "]-(up:UnitPermission) WITH up,ag MATCH(up)-[:" + HAS_UNIT_PERMISSIONS + "]-(position:Position) WITH ag,position\n" +
+            "MATCH (position)-[:" + BELONGS_TO + "]-(s:Staff)\n" +
             "MATCH (s)-[:" + BELONGS_TO + "]-(ps:Position)  MATCH (ps)-[:" + HAS_UNIT_PERMISSIONS + "]-(unitP:UnitPermission)\n" +
             "MATCH (unitP)-[:" + HAS_ACCESS_GROUP + "]-(agp:AccessGroup) RETURN id(s) AS staffId, Collect(DISTINCT id(agp)) AS accessGroupIds")
     List<StaffAccessGroupQueryResult> getStaffIdsAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId);

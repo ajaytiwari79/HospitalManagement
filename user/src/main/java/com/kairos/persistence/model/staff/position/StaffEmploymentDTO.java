@@ -10,7 +10,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 public class StaffEmploymentDTO {
 
    private Staff staff;
-   private Long employmentStartDate;
+   private Long positionStartDate;
 
     public StaffEmploymentDTO() {
 
@@ -18,7 +18,7 @@ public class StaffEmploymentDTO {
 
     public StaffEmploymentDTO(Staff staff, Long startDateMillis ) {
         this.staff = staff;
-        this.employmentStartDate = startDateMillis;
+        this.positionStartDate = startDateMillis;
     }
     public Staff getStaff() {
         return staff;
@@ -28,12 +28,12 @@ public class StaffEmploymentDTO {
         this.staff = staff;
     }
 
-    public Long getEmploymentStartDate() {
-        return employmentStartDate;
+    public Long getPositionStartDate() {
+        return positionStartDate;
     }
 
-    public void setEmploymentStartDate(Long employmentStartDate) {
-        this.employmentStartDate = employmentStartDate;
+    public void setPositionStartDate(Long positionStartDate) {
+        this.positionStartDate = positionStartDate;
     }
 
 

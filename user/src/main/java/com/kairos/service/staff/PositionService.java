@@ -128,7 +128,7 @@ public class PositionService {
                 exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
             }
         }
-        Long employmentStartDate = DateUtils.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
+        Long positionStartDate = DateUtils.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
         objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
@@ -137,8 +137,8 @@ public class PositionService {
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffEmploymentDetail.getTimeCareExternalId());
         staffGraphRepository.save(objectToUpdate);
-        positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), employmentStartDate);
-        StaffEmploymentDTO staffEmploymentDTO = new StaffEmploymentDTO(objectToUpdate, employmentStartDate);
+        positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
+        StaffEmploymentDTO staffEmploymentDTO = new StaffEmploymentDTO(objectToUpdate, positionStartDate);
         return retrieveEmploymentDetails(staffEmploymentDTO);
     }
 
@@ -146,7 +146,7 @@ public class PositionService {
         Staff staff = staffEmploymentDTO.getStaff();
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
-        String employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateUtils.getDateFromEpoch(staffEmploymentDTO.getEmploymentStartDate()).toString() : null;
+        String employedSince = Optional.ofNullable(staffEmploymentDTO.getPositionStartDate()).isPresent() ? DateUtils.getDateFromEpoch(staffEmploymentDTO.getPositionStartDate()).toString() : null;
         map.put("employedSince", employedSince);
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());

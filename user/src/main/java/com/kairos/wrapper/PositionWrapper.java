@@ -14,15 +14,15 @@ public class PositionWrapper {
 
     private List<ClientMinimumDTO> relatedCitizens;
     private UnitPositionQueryResult unitPosition;
-    private PositionQueryResult employment;
+    private PositionQueryResult position;
 
 
-    public PositionQueryResult getEmployment() {
-        return employment;
+    public PositionQueryResult getPosition() {
+        return position;
     }
 
-    public void setEmployment(PositionQueryResult employment) {
-        this.employment = employment;
+    public void setPosition(PositionQueryResult position) {
+        this.position = position;
     }
 
 
@@ -34,9 +34,9 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public PositionWrapper(UnitPositionQueryResult unitPosition, PositionQueryResult employment) {
+    public PositionWrapper(UnitPositionQueryResult unitPosition, PositionQueryResult position) {
         this.unitPosition = unitPosition;
-        this.employment = employment;
+        this.position = position;
     }
 
     public List<ClientMinimumDTO> getRelatedCitizens() {

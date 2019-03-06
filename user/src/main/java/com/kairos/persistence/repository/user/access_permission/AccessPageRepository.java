@@ -208,14 +208,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             " RETURN DISTINCT true")
     Boolean updateAccessStatusOfCountryByCategory(Long tabId, Long countryId, String organizationCategory, Boolean accessStatus);
 
-    @Query("MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={0}\n" +
-            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit:Organization) WHERE id(unit)={1}\n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup)\n" +
-            "MATCH (module:AccessPage{isModule:true})-[:"+SUB_PAGE+"]->(subPage:AccessPage)\n" +
-            "OPTIONAL MATCH (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(module)\n" +
-            "OPTIONAL MATCH (subPage)<-[r2:"+HAS_ACCESS_OF_TABS+"]-(accessGroup) WITH {name:subPage.name,active:subPage.active,moduleId:subPage.moduleId,read:case when r2.isRead then r2.isRead else false end,write:case when r2.isWrite then r2.isWrite else false end,id:id(subPage)} as data,accessGroup,module,r,r2\n" +
-            "RETURN id(accessGroup) as accessGroupId,id(module) as id,module.name as name,module.isModule as module,module.active as active,case when r.isRead then r.isRead else false end as read,case when r.isWrite then r.isWrite else false end as write,module.moduleId as moduleId, collect(data) as tabPermissions")
-    List<StaffPermissionQueryResult> getAccessPermissionOfUserForUnit(Long userId, Long unitId);
 
     @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage as module\n" +
             "MATCH (module)-[:SUB_PAGE*]->(subPage:AccessPage) WITH module,subPage\n" +

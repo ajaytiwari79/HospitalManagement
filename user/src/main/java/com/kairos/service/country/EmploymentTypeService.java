@@ -187,7 +187,7 @@ public class EmploymentTypeService {
         if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {
-            logger.error("Position type settings could not be updated in organization " + unitId);
+            logger.error("Employment type settings could not be updated in organization " + unitId);
             exceptionService.internalServerError("error.employmentType.notBeupdated");
         }
         return null;

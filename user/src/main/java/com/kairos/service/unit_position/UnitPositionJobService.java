@@ -147,8 +147,8 @@ public class UnitPositionJobService {
         }
 
         Position position = positionGraphRepository.findByStaffId(staffId);
-        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
-                unit.getTimeZone());
+//        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
+//                unit.getTimeZone());
 
         position.setEndDateMillis(endDateMillis);
         positionGraphRepository.deletePositionReasonCodeRelation(staffId);
