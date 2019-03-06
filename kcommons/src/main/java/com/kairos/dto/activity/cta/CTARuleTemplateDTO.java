@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -25,13 +26,10 @@ import java.util.*;
 public class CTARuleTemplateDTO {
 
     private BigInteger id;
-    @NotEmpty(message = "error.cta.ruleTemplate.name.notEmpty")
-    @NotNull(message = "error.cta.ruleTemplate.name.notNull")
+    @NotBlank(message = "error.cta.ruleTemplate.name.notEmpty")
     private String name;
     private String description;
     private boolean disabled;
-    @NotNull
-    private BigInteger ruleTemplateCategory;
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -58,6 +56,7 @@ public class CTARuleTemplateDTO {
     private List<Long> dayTypeIds;
     private List<DayOfWeek> days;
     private List<LocalDate> publicHolidays;
+    @NotNull
     private BigInteger ruleTemplateCategoryId;
     private String ruleTemplateCategoryName;
     private UserInfo lastModifiedBy;
@@ -136,14 +135,6 @@ public class CTARuleTemplateDTO {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-
-    public BigInteger getRuleTemplateCategory() {
-        return ruleTemplateCategory;
-    }
-
-    public void setRuleTemplateCategory(BigInteger ruleTemplateCategory) {
-        this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
     public String getRuleTemplateType() {
@@ -317,15 +308,6 @@ public class CTARuleTemplateDTO {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public CTARuleTemplateDTO(String name, String description, String payrollType, String payrollSystem) {
-        this.name = name;
-        this.description = description;
-        this.ruleTemplateCategory = ruleTemplateCategory;
-        this.payrollType = payrollType;
-        this.payrollSystem = payrollSystem;
-
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -333,7 +315,6 @@ public class CTARuleTemplateDTO {
                 .append("name", name)
                 .append("description", description)
                 .append("disabled", disabled)
-                .append("ruleTemplateCategory", ruleTemplateCategory)
                 .append("ruleTemplateType", ruleTemplateType)
                 .append("payrollType", payrollType)
                 .append("payrollSystem", payrollSystem)

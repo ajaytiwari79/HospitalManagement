@@ -62,22 +62,6 @@ public class AppConstants {
     public static final String API_KMD_CARE_URL = "/api/v1/kmdNexus/citizen/unit/";
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/unit/{unitId}/time_slot_name";
 
-    public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
-
-    public static final String SCHEDULE = "SCHEDULE";
-    public static final String TIMING = "TIMING";
-    public static final String LEAVES = "LEAVES";
-
-
-    //URL
-    public static final String INDEX_PAGE = "index";
-    public static final String UNAUTH_PAGE = "user/401";
-
-    public static final String USER_PAGE = "user/user";
-    public static final String ADMIN_PAGE = "admin/admin";
-    public static final String LOGIN_PAGE = "auth/login";
-
-
     public static final String JAVA_MAIL_FILE = "classpath:java-mail.properties";
 
     public static final String HOST = "mail.server.host";
@@ -97,7 +81,6 @@ public class AppConstants {
     public static final String COUNTRY_ADMIN = "COUNTRY_ADMIN";
     public static final String AG_COUNTRY_ADMIN = "AG_COUNTRY_ADMIN";
 
-    public static final String KAIROS = "@kairos.com";
     public static final String IMAGES_PATH = "/opt/kairos/images";
     public static final String HAS_ACCESS_OF_TABS = "HAS_ACCESS_OF_TABS";
     public static final String ORGANIZATION = "organization";
@@ -106,7 +89,6 @@ public class AppConstants {
     public static final String ADMIN_EMAIL = "prabjot.singh@oodlestechnologies.com";
     public static final String ORGANIZATION_LABEL = "Organization";
     public static final String GROUP_LABEL = "Group";
-    public static final String TEAM_LABEL = "Team";
 
     //Kettle commands
     public static final String KETTLE_TRANS_STATUS = "/kettle/transStatus/?name=GetAllWorkShiftsByWorkPlaceId&xml=y";
@@ -159,6 +141,7 @@ public class AppConstants {
     public static final String SKILL_CATEGORY_FOR_TIME_CARE = "Skills From TimeCare";
     public static final int DB_RECORD_LIMIT = 100;
     public static final String KAIROS_EMAIL = "@kairos.com";
+    public static final String DEFAULT_PASSWORD_ENDS_WITH = "@kairos";
 
 
     // Default data to import employments from time care
@@ -223,7 +206,6 @@ public class AppConstants {
     public static final String UNIT_POSITION="unitPosition";
     public static final String UNIT_POSITION_ORGANIZATION_RELATIONSHIP="unitPositionOrgRel";
     public static final String UNIT_POSITION_STAFF_RELATIONSHIP="unitPositionStaffRel";
-    public static final String EMPLOYMENT="emp";
 
     //organization Hierarchy Filter constants
     public static final String ORGANIZATION_TYPES = "organizationType";
