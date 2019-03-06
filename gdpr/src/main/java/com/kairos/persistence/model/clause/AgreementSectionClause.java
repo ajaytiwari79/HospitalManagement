@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
-public class ClauseCkEditorVO {
+public class AgreementSectionClause {
 
     @NotNull(message = "error.message.id.notnull")
     private Long id;
@@ -55,7 +55,7 @@ public class ClauseCkEditorVO {
         this.tempClauseId = tempClauseId;
     }
 
-    public ClauseCkEditorVO(Long id, String titleHtml, String descriptionHtml, String description) {
+    public AgreementSectionClause(Long id, String titleHtml, String descriptionHtml, String description) {
         this.id = id;
         this.titleHtml = titleHtml;
         this.descriptionHtml = descriptionHtml;
@@ -86,6 +86,6 @@ public class ClauseCkEditorVO {
         this.deleted = deleted;
     }
 
-    public ClauseCkEditorVO() {
+    public AgreementSectionClause() {
     }
 }

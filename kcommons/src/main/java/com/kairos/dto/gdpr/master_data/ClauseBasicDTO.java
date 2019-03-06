@@ -47,11 +47,11 @@ public class ClauseBasicDTO {
     }
 
     public String getDescription() {
-        return description.trim();
+        return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description.trim();
     }
 
     public boolean isRequireUpdate() {

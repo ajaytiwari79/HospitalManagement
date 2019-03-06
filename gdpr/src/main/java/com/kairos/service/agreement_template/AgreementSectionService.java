@@ -101,7 +101,11 @@ public class AgreementSectionService{
 
     private void mapClauseIdToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList, Map<UUID,Long > clauseData){
         sectionDTOList.forEach( section -> {
-            section.getClauses().forEach( clause -> clause.setId(clauseData.get(clause.getTempClauseId())));
+            section.getClauses().forEach( clause -> {
+                if(clauseData.containsKey(clause.getTempClauseId())) {
+                    clause.setId(clauseData.get(clause.getTempClauseId()));
+                }
+            });
             mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(),clauseData);
         });
     }

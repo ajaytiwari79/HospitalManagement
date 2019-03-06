@@ -14,7 +14,7 @@ import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.clause.ClauseCkEditorVO;
+import com.kairos.persistence.model.clause.AgreementSectionClause;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepository;
@@ -287,7 +287,7 @@ public class PolicyAgreementTemplateService{
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
         List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
-        Map<BigInteger, ClauseCkEditorVO> clauseCkEditorVOMap = new HashMap<>();
+        Map<BigInteger, AgreementSectionClause> clauseCkEditorVOMap = new HashMap<>();
  /*       if (CollectionUtils.isNotEmpty(agreementSectionResponseDTO.getClauseCkEditorVOS())) {
             clauseCkEditorVOMap = agreementSectionResponseDTO.getClauseCkEditorVOS().stream().collect(Collectors.toMap(ClauseCkEditorVO::getId, clauseCkEditorVO -> clauseCkEditorVO));
         }
