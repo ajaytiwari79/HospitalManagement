@@ -4,6 +4,7 @@ import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO
 import com.kairos.enums.FilterType;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.ModuleId;
+import com.kairos.enums.UnitPosition;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -138,10 +139,16 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos,organization ";
-        }
-        else if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent() && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
+        } else if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent() && filters.get(FilterType.UNIT_POSITION).contains(UnitPosition.STAFF_WITH_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos,organization ";
+        } else if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent() && filters.get(FilterType.UNIT_POSITION).contains(UnitPosition.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
+            query += " MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]-(employment:Employment)-[:" + BELONGS_TO + "]-(staff:Staff) where id(organization)={parentOrganizationId} " +
+                    " MATCH(unit:Organization) WHERE id(unit)={unitId}" +
+                    " MATCH (staff) WHERE NOT (staff)-[:" + BELONGS_TO_STAFF + "]->(:UnitPosition)-[:" + IN_UNIT + "]-(unit)"+
+                    " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User)  " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
+                    " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition)" +
+                    " WITH user, staff, unitPos,organization ";
         } else {
             query += " MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]-(employment:Employment)-[:" + BELONGS_TO + "]-(staff:Staff) where id(organization)={parentOrganizationId} " +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User)  " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
