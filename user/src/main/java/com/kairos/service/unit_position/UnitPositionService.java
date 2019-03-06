@@ -105,7 +105,7 @@ import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPo
 @Service
 
 public class UnitPositionService {
-    private final Logger logger = LoggerFactory.getLogger(UnitPositionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnitPositionService.class);
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -198,7 +198,7 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", unitPositionDTO.getEmploymentTypeId());
         }
         List<FunctionWithAmountQueryResult> functions = findAndValidateFunction(unitPositionDTO);
-        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage(),unitPositionDTO.getAccumulatedTimebankMinutes());
+        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage(),unitPositionDTO.getAccumulatedTimebankMinutes(),unitPositionDTO.getAccumulatedTimebankDate());
 
         preparePosition(unitPosition, unitPositionDTO);
         if ((unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO, -1)) {
@@ -264,7 +264,7 @@ public class UnitPositionService {
                 if (unitPositionEndDate != null) {
                     Interval previousInterval = new Interval(DateUtils.getDateFromEpoch(unitPosition.getStartDate()), DateUtils.getDateFromEpoch(unitPosition.getEndDate()));
                     Interval interval = new Interval(DateUtils.getDateFromEpoch(unitPositionStartDate), DateUtils.getDateFromEpoch(unitPositionEndDate));
-                    logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
+                    LOGGER.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
                     if (previousInterval.overlaps(interval))
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
                 } else {
@@ -449,6 +449,7 @@ public class UnitPositionService {
         List<NameValuePair> changedParams = new ArrayList<>();
         oldUnitPosition.setPublished(!saveAsDraft);
         oldUnitPosition.setAccumulatedTimebankMinutes(unitPositionDTO.getAccumulatedTimebankMinutes());
+        oldUnitPosition.setAccumulatedTimebankDate(unitPositionDTO.getAccumulatedTimebankDate());
         oldUnitPosition.setTaxDeductionPercentage(unitPositionDTO.getTaxDeductionPercentage());
         PositionLineChangeResultDTO changeResultDTO = calculativeValueChanged(unitPositionDTO, positionLineEmploymentTypeRelationShip, currentUnitPositionLine, existingCtaWtaAndAccumulatedTimebankWrapper, changedParams);
         /**
@@ -772,7 +773,7 @@ public class UnitPositionService {
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
                 , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.isMainUnitPosition(),
-                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage(),unitPosition.getAccumulatedTimebankMinutes());
+                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage(),unitPosition.getAccumulatedTimebankMinutes(),unitPosition.getAccumulatedTimebankDate());
 
     }
 
@@ -901,7 +902,7 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.staff.expertise.notassigned");
         }
         Integer experienceInMonth = (int) ChronoUnit.MONTHS.between(DateUtils.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
-        logger.info("user has current experience in months :{}", experienceInMonth);
+        LOGGER.info("user has current experience in months :{}", experienceInMonth);
         SeniorityLevel appliedSeniorityLevel = null;
         for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {
             if (seniorityLevel.getTo() == null) {
@@ -912,7 +913,7 @@ public class UnitPositionService {
                 }
             } else {
                 // to and from is present
-                logger.info("user has current experience in months :{} ,{},{},{}", seniorityLevel.getFrom(), experienceInMonth, seniorityLevel.getTo(), experienceInMonth);
+                LOGGER.info("user has current experience in months :{} ,{},{},{}", seniorityLevel.getFrom(), experienceInMonth, seniorityLevel.getTo(), experienceInMonth);
 
                 if (seniorityLevel.getFrom() * 12 <= experienceInMonth && seniorityLevel.getTo() * 12 >= experienceInMonth) {
                     appliedSeniorityLevel = seniorityLevel;
