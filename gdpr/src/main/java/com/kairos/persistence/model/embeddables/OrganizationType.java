@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 public class OrganizationType {
 
 
-    //TODO pick message from property file
     @NotNull(message = "error.message.id.notnull")
     private Long id;
 

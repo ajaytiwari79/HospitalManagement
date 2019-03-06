@@ -151,7 +151,7 @@ public class PolicyAgreementTemplate extends BaseEntity {
     public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
 */
     public List<AgreementSection> getAgreementSections() {
-        return agreementSections.stream().filter(agreementSection -> agreementSection.isDeleted() == false).collect(Collectors.toList());
+        return agreementSections.stream().filter(agreementSection -> !agreementSection.isDeleted()).collect(Collectors.toList());
     }
 
     public void setAgreementSections(List<AgreementSection> agreementSections) {
