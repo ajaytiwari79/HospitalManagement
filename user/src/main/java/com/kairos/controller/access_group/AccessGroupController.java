@@ -1,5 +1,6 @@
 package com.kairos.controller.access_group;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.dto.user.access_permission.AccessGroupPermissionDTO;
@@ -66,6 +67,12 @@ public class AccessGroupController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessGroups(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupsForUnit(unitId));
+    }
+
+    @RequestMapping(value = UNIT_URL+"/access_group_by_role", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getManagementAccessGroups(@PathVariable long unitId, @RequestParam  AccessGroupRole role) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getOrganizationManagementAccessGroups(unitId,role));
     }
 
     @RequestMapping(value = UNIT_URL+"/staff/{staffId}/access_group", method = RequestMethod.POST)

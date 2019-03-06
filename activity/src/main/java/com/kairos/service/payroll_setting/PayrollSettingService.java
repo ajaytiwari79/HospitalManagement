@@ -5,7 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.payroll_setting.PayrollAccessGroupsDTO;
 import com.kairos.dto.activity.payroll_setting.PayrollPeriodDTO;
 import com.kairos.dto.activity.payroll_setting.PayrollSettingDTO;
-import com.kairos.enums.DurationType;
+import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.payroll_setting.PayrollAccessGroups;
 import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.payroll_setting.PayrollSetting;
@@ -19,10 +19,7 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,24 +35,22 @@ public class PayrollSettingService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public List<Integer> getLocalDatesOfPayrollPeriod(Long unitId) {
-        List<PayrollSetting> payrollSettings = payrollSettingMongoRepository.findAllByunitId(unitId);
-        return isCollectionNotEmpty(payrollSettings) ? payrollSettings.stream().distinct().map(payrollSetting -> payrollSetting.getPayrollPeriods().get(0).getStartDate().getYear()).collect(Collectors.toList()) : new ArrayList<>();
+    public PayrollSettingDTO getDefaultDataOfPayrollPeriod(Long unitId, PayrollFrequency payrollFrequency) {
+        List<PayrollSetting> payrollSettings = payrollSettingMongoRepository.findAllByunitIdAndFrequency(unitId, payrollFrequency);
+        return new PayrollSettingDTO(isCollectionNotEmpty(payrollSettings) ? (Set)payrollSettings.stream().flatMap(payrollSetting -> payrollSetting.getPayrollPeriods().stream().map(payrollPeriod -> payrollPeriod.getStartDate().getYear())).collect(Collectors.toSet()) : new HashSet<>());
     }
 
-    public List<PayrollSettingDTO> getPayrollPeriodByUnitIdAndDateAndDurationType(Long unitId, Integer year, DurationType durationType) {
-        return payrollSettingMongoRepository.findAllPayrollPeriodByStartDate(unitId, DateUtils.getFirstDayOfYear(year), durationType);
+    public List<PayrollSettingDTO> getPayrollPeriodByUnitIdAndDateAndDurationType(Long unitId, Integer year, PayrollFrequency payrollFrequency) {
+        return payrollSettingMongoRepository.getPayrollPeriodByYearAndPayrollFrequency(unitId, payrollFrequency, DateUtils.getFirstDayOfYear(year), DateUtils.getlastDayOfYear(year));
 
     }
 
     public PayrollSettingDTO createPayrollPeriod(PayrollSettingDTO payrollSettingDTO, Long unitId) {
         List<PayrollSetting> payrollSettings = new ArrayList<>();
-        if (!validateStartDateForpayrollPeriodCreation(payrollSettingDTO.getStartDate(), payrollSettingDTO.getDurationType())) {
+        if (!validateStartDateForpayrollPeriodCreation(payrollSettingDTO.getStartDate(), payrollSettingDTO.getPayrollFrequency())) {
             exceptionService.actionNotPermittedException("error.payroll.period.start.date.invalid");
         }
-        if (Optional.ofNullable(payrollSettingMongoRepository.findPayrollPeriodByStartDate(unitId, payrollSettingDTO.getStartDate())).isPresent()) {
-            exceptionService.actionNotPermittedException("message.payroll.period.date.alreadyexists");
-        }
+        payrollSettingMongoRepository.findAndDeletePayrollPeriodByStartDate(unitId, payrollSettingDTO.getStartDate());
         List<LocalDate> payrollStartDates = new ArrayList<>();
         payrollStartDates.add(payrollSettingDTO.getStartDate());
         if (payrollSettingDTO.getStartDate().plusYears(1).isAfter(DateUtils.getlastDayOfYear(payrollSettingDTO.getStartDate().getYear()))) {
@@ -66,18 +61,17 @@ public class PayrollSettingService extends MongoBaseService {
             payrollPeriods = new ArrayList<>();
             LocalDate payrollEndDate = (payrollStartDate.isBefore(DateUtils.getlastDayOfYear(payrollSettingDTO.getStartDate().getYear())) ? DateUtils.getlastDayOfYear(payrollSettingDTO.getStartDate().getYear()) : payrollSettingDTO.getStartDate().plusYears(1));
             while (payrollStartDate.isBefore(payrollEndDate)) {
-                payrollPeriods.add(new PayrollPeriod(payrollStartDate, getNextStartDate(payrollStartDate, payrollSettingDTO.getDurationType()).minusDays(1)));
-                payrollStartDate = getNextStartDate(payrollStartDate, payrollSettingDTO.getDurationType());
+                payrollPeriods.add(new PayrollPeriod(payrollStartDate, getNextStartDate(payrollStartDate, payrollSettingDTO.getPayrollFrequency()).minusDays(1)));
+                payrollStartDate = getNextStartDate(payrollStartDate, payrollSettingDTO.getPayrollFrequency());
             }
-            payrollSettings.add(new PayrollSetting(false, unitId, payrollPeriods, payrollSettingDTO.getDurationType()));
+            payrollSettings.add(new PayrollSetting(false, unitId, payrollPeriods, payrollSettingDTO.getPayrollFrequency()));
         }
         payrollSettingMongoRepository.saveEntities(payrollSettings);
         return ObjectMapperUtils.copyPropertiesByMapper(payrollSettings.get(0), PayrollSettingDTO.class);
     }
 
     public boolean deleteDraftPayrollPeriod(PayrollSettingDTO payrollSettingDTO, Long unitId) {
-        Long delete = payrollSettingMongoRepository.removeDraftpayrollPeriod(unitId, payrollSettingDTO.getId());
-        return delete > 0;
+        return payrollSettingMongoRepository.removeDraftpayrollPeriod(unitId, payrollSettingDTO.getId()) > 0;
 
     }
 
@@ -120,7 +114,7 @@ public class PayrollSettingService extends MongoBaseService {
             if (startDateAndPayrollPeriodMap.containsKey(payrollStartDate) && !startDateAndDraftPayrollPeriodMap.containsKey(payrollStartDate)) {
                 newPayrollSetting.getPayrollPeriods().add(startDateAndPayrollPeriodMap.get(payrollStartDate));
             }
-            payrollStartDate = getNextStartDate(payrollStartDate, payrollSettingDTO.getDurationType());
+            payrollStartDate = getNextStartDate(payrollStartDate, payrollSettingDTO.getPayrollFrequency());
         }
         return newPayrollSetting;
     }
@@ -143,13 +137,13 @@ public class PayrollSettingService extends MongoBaseService {
         newPayrollSetting.setPublished(payrollSettingDTO.isPublished());
         newPayrollSetting.setUnitId(unitId);
         newPayrollSetting.setParentPayrollId(payrollSettingDTO.getParentPayrollId());
-        newPayrollSetting.setDurationType(payrollSettingDTO.getDurationType());
+        newPayrollSetting.setPayrollFrequency(payrollSettingDTO.getPayrollFrequency());
         LocalDate payrollStartDate = payrollSettingDTO.getStartDate();
         while (payrollStartDate.isBefore(payrollSettingDTO.getEndDate())) {
             if (startDateAndPayrollPeriodMap.containsKey(payrollStartDate)) {
                 payrollPeriods.add(startDateAndPayrollPeriodMap.get(payrollStartDate));
             }
-            payrollStartDate = getNextStartDate(payrollStartDate, payrollSettingDTO.getDurationType());
+            payrollStartDate = getNextStartDate(payrollStartDate, payrollSettingDTO.getPayrollFrequency());
         }
         newPayrollSetting.setPayrollPeriods(payrollPeriods);
         newPayrollSetting.setAccessGroupsPriority(payrollSetting.getAccessGroupsPriority());
@@ -180,12 +174,12 @@ public class PayrollSettingService extends MongoBaseService {
         return sumOfGracePeriod == daysTillDeadlineDate;
     }
 
-    private LocalDate getNextStartDate(LocalDate oldDate, DurationType durationType) {
-        return DurationType.MONTHS.equals(durationType) ? oldDate.plusMonths(1) : oldDate.plusWeeks(2);
+    private LocalDate getNextStartDate(LocalDate oldDate, PayrollFrequency payrollFrequency) {
+        return PayrollFrequency.MONTHLY.equals(payrollFrequency) ? oldDate.plusMonths(1) : oldDate.plusWeeks(2);
     }
 
-    private boolean validateStartDateForpayrollPeriodCreation(LocalDate startDate, DurationType durationType) {
-        if (durationType.equals(DurationType.WEEKS)) {
+    private boolean validateStartDateForpayrollPeriodCreation(LocalDate startDate, PayrollFrequency payrollFrequency) {
+        if (payrollFrequency.equals(PayrollFrequency.FORTNIGHTLY)) {
             return startDate.getDayOfWeek().equals(DayOfWeek.MONDAY);
         } else {
             return startDate.equals(startDate.withDayOfMonth(1));

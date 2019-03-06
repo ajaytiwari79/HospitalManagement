@@ -868,8 +868,8 @@ public class AccessGroupService {
     }
 
     // Method to fetch list of Management access group of Organization
-    public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId) {
-        return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, AccessGroupRole.MANAGEMENT.toString());
+    public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId,AccessGroupRole role) {
+        return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, role.toString());
     }
 
     public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {

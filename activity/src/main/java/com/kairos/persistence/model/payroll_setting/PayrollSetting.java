@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.payroll_setting;
 
 import com.kairos.enums.DurationType;
+import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -11,18 +12,18 @@ public class PayrollSetting extends MongoBaseEntity {
     private Long unitId;
     private BigInteger parentPayrollId;
     private List<PayrollPeriod> payrollPeriods;
-    private DurationType durationType;
+    private PayrollFrequency payrollFrequency;
     private List<PayrollAccessGroups> accessGroupsPriority;
 
 
     public PayrollSetting() {
     }
 
-    public PayrollSetting(boolean published, Long unitId, List<PayrollPeriod> payrollPeriods, DurationType durationType) {
+    public PayrollSetting(boolean published, Long unitId, List<PayrollPeriod> payrollPeriods, PayrollFrequency payrollFrequency) {
         this.published = published;
         this.unitId = unitId;
         this.payrollPeriods = payrollPeriods;
-        this.durationType = durationType;
+        this.payrollFrequency = payrollFrequency;
     }
 
     public boolean isPublished() {
@@ -49,12 +50,12 @@ public class PayrollSetting extends MongoBaseEntity {
         this.payrollPeriods = payrollPeriods;
     }
 
-    public DurationType getDurationType() {
-        return durationType;
+    public PayrollFrequency getPayrollFrequency() {
+        return payrollFrequency;
     }
 
-    public void setDurationType(DurationType durationType) {
-        this.durationType = durationType;
+    public void setPayrollFrequency(PayrollFrequency payrollFrequency) {
+        this.payrollFrequency = payrollFrequency;
     }
 
     public List<PayrollAccessGroups> getAccessGroupsPriority() {

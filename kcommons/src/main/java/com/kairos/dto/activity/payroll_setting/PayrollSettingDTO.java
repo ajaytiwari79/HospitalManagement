@@ -1,11 +1,19 @@
 package com.kairos.dto.activity.payroll_setting;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.payroll_setting.PayrollFrequency;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PayrollSettingDTO {
     private BigInteger id;
     // use when break table
@@ -16,7 +24,16 @@ public class PayrollSettingDTO {
     private LocalDate endDate;
     private List<PayrollPeriodDTO> payrollPeriods;
     private List<PayrollAccessGroupsDTO> accessGroupsPriority;
-    private DurationType durationType;
+    private PayrollFrequency payrollFrequency;
+     // for use send default data
+    private Set<Integer> years;
+
+    public PayrollSettingDTO() {
+    }
+
+    public PayrollSettingDTO(Set<Integer> years) {
+        this.years = years;
+    }
 
     public BigInteger getId() {
         return id;
@@ -47,16 +64,12 @@ public class PayrollSettingDTO {
     }
 
     public void setPayrollPeriods(List<PayrollPeriodDTO> payrollPeriods) {
+        if (isCollectionNotEmpty(payrollPeriods)) {
+            payrollPeriods = payrollPeriods.stream().filter(payrollPeriod -> Optional.ofNullable(payrollPeriod.getStartDate()).isPresent()).sorted((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate())).collect(Collectors.toList());
+        }
         this.payrollPeriods = payrollPeriods;
     }
 
-    public DurationType getDurationType() {
-        return durationType;
-    }
-
-    public void setDurationType(DurationType durationType) {
-        this.durationType = durationType;
-    }
 
     public LocalDate getStartDate() {
         return startDate;
@@ -89,4 +102,23 @@ public class PayrollSettingDTO {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+
+
+    public PayrollFrequency getPayrollFrequency() {
+        return payrollFrequency;
+    }
+
+    public void setPayrollFrequency(PayrollFrequency payrollFrequency) {
+        this.payrollFrequency = payrollFrequency;
+    }
+
+    public Set<Integer> getYears() {
+        return years;
+    }
+
+    public void setYears(Set<Integer> years) {
+        this.years = years;
+    }
+
+
 }
