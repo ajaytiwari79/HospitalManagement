@@ -24,6 +24,8 @@ public class TimeTypeDTO {
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
     private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
+    private boolean partOfTeam;
+    private boolean allowChildActivities;
 
     public TimeTypeDTO() {
     }
@@ -130,5 +132,21 @@ public class TimeTypeDTO {
 
     public void setActivityCanBeCopiedForOrganizationHierarchy(Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
+    }
+
+    public boolean isPartOfTeam() {
+        return partOfTeam;
+    }
+
+    public void setPartOfTeam(boolean partOfTeam) {
+        this.partOfTeam = partOfTeam;
+    }
+
+    public boolean isAllowChildActivities() {
+        return allowChildActivities;
+    }
+
+    public void setAllowChildActivities(boolean allowChildActivities) {
+        this.allowChildActivities = allowChildActivities;
     }
 }

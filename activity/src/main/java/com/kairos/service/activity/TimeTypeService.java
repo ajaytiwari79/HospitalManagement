@@ -89,6 +89,8 @@ public class TimeTypeService extends MongoBaseService {
             timeType.setLabel(timeTypeDTO.getLabel());
             timeType.setDescription(timeTypeDTO.getDescription());
             timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+            timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+            timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
 
             Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
