@@ -570,12 +570,8 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) throws Exception {
-
-        String employmentEndDate = positionDTO.getEndDate();//(String)employmentDetail.get("endDate");
-        Long reasonCodeId = positionDTO.getReasonCodeId();
-        Long accessGroupId = positionDTO.getAccessGroupIdOnPositionEnd();
-        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, unitId,employmentEndDate, reasonCodeId, accessGroupId);
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) {
+        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, unitId,positionDTO);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

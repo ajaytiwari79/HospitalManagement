@@ -2,6 +2,7 @@ package com.kairos.service.unit_position;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -124,18 +125,18 @@ public class UnitPositionJobService {
         // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, Long unitId,String employmentEndDate, Long reasonCodeId, Long accessGroupId) {
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, Long unitId,PositionDTO positionDTO) {
         Organization unit=organizationGraphRepository.findOne(unitId);
-        Long endDateMillis = DateUtils.getIsoDateInLong(employmentEndDate);
+        Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
         String unitPositionStartDateMax=unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
         if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(unitPositionStartDateMax))) {
             exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", unitPositionStartDateMax);
 
         }
         List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
-        Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(reasonCodeId, 0);
+        Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(positionDTO.getReasonCodeId(), 0);
         if (!reasonCode.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", reasonCodeId);
+            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
         }
 
         for (UnitPosition unitPosition : unitPositions) {
@@ -153,7 +154,7 @@ public class UnitPositionJobService {
         positionGraphRepository.deletePositionReasonCodeRelation(staffId);
 
         position.setReasonCode(reasonCode.get());
-        position.setAccessGroupIdOnPositionEnd(accessGroupId);
+        position.setAccessGroupIdOnPositionEnd(positionDTO.getAccessGroupIdOnPositionEnd());
         unitPositionGraphRepository.saveAll(unitPositions);
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
