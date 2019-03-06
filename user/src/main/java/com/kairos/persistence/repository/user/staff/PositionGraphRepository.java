@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.staff.position.EmploymentReasonCodeQueryResult;
-import com.kairos.persistence.model.staff.position.ExpiredEmploymentsQueryResult;
+import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
+import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -40,11 +40,11 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "MATCH(position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) RETURN position, \n" +
             "CASE WHEN org IS NOT NULL THEN COLLECT( DISTINCT org) else[] end AS organizations, \n" +
             "CASE WHEN unitPermission is NOT null THEN COLLECT(DISTINCT unitPermission) else[] end AS unitPermissions")
-    List<ExpiredEmploymentsQueryResult> findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(List<Long> positionIds);
+    List<ExpiredPositionsQueryResult> findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(List<Long> positionIds);
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} " +
             "OPTIONAL MATCH(position)-[:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode)  RETURN position, reasonCode")
-    EmploymentReasonCodeQueryResult findEmploymentreasonCodeByStaff(Long staffId);
+    PositionReasonCodeQueryResult findEmploymentreasonCodeByStaff(Long staffId);
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} RETURN position")
     Position findByStaffId(Long staffId);

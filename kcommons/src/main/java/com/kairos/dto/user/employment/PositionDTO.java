@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
  * Created by yatharth on 19/4/18.
  */
 
-public class EmploymentDTO {
+public class PositionDTO {
     @NotNull
     private String endDate;
     private Long reasonCodeId;

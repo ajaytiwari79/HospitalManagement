@@ -7,6 +7,7 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.position.PositionQueryResult;
 import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
@@ -123,7 +124,8 @@ public class UnitPositionJobService {
         // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long reasonCodeId, Long accessGroupId) {
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, Long unitId,String employmentEndDate, Long reasonCodeId, Long accessGroupId) {
+        Organization unit=organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtils.getIsoDateInLong(employmentEndDate);
         String unitPositionStartDateMax=unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
         if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(unitPositionStartDateMax))) {
@@ -144,8 +146,8 @@ public class UnitPositionJobService {
         }
 
         Position position = positionGraphRepository.findByStaffId(staffId);
-//        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
-//                unit.getTimeZone());
+        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
+                unit.getTimeZone());
 
         position.setEndDateMillis(endDateMillis);
         positionGraphRepository.deletePositionReasonCodeRelation(staffId);

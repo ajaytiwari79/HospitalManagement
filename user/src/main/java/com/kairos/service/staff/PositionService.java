@@ -31,8 +31,6 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
@@ -43,10 +41,7 @@ import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.DateConverter;
 import org.apache.http.NameValuePair;
@@ -89,13 +84,7 @@ public class PositionService {
     @Inject
     private AccessGroupRepository accessGroupRepository;
     @Inject
-    private AccessPermissionGraphRepository accessPermissionGraphRepository;
-    @Inject
-    private AccessPageRepository accessPageRepository;
-    @Inject
     private AccessGroupService accessGroupService;
-    @Inject
-    private Scheduler scheduler;
     @Inject
     private AccessPageService accessPageService;
     @Inject
@@ -111,8 +100,6 @@ public class PositionService {
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
-    private StaffService staffService;
-    @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -123,13 +110,9 @@ public class PositionService {
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
-    private UserToSchedulerQueueService userToSchedulerQueueService;
-    @Inject
     private GenericRestClient genericRestClient;
-    @Inject
-    private OrganizationService organizationService;
 
-    private static final Logger logger = LoggerFactory.getLogger(PositionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PositionService.class);
 
     public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail){
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
@@ -226,7 +209,7 @@ public class PositionService {
             unitPermission.setAccessGroup(accessGroup);
             position.getUnitPermissions().add(unitPermission);
             positionGraphRepository.save(position);
-            logger.info(unitPermission.getId() + " Currently created Unit Permission ");
+            LOGGER.info(unitPermission.getId() + " Currently created Unit Permission ");
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
@@ -558,26 +541,22 @@ public class PositionService {
     public boolean moveToReadOnlyAccessGroup(List<Long> positionIds) {
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
-        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
+        List<ExpiredPositionsQueryResult> expiredPositionsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
         accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(positionIds);
 
         List<Organization> organizations;
-        List<Position> positions = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Position>();
-        int currentElement;
+        List<Position> positions = new ArrayList<>();
         Position position;
 
-        for (ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult : expiredEmploymentsQueryResults) {
-            organizations = expiredEmploymentsQueryResult.getOrganizations();
-            position = expiredEmploymentsQueryResult.getPosition();
-            unitPermissions = expiredEmploymentsQueryResult.getUnitPermissions();
-            currentElement = 0;
+        for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
+            organizations = expiredPositionsQueryResult.getOrganizations();
+            position = expiredPositionsQueryResult.getPosition();
+            unitPermissions = expiredPositionsQueryResult.getUnitPermissions();
             List<Long> orgIds = organizations.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
             accessGroupRepository.createAccessGroupUnitRelation(orgIds, position.getAccessGroupIdOnPositionEnd());
             AccessGroup accessGroupDB = accessGroupRepository.findById(position.getAccessGroupIdOnPositionEnd()).get();
-
-
-            for (Organization organziation : expiredEmploymentsQueryResult.getOrganizations()) {
+            for (int currentElement = 0; currentElement< expiredPositionsQueryResult.getOrganizations().size(); currentElement++) {
                 unitPermission = unitPermissions.get(currentElement);
                 if (!Optional.ofNullable(unitPermission).isPresent()) {
                     unitPermission = new UnitPermission();
@@ -591,7 +570,7 @@ public class PositionService {
             position.setEmploymentStatus(EmploymentStatus.FORMER);
             positions.add(position);
         }
-        if (expiredEmploymentsQueryResults.size() > 0) {
+        if (expiredPositionsQueryResults.size() > 0) {
             positionGraphRepository.saveAll(positions);
         }
         return true;
@@ -660,7 +639,7 @@ public class PositionService {
         }
         positionGraphRepository.save(position);
 
-        EmploymentReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
+        PositionReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
         position.setReasonCode(employmentReasonCode.getReasonCode());
 
         return position;

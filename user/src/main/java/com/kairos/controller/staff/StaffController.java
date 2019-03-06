@@ -15,12 +15,12 @@ import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
 import com.kairos.service.unit_position.UnitPositionJobService;
-import com.kairos.dto.user.employment.EmploymentDTO;
+import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.wrapper.staff.StaffEmploymentWrapper;
+import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -570,12 +570,12 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws Exception {
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) throws Exception {
 
-        String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
-        Long reasonCodeId = employmentDTO.getReasonCodeId();
-        Long accessGroupId = employmentDTO.getAccessGroupIdOnPositionEnd();
-        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, employmentEndDate, reasonCodeId, accessGroupId);
+        String employmentEndDate = positionDTO.getEndDate();//(String)employmentDetail.get("endDate");
+        Long reasonCodeId = positionDTO.getReasonCodeId();
+        Long accessGroupId = positionDTO.getAccessGroupIdOnPositionEnd();
+        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, unitId,employmentEndDate, reasonCodeId, accessGroupId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -644,7 +644,7 @@ public class StaffController {
     @RequestMapping(value = "/staff_list/chat", method = RequestMethod.GET)
     @ApiOperation("Get All staff List with login user staff id for chat purpose")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<ResponseDTO<StaffEmploymentWrapper>> getAllStaffListAndLoginUserStaffIdByUnitIdForChat(@PathVariable long unitId) {
+    public ResponseEntity<ResponseDTO<StaffEmploymentTypeWrapper>> getAllStaffListAndLoginUserStaffIdByUnitIdForChat(@PathVariable long unitId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, staffService.getStaffListAndLoginUserStaffIdByUnitId(unitId));
     }
 

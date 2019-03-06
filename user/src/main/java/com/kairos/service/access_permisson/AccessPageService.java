@@ -51,11 +51,11 @@ public class AccessPageService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    AccessPageRepository accessPageRepository;
+    private AccessPageRepository accessPageRepository;
     @Inject
-    AccessPermissionGraphRepository accessPermissionGraphRepository;
+    private AccessPermissionGraphRepository accessPermissionGraphRepository;
     @Inject
-    EmploymentPageGraphRepository employmentPageGraphRepository;
+    private EmploymentPageGraphRepository employmentPageGraphRepository;
     @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject
@@ -69,9 +69,9 @@ public class AccessPageService {
     @Inject
     private AccessPageCustomIdRepository accessPageCustomIdRepository;
     @Inject
-    UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
-    UserGraphRepository userGraphRepository;
+    private UserGraphRepository userGraphRepository;
     @Inject private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -154,7 +154,6 @@ public class AccessPageService {
             accessPages.add(accessPage);
         }
         accessPageRepository.saveAll(accessPages);
-        //setPermissionToAccessPage();
     }
 
     public void setPermissionToAccessPage(){
@@ -209,89 +208,6 @@ public class AccessPageService {
         return (isModule ? AppConstants.MODULE_ID_PRFIX : AppConstants.TAB_ID_PRFIX)+(Optional.ofNullable(lastTabIdNumber).isPresent() ? String.valueOf(lastTabIdNumber+1) : "1");
     }
 
-    /*private synchronized String getTabId(Boolean isModule){
-
-        AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
-        if(!Optional.ofNullable(accessPageCustomId).isPresent()){
-            logger.error("AccessPageCustomId collection is not present");
-            exceptionService.internalServerError("error.accessPage.customId.notPresent");
-
-        }
-        String content[];
-        String tabId = null;
-        if(isModule){
-            content = accessPageCustomId.getModuleId().split("_");
-            if(content.length>0){
-                int id = Integer.parseInt(content[1]);
-                id+=1;
-                tabId = "module_" + id;
-                accessPageCustomId.setModuleId(tabId);
-            }
-        } else {
-            content = accessPageCustomId.getTabId().split("_");
-            if(content.length>0){
-                int id = Integer.parseInt(content[1]);
-                id+=1;
-                tabId = "tab_" + id;
-                accessPageCustomId.setTabId(tabId);
-            }
-        }
-        if(!Optional.ofNullable(tabId).isPresent()){
-            exceptionService.internalServerError("error.tabId.notPresent");
-
-        }
-        save(accessPageCustomId);
-        return tabId;
-    }*/
-
-    // TODO Uncomment and integrate
-    /*public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long organizationId, Long userId){
-        List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,organizationId);
-        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupIdOnPositionEnd));
-        Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
-        Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
-        List<StaffPermissionQueryResult> allPermissions = new ArrayList<>();
-        while (iterator.hasNext()){
-            allPermissions.addAll(iterator.next().getValue());
-        }
-        return preparePermissionList(allPermissions);
-    }*/
-
-    public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long userId){
-        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(userId, AppConstants.AG_COUNTRY_ADMIN);
-        return (isCountryAdmin) ? getPermissionForHubMember() : null;
-    }
-
-    public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long parentOrganizationId,Organization newUnit,Long userId){
-        Organization parentOrganization = organizationGraphRepository.findOne(parentOrganizationId);
-        if(isHubMember(userId)){
-            return getPermissionForHubMember();
-        }
-        List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,parentOrganizationId);
-        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupId));
-        Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
-        Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
-        List<StaffPermissionQueryResult> allPermissions = new ArrayList<>();
-        while (iterator.hasNext()){
-            allPermissions.addAll(iterator.next().getValue());
-        }
-//        createEmploymentWithNewOrganization(newUnit,userId,permissionByAccessGroup,parentOrganizationId);
-        return preparePermissionList(allPermissions);
-    }
-
-    private List<StaffPermissionDTO> preparePermissionList(List<StaffPermissionQueryResult> permissionsOfAllRole){
-        List<StaffPermissionDTO> permissions = new ArrayList<>();
-        List<String> processedModuleIds = new ArrayList<>();
-        for(StaffPermissionQueryResult staffPermission : permissionsOfAllRole){
-            if(!processedModuleIds.contains(staffPermission.getModuleId())){
-                List<StaffPermissionQueryResult> modules = permissionsOfAllRole.stream().filter(module->module.getModuleId().equals(
-                        staffPermission.getModuleId())).collect(Collectors.toList());
-                permissions.add(getUnionOfPermissions(modules));
-                processedModuleIds.add(staffPermission.getModuleId());
-            }
-        }
-        return permissions;
-    }
 
     private StaffPermissionDTO getUnionOfPermissions(List<StaffPermissionQueryResult> modules){
         StaffPermissionDTO moduleToReturn = null;
@@ -323,65 +239,6 @@ public class AccessPageService {
         return tabPermissionToProceed.values().stream().collect(Collectors.toList());
     }
 
-    private void createEmploymentWithNewOrganization(Organization organization,Long userId,
-                                                     Map<Long,List<StaffPermissionQueryResult>> accessPermissionByGroup,Long parentOrganizationId){
-
-        Staff staff;
-        Position position;
-        if(organization.isParentOrganization()){
-            CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
-            staff = new Staff();
-            staff.setFirstName(currentUserDetails.getFirstName());
-            staff.setLastName(currentUserDetails.getLastName());
-            staff.setEmail(currentUserDetails.getEmail());
-            position = new Position();
-            position.setStaff(staff);
-            User user = userGraphRepository.findOne(userId);
-            staff.setUser(user);
-        } else {
-            staff = staffGraphRepository.getStaffByUserId(userId,parentOrganizationId);
-            position = positionGraphRepository.findPosition(parentOrganizationId,staff.getId());
-        }
-        UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(organization);
-        position.getUnitPermissions().add(unitPermission);
-
-        Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = accessPermissionByGroup.entrySet();
-        Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>();
-        List<UnitEmpAccessRelationship> unitEmpAccessRelationships = new ArrayList<>();
-        while (iterator.hasNext()){
-            Map.Entry<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = iterator.next();
-            AccessGroup accessGroup = accessGroupRepository.findOne(permissionByAccessGroup.getKey());
-            AccessPermission accessPermission = new AccessPermission(accessGroup);
-            for(StaffPermissionQueryResult staffPermissionQueryResult : permissionByAccessGroup.getValue()){
-                AccessPage accessPage = objectMapper.convertValue(staffPermissionQueryResult,AccessPage.class);
-                accessPage.setModule(staffPermissionQueryResult.isModule());
-                EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation
-                        (accessPermission,accessPage,staffPermissionQueryResult.isRead(),staffPermissionQueryResult.isWrite());
-                employmentAccessPageRelations.add(employmentAccessPageRelation);
-                for(Map<String,Object> staffTabPermission : staffPermissionQueryResult.getTabPermissions()){
-                    AccessPage subPage = objectMapper.convertValue(staffTabPermission,AccessPage.class);
-                    subPage.setModule(false);
-                    EmploymentAccessPageRelation employmentAccessSubPageRelation = new EmploymentAccessPageRelation(accessPermission,subPage,
-                            staffPermissionQueryResult.isRead(),staffPermissionQueryResult.isWrite());
-                    employmentAccessPageRelations.add(employmentAccessSubPageRelation);
-                }
-            }
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission,accessPermission);
-            unitEmpAccessRelationships.add(unitEmpAccessRelationship);
-        }
-        if(organization.isParentOrganization()){
-            organization.getPositions().add(position);
-            organizationGraphRepository.save(organization);
-        } else {
-            position.getUnitPermissions().add(unitPermission);
-            positionGraphRepository.save(position);
-        }
-        unitEmpAccessGraphRepository.saveAll(unitEmpAccessRelationships);
-        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
-    }
 
     private List<StaffPermissionDTO> getPermissionForHubMember(){
         List<StaffPermissionQueryResult> staffPermissionQueryResults = accessPageRepository.getTabsPermissionForHubUserForUnit();
@@ -401,9 +258,9 @@ public class AccessPageService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId){
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForCountry(countryId);
-        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
-        return kpiTabs;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
     }
+
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
         Long userId=UserContext.getUserDetails().getId();
         if(accessPageRepository.isHubMember(userId)){
@@ -423,8 +280,7 @@ public class AccessPageService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
-        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
-        return kpiTabs;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
     }
 
     public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){

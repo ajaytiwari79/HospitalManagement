@@ -138,26 +138,16 @@ public class TaskService extends MongoBaseService {
     private TaskDemandMongoRepository taskDemandMongoRepository;
     @Inject
     private MongoTemplate mongoTemplate;
-
     @Inject
     private Scheduler scheduler;
     @Inject
     private TaskTypeService taskTypeService;
-
-    @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
-    private TaskMongoRepositoryImpl taskMongoRepositoryImpl;
-    @Inject
-    private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
     @Inject
     private UserIntegrationService userIntegrationService;
-
     @Inject
     private EnvConfig envConfig;
     @Inject
     private TasksMergingService tasksMergingService;
-
     @Inject
     private ClientExceptionMongoRepository clientExceptionMongoRepository;
     @Inject
@@ -166,11 +156,7 @@ public class TaskService extends MongoBaseService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject private TimeBankService timeBankService;
     @Inject
-    private TimeBankCalculationService timeBankCalculationService;
-    @Inject
     private PayOutService payOutService;
-    @Inject
-    private PayOutCalculationService payOutCalculationService;
     @Inject
     private ExceptionService exceptionService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
@@ -181,9 +167,6 @@ public class TaskService extends MongoBaseService {
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
         List response = new ArrayList();
-
-
-//        String query  = "db.tasks.aggregate([{$match:{'citizenId':3439 , 'unitId': 136}},{$lookup:{from:'task_types',localField:'taskTypeId', foreignField:'_id', as:'taskTypes'}},{$unwind:'$taskTypes'},{$group:{_id:null, taskTypesList:{$addToSet:'$taskTypes.subServiceId'}}}]).pretty()\n";
 
         String matchStaffId = " {'$match':{'citizenId' :" + clientId + " , 'unitId': " + orgId + " }  }";
         String lookup = "{'$lookup':{'from':'task_types','localField':'taskTypeId','foreignField':'_id','as':'taskTypes'}}";
@@ -225,7 +208,6 @@ public class TaskService extends MongoBaseService {
         logger.info("Fetching tasks for Service: " + serviceId);
         List<Long> serviceIds = new ArrayList<>();
         List<Object> response = new ArrayList<>();
-        Map<String, String> taskMap = null;
         serviceIds.add(serviceId);
         LocalDate upcomingMonday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         LocalDate fourWeekLater = upcomingMonday.plusDays(28);
@@ -285,91 +267,10 @@ public class TaskService extends MongoBaseService {
                 response.addAll(taskList);
             }
         }
-
-/*        logger.info("Preparing response..");
-        Date startDate = null;
-        Date endDate = null;
-        for (Map data: mappedResult) {
-            logger.debug("Data: "+data);
-            List<Task> taskList = (List<Task>) data.get("taskl");
-            if (taskList!=null){
-                for (Task task:taskList) {
-                    taskMap = new HashMap<>();
-                    // name
-                    // description
-                    // Delivered by
-                    // TaskType
-                    if(task!=null){
-                        taskMap.put( "name", task.getName());
-                        taskMap.put( "status", task.getStatus().value);
-                        taskMap.put( "priority", String.valueOf(task.getPriority()));
-                        if(task.getDateFrom() != null && task.getTimeFrom() != null){
-                            startDate = task.getDateFrom();
-                            startDate.setHours(task.getTimeFrom().getHours());
-                            startDate.setMinutes(task.getTimeFrom().getMinutes());
-                            startDate.setSeconds(task.getTimeFrom().getSeconds());
-                        }
-                        if(task.getDateTo() != null && task.getTimeTo() != null){
-                            endDate = task.getDateTo();
-                            endDate.setHours(task.getTimeTo().getHours());
-                            endDate.setMinutes(task.getTimeTo().getMinutes());
-                            endDate.setSeconds(task.getTimeTo().getSeconds());
-                        }
-                        taskMap.put( "startDate",startDate!=null ? startDate.toString() : null);
-                        taskMap.put( "endDate",endDate!=null ? endDate.toString(): null);
-                        taskMap.put( "supplier", organization.getName());
-                        taskMap.put( "info1", task.getInfo1());
-                        taskMap.put( "info2", task.getInfo2());
-                        response.add(taskMap);
-                    }
-                }
-            }
-        }*/
         return response;
     }
 
-    public List<Task> getTaskByDates(long clientId, DateTime date, Long unitId) {
-        logger.info("Fetching tasks for Date: " + date);
 
-        Date dateStart = DateUtils.getStartOfDay(date.toDateTime(DateTimeZone.UTC).toDate());
-        Date dateEnd = DateUtils.getEndOfDay(date.toDateTime(DateTimeZone.UTC).toDate());
-
-        String dateS = DateUtils.getISODateString(dateStart);
-        String dateE = DateUtils.getISODateString(dateEnd);
-
-
-        List<Task> response = new ArrayList<>();
-        Map<String, String> taskMap = null;
-
-        logger.debug("Fetching tasks for StartDate: " + dateS);
-        logger.debug("Fetching tasks for StartEnd: " + dateE);
-
-        String matchClientAndUnitAndDate = "{ '$match' : {'citizenId':" + clientId + "," + " 'unitId':" + unitId + "," + " 'dateFrom' : {  $gte:{ '$date' : '" + dateS + "'}  }   , 'dateTo':   {   $lt: {'$date' :'" + dateE + "'}   }  }    }";
-        //// TODO: 16/3/17 Apply isEnabled Check
-
-
-        Document matchObject = Document.parse(matchClientAndUnitAndDate);
-
-        // Aggregate from DbObjects
-        Aggregation aggregation = newAggregation(
-                new CustomAggregationOperation(matchObject)
-        );
-        logger.info("Query: " + aggregation.toString());
-
-
-        // Result
-        AggregationResults<Task> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Task.class);
-
-        // Mapped Result
-        List<Task> mappedResult = finalResult.getMappedResults();
-
-        logger.info("Preparing response..");
-        for (Task data : mappedResult) {
-
-            logger.info("Data: " + "id:" + data.getId() + " " + data.getInfo1());
-        }
-        return mappedResult;
-    }
 
 
     public List<Task> getTasksByDemandId(String taskDemandId) {

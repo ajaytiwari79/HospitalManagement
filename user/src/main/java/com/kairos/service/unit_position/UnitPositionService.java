@@ -21,7 +21,7 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.position.PositionQueryResult;
-import com.kairos.persistence.model.staff.position.EmploymentReasonCodeQueryResult;
+import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
 import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
@@ -658,7 +658,7 @@ public class UnitPositionService {
 
         User user = userGraphRepository.getUserByStaffId(staffId);
 
-        EmploymentReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
+        PositionReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
         Position position = employmentReasonCode.getPosition();
 
         Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent() ? employmentReasonCode.getReasonCode().getId() : null;

@@ -73,7 +73,7 @@ import com.kairos.utils.CPRUtil;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
-import com.kairos.wrapper.staff.StaffEmploymentWrapper;
+import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -1521,17 +1521,17 @@ public class StaffService {
      * @param unitId
      * @return - login user staff id and list of staff present in unit
      */
-    public StaffEmploymentWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
+    public StaffEmploymentTypeWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-        StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
-        staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
-        staffEmploymentWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(),unitId));
-        return staffEmploymentWrapper;
+        StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
+        staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
+        staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(),unitId));
+        return staffEmploymentTypeWrapper;
     }
 
 

@@ -11,7 +11,7 @@ import java.util.List;
  * Created by yatharth on 4/4/18.
  */
 @QueryResult
-public class ExpiredEmploymentsQueryResult {
+public class ExpiredPositionsQueryResult {
 
     private Position position;
     private List<AccessGroup> accessGroups;
