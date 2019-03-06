@@ -34,6 +34,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.service.shift.ShiftStateService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +88,7 @@ public class PlanningPeriodService extends MongoBaseService {
     private StaffingLevelStateMongoRepository staffingLevelStateMongoRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject private ShiftStateService shiftStateService;
 
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
@@ -655,7 +657,7 @@ public class PlanningPeriodService extends MongoBaseService {
             });
             save(shifts);
             shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
-            shiftService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
+            shiftStateService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
         }
     }
 

@@ -15,22 +15,31 @@ public class PolicyAgreementTemplate extends BaseEntity {
 
     @NotBlank(message = "Name cannot be empty")
     private String name;
-    @NotBlank(message = "Description cannot be empty")
+
+    @Column(columnDefinition = "text")
     private String description;
+
     private Long countryId;
+
     @ElementCollection
     private List<AccountType> accountTypes;
+
     @OneToMany(cascade = CascadeType.ALL)
     @OrderColumn
     private List<AgreementSection> agreementSections=new ArrayList<>();
+
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
+
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
     @ElementCollection
     private List <ServiceCategory> organizationServices = new ArrayList<>();
+
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
     @OneToOne
     private TemplateType templateType;
     private boolean coverPageAdded;
@@ -38,6 +47,8 @@ public class PolicyAgreementTemplate extends BaseEntity {
     private boolean signatureComponentAdded;
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
+
+    @Column(columnDefinition = "text")
     private String  signatureHtml;
     @Embedded
     private CoverPage coverPageData = new CoverPage();

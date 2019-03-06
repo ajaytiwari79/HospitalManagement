@@ -3,6 +3,7 @@ package com.kairos.persistence.model.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
@@ -14,10 +15,13 @@ public class ClauseCkEditorVO {
     @NotNull
     private Long id;
     @NotNull
+    @Column(columnDefinition = "text")
     private String titleHtml;
     @NotNull
+    @Column(columnDefinition = "text")
     private String description;
 
+    @Column(columnDefinition = "text")
     private String descriptionHtml;
 
     private UUID tempClauseId;

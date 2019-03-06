@@ -1,5 +1,6 @@
 package com.kairos.service.phase;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.commons.utils.DateUtils;
@@ -59,7 +60,7 @@ public class PhaseServiceUnitTest {
         // 1516703598355L Tuesday, 23 January 2018 10:33:18.355
         // 1516704318000 (GMT): Tuesday, 23 January 2018 17:03:18
 
-        Long response = DateUtils.getDifferenceBetweenDatesInMinute(new Date(1516703598355L), new Date(1516704318000L));
+        Long response = new DateTimeInterval(new Date(1516703598355L), new Date(1516704318000L)).getMinutes();
         logger.info(response + "");
     }
     @Test

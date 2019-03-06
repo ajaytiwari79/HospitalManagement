@@ -84,4 +84,10 @@ public class AgreementSectionResponseDTO {
 
     }
 
+    public AgreementSectionResponseDTO(Long id, @NotBlank String title, String titleHtml, Integer orderedIndex) {
+        this.id = id;
+        this.title = title;
+        this.titleHtml = titleHtml;
+        this.orderedIndex = orderedIndex;
+    }
 }
