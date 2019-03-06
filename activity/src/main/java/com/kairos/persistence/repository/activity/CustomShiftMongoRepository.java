@@ -5,6 +5,7 @@ import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -70,4 +71,6 @@ public interface CustomShiftMongoRepository {
     List<Shift> findAllShiftByIntervalAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositionAndByactivityIds(Long unitPositionId, Date startDate, Date endDate,Set<BigInteger> activityIds);
+
+    boolean existShiftsBetweenDurationByUnitId(BigInteger shiftId,Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType);
 }

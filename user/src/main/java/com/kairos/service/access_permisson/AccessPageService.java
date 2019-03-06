@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 @Service
 public class AccessPageService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccessPageService.class);
 
     @Inject
     AccessPageRepository accessPageRepository;
@@ -83,7 +83,7 @@ public class AccessPageService {
         if(Optional.ofNullable(accessPageDTO.getParentTabId()).isPresent()){
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
-                logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
+                LOGGER.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
                 exceptionService.dataNotFoundByIdException("message.dataNotFound","parentAccessPage",accessPageDTO.getParentTabId());
 
             }
@@ -213,7 +213,7 @@ public class AccessPageService {
 
         AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
         if(!Optional.ofNullable(accessPageCustomId).isPresent()){
-            logger.error("AccessPageCustomId collection is not present");
+            LOGGER.error("AccessPageCustomId collection is not present");
             exceptionService.internalServerError("error.accessPage.customId.notPresent");
 
         }

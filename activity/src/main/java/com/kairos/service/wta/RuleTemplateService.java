@@ -215,7 +215,7 @@ public class RuleTemplateService extends MongoBaseService {
         daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffAfterASeriesWTATemplate);
 
-        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate = new NoOfSequenceShiftWTATemplate("No Of Sequence Shift", false, "No of Sequence Shift", PartOfDay.DAY, PartOfDay.NIGHT);
+        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate = new NoOfSequenceShiftWTATemplate("Number of Sequence Shift", false, "Number of Sequence Shift", PartOfDay.DAY, PartOfDay.NIGHT);
         noOfSequenceShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         noOfSequenceShiftWTATemplate.setCountryId(countryDTO.getId());
         noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

@@ -73,9 +73,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
@@ -369,7 +368,6 @@ public class ShiftValidatorService {
 
     }
 
-
     public void validateStatusOfShiftOnDelete(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK);
@@ -379,32 +377,6 @@ public class ShiftValidatorService {
         }
 
     }
-
-
-    public static List<ShiftWithActivityDTO> filterShiftsByActivityIds(List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
-        shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(activitieIds) && CollectionUtils.containsAny(activitieIds, shift.getActivityIds()));
-            if (isValidShift) {
-                shiftQueryResultWithActivities.add(shift);
-            }
-
-        });
-        return shiftQueryResultWithActivities;
-    }
-
-    public static List<ShiftWithActivityDTO> filterShiftsByTimeTypeIds(List<ShiftWithActivityDTO> shifts, List<BigInteger> timeTypeIds) {
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
-        shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds()));
-            if (isValidShift) {
-                shiftQueryResultWithActivities.add(shift);
-            }
-
-        });
-        return shiftQueryResultWithActivities;
-    }
-
 
     public static List<ShiftWithActivityDTO> filterShiftsByPlannedTypeAndTimeTypeIds(List<ShiftWithActivityDTO> shifts, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
@@ -417,10 +389,6 @@ public class ShiftValidatorService {
         });
         return shiftQueryResultWithActivities;
     }
-
-
-
-
 
     public void verifyRankAndStaffingLevel(List<ShiftActivityDTO> shiftActivities, Long unitId, List<ActivityWrapper> activities, Phase phase, UserAccessRoleDTO userAccessRoleDTO) {
         if (!shiftActivities.isEmpty()) {
@@ -762,5 +730,42 @@ public class ShiftValidatorService {
                 }
             });
         }
+    }
+
+    public boolean validateShiftRequiredDetails(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase){
+        Activity activity = activityWrapper.getActivity();
+        if (!Optional.ofNullable(activity).isPresent()) {
+            exceptionService.invalidRequestException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
+        }
+        if (staffAdditionalInfoDTO == null) {
+            exceptionService.invalidRequestException("message.staff.notfound");
+        }
+        if (!staffAdditionalInfoDTO.getUnitPosition().isPublished()) {
+            exceptionService.invalidRequestException("message.shift.not.published");
+        }
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+            exceptionService.actionNotPermittedException("message.unit.position");
+        }
+        if (!staffAdditionalInfoDTO.getUnitPosition().isPublished()) {
+            exceptionService.invalidRequestException("message.shift.not.published");
+        }
+        if (staffAdditionalInfoDTO.getUnitId() == null) {
+            exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
+        }
+        if(!(FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+            boolean shiftExists;
+            if (byTandAPhase || isNotNull(shiftDTO.getId())) {
+                shiftExists = shiftMongoRepository.findShiftBetweenDurationByUnitPositionNotEqualToShiftId(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getStaffUserId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate(), ShiftType.PRESENCE);
+            } else {
+                shiftExists = shiftMongoRepository.existShiftsBetweenDurationByStaffUserId(staffAdditionalInfoDTO.getStaffUserId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate(), ShiftType.PRESENCE);
+            }
+            if(!shiftExists){
+                shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitId(shiftDTO.getId(),staffAdditionalInfoDTO.getUnitPosition().getId(),getStartOfDay(shiftDTO.getActivities().get(0).getStartDate()), getEndOfDay(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate()), ShiftType.ABSENCE);
+            }
+            if (shiftExists) {
+                exceptionService.invalidRequestException("message.shift.date.startandend", shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
+            }
+        }
+        return true;
     }
 }
