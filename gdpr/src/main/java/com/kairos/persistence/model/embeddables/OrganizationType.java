@@ -7,10 +7,12 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class OrganizationType {
 
-    @NotNull(message = "id can't be null")
+
+    //TODO pick message from property file
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
-    @NotBlank(message = "Name can't be  empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
     public Long getId() {

@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class PolicyAgreementTemplate extends BaseEntity {
@@ -150,7 +151,7 @@ public class PolicyAgreementTemplate extends BaseEntity {
     public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
 */
     public List<AgreementSection> getAgreementSections() {
-        return agreementSections;
+        return agreementSections.stream().filter(agreementSection -> agreementSection.isDeleted() == false).collect(Collectors.toList());
     }
 
     public void setAgreementSections(List<AgreementSection> agreementSections) {

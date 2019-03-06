@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +14,11 @@ import java.util.List;
 public class ClauseDTO {
 
     protected Long id;
+
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     protected String title;
+
     @Valid
     protected List<ClauseTagDTO> tags = new ArrayList<>();
 

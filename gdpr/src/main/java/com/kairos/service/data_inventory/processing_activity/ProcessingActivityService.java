@@ -5,8 +5,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataCategory;
+import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
+import com.kairos.dto.gdpr.data_inventory.RelatedDataCategoryDTO;
 import com.kairos.persistence.model.data_inventory.processing_activity.*;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
@@ -138,7 +138,7 @@ public class ProcessingActivityService {
     }
 
 
-    private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long organizationId, List<ProcessingActivityRelatedDataSubject> relatedDataSubjects){
+    private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long organizationId, List<RelatedDataSubjectDTO> relatedDataSubjects){
         List<RelatedDataSubject> dataSubjects =  new ArrayList<>();
         relatedDataSubjects.forEach( dataSubject -> {
             RelatedDataSubject relatedDataSubject = new RelatedDataSubject(dataSubject.getId(), dataSubject.getName());
@@ -408,13 +408,13 @@ public class ProcessingActivityService {
      * @return
      * @description map Data Subject ,Data category and Data Element with processing activity(related tab processing activity)
      */
-    public List<ProcessingActivityRelatedDataSubject> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, Long processingActivityId) {
+    public List<RelatedDataSubjectDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, Long processingActivityId) {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId,unitId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), ProcessingActivityRelatedDataSubject.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class);
     }
   /*  public List<DataSubjectMappingResponseDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
 
@@ -503,11 +503,11 @@ public class ProcessingActivityService {
      * @description method filter data Category and there Corresponding data Element ,method filter data Category and remove Data category from data Category response List
      * similarly Data Elements are remove from data Element response list.
      */
-    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectResponseDTO> dataSubjectList, Map<Long, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
+    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectResponseDTO> dataSubjectList, Map<Long, List<RelatedDataCategoryDTO>> relatedDataCategoryMap) {
 
         for (DataSubjectResponseDTO dataSubjectResponseDTO : dataSubjectList) {
 
-            List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectResponseDTO.getId());
+            List<RelatedDataCategoryDTO> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectResponseDTO.getId());
             Map<Long, Set<Long>> dataElementsCorrespondingToDataCategory = new HashMap<>();
             //relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCorrespondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
             List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();

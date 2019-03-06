@@ -3,17 +3,18 @@ package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class ProcessingActivityRelatedDataElements {
+public class RelatedDataElementsDTO {
 
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
-    @NotNull
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
     public Long getId() {
@@ -32,6 +33,6 @@ public class ProcessingActivityRelatedDataElements {
         this.name = name;
     }
 
-    public ProcessingActivityRelatedDataElements() {
+    public RelatedDataElementsDTO() {
     }
 }
