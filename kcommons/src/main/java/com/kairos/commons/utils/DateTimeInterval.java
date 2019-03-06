@@ -8,6 +8,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -124,9 +125,15 @@ public class DateTimeInterval {
     }
 
     public DateTimeInterval addInterval(DateTimeInterval interval){
-        long start = Math.min(this.start, interval.getStartMillis());
-        long end = Math.max(this.end, interval.getEndMillis());
-        return new DateTimeInterval(start, end);
+        DateTimeInterval dateTimeInterval = null;
+        if (isNull(interval)){
+            dateTimeInterval = this;
+        }else {
+            long start = Math.min(this.start, interval.getStartMillis());
+            long end = Math.max(this.end, interval.getEndMillis());
+            dateTimeInterval = new DateTimeInterval(start, end);
+        }
+        return dateTimeInterval;
     }
 
     public boolean overlaps(DateTimeInterval interval) {

@@ -35,7 +35,7 @@ public class CostTimeAgreementRuleTemplateController {
     @RequestMapping(value = "/country/{countryId}/cta/rule-templates", method = RequestMethod.GET)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> getAllCTARuleTemplate(@PathVariable Long countryId ) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId,null));
     }
 
     /**

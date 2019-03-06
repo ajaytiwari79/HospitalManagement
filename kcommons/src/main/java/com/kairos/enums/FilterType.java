@@ -9,7 +9,7 @@ public enum FilterType {
 
     EMPLOYMENT_TYPE("Employment Type"), EXPERTISE("Expertise"), STAFF_STATUS("Status"), GENDER("Gender"), ENGINEER_TYPE("Engineer Type"),
     TIME_TYPE("Time Type"), PLANNED_TIME_TYPE("Planned Time Type"), ACTIVITY_CATEGORY_TYPE("Category Type"), ORGANIZATION_TYPE("Organization Type"),
-    STAFF_IDS("Staff"), ACTIVITY_IDS("Activity"), UNIT_IDS("Unit"), TIME_INTERVAL("Time Interval"),UNIT_POSITION("Unit Position"), SELECTED_STAFF_IDS("Selected Staff IDs"),
+    STAFF_IDS("Staff"), ACTIVITY_IDS("Activity"), UNIT_IDS("Unit"), TIME_INTERVAL("Time Interval"),UNIT_POSITION("Employment"), SELECTED_STAFF_IDS("Selected Staff IDs"),
     ACTIVITY_STATUS("Activity Status"),PHASE("Phase"),DAYS_OF_WEEK("Days Of Week"),DAY_TYPE("Day Type"),TIME_SLOT("Time Slot");
 
     public String value;
