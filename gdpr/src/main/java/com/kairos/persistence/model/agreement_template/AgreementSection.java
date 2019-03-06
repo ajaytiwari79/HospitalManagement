@@ -91,9 +91,9 @@ public class AgreementSection extends BaseEntity {
     }
 
 
-    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isUnitId, Long referenceId){
+    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isOrganization, Long referenceId){
         this.agreementSubSections.forEach(subSection ->{
-            if(isUnitId){
+            if(isOrganization){
                 this.setOrganizationId(referenceId);
                 subSection.setOrganizationId(referenceId);
             }else{

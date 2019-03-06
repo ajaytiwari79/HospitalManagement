@@ -34,17 +34,17 @@ public class DataElementService{
      * @return map of Data Elements  List  and new Data Elements ids
      * @decription method create new Data Elements throw exception if data element already exist
      */
-    public List<DataElement> createDataElements(Long referenceId, boolean isUnitId, List<DataElementDTO> dataElementsDto, DataCategory dataCategory) {
+    public List<DataElement> createDataElements(Long referenceId, boolean isOrganization, List<DataElementDTO> dataElementsDto, DataCategory dataCategory) {
 
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
-        List<DataElement> existingDataElement = isUnitId ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
+        List<DataElement> existingDataElement = isOrganization ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         if (CollectionUtils.isNotEmpty(existingDataElement)) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
         List<DataElement> dataElementList = new ArrayList<>();
         for (String name : dataElementNames) {
             DataElement dataElement = new DataElement(name);
-            if (isUnitId)
+            if (isOrganization)
                 dataElement.setOrganizationId(referenceId);
             else
                 dataElement.setCountryId(referenceId);
@@ -63,7 +63,7 @@ public class DataElementService{
      */
 
     //TODO need to refactor
-    public List<DataElement> updateDataElementAndCreateNewDataElement(Long referenceId, boolean isUnitId, List<DataElementDTO> dataElementsDto) {
+    public List<DataElement> updateDataElementAndCreateNewDataElement(Long referenceId, boolean isOrganization, List<DataElementDTO> dataElementsDto) {
 
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
         Map<Long, DataElementDTO> dataElementDTOMap = new HashMap<>();
@@ -73,21 +73,21 @@ public class DataElementService{
                 dataElementDTOMap.put(dataElementDto.getId(), dataElementDto);
             } else {
                 DataElement dataElement = new DataElement(dataElementDto.getName());
-                if (isUnitId)
+                if (isOrganization)
                     dataElement.setOrganizationId(referenceId);
                 else
                     dataElement.setCountryId(referenceId);
                 dataElements.add(dataElement);
             }
         });
-        List<DataElement> previousDataElementList = isUnitId ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
+        List<DataElement> previousDataElementList = isOrganization ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         previousDataElementList.forEach(dataElement -> {
 
             if (!dataElementDTOMap.containsKey(dataElement.getId())) {
                 exceptionService.duplicateDataException("message.duplicate", "Data Element", dataElement.getName());
             }
         });
-        previousDataElementList = isUnitId ? dataElementRepository.findByUnitIdAndIds(referenceId, dataElementDTOMap.keySet()) : dataElementRepository.findByCountryIdAndIds(referenceId, dataElementDTOMap.keySet());
+        previousDataElementList = isOrganization ? dataElementRepository.findByUnitIdAndIds(referenceId, dataElementDTOMap.keySet()) : dataElementRepository.findByCountryIdAndIds(referenceId, dataElementDTOMap.keySet());
         previousDataElementList.forEach(dataElement -> dataElement.setName(dataElementDTOMap.get(dataElement.getId()).getName()));
         dataElements.addAll(previousDataElementList);
         dataElementRepository.saveAll(dataElements);

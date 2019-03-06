@@ -60,22 +60,22 @@ public class ClauseService{
 
     /**
      * @param referenceId country id or unit id
-     * @param isUnitId    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is unitId or not
      * @param clauseDto   contain data about clause and template type which belong to clause
      * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
      * @throws DuplicateDataException : if clause already exist for id ,if account type is not selected}
      * @desciption this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
-    public <E extends ClauseDTO> E createClause(Long referenceId, boolean isUnitId, E clauseDto) {
+    public <E extends ClauseDTO> E createClause(Long referenceId, boolean isOrganization, E clauseDto) {
 
-        Clause previousClause = isUnitId ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
+        Clause previousClause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
         }
-        if(isUnitId) {
-            previousClause = prepareOrganizationClauseData(referenceId, clauseDto, null);
+        if(isOrganization) {
+            previousClause = prepareOrganizationClauseData(referenceId, clauseDto, new OrganizationClause());
         }else{
-            previousClause = prepareMasterClauseData(referenceId, clauseDto, null);
+            previousClause = prepareMasterClauseData(referenceId, clauseDto, new MasterClause());
         }
         clauseRepository.save(previousClause);
         clauseDto.setId(previousClause.getId());
@@ -90,9 +90,6 @@ public class ClauseService{
             clauseTags.add(clauseTagRepository.findDefaultTag());
         }
         List<TemplateType> templateTypes = templateTypeRepository.findAllById(clauseDto.getTemplateTypes());
-        if (!Optional.ofNullable(clause).isPresent()) {
-            clause = new OrganizationClause();
-        }
         clause.setOrganizationId(referenceId);
         clause.setTemplateTypes(templateTypes);
         clause.setTitle(clauseDto.getTitle());
@@ -109,9 +106,6 @@ public class ClauseService{
             clauseTags.add(clauseTagRepository.findDefaultTag());
         }
         List<TemplateType> templateTypes = templateTypeRepository.findAllById(clauseDto.getTemplateTypes());
-        if (!Optional.ofNullable(clause).isPresent()) {
-            clause = new MasterClause();
-        }
         MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
         setMetadataOfMasterClause(masterClauseDTO,  clause);
         clause.setCountryId(referenceId);
@@ -140,22 +134,22 @@ public class ClauseService{
     }
     /**
      * @param referenceId country id or unit id
-     * @param isUnitId    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is unitId or not
      * @param clauseDto   contain update data for clause
      * @return updated clause object
      * @throws DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
      * @description this method update clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
-    public <E extends ClauseDTO> E updateClause(Long referenceId, boolean isUnitId, Long clauseId, E clauseDto) {
+    public <E extends ClauseDTO> E updateClause(Long referenceId, boolean isOrganization, Long clauseId, E clauseDto) {
 
-        Clause clause = isUnitId ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
+        Clause clause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
         Optional<Clause> existingClause = clauseRepository.findById(clauseId);
         if(existingClause.isPresent()) {
             clause = existingClause.get();
-            if (isUnitId) {
+            if (isOrganization) {
                 prepareOrganizationClauseData(referenceId, clauseDto, (OrganizationClause) clause);
             } else {
                 prepareMasterClauseData(referenceId, clauseDto, (MasterClause) clause);
@@ -194,14 +188,14 @@ public class ClauseService{
 
     /**
      * @param referenceId country id or unit id
-     * @param isUnitId    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is unitId or not
      * @return boolean true if data deleted successfully
      * @throws DataNotFoundByIdException; if clause not found for id
      */
-    public Boolean deleteClauseById(Long referenceId, boolean isUnitId, Long clauseId) {
+    public Boolean deleteClauseById(Long referenceId, boolean isOrganization, Long clauseId) {
 
         //TODO refactor When done Policy Agreement template
-       /* List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+       /* List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isOrganization, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }*/

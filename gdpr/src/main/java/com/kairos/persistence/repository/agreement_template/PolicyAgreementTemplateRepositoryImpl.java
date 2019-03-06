@@ -15,13 +15,13 @@ class PolicyAgreementTemplateRepositoryImpl  {
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isOrganization, BigInteger agreementTemplateId) {
 
         String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
         String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
         String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},'clauseIdOrderedIndex':{'$first':'$clauseIdOrderedIndex'},'clauseCkEditorVOS':{'$first':'$clauseCkEditorVOS'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' },titleHtml:{$first:'$titleHtml' }}}";
 
-        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false);
+        Criteria criteria = isOrganization ? Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
@@ -63,9 +63,9 @@ class PolicyAgreementTemplateRepositoryImpl  {
     }
 
     @Override
-    public List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isUnitId) {
+    public List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isOrganization) {
 
-        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
+        Criteria criteria = isOrganization ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -82,11 +82,11 @@ class PolicyAgreementTemplateRepositoryImpl  {
 
 
     @Override
-    public List<AgreementTemplateBasicResponseDTO> findAllByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId) {
+    public List<AgreementTemplateBasicResponseDTO> findAllByReferenceIdAndClauseId(Long referenceId, boolean isOrganization, BigInteger clauseId) {
 
         String projectionOperation = "{'$project':{ '_id':1,'name':1 }}";
         Criteria criteria;
-        if (isUnitId)
+        if (isOrganization)
             criteria = Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false);
         else
             criteria = Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
@@ -107,12 +107,12 @@ class PolicyAgreementTemplateRepositoryImpl  {
 
 
     @Override
-    public List<AgreementSection> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId) {
+    public List<AgreementSection> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long referenceId, boolean isOrganization, Set<BigInteger> agreementTemplateIds, BigInteger clauseId) {
 
         String groupOperation = "{'$group':{ '_id':'$_id','agreementSections':{$addToSet:'$agreementSections'},subSections:{$first:'$subSections'}}}";
         String projectionOperation = "{ '$project': {  'agreementSections': { '$setUnion': [ '$agreementSections', '$subSections' ] } } }";
 
-        Criteria criteria= isUnitId ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").in(agreementTemplateIds).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").in(agreementTemplateIds).and(DELETED).is(false);
+        Criteria criteria= isOrganization ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").in(agreementTemplateIds).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").in(agreementTemplateIds).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
@@ -130,9 +130,9 @@ class PolicyAgreementTemplateRepositoryImpl  {
     }
 
     @Override
-    public Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds) {
+    public Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isOrganization, BigInteger templateId, Set<BigInteger> clauseIds) {
 
-        Criteria criteria = isUnitId ? Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(referenceId).and("_id").ne(templateId) : Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(referenceId).and("_id").ne(templateId);
+        Criteria criteria = isOrganization ? Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(referenceId).and("_id").ne(templateId) : Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(referenceId).and("_id").ne(templateId);
 
         String addNonDeletedSubSection = "{  '$addFields':" +
                 "{'subSections':" +
@@ -180,8 +180,8 @@ class PolicyAgreementTemplateRepositoryImpl  {
     }
 
     @Override
-    public List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateIdNotEquals(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
-        Criteria criteria= isUnitId ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false);
+    public List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateIdNotEquals(Long referenceId, boolean isOrganization, BigInteger agreementTemplateId) {
+        Criteria criteria= isOrganization ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
