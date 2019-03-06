@@ -9,16 +9,18 @@ public class IntervalBalance {
     private float available;
     private LocalDate startDate;
     private LocalDate endDate;
+    private float approved;
 
     public IntervalBalance() {
     }
 
-    public IntervalBalance(float total, float scheduled, float available, LocalDate startDate, LocalDate endDate) {
+    public IntervalBalance(float total, float scheduled, float available, LocalDate startDate, LocalDate endDate,float approved) {
         this.total = total;
         this.scheduled = scheduled;
         this.available = available;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.approved = approved;
     }
 
     public float getTotal() {
@@ -59,5 +61,13 @@ public class IntervalBalance {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public float getApproved() {
+        return approved;
+    }
+
+    public void setApproved(float approved) {
+        this.approved = approved;
     }
 }

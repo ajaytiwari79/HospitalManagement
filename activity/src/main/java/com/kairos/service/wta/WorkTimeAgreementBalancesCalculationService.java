@@ -8,6 +8,7 @@ import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -183,18 +184,25 @@ public class WorkTimeAgreementBalancesCalculationService {
                 if (!containsInInterval(intervalBalances, startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByNumberOfWeeks(asDate(startDate), vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate(),planningPeriodEndDate);
                     float scheduledActivityCount = 0;
+                    float approveActivityCount = 0;
                     for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
                         for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
                             if ((shiftActivityDTO.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(shiftActivityDTO.getStartDate()))) {
                                 if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getStopBrickActivityId())) {
                                     scheduledActivityCount = scheduledActivityCount + 0.5f;
+                                    if(shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)){
+                                        approveActivityCount = approveActivityCount + 0.5f;
+                                    }
                                 } else if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getVetoActivityId())) {
                                     scheduledActivityCount++;
+                                    if(shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)){
+                                        approveActivityCount++;
+                                    }
                                 }
                             }
                         }
                     }
-                    intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(), scheduledActivityCount, vetoAndStopBricksWTATemplate.getTotalBlockingPoints() - scheduledActivityCount, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate()));
+                    intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(), scheduledActivityCount, vetoAndStopBricksWTATemplate.getTotalBlockingPoints() - scheduledActivityCount, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1),approveActivityCount));
                 }
                 startDate = startDate.plusDays(1);
             }
@@ -221,10 +229,10 @@ public class WorkTimeAgreementBalancesCalculationService {
                 if(!containsInInterval(intervalBalances,startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), seniorDaysPerYearWTATemplate.getActivityIds(),planningPeriodEndDate);
                     if(isNotNull(dateTimeInterval)) {
-                        float scheduledActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, new HashSet<>(seniorDaysPerYearWTATemplate.getActivityIds()));
+                        int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, new HashSet<>(seniorDaysPerYearWTATemplate.getActivityIds()));
                         CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), staffAdditionalInfoDTO.getStaffAge());
                         if (isNotNull(careDays)) {
-                            intervalBalances.add(new IntervalBalance(careDays.getLeavesAllowed(), scheduledActivityCount, careDays.getLeavesAllowed() - scheduledActivityCount, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1)));
+                            intervalBalances.add(new IntervalBalance(careDays.getLeavesAllowed(), scheduledAndApproveActivityCount[0], careDays.getLeavesAllowed() - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1),scheduledAndApproveActivityCount[1]));
                         }
                     }
                 }
@@ -251,10 +259,10 @@ public class WorkTimeAgreementBalancesCalculationService {
                 if (!containsInInterval(intervalBalances, startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), childCareDaysCheckWTATemplate.getActivityIds(),planningPeriodEndDate);
                     if(isNotNull(dateTimeInterval)){
-                        float scheduledActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, new HashSet(childCareDaysCheckWTATemplate.getActivityIds()));
+                        int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, new HashSet(childCareDaysCheckWTATemplate.getActivityIds()));
                         CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getStaffAge());
                         if(isNotNull(careDays)) {
-                            intervalBalances.add(new IntervalBalance(careDays.getLeavesAllowed(), scheduledActivityCount, careDays.getLeavesAllowed() - scheduledActivityCount, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1)));
+                            intervalBalances.add(new IntervalBalance(careDays.getLeavesAllowed(), scheduledAndApproveActivityCount[0], careDays.getLeavesAllowed() - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1),scheduledAndApproveActivityCount[1]));
                         }
                     }
                 }
@@ -281,8 +289,8 @@ public class WorkTimeAgreementBalancesCalculationService {
                 if (!containsInInterval(intervalBalances, startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), Arrays.asList(wtaForCareDays.getCareDayCounts().get(0).getActivityId()),planningPeriodEndDate);
                     if(isNotNull(dateTimeInterval)){
-                        float scheduledActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, newHashSet(wtaForCareDays.getCareDayCounts().get(0).getActivityId()));
-                        intervalBalances.add(new IntervalBalance(wtaForCareDays.getCareDayCounts().get(0).getCount(), scheduledActivityCount, wtaForCareDays.getCareDayCounts().get(0).getCount() - scheduledActivityCount, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1)));
+                        int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, newHashSet(wtaForCareDays.getCareDayCounts().get(0).getActivityId()));
+                        intervalBalances.add(new IntervalBalance(wtaForCareDays.getCareDayCounts().get(0).getCount(), scheduledAndApproveActivityCount[0], wtaForCareDays.getCareDayCounts().get(0).getCount() - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1),scheduledAndApproveActivityCount[1]));
                     }
                 }
                 startDate = startDate.plusDays(1);
@@ -294,16 +302,20 @@ public class WorkTimeAgreementBalancesCalculationService {
         return workTimeAgreementRuleTemplateBalancesDTO;
     }
 
-    private int getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Set<BigInteger> activityIds){
+    private int[] getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval,List<ShiftWithActivityDTO> shiftWithActivityDTOS,Set<BigInteger> activityIds){
         int activityCount = 0;
+        int approveCount = 0;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())){
                     activityCount++;
+                    if(activity.getStatus().contains(ShiftStatus.APPROVE)){
+                        approveCount++;
+                    }
                 }
             }
         }
-        return activityCount;
+        return new int[]{activityCount,approveCount};
     }
 
 
@@ -368,8 +380,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                     nextEndDate = startDate.plusYears(1);
                     break;
             }
-            dateTimeInterval = new DateTimeInterval(startDate, nextEndDate);
-            if(dateTimeInterval.contains(shiftDate)){
+
+            if(new DateTimeInterval(startDate, nextEndDate).contains(shiftDate)){
+                dateTimeInterval = new DateTimeInterval(startDate, nextEndDate);
                 break;
             }
             startDate = nextEndDate;

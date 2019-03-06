@@ -231,8 +231,8 @@ public class WTAController {
     }
     @ApiOperation(value = "get Wta rule template By wta Id")
     @GetMapping(value =  UNIT_URL + "/wta/{wtaId}/rule_templates")
-    public ResponseEntity<Map<String, Object>> getwtaRuletemplates(@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getwtaRuletemplates(wtaId));
+    public ResponseEntity<Map<String, Object>> getwtaRuletemplates(@PathVariable Long unitId,@PathVariable BigInteger wtaId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getwtaRuletemplates(unitId,wtaId));
     }
 
     @ApiOperation(value = "get current cta and wta applicable on unit position ")
