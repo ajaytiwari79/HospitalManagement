@@ -1,6 +1,7 @@
 package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
@@ -17,58 +18,31 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Created by prerna on 14/11/17.
+ * Created by vipul on 30/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CountryExpertiseDTO {
-
+public class ExpertiseDTO {
     private Long id;
-
-    @NotBlank(message="Expertise name is required")
+    @NotBlank(message = "error.Expertise.name.notEmpty")
     private String name;
-
     private String description;
-
-    @NotNull(message = "Start date can't be null")
-
     private Date startDateMillis;
-
-
     private Date endDateMillis;
-
-    @NotNull(message = "Level can not be null")
     private Long organizationLevelId;
-
-    @NotNull(message = "services can not be null")
     private Set<Long> organizationServiceIds;
-
-    @NotNull(message = "union can not be null")
-  /*  private Long unionId;*/
     private UnionIDNameDTO union;
-
-    @NotNull(message = "FullTime Weekly Minutes can not be null")
-    private Integer fullTimeWeeklyMinutes ; // This is equals to 37 hours
+    private Integer fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
-
     @Valid
     private SeniorityLevelDTO seniorityLevel;
-
     private List<Long> tags;
     private boolean published;
-
-    @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
-
     private SectorDTO sector;
 
 
-
-    public CountryExpertiseDTO() {
-    }
-
-    public CountryExpertiseDTO(Long id, @Valid SeniorityLevelDTO seniorityLevel) {
-        this.id = id;
-        this.seniorityLevel = seniorityLevel;
+    public ExpertiseDTO() {
+        //default cons
     }
 
     public Long getId() {
@@ -95,14 +69,6 @@ public class CountryExpertiseDTO {
         this.description = description;
     }
 
-    public List<Long> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Long> tags) {
-        this.tags = tags;
-    }
-
     public Date getStartDateMillis() {
         return startDateMillis;
     }
@@ -116,8 +82,7 @@ public class CountryExpertiseDTO {
     }
 
     public void setEndDateMillis(Date endDateMillis) {
-        this.endDateMillis =endDateMillis==null?null: DateUtils.getEndOfDay(endDateMillis);
-
+        this.endDateMillis = endDateMillis == null ? null : DateUtils.getEndOfDay(endDateMillis);
     }
 
     public Long getOrganizationLevelId() {
@@ -136,22 +101,12 @@ public class CountryExpertiseDTO {
         this.organizationServiceIds = organizationServiceIds;
     }
 
-
-
     public Integer getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
     }
 
     public void setFullTimeWeeklyMinutes(Integer fullTimeWeeklyMinutes) {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public SeniorityLevelDTO getSeniorityLevel() {
-        return seniorityLevel;
-    }
-
-    public void setSeniorityLevel(SeniorityLevelDTO seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
     }
 
     public Integer getNumberOfWorkingDaysInWeek() {
@@ -163,31 +118,28 @@ public class CountryExpertiseDTO {
     }
 
 
+    public SeniorityLevelDTO getSeniorityLevel() {
+        return seniorityLevel;
+    }
 
-    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @Valid SeniorityLevelDTO seniorityLevel) {
-        this.name = name;
-        this.description = description;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.organizationLevelId = organizationLevelId;
-        this.organizationServiceIds = organizationServiceIds;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+    public void setSeniorityLevel(SeniorityLevelDTO seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
     }
 
-    @AssertTrue(message = "'start date' must be less than 'end date'.")
-    public boolean isValid() {
-        if (!Optional.ofNullable(this.startDateMillis).isPresent()) {
-            return false;
-        }
-        if (Optional.ofNullable(this.endDateMillis).isPresent()) {
-            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
-            return dateValue;
-        }
-        return true;
+    public List<Long> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public BreakPaymentSetting getBreakPaymentSetting() {
@@ -197,8 +149,6 @@ public class CountryExpertiseDTO {
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
     }
-
-
     public SectorDTO getSector() {
         return sector;
     }
@@ -215,11 +165,15 @@ public class CountryExpertiseDTO {
         this.union = union;
     }
 
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
+    @AssertTrue(message = "message.start_date.less_than.end_date")
+    public boolean isValid() {
+        if (!Optional.ofNullable(this.startDateMillis).isPresent() && Optional.ofNullable(this.endDateMillis).isPresent()) {
+            return false;
+        } else if (Optional.ofNullable(this.startDateMillis).isPresent() && (Optional.ofNullable(this.endDateMillis).isPresent())) {
+            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            return !endDateAsUtc.isBefore(startDateAsUtc);
+        }
+        return true;
     }
 }

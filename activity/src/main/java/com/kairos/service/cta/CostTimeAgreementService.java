@@ -148,11 +148,12 @@ public class CostTimeAgreementService extends MongoBaseService {
             assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(),unitActivities.get(organisationCTA.getId()));
             organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
             organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
+            updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(),organizationId,countryId);
             List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class);
             List<BigInteger> ruleTemplateIds = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(ruleTemplates)){
                 ruleTemplates.forEach(ctaRuleTemplate -> { ctaRuleTemplate.setId(null);});
-                updateExistingPhaseIdOfCTA(ruleTemplates,organizationId,countryId);
+                //updateExistingPhaseIdOfCTA(ruleTemplates,organizationId,countryId);
                 save(ruleTemplates);
                 ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
             }
@@ -337,11 +338,14 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @param countryId
      * @return CTARuleTemplateCategoryWrapper
      */
-    public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByCountry(Long countryId) {
+    public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByCountry(Long countryId,Long organizationId) {
         List<RuleTemplateCategory> ruleTemplateCategories = ruleTemplateCategoryRepository.getRuleTemplateCategoryByCountry(countryId, RuleTemplateCategoryType.CTA);
         List<RuleTemplateCategoryDTO> ctaRuleTemplateCategoryList = ObjectMapperUtils.copyPropertiesOfListByMapper(ruleTemplateCategories, RuleTemplateCategoryDTO.class);
         Map<BigInteger,RuleTemplateCategoryDTO> ruleTemplateCategoryDTOMap = ctaRuleTemplateCategoryList.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaRuleTemplateRepository.findByCountryIdAndDeletedFalse(countryId);
+        if(isNotNull(organizationId)){
+            updateExistingPhaseIdOfCTA(ctaRuleTemplateDTOS,organizationId,countryId);
+        }
         ctaRuleTemplateDTOS.forEach(c -> {
             c.setRuleTemplateCategory(c.getRuleTemplateCategoryId());
             c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
@@ -355,7 +359,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      */
     public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByUnit(Long unitId) {
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
-        return loadAllCTARuleTemplateByCountry(countryId);
+        return loadAllCTARuleTemplateByCountry(countryId,unitId);
     }
 
     /**
@@ -593,12 +597,12 @@ public class CostTimeAgreementService extends MongoBaseService {
         return isCalculatedValueChanged;
     }
 
-    private void updateExistingPhaseIdOfCTA(List<CTARuleTemplate> ctaRuleTemplates,Long unitId,Long countryId) {
+    private void updateExistingPhaseIdOfCTA(List<CTARuleTemplateDTO> ctaRuleTemplates,Long unitId,Long countryId) {
         List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(countryId);
         Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap = countryPhase.stream().collect(Collectors.toMap(Phase::getId, Phase::getPhaseEnum));
         List<Phase> unitPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = unitPhases.stream().collect(Collectors.toMap( Phase::getPhaseEnum, Phase::getId));
-        for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
+        for (CTARuleTemplateDTO ctaRuleTemplate : ctaRuleTemplates) {
             for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : ctaRuleTemplate.getPhaseInfo()) {
                 BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseDefaultNameMap.get(ctaRuleTemplatePhaseInfo.getPhaseId()), ctaRuleTemplatePhaseInfo.getPhaseId());
                 ctaRuleTemplatePhaseInfo.setPhaseId(phaseId);
