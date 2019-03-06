@@ -158,8 +158,8 @@ public class UnitPositionJobService {
         unitPositionGraphRepository.saveAll(unitPositions);
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
-        PositionQueryResult employmentUpdated = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
-        return new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
+        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
+        return new EmploymentUnitPositionDTO(positionQueryResult, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
 
     }
 

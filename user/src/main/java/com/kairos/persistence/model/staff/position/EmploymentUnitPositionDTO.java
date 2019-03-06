@@ -9,25 +9,25 @@ import java.util.List;
  */
 public class EmploymentUnitPositionDTO {
 
-    private PositionQueryResult employment;
+    private PositionQueryResult position;
     private List<UnitPositionQueryResult> unitPositions;
 
-    public PositionQueryResult getEmployment() {
-        return employment;
+    public PositionQueryResult getPosition() {
+        return position;
     }
 
     public EmploymentUnitPositionDTO() {
 
     }
 
-    public EmploymentUnitPositionDTO(PositionQueryResult employment, List<UnitPositionQueryResult> unitPositions) {
-        this.employment = employment;
+    public EmploymentUnitPositionDTO(PositionQueryResult position, List<UnitPositionQueryResult> unitPositions) {
+        this.position = position;
         this.unitPositions = unitPositions;
 
     }
 
-    public void setEmployment(PositionQueryResult employment) {
-        this.employment = employment;
+    public void setPosition(PositionQueryResult position) {
+        this.position = position;
     }
 
     public List<UnitPositionQueryResult> getUnitPositions() {
