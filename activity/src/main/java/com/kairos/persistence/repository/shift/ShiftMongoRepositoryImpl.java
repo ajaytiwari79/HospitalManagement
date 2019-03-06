@@ -6,6 +6,7 @@ import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -558,6 +560,18 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         );
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public boolean existShiftsBetweenDurationByUnitPositionId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType){
+        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lt(endDate).and("endDate").gt(startDate);
+        if(isNotNull(shiftId)){
+            criteria.and("_id").ne(shiftId);
+        }
+        if(isNotNull(shiftType)){
+            criteria.and("shiftType").is(shiftType.toString());
+        }
+        return mongoTemplate.exists(new Query(criteria),Shift.class);
     }
 
 }

@@ -25,7 +25,6 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -35,10 +34,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 
@@ -57,9 +54,6 @@ public class AbsenceShiftService {
 
     public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
-        /*if(isNotNull(shiftDTO.getId())){
-            shiftMongoRepository.safeDeleteById(shiftDTO.getId());
-        }*/
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
         if (activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
             Date endDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).plusDays(1).withTimeAtStartOfDay().toDate();
@@ -72,7 +66,7 @@ public class AbsenceShiftService {
             }
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
-            shiftWithViolatedInfoDTO = shiftService.saveShift(activityWrapper, staffAdditionalInfoDTO, newShiftDTO, phase, false);
+            shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, false);
         } else {
             shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId);
         }
@@ -123,14 +117,12 @@ public class AbsenceShiftService {
         shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
-        if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
-            Interval shiftInterval = new Interval(new DateTime(shiftActivity.getStartDate()), new DateTime(shiftActivity.getEndDate()));
-            Optional<ShiftDTO> shift = shifts.stream().filter(s -> !s.getId().equals(shiftDTO.getId()) && shiftInterval.overlaps(new Interval(s.getStartDate().getTime(), s.getEndDate().getTime()))).findFirst();
-            if (shift.isPresent()) {
-                exceptionService.actionNotPermittedException("message.shift.date.startandend",shift.get().getStartDate(),shift.get().getEndDate());
-            }
+        Date endDate = plusDays(fromDate, activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ? 1 : 7);
+        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(shiftDTO.getId(),staffAdditionalInfoDTO.getUnitPosition().getId(), fromDate,endDate,null);
+        if (shiftExists) {
+            exceptionService.actionNotPermittedException("message.shift.date.startandend", fromDate, endDate);
         }
-        return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(),startDateTime.toDate(),startDateTime.plusMinutes(contractualMinutesInADay).toDate());
+        return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(), startDateTime.toDate(), startDateTime.plusMinutes(contractualMinutesInADay).toDate());
     }
 
     private Integer getStartAverage(int day, List<ShiftDTO> shifts) {
