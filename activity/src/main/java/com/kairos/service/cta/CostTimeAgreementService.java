@@ -347,7 +347,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             updateExistingPhaseIdOfCTA(ctaRuleTemplateDTOS,organizationId,countryId);
         }
         ctaRuleTemplateDTOS.forEach(c -> {
-            c.setRuleTemplateCategory(c.getRuleTemplateCategoryId());
+            c.setRuleTemplateCategoryId(c.getRuleTemplateCategoryId());
             c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
         });
         return new CTARuleTemplateCategoryWrapper(ctaRuleTemplateCategoryList, ctaRuleTemplateDTOS);
@@ -369,7 +369,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @param countryDTO
      */
     private void buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, Boolean doUpdate, CountryDTO countryDTO) {
-        ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategory());
+        ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategoryId());
         setActivityBasesCostCalculationSettings(ctaRuleTemplate);
         if (ctaRuleTemplate.getCalculateValueAgainst() != null && ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue() != null) {
             switch (ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue()) {
@@ -434,7 +434,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             ctaRuleTemplate.setId(null);
             setActivityBasesCostCalculationSettings(ctaRuleTemplate);
             ctaRuleTemplate.setEmploymentTypes(ctaRuleTemplateDTO.getEmploymentTypes());
-            ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategory());
+            ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategoryId());
             ctaRuleTemplates.add(ctaRuleTemplate);
         }
         save(ctaRuleTemplates);
