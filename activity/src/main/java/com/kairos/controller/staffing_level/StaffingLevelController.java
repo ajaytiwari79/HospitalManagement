@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -170,7 +171,7 @@ public class StaffingLevelController {
 
     @PostMapping(value = "/updated_staffing_level")
     @ApiOperation("get staffing level if Updated")
-    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody @Valid List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
+    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody @Valid @NotNull(message = "message.staffingLevel.currentDate.not.exists") List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
     }
