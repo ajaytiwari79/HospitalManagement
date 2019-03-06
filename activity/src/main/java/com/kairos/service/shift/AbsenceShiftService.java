@@ -25,7 +25,6 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -118,9 +117,9 @@ public class AbsenceShiftService {
         shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
-        Date endDate = plusDays(fromDate, activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ? 1 : 8);
-        List<Shift> shiftLists = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(fromDate,endDate , staffAdditionalInfoDTO.getUnitId());
-        if (isCollectionNotEmpty(shiftLists)) {
+        Date endDate = plusDays(fromDate, activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ? 1 : 7);
+        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(shiftDTO.getId(),staffAdditionalInfoDTO.getUnitPosition().getId(), fromDate,endDate,null);
+        if (shiftExists) {
             exceptionService.actionNotPermittedException("message.shift.date.startandend", fromDate, endDate);
         }
         return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(), startDateTime.toDate(), startDateTime.plusMinutes(contractualMinutesInADay).toDate());

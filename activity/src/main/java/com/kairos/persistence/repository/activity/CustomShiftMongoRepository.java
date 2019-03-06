@@ -72,5 +72,5 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositionAndByactivityIds(Long unitPositionId, Date startDate, Date endDate,Set<BigInteger> activityIds);
 
-    boolean existShiftsBetweenDurationByUnitId(BigInteger shiftId,Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType);
+    boolean existShiftsBetweenDurationByUnitPositionId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType);
 }

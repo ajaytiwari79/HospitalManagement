@@ -563,10 +563,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public boolean existShiftsBetweenDurationByUnitId(BigInteger shiftId,Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType){
-        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lt(endDate).and("endDate").is(startDate).and("shiftType").is(shiftType);
+    public boolean existShiftsBetweenDurationByUnitPositionId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType){
+        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         if(isNotNull(shiftId)){
             criteria.and("_id").ne(shiftId);
+        }
+        if(isNotNull(shiftType)){
+            criteria.and("shiftType").is(shiftType.toString());
         }
         return mongoTemplate.exists(new Query(criteria),Shift.class);
     }
