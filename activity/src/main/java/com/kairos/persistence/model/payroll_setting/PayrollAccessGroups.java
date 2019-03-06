@@ -1,8 +1,9 @@
 package com.kairos.persistence.model.payroll_setting;
 
 public class PayrollAccessGroups {
+    //access group id and name
+    private Long id;
     private String name;
-    private Long accessGroupId;
     //grace period of access group for pay roll
     private int gracePeriod;
     private int priority;
@@ -15,12 +16,12 @@ public class PayrollAccessGroups {
         this.name = name;
     }
 
-    public Long getAccessGroupId() {
-        return accessGroupId;
+    public Long getId() {
+        return id;
     }
 
-    public void setAccessGroupId(Long accessGroupId) {
-        this.accessGroupId = accessGroupId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public int getGracePeriod() {

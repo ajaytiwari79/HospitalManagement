@@ -6,6 +6,7 @@ import com.kairos.enums.payroll_setting.PayrollFrequency;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PayrollSettingDTO {
+public class UnitPayrollSettingDTO {
     private BigInteger id;
     // use when break table
     private BigInteger parentPayrollId;
@@ -28,10 +29,10 @@ public class PayrollSettingDTO {
      // for use send default data
     private Set<Integer> years;
 
-    public PayrollSettingDTO() {
+    public UnitPayrollSettingDTO() {
     }
 
-    public PayrollSettingDTO(Set<Integer> years) {
+    public UnitPayrollSettingDTO(Set<Integer> years) {
         this.years = years;
     }
 
@@ -65,8 +66,9 @@ public class PayrollSettingDTO {
 
     public void setPayrollPeriods(List<PayrollPeriodDTO> payrollPeriods) {
         if (isCollectionNotEmpty(payrollPeriods)) {
-            payrollPeriods = payrollPeriods.stream().filter(payrollPeriod -> Optional.ofNullable(payrollPeriod.getStartDate()).isPresent()).sorted((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate())).collect(Collectors.toList());
+            payrollPeriods.sort(Comparator.comparing(PayrollPeriodDTO::getStartDate));
         }
+
         this.payrollPeriods = payrollPeriods;
     }
 

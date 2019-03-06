@@ -7,7 +7,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 import java.util.List;
 
-public class PayrollSetting extends MongoBaseEntity {
+public class UnitPayrollSetting extends MongoBaseEntity {
     private boolean published;
     private Long unitId;
     private BigInteger parentPayrollId;
@@ -16,10 +16,10 @@ public class PayrollSetting extends MongoBaseEntity {
     private List<PayrollAccessGroups> accessGroupsPriority;
 
 
-    public PayrollSetting() {
+    public UnitPayrollSetting() {
     }
 
-    public PayrollSetting(boolean published, Long unitId, List<PayrollPeriod> payrollPeriods, PayrollFrequency payrollFrequency) {
+    public UnitPayrollSetting(boolean published, Long unitId, List<PayrollPeriod> payrollPeriods, PayrollFrequency payrollFrequency) {
         this.published = published;
         this.unitId = unitId;
         this.payrollPeriods = payrollPeriods;
