@@ -732,7 +732,7 @@ public class ShiftValidatorService {
         }
     }
 
-    public boolean validateShiftRequiredDetails(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase){
+    public boolean validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase){
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.invalidRequestException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
@@ -753,12 +753,14 @@ public class ShiftValidatorService {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
         if(!(FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
-            boolean shiftExists;
+            //As discussed with Arvind we remove the Check of cross organization overlapping functionality
+            boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate(), ShiftType.PRESENCE);
+            /*boolean shiftExists;
             if (byTandAPhase || isNotNull(shiftDTO.getId())) {
                 shiftExists = shiftMongoRepository.findShiftBetweenDurationByUnitPositionNotEqualToShiftId(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getStaffUserId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate(), ShiftType.PRESENCE);
             } else {
                 shiftExists = shiftMongoRepository.existShiftsBetweenDurationByStaffUserId(staffAdditionalInfoDTO.getStaffUserId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate(), ShiftType.PRESENCE);
-            }
+            }*/
             if(!shiftExists){
                 shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(shiftDTO.getId(),staffAdditionalInfoDTO.getUnitPosition().getId(),getStartOfDay(shiftDTO.getActivities().get(0).getStartDate()), getEndOfDay(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate()), ShiftType.ABSENCE);
             }

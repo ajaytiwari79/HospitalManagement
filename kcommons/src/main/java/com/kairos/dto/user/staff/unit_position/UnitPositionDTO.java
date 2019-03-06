@@ -74,6 +74,7 @@ public class UnitPositionDTO {
     private ExpertiseResponseDTO expertise;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
+    private LocalDate accumulatedTimebankDate;
 
 
 
@@ -361,5 +362,13 @@ public class UnitPositionDTO {
 
     public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
+
+    public LocalDate getAccumulatedTimebankDate() {
+        return accumulatedTimebankDate;
+    }
+
+    public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
+        this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 }

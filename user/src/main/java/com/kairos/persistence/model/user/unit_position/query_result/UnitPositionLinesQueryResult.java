@@ -30,6 +30,7 @@ public class UnitPositionLinesQueryResult {
     private WTAResponseDTO workingTimeAgreement;
     private CTAResponseDTO costTimeAgreement;
     private long accumulatedTimebankMinutes;
+    private LocalDate accumulatedTimebankDate;
 
     public UnitPositionLinesQueryResult() {
         //DC
