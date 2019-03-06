@@ -3,19 +3,15 @@ package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
-import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.RiskSeverity;
 import com.kairos.enums.gdpr.AssetAssessor;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,17 +19,23 @@ import java.util.Set;
 public class AssetDTO {
 
     private Long id;
+
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
+
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
+
     @NotBlank(message = "error.message.HostingLocation.notSelected")
     private String hostingLocation;
+
     @NotNull(message = "error.message.managingDepartment.notNull")
     private ManagingOrganization managingDepartment;
+
     @NotNull(message = "error.message.assetOwner.notNull")
     private Staff assetOwner;
+
     private Set<Long> storageFormats;
     private Set<Long> orgSecurityMeasures;
     private Set<Long> technicalSecurityMeasures;
@@ -48,6 +50,7 @@ public class AssetDTO {
     private RiskSeverity riskLevel;
     private AssetAssessor assetAssessor;
     private boolean suggested;
+
     @NotNull(message = "error.message.assetType.notNull")
     private AssetTypeOrganizationLevelDTO assetType;
     private AssetTypeOrganizationLevelDTO assetSubType;

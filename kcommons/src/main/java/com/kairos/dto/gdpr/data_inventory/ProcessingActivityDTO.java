@@ -7,7 +7,6 @@ import com.kairos.dto.gdpr.Staff;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
@@ -19,13 +18,17 @@ public class ProcessingActivityDTO {
 
 
     private Long id;
+
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
+
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-    @NotNull(message = "Managaing Department cannot be Null")
+
+    @NotNull(message = "error.message.managingDepartment.notNull")
     private ManagingOrganization managingDepartment;
+
     @NotNull(message = "error.message.processOwner.notNull")
     private Staff processOwner;
     private Set<Long> processingPurposes;
@@ -34,7 +37,7 @@ public class ProcessingActivityDTO {
     private Set<Long> accessorParties;
     private Set<Long> processingLegalBasis;
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
-    private List<ProcessingActivityRelatedDataSubject> dataSubjectSet=new ArrayList<>();
+    private List<RelatedDataSubjectDTO> dataSubjectSet=new ArrayList<>();
     private Long responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -128,11 +131,11 @@ public class ProcessingActivityDTO {
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
-    public List<ProcessingActivityRelatedDataSubject> getDataSubjectSet() {
+    public List<RelatedDataSubjectDTO> getDataSubjectSet() {
         return dataSubjectSet;
     }
 
-    public void setDataSubjectSet(List<ProcessingActivityRelatedDataSubject> dataSubjectSet) {
+    public void setDataSubjectSet(List<RelatedDataSubjectDTO> dataSubjectSet) {
         this.dataSubjectSet = dataSubjectSet;
     }
 

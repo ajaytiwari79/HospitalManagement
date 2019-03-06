@@ -1,4 +1,4 @@
-package com.kairos.controller.exception_handler;
+package com.kairos.custom_exception;
 
 class FieldErrorDTO {
 

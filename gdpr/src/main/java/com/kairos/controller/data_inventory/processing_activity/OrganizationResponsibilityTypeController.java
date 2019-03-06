@@ -47,7 +47,7 @@ class OrganizationResponsibilityTypeController {
     @GetMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> getResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(unitId, responsibilityTypeId));
     }
@@ -57,7 +57,7 @@ class OrganizationResponsibilityTypeController {
     @GetMapping("/responsibility_type")
     public ResponseEntity<Object> getAllResponsibilityType(@PathVariable Long unitId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllResponsibilityType(unitId));
 
@@ -67,7 +67,7 @@ class OrganizationResponsibilityTypeController {
     @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(unitId, responsibilityTypeId));
 
@@ -77,7 +77,7 @@ class OrganizationResponsibilityTypeController {
     @PutMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(unitId, responsibilityTypeId, responsibilityType));
 
@@ -88,7 +88,7 @@ class OrganizationResponsibilityTypeController {
     @PostMapping(COUNTRY_URL + "/responsibility_type/suggest")
     public ResponseEntity<Object> saveResponsibilityTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypeDTOs) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.saveAndSuggestResponsibilityTypes(countryId, unitId, responsibilityTypeDTOs.getRequestBody()));
 

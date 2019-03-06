@@ -97,7 +97,7 @@ class TemplateTypeController {
         if (countryId != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.getAllTemplateType(countryId));
         } else {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can not be empty");
 
         }
 

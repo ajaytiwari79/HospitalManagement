@@ -5,22 +5,29 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
-public class ClauseCkEditorVO {
+public class AgreementSectionClause {
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotNull
+
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
+    private String title;
+
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Column(columnDefinition = "text")
     private String titleHtml;
-    @NotNull
+
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     @Column(columnDefinition = "text")
     private String description;
 
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     @Column(columnDefinition = "text")
     private String descriptionHtml;
 
@@ -48,11 +55,19 @@ public class ClauseCkEditorVO {
         this.tempClauseId = tempClauseId;
     }
 
-    public ClauseCkEditorVO(Long id, String titleHtml, String descriptionHtml, String description) {
+    public AgreementSectionClause(Long id, String titleHtml, String descriptionHtml, String description) {
         this.id = id;
         this.titleHtml = titleHtml;
         this.descriptionHtml = descriptionHtml;
         this.description  = description;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -71,6 +86,6 @@ public class ClauseCkEditorVO {
         this.deleted = deleted;
     }
 
-    public ClauseCkEditorVO() {
+    public AgreementSectionClause() {
     }
 }

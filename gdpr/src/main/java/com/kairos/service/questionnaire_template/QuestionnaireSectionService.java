@@ -56,24 +56,24 @@ public class QuestionnaireSectionService {
      * @return add sections ids to questionnaire template and return questionnaire template
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
-    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long referenceId, Long templateId, QuestionnaireTemplateSectionDTO templateSectionDTO, boolean isUnitId) {
-        QuestionnaireTemplate questionnaireTemplate = isUnitId ? questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
+    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long referenceId, Long templateId, QuestionnaireTemplateSectionDTO templateSectionDTO, boolean isOrganization) {
+        QuestionnaireTemplate questionnaireTemplate = isOrganization ? questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", templateId);
         }
 
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(templateSectionDTO.getSections());
-        if (isUnitId)
+        if (isOrganization)
             checkDuplicateQuestionnaireTemplateOrTemplateLinkedWithAnyInProgressAssessment(referenceId, templateId, questionnaireTemplate, templateSectionDTO.getTemplateStatus());
-        questionnaireTemplate.setSections(buildQuestionnaireSections(referenceId, isUnitId, templateSectionDTO.getSections(), questionnaireTemplate.getTemplateType()));
+        questionnaireTemplate.setSections(buildQuestionnaireSections(referenceId, isOrganization, templateSectionDTO.getSections(), questionnaireTemplate.getTemplateType()));
         questionnaireTemplate.setTemplateStatus(templateSectionDTO.getTemplateStatus());
         questionnaireTemplateRepository.save(questionnaireTemplate);
         //return ObjectMapperUtils.copyPropertiesByMapper(questionnaireTemplate, QuestionnaireTemplateResponseDTO.class);
-        return questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(referenceId, questionnaireTemplate.getId(),isUnitId);
+        return questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(referenceId, questionnaireTemplate.getId(),isOrganization);
     }
 
 
-    private List<QuestionnaireSection> buildQuestionnaireSections(Long referenceId, boolean isUnitId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
+    private List<QuestionnaireSection> buildQuestionnaireSections(Long referenceId, boolean isOrganization, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
 
         List<QuestionnaireSection> questionnaireSections = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(questionnaireSectionDTOS)) {
@@ -83,10 +83,10 @@ public class QuestionnaireSectionService {
                         if (Optional.ofNullable(questionnaireSectionDTO.getId()).isPresent()) {
                             questionnaireSection = ObjectMapperUtils.copyPropertiesByMapper(questionnaireSectionDTO, QuestionnaireSection.class);
                         } else {
-                            questionnaireSection = isUnitId ? new QuestionnaireSection(questionnaireSectionDTO.getTitle(), null, referenceId)
+                            questionnaireSection = isOrganization ? new QuestionnaireSection(questionnaireSectionDTO.getTitle(), null, referenceId)
                                     : new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId, null);
                         }
-                        questionnaireSection.setQuestions(buildQuestionsAndUpdate(referenceId, isUnitId, questionnaireSectionDTO.getQuestions(), templateType));
+                        questionnaireSection.setQuestions(buildQuestionsAndUpdate(referenceId, isOrganization, questionnaireSectionDTO.getQuestions(), templateType));
                         questionnaireSections.add(questionnaireSection);
                     }
 
@@ -96,7 +96,7 @@ public class QuestionnaireSectionService {
     }
 
 
-    private List<Question> buildQuestionsAndUpdate(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOS, QuestionnaireTemplateType templateType) {
+    private List<Question> buildQuestionsAndUpdate(Long referenceId, boolean isOrganization, List<QuestionDTO> questionDTOS, QuestionnaireTemplateType templateType) {
         List<Question> questions = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(questionDTOS)) {
             questionDTOS.forEach(questionDTO -> {
@@ -105,7 +105,7 @@ public class QuestionnaireSectionService {
                 if (Optional.ofNullable(questionDTO.getId()).isPresent()) {
                     question = ObjectMapperUtils.copyPropertiesByMapper(questionDTO, Question.class);
                 } else {
-                    question = isUnitId ? new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), null, referenceId)
+                    question = isOrganization ? new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), null, referenceId)
                             : new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), referenceId, null);
                 }
                 addAttributeNameToQuestion(question, questionDTO.getAttributeName(), templateType);
