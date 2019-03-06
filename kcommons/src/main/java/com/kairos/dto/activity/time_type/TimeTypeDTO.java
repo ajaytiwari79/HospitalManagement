@@ -44,13 +44,15 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy, boolean partOfTeam, boolean allowChildActivities) {
         this.id = id;
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
         this.backgroundColor=backgroundColor;
         this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
+        this.partOfTeam = partOfTeam;
+        this.allowChildActivities = allowChildActivities;
     }
 
     public TimeTypeEnum getSecondLevelType() {
