@@ -347,7 +347,6 @@ public class CostTimeAgreementService extends MongoBaseService {
             updateExistingPhaseIdOfCTA(ctaRuleTemplateDTOS,organizationId,countryId);
         }
         ctaRuleTemplateDTOS.forEach(c -> {
-            c.setRuleTemplateCategoryId(c.getRuleTemplateCategoryId());
             c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
         });
         return new CTARuleTemplateCategoryWrapper(ctaRuleTemplateCategoryList, ctaRuleTemplateDTOS);
