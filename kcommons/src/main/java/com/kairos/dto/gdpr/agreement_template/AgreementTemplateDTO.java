@@ -3,7 +3,6 @@ package com.kairos.dto.gdpr.agreement_template;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 
 public class AgreementTemplateDTO {
 
@@ -31,4 +30,7 @@ public class AgreementTemplateDTO {
     public Long getTemplateTypeId() { return templateTypeId; }
 
     public void setTemplateTypeId(Long templateTypeId) { this.templateTypeId = templateTypeId; }
+
+    public AgreementTemplateDTO() {
+    }
 }

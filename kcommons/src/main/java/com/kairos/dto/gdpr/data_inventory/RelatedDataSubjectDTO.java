@@ -3,24 +3,23 @@ package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class ProcessingActivityRelatedDataCategory {
+public class RelatedDataSubjectDTO {
 
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
-    @NotNull
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
-    @NotEmpty
-    private List<ProcessingActivityRelatedDataElements> dataElements= new ArrayList<>();
+    private List<RelatedDataCategoryDTO> dataCategories = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -30,12 +29,12 @@ public class ProcessingActivityRelatedDataCategory {
         this.id = id;
     }
 
-    public List<ProcessingActivityRelatedDataElements> getDataElements() {
-        return dataElements;
+    public List<RelatedDataCategoryDTO> getDataCategories() {
+        return dataCategories;
     }
 
-    public void setDataElements(List<ProcessingActivityRelatedDataElements> dataElements) {
-        this.dataElements = dataElements;
+    public void setDataCategories(List<RelatedDataCategoryDTO> dataCategories) {
+        this.dataCategories = dataCategories;
     }
 
     public String getName() {
@@ -46,6 +45,6 @@ public class ProcessingActivityRelatedDataCategory {
         this.name = name;
     }
 
-    public ProcessingActivityRelatedDataCategory() {
+    public RelatedDataSubjectDTO() {
     }
 }

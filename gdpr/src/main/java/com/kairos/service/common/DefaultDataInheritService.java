@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.clause.Clause;
+import com.kairos.persistence.model.clause.OrganizationClause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.data_inventory.asset.AssetDeprecated;
@@ -296,8 +297,7 @@ public class DefaultDataInheritService{
             Set<Long> clauseTagIds = new HashSet<>();
             List<Clause> clauseList = new ArrayList<>();
             clauses.forEach(clauseResponse -> {
-                Clause clause = new Clause(clauseResponse.getTitle(), clauseResponse.getDescription());
-                clause.setOrganizationId(unitId);
+                OrganizationClause clause = new OrganizationClause(clauseResponse.getTitle(), clauseResponse.getDescription(), unitId);
                 List<ClauseTag> tags = new ArrayList<>();
                 clauseResponse.getTags().forEach(clauseTag -> {
                     if (!clauseTagIds.contains(clauseTag.getId())) {

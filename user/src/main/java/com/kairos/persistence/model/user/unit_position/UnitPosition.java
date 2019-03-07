@@ -51,6 +51,7 @@ public class UnitPosition extends UserBaseEntity {
     private float taxDeductionPercentage;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
+    private LocalDate accumulatedTimebankDate;
 
     public UnitPosition() {
 
@@ -61,13 +62,14 @@ public class UnitPosition extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public UnitPosition(Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published,float taxDeductionPercentage,long accumulatedTimebankMinutes) {
+    public UnitPosition(Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published,float taxDeductionPercentage,long accumulatedTimebankMinutes,LocalDate accumulatedTimebankDate) {
         this.unit = unit;
         this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;
         this.published=published;
         this.taxDeductionPercentage=taxDeductionPercentage;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+        this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 
     public Expertise getExpertise() {
@@ -184,6 +186,14 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
+
+    public LocalDate getAccumulatedTimebankDate() {
+        return accumulatedTimebankDate;
+    }
+
+    public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
+        this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 
     @Override
