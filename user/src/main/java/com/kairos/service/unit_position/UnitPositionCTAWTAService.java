@@ -97,7 +97,7 @@ public class UnitPositionCTAWTAService {
     public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, BigInteger wtaId, WTADTO updateDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
 
         }
         if (unitPosition.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(unitPosition.getEndDate())) {

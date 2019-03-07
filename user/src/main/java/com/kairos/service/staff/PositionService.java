@@ -199,7 +199,7 @@ public class PositionService {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
             if (Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
-                exceptionService.dataNotFoundByIdException("message.employment.unitpermission.alreadyexist", staffId);
+                exceptionService.dataNotFoundByIdException("message.position.unitpermission.alreadyexist");
 
             } else if (!Optional.ofNullable(unitPermission).isPresent()) {
                 unitPermission = new UnitPermission();
@@ -277,7 +277,7 @@ public class PositionService {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup == null) {
-            exceptionService.internalServerError("error.employment.accessgroup.notfound");
+            exceptionService.internalServerError("error.position.accessgroup.notfound");
 
         }
         Position position = new Position();
@@ -468,7 +468,7 @@ public class PositionService {
             }
 
             if (unitPermission == null) {
-                exceptionService.internalServerError("error.unit.employment.null");
+                exceptionService.internalServerError("error.unit.permission.null");
 
             }
 
@@ -617,8 +617,7 @@ public class PositionService {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         ReasonCode reasonCode = null;
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.employment.parentorganization.notfound", unit.getId());
-
+            exceptionService.dataNotFoundByIdException("message.parentorganization.notfound", unit.getId());
         }
 
         Position position = positionGraphRepository.findPosition(parentOrganization.getId(), staffId);

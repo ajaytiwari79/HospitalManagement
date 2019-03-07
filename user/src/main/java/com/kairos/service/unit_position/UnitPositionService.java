@@ -82,6 +82,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -152,7 +153,7 @@ public class UnitPositionService {
 
         Position position = positionGraphRepository.findByStaffId(unitPositionDTO.getStaffId());
         if (!Optional.ofNullable(position).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", unitPositionDTO.getStaffId());
+            exceptionService.dataNotFoundByIdException("message.staff.position.notFound", unitPositionDTO.getStaffId());
         }
         if (position.getStartDateMillis() != null) {
             if (unitPositionDTO.getStartDate().isBefore(DateUtils.getDateFromEpoch(position.getStartDateMillis()))) {
@@ -474,7 +475,10 @@ public class UnitPositionService {
             } else {
                 unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
             }
-            updateTimeBank(newCTAWTAAndAccumulatedTimebankWrapper.getCta().get(0).getId(), unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate(), unitPositionQueryResult.getPositionLines().get(0).getEndDate(), unitId);
+            if(newCTAWTAAndAccumulatedTimebankWrapper!=null && isCollectionNotEmpty(newCTAWTAAndAccumulatedTimebankWrapper.getCta())){
+                updateTimeBank(newCTAWTAAndAccumulatedTimebankWrapper.getCta().get(0).getId(), unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate(), unitPositionQueryResult.getPositionLines().get(0).getEndDate(), unitId);
+            }
+
         }
         // calculative value is not changed it means only end date is updated.
         else {
