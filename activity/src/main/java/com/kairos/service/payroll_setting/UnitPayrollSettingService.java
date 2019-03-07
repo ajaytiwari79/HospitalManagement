@@ -129,6 +129,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByIdAndPayrollFrequency(unitId, unitPayrollSettingDTO.getParentPayrollId(), unitPayrollSettingDTO.getPayrollFrequency());
         if (isNull(unitPayrollSetting)) {
             exceptionService.actionNotPermittedException("message.payroll.period.not.found");
+        } else if (unitPayrollSettingDTO.getStartDate().isBefore(DateUtils.getLocalDate()) || !validateStartDateForPayrollPeriodCreation(unitPayrollSettingDTO.getStartDate(), unitPayrollSettingDTO.getPayrollFrequency())) {
+            exceptionService.actionNotPermittedException("error.payroll.period.start.date.invalid");
         }
         UnitPayrollSetting draftUnitPayrollSetting = unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitId(unitId, unitPayrollSetting.getPayrollFrequency(), DateUtils.getlastDayOfYear(unitPayrollSettingDTO.getEndDate().getYear()));
         Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap = unitPayrollSetting.getPayrollPeriods().stream().collect(Collectors.toMap(PayrollPeriod::getStartDate, Function.identity()));
@@ -239,11 +241,11 @@ public class UnitPayrollSettingService extends MongoBaseService {
     }
 
     private boolean validatePayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Long unitId) {
-        if (!validateStartDateForPayrollPeriodCreation(unitPayrollSettingDTO.getStartDate(), unitPayrollSettingDTO.getPayrollFrequency())) {
+        if (unitPayrollSettingDTO.getStartDate().isBefore(DateUtils.getLocalDate()) || !validateStartDateForPayrollPeriodCreation(unitPayrollSettingDTO.getStartDate(), unitPayrollSettingDTO.getPayrollFrequency())) {
             exceptionService.actionNotPermittedException("error.payroll.period.start.date.invalid");
         }
         boolean existsPayrollPeriod = unitPayrollSettingMongoRepository.findPayrollPeriodByStartDate(unitId, unitPayrollSettingDTO.getStartDate());
-        if (existsPayrollPeriod) {
+        if (existsPayrollPeriod ) {
             exceptionService.actionNotPermittedException("message.payroll.period.date.alreadyexists");
         }
         return true;
