@@ -5,7 +5,9 @@ import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UnitPayrollSetting extends MongoBaseEntity {
     private boolean published;
@@ -47,7 +49,7 @@ public class UnitPayrollSetting extends MongoBaseEntity {
     }
 
     public void setPayrollPeriods(List<PayrollPeriod> payrollPeriods) {
-        this.payrollPeriods = payrollPeriods;
+        this.payrollPeriods = Optional.ofNullable(payrollPeriods).orElse(new ArrayList<>());
     }
 
     public PayrollFrequency getPayrollFrequency() {

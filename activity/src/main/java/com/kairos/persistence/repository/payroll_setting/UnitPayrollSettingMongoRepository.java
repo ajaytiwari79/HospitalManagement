@@ -14,8 +14,8 @@ import java.util.List;
 @Repository
 public interface UnitPayrollSettingMongoRepository extends MongoBaseRepository<UnitPayrollSetting,BigInteger>,CustomUnitPayrollSettingMongoRepository {
 
-    @Query(value = "{deleted:false,published:false,unitId:?0 }",delete = true)
-    Long findAndDeletePayrollPeriodByStartDate(Long unitId);
+    @Query(value = "{deleted:false,published:false,unitId:?0 ,payrollFrequency:?1}",delete = true)
+    Long findAndDeletePayrollPeriodByStartDate(Long unitId,PayrollFrequency payrollFrequency);
 
     @Query(value = "{deleted:false,unitId:?0,_id:?1 }")
     UnitPayrollSetting findPayrollPeriodById(Long unitId, BigInteger id);
@@ -23,11 +23,11 @@ public interface UnitPayrollSettingMongoRepository extends MongoBaseRepository<U
     @Query(value = "{deleted:false,unitId:?0,_id:?1,payrollFrequency:?2 ,published:true}")
     UnitPayrollSetting findPayrollPeriodByIdAndPayrollFrequency(Long unitId, BigInteger id,PayrollFrequency payrollFrequency);
 
-    @Query(value = "{deleted:false,unitId:?0,published:false }")
-    UnitPayrollSetting findDraftPayrollPeriodByUnitId(Long unitId);
+    @Query(value = "{'payrollPeriods.endDate':{$lte:?2},deleted:false,unitId:?0,published:false,payrollFrequency:?1 }")
+    UnitPayrollSetting findDraftPayrollPeriodByUnitId(Long unitId,PayrollFrequency payrollFrequency,LocalDate endDate);
 
-    @Query(value = "{deleted:false,unitId:?0,published:false,parentPayrollId:{$exists:false} }")
-    UnitPayrollSetting findDraftPayrollPeriodByUnitIdAndNotExistParentId(Long unitId);
+    @Query(value = "{deleted:false,_id:{$ne:?0},unitId:?1,payrollFrequency:?2,published:false,parentPayrollId:{$exists:false} }")
+    UnitPayrollSetting findDraftPayrollPeriodByUnitIdAndNotExistParentId(BigInteger id,Long unitId,PayrollFrequency payrollFrequency);
 
 
     @Query(value = "{deleted:false,unitId:?0,payrollFrequency:?1 }")
@@ -36,9 +36,12 @@ public interface UnitPayrollSettingMongoRepository extends MongoBaseRepository<U
     @Query(value = "{deleted:false,unitId:?0,_id:?1,published:false}",delete = true)
     Long removeDraftpayrollPeriod(Long unitId,BigInteger id);
 
+    @Query(value = "{'payrollPeriods.startDate':?1,deleted:false,published:true,unitId:?0 }",exists = true)
+    boolean findPayrollPeriodByStartDate(Long unitId,LocalDate startDate);
 
-    @Query(value = "{'payrollPeriods.startDate':?1,deleted:false,unitId:?0,payrollFrequency:?2 }")
-    List<UnitPayrollSettingDTO> findAllPayrollPeriodByStartDate(Long unitId, LocalDate startDate, PayrollFrequency payrollFrequency);
+
+
+
 
 
 }
