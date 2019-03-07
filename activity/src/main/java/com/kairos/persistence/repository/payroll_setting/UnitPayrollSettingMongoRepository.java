@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface UnitUnitPayrollSettingMongoRepository extends MongoBaseRepository<UnitPayrollSetting,BigInteger>,CustomUnitPayrollSettingMongoRepository {
+public interface UnitPayrollSettingMongoRepository extends MongoBaseRepository<UnitPayrollSetting,BigInteger>,CustomUnitPayrollSettingMongoRepository {
 
     @Query(value = "{deleted:false,published:false,unitId:?0 }",delete = true)
     Long findAndDeletePayrollPeriodByStartDate(Long unitId);
@@ -20,8 +20,14 @@ public interface UnitUnitPayrollSettingMongoRepository extends MongoBaseReposito
     @Query(value = "{deleted:false,unitId:?0,_id:?1 }")
     UnitPayrollSetting findPayrollPeriodById(Long unitId, BigInteger id);
 
+    @Query(value = "{deleted:false,unitId:?0,_id:?1,payrollFrequency:?2 ,published:true}")
+    UnitPayrollSetting findPayrollPeriodByIdAndPayrollFrequency(Long unitId, BigInteger id,PayrollFrequency payrollFrequency);
+
     @Query(value = "{deleted:false,unitId:?0,published:false }")
     UnitPayrollSetting findDraftPayrollPeriodByUnitId(Long unitId);
+
+    @Query(value = "{deleted:false,unitId:?0,published:false,parentPayrollId:{$exists:false} }")
+    UnitPayrollSetting findDraftPayrollPeriodByUnitIdAndNotExistParentId(Long unitId);
 
 
     @Query(value = "{deleted:false,unitId:?0,payrollFrequency:?1 }")
