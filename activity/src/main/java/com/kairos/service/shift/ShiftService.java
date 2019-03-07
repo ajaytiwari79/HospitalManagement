@@ -77,8 +77,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.shift.ShiftStatus.REQUEST;
@@ -897,14 +896,26 @@ public class ShiftService extends MongoBaseService {
         return object;
     }
 
-    private ActivityWrapper getAbsenceTypeOfActivityIfPresent(List<ShiftActivityDTO> shiftActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap){
+    private ActivityWrapper getAbsenceTypeOfActivityIfPresent(List<ShiftActivityDTO> shiftActivityDTOS,Map<BigInteger,ActivityWrapper> activityWrapperMap) {
         ActivityWrapper activityWrapper = null;
         for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
-            if(FULL_WEEK.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+            if (FULL_WEEK.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
                 activityWrapper = activityWrapperMap.get(shiftActivityDTO.getActivityId());
             }
         }
         return activityWrapper;
+    }
+
+    public boolean updatePlanningPeriodInShifts(){
+        List<Shift> shifts = shiftMongoRepository.findAllAbsenceShifts(ShiftType.ABSENCE.toString());
+        for (Shift shift : shifts) {
+            PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOneByUnitIdAndDate(shift.getUnitId(),getStartOfDay(shift.getStartDate()));
+            shift.setPlanningPeriodId(isNotNull(planningPeriod) ? planningPeriod.getId() : null);
+        }
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
+        return true;
 
     }
 }

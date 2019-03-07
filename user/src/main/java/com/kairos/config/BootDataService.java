@@ -19,7 +19,7 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
-import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -142,7 +142,7 @@ public class BootDataService {
     @Inject
     ClientOrganizationRelationService relationService;
     @Inject
-    EmploymentGraphRepository employmentGraphRepository;
+    PositionGraphRepository positionGraphRepository;
     @Inject
     LanguageGraphRepository languageGraphRepository;
     @Inject
@@ -222,10 +222,10 @@ public class BootDataService {
     private Staff livaAsStaff;
     private Staff adminAsStaff;
     private AccessGroup accessGroup;
-    private Employment employmentForMichal;
-    private Employment employmentForLiva;
-    private Employment employmentForAlma;
-    private Employment employmentForAdmin;
+    private Position positionForMichal;
+    private Position positionForLiva;
+    private Position positionForAlma;
+    private Position positionForAdmin;
 
     private Language danish;
 
@@ -694,8 +694,8 @@ public class BootDataService {
     }
 
     private void createEmployment() {
-        employmentForAdmin = new Employment("working as country admin", adminAsStaff);
-        kairosCountryLevel.getEmployments().add(employmentForAdmin);
+        positionForAdmin = new Position("working as country admin", adminAsStaff);
+        kairosCountryLevel.getPositions().add(positionForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
 
@@ -713,8 +713,8 @@ public class BootDataService {
 //        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
 //        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
 //        accessPageService.setPagePermissionToAdmin(accessPermission);
-        employmentForAdmin.getUnitPermissions().add(unitPermission);
-        kairosCountryLevel.getEmployments().add(employmentForAdmin);
+        positionForAdmin.getUnitPermissions().add(unitPermission);
+        kairosCountryLevel.getPositions().add(positionForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
 
@@ -794,12 +794,12 @@ public class BootDataService {
     }
 
     private void createEmploymentForCityLevel() {
-        employmentForMichal = new Employment("working as visitator", michalAsStaff);
-        employmentForLiva = new Employment("working as planner", livaAsStaff);
-        employmentForAlma = new Employment("working as task giver", almaAsStaff);
-        oodlesCityLevel.getEmployments().add(employmentForMichal);
-        oodlesCityLevel.getEmployments().add(employmentForLiva);
-        oodlesCityLevel.getEmployments().add(employmentForAlma);
+        positionForMichal = new Position("working as visitator", michalAsStaff);
+        positionForLiva = new Position("working as planner", livaAsStaff);
+        positionForAlma = new Position("working as task giver", almaAsStaff);
+        oodlesCityLevel.getPositions().add(positionForMichal);
+        oodlesCityLevel.getPositions().add(positionForLiva);
+        oodlesCityLevel.getPositions().add(positionForAlma);
         organizationGraphRepository.save(oodlesCityLevel);
 
     }
@@ -812,8 +812,8 @@ public class BootDataService {
         UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForMichal.getUnitPermissions().add(unitPermission);
-        oodlesCityLevel.getEmployments().add(employmentForMichal);
+        positionForMichal.getUnitPermissions().add(unitPermission);
+        oodlesCityLevel.getPositions().add(positionForMichal);
 
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.TASK_GIVERS);
         unitPermission = new UnitPermission();
@@ -822,8 +822,8 @@ public class BootDataService {
         UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(taskGiverAccess);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForAlma.getUnitPermissions().add(unitPermission);
-        oodlesCityLevel.getEmployments().add(employmentForAlma);
+        positionForAlma.getUnitPermissions().add(unitPermission);
+        oodlesCityLevel.getPositions().add(positionForAlma);
 
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.PLANNER);
         unitPermission = new UnitPermission();
@@ -832,8 +832,8 @@ public class BootDataService {
         UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(plannerAccess);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForLiva.getUnitPermissions().add(unitPermission);
-        oodlesCityLevel.getEmployments().add(employmentForLiva);
+        positionForLiva.getUnitPermissions().add(unitPermission);
+        oodlesCityLevel.getPositions().add(positionForLiva);
         organizationGraphRepository.save(oodlesCityLevel);
     }
 

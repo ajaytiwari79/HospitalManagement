@@ -49,7 +49,7 @@ public class TemplateTypeService {
                 .collect(Collectors.toList());
 
         List<TemplateType> existing = templateTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        templateNames = ComparisonUtils.getNameListForMetadata(existing, templateNames);
+        templateNames = ComparisonUtils.getNewNameListOfMetadata(existing, templateNames);
         List<TemplateType> newDataTemplateList = new ArrayList<>();
         if (!templateNames.isEmpty()) {
             for (String name : templateNames) {

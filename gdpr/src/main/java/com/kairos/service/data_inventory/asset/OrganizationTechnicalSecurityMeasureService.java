@@ -2,7 +2,6 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
@@ -19,11 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationTechnicalSecurityMeasureService {
@@ -55,17 +53,8 @@ public class OrganizationTechnicalSecurityMeasureService {
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
     public List<TechnicalSecurityMeasureDTO> createTechnicalSecurityMeasure(Long organizationId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
-
-        Set<String> techSecurityMeasureNames = new HashSet<>();
-        for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
-            techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
-        }
-        List<String> nameInLowerCase = techSecurityMeasureNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<TechnicalSecurityMeasure> previousSecurityMeasures = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-        techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousSecurityMeasures, techSecurityMeasureNames);
-
+        Set<String> existingTechnicalSecurityMeasureNames = technicalSecurityMeasureRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> techSecurityMeasureNames = ComparisonUtils.getNewMetaDataNames(technicalSecurityMeasureDTOS,existingTechnicalSecurityMeasureNames );
         List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
         if (!techSecurityMeasureNames.isEmpty()) {
             for (String name : techSecurityMeasureNames) {

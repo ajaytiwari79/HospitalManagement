@@ -10,12 +10,19 @@ import org.springframework.data.repository.NoRepositoryBean;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
+//TODO make generic for metadata only and create a generic for rest of the application
 
 @NoRepositoryBean
 public interface CustomGenericRepository<T extends BaseEntity> extends JpaRepository<T, Long> {
 
     @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false and lower(EN.name) IN ?2")
     List<T>  findByCountryIdAndDeletedAndNameIn(Long countryId, List<String> userNames);
+
+    @Query(value = "SELECT LOWER(EN.name) FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false")
+    Set<String>  findNameByCountryIdAndDeleted(Long countryId);
+
+    @Query(value = "SELECT LOWER(EN.name) FROM #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = false")
+    Set<String>  findNameByOrganizationIdAndDeleted(Long orgId);
 
     @Transactional
     @Modifying

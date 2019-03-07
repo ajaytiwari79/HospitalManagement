@@ -223,10 +223,10 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
 
-    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
-        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitEmploymentPositionId);
+    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitPositionId) {
+        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitEmploymentPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
 
         }
         return costTimeAgreementRepository.getOneCtaById(unitPosition.getCostTimeAgreementId());
@@ -235,7 +235,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     public StaffUnitPositionDetails updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,null,ORGANIZATION,unitPositionId,new HashSet<>());
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
         }
         if (staffAdditionalInfoDTO.getUnitPosition().getEndDate()!=null && ctaDTO.getEndDate()!=null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getUnitPosition().getEndDate())){
             exceptionService.actionNotPermittedException("end_date.from.end_date",ctaDTO.getEndDate(),staffAdditionalInfoDTO.getUnitPosition().getEndDate());

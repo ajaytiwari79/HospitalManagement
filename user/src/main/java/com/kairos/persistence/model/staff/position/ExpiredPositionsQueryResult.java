@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -11,9 +11,9 @@ import java.util.List;
  * Created by yatharth on 4/4/18.
  */
 @QueryResult
-public class ExpiredEmploymentsQueryResult {
+public class ExpiredPositionsQueryResult {
 
-    private Employment employment;
+    private Position position;
     private List<AccessGroup> accessGroups;
     private List<Organization> organizations;
     private List<UnitPermission> unitPermissions;
@@ -28,12 +28,12 @@ public class ExpiredEmploymentsQueryResult {
     }
 
 
-    public Employment getEmployment() {
-        return employment;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setEmployment(Employment employment) {
-        this.employment = employment;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public List<AccessGroup> getAccessGroups() {

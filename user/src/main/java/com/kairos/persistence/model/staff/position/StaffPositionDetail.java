@@ -1,15 +1,12 @@
-package com.kairos.persistence.model.staff.employment;
-
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
+package com.kairos.persistence.model.staff.position;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Created by prabjot on 10/1/17.
  */
-public class StaffEmploymentDetail {
+public class StaffPositionDetail {
 
     private String cardNumber;
     private String sendNotificationBy;

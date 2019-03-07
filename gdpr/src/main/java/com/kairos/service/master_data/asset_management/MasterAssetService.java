@@ -88,40 +88,6 @@ public class MasterAssetService{
         return masterAsset;
     }
 
-    //TODO we can delete this method Refactored method is just define below this method with name "saveOrUpdateAssetType"
-    private void saveAndUpdateAssetType(Long countryId, MasterAsset masterAsset, MasterAssetDTO masterAssetDTO) {
-        if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
-
-            AssetType assetType = assetTypeRepository.getOne(masterAssetDTO.getAssetType().getId());
-            masterAsset.setAssetType(assetType);
-            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeBasicDTO -> {
-                if (assetSubTypeBasicDTO.getId() != null) {
-                    masterAsset.setSubAssetType(assetTypeRepository.getOne(assetSubTypeBasicDTO.getId()));
-                } else {
-                    AssetType assetSubType = new AssetType(assetSubTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
-                    assetSubType.setSubAssetType(true);
-                    assetTypeRepository.save(assetSubType);
-                    assetType.getSubAssetTypes().add(assetSubType);
-                    masterAsset.setSubAssetType(assetSubType);
-                }
-            });
-        } else {
-            AssetType previousAssetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType( masterAssetDTO.getAssetType().getName(), countryId, false);
-            Optional.ofNullable(previousAssetType).ifPresent(assetType -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType.getName()));
-            AssetType assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
-            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeDto -> {
-
-                AssetType assetSubType = new AssetType(assetSubTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
-                assetSubType.setSubAssetType(true);
-                assetTypeRepository.save(assetSubType);
-                assetType.getSubAssetTypes().add(assetSubType);
-                masterAsset.setSubAssetType(assetSubType);
-            });
-            assetTypeRepository.save(assetType);
-            masterAsset.setAssetType(assetType);
-        }
-    }
-
     /**
      *  This method id used to update existing asset-type or sub asset-type or create new asset-type/sub asset-type
      *

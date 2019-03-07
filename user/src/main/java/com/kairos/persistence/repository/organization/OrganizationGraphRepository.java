@@ -182,27 +182,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (o:Organization {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) WHERE id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) RETURN oh order by oh.index")
     List<OpeningHours> getOpeningHours(Long organizationId);
 
-    // TODO REMOVE VIPUL
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} WITH org\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
-            "MATCH (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH COLLECT(id(ot)) as organizationTypeIds,org,companyCategory\n" +
-            "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH  COLLECT(id(subType)) as organizationSubTypeIds,organizationTypeIds,org,companyCategory\n" +
-            "MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) WITH organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,companyCategory\n" +
-            "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,companyCategory\n" +
-            "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) WITH level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory  ORDER BY org.name\n" +
-            "OPTIONAL MATCH (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
-            "OPTIONAL MATCH (unitPermission)-[r1:" + HAS_ACCESS_GROUP + "]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})\n" +
-            "OPTIONAL MATCH (emp)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]-(u:User)\n" +
-            "WITH COLLECT(u) as unitManagers, COLLECT(ag) as accessGroups,level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
-            "WITH CASE WHEN size(unitManagers)>0 THEN unitManagers[0] ELSE null END as unitManager,\n" +
-            "CASE WHEN size(accessGroups)>0 THEN accessGroups[0] ELSE null END as accessGroup,\n" +
-            "level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
-            "RETURN COLLECT({unitManager:CASE WHEN unitManager IS NULL THEN null ELSE  {id:id(unitManager), email:unitManager.email, firstName:unitManager.firstName, lastName:unitManager.lastName, cprNumber:unitManager.cprNumber, accessGroupId:id(accessGroup), accessGroupName:accessGroup.name} END ,id:id(org),levelId:id(level),companyCategoryId:id(companyCategory),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,boardingCompleted:org.boardingCompleted,desiredUrl:org.desiredUrl,shortCompanyName:org.shortCompanyName,kairosCompanyId:org.kairosCompanyId,companyType:org.companyType,vatId:org.vatId,costCenter:org.costCenter,costCenterId:org.costCenterId,companyUnitType:org.companyUnitType,contactAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCodeId:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
-    OrganizationQueryResult getParentOrganizationOfRegion(long countryId);
-
-
-    //name             boardingCompleted     typeId             subTypeId     accountTYpe             zipCodeId
 
     @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} \n" +
             "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH org,ot\n" +
@@ -243,20 +222,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " OPTIONAL MATCH(country)<-[:" + IN_COUNTRY + "]-(unitType:UnitType{deleted:false}) WITH organizationTypes,bt ,cc ,serviceTypes,accountTypes,COLLECT(unitType) as unitTypes \n" +
             "RETURN organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes,unitTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
-
-
-    @Query("MATCH (root:Organization) WHERE id(root)={0} WITH root " +
-            "MATCH (root)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(user)={1} WITH employment " +
-            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) WHERE id(unit)={2} WITH unitPermission " +
-            "MATCH (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WITH accessPermission " +
-            "MATCH (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage{moduleId:{3}}) WITH COLLECT(r.isRead) as read " +
-            "RETURN " +
-            "CASE true IN read " +
-            "WHEN true " +
-            "THEN true " +
-            "ELSE false end as result")
-    boolean validateAccessGroupInUnit(long rootOrganizationId, long userId, long childOrganizationId, String accessPageId);
-
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org " +
             "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->(child:Organization{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
@@ -548,9 +513,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,companyCategory\n" +
             "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
             "OPTIONAL MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) WITH level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory  ORDER BY org.name\n" +
-            "OPTIONAL MATCH (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
+            "OPTIONAL MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org)\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:" + HAS_ACCESS_GROUP + "]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})\n" +
-            "OPTIONAL MATCH (emp)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]-(u:User)\n" +
+            "OPTIONAL MATCH (position)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]-(u:User)\n" +
             "WITH COLLECT(u) as unitManagers, COLLECT(ag) as accessGroups,level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
             "WITH CASE WHEN size(unitManagers)>0 THEN unitManagers[0] ELSE null END as unitManager,\n" +
             "CASE WHEN size(accessGroups)>0 THEN accessGroups[0] ELSE null END as accessGroup,\n" +
@@ -723,7 +688,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Long getHubIdByOrganizationId(Long organizationId);
 
 
-    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
 }

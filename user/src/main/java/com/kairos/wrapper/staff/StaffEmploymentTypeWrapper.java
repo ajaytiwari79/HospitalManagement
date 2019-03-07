@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class StaffEmploymentWrapper {
+public class StaffEmploymentTypeWrapper {
     private List<EmploymentType> employmentTypes= new ArrayList<>();
     private List<Map> staffList = new ArrayList<>();
     private Long loggedInStaffId;
 
-    public StaffEmploymentWrapper() {
+    public StaffEmploymentTypeWrapper() {
         // DC
     }
 

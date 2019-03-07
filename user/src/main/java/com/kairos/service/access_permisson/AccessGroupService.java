@@ -316,11 +316,6 @@ public class AccessGroupService {
         return accessPageRepository.getAccessModulesForUnits(parentOrganizationId, userId);
     }
 
-    public void modifyAccessPagePermission(long unitEmploymentId, long accessPageId, boolean read) {
-        accessPageRepository.modifyAccessPagePermission(unitEmploymentId, accessPageId, read);
-    }
-
-
     public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
         // Check if access group is of country
         if (Optional.ofNullable(countryId).isPresent()) {
@@ -552,12 +547,6 @@ public class AccessGroupService {
 
         } else {
             accessGroupRepository.setCustomPermissionForChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
-
-            /*if(updateChildren) {
-                accessGroupRepository.setCustomPermissionForTabAndChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
-            } else {
-                accessGroupRepository.setCustomPermissionForTab((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
-            }*/
         }
 
         Long parentTabId = accessPageRepository.getParentTab(accessPermissionDTO.getPageId());
@@ -568,11 +557,6 @@ public class AccessGroupService {
                     (!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), unit.getId(), accessPermissionDTO.getStaffId());
         }
     }
-
-    public List<AccessGroup> findAllAccessGroup() {
-        return accessGroupRepository.findAll();
-    }
-
 
     public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren) {
 

@@ -4,8 +4,8 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
@@ -17,11 +17,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class HostingProviderService {
@@ -44,17 +43,8 @@ public class HostingProviderService {
      * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
     public List<HostingProviderDTO> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> hostingProviderNames = new HashSet<>();
-        for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
-            hostingProviderNames.add(hostingProvider.getName());
-        }
-        List<String> nameInLowerCase = hostingProviderNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<HostingProvider> previousHostingProviders = hostingProviderRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        hostingProviderNames = ComparisonUtils.getNameListForMetadata(previousHostingProviders, hostingProviderNames);
+        Set<String> existingHostingProviderNames = hostingProviderRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> hostingProviderNames = ComparisonUtils.getNewMetaDataNames(hostingProviderDTOS,existingHostingProviderNames );
         List<HostingProvider> hostingProviders = new ArrayList<>();
         if (!hostingProviderNames.isEmpty()) {
             for (String name : hostingProviderNames) {
@@ -126,7 +116,7 @@ public class HostingProviderService {
      * @throws DuplicateDataException if HostingProvider exist with same name
      */
     public HostingProviderDTO updateHostingProvider(Long countryId, Long id, HostingProviderDTO hostingProviderDTO) {
-        //TODO What actually this code is doing?
+
         HostingProvider hostingProvider = hostingProviderRepository.findByCountryIdAndName(countryId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
