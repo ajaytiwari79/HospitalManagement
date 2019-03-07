@@ -84,8 +84,8 @@ public class AgreementSectionService{
         policyAgreementTemplate.setIncludeContentPage(agreementTemplateSectionDTO.isIncludeContentPage());
 
         policyAgreementRepository.save(policyAgreementTemplate);
-        //return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, templateId);
-        return agreementTemplateSectionResponseDTO;
+        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, templateId);
+        //return agreementTemplateSectionResponseDTO;
     }
 
     @SuppressWarnings("unchecked")
