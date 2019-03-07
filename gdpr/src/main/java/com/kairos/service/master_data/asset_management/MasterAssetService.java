@@ -5,7 +5,7 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -18,7 +18,6 @@ import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetRepository;
-import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
@@ -66,7 +65,7 @@ public class MasterAssetService{
             exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
         }
         MasterAsset masterAsset = new MasterAsset(masterAssetDto.getName(), masterAssetDto.getDescription(), countryId, SuggestedDataStatus.APPROVED);
-        masterAsset = getMetadataOfMasterAsset(masterAssetDto, masterAsset);
+        getMetadataOfMasterAsset(masterAssetDto, masterAsset);
         saveOrUpdateAssetType(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
         masterAssetDto.setId(masterAsset.getId());
@@ -128,48 +127,8 @@ public class MasterAssetService{
      */
 
     public List<MasterAssetResponseDTO> getAllMasterAsset(Long countryId) {
-        List<MasterAssetResponseDTO> masterAssetResponseDTOS = new ArrayList<>();
         List<MasterAsset> assets = masterAssetRepository.findAllByCountryId(countryId);
-        for(MasterAsset asset : assets){
-            masterAssetResponseDTOS.add(prepareAssetResponseDTO(asset));
-        }
-       return masterAssetResponseDTOS;
-    }
-
-    /**
-     * This method is used to convert "MasterAsset" domain into "MasterAssetResponseDTO".
-     *
-     * @param masterAsset
-     * @return MasterAssetResponseDTO
-     */
-
-    private MasterAssetResponseDTO prepareAssetResponseDTO(MasterAsset masterAsset){
-        MasterAssetResponseDTO masterAssetResponseDTO = new MasterAssetResponseDTO(masterAsset.getId(),masterAsset.getName(),masterAsset.getDescription(), masterAsset.getSuggestedDate(), masterAsset.getSuggestedDataStatus());
-        masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(masterAsset.getAssetType().getId(),masterAsset.getAssetType().getName(), masterAsset.getAssetType().isSubAssetType()));
-        masterAssetResponseDTO.setAssetSubType(new AssetTypeBasicResponseDTO(masterAsset.getSubAssetType().getId(),masterAsset.getSubAssetType().getName(), masterAsset.getSubAssetType().isSubAssetType()));
-
-        List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
-        List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
-        List<ServiceCategoryDTO> serviceCategories = new ArrayList<>();
-        List<SubServiceCategoryDTO> subServiceCategories = new ArrayList<>();
-        for(OrganizationType orgType : masterAsset.getOrganizationTypes()){
-            organizationTypes.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
-        }
-        for(OrganizationSubType orgSubType : masterAsset.getOrganizationSubTypes()){
-            organizationSubTypes.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
-        }
-        for(ServiceCategory category : masterAsset.getOrganizationServices()){
-            serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName())) ;
-        }
-        for(SubServiceCategory subServiceCategory : masterAsset.getOrganizationSubServices()){
-            subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
-        }
-
-        masterAssetResponseDTO.setOrganizationTypes(organizationTypes);
-        masterAssetResponseDTO.setOrganizationSubTypes(organizationSubTypes);
-        masterAssetResponseDTO.setOrganizationServices(serviceCategories);
-        masterAssetResponseDTO.setOrganizationSubServices(subServiceCategories);
-        return masterAssetResponseDTO;
+       return ObjectMapperUtils.copyPropertiesOfListByMapper(assets, MasterAssetResponseDTO.class);
     }
 
 
@@ -186,7 +145,7 @@ public class MasterAssetService{
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        masterAsset = getMetadataOfMasterAsset(masterAssetDto, masterAsset);
+        getMetadataOfMasterAsset(masterAssetDto, masterAsset);
         masterAsset = masterAssetRepository.getOne(id);
         masterAsset.setName(masterAssetDto.getName());
         masterAsset.setDescription(masterAssetDto.getDescription());
@@ -214,7 +173,7 @@ public class MasterAssetService{
             throw new DataNotFoundByIdException("master asset not Exist for id " + id);
 
         }
-        return prepareAssetResponseDTO(masterAsset);
+        return ObjectMapperUtils.copyPropertiesByMapper(masterAsset, MasterAssetResponseDTO.class);
     }
 
 
@@ -247,7 +206,7 @@ public class MasterAssetService{
      * @return
      * @description update status of asset (suggest by unit)
      */
-    public boolean updateSuggestedStatusOfMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
+    public boolean updateStatusOfSuggestedMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds,suggestedDataStatus);
         if(updateCount > 0){

@@ -9,7 +9,7 @@ import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.OrganizationClause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.data_inventory.asset.AssetDeprecated;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
@@ -20,7 +20,6 @@ import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateDeprecated;
 import com.kairos.persistence.model.risk_management.Risk;
-import com.kairos.persistence.model.risk_management.RiskDeprecated;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -276,9 +275,9 @@ public class DefaultDataInheritService{
 
     private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAssetResponseDTO> masterAssetDTOS) {
         if (CollectionUtils.isNotEmpty(masterAssetDTOS)) {
-            List<AssetDeprecated> assets = new ArrayList<>();
+            List<Asset> assets = new ArrayList<>();
             for (MasterAssetResponseDTO masterAssetDTO : masterAssetDTOS) {
-                AssetDeprecated asset = new AssetDeprecated(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
+                Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
                // asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
 //                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
@@ -572,19 +571,7 @@ public class DefaultDataInheritService{
     }
 
 
-    private List<RiskDeprecated> buildRisks(Long unitId, List<RiskBasicResponseDTO> riskDTOS) {
 
-        List<RiskDeprecated> risks = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(riskDTOS)) {
-            riskDTOS.forEach(riskDTO -> {
-                RiskDeprecated risk = new RiskDeprecated(riskDTO.getName(), riskDTO.getDescription(), riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
-                //risk.setOrganizationId(unitId);
-                risks.add(risk);
-            });
-        }
-        return risks;
-
-    }
 
 
 }

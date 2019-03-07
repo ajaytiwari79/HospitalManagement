@@ -33,8 +33,10 @@ public class MasterAssetResponseDTO {
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
+    public MasterAssetResponseDTO() {
+    }
 
-    public MasterAssetResponseDTO(@NotNull(message = "error.message.id.notnull") Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description,LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
+    public MasterAssetResponseDTO(@NotNull(message = "error.message.id.notnull") Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -10,7 +10,6 @@ import com.kairos.dto.gdpr.data_inventory.RelatedDataCategoryDTO;
 import com.kairos.persistence.model.data_inventory.processing_activity.*;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
-import com.kairos.persistence.model.master_data.data_category_element.DataElementDeprecated;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -514,7 +513,7 @@ public class ProcessingActivityService {
             dataSubjectResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 
                 if (dataElementsCorrespondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
-                    List<DataElementDeprecated> dataElementBasicResponseDTOS = new ArrayList<>();
+                    //List<DataElementDeprecated> dataElementBasicResponseDTOS = new ArrayList<>();
                     Set<Long> dataElementIdList = dataElementsCorrespondingToDataCategory.get(dataCategoryResponseDTO.getId());
                     dataCategoryResponseDTO.getDataElements().forEach(dataElementBasicResponseDTO -> {
                         if (dataElementIdList.contains(dataElementBasicResponseDTO.getId())) {

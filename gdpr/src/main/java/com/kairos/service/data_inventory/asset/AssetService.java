@@ -92,7 +92,6 @@ public class AssetService {
         Asset previousAsset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, assetDTO.getName());
         Optional.ofNullable(previousAsset).ifPresent(asset ->
                 {
-                    //TODO need refactor why these conditions
                     if (assetDTO.getId() == null || (assetDTO.getId() != null && !asset.getId().equals(assetDTO.getId()))) {
                         exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
 
