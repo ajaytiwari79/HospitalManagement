@@ -292,9 +292,9 @@ public class TimeBankCalculationService {
             valid = false;
             reasonForNotValid = PHASE_IS_NOT_VALID;
         }
-        if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
-            valid = false;
-            reasonForNotValid = ACTIVITY_IS_NOT_VALID;
+        if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
+            valid = ruleTemplate.getCalculationFor().equals(FUNCTIONS);
+            reasonForNotValid = ruleTemplate.getCalculationFor().equals(FUNCTIONS) ? null : ACTIVITY_IS_NOT_VALID;
         }
         if(!(valid && validateDayType(shiftInterval,ruleTemplate,dayTypeDTOMap))){
             valid=false;
@@ -1166,7 +1166,7 @@ public class TimeBankCalculationService {
     }
 
     public Map<java.time.LocalDate, TimeBankByDateDTO> getAccumulatedTimebankDTO(Set<DateTimeInterval> planningPeriodIntervals, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate){
-        long accumulatedTimebank = unitPositionWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
+        long accumulatedTimebank = 0;
         java.time.LocalDate unitPositionStartDate = unitPositionWithCtaDetailsDTO.getStartDate();
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k -> k.getDate(), v -> v));
         Map<java.time.LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = new HashMap<>();
@@ -1180,6 +1180,9 @@ public class TimeBankCalculationService {
                 accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
             } else {
                 totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, unitPositionStartDate, unitPositionWithCtaDetailsDTO.getPositionLines()));
+            }
+            if(unitPositionStartDate.equals(unitPositionWithCtaDetailsDTO.getAccumulatedTimebankDate())){
+                accumulatedTimebank = unitPositionWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
             }
             timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);
             timeBankByDateDTO.setTimeBankChangeMinutes(totalTimeBankMinutes);

@@ -3,6 +3,7 @@ package com.kairos.service.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.staffing_level.Duration;
@@ -217,7 +218,9 @@ public class ShiftSickService extends MongoBaseService {
             ShiftActivity shiftActivity = calculateShiftStartAndEndTime(shiftNeedsToAddForDays, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
             shiftActivity.setActivityId(activity.getId());
             shiftActivity.setActivityName(activity.getName());
-            Shift currentShift = new Shift(null, null, staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
+            ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
+            Shift currentShift = new Shift(shiftActivity.getStartDate(), shiftActivity.getEndDate(), staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
+            currentShift.setShiftType(shiftType);
             shifts.add(currentShift);
         }
         addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts, dates);

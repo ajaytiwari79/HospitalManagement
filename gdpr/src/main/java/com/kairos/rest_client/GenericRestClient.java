@@ -33,8 +33,8 @@ public class GenericRestClient {
     RestTemplate restTemplate;
     @Inject private ExceptionService exceptionService;
 
-    public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit,id);
+    public <T, V> V publish(T t, Long id, boolean isOrganization, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isOrganization,id);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
@@ -73,8 +73,8 @@ public class GenericRestClient {
     }
 
 
-    public <T, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit,id)+uri;
+    public <T, V> V publishRequest(T t, Long id, boolean isOrganization, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isOrganization,id)+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =

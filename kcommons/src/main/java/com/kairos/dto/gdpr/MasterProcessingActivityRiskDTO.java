@@ -10,7 +10,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityRiskDTO {
 
-    @NotNull(message = "Processing Activity Id can't be Null")
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
     @Valid

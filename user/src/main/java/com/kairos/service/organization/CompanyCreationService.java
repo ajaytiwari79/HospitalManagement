@@ -374,7 +374,7 @@ public class CompanyCreationService {
 
     private void setEncryptedPasswordAndAge(UnitManagerDTO unitManagerDTO, User user) {
         if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
-            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
+            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().replaceAll("\\s+","") + "@kairos"));
         }
         user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(unitManagerDTO.getCprNumber()));
         user.setGender(CPRUtil.getGenderFromCPRNumber(unitManagerDTO.getCprNumber()));

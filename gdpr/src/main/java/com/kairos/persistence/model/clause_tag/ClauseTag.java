@@ -9,20 +9,20 @@ import javax.validation.constraints.NotBlank;
 @Entity
 public class ClauseTag extends BaseEntity {
 
-    @NotBlank(message = "Name cannot be  empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
     private boolean defaultTag;
     private Long countryId;
     private Long organizationId;
 
-    public ClauseTag(@NotBlank(message = "Name cannot be  empty") String name) {
+    public ClauseTag(@NotBlank(message = "error.message.name.notNull.orEmpty") String name) {
         this.name = name;
     }
 
     public ClauseTag() {
     }
 
-    public ClauseTag(@NotBlank(message = "Name cannot be  empty") String name, boolean defaultTag) {
+    public ClauseTag(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, boolean defaultTag) {
         this.name = name;
         this.defaultTag = defaultTag;
     }

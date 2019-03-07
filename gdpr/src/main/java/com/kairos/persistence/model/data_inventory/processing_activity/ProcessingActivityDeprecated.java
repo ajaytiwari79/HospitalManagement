@@ -3,7 +3,7 @@ package com.kairos.persistence.model.data_inventory.processing_activity;
 
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
+import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class ProcessingActivityDeprecated {
     private String description;
     private ManagingOrganization managingDepartment;
     private Staff processOwner;
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects = new ArrayList<>();
+    private List<RelatedDataSubjectDTO> dataSubjects = new ArrayList<>();
     private List<BigInteger> linkedAssets = new ArrayList<>();
     private List<BigInteger> processingPurposes;
     private List<BigInteger> dataSources;
@@ -64,8 +64,8 @@ public class ProcessingActivityDeprecated {
 
     public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
 
-    public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
-    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
+    public List<RelatedDataSubjectDTO> getDataSubjects() { return dataSubjects; }
+    public void setDataSubjects(List<RelatedDataSubjectDTO> dataSubjects) { this.dataSubjects = dataSubjects; }
 
     public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
 

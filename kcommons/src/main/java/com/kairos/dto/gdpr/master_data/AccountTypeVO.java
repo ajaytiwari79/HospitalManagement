@@ -3,14 +3,16 @@ package com.kairos.dto.gdpr.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountTypeVO {
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotNull
+
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
     public Long getId() { return id; }

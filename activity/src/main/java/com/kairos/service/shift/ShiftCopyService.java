@@ -10,6 +10,7 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -183,7 +184,6 @@ public class ShiftCopyService extends MongoBaseService {
                     if (shiftExistsMessage != null) {
                         validationMessages.add(shiftExistsMessage);
                     }
-
                     validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffUnitPosition, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs));
                 } else {
                     validationMessages.add(convertMessage("message.unit_position.not.active", shiftCreationStartDate));
@@ -224,10 +224,12 @@ public class ShiftCopyService extends MongoBaseService {
                     sourceShift.getRemarks(), shiftActivities, staffUnitPosition.getStaff().getId(), sourceShift.getUnitId(),
                     sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getParentOpenShiftId(), sourceShift.getId()
                     , planningPeriod.getCurrentPhaseId(), planningPeriod.getId(), staffUnitPosition.getUserId(), sourceShift.getShiftType());
-
+            Activity activity = activityMap.get(sourceShift.getActivities().get(0).getActivityId()).getActivity();
+            ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
             shiftActivities = shiftBreakService.addBreakInShiftsWhileCopy(activityMap, copiedShift, null, dataWrapper.getTimeSlotWrappers(), breakSettings);
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffUnitPosition, planningPeriod, activityConfigurations);
+            copiedShift.setShiftType(shiftType);
             newShifts.add(copiedShift);
 
             return new ShiftResponse(sourceShift.getId(), sourceShift.getActivities().get(0).getActivityName(), Collections.singletonList(NO_CONFLICTS), true, asLocalDate(startDate));

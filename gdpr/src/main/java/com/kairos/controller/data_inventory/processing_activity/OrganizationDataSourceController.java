@@ -47,7 +47,7 @@ class OrganizationDataSourceController {
     @GetMapping("/data_source/{dataSourceId}")
     public ResponseEntity<Object> getDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(unitId, dataSourceId));
     }
@@ -57,7 +57,7 @@ class OrganizationDataSourceController {
     @GetMapping("/data_source")
     public ResponseEntity<Object> getAllDataSource(@PathVariable Long unitId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(unitId));
     }
@@ -67,7 +67,7 @@ class OrganizationDataSourceController {
     @DeleteMapping("/data_source/{dataSourceId}")
     public ResponseEntity<Object> deleteDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(unitId, dataSourceId));
@@ -78,7 +78,7 @@ class OrganizationDataSourceController {
     @PutMapping("/data_source/{dataSourceId}")
     public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(unitId, dataSourceId, dataSource));
@@ -90,7 +90,7 @@ class OrganizationDataSourceController {
     @PostMapping(COUNTRY_URL + "/data_source/suggest")
     public ResponseEntity<Object> saveDataSourceAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSourceDTOs) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.saveAndSuggestDataSources(countryId, unitId, dataSourceDTOs.getRequestBody()));
 

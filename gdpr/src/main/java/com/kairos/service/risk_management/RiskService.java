@@ -34,7 +34,7 @@ public class RiskService{
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
      * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of RISK Ids generated after save operation
      */
-    public <T, E extends BasicRiskDTO> Map<T, List<RiskDeprecated>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
+    public <T, E extends BasicRiskDTO> Map<T, List<RiskDeprecated>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isOrganization, Map<T, List<E>> risksRelatedToObject) {
 
         Assert.notEmpty(risksRelatedToObject, "list can' t be empty");
         List<RiskDeprecated> risks = new ArrayList<>();
@@ -59,23 +59,23 @@ public class RiskService{
             }
             List<RiskDeprecated> riskRelatedTOObject = new ArrayList<>();
             if (!newRisk.isEmpty()) {
-                riskRelatedTOObject = isUnitId ? buildRiskAtOrganizationLevel(referenceId, newRisk) : buildRiskAtCountryLevel(referenceId, newRisk);
+                riskRelatedTOObject = isOrganization ? buildRiskAtOrganizationLevel(referenceId, newRisk) : buildRiskAtCountryLevel(referenceId, newRisk);
                 risks.addAll(riskRelatedTOObject);
             }
             riskListRelatedToObjectMap.put(objectToWhichRiskRelated, riskRelatedTOObject);
         });
         if (!existingRisksRelatedToObject.isEmpty()) {
-            risks.addAll(updateExistingRisk(referenceId, isUnitId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
+            risks.addAll(updateExistingRisk(referenceId, isOrganization, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
         }
        // if (CollectionUtils.isNotEmpty(risks)) riskMongoRepository.saveAll(getNextSequence(risks));
         return riskListRelatedToObjectMap;
     }
 
 
-    private <T, E extends BasicRiskDTO> List<RiskDeprecated> updateExistingRisk(Long referenceId, boolean isUnitId,
+    private <T, E extends BasicRiskDTO> List<RiskDeprecated> updateExistingRisk(Long referenceId, boolean isOrganization,
                                                                                 List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<RiskDeprecated>> riskListRelatedToObjectMap) {
         Assert.notEmpty(existingRiskIds, "List can't be empty");
-       // List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(referenceId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(referenceId, existingRiskIds);
+       // List<Risk> riskList = isOrganization ? riskMongoRepository.findRiskByUnitIdAndIds(referenceId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(referenceId, existingRiskIds);
         //Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
         existingRisksRelatedToObject.forEach((objectToWhichRiskRelate, riskDTOS) ->
         {

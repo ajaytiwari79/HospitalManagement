@@ -55,6 +55,7 @@ public class StaffUnitPositionDetails {
     private boolean published;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
+    private LocalDate accumulatedTimebankDate;
     private CTAResponseDTO costTimeAgreement;
 
     public StaffUnitPositionDetails() {
@@ -315,5 +316,13 @@ public class StaffUnitPositionDetails {
 
     public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
+
+    public LocalDate getAccumulatedTimebankDate() {
+        return accumulatedTimebankDate;
+    }
+
+    public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
+        this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 }

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.agreement_template;
 
 
-import com.kairos.persistence.model.clause.ClauseCkEditorVO;
+import com.kairos.persistence.model.clause.AgreementSectionClause;
 import com.kairos.persistence.model.common.BaseEntity;
 
 import javax.persistence.*;
@@ -24,7 +24,7 @@ public class AgreementSection extends BaseEntity {
 
     @OrderColumn
     @ElementCollection
-    protected List<ClauseCkEditorVO> clauses=new ArrayList<>();
+    protected List<AgreementSectionClause> clauses=new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "agreementSection")
     private List<AgreementSubSection> agreementSubSections =new ArrayList<>();
@@ -62,11 +62,11 @@ public class AgreementSection extends BaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    public List<ClauseCkEditorVO> getClauses() {
+    public List<AgreementSectionClause> getClauses() {
         return clauses.stream().filter(clause -> clause.isDeleted() == false).collect(Collectors.toList());
     }
 
-    public void setClauses(List<ClauseCkEditorVO> clauses) {
+    public void setClauses(List<AgreementSectionClause> clauses) {
         this.clauses = clauses;
     }
 
@@ -91,9 +91,9 @@ public class AgreementSection extends BaseEntity {
     }
 
 
-    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isUnitId, Long referenceId){
+    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isOrganization, Long referenceId){
         this.agreementSubSections.forEach(subSection ->{
-            if(isUnitId){
+            if(isOrganization){
                 this.setOrganizationId(referenceId);
                 subSection.setOrganizationId(referenceId);
             }else{

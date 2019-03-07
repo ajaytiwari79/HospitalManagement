@@ -38,10 +38,10 @@ public interface ClauseRepository extends JpaRepository<Clause, Long> {
     @Query(value = "Select c from Clause c where c.tempClauseId != null")
     List<Clause> getAllClausesHavingTempId();
 
-    @Query(value = "Select c from Clause c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
+    @Query(value = "Select c from MasterClause c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
     List<Clause> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, List<Long> organizationTypeIds, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds, Long templateTypeId);
 
-    @Query(value = "Select DISTINCT c from Clause c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
+    @Query(value = "Select DISTINCT c from MasterClause c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
     List<Clause> getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(Long countryId, List<Long> organizationTypeIds, List<Long> organizationSubTypeIds, List<Long> organizationServiceCategoryIds, List<Long> organizationSubServiceCategoryTypeIds);
 
 }

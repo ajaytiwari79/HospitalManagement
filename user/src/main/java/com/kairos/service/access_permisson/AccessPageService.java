@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @Service
 public class AccessPageService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccessPageService.class);
 
     @Inject
     private AccessPageRepository accessPageRepository;
@@ -76,7 +76,7 @@ public class AccessPageService {
         if(Optional.ofNullable(accessPageDTO.getParentTabId()).isPresent()){
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
-                logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
+                LOGGER.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
                 exceptionService.dataNotFoundByIdException("message.dataNotFound","parentAccessPage",accessPageDTO.getParentTabId());
 
             }
@@ -202,22 +202,6 @@ public class AccessPageService {
     }
 
 
-    private StaffPermissionDTO getUnionOfPermissions(List<StaffPermissionQueryResult> modules){
-        StaffPermissionDTO moduleToReturn = null;
-        List<Map<String,Object>> tabPermissions = new ArrayList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        for(StaffPermissionQueryResult staffPermission : modules){
-            if(!Optional.ofNullable(moduleToReturn).isPresent()){
-                moduleToReturn = objectMapper.convertValue(staffPermission,StaffPermissionDTO.class);
-            } else if(staffPermission.isWrite() || (staffPermission.isRead() && !moduleToReturn.isRead())){
-                moduleToReturn = objectMapper.convertValue(staffPermission,StaffPermissionDTO.class);;
-            }
-            tabPermissions.addAll(staffPermission.getTabPermissions());
-        }
-        moduleToReturn.setTabPermissions(getUnionOfTabPermission(tabPermissions));
-        return moduleToReturn;
-    }
-
     private List<StaffTabPermission> getUnionOfTabPermission(List<Map<String,Object>> staffTabPermissions){
         Map<String,StaffTabPermission> tabPermissionToProceed = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -233,12 +217,6 @@ public class AccessPageService {
     }
 
 
-    private List<StaffPermissionDTO> getPermissionForHubMember(){
-        List<StaffPermissionQueryResult> staffPermissionQueryResults = accessPageRepository.getTabsPermissionForHubUserForUnit();
-        ObjectMapper objectMapper = new ObjectMapper();
-        return staffPermissionQueryResults.parallelStream().map(staffPermissionQueryResult-> objectMapper.
-                convertValue(staffPermissionQueryResult,StaffPermissionDTO.class)).collect(Collectors.toList());
-    }
 
     public boolean isHubMember(Long userId){
         Boolean hubMember = accessPageRepository.isHubMember(userId);
