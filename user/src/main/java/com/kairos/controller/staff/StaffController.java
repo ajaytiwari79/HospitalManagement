@@ -141,7 +141,7 @@ public class StaffController {
 
     }
 
-    @RequestMapping(value = "/{staffId}/unit_employments", method = RequestMethod.GET)
+    @RequestMapping(value = "/{staffId}/positions", method = RequestMethod.GET)
     @ApiOperation("get employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmployments(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {

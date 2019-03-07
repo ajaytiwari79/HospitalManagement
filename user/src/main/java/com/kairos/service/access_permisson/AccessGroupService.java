@@ -316,11 +316,6 @@ public class AccessGroupService {
         return accessPageRepository.getAccessModulesForUnits(parentOrganizationId, userId);
     }
 
-    public void modifyAccessPagePermission(long unitEmploymentId, long accessPageId, boolean read) {
-        accessPageRepository.modifyAccessPagePermission(unitEmploymentId, accessPageId, read);
-    }
-
-
     public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
         // Check if access group is of country
         if (Optional.ofNullable(countryId).isPresent()) {

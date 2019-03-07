@@ -27,10 +27,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (staff)-[:" + STAFF_HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[r:" + ACCESS_GROUP_HAS_ACCESS_TO_PAGE + "{read:false}]->(accessPage:AccessPage{isModule:true}) RETURN DISTINCT accessPage")
     List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId);
 
-    @Query("MATCH (n:UnitPermission)-[:" + HAS_ACCESS_PERMISSION + "]->(accessPermission:AccessPermission)-[r:" + HAS_ACCESS_PAGE_PERMISSION + "]->(p:AccessPage) WHERE id(n)={0} AND id(p)={1} SET r.isRead={2} RETURN r")
-    void modifyAccessPagePermission(long unitEmploymentId, long accessPageId, boolean value);
-
-
     // Fetch access page hierarchy show only selected access page
     @Query("MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
             "MATCH path=(accessPage:AccessPage{active:true})-[:SUB_PAGE*]->(subPage:AccessPage{active:true})-[:"+HAS_ACCESS_OF_TABS+"]-(ag) \n" +

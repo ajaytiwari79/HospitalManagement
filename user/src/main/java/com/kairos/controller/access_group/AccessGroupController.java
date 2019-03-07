@@ -96,14 +96,6 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessModulesForUnits(orgId, userId));
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_permission/unit_employment/{unitPermissionId}/access_page/{accessPageId}", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> modifyAccessPagePermission(@PathVariable long unitPermissionId,
-                                                                          @PathVariable long accessPageId, @RequestBody Map<String, Object> map) {
-        accessGroupService.modifyAccessPagePermission(unitPermissionId, accessPageId, (boolean) map.get("read"));
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-    }
-
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessPageHierarchy(@PathVariable long accessGroupId) {
