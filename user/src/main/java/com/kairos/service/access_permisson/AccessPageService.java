@@ -1,36 +1,29 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.config.security.CurrentUserDetails;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
+import com.kairos.dto.user.staff.permission.StaffPermissionDTO;
+import com.kairos.dto.user.staff.permission.StaffTabPermission;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.staff.position.EmploymentAccessPageRelation;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
-import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
-import com.kairos.persistence.model.staff.permission.UnitPermission;
-import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.position.AccessPermissionAccessPageRelation;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
-import com.kairos.dto.user.access_page.KPIAccessPageDTO;
-import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.dto.user.staff.permission.StaffPermissionDTO;
-import com.kairos.dto.user.staff.permission.StaffTabPermission;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,40 +153,40 @@ public class AccessPageService {
         List<AccessPermission> accessPermissions = accessPermissionGraphRepository.findAll();
         List<AccessPage> accessPages = (List<AccessPage> )accessPageRepository.findAll();
 
-        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>(accessPages.size());
+        List<AccessPermissionAccessPageRelation> accessPermissionAccessPageRelations = new ArrayList<>(accessPages.size());
         for(AccessPermission accessPermission : accessPermissions){
             for (AccessPage accessPage : accessPages) {
-                EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
-                employmentAccessPageRelation.setRead(true);
-                employmentAccessPageRelation.setWrite(false);
-                employmentAccessPageRelations.add(employmentAccessPageRelation);
+                AccessPermissionAccessPageRelation accessPermissionAccessPageRelation = new AccessPermissionAccessPageRelation(accessPermission, accessPage);
+                accessPermissionAccessPageRelation.setRead(true);
+                accessPermissionAccessPageRelation.setWrite(false);
+                accessPermissionAccessPageRelations.add(accessPermissionAccessPageRelation);
             }
         }
-        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
+        employmentPageGraphRepository.saveAll(accessPermissionAccessPageRelations);
     }
 
     public void setPagePermissionToStaff(AccessPermission accessPermission,long accessGroupId) {
         List<AccessPage> accessPages = accessGroupRepository.getAccessPageByGroup(accessGroupId);
-        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>(accessPages.size());
+        List<AccessPermissionAccessPageRelation> accessPermissionAccessPageRelations = new ArrayList<>(accessPages.size());
         for (AccessPage accessPage : accessPages) {
-            EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
-            employmentAccessPageRelation.setRead(true);
-            employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelations.add(employmentAccessPageRelation);
+            AccessPermissionAccessPageRelation accessPermissionAccessPageRelation = new AccessPermissionAccessPageRelation(accessPermission, accessPage);
+            accessPermissionAccessPageRelation.setRead(true);
+            accessPermissionAccessPageRelation.setWrite(true);
+            accessPermissionAccessPageRelations.add(accessPermissionAccessPageRelation);
         }
-        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
+        employmentPageGraphRepository.saveAll(accessPermissionAccessPageRelations);
     }
 
     public void setPagePermissionToAdmin(AccessPermission accessPermission) {
         List<AccessPage> accessPages =(List<AccessPage>) accessPageRepository.findAll();
-        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>(accessPages.size());
+        List<AccessPermissionAccessPageRelation> accessPermissionAccessPageRelations = new ArrayList<>(accessPages.size());
         for (AccessPage accessPage : accessPages) {
-            EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
-            employmentAccessPageRelation.setRead(true);
-            employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelations.add(employmentAccessPageRelation);
+            AccessPermissionAccessPageRelation accessPermissionAccessPageRelation = new AccessPermissionAccessPageRelation(accessPermission, accessPage);
+            accessPermissionAccessPageRelation.setRead(true);
+            accessPermissionAccessPageRelation.setWrite(true);
+            accessPermissionAccessPageRelations.add(accessPermissionAccessPageRelation);
         }
-        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
+        employmentPageGraphRepository.saveAll(accessPermissionAccessPageRelations);
     }
 
 

@@ -6,7 +6,7 @@ import java.time.LocalDate;
 /**
  * Created by prabjot on 10/1/17.
  */
-public class StaffEmploymentDetail {
+public class StaffPositionDetail {
 
     private String cardNumber;
     private String sendNotificationBy;

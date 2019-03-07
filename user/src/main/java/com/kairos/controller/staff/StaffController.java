@@ -6,7 +6,7 @@ import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
-import com.kairos.persistence.model.staff.position.StaffEmploymentDetail;
+import com.kairos.persistence.model.staff.position.StaffPositionDetail;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -70,8 +70,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
     @ApiOperation("update staff employment details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveEmploymentInfo(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody StaffEmploymentDetail staffEmploymentDetail) {
-        Map<String, Object> response = positionService.saveEmploymentDetail(unitId, staffId, staffEmploymentDetail);
+    public ResponseEntity<Map<String, Object>> saveEmploymentInfo(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody StaffPositionDetail staffPositionDetail) {
+        Map<String, Object> response = positionService.savePositionDetail(unitId, staffId, staffPositionDetail);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
         } else {
@@ -146,7 +146,7 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmployments(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {
         Map<String, Object> responseData = new HashMap<String, Object>(2);
-        responseData.put("positions", positionService.getEmployments(staffId, unitId, type));
+        responseData.put("positions", positionService.getPositions(staffId, unitId, type));
         responseData.put("employmentTypes", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }

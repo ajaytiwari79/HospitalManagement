@@ -6,7 +6,7 @@ import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.position.StaffEmploymentDTO;
+import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -225,7 +225,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={0} AND id(staff)={1}\n" +
             " RETURN staff, position.startDateMillis AS positionStartDate")
-    StaffEmploymentDTO getStaffAndEmploymentByUnitId(long unitId, long staffId);
+    StaffPositionDTO getStaffAndEmploymentByUnitId(long unitId, long staffId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(organization:Organization) WHERE id(organization)={0} WITH unitPermission\n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{name:\"COUNTRY_ADMIN\"}) WITH unitPermission\n" +

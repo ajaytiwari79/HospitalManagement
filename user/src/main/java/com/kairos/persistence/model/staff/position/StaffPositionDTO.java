@@ -7,16 +7,16 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * Created by yatharth on 13/4/18.
  */
 @QueryResult
-public class StaffEmploymentDTO {
+public class StaffPositionDTO {
 
    private Staff staff;
    private Long positionStartDate;
 
-    public StaffEmploymentDTO() {
+    public StaffPositionDTO() {
 
     }
 
-    public StaffEmploymentDTO(Staff staff, Long startDateMillis ) {
+    public StaffPositionDTO(Staff staff, Long startDateMillis ) {
         this.staff = staff;
         this.positionStartDate = startDateMillis;
     }

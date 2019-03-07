@@ -114,39 +114,39 @@ public class PositionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PositionService.class);
 
-    public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail){
+    public Map<String, Object> savePositionDetail(long unitId, long staffId, StaffPositionDetail staffPositionDetail){
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
+        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
             exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
         }
-        if (isNotNull(objectToUpdate.getExternalId()) && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-            Staff staff = staffGraphRepository.findByExternalId(staffEmploymentDetail.getTimeCareExternalId());
+        if (isNotNull(objectToUpdate.getExternalId()) && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId())) {
+            Staff staff = staffGraphRepository.findByExternalId(staffPositionDetail.getTimeCareExternalId());
             if (Optional.ofNullable(staff).isPresent()) {
                 exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
             }
         }
-        Long positionStartDate = DateUtils.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
-        EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
-        objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
-        objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
-        objectToUpdate.setSendNotificationBy(staffEmploymentDetail.getSendNotificationBy());
-        objectToUpdate.setCopyKariosMailToLogin(staffEmploymentDetail.isCopyKariosMailToLogin());
+        Long positionStartDate = DateUtils.getIsoDateInLong(staffPositionDetail.getEmployedSince());
+        EngineerType engineerType = engineerTypeGraphRepository.findOne(staffPositionDetail.getEngineerTypeId());
+        objectToUpdate.setEmail(staffPositionDetail.getEmail());
+        objectToUpdate.setCardNumber(staffPositionDetail.getCardNumber());
+        objectToUpdate.setSendNotificationBy(staffPositionDetail.getSendNotificationBy());
+        objectToUpdate.setCopyKariosMailToLogin(staffPositionDetail.isCopyKariosMailToLogin());
         objectToUpdate.setEngineerType(engineerType);
-        objectToUpdate.setExternalId(staffEmploymentDetail.getTimeCareExternalId());
+        objectToUpdate.setExternalId(staffPositionDetail.getTimeCareExternalId());
         staffGraphRepository.save(objectToUpdate);
         positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
-        StaffEmploymentDTO staffEmploymentDTO = new StaffEmploymentDTO(objectToUpdate, positionStartDate);
-        return retrieveEmploymentDetails(staffEmploymentDTO);
+        StaffPositionDTO staffPositionDTO = new StaffPositionDTO(objectToUpdate, positionStartDate);
+        return retrieveEmploymentDetails(staffPositionDTO);
     }
 
-    public Map<String, Object> retrieveEmploymentDetails(StaffEmploymentDTO staffEmploymentDTO) {
-        Staff staff = staffEmploymentDTO.getStaff();
+    public Map<String, Object> retrieveEmploymentDetails(StaffPositionDTO staffPositionDTO) {
+        Staff staff = staffPositionDTO.getStaff();
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
-        String employedSince = Optional.ofNullable(staffEmploymentDTO.getPositionStartDate()).isPresent() ? DateUtils.getDateFromEpoch(staffEmploymentDTO.getPositionStartDate()).toString() : null;
+        String employedSince = Optional.ofNullable(staffPositionDTO.getPositionStartDate()).isPresent() ? DateUtils.getDateFromEpoch(staffPositionDTO.getPositionStartDate()).toString() : null;
         map.put("employedSince", employedSince);
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
@@ -236,7 +236,7 @@ public class PositionService {
     }
 
 
-    public List<Map<String, Object>> getEmployments(long staffId, long unitId, String type) {
+    public List<Map<String, Object>> getPositions(long staffId, long unitId, String type) {
 
         Organization unit = null;
 

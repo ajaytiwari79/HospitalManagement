@@ -13,7 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
  * Created by prabjot on 7/12/16.
  */
 @RelationshipEntity(type=HAS_ACCESS_PAGE_PERMISSION)
-public class EmploymentAccessPageRelation extends UserBaseEntity {
+public class AccessPermissionAccessPageRelation extends UserBaseEntity {
 
     @StartNode
     private AccessPermission accessPermission;
@@ -24,12 +24,12 @@ public class EmploymentAccessPageRelation extends UserBaseEntity {
     private boolean isEnabled = true;
 
 
-    public EmploymentAccessPageRelation(AccessPermission accessPermission, AccessPage accessPage) {
+    public AccessPermissionAccessPageRelation(AccessPermission accessPermission, AccessPage accessPage) {
         this.accessPermission = accessPermission;
         this.accessPage = accessPage;
     }
 
-    public EmploymentAccessPageRelation(AccessPermission accessPermission, AccessPage accessPage, boolean isRead, boolean isWrite) {
+    public AccessPermissionAccessPageRelation(AccessPermission accessPermission, AccessPage accessPage, boolean isRead, boolean isWrite) {
         this.accessPermission = accessPermission;
         this.accessPage = accessPage;
         this.isRead = isRead;
@@ -44,7 +44,7 @@ public class EmploymentAccessPageRelation extends UserBaseEntity {
         isWrite = write;
     }
 
-    public EmploymentAccessPageRelation() {
+    public AccessPermissionAccessPageRelation() {
     }
 
     public AccessPermission getAccessPermission() {
