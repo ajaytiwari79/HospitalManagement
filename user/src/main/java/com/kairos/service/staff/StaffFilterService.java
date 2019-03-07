@@ -16,7 +16,7 @@ import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
-import com.kairos.wrapper.staff.StaffEmploymentWrapper;
+import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -264,7 +264,7 @@ public class StaffFilterService {
         return mapOfFilters;
     }
 
-    public StaffEmploymentWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
+    public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
@@ -277,16 +277,16 @@ public class StaffFilterService {
         }
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-        StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
-        staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
-        staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),moduleId,
+        StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
+        staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
+        staffEmploymentTypeWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
-        staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
-        List<Map> staffs = filterStaffByRoles(staffEmploymentWrapper.getStaffList(),unitId);
+        staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
+        List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(),unitId);
         staffs = staffs.stream().filter(distinctByKey(a->a.get("id"))).collect(Collectors.toList());
-        staffEmploymentWrapper.setStaffList(staffs);
-        return staffEmploymentWrapper;
+        staffEmploymentTypeWrapper.setStaffList(staffs);
+        return staffEmploymentTypeWrapper;
 
     }
 

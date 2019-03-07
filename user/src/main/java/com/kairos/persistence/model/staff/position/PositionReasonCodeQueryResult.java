@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.staff.employment;
+package com.kairos.persistence.model.staff.position;
 
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -7,16 +7,16 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * Created by yatharth on 3/5/18.
  */
 @QueryResult
-public class EmploymentReasonCodeQueryResult {
-    private Employment employment;
+public class PositionReasonCodeQueryResult {
+    private Position position;
     private ReasonCode reasonCode;
 
-    public Employment getEmployment() {
-        return employment;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setEmployment(Employment employment) {
-        this.employment = employment;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public ReasonCode getReasonCode() {
