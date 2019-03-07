@@ -17,7 +17,7 @@ import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
@@ -96,8 +96,8 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = COUNTRY)
     private Country country;
 
-    @Relationship(type = HAS_GROUP)
-    private List<Group> groupList = new ArrayList<>();
+    @Relationship(type = HAS_TEAMS)
+    private List<Team> teams = new ArrayList<>();
 
     @Relationship(type = HAS_SUB_ORGANIZATION)
     private List<Organization> children = new ArrayList<>();
@@ -255,7 +255,7 @@ public class Organization extends UserBaseEntity {
     public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
                         CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted,
-                        List<Group> groupList, List<Organization> children, UnitType unitType,boolean workcentre) {
+                        List<Organization> children, UnitType unitType,boolean workcentre) {
         this.name = name;
         this.description = description;
         this.isKairosHub = isPrekairos;
@@ -278,7 +278,6 @@ public class Organization extends UserBaseEntity {
         this.companyType = companyType;
         this.boardingCompleted = boardingCompleted;
         this.workcentre = workcentre;
-        this.groupList = groupList;
         this.children = children;
         this.unitType = unitType;
 
@@ -354,14 +353,6 @@ public class Organization extends UserBaseEntity {
 
     public void setCountry(Country country) {
         this.country = country;
-    }
-
-    public List<Group> getGroupList() {
-        return groupList;
-    }
-
-    public void setGroupList(List<Group> groupList) {
-        this.groupList = groupList;
     }
 
     public List<Organization> getChildren() {

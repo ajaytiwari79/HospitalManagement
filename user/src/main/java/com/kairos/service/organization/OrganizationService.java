@@ -29,7 +29,6 @@ import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -140,8 +139,6 @@ public class OrganizationService {
     @Inject
     private AddressVerificationService addressVerificationService;
     @Inject
-    private GroupGraphRepository groupGraphRepository;
-    @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
     private
@@ -155,8 +152,6 @@ public class OrganizationService {
     @Inject
     private
     StaffGraphRepository staffGraphRepository;
-    @Inject
-    private GroupService groupService;
     @Inject
     private TeamService teamService;
     @Inject
@@ -316,16 +311,6 @@ public class OrganizationService {
             response.put("generalTabInfo", generalTabInfo);
             response.put("otherData", cloneMap);
 
-        } else if (GROUP.equalsIgnoreCase(type)) {
-            Group group = groupGraphRepository.findOne(id, 0);
-            if (group == null) {
-                exceptionService.dataNotFoundByIdException("message.organization.group.id.notFound");
-            }
-            Map<String, Object> groupInfo = new HashMap<>();
-            groupInfo.put("name", group.getName());
-            groupInfo.put("id", group.getId());
-            response.put("generalTabInfo", groupInfo);
-            response.put("otherData", Collections.emptyMap());
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
@@ -521,8 +506,6 @@ public class OrganizationService {
             return organization.getId();
         } else if (TEAM.equalsIgnoreCase(type)) {
             return organizationGraphRepository.getOrganizationByTeamId(id).getId();
-        } else if (GROUP.equalsIgnoreCase(type)) {
-            return organizationGraphRepository.getOrganizationByGroupId(id).getOrganization().getId();
         }
         return null;
     }
@@ -754,9 +737,6 @@ public class OrganizationService {
         switch (type.toUpperCase()) {
             case ORGANIZATION:
                 organization = organizationGraphRepository.findOne(id, 1);
-                break;
-            case GROUP:
-                organization = groupService.getUnitByGroupId(id);
                 break;
             case TEAM:
                 organization = teamService.getOrganizationByTeamId(id);

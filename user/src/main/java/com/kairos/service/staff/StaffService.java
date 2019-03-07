@@ -1210,28 +1210,6 @@ public class StaffService {
         return staffTaskDTOS;
     }
 
-
-    public Map<String, Object> getTeamStaffAndStaffSkill(Long organizationId, List<Long> staffIds) {
-        Map<String, Object> responseMap = new HashMap();
-        List<Object> teamStaffList = new ArrayList<>();
-        List<Object> staffList = new ArrayList<>();
-        List<Map<String, Object>> teamStaffs = staffGraphRepository.getTeamStaffList(organizationId, staffIds);
-        List<Map<String, Object>> staffs = staffGraphRepository.getSkillsOfStaffs(staffIds);
-        for (Map<String, Object> map : teamStaffs) {
-            Object o = map.get("data");
-            teamStaffList.add(o);
-        }
-        for (Map<String, Object> map : staffs) {
-            Object o = map.get("data");
-            staffList.add(o);
-        }
-
-        responseMap.put("teamStaffList", teamStaffList);
-        responseMap.put("staffs", staffList);
-        return responseMap;
-    }
-
-
     /**
      * @return
      * @auther anil maurya

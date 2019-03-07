@@ -46,7 +46,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("Match (accessPage:AccessPage) where id(accessPage)={0}\n" +
             "Match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage) with subPage\n" +
             "Match (org:Organization),(user:User) where id(org)={1} AND id(user)={2} with org,user,subPage\n" +
-            "Match (org)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff)-[:BELONGS_TO]->(user) with staff,subPage\n" +
+            "Match (org)-[:"+HAS_TEAMS+"]->(team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff)-[:BELONGS_TO]->(user) with staff,subPage\n" +
             "Match (staff)-[:STAFF_HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)-[r:ACCESS_GROUP_HAS_ACCESS_TO_PAGE]->(subPage) return {pageId:id(subPage),pageName:subPage.name,read:r.read,write:r.write} as result")
     List<Map<String, Object>> getPermissionForModuleInOrganization(long accessPageId, long orgId, long userId);
 

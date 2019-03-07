@@ -13,7 +13,6 @@ import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationGeneral;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.department.Department;
@@ -93,8 +92,6 @@ public class OrganizationController {
     private ClientService clientService;
     @Inject
     private OpenningHourService openningHourService;
-    @Inject
-    private GroupService groupService;
     @Inject
     private TeamService teamService;
     @Inject
@@ -513,28 +510,12 @@ public class OrganizationController {
                 organizationService.updateOrganizationGeneralDetails(organizationGeneral, unitId));
     }
 
-    @PutMapping(UNIT_URL+"/group/general")
-    @ApiOperation("update general details of group")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateGroupGeneralDetails(@PathVariable long unitId, @Validated @RequestBody Group group) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                groupService.updateGroupGeneralDetails(unitId, group));
-    }
-
     @PutMapping(UNIT_URL+"/team/general")
     @ApiOperation("update general details of team")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 teamService.updateTeamGeneralDetails(unitId, teamDTO));
-    }
-
-    @GetMapping(UNIT_URL+"/teams")
-    @ApiOperation("Get Team of a Unit")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getUnitTeams(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                teamService.getTeamsInUnit(unitId));
     }
 
     @GetMapping(UNIT_URL+"/languages")

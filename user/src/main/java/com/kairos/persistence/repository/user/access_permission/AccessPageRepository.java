@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Long> {
     @Query("MATCH (org:Organization) WHERE id(org)={0}\n" +
             "MATCH (org)-[:" + HAS_SUB_ORGANIZATION + "*]->(n)\n" +
-            "MATCH (n)-[:"+HAS_GROUP+"]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={1} WITH staff\n" +
+            "MATCH (n)-[:" + HAS_TEAMS + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={1} WITH staff\n" +
             "MATCH (staff)-[:" + STAFF_HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[r:" + ACCESS_GROUP_HAS_ACCESS_TO_PAGE + "{read:false}]->(accessPage:AccessPage{isModule:true}) RETURN DISTINCT accessPage")
     List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId);
 

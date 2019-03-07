@@ -93,9 +93,6 @@ public class UnitService {
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
         response.put("units", units.size() != 0 ? units : Collections.emptyList());
 
-        List<Map<String, Object>> groups = organizationGraphRepository.getGroups(organizationId);
-        response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
-
         response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
 
         OrganizationTypeAndSubType organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(organizationId);

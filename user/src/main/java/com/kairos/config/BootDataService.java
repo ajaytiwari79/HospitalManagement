@@ -16,7 +16,6 @@ import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
@@ -198,8 +197,6 @@ public class BootDataService {
     private Client johnOliver = null;
 
     private Department hrDept;
-    private Group operationsGroup;
-    private Group serviceGroup;
 
     private Team nestingTeam;
     private Team experiencedTeam;
@@ -690,14 +687,6 @@ public class BootDataService {
         staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, adminAsStaff));
     }
 
-    private void createGroup() {
-        operationsGroup = new Group();
-        operationsGroup.setName("Operations Group");
-        operationsGroup.setTeamList(Arrays.asList(nestingTeam));
-
-        kairosCountryLevel.setGroupList(Arrays.asList(operationsGroup));
-        kairosCountryLevel = organizationGraphRepository.save(kairosCountryLevel);
-    }
 
     private void createCountryAdminAccessGroup() {
         accessGroup = new AccessGroup(AppConstants.AG_COUNTRY_ADMIN, "Country Admin Access Group", AccessGroupRole.MANAGEMENT);
@@ -797,17 +786,6 @@ public class BootDataService {
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
     }
 
-    private void createGroupForCityLevel() {
-        operationsGroup = new Group();
-        operationsGroup.setName("oodles-operations Group");
-        operationsGroup.setTeamList(Arrays.asList(nestingTeam));
-
-        serviceGroup = new Group();
-        serviceGroup.setName("oodles-Service Group");
-        serviceGroup.setTeamList(Arrays.asList(experiencedTeam));
-        oodlesCityLevel.setGroupList(Arrays.asList(operationsGroup, serviceGroup));
-        organizationGraphRepository.save(oodlesCityLevel);
-    }
 
     private void linkingOfStaffAndTeamForCityLevel() {
         staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, almaAsStaff));

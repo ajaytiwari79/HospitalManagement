@@ -6,14 +6,12 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -22,7 +20,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
@@ -47,13 +44,9 @@ public class TeamService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    private GroupGraphRepository groupGraphRepository;
-    @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
-    @Inject
-    private AddressVerificationService addressVerificationService;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -68,21 +61,17 @@ public class TeamService {
     private ContactAddressGraphRepository contactAddressGraphRepository;
 
 
-    public Map<String, Object> createTeam(Long groupId, Long unitId, TeamDTO teamDTO, String type) {
+    public Map<String, Object> createTeam(Long unitId, TeamDTO teamDTO) {
         // Long orgId = organizationService.getOrganizationIdByTeamIdOrGroupIdOrOrganizationId(type, unitId);
-        Group group = groupGraphRepository.findOne(groupId);
-        if (group == null) {
-            exceptionService.dataNotFoundByIdException("message.teamservice.group.id.notFound");
-        }
 
-        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByGroupId(groupId);
+        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByOrganizationId(unitId);
         if (organizationContactAddress.getOrganization() == null) {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound.by.group");
         }
 
-        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationAndGroupByName(unitId, group.getId(), teamDTO.getId() != null ? teamDTO.getId() : -1L, "(?i)" + teamDTO.getName());
+        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, teamDTO.getId() != null ? teamDTO.getId() : -1L, "(?i)" + teamDTO.getName());
         if (teamExistInOrganizationAndGroupByName) {
-            exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.group", teamDTO.getName(), group.getName());
+            exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
         }
 
         ContactAddress contactAddress = null;
@@ -167,8 +156,6 @@ public class TeamService {
             team.setHasAddressOfUnit(teamDTO.isHasAddressOfUnit());
             team.setContactAddress(contactAddress);
         }
-        group.getTeamList().add(team);
-        groupGraphRepository.save(group, 2);
         Map<String, Object> response = new HashMap<>();
         response.put("id", team.getId());
         response.put("name", team.getName());
@@ -176,17 +163,10 @@ public class TeamService {
         return response;
     }
 
-    public Map<String, Object> getTeams(long groupId) {
-        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByGroupId(groupId);
-
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationContactAddress.getOrganization().getId());
-
-        List<Map<String, Object>> teams = teamGraphRepository.getTeams(groupId);
+    public Map<String, Object> getTeams(long unitId) {
+        List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
         Map<String, Object> map = new HashMap<>();
         map.put("teams", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
-        if (countryId != null) {
-            map.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
-        }
         return map;
     }
 
@@ -260,33 +240,10 @@ public class TeamService {
         return staff;
     }
 
-       /*
-        By Yasir
-        Commented below method as we are no longer using FLS Visitour
-       */
 
-    private boolean updateTeamIdOfStaffInVisitour(String teamId, long staffId, long unitId) {
-
-        /*LOGGER.info("Updating staff in visitour");
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map <String,Object> engineerMetaData = new HashMap<>();
-        engineerMetaData.put("fmvtid",staffId);
-        engineerMetaData.put("fmextID",staffId);
-        engineerMetaData.put("teamID",teamId);
-        int code = scheduler.createEngineer(engineerMetaData, flsCredentials);
-        LOGGER.info("FLS staff sync status-->" + code);
-        if(code == 0){
-            return true;
-        }*/
-        return false;
-    }
 
     public List<Map<String, Object>> getTeamSelectedServices(Long teamId) {
         return organizationGraphRepository.getTeamAllSelectedSubServices(teamId);
-    }
-
-    public List<Map<String, Object>> getTeamAvailableServices(Long teamId) {
-        return organizationGraphRepository.getTeamGroupServices(teamId);
     }
 
     public List<com.kairos.persistence.model.organization.services.OrganizationService> addTeamSelectedServices(Long teamId, Long[] organizationService) {
@@ -301,10 +258,6 @@ public class TeamService {
     public List<Map<String, Object>> getTeamSelectedSkills(Long teamId) {
         return teamGraphRepository.getSelectedSkills(teamId);
 
-    }
-
-    public List<Map<String, Object>> getTeamAvailableSkills(Long teamId) {
-        return organizationGraphRepository.getTeamGroupSkill(teamId);
     }
 
     public List<Map<String, Object>> getAllTeamsInOrganization(Long unitId) {
