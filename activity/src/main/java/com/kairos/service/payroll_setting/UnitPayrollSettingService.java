@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.payroll_setting.UnitUnitPayrollSettingM
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -21,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -40,7 +42,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
     }
 
     public List<UnitPayrollSettingDTO> getPayrollPeriodByUnitIdAndDateAndDurationType(Long unitId, Integer year, PayrollFrequency payrollFrequency) {
-        return getFilterPayrollSettingData(unitPayrollSettingMongoRepository.getPayrollPeriodByYearAndPayrollFrequency(unitId, payrollFrequency, DateUtils.getFirstDayOfYear(year), DateUtils.getlastDayOfYear(year)));
+        return getUnitPayrollSettingData(unitPayrollSettingMongoRepository.getPayrollPeriodByYearAndPayrollFrequency(unitId, payrollFrequency, DateUtils.getFirstDayOfYear(year), DateUtils.getlastDayOfYear(year)));
 
     }
 
@@ -71,8 +73,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
 
     public UnitPayrollSettingDTO deleteDraftPayrollPeriod(BigInteger id, Long unitId) {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodById(unitId, id);
-        if(isNull(unitPayrollSetting)){
-            exceptionService.actionNotPermittedException("");
+        if (isNull(unitPayrollSetting)) {
+            exceptionService.actionNotPermittedException("message.payroll.period.not.found");
         }
         UnitPayrollSettingDTO unitPayrollSettingDTO = ObjectMapperUtils.copyPropertiesByMapper(unitPayrollSettingMongoRepository.findPayrollPeriodById(unitId, unitPayrollSetting.getParentPayrollId()), UnitPayrollSettingDTO.class);
         unitPayrollSettingMongoRepository.removeDraftpayrollPeriod(unitId, unitPayrollSetting.getId());
@@ -83,8 +85,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
 
     public UnitPayrollSettingDTO updatePayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Long unitId) {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodById(unitId, unitPayrollSettingDTO.getId());
-        if(isNull(unitPayrollSetting)){
-            exceptionService.actionNotPermittedException("");
+        if (isNull(unitPayrollSetting)) {
+            exceptionService.actionNotPermittedException("message.payroll.period.not.found");
         }
         unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         unitPayrollSetting.setPublished(unitPayrollSettingDTO.isPublished());
@@ -103,8 +105,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
 
     public List<UnitPayrollSettingDTO> breakPayrollPeriodOfUnit(Long unitId, UnitPayrollSettingDTO unitPayrollSettingDTO) {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodById(unitId, unitPayrollSettingDTO.getParentPayrollId());
-        if(isNull(unitPayrollSetting)){
-            exceptionService.actionNotPermittedException("");
+        if (isNull(unitPayrollSetting)) {
+            exceptionService.actionNotPermittedException("message.payroll.period.not.found");
         }
         UnitPayrollSetting draftUnitPayrollSetting = unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitId(unitId);
         Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap = unitPayrollSetting.getPayrollPeriods().stream().collect(Collectors.toMap(PayrollPeriod::getStartDate, Function.identity()));
@@ -116,8 +118,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
             newUnitPayrollSetting = getNewDraftStateOfPayroll(unitPayrollSettingDTO, unitPayrollSetting, startDateAndPayrollPeriodMap, newUnitPayrollSetting, unitId);
         }
         unitPayrollSettingMongoRepository.save(newUnitPayrollSetting);
-        List<UnitPayrollSettingDTO> unitPayrollSettingDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(Arrays.asList(newUnitPayrollSetting, unitPayrollSetting), unitPayrollSettingDTO.getClass());
-        return getFilterPayrollSettingData(unitPayrollSettingDTOS);
+        List<UnitPayrollSettingDTO> unitPayrollSettingDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(Arrays.asList(newUnitPayrollSetting, unitPayrollSetting), unitPayrollSettingDTO.getClass());
+        return getUnitPayrollSettingData(unitPayrollSettingDTOS);
     }
 
     private UnitPayrollSetting updateOldDraftStateOfPayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap, UnitPayrollSetting newUnitPayrollSetting) {
@@ -159,7 +161,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
             if (startDateAndPayrollPeriodMap.containsKey(payrollStartDate)) {
                 payrollPeriods.add(startDateAndPayrollPeriodMap.get(payrollStartDate));
             }
-            payrollStartDate = getNextStartDate(payrollStartDate, PayrollFrequency.MONTHLY);
+            payrollStartDate = getNextStartDate(payrollStartDate, unitPayrollSettingDTO.getPayrollFrequency());
         }
         newUnitPayrollSetting.setPayrollPeriods(payrollPeriods);
         newUnitPayrollSetting.setAccessGroupsPriority(unitPayrollSetting.getAccessGroupsPriority());
@@ -204,13 +206,13 @@ public class UnitPayrollSettingService extends MongoBaseService {
         }
     }
 
-    private List<UnitPayrollSettingDTO> getFilterPayrollSettingData(List<UnitPayrollSettingDTO> unitPayrollSettingDTO) {
-        Map<BigInteger,UnitPayrollSettingDTO> idAndPayrollSettingDTOMap= unitPayrollSettingDTO.stream().collect(Collectors.toMap(k->k.getId(), v->v));
-        UnitPayrollSettingDTO unitPayrollSettingDto = unitPayrollSettingDTO.stream().filter(payrollSetting->!payrollSetting.isPublished()).findFirst().orElse(null);
-        if(isNotNull(unitPayrollSettingDto) && idAndPayrollSettingDTOMap.containsKey(unitPayrollSettingDto.getParentPayrollId())){
-            List<PayrollPeriodDTO> payrollPeriod=idAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).getPayrollPeriods();
+    private List<UnitPayrollSettingDTO> getUnitPayrollSettingData(List<UnitPayrollSettingDTO> unitPayrollSettingDTO) {
+        Map<BigInteger, UnitPayrollSettingDTO> idAndPayrollSettingDTOMap = unitPayrollSettingDTO.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        UnitPayrollSettingDTO unitPayrollSettingDto = unitPayrollSettingDTO.stream().filter(payrollSetting -> !payrollSetting.isPublished()).findFirst().orElse(null);
+        if (isNotNull(unitPayrollSettingDto) && idAndPayrollSettingDTOMap.containsKey(unitPayrollSettingDto.getParentPayrollId())) {
+            List<PayrollPeriodDTO> payrollPeriod = idAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).getPayrollPeriods();
             unitPayrollSettingDto.getPayrollPeriods().forEach(payrollPeriodDTO -> {
-                payrollPeriod.removeIf(v->v.getStartDate().isEqual(payrollPeriodDTO.getStartDate()));
+                payrollPeriod.removeIf(v -> v.getStartDate().isEqual(payrollPeriodDTO.getStartDate()));
             });
             idAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).setPayrollPeriods(payrollPeriod);
         }

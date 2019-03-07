@@ -35,7 +35,4 @@ public interface UnitUnitPayrollSettingMongoRepository extends MongoBaseReposito
     List<UnitPayrollSettingDTO> findAllPayrollPeriodByStartDate(Long unitId, LocalDate startDate, PayrollFrequency payrollFrequency);
 
 
-//    @Query(value = "{'payrollPeriods:{'$elemMatch':{'startDate':{$gte:?1 , $lte:?2}}},deleted:false,unitId:?0,payrollFrequency:?3 }")
-//    List<UnitPayrollSettingDTO> findAllPayrollPeriodByStartDate(Long unitId, LocalDate startDate,LocalDate endDate,PayrollFrequency payrollFrequency);
-
 }
