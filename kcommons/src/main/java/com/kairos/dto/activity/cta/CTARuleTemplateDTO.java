@@ -15,6 +15,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * @author pradeep
  * @date - 30/7/18
@@ -39,9 +41,9 @@ public class CTARuleTemplateDTO {
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>();
+    private List<CTARuleTemplatePhaseInfo> phaseInfo;
     private BudgetType budgetType;
-    private List<CalculateValueIfPlanned> calculateValueIfPlanned = new ArrayList<>();
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned;
     private List<Long> employmentTypes = new ArrayList<>();
     private PlanningCategory planningCategory;
     private List<Long> staffFunctions = new ArrayList<>();
@@ -239,7 +241,7 @@ public class CTARuleTemplateDTO {
     }
 
     public void setDayTypeIds(List<Long> dayTypeIds) {
-        this.dayTypeIds = dayTypeIds;
+        this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
     }
 
     public PlanningCategory getPlanningCategory() {
@@ -280,7 +282,7 @@ public class CTARuleTemplateDTO {
     }
 
     public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
+        this.activityIds = isNull(activityIds) ? new ArrayList<>() : activityIds;
     }
 
     public Set<BigInteger> getTimeTypeIds() {
@@ -288,7 +290,7 @@ public class CTARuleTemplateDTO {
     }
 
     public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+        this.timeTypeIds = isNull(timeTypeIds) ? new HashSet<>() : timeTypeIds;
     }
 
     public Set<BigInteger> getPlannedTimeIds() {
@@ -296,7 +298,7 @@ public class CTARuleTemplateDTO {
     }
 
     public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
+        this.plannedTimeIds = isNull(plannedTimeIds) ? new HashSet<>() : plannedTimeIds;
     }
 
     public CalculationFor getCalculationFor() {
