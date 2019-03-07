@@ -98,8 +98,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
             unitPayrollSetting.setPayrollPeriods(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPayrollSettingDTO.getPayrollPeriods(), PayrollPeriod.class));
             unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         } else {
-            unitPayrollSetting.setPayrollPeriods(validatePayrollPeriod(unitPayrollSettingDTO.getPayrollPeriods(), unitPayrollSetting.getPayrollPeriods(),unitPayrollSettingDTO.getPayrollFrequency()));
-            if(isNotNull(unitPayrollSettingDTO.getParentPayrollId())) {
+            unitPayrollSetting.setPayrollPeriods(validatePayrollPeriod(unitPayrollSettingDTO.getPayrollPeriods(), unitPayrollSetting.getPayrollPeriods(),unitPayrollSetting.getPayrollFrequency()));
+            if(isNotNull(unitPayrollSetting.getParentPayrollId())) {
                 unitPayrollSettings.add(updateParentPayrollPeriod(unitId, unitPayrollSetting.getParentPayrollId(), unitPayrollSetting.getPayrollPeriods()));
             }
           //  UnitPayrollSetting availableDraftPayroll=unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitIdAndNotExistParentId(unitId);
@@ -192,9 +192,9 @@ public class UnitPayrollSettingService extends MongoBaseService {
         Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap = payrollPeriods.stream().collect(Collectors.toMap(PayrollPeriod::getStartDate, Function.identity()));
         for (PayrollPeriodDTO payrollPeriodDTO : payrollPeriodDTOS) {
             if (startDateAndPayrollPeriodMap.containsKey(payrollPeriodDTO.getStartDate())) {
-                if (isNull(payrollPeriodDTO.getDeadlineDate()) || DateUtils.getLocalDateFromLocalDateTime(payrollPeriodDTO.getDeadlineDate()).isBefore(payrollPeriodDTO.getStartDate()) || DateUtils.getLocalDateFromLocalDateTime(payrollPeriodDTO.getDeadlineDate()).isAfter(getNextStartDate(payrollPeriodDTO.getStartDate(),payrollFrequency))) {
-                    exceptionService.actionNotPermittedException("message.payroll.deadline.date.not.invalid", payrollPeriodDTO.getStartDate());
-                }
+//                if (isNull(payrollPeriodDTO.getDeadlineDate()) || DateUtils.getLocalDateFromLocalDateTime(payrollPeriodDTO.getDeadlineDate()).isBefore(payrollPeriodDTO.getStartDate()) || DateUtils.getLocalDateFromLocalDateTime(payrollPeriodDTO.getDeadlineDate()).isAfter(getNextStartDate(payrollPeriodDTO.getStartDate(),payrollFrequency))) {
+//                    exceptionService.actionNotPermittedException("message.payroll.deadline.date.not.invalid", payrollPeriodDTO.getStartDate());
+//                }
                 startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setDeadlineDate(payrollPeriodDTO.getDeadlineDate());
                 int daysTillDeadlineDate = (int) ChronoUnit.DAYS.between(payrollPeriodDTO.getEndDate(), payrollPeriodDTO.getDeadlineDate());
                 if (isCollectionNotEmpty(payrollPeriodDTO.getPayrollAccessGroups()) && veryfyGracePeriodOfAccessGroup(payrollPeriodDTO.getPayrollAccessGroups(), daysTillDeadlineDate, payrollPeriodDTO.getStartDate(), payrollPeriodDTO.getEndDate())) {
