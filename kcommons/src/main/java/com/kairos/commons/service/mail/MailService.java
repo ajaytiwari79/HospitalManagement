@@ -71,8 +71,8 @@ public class MailService {
             StringBuilder sb = getRecipientsFromArray(recipients);
             String recipientsString = sb.toString();
             logger.info("List: "+recipientsString);
-            //InternetAddress me = new InternetAddress("info@nordicplanning.dk");
-            mail.setFrom("info@nordicplanning.dk");
+            //InternetAddress me = new InternetAddress("info@kairosplanning.com");
+            mail.setFrom("info@kairosplanning.com");
             //mail.setFrom(me);
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
