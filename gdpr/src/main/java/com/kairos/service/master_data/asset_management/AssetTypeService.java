@@ -229,7 +229,8 @@ public class AssetTypeService{
      */
     //TODO Will try by Object mapper
     private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<Risk> risks){
-        List<RiskBasicResponseDTO> riskBasicResponseDTOS = new ArrayList<>();
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(risks, RiskBasicResponseDTO.class);
+       /* List<RiskBasicResponseDTO> riskBasicResponseDTOS = new ArrayList<>();
         for(Risk assetTypeRisk : risks){
             RiskBasicResponseDTO riskBasicResponseDTO = new RiskBasicResponseDTO();
             riskBasicResponseDTO.setId(assetTypeRisk.getId());
@@ -239,9 +240,9 @@ public class AssetTypeService{
             riskBasicResponseDTO.setRiskLevel(assetTypeRisk.getRiskLevel());
             riskBasicResponseDTO.setDaysToReminderBefore(assetTypeRisk.getDaysToReminderBefore());
             riskBasicResponseDTO.setReminderActive(assetTypeRisk.isReminderActive());
-            riskBasicResponseDTOS.add(riskBasicResponseDTO);
+            riskBasicResponseDTOS.add(ObjectMapperUtils.);
         }
-        return riskBasicResponseDTOS;
+        return riskBasicResponseDTOS;*/
     }
 
     /**
