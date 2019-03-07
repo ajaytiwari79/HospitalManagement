@@ -292,9 +292,9 @@ public class TimeBankCalculationService {
             valid = false;
             reasonForNotValid = PHASE_IS_NOT_VALID;
         }
-        if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
-            valid = false;
-            reasonForNotValid = ACTIVITY_IS_NOT_VALID;
+        if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
+            valid = ruleTemplate.getCalculationFor().equals(FUNCTIONS);
+            reasonForNotValid = ruleTemplate.getCalculationFor().equals(FUNCTIONS) ? null : ACTIVITY_IS_NOT_VALID;
         }
         if(!(valid && validateDayType(shiftInterval,ruleTemplate,dayTypeDTOMap))){
             valid=false;
