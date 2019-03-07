@@ -2,7 +2,6 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
@@ -19,11 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -54,17 +52,8 @@ public class OrganizationStorageFormatService {
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
     public List<StorageFormatDTO> createStorageFormat(Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> storageFormatNames = new HashSet<>();
-        for (StorageFormatDTO storageFormat : storageFormatDTOS) {
-            storageFormatNames.add(storageFormat.getName());
-        }
-        List<String> nameInLowerCase = storageFormatNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<StorageFormat> previousStorageFormats = storageFormatRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-        storageFormatNames = ComparisonUtils.getNameListForMetadata(previousStorageFormats, storageFormatNames);
-
+        Set<String> existingStorageFormatNames = storageFormatRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> storageFormatNames = ComparisonUtils.getNewMetaDataNames(storageFormatDTOS,existingStorageFormatNames );
         List<StorageFormat> storageFormats = new ArrayList<>();
         if (!storageFormatNames.isEmpty()) {
             for (String name : storageFormatNames) {

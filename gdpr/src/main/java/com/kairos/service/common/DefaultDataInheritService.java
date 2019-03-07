@@ -489,8 +489,8 @@ public class DefaultDataInheritService{
             Class[] argumentType = { String.class, Long.class };
             if (!metadataDTOList.isEmpty()) {
                 Class dtoClass = metadataDTOList.get(0).getClass();
-                for (T dataDisposalDTO : metadataDTOList) {
-                    String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dataDisposalDTO);
+                for (T dto : metadataDTOList) {
+                    String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dto);
                     Constructor<?> cons = entityClass.getConstructor(argumentType);
                     baseEntityList.add((BaseEntity)cons.newInstance(name,unitId));
                 }

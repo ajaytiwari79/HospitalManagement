@@ -2,7 +2,6 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
@@ -11,18 +10,16 @@ import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -50,16 +47,8 @@ public class OrganizationHostingTypeService {
      * findByOrganizationIdAndNamesList()  return list of existing HostingType using collation ,used for case insensitive result
      */
     public List<HostingTypeDTO> createHostingType(Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
-
-        Set<String> hostingTypeNames = new HashSet<>();
-        for (HostingTypeDTO hostingType : hostingTypeDTOS) {
-            hostingTypeNames.add(hostingType.getName());
-        }
-        List<String> nameInLowerCase = hostingTypeNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<HostingType> previousHostingtypes = hostingTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-        hostingTypeNames = ComparisonUtils.getNameListForMetadata(previousHostingtypes, hostingTypeNames);
+        Set<String> existingHostingTypeNames = hostingTypeRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> hostingTypeNames = ComparisonUtils.getNewMetaDataNames(hostingTypeDTOS,existingHostingTypeNames );
         List<HostingType> hostingTypes = new ArrayList<>();
         if (!hostingTypeNames.isEmpty()) {
             for (String name : hostingTypeNames) {
