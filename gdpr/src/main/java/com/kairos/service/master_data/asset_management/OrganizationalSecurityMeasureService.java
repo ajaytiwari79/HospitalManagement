@@ -5,8 +5,8 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
@@ -18,11 +18,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationalSecurityMeasureService{
@@ -47,17 +46,8 @@ public class OrganizationalSecurityMeasureService{
      * findMetaDataByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
     public  List<OrganizationalSecurityMeasureDTO> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> orgSecurityMeasureNames = new HashSet<>();
-            for (OrganizationalSecurityMeasureDTO securityMeasure : securityMeasureDTOS) {
-                orgSecurityMeasureNames.add(securityMeasure.getName());
-            }
-            List<String> nameInLowerCase = orgSecurityMeasureNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<OrganizationalSecurityMeasure> previousOrgSecurityMeasures = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousOrgSecurityMeasures, orgSecurityMeasureNames);
+        Set<String> existingOrganizationalSecurityMeasureNames = organizationalSecurityMeasureRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> orgSecurityMeasureNames = ComparisonUtils.getNewMetaDataNames(securityMeasureDTOS,existingOrganizationalSecurityMeasureNames );
             List<OrganizationalSecurityMeasure> orgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
@@ -126,7 +116,7 @@ public class OrganizationalSecurityMeasureService{
      */
     public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, Long id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
 
-        //TODO What actually this code is doing?
+
         OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureRepository.findByCountryIdAndName(countryId,  securityMeasureDTO.getName());
         if (Optional.ofNullable(orgSecurityMeasure).isPresent()) {
             if (id.equals(orgSecurityMeasure.getId())) {

@@ -1,15 +1,19 @@
 package com.kairos.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class ComparisonUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonUtils.class);
 
-    public static <T> Set<String> getNameListForMetadata(List<T> existingObject, Set<String> namesList) {
+    public static <T> Set<String> getNewNameListOfMetadata(List<T> existingObject, Set<String> namesList) {
 
         if (existingObject.size() == 0) {
             return namesList;
@@ -40,6 +44,34 @@ public class ComparisonUtils {
             return newNamesList;
         }
     }
+
+    public static <T> Set<String> getNewMetaDataNames(List<T> metadataDTOList, Set<String> existingMetadataNames) {
+        Map<String, String> metadataNames = new HashMap<>();
+        Set<String> lowerCaseNewNameList = new HashSet<>();
+        try {
+            if (!metadataDTOList.isEmpty()) {
+                Class dtoClass = metadataDTOList.get(0).getClass();
+                Set<String> lowerCaseNameList = new HashSet<>();
+                for (T dto : metadataDTOList) {
+                    String name = (String) new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dto);
+                    String nameInLowerCase = name.toLowerCase();
+                    metadataNames.put(nameInLowerCase, name);
+                    lowerCaseNameList.add(nameInLowerCase);
+                }
+                lowerCaseNameList.removeAll(existingMetadataNames);
+                lowerCaseNameList.forEach(name -> {
+                    if (Optional.ofNullable(metadataNames.get(name.toLowerCase())).isPresent()) {
+                        lowerCaseNewNameList.add(metadataNames.get(name.toLowerCase()));
+                    }
+                });
+            }
+        }catch (Exception ex){
+            LOGGER.error("Error in getMetadataNameListInLowerCase::"+ex.getMessage());
+        }
+        return lowerCaseNewNameList;
+    }
+
+
 
 
 }

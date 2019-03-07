@@ -3,8 +3,8 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
@@ -16,11 +16,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -45,17 +44,8 @@ public class ResponsibilityTypeService {
      * findByNamesList()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
     public List<ResponsibilityTypeDTO> createResponsibilityType(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> responsibilityTypeNames = new HashSet<>();
-        for (ResponsibilityTypeDTO responsibilityType : responsibilityTypeDTOS) {
-            responsibilityTypeNames.add(responsibilityType.getName());
-        }
-        List<String> nameInLowerCase = responsibilityTypeNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<ResponsibilityType> previousResponsibiltyTypes = responsibilityTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(previousResponsibiltyTypes, responsibilityTypeNames);
-
+        Set<String> existingResponsibilityTypeNames = responsibilityTypeRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> responsibilityTypeNames = ComparisonUtils.getNewMetaDataNames(responsibilityTypeDTOS,existingResponsibilityTypeNames );
         List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
         if (!responsibilityTypeNames.isEmpty()) {
             for (String name : responsibilityTypeNames) {

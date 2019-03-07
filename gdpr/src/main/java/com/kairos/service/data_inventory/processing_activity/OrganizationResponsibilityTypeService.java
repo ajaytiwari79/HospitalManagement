@@ -22,9 +22,6 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
-
 @Service
 public class OrganizationResponsibilityTypeService{
 
@@ -53,21 +50,8 @@ public class OrganizationResponsibilityTypeService{
      * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
     public List<ResponsibilityTypeDTO> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
-
-        Set<String> responsibilityTypeNames = new HashSet<>();
-            for (ResponsibilityTypeDTO responsibilityType : responsibilityTypeDTOS) {
-                if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    responsibilityTypeNames.add(responsibilityType.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
-
-            }
-            List<String> nameInLowerCase = responsibilityTypeNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ResponsibilityType> previousResponsibilityTypes = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(previousResponsibilityTypes, responsibilityTypeNames);
-
+        Set<String> existingResponsibilityTypeNames = responsibilityTypeRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> responsibilityTypeNames = ComparisonUtils.getNewMetaDataNames(responsibilityTypeDTOS,existingResponsibilityTypeNames );
             List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {

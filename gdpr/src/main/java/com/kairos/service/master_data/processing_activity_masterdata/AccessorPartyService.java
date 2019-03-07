@@ -4,8 +4,8 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -42,18 +44,8 @@ public class AccessorPartyService {
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
     public List<AccessorPartyDTO> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-
-        Set<String> accessorPartyNames = new HashSet<>();
-        for (AccessorPartyDTO accessorParty : accessorPartyDTOS) {
-            accessorPartyNames.add(accessorParty.getName());
-        }
-        List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<AccessorParty> previousAccessorParties = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        accessorPartyNames = ComparisonUtils.getNameListForMetadata(previousAccessorParties, accessorPartyNames);
-
+        Set<String> existingAccessorPartyNames = accessorPartyRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> accessorPartyNames = ComparisonUtils.getNewMetaDataNames(accessorPartyDTOS,existingAccessorPartyNames );
         List<AccessorParty> accessorParties = new ArrayList<>();
         if (!accessorPartyNames.isEmpty()) {
             for (String name : accessorPartyNames) {
