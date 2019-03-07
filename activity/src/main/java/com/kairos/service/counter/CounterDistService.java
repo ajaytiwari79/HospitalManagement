@@ -700,7 +700,7 @@ public class CounterDistService extends MongoBaseService {
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
         List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
-        List<ApplicableKPI> applicableKpis = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(), Arrays.asList(unitId), ConfLevel.UNIT);
+        List<ApplicableKPI> applicableKpis = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(), Arrays.asList(refId), level);
         List<BigInteger> applicableKpiIds = applicableKpis.stream().map(applicableKPI -> applicableKPI.getActiveKpiId()).collect(toList());
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKpis.stream().collect(Collectors.toMap(k -> k.getActiveKpiId(), v -> v));
         //TODO code update for parent child access group fetching
