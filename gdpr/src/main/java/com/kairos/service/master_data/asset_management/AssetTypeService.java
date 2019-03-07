@@ -204,7 +204,6 @@ public class AssetTypeService{
      * @param assetType - It may be asset type or asset sub type.
      * @return List<AssetTypeRiskResponseDTO> - List of asset-type or Sub asset-type response DTO.
      */
-    //TODO Will try by Object mapper
     private AssetTypeRiskResponseDTO buildAssetTypeOrSubTypeResponseData(AssetType assetType){
             List<AssetTypeRiskResponseDTO> subAssetTypeData = new ArrayList<>();
             AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO();
@@ -227,22 +226,8 @@ public class AssetTypeService{
      * @param risks - Risks of asset-type or Sub asset-type
      * @return List<RiskBasicResponseDTO> - List of RiskResponse DTO.
      */
-    //TODO Will try by Object mapper
     private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<Risk> risks){
         return ObjectMapperUtils.copyPropertiesOfListByMapper(risks, RiskBasicResponseDTO.class);
-       /* List<RiskBasicResponseDTO> riskBasicResponseDTOS = new ArrayList<>();
-        for(Risk assetTypeRisk : risks){
-            RiskBasicResponseDTO riskBasicResponseDTO = new RiskBasicResponseDTO();
-            riskBasicResponseDTO.setId(assetTypeRisk.getId());
-            riskBasicResponseDTO.setName(assetTypeRisk.getName());
-            riskBasicResponseDTO.setDescription(assetTypeRisk.getDescription());
-            riskBasicResponseDTO.setRiskRecommendation(assetTypeRisk.getRiskRecommendation());
-            riskBasicResponseDTO.setRiskLevel(assetTypeRisk.getRiskLevel());
-            riskBasicResponseDTO.setDaysToReminderBefore(assetTypeRisk.getDaysToReminderBefore());
-            riskBasicResponseDTO.setReminderActive(assetTypeRisk.isReminderActive());
-            riskBasicResponseDTOS.add(ObjectMapperUtils.);
-        }
-        return riskBasicResponseDTOS;*/
     }
 
     /**

@@ -123,7 +123,6 @@ public class ClauseService{
      * @param masterClauseDTO
      * @return
      */
-    //TODO need to make common method for asset and processing activity and others
     private void setMetadataOfMasterClause(MasterClauseDTO masterClauseDTO, MasterClause clause) {
             clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationTypes(), OrganizationType.class));
             clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubTypes(), OrganizationSubType.class));

@@ -2,11 +2,11 @@ package com.kairos.service.data_inventory.asset;
 
 
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeDeprecated;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -116,30 +115,6 @@ public class OrganizationAssetTypeService{
 
 
     /**
-     * @param
-     * @param subAssetTypesDto contain list of Existing Sub Asset type which need to we update
-     * @return map of Sub asset Types List and Ids (List for rollback)
-     * @description this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
-     */
-    private List<AssetTypeDeprecated> updateSubAssetTypes(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, Map<AssetTypeDeprecated, List<OrganizationLevelRiskDTO>> riskRelatedToSubAssetTypes) {
-
-        Set<BigInteger> subAssetTypesIds = new HashSet<>();
-        Map<BigInteger, AssetTypeOrganizationLevelDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
-        subAssetTypesDto.forEach(subAssetTypeDto -> {
-//            subAssetTypesIds.add(subAssetTypeDto.getId());
-            //   subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
-        });
-        //TODO
-        List<AssetTypeDeprecated> subAssetTypesList = new ArrayList<>();/*assetTypeMongoRepository.findAllByUnitIdAndIds(unitId, subAssetTypesIds);
-        subAssetTypesList.forEach(subAssetType -> {
-            AssetTypeOrganizationLevelDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
-            subAssetType.setName(subAssetTypeDto.getName());
-        });*/
-        return subAssetTypesList;
-    }
-
-    /**
      * THis method is used to build response of asset type and asset sub type. This method used recursion
      * to prepare the data of asset sub type.
      *
@@ -170,19 +145,7 @@ public class OrganizationAssetTypeService{
      * @return List<OrganizationLevelRiskDTO> - List of RiskResponse DTO.
      */
     public List<OrganizationLevelRiskDTO> buildAssetTypeRisksResponse(List<Risk> risks) {
-        List<OrganizationLevelRiskDTO> riskBasicResponseDTOS = new ArrayList<>();
-        for (Risk assetTypeRisk : risks) {
-            OrganizationLevelRiskDTO riskBasicResponseDTO = new OrganizationLevelRiskDTO();
-            riskBasicResponseDTO.setId(assetTypeRisk.getId());
-            riskBasicResponseDTO.setName(assetTypeRisk.getName());
-            riskBasicResponseDTO.setDescription(assetTypeRisk.getDescription());
-            riskBasicResponseDTO.setRiskRecommendation(assetTypeRisk.getRiskRecommendation());
-            riskBasicResponseDTO.setRiskLevel(assetTypeRisk.getRiskLevel());
-            riskBasicResponseDTO.setDaysToReminderBefore(assetTypeRisk.getDaysToReminderBefore());
-            riskBasicResponseDTO.setReminderActive(assetTypeRisk.isReminderActive());
-            riskBasicResponseDTOS.add(riskBasicResponseDTO);
-        }
-        return riskBasicResponseDTOS;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(risks, OrganizationLevelRiskDTO.class);
     }
 
 

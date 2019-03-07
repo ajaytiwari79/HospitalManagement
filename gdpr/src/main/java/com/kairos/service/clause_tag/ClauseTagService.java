@@ -138,8 +138,6 @@ public class ClauseTagService{
             exceptionService.duplicateDataException("message.duplicate", "message.tag", previousClauseTags.get(0).getName());
         }
         }
-
-        //TODO check for empty list
         clauseTagRepository.saveAll(clauseTagList);
         if(!existClauseTagIds.isEmpty()) {
             clauseTagList.addAll(clauseTagRepository.findAllClauseTagByIds(existClauseTagIds));
