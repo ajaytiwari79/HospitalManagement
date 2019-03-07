@@ -108,8 +108,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.shift.ShiftStatus.*;
@@ -1479,5 +1478,18 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.actionNotPermittedException("please.select.valid.criteria");
         }
         return object;
+    }
+
+    public boolean updatePlanningPeriodInShifts(){
+        List<Shift> shifts = shiftMongoRepository.findAllAbsenceShifts(ShiftType.ABSENCE.toString());
+        for (Shift shift : shifts) {
+            PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOneByUnitIdAndDate(shift.getUnitId(),getStartOfDay(shift.getStartDate()));
+            shift.setPlanningPeriodId(isNotNull(planningPeriod) ? planningPeriod.getId() : null);
+        }
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
+        return true;
+
     }
 }

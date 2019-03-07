@@ -175,4 +175,12 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId, viewType, shiftFilterParam, expertiseId));
     }
 
+    @ApiOperation("Update planning period id in Shifts")
+    @PutMapping(value = "/update_planning_period_in_shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updatePlanningPeriodInShifts() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updatePlanningPeriodInShifts());
+    }
+
+
 }
