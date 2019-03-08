@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
 
 /**
  * @author pradeep
@@ -308,6 +309,22 @@ public class CTARuleTemplateDTO {
 
     public void setLastModifiedBy(UserInfo lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
+    }
+
+    private boolean isPhaseValid(BigInteger shiftPhaseId){
+        return this.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent();
+    }
+
+    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
+        return this.getActivityIds().contains(activityId) || (this.getTimeTypeIds().contains(timeTypeId)) && this.getPlannedTimeIds().contains(plannedTimeId);
+    }
+
+    private boolean isEmployementTypeValid(Long employmentId){
+        return this.getEmploymentTypes().contains(employmentId);
+    }
+
+    public boolean isRuleTemplateValid(Long employmentId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimeId) || this.getCalculationFor().equals(FUNCTIONS));
     }
 
     @Override
