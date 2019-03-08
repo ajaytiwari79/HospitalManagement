@@ -3,6 +3,7 @@ package com.kairos.dto.user.employment;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -25,6 +26,7 @@ public class UnitPositionLinesDTO {
     private Integer totalWeeklyMinutes;
     //This is the Intial value of accumulatedTimebank of unitPosition
     private long accumulatedTimebankMinutes;
+    private BigDecimal hourlyCost;
 
     public Long getId() {
         return id;
@@ -113,5 +115,13 @@ public class UnitPositionLinesDTO {
 
     public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
+
+    public BigDecimal getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(BigDecimal hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 }

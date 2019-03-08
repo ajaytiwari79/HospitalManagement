@@ -10,6 +10,8 @@ import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 /**
  * @author pradeep
  * @date - 30/7/18
@@ -135,7 +137,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     }
 
     public void setActivityIds(List<Long> activityIds) {
-        this.activityIds = activityIds;
+        this.activityIds = isNotNull(activityIds) ? activityIds : new ArrayList<>();
     }
 
     public Set<Long> getTimeTypeIds() {
@@ -143,7 +145,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     }
 
     public void setTimeTypeIds(Set<Long> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+        this.timeTypeIds = isNotNull(timeTypeIds) ? timeTypeIds : new HashSet<>();
     }
 
     public Set<Long> getPlannedTimeIds() {
@@ -151,7 +153,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     }
 
     public void setPlannedTimeIds(Set<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
+        this.plannedTimeIds = isNotNull(plannedTimeIds) ? plannedTimeIds : new HashSet<>();
     }
 
     public String getPayrollType() {
@@ -207,7 +209,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     }
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
-        this.phaseInfo = phaseInfo;
+        this.phaseInfo = isNotNull(phaseInfo) ? phaseInfo : new ArrayList<>();
     }
 
     public BudgetType getBudgetType() {
@@ -257,7 +259,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     }
 
     public void setDayTypeIds(List<Long> dayTypeIds) {
-        this.dayTypeIds = dayTypeIds;
+        this.dayTypeIds = isNotNull(dayTypeIds) ? dayTypeIds : new ArrayList<>();
     }
 
     public String getRuleTemplateType() {

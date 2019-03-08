@@ -73,7 +73,7 @@ public class StaffUnitPositionDetails {
 
 
     public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
-        this.ctaRuleTemplates = ctaRuleTemplates;
+        this.ctaRuleTemplates = Optional.ofNullable(ctaRuleTemplates).orElse(new ArrayList<>());
     }
     public List<AppliedFunctionDTO> getAppliedFunctions() {
         return Optional.ofNullable(appliedFunctions).orElse(new ArrayList<>());
@@ -203,7 +203,7 @@ public class StaffUnitPositionDetails {
     }
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
-        return ctaRuleTemplates=Optional.ofNullable(ctaRuleTemplates).orElse(new ArrayList<>());
+        return ctaRuleTemplates;
     }
 
     public ZoneId getUnitTimeZone() {

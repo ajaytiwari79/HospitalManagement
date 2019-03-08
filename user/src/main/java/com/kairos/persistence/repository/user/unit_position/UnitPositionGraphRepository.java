@@ -137,6 +137,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "return unitPosition,employmentRel,employmentType")
     List<UnitPositionLineEmploymentTypeRelationShip> findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(Long parentOrganizationId);
 
+
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} AND ( up.endDate IS NULL OR DATE(up.endDate) > DATE({1}))  return up")
     List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, String endDate);
 
