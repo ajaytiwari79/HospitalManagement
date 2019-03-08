@@ -60,7 +60,7 @@ public class ClauseService{
 
     /**
      * @param referenceId country id or unit id
-     * @param isOrganization    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is organizationId or not
      * @param clauseDto   contain data about clause and template type which belong to clause
      * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
      * @throws DuplicateDataException : if clause already exist for id ,if account type is not selected}
@@ -133,7 +133,7 @@ public class ClauseService{
     }
     /**
      * @param referenceId country id or unit id
-     * @param isOrganization    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is organizationId or not
      * @param clauseDto   contain update data for clause
      * @return updated clause object
      * @throws DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
@@ -170,8 +170,8 @@ public class ClauseService{
         return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
     }
 
-    public List<UnitLevelClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
-        List<Clause> clauses = clauseRepository.findAllClauseByUnitId(unitId);
+    public List<UnitLevelClauseResponseDTO> getAllClauseByUnitId(Long organizationId) {
+        List<Clause> clauses = clauseRepository.findAllClauseByUnitId(organizationId);
        return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
     }
 
@@ -187,7 +187,7 @@ public class ClauseService{
 
     /**
      * @param referenceId country id or unit id
-     * @param isOrganization    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is organizationId or not
      * @return boolean true if data deleted successfully
      * @throws DataNotFoundByIdException; if clause not found for id
      */
@@ -219,15 +219,15 @@ public class ClauseService{
 
     /**
      *
-     * @param unitId
+     * @param organizationId
      * @return
      */
 
     //TODO try to use DTO instead of map
-    public Map<String,Object> getClauseMetadataByOrganizationId(Long unitId) {
+    public Map<String,Object> getClauseMetadataByOrganizationId(Long organizationId) {
         Map<String,Object> clauseMetaDataMap=new HashMap<>();
-        clauseMetaDataMap.put("clauseTagList",clauseTagService.getAllClauseTagByUnitId(unitId));
-        clauseMetaDataMap.put("templateTypeList",policyAgreementTemplateService.getAllTemplateType(unitId));
+        clauseMetaDataMap.put("clauseTagList",clauseTagService.getAllClauseTagByUnitId(organizationId));
+        clauseMetaDataMap.put("templateTypeList",policyAgreementTemplateService.getAllTemplateType(organizationId));
         return clauseMetaDataMap;
     }
 }

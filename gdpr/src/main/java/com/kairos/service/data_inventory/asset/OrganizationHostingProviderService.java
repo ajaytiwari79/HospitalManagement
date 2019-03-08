@@ -98,12 +98,12 @@ public class OrganizationHostingProviderService {
     }
 
 
-    public Boolean deleteHostingProvider(Long unitId, Long hostingProviderId) {
-        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, hostingProviderId);
+    public Boolean deleteHostingProvider(Long organizationId, Long hostingProviderId) {
+        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(organizationId, hostingProviderId);
         if (CollectionUtils.isNotEmpty(assetNames)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
         }
-        Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, unitId);
+        Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, organizationId);
         if (resultCount > 0) {
             LOGGER.info("Hosting provider deleted successfully for id :: {}", hostingProviderId);
         } else {

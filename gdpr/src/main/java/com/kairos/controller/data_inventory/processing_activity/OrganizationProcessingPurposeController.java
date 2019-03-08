@@ -34,62 +34,62 @@ class OrganizationProcessingPurposeController {
 
     @ApiOperation("add processing purpose")
     @PostMapping("/processing_purpose")
-    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
+    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
         if (CollectionUtils.isEmpty(processingPurposes.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(unitId, processingPurposes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(organizationId, processingPurposes.getRequestBody()));
 
     }
 
 
     @ApiOperation("get processing purpose by id")
     @GetMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long unitId, @PathVariable Long processingPurposeId) {
-        if (unitId == null) {
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long organizationId, @PathVariable Long processingPurposeId) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(unitId, processingPurposeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(organizationId, processingPurposeId));
     }
 
 
     @ApiOperation("get all processing purpose")
     @GetMapping("/processing_purpose")
-    public ResponseEntity<Object> getAllProcessingPurpose(@PathVariable Long unitId) {
-        if (unitId == null) {
+    public ResponseEntity<Object> getAllProcessingPurpose(@PathVariable Long organizationId) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(organizationId));
     }
 
 
     @ApiOperation("delete processing purpose by id")
     @DeleteMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long unitId, @PathVariable Long processingPurposeId) {
-        if (unitId == null) {
+    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long organizationId, @PathVariable Long processingPurposeId) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(unitId, processingPurposeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(organizationId, processingPurposeId));
 
     }
 
     @ApiOperation("update processing purpose by id")
     @PutMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long unitId, @PathVariable Long processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
-        if (unitId == null) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long organizationId, @PathVariable Long processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(unitId, processingPurposeId, processingPurpose));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(organizationId, processingPurposeId, processingPurpose));
     }
 
 
     @ApiOperation("save processing purpose And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/processing_purpose/suggest")
-    public ResponseEntity<Object> saveProcessingPurposeBasisAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposeDTOs) {
-        if (unitId == null) {
+    public ResponseEntity<Object> saveProcessingPurposeBasisAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposeDTOs) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.saveAndSuggestProcessingPurposes(countryId, unitId, processingPurposeDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.saveAndSuggestProcessingPurposes(countryId, organizationId, processingPurposeDTOs.getRequestBody()));
 
     }
 

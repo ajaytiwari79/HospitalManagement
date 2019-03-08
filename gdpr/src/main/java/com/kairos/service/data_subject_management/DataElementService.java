@@ -29,7 +29,7 @@ public class DataElementService{
 
 
     /**
-     * @param referenceId     reference id may be country id or unitId
+     * @param referenceId     reference id may be country id or organizationId
      * @param dataElementsDto request body for creating New Data Elements
      * @return map of Data Elements  List  and new Data Elements ids
      * @decription method create new Data Elements throw exception if data element already exist
@@ -56,7 +56,7 @@ public class DataElementService{
 
 
     /**
-     * @param referenceId     = unitId or countryId
+     * @param referenceId     = organizationId or countryId
      * @param dataElementsDto request body contain list Of Existing Data Elements which needs to be Update and List of New Data Elements
      * @return map of Data Element ids and ,List of  updated and new Data Elements
      * @desciption method create new data Data elements and update data Element if data element already exist.
@@ -122,11 +122,11 @@ public class DataElementService{
 
 
     /*
-      @param unitId
+      @param organizationId
      * @return get organizational data elements
      */
-   /* public List<DataElement> getAllDataElementByUnitId(Long unitId) {
-        return dataElementMongoRepository.getAllDataElementByUnitId(unitId);
+   /* public List<DataElement> getAllDataElementByUnitId(Long organizationId) {
+        return dataElementMongoRepository.getAllDataElementByUnitId(organizationId);
     }*/
 
 

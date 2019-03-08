@@ -75,34 +75,34 @@ class QuestionnaireTemplateController {
 
     @ApiOperation(value = "save  questionnaire template basic data at organization level ")
     @PostMapping(UNIT_URL + "/questionnaire_template")
-    public ResponseEntity<Object> saveQuestionnaireTemplate(@PathVariable Long unitId, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.saveQuestionnaireTemplate(unitId, templateDto));
+    public ResponseEntity<Object> saveQuestionnaireTemplate(@PathVariable Long organizationId, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.saveQuestionnaireTemplate(organizationId, templateDto));
     }
 
     @ApiOperation(value = "update basic detail of Questionnaire template at organization level ")
     @PutMapping(UNIT_URL + "/questionnaire_template/{questionnaireTemplateId}")
-    public ResponseEntity<Object> updateQuestionnaireTemplate(@PathVariable Long unitId, @PathVariable Long questionnaireTemplateId, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.updateQuestionnaireTemplate(unitId, questionnaireTemplateId, templateDto));
+    public ResponseEntity<Object> updateQuestionnaireTemplate(@PathVariable Long organizationId, @PathVariable Long questionnaireTemplateId, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.updateQuestionnaireTemplate(organizationId, questionnaireTemplateId, templateDto));
     }
 
     @ApiOperation(value = "delete questionnaire template by id ")
     @DeleteMapping(UNIT_URL + "/questionnaire_template/{questionnaireTemplateId}")
-    public ResponseEntity<Object> deleteQuestionnaireTemplate(@PathVariable Long unitId, @PathVariable Long questionnaireTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.deleteQuestionnaireTemplate(unitId, questionnaireTemplateId));
+    public ResponseEntity<Object> deleteQuestionnaireTemplate(@PathVariable Long organizationId, @PathVariable Long questionnaireTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.deleteQuestionnaireTemplate(organizationId, questionnaireTemplateId));
     }
 
 
     @ApiOperation(value = "get questionnaire template With Sections by Id of unit")
     @GetMapping(UNIT_URL + "/questionnaire_template/{questionnaireTemplateId}")
-    public ResponseEntity<Object> getQuestionnaireTemplateWithSectionAndQuestionById(@PathVariable Long unitId, @PathVariable Long questionnaireTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(unitId, questionnaireTemplateId, true));
+    public ResponseEntity<Object> getQuestionnaireTemplateWithSectionAndQuestionById(@PathVariable Long organizationId, @PathVariable Long questionnaireTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(organizationId, questionnaireTemplateId, true));
     }
 
 
     @ApiOperation(value = "get all questionnaire template of unit ")
     @GetMapping(UNIT_URL + "/questionnaire_template")
-    public ResponseEntity<Object> getAllQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(unitId, true));
+    public ResponseEntity<Object> getAllQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(organizationId, true));
     }
 
 }

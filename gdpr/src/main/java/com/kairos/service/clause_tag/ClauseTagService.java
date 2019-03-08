@@ -57,8 +57,8 @@ public class ClauseTagService{
         return clauseTagRepository.findAllByCountryId(countryId);
     }
 
-    public List<ClauseTag> getAllClauseTagByUnitId(Long unitId) {
-        return clauseTagRepository.findAllClauseTagByUnitId(unitId);
+    public List<ClauseTag> getAllClauseTagByUnitId(Long organizationId) {
+        return clauseTagRepository.findAllClauseTagByUnitId(organizationId);
     }
 
 //TODO

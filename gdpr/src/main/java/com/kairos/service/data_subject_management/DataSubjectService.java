@@ -121,19 +121,19 @@ public class DataSubjectService {
 
 
     /**
-     * @param unitId
+     * @param organizationId
      * @param subjectDTO data subject Dto contain basic field ,name description and data category id
      * @return
      */
-    public DataSubjectDTO saveOrganizationDataSubject(Long unitId, DataSubjectDTO subjectDTO) {
+    public DataSubjectDTO saveOrganizationDataSubject(Long organizationId, DataSubjectDTO subjectDTO) {
 
 
-        DataSubject previousDataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, subjectDTO.getName());
+        DataSubject previousDataSubject = dataSubjectRepository.findByNameAndUnitId(organizationId, subjectDTO.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Data Subject", subjectDTO.getName());
         }
         DataSubject dataSubject = new DataSubject(subjectDTO.getName(), subjectDTO.getDescription(), dataCategoryService.getAllDataCategoriesByIds(subjectDTO.getDataCategories()));
-        dataSubject.setOrganizationId(unitId);
+        dataSubject.setOrganizationId(organizationId);
         dataSubjectRepository.save(dataSubject);
         subjectDTO.setId(dataSubject.getId());
         return subjectDTO;
@@ -146,9 +146,9 @@ public class DataSubjectService {
     }
 
 
-    public List<DataSubjectResponseDTO> findOrganizationAllDataSubjectWithDataCategoryAndDataElements(Long unitId) {
+    public List<DataSubjectResponseDTO> findOrganizationAllDataSubjectWithDataCategoryAndDataElements(Long organizationId) {
         List<DataSubjectResponseDTO> dataSubjectResponseDTOList = new ArrayList<>();
-        List<DataSubject> dataSubjects = dataSubjectRepository.getAllDataSubjectByUnitId(unitId);
+        List<DataSubject> dataSubjects = dataSubjectRepository.getAllDataSubjectByUnitId(organizationId);
         for(DataSubject dataSubject : dataSubjects){
             dataSubjectResponseDTOList.add(prepareDataSubjectResponseDTO(dataSubject, false));
         }
@@ -158,13 +158,13 @@ public class DataSubjectService {
 
 
     /**
-     * @param unitId
+     * @param organizationId
      * @param dataSubjectId
      * @param dataSubjectDTO
      */
-    public DataSubjectDTO updateOrganizationDataSubject(Long unitId, Long dataSubjectId, DataSubjectDTO dataSubjectDTO) {
+    public DataSubjectDTO updateOrganizationDataSubject(Long organizationId, Long dataSubjectId, DataSubjectDTO dataSubjectDTO) {
 
-        DataSubject dataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, dataSubjectDTO.getName());
+        DataSubject dataSubject = dataSubjectRepository.findByNameAndUnitId(organizationId, dataSubjectDTO.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Data Subject", dataSubject.getName());
         }
@@ -178,8 +178,8 @@ public class DataSubjectService {
     }
 
 
-    public DataSubjectResponseDTO getDataSubjectWithDataCategoryAndElementByUnitIdAndId(Long unitId, Long datSubjectId) {
-        DataSubject dataSubject = dataSubjectRepository.getDataSubjectByUnitIdAndId(unitId, datSubjectId);
+    public DataSubjectResponseDTO getDataSubjectWithDataCategoryAndElementByUnitIdAndId(Long organizationId, Long datSubjectId) {
+        DataSubject dataSubject = dataSubjectRepository.getDataSubjectByUnitIdAndId(organizationId, datSubjectId);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", datSubjectId);
         }

@@ -48,16 +48,16 @@ class QuestionnaireSectionController {
 
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping(UNIT_URL + "/questionnaire_template/{templateId}/section")
-    public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long unitId, @PathVariable Long templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
+    public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long organizationId, @PathVariable Long templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
             return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(unitId, templateId, questionnaireSectionsDto,true));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(organizationId, templateId, questionnaireSectionsDto,true));
     }
 
     @ApiOperation("delete questionnaire section by id ")
     @DeleteMapping(UNIT_URL + "/questionnaire_template/{templateId}/section/{sectionId}")
-    public ResponseEntity<Object> deleteQuestionnaireSectionByUnitId(@PathVariable Long unitId, @PathVariable Long templateId, @PathVariable Long sectionId) {
+    public ResponseEntity<Object> deleteQuestionnaireSectionByUnitId(@PathVariable Long organizationId, @PathVariable Long templateId, @PathVariable Long sectionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.deleteQuestionnaireSectionFromTemplate(templateId, sectionId));
     }
 

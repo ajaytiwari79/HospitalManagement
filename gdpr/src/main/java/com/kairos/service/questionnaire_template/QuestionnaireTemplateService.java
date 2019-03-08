@@ -301,20 +301,20 @@ public class QuestionnaireTemplateService {
 
 
     /**
-     * @param unitId
+     * @param organizationId
      * @param questionnaireTemplateDTO
      * @return
      * @description create Questionnaire template at organization level
      */
-    public QuestionnaireTemplateDTO saveQuestionnaireTemplate(Long unitId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
+    public QuestionnaireTemplateDTO saveQuestionnaireTemplate(Long organizationId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
+        QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(organizationId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "message.questionnaireTemplate", questionnaireTemplateDTO.getName());
         }
         QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), QuestionnaireTemplateStatus.DRAFT);
-        questionnaireTemplate.setOrganizationId(unitId);
-        validateQuestionnaireTemplateAndAddTemplateType(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
+        questionnaireTemplate.setOrganizationId(organizationId);
+        validateQuestionnaireTemplateAndAddTemplateType(organizationId, true, questionnaireTemplate, questionnaireTemplateDTO);
         questionnaireTemplateRepository.save(questionnaireTemplate);
         return questionnaireTemplateDTO.setId(questionnaireTemplate.getId());
 
@@ -322,15 +322,15 @@ public class QuestionnaireTemplateService {
 
 
     /**
-     * @param unitId
+     * @param organizationId
      * @param questionnaireTemplateId
      * @param questionnaireTemplateDTO
      * @return
      * @description method update existing questionnaire template at organization level( check if template with same name exist, then throw exception )
      */
-    public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
+    public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long organizationId, Long questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(organizationId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(questionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(questionnaireTemplate.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "message.questionnaireTemplate", questionnaireTemplateDTO.getName());
         }
@@ -338,7 +338,7 @@ public class QuestionnaireTemplateService {
             questionnaireTemplate = questionnaireTemplateRepository.getOne(questionnaireTemplateId);
             questionnaireTemplate.setName(questionnaireTemplateDTO.getName());
             questionnaireTemplate.setDescription(questionnaireTemplateDTO.getDescription());
-            validateQuestionnaireTemplateAndAddTemplateType(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
+            validateQuestionnaireTemplateAndAddTemplateType(organizationId, true, questionnaireTemplate, questionnaireTemplateDTO);
             questionnaireTemplateRepository.save(questionnaireTemplate);
         } catch (EntityNotFoundException ene) {
             exceptionService.duplicateDataException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
@@ -349,8 +349,8 @@ public class QuestionnaireTemplateService {
     }
 
 
-    public boolean deleteQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(questionnaireTemplateId, unitId);
+    public boolean deleteQuestionnaireTemplate(Long organizationId, Long questionnaireTemplateId) {
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(questionnaireTemplateId, organizationId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);
         }
@@ -359,15 +359,15 @@ public class QuestionnaireTemplateService {
         return true;
     }
     /*
-      @param unitId
+      @param organizationId
      * @param questionnaireTemplateId
      * @return method return questionnaire template with sections and questions
      * @description we get  section[ {} ] as query response from mongo on using group operation,
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    /*public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(Long unitId, Long questionnaireTemplateId) {
-        QuestionnaireTemplateResponseDTO templateResponseDto = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, questionnaireTemplateId);
+    /*public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(Long organizationId, Long questionnaireTemplateId) {
+        QuestionnaireTemplateResponseDTO templateResponseDto = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(organizationId, questionnaireTemplateId);
         if (!Optional.ofNullable(templateResponseDto.getSections().get(0).getId()).isPresent()) {
             templateResponseDto.setSections(new ArrayList<>());
         }

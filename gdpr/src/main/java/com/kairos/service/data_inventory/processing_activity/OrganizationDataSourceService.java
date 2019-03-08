@@ -19,8 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -91,13 +93,13 @@ public class OrganizationDataSourceService{
     }
 
 
-    public Boolean deleteDataSource(Long unitId, Long dataSourceId) {
+    public Boolean deleteDataSource(Long organizationId, Long dataSourceId) {
 
-        List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
+        List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(organizationId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
         }
-       dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, unitId);
+       dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, organizationId);
         return true;
     }
 

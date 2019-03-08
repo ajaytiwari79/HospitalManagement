@@ -105,71 +105,71 @@ class PolicyAgreementTemplateController {
 
     @ApiOperation("save agreement template with basic detail , unit level ")
     @PostMapping(UNIT_URL+"/agreement_template")
-    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createPolicyAgreementTemplate(@PathVariable Long unitId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createPolicyAgreementTemplate(@PathVariable Long organizationId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
 
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(unitId,true, agreementTemplateDto));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(organizationId,true, agreementTemplateDto));
     }
 
     //TODO
     @ApiOperation("upload cover image of agreement template , unit level")
     @PostMapping(UNIT_URL+"/agreement_template/{agreementTemplateId}/upload")
-    public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByUnitId(@PathVariable Long unitId, @PathVariable Long agreementTemplateId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByUnitId(@PathVariable Long organizationId, @PathVariable Long agreementTemplateId, @RequestParam("file") MultipartFile file) {
         if (file.getSize() == 0) {
             return ResponseHandler.generateResponseDTO(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.uploadCoverPageLogo(unitId,true, agreementTemplateId, file));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.uploadCoverPageLogo(organizationId,true, agreementTemplateId, file));
     }
 
 
     @ApiOperation("delete  agreement template by id ,unit level ")
     @DeleteMapping(UNIT_URL+"/agreement_template/delete/{agreementTemplateId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deletePolicyAgreementTemplateByUnitIdAndId(@PathVariable Long unitId, @PathVariable Long agreementTemplateId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(unitId, true, agreementTemplateId));
+    public ResponseEntity<ResponseDTO<Boolean>> deletePolicyAgreementTemplateByUnitIdAndId(@PathVariable Long organizationId, @PathVariable Long agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(organizationId, true, agreementTemplateId));
 
     }
 
 
     @ApiOperation("update  agreement template basic details , unit level ")
     @PutMapping(UNIT_URL+"/agreement_template/{agreementTemplateId}")
-    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> updateAgreementTemplate(@PathVariable Long unitId, @PathVariable Long agreementTemplateId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(unitId,true, agreementTemplateId, agreementTemplateDto));
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> updateAgreementTemplate(@PathVariable Long organizationId, @PathVariable Long agreementTemplateId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(organizationId,true, agreementTemplateId, agreementTemplateDto));
 
     }
 
     @ApiOperation("get all policy agreement Template with basic details , unit  level  ")
     @GetMapping(UNIT_URL+"/agreement_template")
-    public ResponseEntity<ResponseDTO<List<PolicyAgreementTemplateResponseDTO>>> getAllAgreementTemplateOfUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByUnitId(unitId));
+    public ResponseEntity<ResponseDTO<List<PolicyAgreementTemplateResponseDTO>>> getAllAgreementTemplateOfUnit(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByUnitId(organizationId));
 
     }
 
     @ApiOperation("get all agreement sections and sub section of agreement template , unit level ")
     @GetMapping(UNIT_URL+ "/agreement_template/{agreementTemplateId}/section")
-    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable Long agreementTemplateId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId,true, agreementTemplateId));
+    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long organizationId, @PathVariable Long agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(organizationId,true, agreementTemplateId));
     }
 
     //TODO
     @ApiOperation("get all agreement Template linked with clause , org level ")
     @GetMapping(UNIT_URL+"/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(unitId,true, clauseId));
+    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long organizationId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(organizationId,true, clauseId));
 
     }
 
     //TODO
    /* @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
     @PutMapping(UNIT_URL+"/agreement_template/clause/version")
-    public ResponseEntity<Object> updateTemplateClauseWithNewVersion(@PathVariable Long unitId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(unitId, true,agreementTemplateClauseUpdateDTO));
+    public ResponseEntity<Object> updateTemplateClauseWithNewVersion(@PathVariable Long organizationId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(organizationId, true,agreementTemplateClauseUpdateDTO));
 
     }*/
 
     //TODO
     @ApiOperation(value = "All Template Type type ")
     @GetMapping(UNIT_URL+"/template/all")
-    public ResponseEntity<Object> getAllTemplateType(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllTemplateType(unitId));
+    public ResponseEntity<Object> getAllTemplateType(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllTemplateType(organizationId));
     }
 
 }

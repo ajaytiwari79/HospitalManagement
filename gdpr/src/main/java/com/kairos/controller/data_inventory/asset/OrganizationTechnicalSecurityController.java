@@ -35,48 +35,48 @@ class OrganizationTechnicalSecurityController {
 
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
-    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
+    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
         if (CollectionUtils.isEmpty(securityMeasures.getRequestBody()))
         {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(unitId, securityMeasures.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(organizationId, securityMeasures.getRequestBody()));
 
     }
 
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
     @GetMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long techSecurityMeasureId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(unitId, techSecurityMeasureId));
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long organizationId, @PathVariable Long techSecurityMeasureId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(organizationId, techSecurityMeasureId));
     }
 
 
     @ApiOperation("get all TechnicalSecurityMeasure ")
     @GetMapping("/technical_security")
-    public ResponseEntity<Object> getAllTechnicalSecurityMeasure(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
+    public ResponseEntity<Object> getAllTechnicalSecurityMeasure(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(organizationId));
     }
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
     @DeleteMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long techSecurityMeasureId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(unitId, techSecurityMeasureId));
+    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long organizationId, @PathVariable Long techSecurityMeasureId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(organizationId, techSecurityMeasureId));
 
     }
 
     @ApiOperation("update TechnicalSecurityMeasure by id")
     @PutMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(unitId, techSecurityMeasureId, securityMeasure));
+    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long organizationId, @PathVariable Long techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(organizationId, techSecurityMeasureId, securityMeasure));
 
     }
 
 
     @ApiOperation("save technical security And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/technical_security/suggest")
-    public ResponseEntity<Object> saveTechnicalSecurityAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> technicalSecurityDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.saveAndSuggestTechnicalSecurityMeasures(countryId, unitId, technicalSecurityDTOs.getRequestBody()));
+    public ResponseEntity<Object> saveTechnicalSecurityAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> technicalSecurityDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.saveAndSuggestTechnicalSecurityMeasures(countryId, organizationId, technicalSecurityDTOs.getRequestBody()));
 
     }
 

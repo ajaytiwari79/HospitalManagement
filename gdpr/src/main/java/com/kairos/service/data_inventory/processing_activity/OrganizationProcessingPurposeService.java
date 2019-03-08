@@ -94,13 +94,13 @@ public class OrganizationProcessingPurposeService{
     }
 
 
-    public Boolean deleteProcessingPurpose(Long unitId, Long processingPurposeId) {
+    public Boolean deleteProcessingPurpose(Long organizationId, Long processingPurposeId) {
 
-        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingPurpose(organizationId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", StringUtils.join(processingActivities,','));
         }
-        processingPurposeRepository.deleteByIdAndOrganizationId(processingPurposeId, unitId);
+        processingPurposeRepository.deleteByIdAndOrganizationId(processingPurposeId, organizationId);
         return true;
     }
 

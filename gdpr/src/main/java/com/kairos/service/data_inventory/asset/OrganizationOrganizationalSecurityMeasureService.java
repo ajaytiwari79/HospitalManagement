@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationOrganizationalSecurityMeasureService{
@@ -95,13 +97,13 @@ public class OrganizationOrganizationalSecurityMeasureService{
     }
 
 
-    public Boolean deleteOrganizationalSecurityMeasure(Long unitId, Long orgSecurityMeasureId) {
+    public Boolean deleteOrganizationalSecurityMeasure(Long organizationId, Long orgSecurityMeasureId) {
 
-        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
+        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", StringUtils.join(assetsLinked, ','));
         }
-        organizationalSecurityMeasureRepository.deleteByIdAndOrganizationId(orgSecurityMeasureId, unitId);
+        organizationalSecurityMeasureRepository.deleteByIdAndOrganizationId(orgSecurityMeasureId, organizationId);
         return true;
 
     }

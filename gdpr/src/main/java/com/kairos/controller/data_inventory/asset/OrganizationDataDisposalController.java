@@ -33,46 +33,46 @@ class OrganizationDataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
 
         if (CollectionUtils.isEmpty(dataDisposalDTOs.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(unitId, dataDisposalDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(organizationId, dataDisposalDTOs.getRequestBody()));
     }
 
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(unitId, dataDisposalId));
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long organizationId, @PathVariable Long dataDisposalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(organizationId, dataDisposalId));
     }
 
 
     @ApiOperation("get all DataDisposal ")
     @GetMapping("/data_disposal")
-    public ResponseEntity<Object> getAllDataDisposal(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal(unitId));
+    public ResponseEntity<Object> getAllDataDisposal(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal(organizationId));
     }
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(unitId, dataDisposalId));
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long organizationId, @PathVariable Long dataDisposalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(organizationId, dataDisposalId));
     }
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(unitId, dataDisposalId, dataDisposalDTO));
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long organizationId, @PathVariable Long dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(organizationId, dataDisposalId, dataDisposalDTO));
 
     }
 
 
     @ApiOperation("save Data Disposal And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/data_disposal/suggest")
-    public ResponseEntity<Object> saveDataDisposalAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.saveAndSuggestDataDisposal(countryId, unitId, dataDisposalDTOs.getRequestBody()));
+    public ResponseEntity<Object> saveDataDisposalAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.saveAndSuggestDataDisposal(countryId, organizationId, dataDisposalDTOs.getRequestBody()));
 
     }
 

@@ -61,29 +61,29 @@ class DataElementController {
 
     @ApiOperation("organization ,create  data Element ")
     @PostMapping(UNIT_URL + "/data_element")
-    public ResponseEntity<Object> saveOrganizationDataElement(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataElementDTO> dataElements) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.createDataElements(unitId, true, dataElements.getRequestBody(), null));
+    public ResponseEntity<Object> saveOrganizationDataElement(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataElementDTO> dataElements) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.createDataElements(organizationId, true, dataElements.getRequestBody(), null));
 
     }
 
 //TODO
     /*@ApiOperation("organization ,get data Element by id")
     @GetMapping(UNIT_URL + "/data_element/{dataElementId}")
-    public ResponseEntity<ResponseDTO<DataElement>> getOrganizationDataElementById(@PathVariable Long unitId, @PathVariable BigInteger dataElementId) {
+    public ResponseEntity<ResponseDTO<DataElement>> getOrganizationDataElementById(@PathVariable Long organizationId, @PathVariable BigInteger dataElementId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getDataElementById(dataElementId));
 
     }
 
     @ApiOperation("organization, get All data Element ")
     @GetMapping(UNIT_URL + "/data_element")
-    public ResponseEntity<ResponseDTO<List<DataElement>>> getAllOrganizationDataElement(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getAllDataElementByUnitId(unitId));
+    public ResponseEntity<ResponseDTO<List<DataElement>>> getAllOrganizationDataElement(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getAllDataElementByUnitId(organizationId));
 
     }
 
     @ApiOperation("organization, deleted  data element by id ")
     @DeleteMapping(UNIT_URL + "/data_element/{dataElementId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataElementById(@PathVariable Long unitId, @PathVariable BigInteger dataElementId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataElementById(@PathVariable Long organizationId, @PathVariable BigInteger dataElementId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.deleteDataElementById(dataElementId));
 
     }

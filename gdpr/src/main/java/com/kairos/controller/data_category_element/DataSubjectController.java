@@ -69,32 +69,32 @@ class DataSubjectController {
 
     @ApiOperation("organization, save  data Subject ")
     @PostMapping(UNIT_URL+"/data_subject")
-    public ResponseEntity<Object> saveOrganizationDataSubject(@PathVariable Long unitId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.saveOrganizationDataSubject(unitId, dataSubjectDTO));
+    public ResponseEntity<Object> saveOrganizationDataSubject(@PathVariable Long organizationId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.saveOrganizationDataSubject(organizationId, dataSubjectDTO));
     }
 
     @ApiOperation("organization, delete data Subject by id ")
     @DeleteMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> deleteOrganizationDataSubjectById(@PathVariable Long unitId, @PathVariable Long dataSubjectId) {
+    public ResponseEntity<Object> deleteOrganizationDataSubjectById(@PathVariable Long organizationId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.deleteDataSubjectById(dataSubjectId));
     }
 
     @ApiOperation("Organization get data Subject with data Category and data elements by id ")
     @GetMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> getOrganizationDataSubjectWithDataCategoryAndElementsById(@PathVariable Long unitId, @PathVariable Long dataSubjectId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.getDataSubjectWithDataCategoryAndElementByUnitIdAndId(unitId, dataSubjectId));
+    public ResponseEntity<Object> getOrganizationDataSubjectWithDataCategoryAndElementsById(@PathVariable Long organizationId, @PathVariable Long dataSubjectId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.getDataSubjectWithDataCategoryAndElementByUnitIdAndId(organizationId, dataSubjectId));
     }
 
     @ApiOperation("organization ,get all data Subject  ")
     @GetMapping(UNIT_URL+"/data_subject")
-    public ResponseEntity<Object> getOrganizationAllDataSubjectWithDataCategoryAndElements(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.findOrganizationAllDataSubjectWithDataCategoryAndDataElements(unitId));
+    public ResponseEntity<Object> getOrganizationAllDataSubjectWithDataCategoryAndElements(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.findOrganizationAllDataSubjectWithDataCategoryAndDataElements(organizationId));
     }
 
     @ApiOperation("organization, update data Subject ")
     @PutMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> updateOrganizationDataSubjectAndMapping(@PathVariable Long unitId, @PathVariable Long dataSubjectId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.updateOrganizationDataSubject(unitId, dataSubjectId, dataSubjectDTO));
+    public ResponseEntity<Object> updateOrganizationDataSubjectAndMapping(@PathVariable Long organizationId, @PathVariable Long dataSubjectId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.updateOrganizationDataSubject(organizationId, dataSubjectId, dataSubjectDTO));
     }
 
 
@@ -106,14 +106,14 @@ class DataSubjectController {
 
   /*  @ApiOperation("get data Subject mapping with data Category and data elements of unit by id ")
     @GetMapping(UNIT_URL + "/dataSubject_mapping/{dataSubjectId}")
-    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelectionById(unitId, dataSubjectId));
+    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementOfUnitById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger dataSubjectId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelectionById(organizationId, dataSubjectId));
     }
 
     @ApiOperation("get all data Subject mapping of Unit ")
     @GetMapping(UNIT_URL + "/dataSubject_mapping/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElementOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelection(unitId));
+    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElementOfUnit(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelection(organizationId));
     }*/
 
 }

@@ -77,27 +77,27 @@ class ClauseController {
 
     @ApiOperation("save clause at unit level")
     @PostMapping(UNIT_URL + "/clause")
-    public ResponseEntity<ResponseDTO<ClauseDTO>> saveClause(@PathVariable Long unitId, @Validated @RequestBody ClauseDTO clauseDto) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.createClause(unitId, true, clauseDto));
+    public ResponseEntity<ResponseDTO<ClauseDTO>> saveClause(@PathVariable Long organizationId, @Validated @RequestBody ClauseDTO clauseDto) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.createClause(organizationId, true, clauseDto));
     }
 
 
     @ApiOperation("update clause at  unit level")
     @PutMapping(UNIT_URL + "/clause/{clauseId}")
-    public ResponseEntity<ResponseDTO<ClauseDTO>> updateClause(@PathVariable Long unitId, @PathVariable Long clauseId, @Validated @RequestBody ClauseDTO clauseDto) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.updateClause(unitId, true, clauseId, clauseDto));
+    public ResponseEntity<ResponseDTO<ClauseDTO>> updateClause(@PathVariable Long organizationId, @PathVariable Long clauseId, @Validated @RequestBody ClauseDTO clauseDto) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.updateClause(organizationId, true, clauseId, clauseDto));
     }
 
     @ApiOperation("get all clause of unit")
     @GetMapping(UNIT_URL + "/clause")
-    public ResponseEntity<ResponseDTO<List<UnitLevelClauseResponseDTO>>> getAllClause(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.getAllClauseByUnitId(unitId));
+    public ResponseEntity<ResponseDTO<List<UnitLevelClauseResponseDTO>>> getAllClause(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.getAllClauseByUnitId(organizationId));
     }
 
     @ApiOperation("delete  clause by id")
     @DeleteMapping(UNIT_URL + "/clause/{clauseId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteClause(@PathVariable Long unitId, @PathVariable Long clauseId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteClause(@PathVariable Long organizationId, @PathVariable Long clauseId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(organizationId, true, clauseId));
     }
 
     @ApiOperation("Get Clause MetaData")
@@ -109,8 +109,8 @@ class ClauseController {
 
     @ApiOperation("get  clause metadata of unit")
     @GetMapping(UNIT_URL + "/clause/meta_data")
-    public ResponseEntity<Object> getClauseMetadataByOrganizationId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseMetadataByOrganizationId(unitId));
+    public ResponseEntity<Object> getClauseMetadataByOrganizationId(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseMetadataByOrganizationId(organizationId));
     }
 
 

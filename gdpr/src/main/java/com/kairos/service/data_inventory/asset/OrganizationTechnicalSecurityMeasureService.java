@@ -98,14 +98,14 @@ public class OrganizationTechnicalSecurityMeasureService {
     }
 
 
-    public Boolean deleteTechnicalSecurityMeasure(Long unitId, Long techSecurityMeasureId) {
+    public Boolean deleteTechnicalSecurityMeasure(Long organizationId, Long techSecurityMeasureId) {
 
-        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
+        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(organizationId, techSecurityMeasureId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
 
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", StringUtils.join(assetsLinked, ','));
         }
-        technicalSecurityMeasureRepository.deleteByIdAndOrganizationId(techSecurityMeasureId, unitId);
+        technicalSecurityMeasureRepository.deleteByIdAndOrganizationId(techSecurityMeasureId, organizationId);
         return true;
     }
 

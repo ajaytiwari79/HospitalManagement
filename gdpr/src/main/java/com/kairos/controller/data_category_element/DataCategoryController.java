@@ -69,35 +69,35 @@ class DataCategoryController {
 
     @ApiOperation("organization save data category ")
     @PostMapping(UNIT_URL + "/data_category")
-    public ResponseEntity<ResponseDTO<DataCategoryDTO>> addDataCategoryAndDataElement(@PathVariable Long unitId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.saveDataCategoryAndDataElement(unitId, true, dataCategoryDto));
+    public ResponseEntity<ResponseDTO<DataCategoryDTO>> addDataCategoryAndDataElement(@PathVariable Long organizationId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.saveDataCategoryAndDataElement(organizationId, true, dataCategoryDto));
     }
 
     @ApiOperation("organization update data category by id ")
     @PutMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateOrganizationDataCategoryAndDataElement(@PathVariable Long unitId, @PathVariable Long dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(unitId, true, dataCategoryId, dataCategoryDto));
+    public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateOrganizationDataCategoryAndDataElement(@PathVariable Long organizationId, @PathVariable Long dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(organizationId, true, dataCategoryId, dataCategoryDto));
 
     }
 
     @ApiOperation("organization, get data category by id with data Elements ")
     @GetMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<DataCategoryResponseDTO>> getOrganizationDataCategoryWithDataElements(@PathVariable Long unitId, @PathVariable Long dataCategoryId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementByUnitIdAndId(unitId, dataCategoryId));
+    public ResponseEntity<ResponseDTO<DataCategoryResponseDTO>> getOrganizationDataCategoryWithDataElements(@PathVariable Long organizationId, @PathVariable Long dataCategoryId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementByUnitIdAndId(organizationId, dataCategoryId));
 
     }
 
     @ApiOperation("organization get all data category ")
     @GetMapping(UNIT_URL + "/data_category")
-    public ResponseEntity<ResponseDTO<List<DataCategoryResponseDTO>>> getAllOrganizationDataCategoryWithDataElements(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.getAllDataCategoryWithDataElementByUnitId(unitId));
+    public ResponseEntity<ResponseDTO<List<DataCategoryResponseDTO>>> getAllOrganizationDataCategoryWithDataElements(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.getAllDataCategoryWithDataElementByUnitId(organizationId));
 
     }
 
     @ApiOperation("organization ,delete data category by id ")
     @DeleteMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataCategory(@PathVariable Long unitId, @PathVariable Long dataCategoryId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategoryById(unitId,true,dataCategoryId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataCategory(@PathVariable Long organizationId, @PathVariable Long dataCategoryId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategoryById(organizationId,true,dataCategoryId));
 
     }
 

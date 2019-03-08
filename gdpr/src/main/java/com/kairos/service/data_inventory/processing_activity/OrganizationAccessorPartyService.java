@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationAccessorPartyService {
@@ -84,13 +86,13 @@ public class OrganizationAccessorPartyService {
     }
 
 
-    public Boolean deleteAccessorParty(Long unitId, Long accessorPartyId) {
+    public Boolean deleteAccessorParty(Long organizationId, Long accessorPartyId) {
 
-        List<String> processingActivitiesLinkedWithAccessorParty = processingActivityRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        List<String> processingActivitiesLinkedWithAccessorParty = processingActivityRepository.findAllProcessingActivityLinkedWithAccessorParty(organizationId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
         }
-        accessorPartyRepository.deleteByIdAndOrganizationId(accessorPartyId, unitId);
+        accessorPartyRepository.deleteByIdAndOrganizationId(accessorPartyId, organizationId);
         return true;
     }
 

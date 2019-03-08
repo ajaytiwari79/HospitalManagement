@@ -65,15 +65,15 @@ class AgreementSectionController {
 
     @ApiOperation("save section of Agreement template ,org level ")
     @PostMapping(UNIT_URL+ "/agreement_template/{templateId}/section")
-    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> createAgreementSection(@PathVariable Long unitId, @PathVariable Long templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(unitId,true, templateId, agreementTemplateSectionDTO));
+    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> createAgreementSection(@PathVariable Long organizationId, @PathVariable Long templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(organizationId,true, templateId, agreementTemplateSectionDTO));
     }
 
 
     @ApiOperation("deleted agreement section , org level")
     @DeleteMapping(UNIT_URL+"/agreement_template/{templateId}/section/delete/{id}")
-    public ResponseEntity<Object> deleteAgreementSection(@PathVariable Long unitId, @PathVariable Long templateId, @PathVariable Long id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(unitId, true,templateId, id));
+    public ResponseEntity<Object> deleteAgreementSection(@PathVariable Long organizationId, @PathVariable Long templateId, @PathVariable Long id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(organizationId, true,templateId, id));
 
     }
 

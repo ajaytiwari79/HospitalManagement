@@ -95,13 +95,13 @@ public class OrganizationStorageFormatService {
     }
 
 
-    public Boolean deleteStorageFormat(Long unitId, Long storageFormatId) {
+    public Boolean deleteStorageFormat(Long organizationId, Long storageFormatId) {
 
-        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
+        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithStorageFormat(organizationId, storageFormatId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", StringUtils.join(assetsLinked, ','));
         }
-        storageFormatRepository.deleteByIdAndOrganizationId(storageFormatId, unitId);
+        storageFormatRepository.deleteByIdAndOrganizationId(storageFormatId, organizationId);
         return true;
     }
 

@@ -3,7 +3,6 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
@@ -19,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationTransferMethodService {
@@ -89,13 +90,13 @@ public class OrganizationTransferMethodService {
     }
 
 
-    public Boolean deleteTransferMethod(Long unitId, Long transferMethodId) {
+    public Boolean deleteTransferMethod(Long organizationId, Long transferMethodId) {
 
-        List<String> processingActivitiesLinkedWithTransferMethod = processingActivityRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
+        List<String> processingActivitiesLinkedWithTransferMethod = processingActivityRepository.findAllProcessingActivityLinkedWithTransferMethod(organizationId, transferMethodId);
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", StringUtils.join(processingActivitiesLinkedWithTransferMethod, ','));
         }
-        transferMethodRepository.deleteByIdAndOrganizationId(transferMethodId, unitId);
+        transferMethodRepository.deleteByIdAndOrganizationId(transferMethodId, organizationId);
         return true;
     }
 

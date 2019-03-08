@@ -56,6 +56,6 @@ public interface ProcessingActivityRepository extends CustomGenericRepository<Pr
     List<String> findAllProcessingActivityLinkedWithAccessorParty(Long orgId, Long accessorPartyId);
 
     @Query(value = "Select new com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO(PA.id, PA.name, PA.description, PA.managingDepartment.managingOrgId, PA.managingDepartment.managingOrgName) from ProcessingActivity PA where PA.organizationId = ?1 and PA.deleted = false")
-    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityWithBasicDetailForAsset(Long unitId);
+    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityWithBasicDetailForAsset(Long organizationId);
 
 }

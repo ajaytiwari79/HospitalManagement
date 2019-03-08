@@ -34,62 +34,62 @@ class OrganizationProcessingLegalBasisController {
 
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/legal_basis")
-    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
+    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
         if (CollectionUtils.isEmpty(legalBases.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(unitId, legalBases.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(organizationId, legalBases.getRequestBody()));
     }
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId) {
-        if (unitId == null) {
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long organizationId, @PathVariable Long legalBasisId) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(unitId, legalBasisId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(organizationId, legalBasisId));
     }
 
 
     @ApiOperation("get all ProcessingLegalBasis ")
     @GetMapping("/legal_basis")
-    public ResponseEntity<Object> getAllProcessingLegalBasis(@PathVariable Long unitId) {
-        if (unitId == null) {
+    public ResponseEntity<Object> getAllProcessingLegalBasis(@PathVariable Long organizationId) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis(organizationId));
     }
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
     @DeleteMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId) {
-        if (unitId == null) {
+    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long organizationId, @PathVariable Long legalBasisId) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(unitId, legalBasisId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(organizationId, legalBasisId));
 
     }
 
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
-        if (unitId == null) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long organizationId, @PathVariable Long legalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(unitId, legalBasisId, legalBasis));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(organizationId, legalBasisId, legalBasis));
 
     }
 
 
     @ApiOperation("save processing Legal BasisAnd Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/legal_basis/suggest")
-    public ResponseEntity<Object> saveProcessingLegalBasisAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> processingLegalBasisDTOs) {
-        if (unitId == null) {
+    public ResponseEntity<Object> saveProcessingLegalBasisAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> processingLegalBasisDTOs) {
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.saveAndSuggestProcessingLegalBasis(countryId, unitId, processingLegalBasisDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.saveAndSuggestProcessingLegalBasis(countryId, organizationId, processingLegalBasisDTOs.getRequestBody()));
 
     }
 

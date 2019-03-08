@@ -25,15 +25,15 @@ class DefaultDataInheritController {
 
 
     /**
-     * @param unitId                  - id of the organization which inherit data from from
+     * @param organizationId                  - id of the organization which inherit data from from
      * @param organizationMetaDataDTO - contain meta data about child organization, on the basis of meta data (org type ,sub type ,service category and sub service) unit
      *                                inherit data from parent
      * @return
      */
     @ApiOperation(value = "inherit Data from Parent organization on the basis of Org Type, sub Type,Category and Sub Category")
     @PostMapping(UNIT_URL + "/inherit")
-    public ResponseEntity<ResponseDTO<Boolean>> inheritMasterDataFromCountry(@PathVariable Long unitId, @Valid @RequestBody OrgTypeSubTypeServiceCategoryVO organizationMetaDataDTO) throws Exception {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, defaultDataInheritService.copyMasterDataFromCountry( unitId,organizationMetaDataDTO));
+    public ResponseEntity<ResponseDTO<Boolean>> inheritMasterDataFromCountry(@PathVariable Long organizationId, @Valid @RequestBody OrgTypeSubTypeServiceCategoryVO organizationMetaDataDTO) throws Exception {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, defaultDataInheritService.copyMasterDataFromCountry( organizationId,organizationMetaDataDTO));
 
     }
 

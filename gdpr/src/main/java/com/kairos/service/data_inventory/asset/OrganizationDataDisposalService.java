@@ -95,12 +95,12 @@ public class OrganizationDataDisposalService {
     }
 
 
-    public Boolean deleteDataDisposalById(Long unitId, Long dataDisposalId) {
-        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
+    public Boolean deleteDataDisposalById(Long organizationId, Long dataDisposalId) {
+        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(organizationId, dataDisposalId);
         if (CollectionUtils.isNotEmpty(assetNames)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
         }
-        Integer resultCount = dataDisposalRepository.deleteByIdAndOrganizationId(dataDisposalId, unitId);
+        Integer resultCount = dataDisposalRepository.deleteByIdAndOrganizationId(dataDisposalId, organizationId);
         if (resultCount > 0) {
             LOGGER.info("Data Disposal deleted successfully for id :: {}", dataDisposalId);
         } else {

@@ -35,49 +35,49 @@ class OrganizationHostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/hosting_provider")
-    public ResponseEntity<Object> createHostingProvider(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
         if (CollectionUtils.isEmpty(hostingProviderDTOs.getRequestBody()))
         {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(unitId, hostingProviderDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(organizationId, hostingProviderDTOs.getRequestBody()));
 
     }
 
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(unitId, hostingProviderId));
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long organizationId, @PathVariable Long hostingProviderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(organizationId, hostingProviderId));
 
     }
 
 
     @ApiOperation("get all HostingProvider ")
     @GetMapping("/hosting_provider")
-    public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider(unitId));
+    public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider(organizationId));
     }
 
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, hostingProviderId));
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long organizationId, @PathVariable Long hostingProviderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(organizationId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, hostingProviderId, hostingProviderDTO));
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long organizationId, @PathVariable Long hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(organizationId, hostingProviderId, hostingProviderDTO));
 
     }
 
     @ApiOperation("save Hosting Provider And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/hosting_provider/suggest")
-    public ResponseEntity<Object> saveHostingProviderAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.saveAndSuggestHostingProviders(countryId, unitId, hostingProviderDTOs.getRequestBody()));
+    public ResponseEntity<Object> saveHostingProviderAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.saveAndSuggestHostingProviders(countryId, organizationId, hostingProviderDTOs.getRequestBody()));
 
     }
 

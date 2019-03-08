@@ -19,9 +19,9 @@ public class RiskDaoImpl {
     private EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    public List<RiskResponseDTO> getAllRiskOfOrganizationId(Long unitId){
-        Query assetTypeRiskQuery = entityManager.createNamedQuery("getAllAssetTypeRiskData").setParameter(1, unitId);
-        Query processingActivityRiskQuery = entityManager.createNamedQuery("getAllProcessingActivityRiskData").setParameter(1, unitId);
+    public List<RiskResponseDTO> getAllRiskOfOrganizationId(Long organizationId){
+        Query assetTypeRiskQuery = entityManager.createNamedQuery("getAllAssetTypeRiskData").setParameter(1, organizationId);
+        Query processingActivityRiskQuery = entityManager.createNamedQuery("getAllProcessingActivityRiskData").setParameter(1, organizationId);
         List<RiskResponseDTO> allRisks = new ArrayList<>();
         allRisks.addAll( assetTypeRiskQuery.getResultList());
         allRisks.addAll(processingActivityRiskQuery.getResultList());

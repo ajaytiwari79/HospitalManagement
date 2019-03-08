@@ -19,8 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationProcessingLegalBasisService{
@@ -88,13 +90,13 @@ public class OrganizationProcessingLegalBasisService{
     }
 
 
-    public Boolean deleteProcessingLegalBasis(Long unitId, Long legalBasisId) {
+    public Boolean deleteProcessingLegalBasis(Long organizationId, Long legalBasisId) {
 
-        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(organizationId, legalBasisId);
         if (!processingActivities.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", StringUtils.join(processingActivities, ','));
         }
-        processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, unitId);
+        processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, organizationId);
         return true;
     }
 
