@@ -2,5 +2,5 @@
 match orgs= (org:Organization)
 forEach(o IN nodes(orgs)|
   merge(o)-[:ORGANIZATION_HAS_ACCESS_GROUPS]->(t:AccessGroup
-{isEmploymentExpired:true,lastModificationDate:timestamp(),role:"STAFF",deleted:false,isEnabled:true,typeOfTaskGiver:false,name:"Read Only Aceess Group",description:"Access group for expired employments"})
+{isEmploymentExpired:true,lastModificationDate:timestamp(),role:"STAFF",deleted:false,isEnabled:true,typeOfTaskGiver:false,name:"Read Only Aceess Group",description:"Access group for expired positions"})
 );

@@ -1,0 +1,8 @@
+MATCH (employment:Employment)
+REMOVE employment:Employment
+SET employment:Position
+
+
+MATCH(organization:Organization)-[r:HAS_EMPLOYMENTS]->(position:Position)
+delete r
+CREATE UNIQUE(organization)-[r1:HAS_POSITIONS]->(position)

@@ -74,20 +74,9 @@ public class SkillService {
     @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
-    private OrganizationServiceRepository organizationServiceRepository;
-    //anilm2 will remove this repo call this method from rest template
-  /*  @Inject
-    private TaskTypeMongoRepository taskTypeMongoRepository;*/
-    @Inject
     private MailService mailService;
     @Inject
-    private StaffService staffService;
-    @Inject
     private UserSkillLevelRelationshipGraphRepository userSkillLevelRelationshipGraphRepository;
-    @Inject
-    private IntegrationService integrationService;
-    @Inject
-    private Scheduler scheduler;
     @Inject
     private OrganizationMetadataRepository organizationMetadataRepository;
     @Inject
@@ -235,56 +224,6 @@ public class SkillService {
 
     }
 
-
-    /**
-     * * this method returns all skills and staff of unit/organization
-     *
-     * @param unitId {id of unit/organization}
-     * @return
-     */
-    public HashMap<String, Object> getUnitData(long unitId) {
-
-        HashMap<String, Object> response = new HashMap<>();
-
-        List<Map<String, Object>> skills = organizationGraphRepository.getSkillsOfOrganization(unitId);
-
-        List<Map<String, Object>> filterSkillData = new ArrayList<>();
-        for (Map<String, Object> map : skills) {
-            filterSkillData.add((Map<String, Object>) map.get("data"));
-        }
-
-        response.put("skillList", filterSkillData);
-        List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(unitId);
-        Map<String, Object> taskTypeList = skillServiceTemplateClient.getTaskTypeList(serviceIds, unitId);
-        response.putAll(taskTypeList);
-
-        response.put("teamList", teamService.getAllTeamsInOrganization(unitId));
-        response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryGraphRepository.getCountryIdByUnitId(unitId)));
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(unitId);
-
-        if (timeSlotData != null) {
-            response.put("timeSlotList", timeSlotData);
-        }
-
-        List<Map<String, Object>> staff = staffGraphRepository.getStaffWithBasicInfo(unitId, unitId, envConfig.getServerHost() + FORWARD_SLASH);
-
-        List<Map<String, Object>> staffList = new ArrayList<>();
-        for (Map<String, Object> map : staff) {
-            staffList.add((Map<String, Object>) map.get("data"));
-        }
-        List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(unitId);
-        for (Map<String, Object> map : tagList) {
-            localAreaTagsList.add(map.get("tags"));
-        }
-        response.put("staffList", staffList);
-        response.put("localAreaTags", localAreaTagsList);
-        response.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
-        response.put("exceptionTypes", taskDemandRestClient.getCitizensExceptionTypes(unitId));
-
-        return response;
-
-    }
 
 
     /**

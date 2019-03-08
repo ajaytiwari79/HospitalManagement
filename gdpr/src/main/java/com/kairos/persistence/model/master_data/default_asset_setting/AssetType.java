@@ -20,8 +20,8 @@ public class AssetType extends BaseEntity {
     private String name;
     private Long countryId;
     private Long organizationId;
-    private boolean subAssetType;
-    private boolean hasSubAsset;
+    private boolean isSubAssetType;
+    private boolean hasSubAssetType;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -62,13 +62,9 @@ public class AssetType extends BaseEntity {
 
     public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
-    public boolean isHasSubAsset() { return hasSubAsset; }
+    public boolean isHasSubAssetType() { return hasSubAssetType; }
 
-    public void setHasSubAsset(boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
-
-    public boolean isSubAssetType() { return subAssetType; }
-
-    public void setSubAssetType(boolean subAssetType) { this.subAssetType = subAssetType; }
+    public void setHasSubAssetType(boolean hasSubAssetType) { this.hasSubAssetType = hasSubAssetType; }
 
     public Long getCountryId() {
         return countryId;
@@ -100,6 +96,14 @@ public class AssetType extends BaseEntity {
 
     public void setSubAssetTypes(List<AssetType> subAssetTypes) {
         this.subAssetTypes = subAssetTypes;
+    }
+
+    public boolean isSubAssetType() {
+        return isSubAssetType;
+    }
+
+    public void setSubAssetType(boolean subAssetType) {
+        isSubAssetType = subAssetType;
     }
 
     public AssetType() {

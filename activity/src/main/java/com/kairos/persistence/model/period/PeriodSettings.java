@@ -56,10 +56,10 @@ public class PeriodSettings extends MongoBaseEntity {
     public void setDuration(int duration) {
         this.duration = duration;
     }
-    public DurationType getDurationType() {
+    public DurationType getPayrollFrequency() {
         return durationType;
     }
-    public void setDurationType(DurationType durationType) {
+    public void setPayrollFrequency(DurationType durationType) {
         this.durationType = durationType;
     }*/
 }

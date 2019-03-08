@@ -48,7 +48,7 @@ public class MasterAssetDTO {
 
     @NotNull(message = "error.message.assetType.notNull")
     private AssetTypeBasicDTO assetType;
-    private AssetTypeBasicDTO assetSubType;
+    private AssetTypeBasicDTO subAssetType;
 
 
 
@@ -102,7 +102,7 @@ public class MasterAssetDTO {
 
     public void setAssetType(AssetTypeBasicDTO assetType) { this.assetType = assetType; }
 
-    public AssetTypeBasicDTO getAssetSubType() { return assetSubType; }
+    public AssetTypeBasicDTO getAssetSubType() { return subAssetType; }
 
-    public void setAssetSubType(AssetTypeBasicDTO assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(AssetTypeBasicDTO subAssetType) { this.subAssetType = subAssetType; }
 }

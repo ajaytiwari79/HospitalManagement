@@ -4,7 +4,6 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
@@ -22,9 +21,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class OrganizationProcessingLegalBasisService{
@@ -52,17 +48,8 @@ public class OrganizationProcessingLegalBasisService{
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingLegalBasis using collation ,used for case insensitive result
      */
     public List<ProcessingLegalBasisDTO> createProcessingLegalBasis(Long organizationId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
-
-        Set<String> legalBasisNames = new HashSet<>();
-            for (ProcessingLegalBasisDTO legalBasis : legalBasisDTOList) {
-                legalBasisNames.add(legalBasis.getName());
-            }
-            List<String> nameInLowerCase = legalBasisNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingLegalBasis> previousLegalBasis = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            legalBasisNames = ComparisonUtils.getNameListForMetadata(previousLegalBasis, legalBasisNames);
-
+        Set<String> existingProcessingLegalBasisNames = processingLegalBasisRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> legalBasisNames = ComparisonUtils.getNewMetaDataNames(legalBasisDTOList,existingProcessingLegalBasisNames );
             List<ProcessingLegalBasis> processingLegalBases = new ArrayList<>();
             if (!legalBasisNames.isEmpty()) {
                 for (String name : legalBasisNames) {

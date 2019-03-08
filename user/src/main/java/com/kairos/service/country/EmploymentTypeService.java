@@ -156,12 +156,11 @@ public class EmploymentTypeService {
         return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
     }
 
-    public List<Map<String, Object>> getEmploymentTypeOfOrganization(long unitId, boolean isDeleted) {
+    public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
-
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);
         return organizationGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);

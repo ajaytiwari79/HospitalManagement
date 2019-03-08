@@ -46,7 +46,6 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(countryId,false, agreementTemplateDto));
     }
 
-    //TODO
     @ApiOperation("upload cover image of agreement template , country level")
     @PostMapping(COUNTRY_URL+"/agreement_template/{agreementTemplateId}/upload")
     public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByCountryId(@PathVariable Long countryId, @PathVariable Long agreementTemplateId, @RequestParam("file") MultipartFile file) {

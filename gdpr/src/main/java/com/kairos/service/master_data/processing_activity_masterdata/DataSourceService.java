@@ -4,8 +4,8 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataSourceDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
@@ -17,11 +17,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -45,16 +44,8 @@ public class DataSourceService {
      * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
     public List<DataSourceDTO> createDataSource(Long countryId, List<DataSourceDTO> dataSourceDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> dataSourceNames = new HashSet<>();
-        for (DataSourceDTO dataSource : dataSourceDTOS) {
-            dataSourceNames.add(dataSource.getName());
-        }
-        List<String> nameInLowerCase = dataSourceNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataSource> previousDataSources = dataSourceRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        dataSourceNames = ComparisonUtils.getNameListForMetadata(previousDataSources, dataSourceNames);
+        Set<String> existingDataSourceNames = dataSourceRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS,existingDataSourceNames );
 
         List<DataSource> dataSources = new ArrayList<>();
         if (!dataSourceNames.isEmpty()) {

@@ -3,7 +3,6 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
@@ -21,9 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class OrganizationAccessorPartyService {
@@ -52,17 +48,8 @@ public class OrganizationAccessorPartyService {
      * findMetaDataByNamesAndCountryId()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
     public List<AccessorPartyDTO> createAccessorParty(Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
-
-        Set<String> accessorPartyNames = new HashSet<>();
-        for (AccessorPartyDTO accessorParty : accessorPartyDTOS) {
-            accessorPartyNames.add(accessorParty.getName());
-        }
-        List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<AccessorParty> previousAccessorParties = accessorPartyRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-        accessorPartyNames = ComparisonUtils.getNameListForMetadata(previousAccessorParties, accessorPartyNames);
-
+        Set<String> existingAccessorPartyNames = accessorPartyRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> accessorPartyNames = ComparisonUtils.getNewMetaDataNames(accessorPartyDTOS,existingAccessorPartyNames );
         List<AccessorParty> accessorParties = new ArrayList<>();
         if (!accessorPartyNames.isEmpty()) {
             for (String name : accessorPartyNames) {

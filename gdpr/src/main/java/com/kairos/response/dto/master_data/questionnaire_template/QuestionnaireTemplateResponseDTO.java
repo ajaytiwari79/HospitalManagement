@@ -18,7 +18,7 @@ public class QuestionnaireTemplateResponseDTO {
     private QuestionnaireTemplateType templateType;
     private boolean isDefaultAssetTemplate;
     private QuestionnaireAssetTypeDTO assetType;
-    private QuestionnaireAssetTypeDTO assetSubType;
+    private QuestionnaireAssetTypeDTO subAssetType;
     private QuestionnaireTemplateStatus templateStatus;
     private List<QuestionnaireSectionResponseDTO> sections;
 
@@ -37,9 +37,9 @@ public class QuestionnaireTemplateResponseDTO {
 
     public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
 
-    public QuestionnaireAssetTypeDTO getAssetSubType() { return assetSubType; }
+    public QuestionnaireAssetTypeDTO getAssetSubType() { return subAssetType; }
 
-    public void setAssetSubType(QuestionnaireAssetTypeDTO assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(QuestionnaireAssetTypeDTO subAssetType) { this.subAssetType = subAssetType; }
 
     public boolean isDefaultAssetTemplate() { return isDefaultAssetTemplate; }
 

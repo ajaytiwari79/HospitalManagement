@@ -36,8 +36,8 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
-import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
+import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
@@ -113,7 +113,7 @@ public class StaffRetrievalService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private EmploymentService employmentService;
+    private PositionService positionService;
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
@@ -148,16 +148,16 @@ public class StaffRetrievalService {
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId, String type) {
 
-        StaffEmploymentDTO staffEmploymentDTO = null;
+        StaffPositionDTO staffPositionDTO = null;
         Staff staff = null;
         Organization unit = organizationGraphRepository.findOne(unitId);
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getTeamStaff(unitId, staffId);
-            staffEmploymentDTO = new StaffEmploymentDTO(staff, null);
+            staffPositionDTO = new StaffPositionDTO(staff, null);
         } else if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staffEmploymentDTO = staffGraphRepository.getStaffAndEmploymentByUnitId(parentOrganization.getId(), staffId);
-            staff = Optional.ofNullable(staffEmploymentDTO).isPresent() ? staffEmploymentDTO.getStaff() : null;
+            staffPositionDTO = staffGraphRepository.getStaffAndEmploymentByUnitId(parentOrganization.getId(), staffId);
+            staff = Optional.ofNullable(staffPositionDTO).isPresent() ? staffPositionDTO.getStaff() : null;
         }
         if (staff == null) {
             exceptionService.dataNotFoundByIdException("message.staff.idandunitid.notfound", staffId, type, unitId);
@@ -176,7 +176,7 @@ public class StaffRetrievalService {
             languages = Collections.emptyList();
             engineerTypes = Collections.emptyList();
         }
-        personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
+        personalInfo.put("employmentInfo", positionService.retrieveEmploymentDetails(staffPositionDTO));
 
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
         personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, unit.getId()));

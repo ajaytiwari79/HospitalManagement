@@ -2,25 +2,23 @@ package com.kairos.service.common;
 
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServiceCategoryVO;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.OrganizationClause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.data_inventory.asset.AssetDeprecated;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.persistence.model.master_data.data_category_element.DataSubject;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
-import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateDeprecated;
 import com.kairos.persistence.model.risk_management.Risk;
-import com.kairos.persistence.model.risk_management.RiskDeprecated;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -46,9 +44,6 @@ import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.data_subject_management.DataCategoryService;
 import com.kairos.service.data_subject_management.DataSubjectService;
@@ -276,14 +271,14 @@ public class DefaultDataInheritService{
 
     private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAssetResponseDTO> masterAssetDTOS) {
         if (CollectionUtils.isNotEmpty(masterAssetDTOS)) {
-            List<AssetDeprecated> assets = new ArrayList<>();
+            List<Asset> assets = new ArrayList<>();
             for (MasterAssetResponseDTO masterAssetDTO : masterAssetDTOS) {
-                AssetDeprecated asset = new AssetDeprecated(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
+                Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
                // asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
 //                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
-                if (Optional.of(masterAssetDTO.getAssetSubType()).isPresent()) {
-                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getAssetSubType().getName().toLowerCase().trim()));
+                if (Optional.of(masterAssetDTO.getSubAssetType()).isPresent()) {
+                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getSubAssetType().getName().toLowerCase().trim()));
                 }
                 assets.add(asset);
             }
@@ -389,7 +384,7 @@ public class DefaultDataInheritService{
     }
 
 
-    private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
+    /*private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
 
 
         Map<QuestionnaireTemplateDeprecated, List<QuestionnaireSectionDeprecated>> questionnaireTemplateAndSectionListMap = new HashMap<>();
@@ -470,7 +465,7 @@ public class DefaultDataInheritService{
 
         return questionnaireTemplate;
 
-    }
+    }*/
 
 
     private void saveDataDisposal(Long unitId, List<DataDisposalResponseDTO> dataDisposalDTOS) {
@@ -489,8 +484,8 @@ public class DefaultDataInheritService{
             Class[] argumentType = { String.class, Long.class };
             if (!metadataDTOList.isEmpty()) {
                 Class dtoClass = metadataDTOList.get(0).getClass();
-                for (T dataDisposalDTO : metadataDTOList) {
-                    String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dataDisposalDTO);
+                for (T dto : metadataDTOList) {
+                    String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dto);
                     Constructor<?> cons = entityClass.getConstructor(argumentType);
                     baseEntityList.add((BaseEntity)cons.newInstance(name,unitId));
                 }
@@ -572,19 +567,7 @@ public class DefaultDataInheritService{
     }
 
 
-    private List<RiskDeprecated> buildRisks(Long unitId, List<RiskBasicResponseDTO> riskDTOS) {
 
-        List<RiskDeprecated> risks = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(riskDTOS)) {
-            riskDTOS.forEach(riskDTO -> {
-                RiskDeprecated risk = new RiskDeprecated(riskDTO.getName(), riskDTO.getDescription(), riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
-                //risk.setOrganizationId(unitId);
-                risks.add(risk);
-            });
-        }
-        return risks;
-
-    }
 
 
 }

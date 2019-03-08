@@ -2,7 +2,6 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
@@ -21,9 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class OrganizationOrganizationalSecurityMeasureService{
@@ -54,17 +50,8 @@ public class OrganizationOrganizationalSecurityMeasureService{
      * findByOrganizationIdAndNamesList()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
     public List<OrganizationalSecurityMeasureDTO> createOrganizationalSecurityMeasure(Long organizationId, List<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOs) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> orgSecurityMeasureNames = new HashSet<>();
-            for (OrganizationalSecurityMeasureDTO securityMeasure : orgSecurityMeasureDTOs) {
-                orgSecurityMeasureNames.add(securityMeasure.getName());
-            }
-
-            List<String> nameInLowerCase = orgSecurityMeasureNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<OrganizationalSecurityMeasure> previousOrganizationalSecurityMeasures = organizationalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousOrganizationalSecurityMeasures, orgSecurityMeasureNames);
+        Set<String> existingOrganizationalSecurityMeasureNames = organizationalSecurityMeasureRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> orgSecurityMeasureNames = ComparisonUtils.getNewMetaDataNames(orgSecurityMeasureDTOs,existingOrganizationalSecurityMeasureNames );
             List<OrganizationalSecurityMeasure> organizationalSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
