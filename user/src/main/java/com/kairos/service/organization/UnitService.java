@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
@@ -65,7 +66,7 @@ public class UnitService {
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
         response.put("accountType", parentOrg.getAccountType());
-        response.put("accessGroups",accessGroupService.getOrganizationManagementAccessGroups(parentOrg.getId()));
+        response.put("accessGroups",accessGroupService.getOrganizationManagementAccessGroups(parentOrg.getId(), AccessGroupRole.MANAGEMENT));
         //response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
         response.put("businessTypes", parentOrg.getBusinessTypes());
         response.put("companyCategory", parentOrg.getCompanyCategory());
@@ -107,7 +108,7 @@ public class UnitService {
         response.put("companyTypes", CompanyType.getListOfCompanyType());
         response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
         response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId));
-        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(organizationId));
+        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(organizationId,AccessGroupRole.MANAGEMENT));
         return response;
     }
 
