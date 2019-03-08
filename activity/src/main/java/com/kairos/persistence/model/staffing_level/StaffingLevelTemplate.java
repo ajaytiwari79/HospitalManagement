@@ -27,15 +27,6 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
     public StaffingLevelTemplate() {
         //default constructor
     }
-
-    public StaffingLevelTemplate(String name, List<Day> validDayTypes,
-                                 StaffingLevelTemplatePeriod validity, StaffingLevelSetting staffingLevelSetting) {
-        this.name=name;
-        this.validDays = validDayTypes;
-        this.validity = validity;
-        this.staffingLevelSetting = staffingLevelSetting;
-    }
-
     public String getName() {
         return name;
     }

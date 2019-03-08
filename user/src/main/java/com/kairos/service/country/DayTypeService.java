@@ -128,7 +128,7 @@ public class DayTypeService {
         calendar.set(Calendar.SECOND, 59);
         Date endDate = calendar.getTime();
         CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate.getTime()), DateUtils.asLocalDate(endDate.getTime()));
+                findByIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate).toString(), DateUtils.asLocalDate(endDate).toString());
 
         if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
             List<DayType> dayTypes = new ArrayList<>();
