@@ -74,7 +74,7 @@ public class OrganizationAssetTypeService{
         List<Risk> assetTypeRisks = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeDto.getSubAssetTypes())) {
             List<AssetType> subAssetTypeList = buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, assetTypeDto.getSubAssetTypes(), assetType);
-            assetType.setHasSubAsset(true);
+            assetType.setHasSubAssetType(true);
             assetType.setSubAssetTypes(subAssetTypeList);
         }
         for (OrganizationLevelRiskDTO assetTypeRisk : assetTypeDto.getRisks()) {
@@ -96,18 +96,18 @@ public class OrganizationAssetTypeService{
         List<AssetType> subAssetTypes = new ArrayList<>();
         List<Risk> subAssetRisks = new ArrayList<>();
         for (AssetTypeOrganizationLevelDTO subAssetTypeDto : subAssetTypesDto) {
-            AssetType assetSubType = new AssetType(subAssetTypeDto.getName());
-            assetSubType.setSubAssetType(true);
-            assetSubType.setOrganizationId(unitId);
-            assetSubType.setAssetType(assetType);
-            assetSubType.setHasSubAsset(false);
+            AssetType subAssetType = new AssetType(subAssetTypeDto.getName());
+            subAssetType.setSubAssetType(true);
+            subAssetType.setOrganizationId(unitId);
+            subAssetType.setAssetType(assetType);
+            subAssetType.setHasSubAssetType(false);
             for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
                 Risk risk = new Risk(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel());
                 risk.setOrganizationId(unitId);
                 subAssetRisks.add(risk);
             }
-            assetSubType.setRisks(subAssetRisks);
-            subAssetTypes.add(assetSubType);
+            subAssetType.setRisks(subAssetRisks);
+            subAssetTypes.add(subAssetType);
         }
         return subAssetTypes;
 
@@ -126,11 +126,11 @@ public class OrganizationAssetTypeService{
         AssetTypeResponseDTO assetTypeRiskResponseDTO = new AssetTypeResponseDTO();
         assetTypeRiskResponseDTO.setId(assetType.getId());
         assetTypeRiskResponseDTO.setName(assetType.getName());
-        assetTypeRiskResponseDTO.setHasSubAsset(assetType.isHasSubAsset());
+        assetTypeRiskResponseDTO.setHasSubAsset(assetType.isHasSubAssetType());
         if (!assetType.getRisks().isEmpty()) {
             assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
         }
-        if (assetType.isHasSubAsset()) {
+        if (assetType.isHasSubAssetType()) {
             assetType.getSubAssetTypes().forEach(subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
             assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
         }
@@ -264,16 +264,16 @@ public class OrganizationAssetTypeService{
                 });
                 subAssetTypeNewRiskDto.put(subAssetTypeDto.getId(), newRiskOfSubAssetType);
             } else {
-                AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), unitId, SuggestedDataStatus.APPROVED);
-                assetSubType.setSubAssetType(true);
-                assetSubType.setAssetType(assetType);
+                AssetType subAssetType = new AssetType(subAssetTypeDto.getName(), unitId, SuggestedDataStatus.APPROVED);
+                subAssetType.setSubAssetType(true);
+                subAssetType.setAssetType(assetType);
                 for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
                     Risk risk = new Risk(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel());
                     risk.setOrganizationId(unitId);
                     subAssetRisks.add(risk);
                 }
-                assetSubType.setRisks(subAssetRisks);
-                subAssetTypes.add(assetSubType);
+                subAssetType.setRisks(subAssetRisks);
+                subAssetTypes.add(subAssetType);
             }
 
         });
@@ -327,11 +327,11 @@ public class OrganizationAssetTypeService{
     public boolean deleteAssetSubTypeById(Long unitId, Long assetTypeId, Long subAssetTypeId) {
         List<String> assetsLinkedWithAssetSubType = assetRepository.findAllAssetLinkedWithAssetType(unitId, subAssetTypeId);
         if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetSubType)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.assetSubType", StringUtils.join(assetsLinkedWithAssetSubType, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.subAssetType", StringUtils.join(assetsLinkedWithAssetSubType, ','));
         }
         AssetType subAssetType = assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted( subAssetTypeId, assetTypeId, unitId);
         if (!Optional.ofNullable(subAssetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetSubType", subAssetType);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.subAssetType", subAssetType);
         }
 
         subAssetType.delete();
@@ -394,7 +394,7 @@ public class OrganizationAssetTypeService{
                 AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
                 subAssetType.setOrganizationId(unitId);
                 subAssetType.setSuggestedDate(LocalDate.now());
-                assetType.setHasSubAsset(true);
+                assetType.setHasSubAssetType(true);
                 subAssetType.setSubAssetType(true);
                 subAssetTypes.add(subAssetType);
             }

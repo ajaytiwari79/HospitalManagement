@@ -53,7 +53,7 @@ public class AssetDTO {
 
     @NotNull(message = "error.message.assetType.notNull")
     private AssetTypeOrganizationLevelDTO assetType;
-    private AssetTypeOrganizationLevelDTO assetSubType;
+    private AssetTypeOrganizationLevelDTO subAssetType;
     private Set<BigInteger> processingActivityIds;
     private Set<BigInteger> subProcessingActivityIds;
 
@@ -139,9 +139,9 @@ public class AssetDTO {
 
     public void setAssetType(AssetTypeOrganizationLevelDTO assetType) { this.assetType = assetType; }
 
-    public AssetTypeOrganizationLevelDTO getAssetSubType() { return assetSubType; }
+    public AssetTypeOrganizationLevelDTO getAssetSubType() { return subAssetType; }
 
-    public void setAssetSubType(AssetTypeOrganizationLevelDTO assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(AssetTypeOrganizationLevelDTO subAssetType) { this.subAssetType = subAssetType; }
 
     public Set<BigInteger> getProcessingActivityIds() { return processingActivityIds; }
 

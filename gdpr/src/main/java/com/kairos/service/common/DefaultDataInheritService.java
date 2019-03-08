@@ -2,9 +2,11 @@ package com.kairos.service.common;
 
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServiceCategoryVO;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.OrganizationClause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
@@ -16,9 +18,6 @@ import com.kairos.persistence.model.master_data.data_category_element.DataElemen
 import com.kairos.persistence.model.master_data.data_category_element.DataSubject;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
-import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateDeprecated;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
@@ -45,9 +44,6 @@ import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.data_subject_management.DataCategoryService;
 import com.kairos.service.data_subject_management.DataSubjectService;
@@ -281,8 +277,8 @@ public class DefaultDataInheritService{
                // asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
 //                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
-                if (Optional.of(masterAssetDTO.getAssetSubType()).isPresent()) {
-                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getAssetSubType().getName().toLowerCase().trim()));
+                if (Optional.of(masterAssetDTO.getSubAssetType()).isPresent()) {
+                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getSubAssetType().getName().toLowerCase().trim()));
                 }
                 assets.add(asset);
             }
@@ -388,7 +384,7 @@ public class DefaultDataInheritService{
     }
 
 
-    private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
+    /*private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
 
 
         Map<QuestionnaireTemplateDeprecated, List<QuestionnaireSectionDeprecated>> questionnaireTemplateAndSectionListMap = new HashMap<>();
@@ -469,7 +465,7 @@ public class DefaultDataInheritService{
 
         return questionnaireTemplate;
 
-    }
+    }*/
 
 
     private void saveDataDisposal(Long unitId, List<DataDisposalResponseDTO> dataDisposalDTOS) {
