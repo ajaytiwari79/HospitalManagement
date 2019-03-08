@@ -140,7 +140,7 @@ public class AssetService {
         AssetType subAssetType = null;
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
             Optional<AssetType> assetTypeObj = assetTypeRepository.findById(assetDTO.getAssetType().getId());
-            if (!Optional.ofNullable(assetTypeObj).isPresent()) {
+            if (!assetTypeObj.isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType().getId());
             }
             assetType = assetTypeObj.get();
