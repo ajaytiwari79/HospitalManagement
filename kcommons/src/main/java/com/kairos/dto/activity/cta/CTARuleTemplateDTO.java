@@ -316,7 +316,7 @@ public class CTARuleTemplateDTO {
     }
 
     private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
-        return this.getActivityIds().contains(activityId) || (this.getTimeTypeIds().contains(timeTypeId)) && this.getPlannedTimeIds().contains(plannedTimeId);
+        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && this.getPlannedTimeIds().contains(plannedTimeId);
     }
 
     private boolean isEmployementTypeValid(Long employmentId){
