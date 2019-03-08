@@ -5,7 +5,7 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
+import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -18,6 +18,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetRepository;
+import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
@@ -105,15 +106,15 @@ public class MasterAssetService{
             Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType1.getName()));
             assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
         }
-            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeBasicDTO -> {
-                if (assetSubTypeBasicDTO.getId() != null) {
-                    masterAsset.setSubAssetType(assetTypeRepository.getOne(assetSubTypeBasicDTO.getId()));
+            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(subAssetTypeBasicDTO -> {
+                if (subAssetTypeBasicDTO.getId() != null) {
+                    masterAsset.setSubAssetType(assetTypeRepository.getOne(subAssetTypeBasicDTO.getId()));
                 } else {
-                    AssetType assetSubType = new AssetType(assetSubTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
-                    assetSubType.setSubAssetType(true);
-                    assetTypeRepository.save(assetSubType);
-                    assetType.getSubAssetTypes().add(assetSubType);
-                    masterAsset.setSubAssetType(assetSubType);
+                    AssetType subAssetType = new AssetType(subAssetTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
+                    subAssetType.setSubAssetType(true);
+                    assetTypeRepository.save(subAssetType);
+                    assetType.getSubAssetTypes().add(subAssetType);
+                    masterAsset.setSubAssetType(subAssetType);
                 }
             });
             assetTypeRepository.save(assetType);
@@ -127,8 +128,48 @@ public class MasterAssetService{
      */
 
     public List<MasterAssetResponseDTO> getAllMasterAsset(Long countryId) {
+        List<MasterAssetResponseDTO> masterAssetResponseDTOS = new ArrayList<>();
         List<MasterAsset> assets = masterAssetRepository.findAllByCountryId(countryId);
-       return ObjectMapperUtils.copyPropertiesOfListByMapper(assets, MasterAssetResponseDTO.class);
+        for(MasterAsset asset : assets){
+            masterAssetResponseDTOS.add(prepareAssetResponseDTO(asset));
+        }
+        return masterAssetResponseDTOS;
+    }
+
+    /**
+     * This method is used to convert "MasterAsset" domain into "MasterAssetResponseDTO".
+     *
+     * @param masterAsset
+     * @return MasterAssetResponseDTO
+     */
+
+    private MasterAssetResponseDTO prepareAssetResponseDTO(MasterAsset masterAsset){
+        MasterAssetResponseDTO masterAssetResponseDTO = new MasterAssetResponseDTO(masterAsset.getId(),masterAsset.getName(),masterAsset.getDescription(), masterAsset.getSuggestedDate(), masterAsset.getSuggestedDataStatus());
+        masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(masterAsset.getAssetType().getId(),masterAsset.getAssetType().getName(), masterAsset.getAssetType().isSubAssetType()));
+        masterAssetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(masterAsset.getSubAssetType().getId(),masterAsset.getSubAssetType().getName(), masterAsset.getSubAssetType().isSubAssetType()));
+
+        List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
+        List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
+        List<ServiceCategoryDTO> serviceCategories = new ArrayList<>();
+        List<SubServiceCategoryDTO> subServiceCategories = new ArrayList<>();
+        for(OrganizationType orgType : masterAsset.getOrganizationTypes()){
+            organizationTypes.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
+        }
+        for(OrganizationSubType orgSubType : masterAsset.getOrganizationSubTypes()){
+            organizationSubTypes.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
+        }
+        for(ServiceCategory category : masterAsset.getOrganizationServices()){
+            serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName())) ;
+        }
+        for(SubServiceCategory subServiceCategory : masterAsset.getOrganizationSubServices()){
+            subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
+        }
+
+        masterAssetResponseDTO.setOrganizationTypes(organizationTypes);
+        masterAssetResponseDTO.setOrganizationSubTypes(organizationSubTypes);
+        masterAssetResponseDTO.setOrganizationServices(serviceCategories);
+        masterAssetResponseDTO.setOrganizationSubServices(subServiceCategories);
+        return masterAssetResponseDTO;
     }
 
 
@@ -173,7 +214,7 @@ public class MasterAssetService{
             throw new DataNotFoundByIdException("master asset not Exist for id " + id);
 
         }
-        return ObjectMapperUtils.copyPropertiesByMapper(masterAsset, MasterAssetResponseDTO.class);
+        return prepareAssetResponseDTO(masterAsset);
     }
 
 

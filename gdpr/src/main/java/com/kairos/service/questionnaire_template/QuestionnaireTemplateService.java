@@ -117,15 +117,15 @@ public class QuestionnaireTemplateService {
 
             } else {
                 if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent())) {
-                    exceptionService.invalidRequestException("message.assetSubType.not.selected");
+                    exceptionService.invalidRequestException("message.subAssetType.not.selected");
                 } else {
                     previousTemplate = isOrganization ? questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED)
                             : questionnaireTemplateRepository.findTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeIdAndTemplateType(referenceId, templateDto.getAssetType(),templateDto.getAssetSubType(),QuestionnaireTemplateType.ASSET_TYPE);
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
                     }
-                    AssetType assetSubType = isOrganization ? assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted(templateDto.getAssetSubType(), templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndAssetTypeAndDeleted(templateDto.getAssetSubType(), templateDto.getAssetType(), referenceId);
-                    questionnaireTemplate.setAssetSubType(assetSubType);
+                    AssetType subAssetType = isOrganization ? assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted(templateDto.getAssetSubType(), templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndAssetTypeAndDeleted(templateDto.getAssetSubType(), templateDto.getAssetType(), referenceId);
+                    questionnaireTemplate.setAssetSubType(subAssetType);
                 }
             }
         }
@@ -148,9 +148,9 @@ public class QuestionnaireTemplateService {
                 }
 
             } else {
-                AssetType selectedAssetSubType = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(templateDto.getAssetSubType())).findFirst().orElse(null);
+                AssetType selectedAssetSubType = assetType.getSubAssetTypes().stream().filter(subAssetType -> subAssetType.getId().equals(templateDto.getAssetSubType())).findFirst().orElse(null);
                 if (!Optional.ofNullable(selectedAssetSubType).isPresent()) {
-                    exceptionService.invalidRequestException("message.assetSubType.invalid.selection");
+                    exceptionService.invalidRequestException("message.subAssetType.invalid.selection");
                 }
                 previousTemplate = isOrganization ? questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED)
                         : questionnaireTemplateRepository.findTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeIdAndTemplateType(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType(),QuestionnaireTemplateType.RISK);
