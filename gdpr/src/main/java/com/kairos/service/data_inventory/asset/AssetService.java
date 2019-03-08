@@ -139,11 +139,11 @@ public class AssetService {
         AssetType assetType= null;
         AssetType subAssetType = null;
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
-            Optional<AssetType> assetTypeObj = assetTypeRepository.findById(assetDTO.getAssetType().getId());
-            if (!assetTypeObj.isPresent()) {
+            AssetType assetTypeObj = assetTypeRepository.findById(assetDTO.getAssetType().getId()).orElse(null);
+            if (assetTypeObj==null) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType().getId());
             }
-            assetType = assetTypeObj.get();
+
             linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
                 if (assetDTO.getAssetSubType().getId() != null) {
