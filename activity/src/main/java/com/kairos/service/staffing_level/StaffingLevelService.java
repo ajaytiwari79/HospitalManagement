@@ -625,7 +625,7 @@ public class StaffingLevelService extends MongoBaseService {
         List<ActivityDTO> activityDTOS = activityMongoRepositoryImpl.getAllActivityWithTimeType(unitId, activityIds);
         shiftPlanningInfo.put("unitId", unitId);
         shiftPlanningInfo.put("activities", activityDTOS);
-        List<Long> expertiseIds = activityDTOS.stream().flatMap(a -> a.getExpertises().stream()).collect(Collectors.toList());
+        Set<Long> expertiseIds = activityDTOS.stream().flatMap(a -> a.getExpertises().stream()).collect(Collectors.toSet());
         shiftPlanningInfo.put("staffs", userIntegrationService.getStaffInfo(unitId, expertiseIds));
         submitShiftPlanningProblemToPlanner(shiftPlanningInfo);
     }
