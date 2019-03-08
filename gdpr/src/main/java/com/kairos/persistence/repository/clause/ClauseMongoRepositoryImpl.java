@@ -32,9 +32,9 @@ class ClauseMongoRepositoryImpl  {
     }
 
     @Override
-    public List<Clause> findClauseByReferenceIdAndTitles(Long referenceId, boolean isUnitId, List<String> clauseTitles) {
+    public List<Clause> findClauseByReferenceIdAndTitles(Long referenceId, boolean isOrganization, List<String> clauseTitles) {
 
-        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles);
+        Criteria criteria = isOrganization ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles);
         Query query = new Query();
         query.addCriteria(criteria);
         query.collation(Collation.of("en").

@@ -15,6 +15,11 @@ public class FunctionalPaymentMatrixQueryResult {
         // dc
     }
 
+    public FunctionalPaymentMatrixQueryResult(Set<Long> payGroupAreasIds, List<SeniorityLevelFunctionQR> seniorityLevelFunction) {
+        this.payGroupAreasIds = payGroupAreasIds;
+        this.seniorityLevelFunction = seniorityLevelFunction;
+    }
+
     public Set<Long> getPayGroupAreasIds() {
         return payGroupAreasIds;
     }

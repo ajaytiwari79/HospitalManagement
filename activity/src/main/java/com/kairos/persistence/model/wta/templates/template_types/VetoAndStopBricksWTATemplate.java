@@ -6,8 +6,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.validation.constraints.NotNull;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.kairos.utils.ShiftValidatorService.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
 /**

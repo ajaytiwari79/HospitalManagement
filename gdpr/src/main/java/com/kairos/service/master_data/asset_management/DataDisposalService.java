@@ -4,8 +4,8 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
@@ -17,11 +17,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DataDisposalService{
@@ -44,18 +43,8 @@ public class DataDisposalService{
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
     public List<DataDisposalDTO> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
-
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> dataDisposalsNames = new HashSet<>();
-        for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
-            dataDisposalsNames.add(dataDisposal.getName());
-        }
-        List<String> nameInLowerCase = dataDisposalsNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataDisposal> previousDataDisposals = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        dataDisposalsNames = ComparisonUtils.getNameListForMetadata(previousDataDisposals, dataDisposalsNames);
+        Set<String> existingDataDisposalNames = dataDisposalRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> dataDisposalsNames = ComparisonUtils.getNewMetaDataNames(dataDisposalDTOS,existingDataDisposalNames );
         List<DataDisposal> dataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
@@ -121,7 +110,7 @@ public class DataDisposalService{
      */
     public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
-        //TODO What actually this code is doing?
+
         DataDisposal dataDisposal = dataDisposalRepository.findByCountryIdAndName(countryId,  dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {

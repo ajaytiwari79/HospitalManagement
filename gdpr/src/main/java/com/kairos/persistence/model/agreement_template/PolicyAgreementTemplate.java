@@ -9,28 +9,38 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class PolicyAgreementTemplate extends BaseEntity {
 
     @NotBlank(message = "Name cannot be empty")
     private String name;
-    @NotBlank(message = "Description cannot be empty")
+
+    @Column(columnDefinition = "text")
     private String description;
+
     private Long countryId;
+
     @ElementCollection
     private List<AccountType> accountTypes;
+
     @OneToMany(cascade = CascadeType.ALL)
     @OrderColumn
     private List<AgreementSection> agreementSections=new ArrayList<>();
+
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
+
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
     @ElementCollection
     private List <ServiceCategory> organizationServices = new ArrayList<>();
+
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
     @OneToOne
     private TemplateType templateType;
     private boolean coverPageAdded;
@@ -38,6 +48,8 @@ public class PolicyAgreementTemplate extends BaseEntity {
     private boolean signatureComponentAdded;
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
+
+    @Column(columnDefinition = "text")
     private String  signatureHtml;
     @Embedded
     private CoverPage coverPageData = new CoverPage();
@@ -139,7 +151,7 @@ public class PolicyAgreementTemplate extends BaseEntity {
     public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
 */
     public List<AgreementSection> getAgreementSections() {
-        return agreementSections;
+        return agreementSections.stream().filter(agreementSection -> !agreementSection.isDeleted()).collect(Collectors.toList());
     }
 
     public void setAgreementSections(List<AgreementSection> agreementSections) {

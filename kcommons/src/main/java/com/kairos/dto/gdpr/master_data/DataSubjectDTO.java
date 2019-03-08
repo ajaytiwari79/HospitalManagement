@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,7 +19,7 @@ public class DataSubjectDTO {
 
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     protected String description;
-    @NotEmpty(message = "Data Category  can't be  empty")
+    @NotEmpty(message = "error.message.datacategory.notNull")
     protected Set<Long> dataCategories;
 
     public Long getId() { return id; }

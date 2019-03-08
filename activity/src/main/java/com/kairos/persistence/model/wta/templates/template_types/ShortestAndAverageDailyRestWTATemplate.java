@@ -2,14 +2,12 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotEmpty;
@@ -21,7 +19,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.utils.ShiftValidatorService.*;
+import static com.kairos.service.shift.ShiftValidatorService.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.

@@ -24,7 +24,7 @@ public class QuestionnaireTemplate extends BaseEntity {
     @OneToOne
     private AssetType assetType;
     @OneToOne
-    private AssetType assetSubType;
+    private AssetType subAssetType;
     private Long countryId;
     private boolean isDefaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
@@ -74,11 +74,11 @@ public class QuestionnaireTemplate extends BaseEntity {
     }
 
     public AssetType getAssetSubType() {
-        return assetSubType;
+        return subAssetType;
     }
 
-    public void setAssetSubType(AssetType assetSubType) {
-        this.assetSubType = assetSubType;
+    public void setAssetSubType(AssetType subAssetType) {
+        this.subAssetType = subAssetType;
     }
 
     public List<QuestionnaireSection> getSections() {

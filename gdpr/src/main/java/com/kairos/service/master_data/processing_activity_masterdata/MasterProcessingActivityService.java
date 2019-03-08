@@ -6,13 +6,12 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
+import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.embeddables.OrganizationSubType;
 import com.kairos.persistence.model.embeddables.OrganizationType;
 import com.kairos.persistence.model.embeddables.ServiceCategory;
 import com.kairos.persistence.model.embeddables.SubServiceCategory;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivityDeprecated;
-import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
 
 
@@ -63,7 +61,7 @@ public class MasterProcessingActivityService{
             exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
         }
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, countryId);
-        masterProcessingActivity = getMetadataOfMasterProcessingActivity(masterProcessingActivityDto, masterProcessingActivity);
+        masterProcessingActivity = setMetadataOfMasterProcessingActivity(masterProcessingActivityDto, masterProcessingActivity);
         masterProcessingActivity.setSubProcessActivity(false);
         if (Optional.ofNullable(masterProcessingActivityDto.getSubProcessingActivities()).isPresent() && !masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
             List<MasterProcessingActivity> subProcessingActivity = createNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivity);
@@ -86,8 +84,7 @@ public class MasterProcessingActivityService{
      * @param masterProcessingActivityDto
      * @return
      */
-    //TODO need to make common method for asset and processing activity and others
-    private MasterProcessingActivity getMetadataOfMasterProcessingActivity(MasterProcessingActivityDTO masterProcessingActivityDto, MasterProcessingActivity masterProcessingActivity){
+    private MasterProcessingActivity setMetadataOfMasterProcessingActivity(MasterProcessingActivityDTO masterProcessingActivityDto, MasterProcessingActivity masterProcessingActivity){
         masterProcessingActivity.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationTypes(), OrganizationType.class));
         masterProcessingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationSubServices(), OrganizationSubType.class));
         masterProcessingActivity.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationServices(), ServiceCategory.class));
@@ -115,7 +112,7 @@ public class MasterProcessingActivityService{
             MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(activity.getName(), activity.getDescription(), SuggestedDataStatus.APPROVED, countryId);
             subProcessingActivity.setSubProcessActivity(true);
             subProcessingActivity.setMasterProcessingActivity(parentProcessingActivity);
-            subProcessingActivity = getMetadataOfMasterProcessingActivity(activity, subProcessingActivity);
+            subProcessingActivity = setMetadataOfMasterProcessingActivity(activity, subProcessingActivity);
             subProcessingActivityList.add(subProcessingActivity);
         }
        return subProcessingActivityList;
@@ -148,7 +145,7 @@ public class MasterProcessingActivityService{
                 processingActivity.setSubProcessingActivities(subProcessingActivities);
 
             }
-            getMetadataOfMasterProcessingActivity(masterProcessingActivityDto, processingActivity);
+            setMetadataOfMasterProcessingActivity(masterProcessingActivityDto, processingActivity);
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
             processingActivity.setName(masterProcessingActivityDto.getName());
             try {
@@ -418,14 +415,14 @@ public class MasterProcessingActivityService{
     }
 
 
-    private MasterProcessingActivityDeprecated buildSuggestedProcessingActivityAndSubProcessingActivity(Long countryId, ProcessingActivityDTO processingActivityDTO, OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO) {
+    /*private MasterProcessingActivityDeprecated buildSuggestedProcessingActivityAndSubProcessingActivity(Long countryId, ProcessingActivityDTO processingActivityDTO, OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO) {
         MasterProcessingActivityDeprecated processingActivity = new MasterProcessingActivityDeprecated(processingActivityDTO.getName(), processingActivityDTO.getDescription(), countryId, SuggestedDataStatus.PENDING, LocalDate.now());
         processingActivity.setOrganizationServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices())
                 .setOrganizationTypeDTOS(Arrays.asList(new OrganizationTypeDTO(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
                 .setOrganizationSubTypeDTOS(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS())
                 .setOrganizationSubServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices());
         return processingActivity;
-    }
+    }*/
 
 
     /**

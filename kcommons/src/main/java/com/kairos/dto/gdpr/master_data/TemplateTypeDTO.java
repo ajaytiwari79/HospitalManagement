@@ -2,13 +2,14 @@ package com.kairos.dto.gdpr.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
+import javax.validation.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TemplateTypeDTO {
 
     private Long id;
 
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
     public Long getId() {

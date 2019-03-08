@@ -17,11 +17,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityResponseDTO {
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotBlank
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-    @NotBlank
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private List<OrganizationTypeDTO> organizationTypes;
     private List<OrganizationSubTypeDTO> organizationSubTypes;

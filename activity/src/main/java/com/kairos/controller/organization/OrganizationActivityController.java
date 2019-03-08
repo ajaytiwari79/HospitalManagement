@@ -112,10 +112,11 @@ public class OrganizationActivityController {
     ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO));
     }
+
     // Phase Settings
     @ApiOperation("get Phase setting Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/phase_settings")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getPhaseSettingTab(@PathVariable BigInteger activityId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getPhaseSettingTabOfActivity(activityId, unitId));
     }
@@ -168,8 +169,8 @@ public class OrganizationActivityController {
     @ApiOperation("Update compositeShifts Tab of Activity")
     @PutMapping(value = "/activity/{activityId}/compositeShifts")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId,@RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId,compositeShiftActivityDTO));
+    ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId, compositeShiftActivityDTO));
     }
 
     @ApiOperation("get compositeShifts Tab of Activity")
@@ -325,7 +326,7 @@ public class OrganizationActivityController {
     @RequestMapping(value = "/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync( unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(unitId));
     }
 
     @ApiOperation("Get all activity based on unitId")
@@ -353,7 +354,7 @@ public class OrganizationActivityController {
 
     @ApiOperation("Remove uploaded Attachments in Activity")
     @DeleteMapping(value = "/activity/{activityId}/remove_uploaded_attachments")
-    ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
+    ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
     }
 

@@ -619,32 +619,6 @@ public class UserService {
         return subPages;
     }
 
-    public List<GrantedAuthority> getTabPermission(Long userId) {
-        long startTime = System.currentTimeMillis();
-        Set<TabPermission> tabPermissions = userGraphRepository.getAccessPermissionsOfUser(userId);
-        Map<Long, List<TabPermission>> tabPermissionsByUnit = tabPermissions.stream().collect(Collectors.groupingBy(TabPermission::getUnitId));
-        Set<Map.Entry<Long, List<TabPermission>>> entries = tabPermissionsByUnit.entrySet();
-        Iterator<Map.Entry<Long, List<TabPermission>>> entryIterator = entries.iterator();
-        List<GrantedAuthority> permissions = new ArrayList<>();
-        while (entryIterator.hasNext()) {
-            Map.Entry<Long, List<TabPermission>> unitPermissions = entryIterator.next();
-            Map<String, TabPermission> processedTabs = new HashMap<>();
-            unitPermissions.getValue().stream().forEach(tabPermission -> {
-                if (processedTabs.containsKey(tabPermission.getTabId())) {
-                    if (tabPermission.isWrite() || !processedTabs.get(tabPermission.getTabId()).isRead() && tabPermission.isRead()) {
-                        processedTabs.put(tabPermission.getTabId(), tabPermission);
-                    }
-                } else {
-                    processedTabs.put(tabPermission.getTabId(), tabPermission);
-                }
-            });
-            permissions.addAll(getAuthoritiesList(processedTabs, unitPermissions.getKey()));
-        }
-        long endTime = System.currentTimeMillis();
-        logger.info("Total time taken by : UserService:getTabPermission() " + (endTime - startTime) + " ms");
-        return permissions;
-    }
-
     private List<GrantedAuthority> getAuthoritiesList(Map<String, TabPermission> permissionByUnit, Long unitId) {
 
         Set<Map.Entry<String, TabPermission>> entries = permissionByUnit.entrySet();

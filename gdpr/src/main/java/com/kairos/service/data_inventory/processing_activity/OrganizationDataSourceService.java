@@ -4,7 +4,6 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
@@ -22,9 +21,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
@@ -55,17 +51,8 @@ public class OrganizationDataSourceService{
      * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
     public List<DataSourceDTO> createDataSource(Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
-
-        Set<String> dataSourceNames = new HashSet<>();
-            for (DataSourceDTO dataSource : dataSourceDTOS) {
-                dataSourceNames.add(dataSource.getName());
-            }
-            List<String> nameInLowerCase = dataSourceNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<DataSource> previousDataSources = dataSourceRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-            dataSourceNames = ComparisonUtils.getNameListForMetadata(previousDataSources, dataSourceNames);
-
+        Set<String> existingDataSourceNames = dataSourceRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS,existingDataSourceNames );
             List<DataSource> dataSources = new ArrayList<>();
             if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {

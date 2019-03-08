@@ -18,23 +18,25 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MasterAssetResponseDTO {
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-    @NotBlank(message = "Description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private List<OrganizationTypeDTO> organizationTypes;
     private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
     private AssetTypeBasicResponseDTO assetType;
-    private AssetTypeBasicResponseDTO assetSubType;
+    private AssetTypeBasicResponseDTO subAssetType;
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
+    public MasterAssetResponseDTO() {
+    }
 
-    public MasterAssetResponseDTO(@NotNull Long id, @NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description can't be empty") String description,LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
+    public MasterAssetResponseDTO(@NotNull(message = "error.message.id.notnull") Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -54,9 +56,9 @@ public class MasterAssetResponseDTO {
 
     public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType; }
 
-    public AssetTypeBasicResponseDTO getAssetSubType() { return assetSubType; }
+    public AssetTypeBasicResponseDTO getSubAssetType() { return subAssetType; }
 
-    public void setAssetSubType(AssetTypeBasicResponseDTO assetSubType) { this.assetSubType = assetSubType; }
+    public void setSubAssetType(AssetTypeBasicResponseDTO subAssetType) { this.subAssetType = subAssetType; }
 
     public String getName() {
         return name;

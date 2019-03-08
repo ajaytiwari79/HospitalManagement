@@ -5,16 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Staff {
 
-    @NotNull
+    @NotNull(message = "error.message.staffid.notnull")
     private Long staffId;
     private String lastName;
-    @NotBlank(message = "Staff Name can't be empty ")
+    @NotBlank(message = "error.message.staffName.notnull")
     private String firstName;
 
     public Long getStaffId() { return staffId; }

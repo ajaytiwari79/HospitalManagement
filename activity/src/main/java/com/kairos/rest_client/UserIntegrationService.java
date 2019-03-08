@@ -41,6 +41,7 @@ import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
@@ -406,8 +407,8 @@ public class UserIntegrationService {
         }, userId);
     }
 
-    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId, List<Long> expertiesIdList) {
-        return genericRestClient.publishRequest(expertiesIdList, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId, Set<Long> expertiseIds) {
+        return genericRestClient.publishRequest(expertiseIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 
@@ -750,8 +751,6 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, REASON_CODE_LINK_WITH_TIME_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         },timeTypeId);
     }
-
-
 }
 
 

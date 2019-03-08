@@ -4,8 +4,8 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
@@ -18,10 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class TechnicalSecurityMeasureService {
@@ -44,18 +40,8 @@ public class TechnicalSecurityMeasureService {
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
     public List<TechnicalSecurityMeasureDTO> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> techSecurityMeasureNames = new HashSet<>();
-        for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
-            techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
-        }
-        List<String> nameInLowerCase = techSecurityMeasureNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<TechnicalSecurityMeasure> previousSecurityMeasures = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
-        techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(previousSecurityMeasures, techSecurityMeasureNames);
-
+        Set<String> existingTechnicalSecurityMeasureNames = technicalSecurityMeasureRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> techSecurityMeasureNames = ComparisonUtils.getNewMetaDataNames(technicalSecurityMeasureDTOS,existingTechnicalSecurityMeasureNames );
         List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
         if (!techSecurityMeasureNames.isEmpty()) {
             for (String name : techSecurityMeasureNames) {
@@ -126,7 +112,7 @@ public class TechnicalSecurityMeasureService {
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
-        //TODO What actually this code is doing?
+
         TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndName(countryId, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {

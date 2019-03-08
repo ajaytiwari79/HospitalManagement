@@ -11,14 +11,14 @@ import java.util.List;
 public class DayType {
     protected Long id;
     private String name;
-    int code;
+    private int code;
     private String description;
     private String colorCode;
     private List<Day> validDays=new ArrayList<>();
     private List<CountryHolidayCalenderDTO> countryHolidayCalenderData;
     private boolean holidayType;
     private boolean isEnabled = true;
-    private boolean allowTimeSettings = false;
+    private boolean allowTimeSettings;
 
     // Constructor
     public DayType() {
@@ -94,9 +94,15 @@ public class DayType {
         return allowTimeSettings;
     }
 
+    public List<CountryHolidayCalenderDTO> getCountryHolidayCalenderData() {
+        return countryHolidayCalenderData;
+    }
 
+    public void setCountryHolidayCalenderData(List<CountryHolidayCalenderDTO> countryHolidayCalenderData) {
+        this.countryHolidayCalenderData = countryHolidayCalenderData;
+    }
 
-   
-
-
+    public void setAllowTimeSettings(boolean allowTimeSettings) {
+        this.allowTimeSettings = allowTimeSettings;
+    }
 }

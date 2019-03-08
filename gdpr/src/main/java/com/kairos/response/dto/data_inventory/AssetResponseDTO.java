@@ -27,7 +27,7 @@ public class AssetResponseDTO {
     private HostingTypeResponseDTO hostingType;
     private DataDisposalResponseDTO dataDisposal;
     private AssetTypeBasicResponseDTO assetType;
-    private AssetTypeBasicResponseDTO assetSubType;
+    private AssetTypeBasicResponseDTO subAssetType;
     private Integer dataRetentionPeriod;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
@@ -156,12 +156,12 @@ public class AssetResponseDTO {
         this.assetType = assetType;
     }
 
-    public AssetTypeBasicResponseDTO getAssetSubType() {
-        return assetSubType;
+    public AssetTypeBasicResponseDTO getSubAssetType() {
+        return subAssetType;
     }
 
-    public void setAssetSubType(AssetTypeBasicResponseDTO assetSubType) {
-        this.assetSubType = assetSubType;
+    public void setSubAssetType(AssetTypeBasicResponseDTO subAssetType) {
+        this.subAssetType = subAssetType;
     }
 
     public Integer getDataRetentionPeriod() {

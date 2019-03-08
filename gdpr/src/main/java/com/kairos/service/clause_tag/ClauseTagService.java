@@ -36,7 +36,7 @@ public class ClauseTagService{
      * @return tag object
      * @description method create tag and if tag already exist with same name then throw exception
      */
-    //TODO
+    //TODO clause tag creation test
     /*public ClauseTag createClauseTag(Long countryId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
             throw new InvalidRequestException("requested param name is null or empty");
@@ -108,7 +108,7 @@ public class ClauseTagService{
      * @throws DuplicateDataException if tag with same name is present in tagList
      * @description method new create tags and if tag already exist with same name then simply add tag id to  existClauseTagIds which later add to clause ,
      */
-    public List<ClauseTag> saveClauseTagList(Long referenceId, boolean isUnitId, List<ClauseTagDTO> tagList) {
+    public List<ClauseTag> saveClauseTagList(Long referenceId, boolean isOrganization, List<ClauseTagDTO> tagList) {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
         List<Long> existClauseTagIds = new ArrayList<>();
@@ -120,7 +120,7 @@ public class ClauseTagService{
                 }
                 clauseTagsName.add(tagDto.getName());
                 ClauseTag clauseTag = new ClauseTag(tagDto.getName());
-                if (isUnitId)
+                if (isOrganization)
                     clauseTag.setOrganizationId(referenceId);
                 else
                     clauseTag.setCountryId(referenceId);
@@ -133,10 +133,11 @@ public class ClauseTagService{
         if(!clauseTagsName.isEmpty()){
         Set<String> nameInLowerCase = clauseTagsName.stream().map(String::toLowerCase)
                 .collect(Collectors.toSet());
-        List<ClauseTag> previousClauseTags = isUnitId ? clauseTagRepository.findByUnitIdAndTitles(referenceId, nameInLowerCase) : clauseTagRepository.findByCountryIdAndTitles(referenceId, nameInLowerCase);
+        List<ClauseTag> previousClauseTags = isOrganization ? clauseTagRepository.findByUnitIdAndTitles(referenceId, nameInLowerCase) : clauseTagRepository.findByCountryIdAndTitles(referenceId, nameInLowerCase);
         if (CollectionUtils.isNotEmpty(previousClauseTags)) {
             exceptionService.duplicateDataException("message.duplicate", "message.tag", previousClauseTags.get(0).getName());
-        }}
+        }
+        }
         clauseTagRepository.saveAll(clauseTagList);
         if(!existClauseTagIds.isEmpty()) {
             clauseTagList.addAll(clauseTagRepository.findAllClauseTagByIds(existClauseTagIds));

@@ -11,7 +11,6 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
@@ -20,7 +19,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.utils.ShiftValidatorService.throwException;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
 /**
  * @author pradeep

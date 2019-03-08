@@ -16,7 +16,7 @@ import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRep
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.TaskDemandRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
@@ -105,7 +105,7 @@ public class CitizenService {
     @Inject
     private StaffService staffService;
     @Inject
-    private EmploymentGraphRepository employmentGraphRepository;
+    private PositionGraphRepository positionGraphRepository;
     @Autowired
     TaskServiceRestClient taskServiceRestClient;
     @Autowired
@@ -549,13 +549,13 @@ public class CitizenService {
         }
 
         if (parent == null) {
-            if((staff.getId() == null) || (employmentGraphRepository.findEmployment(unit.getId(), staff.getId()) == null)){
-                employmentGraphRepository.createEmployments(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
+            if((staff.getId() == null) || (positionGraphRepository.findPosition(unit.getId(), staff.getId()) == null)){
+                positionGraphRepository.createPositions(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
             }
 
         } else {
-            if((staff.getId() == null) || (employmentGraphRepository.findEmployment(parent.getId(), staff.getId()) == null)) {
-                employmentGraphRepository.createEmployments(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
+            if((staff.getId() == null) || (positionGraphRepository.findPosition(parent.getId(), staff.getId()) == null)) {
+                positionGraphRepository.createPositions(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
             }
         }
 

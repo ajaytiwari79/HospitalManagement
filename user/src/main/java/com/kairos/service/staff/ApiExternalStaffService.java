@@ -5,7 +5,7 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by prabjot on 19/5/17.
@@ -36,7 +33,7 @@ public class ApiExternalStaffService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    private EmploymentGraphRepository employmentGraphRepository;
+    private PositionGraphRepository positionGraphRepository;
     @Inject
     private StaffAddressService staffAddressService;
     @Inject
@@ -83,9 +80,9 @@ public class ApiExternalStaffService {
             }
 
             if(parent == null){
-                employmentGraphRepository.createEmployments(unit.getId(),staffList,unit.getId());
+                positionGraphRepository.createPositions(unit.getId(),staffList,unit.getId());
             } else {
-                employmentGraphRepository.createEmployments(parent.getId(),staffList,unit.getId());
+                positionGraphRepository.createPositions(parent.getId(),staffList,unit.getId());
             }
 
             AddressDTO address = new AddressDTO();
@@ -97,7 +94,7 @@ public class ApiExternalStaffService {
             address.setHouseNumber("8");
             address.setFloorNumber(2);
             address.setZipCodeId(102L);
-            staffAddressService.saveAddress(staff.getId(), address, orgnaizationId);
+            staffAddressService.saveAddress(staff, Arrays.asList(address));
             return staff;
         }
         return null;

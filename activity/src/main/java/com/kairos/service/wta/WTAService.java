@@ -108,7 +108,7 @@ public class WTAService extends MongoBaseService {
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
 
-    @Inject private WorkTimeAgreementBalancesCalculaionService workTimeAgreementBalancesCalculaionService;
+    @Inject private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -794,7 +794,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long unitPositionId,LocalDate startDate,LocalDate endDate){
-       return workTimeAgreementBalancesCalculaionService.getWorktimeAgreementBalance(unitId,unitPositionId,startDate,endDate);
+       return workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(unitId,unitPositionId,startDate,endDate);
     }
 
 }

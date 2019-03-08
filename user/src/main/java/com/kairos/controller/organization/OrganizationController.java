@@ -298,13 +298,6 @@ public class OrganizationController {
                 skillService.getAllAvailableSkills(unitId, type));
     }
 
-    @ApiOperation(value = "Get Unit Data of organization")
-    @GetMapping(UNIT_URL+"/unitData")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getUnitData(@PathVariable long unitId, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                skillService.getUnitData(unitId));
-    }
 
     @ApiOperation(value = "Add Organization Skills One by One")
     @PutMapping(UNIT_URL+"/skill")

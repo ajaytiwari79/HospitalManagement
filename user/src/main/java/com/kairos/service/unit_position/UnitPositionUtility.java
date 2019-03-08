@@ -33,6 +33,7 @@ public class UnitPositionUtility {
         unitPositionDetails.setPublished(unitPosition.getPublished());
         unitPositionDetails.setEditable(unitPosition.getEditable());
         unitPositionDetails.setAccumulatedTimebankMinutes(unitPosition.getAccumulatedTimebankMinutes());
+        unitPositionDetails.setAccumulatedTimebankDate(unitPosition.getAccumulatedTimebankDate());
         return unitPositionDetails;
     }
 

@@ -223,10 +223,10 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
 
-    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
-        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitEmploymentPositionId);
+    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitPositionId) {
+        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitEmploymentPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
 
         }
         return costTimeAgreementRepository.getOneCtaById(unitPosition.getCostTimeAgreementId());
@@ -235,7 +235,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     public StaffUnitPositionDetails updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,null,ORGANIZATION,unitPositionId,new HashSet<>());
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
         }
         if (staffAdditionalInfoDTO.getUnitPosition().getEndDate()!=null && ctaDTO.getEndDate()!=null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getUnitPosition().getEndDate())){
             exceptionService.actionNotPermittedException("end_date.from.end_date",ctaDTO.getEndDate(),staffAdditionalInfoDTO.getUnitPosition().getEndDate());
@@ -347,7 +347,6 @@ public class CostTimeAgreementService extends MongoBaseService {
             updateExistingPhaseIdOfCTA(ctaRuleTemplateDTOS,organizationId,countryId);
         }
         ctaRuleTemplateDTOS.forEach(c -> {
-            c.setRuleTemplateCategory(c.getRuleTemplateCategoryId());
             c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
         });
         return new CTARuleTemplateCategoryWrapper(ctaRuleTemplateCategoryList, ctaRuleTemplateDTOS);
@@ -369,7 +368,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @param countryDTO
      */
     private void buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, Boolean doUpdate, CountryDTO countryDTO) {
-        ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategory());
+        ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategoryId());
         setActivityBasesCostCalculationSettings(ctaRuleTemplate);
         if (ctaRuleTemplate.getCalculateValueAgainst() != null && ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue() != null) {
             switch (ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue()) {
@@ -434,7 +433,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             ctaRuleTemplate.setId(null);
             setActivityBasesCostCalculationSettings(ctaRuleTemplate);
             ctaRuleTemplate.setEmploymentTypes(ctaRuleTemplateDTO.getEmploymentTypes());
-            ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategory());
+            ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategoryId());
             ctaRuleTemplates.add(ctaRuleTemplate);
         }
         save(ctaRuleTemplates);

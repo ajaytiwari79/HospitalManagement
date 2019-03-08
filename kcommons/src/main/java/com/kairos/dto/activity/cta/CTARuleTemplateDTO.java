@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
 
 /**
  * @author pradeep
@@ -26,13 +29,10 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 public class CTARuleTemplateDTO {
 
     private BigInteger id;
-    @NotEmpty(message = "error.cta.ruleTemplate.name.notEmpty")
-    @NotNull(message = "error.cta.ruleTemplate.name.notNull")
+    @NotBlank(message = "error.cta.ruleTemplate.name.notEmpty")
     private String name;
     private String description;
     private boolean disabled;
-    @NotNull
-    private BigInteger ruleTemplateCategory;
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -59,8 +59,10 @@ public class CTARuleTemplateDTO {
     private List<Long> dayTypeIds;
     private List<DayOfWeek> days;
     private List<LocalDate> publicHolidays;
+    @NotNull
     private BigInteger ruleTemplateCategoryId;
     private String ruleTemplateCategoryName;
+    private UserInfo lastModifiedBy;
 
     public CTARuleTemplateDTO() {
     }
@@ -136,14 +138,6 @@ public class CTARuleTemplateDTO {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-
-    public BigInteger getRuleTemplateCategory() {
-        return ruleTemplateCategory;
-    }
-
-    public void setRuleTemplateCategory(BigInteger ruleTemplateCategory) {
-        this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
     public String getRuleTemplateType() {
@@ -309,15 +303,28 @@ public class CTARuleTemplateDTO {
         this.calculationFor = calculationFor;
     }
 
+    public UserInfo getLastModifiedBy() {
+        return lastModifiedBy;
+    }
 
+    public void setLastModifiedBy(UserInfo lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
-    public CTARuleTemplateDTO(String name, String description, String payrollType, String payrollSystem) {
-        this.name = name;
-        this.description = description;
-        this.ruleTemplateCategory = ruleTemplateCategory;
-        this.payrollType = payrollType;
-        this.payrollSystem = payrollSystem;
+    private boolean isPhaseValid(BigInteger shiftPhaseId){
+        return this.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent();
+    }
 
+    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
+        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && this.getPlannedTimeIds().contains(plannedTimeId);
+    }
+
+    private boolean isEmployementTypeValid(Long employmentId){
+        return this.getEmploymentTypes().contains(employmentId);
+    }
+
+    public boolean isRuleTemplateValid(Long employmentId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimeId) || this.getCalculationFor().equals(FUNCTIONS));
     }
 
     @Override
@@ -327,7 +334,6 @@ public class CTARuleTemplateDTO {
                 .append("name", name)
                 .append("description", description)
                 .append("disabled", disabled)
-                .append("ruleTemplateCategory", ruleTemplateCategory)
                 .append("ruleTemplateType", ruleTemplateType)
                 .append("payrollType", payrollType)
                 .append("payrollSystem", payrollSystem)

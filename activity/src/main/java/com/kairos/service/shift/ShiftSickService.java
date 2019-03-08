@@ -3,6 +3,7 @@ package com.kairos.service.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.staffing_level.Duration;
@@ -43,6 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 /**
@@ -172,7 +174,7 @@ public class ShiftSickService extends MongoBaseService {
                     exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
                 }
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                 List<ShiftActivity> breakActivities = shiftService.updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
                 if (!breakActivities.isEmpty()) {
                     shift.setActivities(breakActivities);
@@ -216,7 +218,9 @@ public class ShiftSickService extends MongoBaseService {
             ShiftActivity shiftActivity = calculateShiftStartAndEndTime(shiftNeedsToAddForDays, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
             shiftActivity.setActivityId(activity.getId());
             shiftActivity.setActivityName(activity.getName());
-            Shift currentShift = new Shift(null, null, staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
+            ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
+            Shift currentShift = new Shift(shiftActivity.getStartDate(), shiftActivity.getEndDate(), staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
+            currentShift.setShiftType(shiftType);
             shifts.add(currentShift);
         }
         addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts, dates);
@@ -307,7 +311,7 @@ public class ShiftSickService extends MongoBaseService {
                         exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
                     }
                     staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                    shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                    setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
                 }
             }

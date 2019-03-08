@@ -22,9 +22,6 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
-
 @Service
 public class OrganizationTransferMethodService {
 
@@ -52,21 +49,8 @@ public class OrganizationTransferMethodService {
      * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
     public List<TransferMethodDTO> createTransferMethod(Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
-
-        Set<String> transferMethodNames = new HashSet<>();
-        for (TransferMethodDTO transferMethod : transferMethodDTOS) {
-            if (!StringUtils.isBlank(transferMethod.getName())) {
-                transferMethodNames.add(transferMethod.getName());
-            } else
-                throw new InvalidRequestException("name could not be empty or null");
-
-        }
-        List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<TransferMethod> previousTransferMethods = transferMethodRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
-        transferMethodNames = ComparisonUtils.getNameListForMetadata(previousTransferMethods, transferMethodNames);
-
+        Set<String> existingTransferMethodNames = transferMethodRepository.findNameByOrganizationIdAndDeleted(organizationId);
+        Set<String> transferMethodNames = ComparisonUtils.getNewMetaDataNames(transferMethodDTOS,existingTransferMethodNames );
         List<TransferMethod> transferMethods = new ArrayList<>();
         if (!transferMethodNames.isEmpty()) {
             for (String name : transferMethodNames) {
