@@ -19,7 +19,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class PayrollSettingController {
+public class UnitPayrollSettingController {
 
    @Inject
    UnitPayrollSettingService unitPayrollSettingService;
@@ -61,9 +61,9 @@ public class PayrollSettingController {
     }
 
     @ApiOperation(value = "delete PayRoll Period")
-    @DeleteMapping(value="/payroll_period/{id}")
-    public ResponseEntity<Map<String, Object>> deleteDraftPayRollPeriod(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.deleteDraftPayrollPeriod(id,unitId));
+    @DeleteMapping(value="/payroll_period/{payrollPeriodId}")
+    public ResponseEntity<Map<String, Object>> deleteDraftPayRollPeriod(@PathVariable Long unitId, @PathVariable BigInteger payrollPeriodId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.deleteDraftPayrollPeriod(payrollPeriodId,unitId));
 
     }
 }

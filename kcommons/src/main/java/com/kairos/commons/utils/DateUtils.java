@@ -902,7 +902,19 @@ public  class DateUtils {
         return LocalDate.of(year,1,1).with(TemporalAdjusters.lastDayOfYear());
     }
 
+    public static LocalDate getlastDayOfYear(LocalDate localDate){
+        return localDate.with(TemporalAdjusters.lastDayOfYear());
+    }
+
     public static LocalDate getFirstDayOfYear(Integer year){
         return LocalDate.of(year,1,1);
+    }
+
+    public static LocalDate getFirstDayOfYear(LocalDate localDate){
+        return localDate.with(TemporalAdjusters.firstDayOfYear());
+    }
+
+    public static LocalDate getFirstDayOfNextYear(LocalDate localDate){
+        return localDate.with(TemporalAdjusters.firstDayOfNextYear());
     }
 }
