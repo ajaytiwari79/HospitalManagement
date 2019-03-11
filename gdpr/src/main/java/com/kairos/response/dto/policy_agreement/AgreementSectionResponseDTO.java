@@ -2,6 +2,7 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.clause.AgreementSectionClause;
 
 import javax.validation.constraints.NotBlank;
@@ -10,6 +11,7 @@ import java.util.List;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgreementSectionResponseDTO {
 
     private Long id;
@@ -18,10 +20,12 @@ public class AgreementSectionResponseDTO {
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
+    protected Long countryId;
+    protected Long organizationId;
     //private List<BigInteger> clauseIdOrderedIndex;
     //private List<ClauseBasicResponseDTO> clauses;
     private List<AgreementSectionClause> clauses;
-    private List<AgreementSectionResponseDTO> agreementSubSections =new ArrayList<>();
+    private List<AgreementSectionResponseDTO> agreementSubSections = new ArrayList<>();
 
     public Integer getOrderedIndex() {
         return orderedIndex;
@@ -60,6 +64,22 @@ public class AgreementSectionResponseDTO {
         this.clauses = clauses;
     }*/
 
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -76,18 +96,24 @@ public class AgreementSectionResponseDTO {
         this.clauses = clauses;
     }
 
-    public String getTitleHtml() { return titleHtml; }
+    public String getTitleHtml() {
+        return titleHtml;
+    }
 
-    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
+    public void setTitleHtml(String titleHtml) {
+        this.titleHtml = titleHtml;
+    }
 
     public AgreementSectionResponseDTO() {
 
     }
 
-    public AgreementSectionResponseDTO(Long id, @NotBlank String title, String titleHtml, Integer orderedIndex) {
+    public AgreementSectionResponseDTO(Long id, @NotBlank String title, String titleHtml, Integer orderedIndex, Long countryId, Long organizationId) {
         this.id = id;
         this.title = title;
         this.titleHtml = titleHtml;
         this.orderedIndex = orderedIndex;
+        this.countryId = countryId;
+        this.organizationId = organizationId;
     }
 }
