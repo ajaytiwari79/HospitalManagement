@@ -461,7 +461,7 @@ public class StaffService {
                 }
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                 if (isCollectionNotEmpty(missingMandatoryFields) || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
-                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Missing fields : "+ StringUtils.join(missingMandatoryFields, ", "));
+                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Missing field(s) : "+ StringUtils.join(missingMandatoryFields, ", "));
                     if (isNotNull(cprAsLong)) {
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                     }
@@ -492,7 +492,7 @@ public class StaffService {
                     staff.setContactDetail(contactDetail);
                     staff.setContactAddress(contactAddress);
                     User user = null;
-                    if (isCollectionNotEmpty(missingMandatoryFields)) {
+                    if (isCollectionEmpty(missingMandatoryFields)) {
                         user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail);
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
