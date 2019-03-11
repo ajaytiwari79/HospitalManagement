@@ -21,8 +21,10 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
+import com.kairos.persistence.repository.master_data.asset_management.MasterAssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
@@ -41,7 +43,6 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
-import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.service.AsynchronousService;
@@ -72,6 +73,12 @@ public class DefaultDataInheritService{
 
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
+
+    @Inject
+    private MasterAssetRepository masterAssetRepository;
+
+    @Inject
+    private AssetRepository assetRepository;
 
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
@@ -221,20 +228,20 @@ public class DefaultDataInheritService{
             return true;
         };
         Callable<Boolean> processingActivityTask = () -> {
-            List<MasterProcessingActivity> masterProcessingActivityDTOS = masterProcessingActivityRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(),organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
-            copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivityDTOS);
+            List<MasterProcessingActivity> masterProcessingActivities = masterProcessingActivityRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(),organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
+            copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivities);
             return true;
         };
         /*Callable<Boolean> questionniareTemplateTask = () -> {
             List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllQuestionnaireTemplateByCountryIdOrOrganizationId(countryId);
             copyQuestionnaireTemplateFromCountry(unitId, questionnaireTemplateDTOS);
             return true;
-        };
-        Callable<Boolean> assetTask = () -> {
-            List<MasterAssetResponseDTO> masterAssetDTOS = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
-            copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssetDTOS);
-            return true;
         };*/
+        Callable<Boolean> assetTask = () -> {
+            List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(),organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
+            copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets);
+            return true;
+        };
         Callable<Boolean> dataSubjectTask = () -> {
             List<DataSubjectResponseDTO> dataSubjectDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
             copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectDTOS);
@@ -257,8 +264,8 @@ public class DefaultDataInheritService{
         callables.add(responsibilityTypeTask);
         callables.add(transferMethodTask);
         callables.add(processingActivityTask);
-        /*callables.add(questionniareTemplateTask);
-        callables.add(assetTask);*/
+//        callables.add(questionniareTemplateTask);
+        callables.add(assetTask);
         callables.add(dataSubjectTask);
         callables.add(clauseTask);
         callables.add(dataDisposalCreationlTask);
@@ -269,20 +276,31 @@ public class DefaultDataInheritService{
     }
 
 
-    private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAssetResponseDTO> masterAssetDTOS) {
-        if (CollectionUtils.isNotEmpty(masterAssetDTOS)) {
-            List<Asset> assets = new ArrayList<>();
-            for (MasterAssetResponseDTO masterAssetDTO : masterAssetDTOS) {
-                Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
-               // asset.setOrganizationId(unitId);
-                AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
-//                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
-                if (Optional.of(masterAssetDTO.getSubAssetType()).isPresent()) {
-                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getSubAssetType().getName().toLowerCase().trim()));
+    private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAsset> masterAssets) {
+        try {
+            List<Asset> unitLevelAssets = new ArrayList<>();
+            masterAssets.forEach(masterAsset -> {
+                AssetType unitLevelAssetType = null;
+                AssetType assetType = masterAsset.getAssetType();
+                if (assetType != null) {
+                    unitLevelAssetType = assetTypeService.prepareAssetTypeDataForUnitLevel(assetType, unitId, false, null);
+                    assetTypeRepository.save(unitLevelAssetType);
                 }
-                assets.add(asset);
-            }
-           // assetMongoRepository.saveAll(getNextSequence(assets));
+                Asset unitLevelAsset = new Asset();
+                unitLevelAsset.setName(masterAsset.getName());
+                unitLevelAsset.setDescription(masterAsset.getDescription());
+                unitLevelAsset.setOrganizationId(unitId);
+                unitLevelAsset.setAssetType(unitLevelAssetType);
+                Optional<AssetType> unitLevelSubAssetTypeOfAsset = unitLevelAssetType.getSubAssetTypes().stream().filter(subAssetType -> subAssetType.getName() == masterAsset.getSubAssetType().getName()).findFirst();
+                if (unitLevelSubAssetTypeOfAsset.isPresent()) {
+                    unitLevelAsset.setSubAssetType(unitLevelSubAssetTypeOfAsset.get());
+                }
+                unitLevelAssets.add(unitLevelAsset);
+
+            });
+            assetRepository.saveAll(unitLevelAssets);
+        }catch (Exception ex){
+            LOGGER.error("Error in asset processing=="+ex.getMessage());
         }
     }
 
