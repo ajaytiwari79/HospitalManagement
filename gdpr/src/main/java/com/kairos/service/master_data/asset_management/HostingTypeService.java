@@ -49,7 +49,7 @@ public class HostingTypeService {
         List<HostingType> hostingTypes = new ArrayList<>();
         if (!hostingTypeNames.isEmpty()) {
             for (String name : hostingTypeNames) {
-                HostingType hostingType = new HostingType(name, countryId);
+                HostingType hostingType = new HostingType(countryId, name);
                 if (isSuggestion) {
                     hostingType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     hostingType.setSuggestedDate(LocalDate.now());

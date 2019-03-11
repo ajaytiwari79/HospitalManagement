@@ -50,7 +50,7 @@ public class DataSourceService {
         List<DataSource> dataSources = new ArrayList<>();
         if (!dataSourceNames.isEmpty()) {
             for (String name : dataSourceNames) {
-                DataSource dataSource = new DataSource(name, countryId);
+                DataSource dataSource = new DataSource(countryId, name);
                 if (isSuggestion) {
                     dataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     dataSource.setSuggestedDate(LocalDate.now());
