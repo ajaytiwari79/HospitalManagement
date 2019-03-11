@@ -12,5 +12,5 @@ public interface CustomUnitPayrollSettingMongoRepository {
     List<UnitPayrollSettingDTO> getPayrollPeriodByYearAndPayrollFrequency(Long unitId, PayrollFrequency payrollFrequency, LocalDate startDate, LocalDate endDate);
 
 
-    List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnits( PayrollFrequency payrollFrequency);
+    List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(PayrollFrequency payrollFrequency,Long unitId);
 }

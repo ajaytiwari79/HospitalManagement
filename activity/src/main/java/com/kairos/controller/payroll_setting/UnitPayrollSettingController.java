@@ -66,4 +66,22 @@ public class UnitPayrollSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.deleteDraftPayrollPeriod(payrollPeriodId,unitId));
 
     }
+
+
+    @ApiOperation(value = "add PayRoll Period by button")
+    @PutMapping(value="/payroll_period_manual")
+    public ResponseEntity<Map<String, Object>> update(Long unitId,@RequestParam PayrollFrequency payrollFrequency) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(unitId,payrollFrequency));
+
+    }
+
+
+    @ApiOperation(value = "create job for PayRoll Period ")
+    @PutMapping(value="/payroll_period_job")
+    public ResponseEntity<Map<String, Object>> createJobForPayrollPeriod() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.createJobForAddpayrollPeriod());
+
+    }
+
+
 }

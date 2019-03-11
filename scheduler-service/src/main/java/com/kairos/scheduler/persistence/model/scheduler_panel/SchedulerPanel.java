@@ -44,6 +44,7 @@ public class SchedulerPanel extends MongoBaseEntity {
     private JobType jobType;
     private JobSubType jobSubType;
     private boolean oneTimeTrigger;
+    private boolean everyMonthTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
 
@@ -242,4 +243,11 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.runOnce = runOnce;
     }
 
+    public boolean isEveryMonthTrigger() {
+        return everyMonthTrigger;
+    }
+
+    public void setEveryMonthTrigger(boolean everyMonthTrigger) {
+        this.everyMonthTrigger = everyMonthTrigger;
+    }
 }

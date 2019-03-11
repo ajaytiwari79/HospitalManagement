@@ -5,20 +5,31 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.payroll_setting.PayrollAccessGroupsDTO;
 import com.kairos.dto.activity.payroll_setting.PayrollPeriodDTO;
 import com.kairos.dto.activity.payroll_setting.UnitPayrollSettingDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.payroll_setting.PayrollAccessGroups;
 import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
 import com.kairos.persistence.repository.payroll_setting.UnitPayrollSettingMongoRepository;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -30,12 +41,14 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 
 @Service
 public class UnitPayrollSettingService extends MongoBaseService {
-
+    private static final Logger logger = LoggerFactory.getLogger(UnitPayrollSettingService.class);
     @Inject
     private UnitPayrollSettingMongoRepository unitPayrollSettingMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private SchedulerServiceRestClient schedulerRestClient;
 
     public UnitPayrollSettingDTO getDefaultDataOfPayrollPeriod(Long unitId, PayrollFrequency payrollFrequency) {
         List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.findAllByUnitIdAndFrequency(unitId, payrollFrequency);
@@ -125,8 +138,63 @@ public class UnitPayrollSettingService extends MongoBaseService {
         return availableDraftPayroll;
     }
 
-    public void addPayrollPeriodInUnitViaJob(PayrollFrequency payrollFrequency){
+//    public List<UnitPayrollSetting> addPayrollPeriodInUnitByButton(Long unitId, PayrollFrequency payrollFrequency) {
+//        List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(payrollFrequency, unitId);
+//        if(isCollectionNotEmpty(unitPayrollSettings)) {
+//            unitPayrollSettings = addPayrollPeriodViaJob(unitPayrollSettings, payrollFrequency);
+//            unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
+//        }
+//        return unitPayrollSettings;
+//    }
 
+    //in manual add payroll period we need unitId for update payroll period of unit and with job all unit payroll period update
+    public List<UnitPayrollSetting> addPayrollPeriodInUnitViaJobOrManual(Long unitId, PayrollFrequency payrollFrequency) {
+        List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(payrollFrequency, unitId);
+        if(isCollectionNotEmpty(unitPayrollSettings)) {
+            unitPayrollSettings = addPayrollPeriodViaJob(unitPayrollSettings, payrollFrequency);
+            unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
+        }
+        return unitPayrollSettings;
+    }
+
+    public boolean createJobForAddpayrollPeriod(){
+        List<SchedulerPanelDTO> schedulerPanelDTOS=Arrays.asList(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.CREATE_PAYROLL_PERIOD,true,LocalTime.of(23,00),false));
+        logger.info("create job for add payroll period");
+        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+        });
+        logger.info("job register of add payroll period");
+        return isCollectionNotEmpty(schedulerPanelDTOS);
+    }
+
+    private List<UnitPayrollSetting> addPayrollPeriodViaJob(List<UnitPayrollSetting> unitPayrollSettings, PayrollFrequency payrollFrequency) {
+        List<UnitPayrollSetting> updateUnitPayrollSettings = new ArrayList<>();
+        UnitPayrollSetting newUnitPayrollSetting = null;
+        updateUnitPayrollSettings.addAll(unitPayrollSettings);
+        for (UnitPayrollSetting unitPayrollSetting : unitPayrollSettings) {
+            int daysTillDeadlineDate = getDurationBetweenTwoLocalDates(unitPayrollSetting.getPayrollPeriods().get(unitPayrollSetting.getPayrollPeriods().size() - 1).getEndDate(), unitPayrollSetting.getPayrollPeriods().get(unitPayrollSetting.getPayrollPeriods().size() - 1).getDeadlineDate().toLocalDate(), DurationType.DAYS).intValue();
+            LocalDate startDateOfNextPayrollPeriod = unitPayrollSetting.getPayrollPeriods().get(unitPayrollSetting.getPayrollPeriods().size() - 1).getEndDate().plusDays(1);
+            LocalDate endDateOfPayrollPeriod = getNextStartDate(startDateOfNextPayrollPeriod, PayrollFrequency.MONTHLY);
+            while (startDateOfNextPayrollPeriod.isBefore(endDateOfPayrollPeriod)) {
+                PayrollPeriod payrollPeriod = new PayrollPeriod(startDateOfNextPayrollPeriod, getNextStartDate(startDateOfNextPayrollPeriod, payrollFrequency).minusDays(1));
+                payrollPeriod.setDeadlineDate(getLocalDateTimeFromLocalDateAndLocalTime(payrollPeriod.getEndDate().plusDays(daysTillDeadlineDate), unitPayrollSetting.getPayrollPeriods().get(unitPayrollSetting.getPayrollPeriods().size() - 1).getDeadlineDate().toLocalTime()));
+                payrollPeriod.setPayrollAccessGroups(unitPayrollSetting.getPayrollPeriods().get(unitPayrollSetting.getPayrollPeriods().size() - 1).getPayrollAccessGroups());
+                if (startDateOfNextPayrollPeriod.isBefore(getlastDayOfYear(unitPayrollSetting.getPayrollPeriods().get(unitPayrollSetting.getPayrollPeriods().size() - 1).getStartDate()))) {
+                    unitPayrollSetting.getPayrollPeriods().add(payrollPeriod);
+                } else {
+                    if (isNull(newUnitPayrollSetting)) {
+                        newUnitPayrollSetting = ObjectMapperUtils.copyPropertiesByMapper(unitPayrollSetting, UnitPayrollSetting.class);
+                        newUnitPayrollSetting.setId(null);
+                        newUnitPayrollSetting.setPayrollPeriods(new ArrayList<>());
+                    }
+                    newUnitPayrollSetting.getPayrollPeriods().add(payrollPeriod);
+                }
+                startDateOfNextPayrollPeriod = getNextStartDate(startDateOfNextPayrollPeriod, payrollFrequency);
+            }
+        }
+        if (isNotNull(newUnitPayrollSetting)) {
+            updateUnitPayrollSettings.add(newUnitPayrollSetting);
+        }
+        return updateUnitPayrollSettings;
     }
 
     public List<UnitPayrollSettingDTO> breakPayrollPeriodOfUnit(Long unitId, UnitPayrollSettingDTO unitPayrollSettingDTO) {

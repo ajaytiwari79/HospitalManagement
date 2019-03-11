@@ -63,7 +63,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
     public String setCronScheduling(SchedulerPanel schedulerPanel, String timezone) {
         logger.debug("cron----> " + schedulerPanel.getCronExpression());
         CronTrigger trigger = null;
-        if(!schedulerPanel.isOneTimeTrigger()) {
+        if(!schedulerPanel.isOneTimeTrigger() || schedulerPanel.isEveryMonthTrigger()) {
             trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone(timezone));
         }
 
@@ -72,7 +72,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
         threadPoolTaskScheduler.initialize();
         Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
-        if(!schedulerPanel.isOneTimeTrigger()) {
+        if(!schedulerPanel.isOneTimeTrigger() || schedulerPanel.isEveryMonthTrigger() ) {
            future =  threadPoolTaskScheduler.schedule(runnable, trigger);
         }
         else {

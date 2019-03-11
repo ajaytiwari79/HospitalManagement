@@ -4,6 +4,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.payroll_setting.UnitPayrollSettingDTO;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
+import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -14,6 +16,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollSettingMongoRepository {
@@ -34,17 +37,30 @@ public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollS
                 project().and("_id").as("id").and("unitId").as("unitId").and("published").as("published")
                         .and("payrollFrequency").as("payrollFrequency").and("accessGroupsPriority").as("accessGroupsPriority")
                         .and("payrollPeriods").as("payrollPeriods").and("parentPayrollId").as("parentPayrollId"),
-                sort(Sort.Direction.ASC,"id")
+                sort(Sort.Direction.ASC, "id")
 
 
         );
         AggregationResults<UnitPayrollSetting> results = mongoTemplate.aggregate(aggregation, UnitPayrollSetting.class, UnitPayrollSetting.class);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(results.getMappedResults(),UnitPayrollSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(results.getMappedResults(), UnitPayrollSettingDTO.class);
 
     }
 
     @Override
-    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnits(PayrollFrequency payrollFrequency) {
-        return null;
+    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(PayrollFrequency payrollFrequency,Long unitId) {
+        String addFieldOperation = "{'$addFields':{'endDate':{ '$arrayElemAt': [ '$payrollPeriods.endDate', -1 ]}}}";
+        String sortByEndDate="{'$sort':{'endDate':-1}}";
+        Criteria criteria=Criteria.where("payrollFrequency").is(payrollFrequency).and("published").is(true);
+        if(isNotNull(unitId)){
+            criteria.and("unitId").is(unitId);
+        }
+        Aggregation aggregation = newAggregation(
+                match(criteria),
+                new CustomAggregationOperation(Document.parse(addFieldOperation)),
+                new CustomAggregationOperation(Document.parse(sortByEndDate)),
+                limit(1)
+        );
+        AggregationResults<UnitPayrollSetting> results = mongoTemplate.aggregate(aggregation, UnitPayrollSetting.class, UnitPayrollSetting.class);
+        return results.getMappedResults();
     }
 }

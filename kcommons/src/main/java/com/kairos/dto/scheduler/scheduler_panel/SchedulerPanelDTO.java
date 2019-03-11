@@ -39,11 +39,20 @@ public class SchedulerPanelDTO {
     private BigInteger entityId;
     private String timezone;
     private Long oneTimeTriggerDateMillis;
+    private boolean everyMonthTrigger;
 
 
 
     public SchedulerPanelDTO() {
 
+    }
+
+    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, boolean everyMonthTrigger,LocalTime runOnce,boolean oneTimeTrigger ) {
+        this.runOnce = runOnce;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.everyMonthTrigger = everyMonthTrigger;
+        this.oneTimeTrigger=oneTimeTrigger;
     }
 
     public SchedulerPanelDTO(String name, boolean active, Integer startMinute, Integer repeat, List<DayOfWeek> days, LocalTime runOnce, List<String> selectedHours, Long unitId, BigInteger integrationConfigurationId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
@@ -124,6 +133,14 @@ public class SchedulerPanelDTO {
 
     public void setOneTimeTriggerDate(LocalDateTime oneTimeTriggerDate) {
         this.oneTimeTriggerDate = oneTimeTriggerDate;
+    }
+
+    public boolean isEveryMonthTrigger() {
+        return everyMonthTrigger;
+    }
+
+    public void setEveryMonthTrigger(boolean everyMonthTrigger) {
+        this.everyMonthTrigger = everyMonthTrigger;
     }
 
     public JobType getJobType() {
