@@ -114,7 +114,7 @@ public class ActivityService extends MongoBaseService {
     private ActivityCategoryRepository activityCategoryRepository;
     @Inject
     private ShiftService shiftService;
-    @Autowired
+    @Inject
     private PhaseService phaseService;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
@@ -132,7 +132,7 @@ public class ActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Autowired
+    @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ExceptionService exceptionService;

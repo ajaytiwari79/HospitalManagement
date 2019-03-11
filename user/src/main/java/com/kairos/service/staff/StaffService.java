@@ -32,7 +32,7 @@ import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
-import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
+import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -153,7 +153,7 @@ public class StaffService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
-    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
@@ -701,9 +701,9 @@ public class StaffService {
             UnitPermission unitPermission = new UnitPermission();
             unitPermission.setOrganization(organization);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-            unitEmpAccessRelationship.setEnabled(true);
-            unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+            UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
+            unitPermissionAccessPermissionRelationship.setEnabled(true);
+            unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
             accessPageService.setPagePermissionToAdmin(accessPermission);
             position.getUnitPermissions().add(unitPermission);
             organization.getPositions().add(position);
@@ -922,9 +922,9 @@ public class StaffService {
 
     private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessRelationship.setEnabled(true);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
+        unitPermissionAccessPermissionRelationship.setEnabled(true);
+        unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
         accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroup.getId());
     }
 
@@ -1096,7 +1096,7 @@ public class StaffService {
             userGraphRepository.save(user);
             Staff staff = createStaff(user);
             unitManagerDTOMap.put("id", staff.getId());
-            positionService.createEmploymentForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
+            positionService.createPositionForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
             sendEmailToUnitManager(unitManagerDTO, password);
             return unitManagerDTOMap;
         } else {
@@ -1104,7 +1104,7 @@ public class StaffService {
             if (staffGraphRepository.countOfUnitEmployment(organizationId, unitId, user.getEmail()) == 0) {
                 Staff staff = createStaff(user);
                 unitManagerDTOMap.put("id", staff.getId());
-                positionService.createEmploymentForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
+                positionService.createPositionForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
                 userGraphRepository.save(user);
                 sendEmailToUnitManager(unitManagerDTO, password);
                 return unitManagerDTOMap;

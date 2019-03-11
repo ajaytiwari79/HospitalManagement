@@ -21,11 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("Match (org:Organization)-[:"+ HAS_TEAMS +"]->(team:Team {isEnabled:true}) where id(org)={0} with team\n" +
-            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_LOCATION+"]->(contactAddress:ContactAddress) with contactAddress,team\n" +
-            "OPTIONAL MATCH (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with zipCode,contactAddress,team\n" +
-            "OPTIONAL MATCH (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with zipCode,contactAddress,team,municipality \n"+
-            "RETURN COLLECT({id:id(team), name:team.name, hasAddressOfUnit:team.hasAddressOfUnit, contactAddress: CASE WHEN contactAddress IS NULL THEN [] ELSE {id:id(contactAddress),city:contactAddress.city,street:contactAddress.street,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber,houseNumber:contactAddress.houseNumber,province:contactAddress.province,country:contactAddress.country,regionName:contactAddress.regionName,\n" +
-            "municipalityId:id(municipality),municipalityName:municipality.name} END}) as teams")
+            "RETURN COLLECT({id:id(team), name:team.name, description:team.description}) as teams")
     List<Map<String,Object>> getTeams(long unitId);
 
     @Query("MATCH (t:Team)-[:"+TEAM_HAS_MEMBER+"]->(u:Staff) where id(t)={0} return u")

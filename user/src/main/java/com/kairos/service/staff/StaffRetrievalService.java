@@ -484,7 +484,7 @@ public class StaffRetrievalService {
      * */
 
     // TODO NEED TO FIX map
-    public List<Map<String, Object>> getStaffWithBasicInfo(long unitId) {
+    public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);

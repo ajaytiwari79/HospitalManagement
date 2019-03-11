@@ -13,7 +13,6 @@ import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
-import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -46,9 +45,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH(n:Organization {isEnable:true}),(d:Department),(u:User) WHERE id(n)={0} And id(d)={1} And id(u)={2}  create(d)-[:has_staff]->(u)")
     Organization addStaff(long organzationId, long departmentId, long userId);
-
-    @Query("MATCH(d:Department {isEnable:true} ),(t:Team) WHERE id(d)={0} and id(t)in {1} create(d)-[:HAS_MANAGE]->(t)")
-    Department linkDeptWithTeams(long departmentId, List<Long> childIds);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
             "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) RETURN org limit 1")
@@ -163,13 +159,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
     int isServiceAlreadyExist(long unitId, long serviceId);
-
-    @Query("MATCH (o:Organization)-[:" + ORGANIZATION_HAS_DEPARTMENT + "]->(dept:Department) WHERE id(o)={0} RETURN dept")
-    List<Department> getAllDepartments(Long organizationId);
-
-
-    @Query("MATCH (o:Organization)-[:" + ORGANIZATION_HAS_DEPARTMENT + "]-(d:Department) WHERE id(d)={0} RETURN id(o)")
-    Long getOrganizationByDepartmentId(Long departmentId);
 
     @Query("MATCH (o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*..4]-(co:Organization) WHERE id(o)={0}  RETURN " +
             "COLLECT ({name:co.name,id:id(co),level:co.organizationLevel}) as organizationList")

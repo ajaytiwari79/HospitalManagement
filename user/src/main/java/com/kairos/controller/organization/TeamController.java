@@ -25,12 +25,18 @@ import static com.kairos.constants.AppConstants.TEAM;
         @Inject
         TeamService teamService;
 
-        //Group
-        @ApiOperation(value = "Add Team to Unit")
+        @ApiOperation(value = "Add Team in Unit")
         @RequestMapping(value = "/team", method = RequestMethod.POST)
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> createTeam(@PathVariable Long unitId, @Validated @RequestBody TeamDTO teamDTO) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.createTeam(unitId, teamDTO));
+        }
+
+        @ApiOperation(value = "Update Team of Unit")
+        @RequestMapping(value = "/team/{teamId}", method = RequestMethod.PUT)
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> updateTeam(@PathVariable Long unitId, @PathVariable Long teamId, @Validated @RequestBody TeamDTO teamDTO) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeam(unitId, teamId, teamDTO));
         }
 
 
@@ -44,7 +50,7 @@ import static com.kairos.constants.AppConstants.TEAM;
         }
 
         @ApiOperation(value = "Delete Team By TeamId")
-        @RequestMapping(value = "team/{teamId}", method = RequestMethod.DELETE)
+        @RequestMapping(value = "/team/{teamId}", method = RequestMethod.DELETE)
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> deleteTeamByTeamId(@PathVariable Long unitId, @PathVariable Long teamId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,

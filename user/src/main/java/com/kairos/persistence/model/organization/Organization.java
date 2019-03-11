@@ -22,7 +22,6 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -118,10 +117,6 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = ORGANIZATION_HAS_RESOURCE)
     private List<Resource> resourceList;
-
-
-    @Relationship(type = ORGANIZATION_HAS_DEPARTMENT)
-    private List<Department> departments;
 
     @Relationship(type = HAS_PUBLIC_PHONE_NUMBER)
     private List<PublicPhoneNumber> publicPhoneNumberList;
@@ -393,14 +388,6 @@ public class Organization extends UserBaseEntity {
 
     public void setCostCenterCode(String costCenterCode) {
         this.costCenterCode = costCenterCode;
-    }
-
-    public List<Department> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(List<Department> departments) {
-        this.departments = departments;
     }
 
     public int getEndTimeDeduction() {
@@ -935,4 +922,12 @@ public class Organization extends UserBaseEntity {
         this.sectors = sectors;
     }
 
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
 }

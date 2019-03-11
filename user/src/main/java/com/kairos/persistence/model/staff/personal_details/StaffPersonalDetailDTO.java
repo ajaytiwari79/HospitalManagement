@@ -2,12 +2,14 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.utils.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Set;
 
 /**
  * Created by vipul on 8/9/17.
@@ -24,9 +26,7 @@ public class StaffPersonalDetailDTO {
     private Long externalId;
     private String firstName;
     private Long organizationId;
-    private Long visitourId;
     private String cprNumber;
-    private String visitourTeamId;
     private Long roasteringTime;
     private Long freeDay;
     private Long mostOverStaffingHours;
@@ -49,6 +49,9 @@ public class StaffPersonalDetailDTO {
     private Long parentAccessGroupId;
     private String email;
     private Staff staff;
+    private Set<AccessGroupRole> roles;
+
+
     public StaffPersonalDetailDTO() {
         // default constructor
     }
@@ -117,28 +120,12 @@ public class StaffPersonalDetailDTO {
         this.organizationId = organizationId;
     }
 
-    public Long getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(Long visitourId) {
-        this.visitourId = visitourId;
-    }
-
     public String getCprNumber() {
         return cprNumber;
     }
 
     public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
-    }
-
-    public String getVisitourTeamId() {
-        return visitourTeamId;
-    }
-
-    public void setVisitourTeamId(String visitourTeamId) {
-        this.visitourTeamId = visitourTeamId;
     }
 
     public Long getRoasteringTime() {
@@ -308,5 +295,13 @@ public class StaffPersonalDetailDTO {
 
     public void setParentAccessGroupId(Long parentAccessGroupId) {
         this.parentAccessGroupId = parentAccessGroupId;
+    }
+
+    public Set<AccessGroupRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<AccessGroupRole> roles) {
+        this.roles = roles;
     }
 }

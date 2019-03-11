@@ -1,75 +1,58 @@
 package com.kairos.config;
 
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
-
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.default_data.Currency;
+import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
-import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.staff.permission.AccessPermission;
-import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.department.Department;
+import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
-import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffRelationshipGraphRespository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionAndAccessPermissionGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.auth.RoleServiceUser;
-import com.kairos.service.auth.UserRoleServiceUser;
-import com.kairos.service.auth.UserService;
-import com.kairos.service.client.ClientOrganizationRelationService;
-import com.kairos.service.client.ClientService;
-import com.kairos.service.country.CountryService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OpenningHourService;
-import com.kairos.service.organization.OrganizationTypeService;
-import com.kairos.service.organization.TeamService;
-import com.kairos.service.skill.SkillService;
-import com.kairos.service.staff.StaffService;
 import com.kairos.utils.CPRUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,35 +73,13 @@ import static com.kairos.enums.user.UserType.SYSTEM_ACCOUNT;
 @Service
 public class BootDataService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Inject
-    private ClientLanguageRelationGraphRepository clientLanguageRelationGraphRepository;
 
-    @Inject
-    UserService userService;
     @Inject
     com.kairos.service.organization.OrganizationService organizationService;
     @Inject
-    SkillService skillService;
-    @Inject
-    CountryService countryService;
-    @Inject
-    RoleServiceUser roleService;
-    @Inject
-    ClientService clientService;
-    @Inject
-    UserRoleServiceUser userRoleService;
-    @Inject
-    TeamService teamService;
-    @Inject
     StaffGraphRepository staffGraphRepository;
     @Inject
-    ExpertiseGraphRepository expertiseGraphRepository;
-    @Inject
-    ClientOrganizationRelationGraphRepository clientOrganizationRelationGraphRepository;
-    @Inject
     AccessGroupRepository accessGroupRepository;
-    @Inject
-    OpeningHourGraphRepository openingHourGraphRepository;
     @Inject
     OrganizationServiceRepository organizationServiceRepository;
     @Inject
@@ -128,21 +89,11 @@ public class BootDataService {
     @Inject
     SkillGraphRepository skillGraphRepository;
     @Inject
-    ResourceGraphRepository resourceGraphRepository;
-    @Inject
     UserGraphRepository userGraphRepository;
     @Inject
     TeamGraphRepository teamGraphRepository;
     @Inject
-    AccessGroupService accessGroupService;
-    @Inject
     UnitPermissionGraphRepository unitPermissionGraphRepository;
-    @Inject
-    StaffService staffService;
-    @Inject
-    ClientOrganizationRelationService relationService;
-    @Inject
-    PositionGraphRepository positionGraphRepository;
     @Inject
     LanguageGraphRepository languageGraphRepository;
     @Inject
@@ -156,10 +107,6 @@ public class BootDataService {
     @Inject
     RegionGraphRepository regionGraphRepository;
     @Inject
-    ContactAddressGraphRepository contactAddressGraphRepository;
-    @Inject
-    OrganizationTypeService organizationTypeService;
-    @Inject
     PaymentTypeGraphRepository paymentTypeGraphRepository;
     @Inject
     CurrencyGraphRepository currencyGraphRepository;
@@ -170,7 +117,7 @@ public class BootDataService {
     @Inject
     private AccessPageService accessPageService;
     @Inject
-    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
     @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
     @Inject
@@ -180,57 +127,33 @@ public class BootDataService {
     @Inject private StaffRelationshipGraphRespository staffRelationshipGraphRespository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+
     private List<Long> skillList;
     private OrganizationService homeCareService;
 
     private OrganizationService medicalCareService;
 
     private Country denmark = null;
-    private Country germany = null;
 
     private Organization kairosCountryLevel = null;
     private Organization kairosRegionLevel = null;
-    private Organization oodlesCityLevel = null;
-
-    private OrganizationSetting oodlesSetting = null;
-
-    private Client johnOliver = null;
-
-    private Department hrDept;
 
     private Team nestingTeam;
-    private Team experiencedTeam;
-
-    private Resource van = null;
-    private Resource bicycle = null;
-    private Resource ambulance = null;
-
-    private OrganizationType type1 = null;
 
     private OrganizationType publicOrganization = null;
     private OrganizationType privateOrganization = null;
     private OrganizationType ngoOrganization = null;
 
-    private User alma;
-    private User michal;
-    private User liva;
     private User admin;
     private User systemUser;
 
-    private Staff almaAsStaff;
-    private Staff michalAsStaff;
-    private Staff livaAsStaff;
     private Staff adminAsStaff;
     private AccessGroup accessGroup;
-    private Position positionForMichal;
-    private Position positionForLiva;
-    private Position positionForAlma;
     private Position positionForAdmin;
 
     private Language danish;
 
     Region hovedstaden;
-    Region Syddanmark;
 
     Province copenhagenCity;
     Municipality copenhagen;
@@ -267,7 +190,6 @@ public class BootDataService {
             createTimeTypes();
 //            createCTARuleTemplateCategory();
 //            createCityLevelOrganization();
-//            createCitizen();
         }
 
         //createCTARuleTemplateCategory();
@@ -434,150 +356,10 @@ public class BootDataService {
     private void createCountries() {
         denmark = new Country();
         denmark.setName("Denmark");
-        // denmark.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", DateUtil.getCurrentDate().getTime()), new CountryHolidayCalender("Christmas",  1474696870000L)));
-        // denmark.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
         countryGraphRepository.save(denmark);
-        //  createCitizenStatus();
     }
 
-    private void createCitizenStatus() {
-        CitizenStatus deadStatus = new CitizenStatus();
-        deadStatus.setName("Dead");
-        deadStatus.setDescription("When pulse stops , patient is declared dead");
-
-
-        CitizenStatus singleStatus = new CitizenStatus();
-        singleStatus.setDescription("Single");
-        singleStatus.setDescription("A Citizen is not married ");
-        singleStatus.setCountry(denmark);
-
-        CitizenStatus marriedStatus = new CitizenStatus();
-        marriedStatus.setName("Married");
-        marriedStatus.setDescription("A Citizen is have a wife");
-        marriedStatus.setCountry(denmark);
-
-        CitizenStatus disvorcedStatus = new CitizenStatus();
-        disvorcedStatus.setName("Divorced");
-        disvorcedStatus.setDescription("A Citizen was married ,but now divorced ");
-        disvorcedStatus.setCountry(denmark);
-
-        CitizenStatus livingPartnerStatus = new CitizenStatus();
-        livingPartnerStatus.setName("Longest living partner");
-        livingPartnerStatus.setDescription("A Citizen is living Partner");
-        livingPartnerStatus.setCountry(denmark);
-
-        CitizenStatus registeredStatus = new CitizenStatus();
-        registeredStatus.setName("Registered partnership");
-        registeredStatus.setDescription("Relationship of Citizen is registered formally");
-        registeredStatus.setCountry(denmark);
-
-        citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus, livingPartnerStatus, disvorcedStatus, marriedStatus, singleStatus, deadStatus));
-    }
-/*
-    private void createCitizen() {
-        johnOliver = new Client();
-        johnOliver.setClientType(ClientEnum.INDIVIDUAL);
-        johnOliver.setFirstName("John");
-        johnOliver.setLastName("Oliver");
-        johnOliver.setNickName("Johnny");
-//        johnOliver.setAge(57);
-//        johnOliver.setCivilianStatus(ClientEnum.CivilianStatus.MARRIED);
-        johnOliver.setOccupation("Stock Broker");
-        johnOliver.setGender(Gender.MALE);
-        johnOliver.setCitizenship(ClientEnum.CitizenShip.DANISH);
-
-        List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryId(denmark.getId());
-
-        AccessToLocation accessToLocation = new AccessToLocation("AlphaNumeric", "21", "412398", "Cellular phone", "UYTRE7654321", "Unlocking the door",
-                "Simple keySystem with password security", true, "Checking purpose", "Enter the passcode and press unlock", "Must lock the door after serving purpose");
-
-        AccessToLocation accessToLocation2 = new AccessToLocation("AlphaNumeric", "45", "512342", "Cellular phone", "MNTLE7654321", "Unlocking the door",
-                "Simple keySystem with password security", true, "Checking purpose", "Enter the passcode and press unlock", "Must lock the door after serving purpose");
-
-        johnOliver.setContactDetail(new ContactDetail("john.oliver@stockExchange.com", "john.oliver21@gmail.com", "4234423", "4139156"));
-        ContactAddress home = new ContactAddress("Park Street", 3, "12", allegade);
-        home.setLatitude(28.412582F);
-        home.setLongitude(77.043488F);
-        home.setAccessToLocation(accessToLocation);
-//        ContactAddress second = new ContactAddress("Smith Street", 2, 766112264, "Copenhagen", 722, "Apartment", accesToLocation2, true);
-//        ContactAddress partner = new ContactAddress("Rosewood Street", 1, 1131, "Copenhagen", 122, "Apartment");
-//        ContactAddress office = new ContactAddress("Metalbuen", 2, 7662246, "Ballerup", 123, "Commercial");
-        home = contactAddressGraphRepository.save(home);
-        johnOliver.setHomeAddress(home);
-//        johnOliver.setOfficeAddress(office);
-//        johnOliver.setSecondaryAddress(second);
-//        johnOliver.setPartnerAddress(partner);
-
-        johnOliver.setRequiredEquipmentsList("Oxygen Support, Walk Stick, Other Equipment");
-        johnOliver.setDriverLicenseNumber("ABOC7534");
-        johnOliver.setPlaceOfBirth("Copenhagen");
-        johnOliver.setDoRequireTranslationAssistance(false);
-        johnOliver.setLivesAlone(true);
-        johnOliver.setPeopleInHousehold(false);
-//        Client firstHousehold= new Client();
-//        firstHousehold.setFirstName("Tilde");
-//        firstHousehold.setLastName("O. Sørensen");
-//        firstHousehold.setCprNumber("120943-0416");
-//        firstHousehold
-//        Client secondHousehold= new Client();
-//        secondHousehold.setFirstName("Stine");
-//        secondHousehold.setLastName("Laursen");
-//        secondHousehold .setCprNumber("310849-4742");
-//
-/        johnOliver.setPeopleInHouseholdList(Arrays.asList(firstHousehold,secondHousehold))
-
-
-        johnOliver.setWheelChair(false);
-        johnOliver.setLiftBus(false);
-        johnOliver.setRequire2peopleForTransport(false);
-        johnOliver.setRequireMinibusForTransport(false);
-        johnOliver.setRequireOxygenUnderTransport(true);
-        johnOliver.setPortPhoneNumber("32");
-        johnOliver.setMemberOfDenmark(true);
-        johnOliver.setCitizenGettingPension(true);
-        johnOliver.setCitizenPensionType("Regular");
-        johnOliver.setCitizenTerminal(true);
-        johnOliver.setCitizenTerminalDescription("No Description");
-        johnOliver.setDoesHaveAllergies(false);
-        johnOliver.setDoesHaveDiseases(true);
-        johnOliver.setDoesHaveDiagnoses(false);
-        johnOliver.setClientAllergiesList(null);
-        johnOliver.setClientDiagnoseList(null);
-        johnOliver.setCprNumber("1508574653");
-        johnOliver.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(johnOliver.getCprNumber()));
-        johnOliver.setClientDiagnoseList(Arrays.asList(new ClientDiagnose("Heart Diagnose", " Moderate Condition", "positive", "Eat Healthy"),
-                new ClientDiagnose("Lung Diagnose", " Poor Condition", "positive", "Quit Smoking")));
-        johnOliver.setTranslationLanguage(new String[]{"Danish"});
-        johnOliver.setClientDiseaseList(Arrays.asList(new ClientDisease("Hepatitis B", "Common", "Don't allow Junk food")));
-
-        ClientMinimumDTO minimumDTO = new ClientMinimumDTO();
-        minimumDTO.setFirstName("Kin");
-        minimumDTO.setLastName("yong");
-        minimumDTO.setCprnumber("1106513681");
-        Client nextKin = clientService.createCitizen(minimumDTO, oodlesCityLevel.getId());
-
-        ContactDetail contactDetail = new ContactDetail();
-        contactDetail.setMobilePhone("4566353");
-        contactDetail.setLandLinePhone("223221");
-        contactDetail.setWorkPhone("765436");
-        nextKin.setContactDetail(contactDetail);
-
-//        johnOliver.setNextToKin(nextKin);
-
-        johnOliver.setClientAllergiesList(Arrays.asList(
-                new ClientAllergies("type1 ", "Allergy1", true, new String[]{"Avoid1", "Avoid2", "Avoid3"}
-                )));
-        Client client = clientService.createCitizen(johnOliver);
-        ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, oodlesCityLevel, new DateTime().getMillis());
-        relationService.createRelation(clientOrganizationRelation);
-
-        ClientLanguageRelation clientLanguageRelation = new ClientLanguageRelation();
-        clientLanguageRelation.setClient(client);
-        clientLanguageRelation.setLanguage(danish);
-        clientLanguageRelationGraphRepository.save(clientLanguageRelation);
-
-    }
-*/    private void createCountryLevelOrganization() {
+     private void createCountryLevelOrganization() {
 
         kairosCountryLevel = new OrganizationBuilder().createOrganization();
         kairosCountryLevel.setKairosHub(true);
@@ -613,12 +395,11 @@ public class BootDataService {
 
         // Create AccessGroup for Ulrik as AG_COUNTRY_ADMIN
         createCountryAdminAccessGroup();
-        createEmployment();
+        createPosition();
         createTeam();
 
         linkingOfStaffAndTeam();
         createUnitEmploymentForCountryLevel();
-//        createGroup();
     }
 
     private void createUser() {
@@ -693,7 +474,7 @@ public class BootDataService {
         accessGroupRepository.save(accessGroup);
     }
 
-    private void createEmployment() {
+    private void createPosition() {
         positionForAdmin = new Position("working as country admin", adminAsStaff);
         kairosCountryLevel.getPositions().add(positionForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
@@ -718,21 +499,6 @@ public class BootDataService {
         organizationGraphRepository.save(kairosCountryLevel);
     }
 
-    private void createOodlesDepartments() {
-        Staff hr = new Staff("August");
-        hr.setLastName("Knudsen");
-
-        Staff hrManager = new Staff("Olivia");
-        hrManager.setLastName("Mikkelsen");
-
-        hrDept = new Department();
-        hrDept.setName("Human Resource");
-        hrDept.setTeams(Arrays.asList(hrManager, hr));
-
-
-        oodlesCityLevel.setDepartments(Arrays.asList(hrDept));
-        organizationGraphRepository.save(oodlesCityLevel);
-    }
 
     private void createRegionLevelOrganization() {
 
@@ -766,75 +532,6 @@ public class BootDataService {
         organizationService.createOrganization(kairosRegionLevel, kairosCountryLevel.getId(), true);
 
         //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
-    }
-
-
-    private void createPublicPhoneNumberForCityLevel() {
-        PublicPhoneNumber publicPhoneNumber = new PublicPhoneNumber("7100000000");
-        List<PublicPhoneNumber> publicPhoneNumberList = new ArrayList<PublicPhoneNumber>();
-        publicPhoneNumberList.add(publicPhoneNumber);
-        oodlesCityLevel.setPublicPhoneNumberList(publicPhoneNumberList);
-        organizationGraphRepository.save(oodlesCityLevel);
-    }
-
-    private void createTeamsForCityLevel() {
-        nestingTeam = new Team();
-        nestingTeam.setName("Nesting Team");
-
-        experiencedTeam = new Team();
-        experiencedTeam.setName("Experienced Team");
-        teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
-    }
-
-
-    private void linkingOfStaffAndTeamForCityLevel() {
-        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, almaAsStaff));
-        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, livaAsStaff));
-        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, michalAsStaff));
-    }
-
-    private void createEmploymentForCityLevel() {
-        positionForMichal = new Position("working as visitator", michalAsStaff);
-        positionForLiva = new Position("working as planner", livaAsStaff);
-        positionForAlma = new Position("working as task giver", almaAsStaff);
-        oodlesCityLevel.getPositions().add(positionForMichal);
-        oodlesCityLevel.getPositions().add(positionForLiva);
-        oodlesCityLevel.getPositions().add(positionForAlma);
-        organizationGraphRepository.save(oodlesCityLevel);
-
-    }
-
-    private void createUnitEmploymentForCityLevel() {
-        accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.VISITATOR);
-        UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(oodlesCityLevel);
-        AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        positionForMichal.getUnitPermissions().add(unitPermission);
-        oodlesCityLevel.getPositions().add(positionForMichal);
-
-        accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.TASK_GIVERS);
-        unitPermission = new UnitPermission();
-        unitPermission.setOrganization(oodlesCityLevel);
-        accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(taskGiverAccess);
-        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        positionForAlma.getUnitPermissions().add(unitPermission);
-        oodlesCityLevel.getPositions().add(positionForAlma);
-
-        accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.PLANNER);
-        unitPermission = new UnitPermission();
-        unitPermission.setOrganization(oodlesCityLevel);
-        accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(plannerAccess);
-        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        positionForLiva.getUnitPermissions().add(unitPermission);
-        oodlesCityLevel.getPositions().add(positionForLiva);
-        organizationGraphRepository.save(oodlesCityLevel);
     }
 
     private void createPaymentTypes() {

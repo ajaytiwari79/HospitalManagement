@@ -23,11 +23,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 public class Team extends UserBaseEntity {
 
     private String name;
-
+    private String description;
     /**
      * Specifies if team's address is same as unit's address
      */
-    private boolean hasAddressOfUnit;
 
     @Relationship(type = TEAM_HAS_SKILLS)
     private List<Skill> skillList;
@@ -40,6 +39,14 @@ public class Team extends UserBaseEntity {
 
     private boolean isEnabled = true;
 
+    public Team() {
+    }
+
+    public Team(String name, String description,  ContactAddress contactAddress) {
+        this.name = name;
+        this.description = description;
+        this.contactAddress = contactAddress;
+    }
 
     public List<Skill> getSkillList() {
         return skillList;
@@ -77,14 +84,6 @@ public class Team extends UserBaseEntity {
         return contactAddress;
     }
 
-    public boolean isHasAddressOfUnit() {
-        return hasAddressOfUnit;
-    }
-
-    public void setHasAddressOfUnit(boolean hasAddressOfUnit) {
-        this.hasAddressOfUnit = hasAddressOfUnit;
-    }
-
     public boolean isEnabled() {
         return isEnabled;
     }
@@ -93,13 +92,16 @@ public class Team extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public Team() {
+
+
+    public String getDescription() {
+        return description;
     }
 
-    public Team(String name, boolean hasAddressOfUnit, ContactAddress contactAddress) {
-        this.name = name;
-        this.hasAddressOfUnit = hasAddressOfUnit;
-        this.contactAddress = contactAddress;
+    public void setDescription(String description) {
+        this.description = description;
     }
+
+
 
 }

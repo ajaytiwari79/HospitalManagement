@@ -12,12 +12,10 @@ import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.dto.user.client.Client;
-import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.patient.PatientResourceList;
 import com.kairos.dto.user.staff.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.model.activity.Activity;
@@ -33,27 +31,19 @@ import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
-import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepositoryImpl;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
-import com.kairos.persistence.repository.repository_impl.TaskMongoRepositoryImpl;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.rule_validator.TaskSpecification;
-import com.kairos.rule_validator.task.MergeTaskSpecification;
-import com.kairos.rule_validator.task.TaskDaySpecification;
-import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
 import com.kairos.serializers.MongoDateMapper;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.fls_visitour.schedule.TaskConverterService;
-import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.planner.TasksMergingService;
@@ -63,17 +53,14 @@ import com.kairos.utils.JsonUtils;
 import com.kairos.utils.TaskUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.EscalatedTasksWrapper;
 import com.kairos.wrapper.TaskWrapper;
 import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
 import com.kairos.wrapper.task.TaskClientExceptionWrapper;
 import com.kairos.wrapper.task.TaskGanttDTO;
-import org.apache.poi.ss.usermodel.Cell;
 import org.bson.Document;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -92,7 +79,6 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -113,8 +99,6 @@ import java.util.stream.Stream;
 
 import static com.kairos.constants.AppConstants.CITIZEN_ID;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
-import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.EXCLUDED_EMPLOYEES;
-import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.PREFERRED_EMPLOYEES;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 import static java.time.ZoneId.systemDefault;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -172,13 +156,10 @@ public class TaskService extends MongoBaseService {
         String lookup = "{'$lookup':{'from':'task_types','localField':'taskTypeId','foreignField':'_id','as':'taskTypes'}}";
         String unwind = "{ '$unwind': '$taskTypes'  }";
         String group = "{'$group':{'_id':null, 'taskTypesList':{'$addToSet':'$taskTypes.subServiceId'}}}";
-
-
         Document groupObject = Document.parse(group);
         Document matchServiceObj = Document.parse(matchStaffId);
         Document unwindObj = Document.parse(unwind);
         Document lookObj = Document.parse(lookup);
-
         // Aggregate from DbObjects
         Aggregation aggregation = newAggregation(
                 new CustomAggregationOperation(matchServiceObj),
@@ -187,10 +168,8 @@ public class TaskService extends MongoBaseService {
                 new CustomAggregationOperation(groupObject)
         );
         logger.info("Query: " + aggregation.toString());
-
         // Result
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, TaskDemand.class, Map.class);
-
         // Mapped Result
         List<Map> mappedResult = finalResult.getMappedResults();
         if (mappedResult == null) {
@@ -234,7 +213,6 @@ public class TaskService extends MongoBaseService {
 
         logger.debug("Match Client: " + matchClientObj.toString());
         logger.debug("Match Unit: " + matchUnitObj.toString());
-
         // Aggregate from DbObjects
         Aggregation aggregation = newAggregation(
 
@@ -245,23 +223,16 @@ public class TaskService extends MongoBaseService {
                 new CustomAggregationOperation(sortObj),
                 limit(5 * 10),
                 new CustomAggregationOperation(groupObject)
-
         );
         logger.info("Query: " + aggregation.toString());
-
         // Result
         mongoTemplate.indexOps(Task.class).
                 ensureIndex(new Index().on("taskTypeId", Sort.Direction.ASC));
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, TaskType.class, Map.class);
-
         // Mapped Result
         List<Map> mappedResult = finalResult.getMappedResults();
-
-
         logger.info("Preparing response..");
         for (Map data : mappedResult) {
-            //logger.debug("Data: " + data);
-
             List<Task> taskList = (List<Task>) data.get("taskl");
             if (taskList != null) {
                 response.addAll(taskList);
@@ -269,9 +240,6 @@ public class TaskService extends MongoBaseService {
         }
         return response;
     }
-
-
-
 
     public List<Task> getTasksByDemandId(String taskDemandId) {
         return taskMongoRepository.findAllByTaskDemandIdAndIsDeleted(taskDemandId, false, new Sort(Sort.Direction.ASC, "dateFrom"));
@@ -284,7 +252,6 @@ public class TaskService extends MongoBaseService {
     public Task findBySubTaskIds(String subTaskId) {
         return taskMongoRepository.findBySubTaskIdsAndIsDeleted(subTaskId, false);
     }
-
 
     /**
      * This method is used to create task coming from TimeCare and according to data coming from TimeCare.
@@ -304,10 +271,8 @@ public class TaskService extends MongoBaseService {
             String kmdExternalId = String.valueOf(data.get("kmdExternalId"));
             String lastSyncJobId = String.valueOf(data.get("lastSyncJobId"));
             AbsencePlanningStatus absencePlanningStatus = (AbsencePlanningStatus) data.get("absencePlanningStatus");
-
             Boolean isTaskTypeAnonymous = Boolean.valueOf(String.valueOf(data.get("isTaskTypeAnonymous")));
             Task task;
-
             switch (requestFrom) {
                 case AppConstants.REQUEST_FROM_KMD:
                     task = taskMongoRepository.findByKmdExternalId(kmdExternalId);
@@ -371,24 +336,17 @@ public class TaskService extends MongoBaseService {
             task.setStaffAnonymous(isStaffAnonymous);
             task.setTaskTypeAnonymous(isTaskTypeAnonymous);
             if (kmdExternalId != null) task.setKmdExternalId(kmdExternalId);
-
             save(task);
-
-            //logger.info("Task----- created---> "+task);
-
             return task;
-
         }
         return null;
     }
 
     public List<Map<String, Object>> getStaffTasks(Long staffId, Long organizationId) {
         List<Task> tasks = taskMongoRepository.findByStaffIdAndUnitId(staffId, organizationId);
-        //logger.info("Task----- created---> "+tasks);
         List<Map<String, Object>> mapList = new ArrayList<>();
         for (Task task : tasks) {
             Map<String, Object> map = new HashMap<>();
-            // logger.info("Task---Type id-- ---> "+id);
             map.put("id", task.getId());
             map.put("name", taskTypeMongoRepository.findOne(task.getTaskTypeId()).getTitle());
             map.put("shifts", 1);
@@ -416,61 +374,9 @@ public class TaskService extends MongoBaseService {
         AggregationResults<Map> finalResult =
                 mongoTemplate.aggregate(aggregation, Task.class, Map.class);
         return finalResult.getMappedResults();
-        //  return taskMongoRepository.findByStaffIdAndStartDate(staffId, startDateFrom, startDateTo, new Sort(Sort.Direction.ASC, "startDate"));
     }
 
-
-    public List<Task> findByCitizenId(Long clientId) {
-        return taskMongoRepository.findByCitizenId(clientId);
-    }
-
-    public List<Task> getTaskByClientIdAndDate(DateTime date, Long id) {
-
-        return null;
-    }
-
-    public List<Map> tasksNotUpdatedInLastSync(String jobId) {
-        DateTime startDateFrom = new DateTime(DateUtils.getDate(), DateTimeZone.forTimeZone(TimeZone.getTimeZone("Denmark")));
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(
-                        Criteria.where("lastSyncJobId").ne(jobId).and("isDeleted").is(false).and("timeCareExternalId").exists(true).and("startDate").gte(startDateFrom)
-                )
-        );
-        AggregationResults<Map> finalResult =
-                mongoTemplate.aggregate(aggregation, Task.class, Map.class);
-        return finalResult.getMappedResults();
-    }
-
-    public void deleteTimeCareTask(Task task) {
-        task.setDeleted(true);
-        save(task);
-    }
-
-    public int syncDeleteTask(Date startDate, Date endDate, String fmextID, Map<String, String> flsCredentials) {
-        int workScheduleResult;
-        Boolean sendToFls = false; //Add task to
-        Map<String, Object> workScheduleMetaData = new HashMap<>();
-        workScheduleMetaData.put("fmextID", fmextID);
-        workScheduleMetaData.put("startLocation", 0); //0=Start at home address (default), -1=Start at office address
-        workScheduleMetaData.put("endLocation", 0);
-        workScheduleMetaData.put("type", -1);
-        Map<String, Object> dateTimeInfo = new HashMap<>();
-        dateTimeInfo.put("startDate", startDate); //Assigning Absence starting from tomorrow
-        dateTimeInfo.put("endDate", endDate); //till day after tomorrow
-        dateTimeInfo.put("startTime", 0); //Assigning Absence starting from tomorrow
-        dateTimeInfo.put("endTime", 0); //till day after tomorrow
-        dateTimeInfo.put("startTimeMinute", 0); //Assigning Absence starting from tomorrow
-        dateTimeInfo.put("endTimeMinute", 0); //till day after tomorrow
-        workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo, flsCredentials);
-        return workScheduleResult;
-
-    }
-
-    public Task findByExternalId(String externalId) {
-        return taskMongoRepository.findByExternalId(externalId);
-    }
-
-    public Task findOne(String id) {
+     public Task findOne(String id) {
         return taskMongoRepository.findOne(new BigInteger(id));
     }
 
@@ -497,50 +403,6 @@ public class TaskService extends MongoBaseService {
         }
         returnData.put("TOTAL", counter); // Set total task counter in response
         return returnData;
-    }
-
-    public List getStaffTaskTypes(Object staffId) {
-        logger.info("Fetching tasks for staffId: " + staffId);
-
-        List response = null;
-
-//      String query = "db.tasks.aggregate([{$match:{staffId:6091}},{$lookup:{from:'task_types',localField:'taskTypeId', foreignField:'_id', as:'taskTypes'}},{$unwind:'$taskTypes'},{$group:{_id:null, taskTypesList:{$addToSet:'$taskTypes.title'}}}]).pretty()";
-
-        String matchStaffId = " {'$match':{'staffId' :" + staffId + "}  }";
-        String lookup = "{'$lookup':{'from':'task_types','localField':'taskTypeId','foreignField':'_id','as':'taskTypes'}}";
-        String unwind = "{ '$unwind': '$taskTypes'  }";
-        String group = "{'$group':{'_id':null, 'taskTypesList':{'$addToSet':{'title':'$taskTypes.title','id':'$taskTypes.id', 'color':'$taskTypes.colorForGantt' }}}}";
-        Criteria criteria = Criteria.where("staffId").is(staffId).and("citizenId").ne(0);
-
-
-        Document groupObject = Document.parse(group);
-        Document matchServiceObj = Document.parse(matchStaffId);
-        Document unwindObj = Document.parse(unwind);
-        Document lookObj = Document.parse(lookup);
-
-        // Aggregate from DbObjects
-        Aggregation aggregation = newAggregation(
-                // new CustomAggregationOperation(matchServiceObj),
-                match(criteria),
-                new CustomAggregationOperation(lookObj),
-                new CustomAggregationOperation(unwindObj),
-                new CustomAggregationOperation(groupObject)
-        );
-        logger.debug("Query: " + aggregation.toString());
-
-        // Result
-        AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
-
-        // Mapped Result
-        List<Map> mappedResult = finalResult.getMappedResults();
-        if (mappedResult == null) {
-            return null;
-        }
-        for (Map<String, Object> map : mappedResult) {
-            logger.debug("Data: " + map);
-            response = (List) map.get("taskTypesList");
-        }
-        return response;
     }
 
     public List<String> importShiftsFromTimeCare(GetWorkShiftsFromWorkPlaceByIdResponse timeCareShifts) {
@@ -586,7 +448,6 @@ public class TaskService extends MongoBaseService {
     }
 
     private Shift mapTimeCareShiftDataToKairos(GetWorkShiftsFromWorkPlaceByIdResult timeCareShift, Long workPlaceId) {
-
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         Shift shift = objectMapper.convertValue(timeCareShift, Shift.class);
@@ -622,7 +483,6 @@ public class TaskService extends MongoBaseService {
                 shift.setUnitPositionId(unitPositionDTO.getId());
                 shiftsToCreate.add(shift);
             }
-
         }
         if (!shiftsToCreate.isEmpty()) {
             Set<LocalDateTime> dates = shiftsToCreate.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
@@ -637,306 +497,24 @@ public class TaskService extends MongoBaseService {
     }
 
 
-    /*public boolean createTasksFromTimeCare(GetWorkShiftsFromWorkPlaceByIdResponse shifts,Long controlPanelId){
-
-        //moved code into control panel controller
-         *//*String jobId = controlPanelService.getRecentJobId(controlPanelId);
-         Long unitId = controlPanelService.getControlPanelUnitId(controlPanelId);
-         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);*//*
-
-        ControlPanelDTO controlPanelDTO = controlPanelRestClient.getRequiredControlPanelData(controlPanelId);
-        return   createTasksFromTimeCare(shifts, controlPanelDTO.getJobId(), controlPanelDTO.getFlsCredentails());
-
-    }*/
-
-    /*public Boolean createTasksFromTimeCare(GetWorkShiftsFromWorkPlaceByIdResponse shifts, String jobId, Map<String, String> flsCredentials){
-
-
-        try {
-            logger.info("flsCredentials-----------> " + flsCredentials);
-            for (GetWorkShiftsFromWorkPlaceByIdResult shift : shifts.getGetWorkShiftsFromWorkPlaceByIdResult()) {
-                logger.info("Shift ID getting from Time care is----> " + shift.getId());
-                OrganizationDTO parentOrganization = organizationRestClient.getOrganizationAndStaffByExternalId(shift.getPerson().getParentWorkPlaceId().toString());
-
-                if (parentOrganization != null && shift.getPerson().getParentWorkPlaceId().toString().equals("14") == true) {
-
-                    TimeCareOrganizationDTO timeCareOrganizationDTO = timeCareRestClient.getPrerequisitesForTimeCareTask(shift);
-
-                    OrganizationContactAddress organizationContactData = timeCareOrganizationDTO.getOrganizationContactAddress();
-                    ContactAddressDTO officeAddress = organizationContactData.getContactAddress();
-                    if (officeAddress == null) {
-                        throw new InternalError("organization address is null");
-                    }
-                    ZipCode officeZipCode = organizationContactData.getZipCode();
-
-                    if (officeZipCode == null) {
-                        throw new InternalError("office zip code can not null");
-                    }
-
-                    Boolean isTaskTypeAnonymous = false;
-                    TaskType taskType = taskTypeService.findByExternalId(shift.getActivity().getId());
-                    //logger.info("taskType---------> " + taskType);
-                    if (taskType == null) isTaskTypeAnonymous = true;
-                    // else logger.info("taskType exist---> " + taskType.getId());
-
-                    StaffDTO staff = timeCareOrganizationDTO.getStaff(); // need to change externalId
-                    Boolean isStaffAnonymous = false;
-                    AddressCode startAddress = null;
-                    AddressCode endAddress = null;
-
-                    AbsencePlanningStatus absencePlanningStatus = AbsencePlanningStatus.NOT_SYNCHRONISED;
-
-
-                    if (staff != null && Long.valueOf(staff.getVisitourId()) != null) {
-                        //we should uncomment when Absence Planning functionality completed
-                        int returnedValue = -1;
-                        //Add Engineer to Fls
-                        Map<String, Object> engineerMetaData = new HashMap<>();
-
-                        //General Info
-                        engineerMetaData.put("fmvtid", staff.getVisitourId());    //If the engineer is not found in the VISITOUR database, he will be created, otherwise he will be updated.
-                        engineerMetaData.put("fmextID", staff.getId());   //If the engineer is not found in the VISITOUR database, he will be created, otherwise he will be updated.
-                        engineerMetaData.put("prename", staff.getFirstName());
-                        engineerMetaData.put("name", staff.getLastName());
-                        //Address1 (Home)
-                        //  engineerMetaData.put("scountry", staff.getContactAddress().getCountryId());
-                        engineerMetaData.put("scountry", "DK");
-                        engineerMetaData.put("szip", officeZipCode.getZipCode());
-                        engineerMetaData.put("scity", officeAddress.getCity());
-                        engineerMetaData.put("sstreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
-
-                        //Address2 (Office)
-                        engineerMetaData.put("ecountry", "DK");
-                        engineerMetaData.put("ezip", officeZipCode.getZipCode());
-                        engineerMetaData.put("ecity", officeAddress.getCity());
-                        engineerMetaData.put("estreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
-
-                        //Contact Data
-                        engineerMetaData.put("email", staff.getEmail());
-
-
-                        returnedValue = scheduler.createEngineer(engineerMetaData, flsCredentials);
-                    } else {
-                        isStaffAnonymous = true;
-
-                    }
-
-                    int workScheduleResult;
-                    Boolean sendToFls = false; //Add task to
-                    Map<String, Object> workScheduleMetaData = new HashMap<>();
-                    Map<String, Object> dateTimeInfo = new HashMap<>();
-                    Date reducedEndTime = DateUtils.getDeductionInTimeDuration(shift.getStartDateTime(), shift.getEndDateTime(), parentOrganization.getDayShiftTimeDeduction(), parentOrganization.getNightShiftTimeDeduction());
-                    dateTimeInfo.put("startDate", shift.getStartDateTime()); //Assigning Absence starting from tomorrow
-                    dateTimeInfo.put("endDate", reducedEndTime); //till day after tomorrow
-
-                    if (staff != null) workScheduleMetaData.put("fmextID", staff.getId());
-
-                    Boolean fullDayAbsence = false;
-
-
-                    Map<String, Object> taskMetaData = new HashMap<>();
-                    taskMetaData.put("startDate", shift.getStartDateTime());
-                    taskMetaData.put("endDate", shift.getEndDateTime());
-                    taskMetaData.put("externalId", shift.getId());
-                    taskMetaData.put("organizationId", timeCareOrganizationDTO.getOrganization().getId());
-                    if (isStaffAnonymous == false) {
-                        taskMetaData.put("staffId", staff.getId());
-
-                    } else {
-                        taskMetaData.put("staffAnonymousId", shift.getPersonId());
-                        taskMetaData.put("staffAnonymousGender", shift.getPerson().getGender());
-                        absencePlanningStatus = AbsencePlanningStatus.ERROR;
-                    }
-                    if (isTaskTypeAnonymous == false) {
-                        taskMetaData.put("taskTypeId", taskType.getId());
-                    } else {
-                        taskMetaData.put("taskTypeAnonymousId", shift.getActivityId());
-                        absencePlanningStatus = AbsencePlanningStatus.ERROR;
-                    }
-                    taskMetaData.put("duration", Math.round(shift.getLength()));
-                    taskMetaData.put("isStaffAnonymous", isStaffAnonymous);
-                    taskMetaData.put("isTaskTypeAnonymous", isTaskTypeAnonymous);
-                    taskMetaData.put("absencePlanningStatus", absencePlanningStatus);
-                    taskMetaData.put("updateDate", shift.getUpdateDate());
-                    taskMetaData.put("lastSyncJobId", jobId);
-                    if (startAddress != null && endAddress != null) {
-                        taskMetaData.put("startAddress", startAddress);
-                        taskMetaData.put("endAddress", endAddress);
-                    }
-                    Task task = createTaskFromTimeCare(taskMetaData, AppConstants.REQUEST_FROM_TIME_CARE);
-
-
-                    if (task != null && isStaffAnonymous) {
-                        //        notificationService.addStaffMissingNotification(task, STAFF_MISSING_MESSAGE, STAFF_MISSING_STATUS);
-                    }
-                    if (task != null && isTaskTypeAnonymous) {
-                        //       notificationService.addStaffMissingNotification(task, TASK_TYPE_MISSING_MESSAGE, TASK_TYPE_MISSING_STATUS);
-                    }
-                    if (task != null && task.getAddress() == null) {
-                        //       notificationService.addStaffMissingNotification(task, LOCATION_MISSING_MESSAGE, LOCATION_MISSING_STATUS);
-                    }
-
-                    //When shift is of type Full day Absence or Presence we need to update Engineer's Working hours
-                    if (taskType != null && isStaffAnonymous == false) {
-
-                        //CASE1 FULL DAY ABSENCE TASKS
-                        if (taskType.getTaskTypeSchedule().equals(AppConstants.FULL_DAY) && taskType.getTaskTypeVisibility().equals(AppConstants.ABSENT)) {
-                            //   logger.info(" Activity is of type Full Day Absence");
-                            AbsenceTypes absenceTypes = timeCareOrganizationDTO.getAbsenceTypes();
-                            //    logger.info("Absence Types------------> " + absenceTypes.getATVTID());
-                            workScheduleMetaData.put("type", absenceTypes.getATVTID());
-                            //  else workScheduleMetaData.put("type", absenceTypes.getATVTID());b   .;l;4
-
-                            //Ranging 1-40 : Whole day absence according to the VISITOUR master data, eg. holiday, illness.
-                            workScheduleMetaData.put("info", "Testing Absence");
-                            workScheduleMetaData.put("startLocation", 0); //0=Start at home address (default), -1=Start at office address
-                            workScheduleMetaData.put("endLocation", 0);
-                            startAddress = AddressCode.HOME;
-                            endAddress = AddressCode.HOME;
-                            sendToFls = true;
-                            fullDayAbsence = true;
-                        }
-
-                        //CASE2 PARTIAL DAY ABSENCE
-                        if (taskType.getTaskTypeSchedule().equals(AppConstants.PARTIALLY) && taskType.getTaskTypeVisibility().equals(AppConstants.ABSENT)) {
-                            //   logger.info("Partially absent case--------!!! ");
-                            sendToFls = true;
-                        }
-
-                        //CASE3 Presence
-                        if (taskType.getTaskTypeVisibility().equals(AppConstants.PRESENT)) {
-                            //   logger.info(" Activity is of type Presence");
-                            workScheduleMetaData.put("type", -1);
-                            //   workScheduleMetaData.put("type", 0); //Ranging 1-40 : Whole day absence according to the VISITOUR master data, eg. holiday, illness.
-                            workScheduleMetaData.put("info", "Testing Available");
-                            sendToFls = true;
-                            workScheduleMetaData.put("startLocation", -1); //0=Start at home address (default), -1=Start at office address
-                            workScheduleMetaData.put("endLocation", -1);
-                            DateTime startDateTime = new DateTime(shift.getStartDateTime()).toDateTime(DateTimeZone.UTC);
-                            DateTime endDateTime = new DateTime(reducedEndTime).toDateTime(DateTimeZone.UTC);
-                            dateTimeInfo.put("startTime", startDateTime.hourOfDay().get()); //Assigning Absence starting from tomorrow
-                            dateTimeInfo.put("endTime", endDateTime.hourOfDay().get()); //till day after tomorrow
-                            dateTimeInfo.put("startTimeMinute", startDateTime.minuteOfHour().get()); //Assigning Absence starting from tomorrow
-                            dateTimeInfo.put("endTimeMinute", endDateTime.minuteOfHour().get()); //till day after tomorrow
-                            startAddress = AddressCode.UNIT;
-                            endAddress = AddressCode.UNIT;
-
-                        }
-
-
-                        if (sendToFls) {
-                            //     logger.info("fullDayAbsence-------------> " + fullDayAbsence);
-                            if (!fullDayAbsence) {
-                                DateTime shiftStartDate = new DateTime(shift.getStartDateTime()).toDateTime(DateTimeZone.UTC);
-                                List<Map> tasks = findByStaffIdAndStartDate(staff.getId(), shiftStartDate);
-                                logger.info("Tasks of this date " + shiftStartDate + " of Staff name--> " + staff.getFirstName() + " " + staff.getLastName() + " is " + tasks.size());
-                                if (tasks.size() != 0) {
-                                    Task firstTaskOfDay = (Task) findOne(String.valueOf(tasks.get(0).get("_id")));
-                                    Task lastTaskOfDay = findOne(String.valueOf(tasks.get(tasks.size() - 1).get("_id")));
-                                    DateTime startDateTime = new DateTime(firstTaskOfDay.getStartDate()).toDateTime(DateTimeZone.UTC);
-                                    logger.info("startDateTime-------------> " + startDateTime);
-                                    reducedEndTime = DateUtils.getDeductionInTimeDuration(firstTaskOfDay.getStartDate(), lastTaskOfDay.getEndDate(), parentOrganization.getDayShiftTimeDeduction(), parentOrganization.getNightShiftTimeDeduction());
-
-                                    DateTime endDateTime = new DateTime(reducedEndTime).toDateTime(DateTimeZone.UTC);
-                                    logger.info("reducedEndTime--------------> " + endDateTime);
-                                    logger.info("endDateTime--------------> " + new DateTime(lastTaskOfDay.getEndDate()).toDateTime(DateTimeZone.UTC));
-                                    dateTimeInfo.put("startTime", startDateTime.hourOfDay().get());
-                                    dateTimeInfo.put("startTimeMinute", startDateTime.minuteOfHour().get());
-                                    if (startDateTime.getDayOfMonth() != endDateTime.getDayOfMonth() && endDateTime.hourOfDay().get() == 0 && endDateTime.minuteOfHour().get() == 0) {
-                                        dateTimeInfo.put("endDate", shift.getEndDate());
-                                        dateTimeInfo.put("endTime", 23);
-                                        dateTimeInfo.put("endTimeMinute", 59);
-                                        dateTimeInfo.put("startTimeSeconds", 0);
-                                        dateTimeInfo.put("endTimeSeconds", 59);
-                                    } else {
-                                        dateTimeInfo.put("endTime", endDateTime.hourOfDay().get());
-                                        dateTimeInfo.put("endTimeMinute", endDateTime.minuteOfHour().get());
-                                    }
-                                }
-                            }
-                            //     logger.info("workScheduleMetaData-------------> " + workScheduleMetaData);
-                            //    logger.info("dateTimeInfo--------------> " + dateTimeInfo);
-
-                            //   workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo);
-                            //    logger.info("workScheduleResult------------------> " + workScheduleResult);
-
-
-                            workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo, flsCredentials);
-
-                            //     logger.info("workScheduleResult------------------> " + workScheduleResult);
-
-                            //if tasks get deleted from FLS
-       *//*     Thread.sleep(2000);
-            List<Map> nonSyncTasks = taskService.tasksNotUpdatedInLastSync(jobId.toString());
-            logger.info("nonSyncTasks------in last job---> "+nonSyncTasks.size());
-            if(nonSyncTasks != null) {
-                for (Map task : nonSyncTasks) {
-                    Task nonSyncTask = (Task) taskService.findByExternalId(String.valueOf(task.get("externalId")));
-                    String staffId = String.valueOf(nonSyncTask.getStaff());
-                    DateTime nonSyncTaskDate = new DateTime(nonSyncTask.getStartDate());
-                    Date startDate = nonSyncTask.getStartDate();
-                    Date endDate = nonSyncTask.getEndDate();
-                    taskService.deleteTimeCareTask(nonSyncTask);
-                    List<Map> tasks = taskService.findByStaffIdAndStartDate(Long.valueOf(staffId), nonSyncTaskDate);
-                    if(tasks.size() == 0)  taskService.syncDeleteTask(startDate, endDate, staffId, null);
-
-                }
-            }*//*
-
-                        }
-                    } else {
-                        logger.info("TaskType " + shift.getActivity().getName() + " not found for this shift " + shift.getId() + " , please add this taskType in Kairos!! ");
-                    }
-                }
-            }
-            return true;
-        } catch (ParseException parseException) {
-            return false;
-        }
-    }*/
-
     public void syncFourthWeekTasks(LocalDateTime startDate) {
-
         logger.info("SyncFourthWeekTasks Job starting at" + LocalDateTime.now());
-
-            /*LocalDate today = LocalDate.now();
-            LocalDate fourthWeekStartDate = today.plusDays(22);
-            LocalDate fourthWeekEndDate = today.plusDays(28);*/
-
-        /*LocalDate fourthWeekStartDate = LocalDate.of(2017, 07, 10);
-        logger.info("fourthWeekStartDate " + fourthWeekStartDate);
-        LocalDate fourthWeekEndDate = LocalDate.of(2017, 07, 10);
-        logger.info("fourthWeekEndDate " + fourthWeekEndDate);*/
-
-        /*Date fromDate = Date.from(fourthWeekStartDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date toDate = Date.from(fourthWeekEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant());*/
-
         LocalDateTime localDateFrom = startDate;
         LocalDateTime localDateTo = localDateFrom.plusDays(1);
-
-
         for (int i = 1; i <= 7; i++) {
-
             logger.debug("LocalDateFrom " + localDateFrom);
             logger.debug("LocalDateTo   " + localDateTo);
-
             Date fromDate = Date.from(localDateFrom.atZone(ZoneId.systemDefault()).toInstant());
             Date toDate = Date.from(localDateTo.atZone(ZoneId.systemDefault()).toInstant());
-
-
             Criteria criteria = Criteria.where("visitourId").exists(false).orOperator(Criteria.where("visitourId").is(null));
             criteria.and("dateFrom").gte(fromDate).and("dateTo").lt(toDate).and("isSubTask").is(false).and("isDeleted").is(false);
             criteria.and("taskOriginator").is(TaskTypeEnum.TaskOriginator.PRE_PLANNING).and("taskStatus").ne(TaskStatus.CANCELLED);
-
             String lookup = "{'$lookup':{'from':'task_types','localField':'taskTypeId','foreignField':'_id','as':'taskTypeList'}}";
             String unwind = "{ '$unwind': '$taskTypeList'  }";
             String group = "{'$group':{'_id':'$taskTypeList.organizationId', 'taskList':{'$push':'$$ROOT'}}}";
-
             Document groupObject = Document.parse(group);
             Document unwindObj = Document.parse(unwind);
             Document lookObj = Document.parse(lookup);
-
-
             // Aggregate from DbObjects
             Aggregation aggregation = newAggregation(
                     match(criteria),
@@ -945,31 +523,19 @@ public class TaskService extends MongoBaseService {
                     new CustomAggregationOperation(groupObject)
             );
             logger.debug("SyncFourthWeekTasks Job  Query: " + aggregation.toString());
-
-            // Result
             AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
-
             List<Map> taskListWithUnitIdGroup = finalResult.getMappedResults();
-
             for (Map<String, Object> map : taskListWithUnitIdGroup) {
-
                 Map<String, String> flsCredentials = getFLS_Credentials((long) map.get("_id"));
-
                 if (flsCredentials.get("flsDefaultUrl") != "" && flsCredentials.get("userpassword") != "") {
-
-                    //List tasks = new ArrayList();
                     List tasks = (List) map.get("taskList");
-                    //tasks.addAll(existingList);
-
                     List<Task> tasksToSync = new ArrayList<>();
                     for (Object object : tasks) {
                         ObjectMapper mapper = new ObjectMapper();
                         Task task = mapper.convertValue(object, Task.class);
                         tasksToSync.add(task);
                     }
-
                     logger.debug("tasksToSync: size " + tasksToSync.size());
-
                     if (tasksToSync.size() > 0) {
                         taskConverterService.createFlsCallFromTasks(tasksToSync, flsCredentials);
 
@@ -984,11 +550,9 @@ public class TaskService extends MongoBaseService {
                     logger.info("FLS Credentials Missing for Unit Id " + map.get("_id"));
                 }
             }
-
             localDateFrom = localDateFrom.plusDays(1);
             localDateTo = localDateTo.plusDays(1);
         }
-
     }
 
     /**
@@ -998,12 +562,6 @@ public class TaskService extends MongoBaseService {
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
         Map<String, String> flsCredential = userIntegrationService.getFLS_Credentials(organizationId);
-       /* Visitour visitour = visitourGraphRepository.findByOrganizationId(organizationId);
-        Map<String, String> credentials = new HashMap<>();
-        String url = (visitour != null) ? visitour.getServerName() : "";
-        String userPass = (visitour != null) ? visitour.getUsername() + ":" + visitour.getPassword() : "";
-        credentials.put("flsDefaultUrl", url);
-        credentials.put("userpassword", userPass);*/
         return flsCredential;
     }
 
@@ -1034,20 +592,15 @@ public class TaskService extends MongoBaseService {
                     task.setStatus(task.getStatus());
 
             }
-            // task.setStaff(Long.parseLong(receivedTask.getFMExtID() != null ? receivedTask.getFMExtID() : "-1"));
             Optional<String> receivedTaskOptional = Optional.ofNullable(receivedTask.getFMExtID());
-
             if (receivedTaskOptional.isPresent()) {
                 List<Long> assingedStaffIds = Stream.of(receivedTaskOptional.get().split(",")).map(Long::parseLong).collect(Collectors.toList());
                 task.setAssignedStaffIds(assingedStaffIds);
             } else {
                 task.setAssignedStaffIds(Collections.EMPTY_LIST);
             }
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            logger.info("privious start date" + task.getStartDate());
             task.setDateFrom(receivedTask.getEarliestStartTime());
             task.setExecutionDate(receivedTask.getLatestStartTime());
-            logger.info("new start date" + task.getStartDate());
             Calendar cal = Calendar.getInstance();
             cal.setTime(receivedTask.getLatestStartTime());
             cal.add(Calendar.MINUTE, receivedTask.getPlannedDuration());
@@ -1072,12 +625,10 @@ public class TaskService extends MongoBaseService {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", task.getId());
                 map.put("name", taskTypeMongoRepository.findOne(demand.getTaskTypeId()).getTitle());
-                // map.put("shifts", task.getTaskFrequency());
                 map.put("start", task.getStartDate());
                 map.put("taskTypeId", demand.getTaskTypeId());
                 map.put("end", task.getEndDate());
                 map.put("citizenId", task.getCitizenId());
-                //map.put("organizationId", task.getUnitID());
                 mapList.add(map);
             }
         }
@@ -1092,26 +643,21 @@ public class TaskService extends MongoBaseService {
     }
 
     private TaskGanttDTO customTask(Task task) {
-
-
         ObjectMapper objectMapper = new ObjectMapper();
         TaskGanttDTO taskGanttDTO = objectMapper.convertValue(task, TaskGanttDTO.class);
         taskGanttDTO.setTaskTypeIconUrl(envConfig.getServerHost() + FORWARD_SLASH + "cleaningIcon.png");
         Date resourceDate;
         if (task.getTaskStatus() == TaskStatus.PLANNED) {
             resourceDate = task.getExecutionDate();
-
         } else {
             resourceDate = task.getDateFrom();
             resourceDate.setHours(task.getTimeFrom().getHours());
             resourceDate.setMinutes(task.getTimeFrom().getMinutes());
             resourceDate.setSeconds(0);
         }
-
         if (!task.isSingleTask() && task.getActualPlanningTask() != null) {
             taskGanttDTO.setEditable(false);
         }
-
         taskGanttDTO.setResource(resourceDate);
         taskGanttDTO.setLocationChanged(task.isLocationChanged());
         if (Optional.ofNullable(task.getTaskTypeId()).isPresent()) {
@@ -1122,11 +668,8 @@ public class TaskService extends MongoBaseService {
                     taskGanttDTO.setChangeLocationNotAllowed(taskTypeDefination.isHasPrimaryAddress());
             }
         }
-
-
         taskGanttDTO.setStartHour(resourceDate.getHours());
         taskGanttDTO.setStartMinute(resourceDate.getMinutes());
-
         resourceDate = DateUtils.addMinutes(resourceDate, task.getDuration());
         taskGanttDTO.setEndHour(resourceDate.getHours());
         taskGanttDTO.setEndMinute(resourceDate.getMinutes());
@@ -1139,21 +682,16 @@ public class TaskService extends MongoBaseService {
     public List<TaskGanttDTO> customizeTaskData(List<Task> taskList) {
         List<TaskGanttDTO> responseList = new ArrayList<>();
         for (Task task : taskList) {
-
             TaskGanttDTO response = customTask(task);
-
             List<TaskGanttDTO> customSubTaskList = new ArrayList<>();
             if (task.getSubTaskIds() != null && task.getSubTaskIds().size() > 0) {
                 List<Task> subTasks = taskMongoRepository.findByIdIn(task.getSubTaskIds(), new Sort(Sort.Direction.ASC, "timeFrom"));
-
                 for (Task subTask : subTasks) {
                     TaskGanttDTO subTaskResponse = customTask(subTask);
                     customSubTaskList.add(subTaskResponse);
                 }
             }
-
             response.setSubTasks(customSubTaskList);
-
             responseList.add(response);
         }
         return responseList;
@@ -1208,24 +746,6 @@ public class TaskService extends MongoBaseService {
 
     }
 
-    @Scheduled(cron = "0 15 10 ? * *")
-    public void generateTaskFromScheduler() {
-        List<TaskDemand> taskDemands = taskDemandMongoRepository.getTaskDemandWhichTaskCreatedTillDateNotNull();
-        LocalDate now = LocalDate.now();
-        Date toDate = Date.from(now.plusMonths(1).atStartOfDay(systemDefault()).toInstant());
-        Date fromDate = Date.from(now.minusMonths(11).atStartOfDay(systemDefault()).toInstant());
-        /* while(dbCursor.hasNext()){
-             DBObject dbObject = dbCursor.next();
-             ObjectMapper objectMapper = new ObjectMapper();
-             TaskDemand taskDemand = objectMapper.convertValue(dbObject, TaskDemand.class);
-             createNewTasksOfGivenTaskDemandsAndBetweenDates( taskDemand, fromDate, toDate);
-         }*/
-        for (TaskDemand taskDemand : taskDemands) {
-            createNewTasksOfGivenTaskDemandsAndBetweenDates(taskDemand, fromDate, toDate);
-        }
-
-    }
-
     private void createNewTasksOfGivenTaskDemandsAndBetweenDates(TaskDemand taskDemand, Date fromDate, Date toDate) {
         List<Task> tasks = taskMongoRepository.findAllByTaskDemandAndBetweenDates(taskDemand.getId().longValue(), fromDate, toDate);
         List<Task> updatedTasks = new ArrayList<Task>();
@@ -1234,8 +754,6 @@ public class TaskService extends MongoBaseService {
         });
         if (!updatedTasks.isEmpty()) save(updatedTasks);
         updatedTasks.clear();
-
-
     }
 
 
@@ -1247,7 +765,6 @@ public class TaskService extends MongoBaseService {
      * this method is called from user micro service
      */
     public boolean updateTaskForStaff(Long staffId, Long anonymousStaffId) {
-
         List<Task> tasks = taskMongoRepository.findByStaffAnonymousId(anonymousStaffId);
         if (tasks != null) {
             for (Task task : tasks) {
@@ -1258,26 +775,7 @@ public class TaskService extends MongoBaseService {
             }
         }
         return true;
-
     }
-
-    /**
-     * @param staffId
-     * @return
-     * @auther anil maurya
-     */
-    public Map<String, Object> getStaffTasks(Long staffId) {
-
-        List taskTypeData = getStaffTaskTypes(staffId);
-        if (taskTypeData != null) {
-            Map<String, Object> completeData = new HashMap<>();
-            completeData.put("taskTypes", taskTypeData);
-            logger.info("Complete data: " + completeData);
-            return completeData;
-        }
-        return null;
-    }
-
 
     /**
      * @param staffId
@@ -1286,7 +784,6 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      * This method is use in citizen controller
      */
-
     public void createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId) {
         try {
             TaskType taskType = taskTypeService.findByExternalId("6123");
@@ -1320,7 +817,6 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      * this method come from citizen service bcs its performing action on task
      */
-
     public void getTasks(Long filterId, Long unitId) {
         RestTemplate loginTemplate = new RestTemplate();
         HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
@@ -1328,10 +824,8 @@ public class TaskService extends MongoBaseService {
         loginTemplate.getMessageConverters().add(formHttpMessageConverter);
         loginTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
         loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        //   headers.add("Content-Type" , "application/json");
         logger.info("Auth token--------> " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         Map map = new HashMap<String, String>();
         map.put("Content-Type", "application/json");
@@ -1348,7 +842,6 @@ public class TaskService extends MongoBaseService {
             Integer grantCount = 0;
             TaskDemand taskDemand = null;
             Client citizen = null;
-            // Staff staff = null;
             List<Long> staffIds = new ArrayList<>();
             TaskAddress taskAddress = createTaskAddress(kmdTask);
             List<String> taskIds = new ArrayList<>();
@@ -1357,20 +850,13 @@ public class TaskService extends MongoBaseService {
                     for (Grants grants : patientResourceList.getGrants()) {
                         String grantId = grants.getId();
                         taskDemand = taskDemandMongoRepository.findByKmdExternalId(String.valueOf(grantId));
-                        //citizen = clientGraphRepository.findOne(taskDemand.getCitizenId());
                         if (citizen == null) return;
                         TaskType taskType = taskTypeMongoRepository.findOne(taskDemand.getTaskTypeId());
                         if (taskDemand == null) return;
                         grantCount += 1;
-                        String staffExternalId = kmdTask.getResourceId();
-                        staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:") + 13);
-                        //anil me will use rest template here
-                        //staff = staffGraphRepository.findByKmdExternalId(Long.valueOf(staffExternalId));
-                        // staffIds.add(staff.getId());
                         Task task = createKMDPlannedTask(kmdTask, taskType, taskDemand, taskAddress, staffIds);
                         taskIds.add(task.getId().toString());
                     }
-
                 }
                 if (grantCount > 1) {
                     String uniqueID = UUID.randomUUID().toString();
@@ -1382,18 +868,12 @@ public class TaskService extends MongoBaseService {
                         logger.warn("Exception occurs while merging Imported KMD Tasks----> " + exception.getMessage());
                     }
                 }
-
             }
-
         }
-
     }
-
 
     public Task createKMDPlannedTask(ImportTaskDTO kmdTask, TaskType taskType, TaskDemand taskDemand,
                                      TaskAddress taskAddress, List<Long> staffIds) {
-        //Single task
-
         Task task = findByKmdTaskExternalId(kmdTask.getId());
         if (task == null) task = new Task();
         task.setTaskOriginator(TaskTypeEnum.TaskOriginator.PRE_PLANNING);
@@ -1437,7 +917,6 @@ public class TaskService extends MongoBaseService {
         taskAddress.setStreet(street);
         taskAddress.setHouseNumber(hnr);
         return taskAddress;
-
     }
 
     public TaskClientExceptionWrapper getUnhandledTasksOfCurrentWeek(long citizendId, long unitId) {
@@ -1453,7 +932,6 @@ public class TaskService extends MongoBaseService {
         taskClientExceptionWrapper.setClientExceptions(clientExceptions);
         taskClientExceptionWrapper.setTasks(tasks);
         return taskClientExceptionWrapper;
-
     }
 
     public Task assignGivenTaskToUser(BigInteger taskId) {
@@ -1467,63 +945,8 @@ public class TaskService extends MongoBaseService {
         return pickTask;
     }
 
-    public void validateTask(Task task) {
-        TaskType taskType = taskTypeMongoRepository.findOne(task.getTaskTypeId());
-        TaskSpecification<Task> mergeTaskSpecification = new MergeTaskSpecification(taskType.isMainTask());
-        boolean excludeEmployees = taskType.getEmployees().contains(EXCLUDED_EMPLOYEES);
-        boolean preferredEmployees = taskType.getEmployees().contains(PREFERRED_EMPLOYEES);
-        TaskSpecification<Task> taskStaffSpecification = new TaskStaffTypeSpecification(excludeEmployees, preferredEmployees);
-
-        List<DayType> dayTypes = userIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
-
-        Set<Day> days = new HashSet<>();
-        for (DayType dayType : dayTypes) {
-            days.addAll(dayType.getValidDays());
-        }
-        TaskSpecification<Task> taskDaySpecification = new TaskDaySpecification(days);
-        TaskSpecification<Task> taskSpecification = taskDaySpecification.and(taskStaffSpecification).or(mergeTaskSpecification);
-    }
-
-
-    private Double getValue(Cell cell){
-        Double value = null;
-        if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
-            value =  cell.getNumericCellValue();
-        }else {
-            value = new Double(cell.getStringCellValue().replaceAll(",","."));
-
-        }
-        return value;
-    }
-
-    /*private List<Task> getVrpTasksByRows(List<Row> rows, Long unitId){
-        List<VRPClientDTO> vrpClientDTOS = vrpRestClient.getAllVRPClient();
-        Map<Integer,Long> installationAndCitizenId = vrpClientDTOS.stream().collect(Collectors.toMap(c->c.getInstallationNumber(),c->c.getId()));
-        List<Task> tasks = new ArrayList<>();
-        for (int i = 2;i<rows.size();i++){
-            Row row = rows.get(i);
-            Task task = new Task();
-            TaskAddress taskAddress = new TaskAddress();
-            taskAddress.setLatitude(getConstraintValue(row.getCell(14)).toString());
-            taskAddress.setLongitude(getConstraintValue(row.getCell(14)).toString());
-            taskAddress.setCity(row.getCell(13).getStringCellValue());
-            taskAddress.setFloorNumber((int) row.getCell(10).getNumericCellValue());
-            taskAddress.setHouseNumber( ""+row.getCell(8).getNumericCellValue());
-            taskAddress.setZip(new Integer(row.getCell(12).getStringCellValue()));
-            taskAddress.setStreet(row.getCell(7).getStringCellValue());
-            taskAddress.setBlock(row.getCell(9).getStringCellValue());
-            task.setAddress(taskAddress);
-            task.setInstallationNumber(getConstraintValue(row.getCell(5)).intValue());
-            task.setDuration((int) row.getCell(0).getNumericCellValue());
-            task.setCitizenId(installationAndCitizenId.get(task.getInstallationNumber()));
-            task.setUnitId(unitId);
-            tasks.add(task);
-        }
-        return tasks;
-    }*/
 
     public Boolean importTask(Long unitId, List<VRPTaskDTO> taskDTOS){
-        // List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
         Set<String> skills = taskDTOS.stream().map(t->t.getSkill()).collect(Collectors.toSet());
         List<TaskType> taskTypes = taskTypeMongoRepository.findByName(unitId,new ArrayList<>(skills));
         Map<String,BigInteger> taskTypeIds = taskTypes.stream().collect(Collectors.toMap(t->t.getTitle(),t->t.getId()));
@@ -1546,15 +969,12 @@ public class TaskService extends MongoBaseService {
 
     public List<VRPTaskDTO> getAllTask(Long unitId){
         List<VRPTaskDTO> tasks = taskMongoRepository.getAllTasksByUnitId(unitId);
-        //return ObjectMapperUtils.copyPropertiesOfListByMapper(tasks,TaskDTO.class);
         return tasks;//new ArrayList<>();
-
     }
 
     public TaskDTO getTask(BigInteger taskId){
         Task task = taskMongoRepository.findOne(taskId);
         return ObjectMapperUtils.copyPropertiesByMapper(task,TaskDTO.class);
     }
-
 
 }

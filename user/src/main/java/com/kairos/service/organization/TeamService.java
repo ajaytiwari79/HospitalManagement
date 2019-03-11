@@ -2,13 +2,13 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -21,7 +21,9 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.FormatUtil;
+import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,118 +61,96 @@ public class TeamService {
     private ExceptionService exceptionService;
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private SkillService skillService;
 
-
-    public Map<String, Object> createTeam(Long unitId, TeamDTO teamDTO) {
-        // Long orgId = organizationService.getOrganizationIdByTeamIdOrGroupIdOrOrganizationId(type, unitId);
+    public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
 
         OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByOrganizationId(unitId);
         if (organizationContactAddress.getOrganization() == null) {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound.by.group");
         }
-
-        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, teamDTO.getId() != null ? teamDTO.getId() : -1L, "(?i)" + teamDTO.getName());
+        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
         if (teamExistInOrganizationAndGroupByName) {
             exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
         }
 
-        ContactAddress contactAddress = null;
-        ZipCode zipCode = null;
-        Municipality municipality = null;
-        if (!teamDTO.isHasAddressOfUnit()) {
-            LOGGER.info("Setting Contact Address of Team different from Unit");
-            AddressDTO addressDTO = teamDTO.getContactAddress();
-            contactAddress = new ContactAddress();
-            // -------Parse Address from DTO -------- //
-            //ZipCode
-            if (addressDTO.getZipCodeId() == null) {
-                LOGGER.info("No ZipCode value received");
-                return null;
-            }
-            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId(), 0);
-            if (zipCode == null) {
-                exceptionService.dataNotFoundByIdException("message.zipcode.notFound");
-            }
-            if (addressDTO.getMunicipalityId() != null) {
-                municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId(), 0);
-                if (municipality == null) {
-                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
-                }
-                contactAddress.setMunicipality(municipality);
-                Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-                if (geographyData == null) {
-                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
-                }
-                contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-                contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
+        Organization organization = organizationContactAddress.getOrganization();
 
-            }
-            contactAddress.setCity(addressDTO.getCity());
-            contactAddress.setFloorNumber(addressDTO.getFloorNumber());
-            contactAddress.setHouseNumber(addressDTO.getHouseNumber());
-            contactAddress.setStreet(addressDTO.getStreet());
-            contactAddress.setZipCode(zipCode);
-        } else {
-            LOGGER.info("Setting Contact Address of Team same as Unit");
-            if (organizationContactAddress.getOrganization() != null) {
-                contactAddress = organizationContactAddress.getContactAddress();
+        ContactAddress contactAddress;
+        ZipCode zipCode;
+        Municipality municipality;
 
-                zipCode = organizationContactAddress.getZipCode();
-                LOGGER.debug("zip code found is " + zipCode);
-                if (zipCode == null) {
-                    exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
-                }
-                municipality = organizationContactAddress.getMunicipality();
-                if (municipality == null) {
-                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
-
-                }
-                Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-                if (geographyData == null) {
-                    LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
-                }
-                contactAddress = new ContactAddress();
-                contactAddress.setMunicipality(municipality);
-                contactAddress.setLongitude(organizationContactAddress.getContactAddress().getLongitude());
-                contactAddress.setProvince(organizationContactAddress.getContactAddress().getProvince());
-                contactAddress.setRegionName(organizationContactAddress.getContactAddress().getRegionName());
-                contactAddress.setCity(organizationContactAddress.getContactAddress().getCity());
-                contactAddress.setCountry(organizationContactAddress.getContactAddress().getCountry());
-                contactAddress.setZipCode(zipCode);
-                contactAddress.setLatitude(organizationContactAddress.getContactAddress().getLatitude());
-                contactAddress.setHouseNumber(organizationContactAddress.getContactAddress().getHouseNumber());
-                contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
-                contactAddress.setStreetUrl(organizationContactAddress.getContactAddress().getStreetUrl());
-                contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
-                contactAddress.setFloorNumber(organizationContactAddress.getContactAddress().getFloorNumber());
-            }
+        zipCode = organizationContactAddress.getZipCode();
+        LOGGER.debug("zip code found is " + zipCode);
+        if (zipCode == null) {
+            exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
         }
-        contactAddressGraphRepository.save(contactAddress,2);
-        Team team;
-        if (teamDTO.getId() == null) {
-            team = new Team(teamDTO.getName(), teamDTO.isHasAddressOfUnit(), contactAddress);
-        } else {
-            team = teamGraphRepository.findOne(teamDTO.getId());
+        municipality = organizationContactAddress.getMunicipality();
+        if (municipality == null) {
+            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+
+        }
+        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
+        if (geographyData == null) {
+            LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+        }
+        contactAddress = new ContactAddress();
+        contactAddress.setMunicipality(municipality);
+        contactAddress.setLongitude(organizationContactAddress.getContactAddress().getLongitude());
+        contactAddress.setProvince(organizationContactAddress.getContactAddress().getProvince());
+        contactAddress.setRegionName(organizationContactAddress.getContactAddress().getRegionName());
+        contactAddress.setCity(organizationContactAddress.getContactAddress().getCity());
+        contactAddress.setCountry(organizationContactAddress.getContactAddress().getCountry());
+        contactAddress.setZipCode(zipCode);
+        contactAddress.setLatitude(organizationContactAddress.getContactAddress().getLatitude());
+        contactAddress.setHouseNumber(organizationContactAddress.getContactAddress().getHouseNumber());
+        contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
+        contactAddress.setStreetUrl(organizationContactAddress.getContactAddress().getStreetUrl());
+        contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
+        contactAddress.setFloorNumber(organizationContactAddress.getContactAddress().getFloorNumber());
+        contactAddressGraphRepository.save(contactAddress, 2);
+        Team team = new Team(teamDTO.getName(), teamDTO.getDescription(), contactAddress);
+        teamGraphRepository.save(team);
+        teamDTO.setId(team.getId());
+
+        organization.getTeams().add(team);
+        organizationGraphRepository.save(organization, 2);
+        return teamDTO;
+    }
+
+    public TeamDTO updateTeam(Long unitId, Long teamId, TeamDTO teamDTO) {
+        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, teamId, "(?i)" + teamDTO.getName());
+        if (teamExistInOrganizationAndGroupByName) {
+            exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
+        }
+        Team team = teamGraphRepository.findOne(teamId);
+        if (team != null) {
             team.setName(teamDTO.getName());
-            team.setHasAddressOfUnit(teamDTO.isHasAddressOfUnit());
-            team.setContactAddress(contactAddress);
+            team.setDescription(teamDTO.getDescription());
+            teamGraphRepository.save(team);
+        } else {
+            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound");
         }
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", team.getId());
-        response.put("name", team.getName());
-        response.put("contactAddress", new AddressDTO(contactAddress.getId(), contactAddress.getStreet(), contactAddress.getHouseNumber(),contactAddress.getCity(), municipality.getName(), zipCode.getId(), contactAddress.getRegionName(), contactAddress.getProvince(), municipality.getId()));
-        return response;
+        return teamDTO;
     }
 
     public Map<String, Object> getTeams(long unitId) {
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
         Map<String, Object> map = new HashMap<>();
         map.put("teams", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        map.put("staffList", staffPersonalDetailDTOS);
+        map.put("skillList", skillService.getSkillsOfOrganization(unitId));
         return map;
     }
 
-    public boolean deleteTeamByTeamId(long  teamId) {
+    public boolean deleteTeamByTeamId(long teamId) {
         Team team = teamGraphRepository.findOne(teamId);
         if (team != null) {
             team.setEnabled(false);
@@ -239,7 +219,6 @@ public class TeamService {
         }
         return staff;
     }
-
 
 
     public List<Map<String, Object>> getTeamSelectedServices(Long teamId) {
