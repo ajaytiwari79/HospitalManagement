@@ -32,6 +32,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.*;
+
 
 @Service
 public class TimeAndAttendanceService extends MongoBaseService {
@@ -241,7 +243,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     // check out after job run
     public void checkOutBySchedulerJob(Long unitId){
         List<TimeAndAttendance> timeAndAttendances = timeAndAttendanceRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getEndOfDayFromLocalDateTime()));
-        List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(timeAndAttendances.stream().flatMap(timeAndAttendance -> timeAndAttendance.getAttendanceTimeSlot().stream().map(attendanceTimeSlot -> attendanceTimeSlot.getShiftId()).distinct()).collect(Collectors.toList()));
+        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(getDate()),getDate(),unitId);
              Map<BigInteger, Shift> staffIdAndShifts = shifts.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
              timeAndAttendances.forEach(timeAndAttendance -> {
                  if (staffIdAndShifts.get(timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).getShiftId()) != null) {
