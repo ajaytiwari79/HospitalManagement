@@ -51,7 +51,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
         List<UnitPayrollSetting> unitPayrollSettings = new ArrayList<>();
         validatePayrollPeriod(unitPayrollSettingDTO, unitId);
         unitPayrollSettingMongoRepository.findAndDeletePayrollPeriodByUnitIdAndPayrollFrequency(unitId, unitPayrollSettingDTO.getPayrollFrequency());
-        List<LocalDate> payrollStartDates = Arrays.asList(unitPayrollSettingDTO.getStartDate());
+        List<LocalDate> payrollStartDates = new ArrayList<>();
+        payrollStartDates.add(unitPayrollSettingDTO.getStartDate());
         if (unitPayrollSettingDTO.getStartDate().plusYears(1).minusDays(1).isAfter(getlastDayOfYear(unitPayrollSettingDTO.getStartDate()))) {
             payrollStartDates.add(getFirstDayOfNextYear(unitPayrollSettingDTO.getStartDate()));
         }
@@ -145,6 +146,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         return getUnitPayrollSettingData(unitPayrollSettingDTOS);
     }
 
+
     private UnitPayrollSetting updateOldDraftStateOfPayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap, UnitPayrollSetting newUnitPayrollSetting) {
         Map<LocalDate, PayrollPeriod> startDateAndDraftPayrollPeriodMap = newUnitPayrollSetting.getPayrollPeriods().stream().collect(Collectors.toMap(PayrollPeriod::getStartDate, Function.identity()));
         LocalDate payrollStartDate = unitPayrollSettingDTO.getStartDate();
@@ -167,7 +169,6 @@ public class UnitPayrollSettingService extends MongoBaseService {
                 }
             }
             unitPayrollSetting.setPayrollPeriods(startDateAndPayrollPeriodMap.keySet().stream().map(date -> startDateAndPayrollPeriodMap.get(date)).collect(Collectors.toList()));
-            //unitPayrollSettingMongoRepository.save(unitPayrollSetting);
         }
         return unitPayrollSetting;
     }
