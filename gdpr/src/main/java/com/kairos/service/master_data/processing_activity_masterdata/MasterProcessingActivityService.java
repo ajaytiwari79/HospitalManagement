@@ -121,7 +121,7 @@ public class MasterProcessingActivityService{
 
 
     /**
-     * updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
+     * updateExistingAndCreateNewSubProcessingActivity(countryId, unitId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
      * is used for updating and creating new sub processing activity
      *
      * @param countryId

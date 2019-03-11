@@ -30,18 +30,18 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> ,C
     Assessment findByOrganizationIdAndId(Long orgId, Long id);
 
     @Query(value = "SELECT assessment FROM assessment assessment JOIN assessment_assignee_list staff ON assessment.id = assessment_assignee_list.assessment_id WHERE assessment.organization_id = ?1 and staff.staff_id = ?2 and assessment.assessment_status IN (?3)", nativeQuery = true)
-    List<Assessment> getAllAssessmentByUnitIdAndStaffId(Long unitId, Long staffId, List<AssessmentStatus> status);
+    List<Assessment> getAllAssessmentByUnitIdAndStaffId(Long organizationId, Long staffId, List<AssessmentStatus> status);
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.deleted = false")
-    List<Assessment> getAllAssessmentByUnitId(Long unitId);
+    List<Assessment> getAllAssessmentByUnitId(Long organizationId);
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.id = ?2 and assessment.assessmentStatus = ?3 and assessment.deleted = false")
-    Assessment findByUnitIdAndIdAndAssessmentStatus(Long unitId, Long assessmentId, AssessmentStatus status);
+    Assessment findByUnitIdAndIdAndAssessmentStatus(Long organizationId, Long assessmentId, AssessmentStatus status);
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.processingActivity.id = ?2 and assessment.deleted = false")
-    List<Assessment> findAllProcessingActivityAssessmentByActivityIdAndUnitId(Long unitId, Long processingActivityId);
+    List<Assessment> findAllProcessingActivityAssessmentByActivityIdAndUnitId(Long organizationId, Long processingActivityId);
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.asset.id = ?2 and assessment.deleted = false")
-    List<Assessment> findAllAssetAssessmentByAssetIdAndUnitId(Long unitId, Long assetId);
+    List<Assessment> findAllAssetAssessmentByAssetIdAndUnitId(Long organizationId, Long assetId);
 
 }

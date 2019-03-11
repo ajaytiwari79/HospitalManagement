@@ -151,11 +151,11 @@ public class OrganizationAssetTypeService{
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public List<AssetTypeResponseDTO> getAllAssetType(Long organizationId) {
-        List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypesByOrganization(organizationId);
+    public List<AssetTypeResponseDTO> getAllAssetType(Long unitId) {
+        List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypesByOrganization(unitId);
         List<AssetTypeResponseDTO> assetTypesWithAllData = new ArrayList<>();
         for (AssetType assetType : assetTypes) {
             assetTypesWithAllData.add(buildAssetTypeOrSubTypeResponseData(assetType));
@@ -166,11 +166,11 @@ public class OrganizationAssetTypeService{
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public AssetTypeResponseDTO getAssetTypeById(Long organizationId, Long id) {
-        AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
+    public AssetTypeResponseDTO getAssetTypeById(Long unitId, Long id) {
+        AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(id, unitId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", id);
         }
