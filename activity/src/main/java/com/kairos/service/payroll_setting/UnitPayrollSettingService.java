@@ -124,6 +124,10 @@ public class UnitPayrollSettingService extends MongoBaseService {
         return availableDraftPayroll;
     }
 
+    public void addPayrollPeriodInUnitViaJob(PayrollFrequency payrollFrequency){
+
+    }
+
     public List<UnitPayrollSettingDTO> breakPayrollPeriodOfUnit(Long unitId, UnitPayrollSettingDTO unitPayrollSettingDTO) {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByIdAndPayrollFrequency(unitId, unitPayrollSettingDTO.getParentPayrollId(), unitPayrollSettingDTO.getPayrollFrequency());
         if (isNull(unitPayrollSetting)) {

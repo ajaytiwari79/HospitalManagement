@@ -42,4 +42,9 @@ public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollS
         return ObjectMapperUtils.copyPropertiesOfListByMapper(results.getMappedResults(),UnitPayrollSettingDTO.class);
 
     }
+
+    @Override
+    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnits(PayrollFrequency payrollFrequency) {
+        return null;
+    }
 }
