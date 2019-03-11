@@ -45,21 +45,21 @@ public class OrganizationTechnicalSecurityMeasureService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param technicalSecurityMeasureDTOS
      * @return return map which contain list of new TechnicalSecurityMeasure and list of existing TechnicalSecurityMeasure if TechnicalSecurityMeasure already exist
      * @description this method create new TechnicalSecurityMeasure if TechnicalSecurityMeasure not exist with same name ,
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
-    public List<TechnicalSecurityMeasureDTO> createTechnicalSecurityMeasure(Long organizationId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
-        Set<String> existingTechnicalSecurityMeasureNames = technicalSecurityMeasureRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<TechnicalSecurityMeasureDTO> createTechnicalSecurityMeasure(Long unitId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+        Set<String> existingTechnicalSecurityMeasureNames = technicalSecurityMeasureRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> techSecurityMeasureNames = ComparisonUtils.getNewMetaDataNames(technicalSecurityMeasureDTOS,existingTechnicalSecurityMeasureNames );
         List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
         if (!techSecurityMeasureNames.isEmpty()) {
             for (String name : techSecurityMeasureNames) {
                 TechnicalSecurityMeasure securityMeasure = new TechnicalSecurityMeasure(name);
-                securityMeasure.setOrganizationId(organizationId);
+                securityMeasure.setOrganizationId(unitId);
                 technicalSecurityMeasures.add(securityMeasure);
             }
             technicalSecurityMeasureRepository.saveAll(technicalSecurityMeasures);
@@ -71,24 +71,24 @@ public class OrganizationTechnicalSecurityMeasureService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @return list of TechnicalSecurityMeasure
      */
-    public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long unitId) {
+        return technicalSecurityMeasureRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param id             id of TechnicalSecurityMeasure
      * @return object of TechnicalSecurityMeasure
      * @throws DataNotFoundByIdException throw exception if TechnicalSecurityMeasure not exist for given id
      */
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long organizationId, Long id) {
+    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long unitId, Long id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -111,21 +111,21 @@ public class OrganizationTechnicalSecurityMeasureService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param id                          id of TechnicalSecurityMeasure
      * @param technicalSecurityMeasureDTO
      * @return TechnicalSecurityMeasure updated object
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
-    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long organizationId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(organizationId, technicalSecurityMeasureDTO.getName());
+    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long unitId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(unitId, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Technical Security Measure", technicalSecurityMeasure.getName());
         }
-        Integer resultCount = technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, organizationId);
+        Integer resultCount = technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, unitId);
         if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Format", id);
         } else {
@@ -137,9 +137,9 @@ public class OrganizationTechnicalSecurityMeasureService {
     }
 
 
-    public List<TechnicalSecurityMeasureDTO> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long organizationId, List<TechnicalSecurityMeasureDTO> techSecurityMeasureDTOS) {
+    public List<TechnicalSecurityMeasureDTO> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long unitId, List<TechnicalSecurityMeasureDTO> techSecurityMeasureDTOS) {
 
-        List<TechnicalSecurityMeasureDTO> result = createTechnicalSecurityMeasure(organizationId, techSecurityMeasureDTOS);
+        List<TechnicalSecurityMeasureDTO> result = createTechnicalSecurityMeasure(unitId, techSecurityMeasureDTOS);
         technicalSecurityMeasureService.saveSuggestedTechnicalSecurityMeasuresFromUnit(countryId, techSecurityMeasureDTOS);
         return result;
     }

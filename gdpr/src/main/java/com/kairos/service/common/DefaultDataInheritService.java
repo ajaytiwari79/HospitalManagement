@@ -522,7 +522,7 @@ public class DefaultDataInheritService{
             }
             catch(Exception e){
                     e.printStackTrace();
-                    LOGGER.error("Exception while updating country and organizationId of metadata using reflection ::" + e.getMessage());
+                    LOGGER.error("Exception while updating country and unitId of metadata using reflection ::" + e.getMessage());
                     throw new RuntimeException(e);
                 }
 

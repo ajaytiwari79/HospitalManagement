@@ -30,13 +30,13 @@ public interface DataCategoryRepository extends JpaRepository<DataCategory,Long>
 
 
     @Query("Select DC from DataCategory DC where DC.organizationId = ?1 and DC.deleted = false")
-    List<DataCategory> getAllDataCategoriesByUnitId(Long unitId);
+    List<DataCategory> getAllDataCategoriesByUnitId(Long organizationId);
 
     @Query("Select DC from DataCategory DC where DC.countryId = ?1 and DC.id = ?2 and DC.deleted = false")
     DataCategory getDataCategoryByCountryIdAndId(Long countryId, Long id);
 
     @Query("Select DC from DataCategory DC where DC.organizationId = ?1 and DC.id = ?2 and DC.deleted = false")
-    DataCategory getDataCategoryByUnitIdAndId(Long unitId, Long id);
+    DataCategory getDataCategoryByUnitIdAndId(Long organizationId, Long id);
 
     @Query("Select DC from DataCategory DC where DC.id IN (?1) and DC.deleted = false")
     List<DataCategory> getAllDataCategoriesByIds(Set<Long> ids);
