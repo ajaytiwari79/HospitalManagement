@@ -15,8 +15,8 @@ import java.util.List;
 @Entity
 public class AssetType extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty or null")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty or null")
+    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
     private Long organizationId;

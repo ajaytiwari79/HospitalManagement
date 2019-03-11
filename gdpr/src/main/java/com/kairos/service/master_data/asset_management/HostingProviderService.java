@@ -48,7 +48,7 @@ public class HostingProviderService {
         List<HostingProvider> hostingProviders = new ArrayList<>();
         if (!hostingProviderNames.isEmpty()) {
             for (String name : hostingProviderNames) {
-                HostingProvider hostingProvider = new HostingProvider(name, countryId);
+                HostingProvider hostingProvider = new HostingProvider(countryId, name);
                 if (isSuggestion) {
                     hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     hostingProvider.setSuggestedDate(LocalDate.now());

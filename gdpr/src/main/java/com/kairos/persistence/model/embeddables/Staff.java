@@ -19,7 +19,7 @@ public class Staff{
 
     private String lastName;
 
-    @NotBlank(message = "Staff Name can't be empty ")
+    @NotBlank(message = "error.message.staffName.notnull ")
     private String firstName;
 
     public Long getStaffId() { return staffId; }

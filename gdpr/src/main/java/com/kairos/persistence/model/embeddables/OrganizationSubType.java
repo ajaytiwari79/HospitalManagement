@@ -11,7 +11,7 @@ public class OrganizationSubType {
     @NotNull(message = "id can't be null")
     private Long id;
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
     public Long getId() {

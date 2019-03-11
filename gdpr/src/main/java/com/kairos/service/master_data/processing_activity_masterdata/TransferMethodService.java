@@ -50,7 +50,7 @@ public class TransferMethodService {
         List<TransferMethod> transferMethods = new ArrayList<>();
         if (!transferMethodNames.isEmpty()) {
             for (String name : transferMethodNames) {
-                TransferMethod transferMethod = new TransferMethod(name, countryId);
+                TransferMethod transferMethod = new TransferMethod(countryId, name);
                 if (isSuggestion) {
                     transferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     transferMethod.setSuggestedDate(LocalDate.now());

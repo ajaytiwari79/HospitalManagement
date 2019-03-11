@@ -49,7 +49,7 @@ public class AccessorPartyService {
         List<AccessorParty> accessorParties = new ArrayList<>();
         if (!accessorPartyNames.isEmpty()) {
             for (String name : accessorPartyNames) {
-                AccessorParty accessorParty = new AccessorParty(name, countryId);
+                AccessorParty accessorParty = new AccessorParty(countryId, name);
                 if (isSuggestion) {
                     accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     accessorParty.setSuggestedDate(LocalDate.now());

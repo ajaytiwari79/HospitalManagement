@@ -98,7 +98,7 @@ public class DefaultDataInheritService{
     @Inject
     private ResponsibilityTypeRepository responsibilityTypeRepository;
     @Inject
-    private TransferMethodRepository transferMethodMongoRepository;
+    private TransferMethodRepository transferMethodRepository;
     @Inject
     private DataSubjectService dataSubjectService;
     @Inject
@@ -215,9 +215,9 @@ public class DefaultDataInheritService{
             return true;
         };
         Callable<Boolean> transferMethodTask = () -> {
-            List<TransferMethodResponseDTO> transferMethodDTOS = transferMethodMongoRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+            List<TransferMethodResponseDTO> transferMethodDTOS = transferMethodRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
             List transferMethods = prepareMetadataObjectList(unitId,transferMethodDTOS, TransferMethod.class);
-            responsibilityTypeRepository.saveAll(transferMethods);
+            transferMethodRepository.saveAll(transferMethods);
             return true;
         };
         Callable<Boolean> processingActivityTask = () -> {
@@ -487,7 +487,7 @@ public class DefaultDataInheritService{
                 for (T dto : metadataDTOList) {
                     String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dto);
                     Constructor<?> cons = entityClass.getConstructor(argumentType);
-                    baseEntityList.add((BaseEntity)cons.newInstance(name,unitId));
+                    baseEntityList.add((BaseEntity)cons.newInstance(name, unitId));
                 }
             }
         }catch (Exception ex){

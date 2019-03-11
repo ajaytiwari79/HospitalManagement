@@ -45,7 +45,7 @@ public class TechnicalSecurityMeasureService {
         List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
         if (!techSecurityMeasureNames.isEmpty()) {
             for (String name : techSecurityMeasureNames) {
-                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name, countryId);
+                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(countryId, name);
                 if (isSuggestion) {
                     technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
