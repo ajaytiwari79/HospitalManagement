@@ -1,0 +1,21 @@
+db.cTARuleTemplate.find().forEach(function(c) {
+if(!c.plannedTimeIds){
+c.plannedTimeIds = [];
+}
+if(!c.phaseInfo){
+c.phaseInfo = [];
+}
+if(!c.dayTypeIds){
+c.dayTypeIds = [];
+}
+if(!c.timeTypeIds){
+c.timeTypeIds = [];
+}
+if(!c.activityIds){
+c.activityIds = [];
+}
+if(!c.employmentTypes){
+c.employmentTypes = [];
+}
+db.cTARuleTemplate.save(c);
+});

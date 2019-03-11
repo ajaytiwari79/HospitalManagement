@@ -1,9 +1,11 @@
 package com.kairos.service.staffing_level;
 
-import com.kairos.commons.service.locale.LocaleService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
+import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
@@ -12,13 +14,9 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRep
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -33,24 +31,22 @@ import java.util.stream.Stream;
 @Service
 @Transactional
 public class StaffingLevelTemplateService extends MongoBaseService {
-    private Logger logger = LoggerFactory.getLogger(StaffingLevelService.class);
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaffingLevelService.class);
+    @Inject
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
-    @Autowired
+    @Inject
     private UserIntegrationService userIntegrationService;
-    @Autowired
+    @Inject
     private ExceptionService exceptionService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private LocaleService localeService;
 
     /**
      * @param staffingLevelTemplateDTO
      * @return
      */
     public StaffingLevelTemplateDTO createStaffingLevelTemplate(Long unitId,StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
-        logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
+        LOGGER.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
         boolean alreadyExists=staffingLevelTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(staffingLevelTemplateDTO.getName(),unitId);
         if(alreadyExists){
             exceptionService.duplicateDataException("error.name.duplicate",staffingLevelTemplateDTO.getName());
@@ -80,7 +76,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      */
     public StaffingLevelTemplateDTO updateStaffingLevelTemplte(StaffingLevelTemplateDTO staffingLevelTemplateDTO,
                                                            BigInteger staffingTemplateId) {
-        logger.info("updating staffing level Template ID={}", staffingTemplateId);
+        LOGGER.info("updating staffing level Template ID={}", staffingTemplateId);
 
         //validating Activities
         List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
@@ -122,7 +118,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
         List<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toList());
 
-        Optional<DayType> holidayDayType = dayTypes.stream().filter(dayType -> dayType.isHolidayType()).findFirst();
+        Optional<DayType> holidayDayType = dayTypes.stream().filter(DayType::isHolidayType).findFirst();
         LocalDate localDate = DateUtils.asLocalDate(proposedDate);
 
         String day = localDate.getDayOfWeek().name();
