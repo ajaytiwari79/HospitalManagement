@@ -33,65 +33,65 @@ class OrganizationAccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/accessor_party")
-    public ResponseEntity<Object> createAccessorParty(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorParties) {
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorParties) {
         if (CollectionUtils.isEmpty(accessorParties.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(organizationId, accessorParties.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(unitId, accessorParties.getRequestBody()));
 
     }
 
 
     @ApiOperation("get AccessorParty by id")
     @GetMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> getAccessorPartyById(@PathVariable Long organizationId, @PathVariable Long accessorPartyId) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> getAccessorPartyById(@PathVariable Long unitId, @PathVariable Long accessorPartyId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyById(organizationId, accessorPartyId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyById(unitId, accessorPartyId));
     }
 
 
     @ApiOperation("get all AccessorParty ")
     @GetMapping("/accessor_party")
-    public ResponseEntity<Object> getAllAccessorParty(@PathVariable Long organizationId) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> getAllAccessorParty(@PathVariable Long unitId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllAccessorParty(organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllAccessorParty(unitId));
     }
 
     @ApiOperation("delete AccessorParty  by id")
     @DeleteMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long organizationId, @PathVariable Long accessorPartyId) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable Long accessorPartyId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(organizationId, accessorPartyId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(unitId, accessorPartyId));
 
     }
 
     @ApiOperation("update AccessorParty by id")
     @PutMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long organizationId, @PathVariable Long accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long unitId, @PathVariable Long accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(organizationId, accessorPartyId, accessorParty));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(unitId, accessorPartyId, accessorParty));
 
     }
 
 
     @ApiOperation("save accessor party And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/accessor_party/suggest")
-    public ResponseEntity<Object> saveAccessorPartyAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorPartyDTOs) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> saveAccessorPartyAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorPartyDTOs) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.saveAndSuggestAccessorParties(countryId, organizationId, accessorPartyDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.saveAndSuggestAccessorParties(countryId, unitId, accessorPartyDTOs.getRequestBody()));
 
     }
 

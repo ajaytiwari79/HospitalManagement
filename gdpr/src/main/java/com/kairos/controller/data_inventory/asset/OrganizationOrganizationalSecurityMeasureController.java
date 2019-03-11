@@ -34,49 +34,49 @@ class OrganizationOrganizationalSecurityMeasureController {
 
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/organization_security")
-    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
+    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
 
         if (CollectionUtils.isEmpty(orgSecurityMeasures.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(organizationId, orgSecurityMeasures.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(unitId, orgSecurityMeasures.getRequestBody()));
 
     }
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long organizationId, @PathVariable Long orgSecurityMeasureId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureId));
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
     }
 
 
     @ApiOperation("get all OrganizationalSecurityMeasure ")
     @GetMapping("/organization_security")
-    public ResponseEntity<Object> getAllOrganizationalSecurityMeasure(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(organizationId));
+    public ResponseEntity<Object> getAllOrganizationalSecurityMeasure(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
     }
 
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
     @DeleteMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long organizationId, @PathVariable Long orgSecurityMeasureId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureId));
+    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
 
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long organizationId, @PathVariable Long orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureId, orgSecurityMeasure));
+    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId, orgSecurityMeasure));
 
     }
 
 
     @ApiOperation("save Organizational Security measure  And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/organization_security/suggest")
-    public ResponseEntity<Object> saveOrganizationalSecurityMeasureAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.saveAndSuggestOrganizationalSecurityMeasures(countryId, organizationId, orgSecurityMeasureDTOs.getRequestBody()));
+    public ResponseEntity<Object> saveOrganizationalSecurityMeasureAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.saveAndSuggestOrganizationalSecurityMeasures(countryId, unitId, orgSecurityMeasureDTOs.getRequestBody()));
 
     }
 

@@ -42,21 +42,21 @@ public class OrganizationProcessingLegalBasisService{
     private ProcessingActivityRepository processingActivityRepository;
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param legalBasisDTOList
      * @return return map which contain list of new ProcessingLegalBasis and list of existing ProcessingLegalBasis if ProcessingLegalBasis already exist
      * @description this method create new ProcessingLegalBasis if ProcessingLegalBasis not exist with same name ,
      * and if exist then simply add  ProcessingLegalBasis to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingLegalBasis using collation ,used for case insensitive result
      */
-    public List<ProcessingLegalBasisDTO> createProcessingLegalBasis(Long organizationId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
-        Set<String> existingProcessingLegalBasisNames = processingLegalBasisRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<ProcessingLegalBasisDTO> createProcessingLegalBasis(Long unitId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
+        Set<String> existingProcessingLegalBasisNames = processingLegalBasisRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> legalBasisNames = ComparisonUtils.getNewMetaDataNames(legalBasisDTOList,existingProcessingLegalBasisNames );
             List<ProcessingLegalBasis> processingLegalBases = new ArrayList<>();
             if (!legalBasisNames.isEmpty()) {
                 for (String name : legalBasisNames) {
                     ProcessingLegalBasis legalBasis = new ProcessingLegalBasis(name);
-                    legalBasis.setOrganizationId(organizationId);
+                    legalBasis.setOrganizationId(unitId);
                     processingLegalBases.add(legalBasis);
                 }
 
@@ -67,22 +67,22 @@ public class OrganizationProcessingLegalBasisService{
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @return list of ProcessingLegalBasis
      */
-    public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long organizationId) {
-        return processingLegalBasisRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long unitId) {
+        return processingLegalBasisRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id             id of ProcessingLegalBasis
      * @return ProcessingLegalBasis object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ProcessingLegalBasis not found for given id
      */
-    public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, Long id) {
+    public ProcessingLegalBasis getProcessingLegalBasis(Long unitId, Long id) {
 
-        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -90,33 +90,33 @@ public class OrganizationProcessingLegalBasisService{
     }
 
 
-    public Boolean deleteProcessingLegalBasis(Long organizationId, Long legalBasisId) {
+    public Boolean deleteProcessingLegalBasis(Long unitId, Long legalBasisId) {
 
-        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(organizationId, legalBasisId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
         if (!processingActivities.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", StringUtils.join(processingActivities, ','));
         }
-        processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, organizationId);
+        processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, unitId);
         return true;
     }
 
     /***
      * @throws DuplicateDataException throw exception if ProcessingLegalBasis data not exist for given id
-     * @param organizationId
+     * @param unitId
      * @param id id of ProcessingLegalBasis
      * @param legalBasisDTO
      * @return ProcessingLegalBasis updated object
      */
-    public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long organizationId, Long id, ProcessingLegalBasisDTO legalBasisDTO) {
+    public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long unitId, Long id, ProcessingLegalBasisDTO legalBasisDTO) {
 
-        ProcessingLegalBasis processingLegalBasis = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndName(organizationId,  legalBasisDTO.getName());
+        ProcessingLegalBasis processingLegalBasis = processingLegalBasisRepository.findByOrganizationIdAndDeletedAndName(unitId,  legalBasisDTO.getName());
         if (Optional.ofNullable(processingLegalBasis).isPresent()) {
             if (id.equals(processingLegalBasis.getId())) {
                 return legalBasisDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Legal Basis", processingLegalBasis.getName());
         }
-        Integer resultCount =  processingLegalBasisRepository.updateMetadataName(legalBasisDTO.getName(), id, organizationId);
+        Integer resultCount =  processingLegalBasisRepository.updateMetadataName(legalBasisDTO.getName(), id, unitId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", id);
         }else{
@@ -127,9 +127,9 @@ public class OrganizationProcessingLegalBasisService{
 
     }
 
-    public List<ProcessingLegalBasisDTO> saveAndSuggestProcessingLegalBasis(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
+    public List<ProcessingLegalBasisDTO> saveAndSuggestProcessingLegalBasis(Long countryId, Long unitId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
 
-        List<ProcessingLegalBasisDTO> result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
+        List<ProcessingLegalBasisDTO> result = createProcessingLegalBasis(unitId, processingLegalBasisDTOS);
         processingLegalBasisService.saveSuggestedProcessingLegalBasisFromUnit(countryId, processingLegalBasisDTOS);
         return result;
     }

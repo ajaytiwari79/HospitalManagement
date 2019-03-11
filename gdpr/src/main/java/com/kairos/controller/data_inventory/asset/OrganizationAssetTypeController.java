@@ -33,73 +33,73 @@ class OrganizationAssetTypeController {
 
     @ApiOperation("add AssetType")
     @PostMapping("/asset_type")
-    public ResponseEntity<Object> createAssetType(@PathVariable Long organizationId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
+    public ResponseEntity<Object> createAssetType(@PathVariable Long unitId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.createAssetTypeAndAddSubAssetTypes(organizationId, assetTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.createAssetTypeAndAddSubAssetTypes(unitId, assetTypeDTO));
 
     }
 
 
     @ApiOperation("get AssetType by id")
     @GetMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> getAssetType(@PathVariable Long organizationId, @PathVariable Long assetTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAssetTypeById(organizationId, assetTypeId));
+    public ResponseEntity<Object> getAssetType(@PathVariable Long unitId, @PathVariable Long assetTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAssetTypeById(unitId, assetTypeId));
 
     }
 
 
     @ApiOperation("get all AssetType with risk")
     @GetMapping("/asset_type")
-    public ResponseEntity<Object> getAllAssetType(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAllAssetType(organizationId));
+    public ResponseEntity<Object> getAllAssetType(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAllAssetType(unitId));
 
     }
 
 
     @ApiOperation("delete Asset Type by Id")
     @DeleteMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long organizationId, @PathVariable Long assetTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.deleteAssetTypeById(organizationId, assetTypeId));
+    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long unitId, @PathVariable Long assetTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.deleteAssetTypeById(unitId, assetTypeId));
 
     }
 
 
     @ApiOperation("delete Asset Sub type by Id")
     @DeleteMapping("/asset_type/{assetTypeId}/sub_asset_type/{subAssetTypeId}")
-    public ResponseEntity<Object> deleteAssetSubTypeById(@PathVariable Long organizationId, @PathVariable Long assetTypeId, @PathVariable Long subAssetTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.deleteAssetSubTypeById(organizationId, assetTypeId, subAssetTypeId));
+    public ResponseEntity<Object> deleteAssetSubTypeById(@PathVariable Long unitId, @PathVariable Long assetTypeId, @PathVariable Long subAssetTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.deleteAssetSubTypeById(unitId, assetTypeId, subAssetTypeId));
 
     }
 
     @ApiOperation("unlink RISK From Asset Type and delete risk")
     @DeleteMapping("/asset_type/{assetTypeId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromAssetType(@PathVariable Long organizationId, @PathVariable Long assetTypeId, @PathVariable Long riskId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(organizationId, assetTypeId, riskId));
+    public ResponseEntity<Object> unlinkRiskFromAssetType(@PathVariable Long unitId, @PathVariable Long assetTypeId, @PathVariable Long riskId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(unitId, assetTypeId, riskId));
 
     }
 
 
     @ApiOperation("unlink RISK From Sub Asset Type and delete risk")
     @DeleteMapping("/asset_type/sub_asset_type/{subAssetTypeId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromSubAssetType(@PathVariable Long organizationId, @PathVariable Long subAssetTypeId, @PathVariable Long riskId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(organizationId, subAssetTypeId, riskId));
+    public ResponseEntity<Object> unlinkRiskFromSubAssetType(@PathVariable Long unitId, @PathVariable Long subAssetTypeId, @PathVariable Long riskId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(unitId, subAssetTypeId, riskId));
 
     }
 
 
     @ApiOperation("update Asset  type and Sub Asset type by id")
     @PutMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> updateAssetType(@PathVariable Long organizationId, @PathVariable Long assetTypeId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.updateAssetTypeAndSubAssetsAndAddRisks(organizationId, assetTypeId, assetTypeDTO));
+    public ResponseEntity<Object> updateAssetType(@PathVariable Long unitId, @PathVariable Long assetTypeId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.updateAssetTypeAndSubAssetsAndAddRisks(unitId, assetTypeId, assetTypeDTO));
 
     }
 
 
     @ApiOperation("save and suggest AssetType to country admin ")
     @PostMapping(COUNTRY_URL+"/asset_type/suggest")
-    public ResponseEntity<Object> saveAssetTypeAndSubAssetTypeAndSuggestToCountryAdmin(@PathVariable Long organizationId, @PathVariable Long countryId,@Valid @RequestBody AssetTypeBasicDTO assetTypeDTO) {
+    public ResponseEntity<Object> saveAssetTypeAndSubAssetTypeAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId,@Valid @RequestBody AssetTypeBasicDTO assetTypeDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.saveAndSuggestAssetTypeAndSubAssetTypeToCountryAdmin(organizationId,countryId,assetTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.saveAndSuggestAssetTypeAndSubAssetTypeToCountryAdmin(unitId,countryId,assetTypeDTO));
 
     }
 

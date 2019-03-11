@@ -121,12 +121,12 @@ public class DataCategoryService{
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param dataCategoryId data category id
      * @return return data category with its data elements
      */
-    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long organizationId, Long dataCategoryId) {
-        DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(organizationId, dataCategoryId);
+    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, Long dataCategoryId) {
+        DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
@@ -149,7 +149,7 @@ public class DataCategoryService{
      * @param countryId
      * @return void
      */
-    public void findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(Long countryId, Long organizationId) {
+    public void findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(Long countryId, Long unitId) {
         List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryIdNotLinkedWithDataSubject(countryId);
         List<DataCategory> unitLevelDataCategories = new ArrayList<>();
         dataCategories.forEach(dataCategory -> {
@@ -157,9 +157,9 @@ public class DataCategoryService{
             unitLevelDataCategory.setName(dataCategory.getName());
             List<DataElement> unitLevelDataElements = new ArrayList<>();
             dataCategory.getDataElements().forEach(dataElement -> {
-                unitLevelDataElements.add(new DataElement(organizationId,dataElement.getName()));
+                unitLevelDataElements.add(new DataElement(unitId,dataElement.getName()));
             });
-            unitLevelDataCategory.setOrganizationId(organizationId);
+            unitLevelDataCategory.setOrganizationId(unitId);
             unitLevelDataCategory.setDataElements(unitLevelDataElements);
             unitLevelDataCategories.add(unitLevelDataCategory);
         });
@@ -168,11 +168,11 @@ public class DataCategoryService{
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @return return list of Data Category with data Elements
      */
-    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long organizationId) {
-        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(organizationId);
+    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(unitId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 

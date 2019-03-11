@@ -146,25 +146,25 @@ public class QuestionnaireSectionService {
       }
 
 
-    private void checkDuplicateQuestionnaireTemplateOrTemplateLinkedWithAnyInProgressAssessment(Long organizationId, Long questionnaireTemplateId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateStatus templateStatus) {
+    private void checkDuplicateQuestionnaireTemplateOrTemplateLinkedWithAnyInProgressAssessment(Long unitId, Long questionnaireTemplateId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateStatus templateStatus) {
         if (!Optional.ofNullable(templateStatus).isPresent()) {
             exceptionService.invalidRequestException("error.message.questionnaireTemplate.template.status.null");
         }
         if (QuestionnaireTemplateStatus.PUBLISHED.equals(questionnaireTemplate.getTemplateStatus())) {
-            List<Assessment> inProgressAssessmentsLinkedWithQuestionnaireTemplate = assessmentRepository.findByOrgIdAndQuestionnaireTemplateIdAndAssessmentStatusNewOrInProgress(organizationId, questionnaireTemplateId);
+            List<Assessment> inProgressAssessmentsLinkedWithQuestionnaireTemplate = assessmentRepository.findByOrgIdAndQuestionnaireTemplateIdAndAssessmentStatusNewOrInProgress(unitId, questionnaireTemplateId);
             if (CollectionUtils.isNotEmpty(inProgressAssessmentsLinkedWithQuestionnaireTemplate)) {
                 exceptionService.invalidRequestException("message.questionnaire.cannotbe.edit", new StringBuilder(inProgressAssessmentsLinkedWithQuestionnaireTemplate.stream().map(Assessment::getName).map(String::toString).collect(Collectors.joining(","))));
             }
         }
         switch (questionnaireTemplate.getTemplateType()) {
             case ASSET_TYPE:
-                checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(organizationId, questionnaireTemplate);
+                checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(unitId, questionnaireTemplate);
                 break;
             case RISK:
-                checkIfRiskQuestionnaireTemplateIsInPublishedState(organizationId, questionnaireTemplate);
+                checkIfRiskQuestionnaireTemplateIsInPublishedState(unitId, questionnaireTemplate);
                 break;
             default:
-                QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(organizationId, questionnaireTemplate.getTemplateType(), QuestionnaireTemplateStatus.PUBLISHED);
+                QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(unitId, questionnaireTemplate.getTemplateType(), QuestionnaireTemplateStatus.PUBLISHED);
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType());
                 }
@@ -175,22 +175,22 @@ public class QuestionnaireSectionService {
 
 
     // to check if already a questionnaire tepmlate of same asset type is present in published state , duplicate template with same asset type and risk in draft state is accepted
-    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long organizationId, QuestionnaireTemplate questionnaireTemplate) {
+    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
 
         QuestionnaireTemplate previousTemplate;
         if (questionnaireTemplate.isDefaultAssetTemplate()) {
-            previousTemplate = questionnaireTemplateRepository.findDefaultTemplateByUnitIdAndTemplateTypeAndStatus(organizationId,QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
+            previousTemplate = questionnaireTemplateRepository.findDefaultTemplateByUnitIdAndTemplateTypeAndStatus(unitId,QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.duplicateDataException("duplicate.questionnaire.template.assetType.defaultTemplate");
             }
         } else {
             if (Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
-                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(organizationId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetSubType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
+                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetSubType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
                 }
             } else {
-                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(organizationId, questionnaireTemplate.getAssetType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
+                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, questionnaireTemplate.getAssetType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName());
                 }
@@ -198,24 +198,24 @@ public class QuestionnaireSectionService {
         }
     }
 
-    private void checkIfRiskQuestionnaireTemplateIsInPublishedState(Long organizationId, QuestionnaireTemplate questionnaireTemplate) {
+    private void checkIfRiskQuestionnaireTemplateIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
         QuestionnaireTemplate previousTemplate = null;
         switch (questionnaireTemplate.getRiskAssociatedEntity()) {
             case ASSET_TYPE:
                 if (Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
-                    previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(organizationId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetSubType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED);
+                    previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetSubType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED);
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
                     }
                 } else {
-                    previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(organizationId, questionnaireTemplate.getAssetType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED);
+                    previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, questionnaireTemplate.getAssetType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateStatus.PUBLISHED);
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName());
                     }
                 }
                 break;
             case PROCESSING_ACTIVITY:
-                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndRiskAssociatedEntityAndTemplateTypeAndStatus(organizationId,QuestionnaireTemplateType.RISK,QuestionnaireTemplateType.PROCESSING_ACTIVITY,QuestionnaireTemplateStatus.PUBLISHED);
+                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndRiskAssociatedEntityAndTemplateTypeAndStatus(unitId,QuestionnaireTemplateType.RISK,QuestionnaireTemplateType.PROCESSING_ACTIVITY,QuestionnaireTemplateStatus.PUBLISHED);
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType().value);
                 }

@@ -38,8 +38,8 @@ class RiskController {
 
     @ApiOperation(value = "get All risk of Level")
     @GetMapping(UNIT_URL + "/risk")
-    public ResponseEntity<ResponseDTO<List<RiskResponseDTO>>> getAllRiskOfUnit(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, riskService.getAllRiskByUnitId(organizationId));
+    public ResponseEntity<ResponseDTO<List<RiskResponseDTO>>> getAllRiskOfUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, riskService.getAllRiskByUnitId(unitId));
     }
 
     /*@ApiOperation(value = "delete risk by id")

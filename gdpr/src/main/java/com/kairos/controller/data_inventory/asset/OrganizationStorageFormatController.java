@@ -35,50 +35,50 @@ class OrganizationStorageFormatController {
 
     @ApiOperation("add StorageFormat")
     @PostMapping("/storage_format")
-    public ResponseEntity<Object> createStorageFormat(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
+    public ResponseEntity<Object> createStorageFormat(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
 
         if (CollectionUtils.isEmpty(storageFormat.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(organizationId, storageFormat.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(unitId, storageFormat.getRequestBody()));
 
     }
 
 
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> getStorageFormat(@PathVariable Long organizationId, @PathVariable Long storageFormatId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(organizationId, storageFormatId));
+    public ResponseEntity<Object> getStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(unitId, storageFormatId));
     }
 
 
     @ApiOperation("get all StorageFormat ")
     @GetMapping("/storage_format")
-    public ResponseEntity<Object> getAllStorageFormat(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getAllStorageFormat(organizationId));
+    public ResponseEntity<Object> getAllStorageFormat(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getAllStorageFormat(unitId));
     }
 
 
     @ApiOperation("delete StorageFormat  by id")
     @DeleteMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long organizationId, @PathVariable Long storageFormatId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(organizationId, storageFormatId));
+    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(unitId, storageFormatId));
 
     }
 
 
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long organizationId, @PathVariable Long storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(organizationId, storageFormatId, storageFormat));
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(unitId, storageFormatId, storageFormat));
 
     }
 
 
     @ApiOperation("save Storage Format And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/storage_format/suggest")
-    public ResponseEntity<Object> saveStorageFormatAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormatDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.saveAndSuggestStorageFormats(countryId, organizationId, storageFormatDTOs.getRequestBody()));
+    public ResponseEntity<Object> saveStorageFormatAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormatDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.saveAndSuggestStorageFormats(countryId, unitId, storageFormatDTOs.getRequestBody()));
 
     }
 }

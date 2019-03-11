@@ -43,21 +43,21 @@ public class OrganizationResponsibilityTypeService{
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param responsibilityTypeDTOS
      * @return return map which contain list of new ResponsibilityType and list of existing ResponsibilityType if ResponsibilityType already exist
      * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
-    public List<ResponsibilityTypeDTO> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
-        Set<String> existingResponsibilityTypeNames = responsibilityTypeRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<ResponsibilityTypeDTO> createResponsibilityType(Long unitId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+        Set<String> existingResponsibilityTypeNames = responsibilityTypeRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> responsibilityTypeNames = ComparisonUtils.getNewMetaDataNames(responsibilityTypeDTOS,existingResponsibilityTypeNames );
             List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
                     ResponsibilityType responsibilityType = new ResponsibilityType(name);
-                    responsibilityType.setOrganizationId(organizationId);
+                    responsibilityType.setOrganizationId(unitId);
                     responsibilityTypes.add(responsibilityType);
                 }
               responsibilityTypeRepository.saveAll(responsibilityTypes);
@@ -68,23 +68,23 @@ public class OrganizationResponsibilityTypeService{
     }
 
     /**
-     * * @param organizationId
+     * * @param unitId
      *
      * @return list of ResponsibilityType
      */
-    public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long unitId) {
+        return responsibilityTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id             id of ResponsibilityType
      * @return ResponsibilityType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
      */
-    public ResponsibilityType getResponsibilityType(Long organizationId, Long id) {
+    public ResponsibilityType getResponsibilityType(Long unitId, Long id) {
 
-        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -94,34 +94,34 @@ public class OrganizationResponsibilityTypeService{
     }
 
 
-    public Boolean deleteResponsibilityType(Long organizationId, Long responsibilityTypeId) {
+    public Boolean deleteResponsibilityType(Long unitId, Long responsibilityTypeId) {
 
-        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithResponsibilityType(organizationId, responsibilityTypeId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
                 exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", StringUtils.join(processingActivities, ','));
         }
-        responsibilityTypeRepository.deleteByIdAndOrganizationId(responsibilityTypeId, organizationId);
+        responsibilityTypeRepository.deleteByIdAndOrganizationId(responsibilityTypeId, unitId);
         return true;
     }
 
     /***
      * @throws DuplicateDataException throw exception if ResponsibilityType data not exist for given id
-     * @param organizationId
+     * @param unitId
      * @param id id of ResponsibilityType
      * @param responsibilityTypeDTO
      * @return ResponsibilityType updated object
      */
-    public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
+    public ResponsibilityTypeDTO updateResponsibilityType(Long unitId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, responsibilityTypeDTO.getName());
+        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(unitId, responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Responsibility Type", responsibilityType.getName());
         }
-        Integer resultCount =  responsibilityTypeRepository.updateMetadataName(responsibilityTypeDTO.getName(), id, organizationId);
+        Integer resultCount =  responsibilityTypeRepository.updateMetadataName(responsibilityTypeDTO.getName(), id, unitId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Typ", id);
         }else{
@@ -133,9 +133,9 @@ public class OrganizationResponsibilityTypeService{
     }
 
 
-    public List<ResponsibilityTypeDTO> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public List<ResponsibilityTypeDTO> saveAndSuggestResponsibilityTypes(Long countryId, Long unitId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        List<ResponsibilityTypeDTO> result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
+        List<ResponsibilityTypeDTO> result = createResponsibilityType(unitId, responsibilityTypeDTOS);
         responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
         return result;
     }

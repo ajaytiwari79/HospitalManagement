@@ -76,7 +76,7 @@ public class PolicyAgreementTemplateService{
 
 
     /**
-     * @param referenceId                - countryId or organizationId
+     * @param referenceId                - countryId or unitId
      * @param -                          isOrganization boolean to check whether referenceId id country id or unit id
      * @param policyAgreementTemplateDto
      * @return return object of basic policy agreement template.
@@ -116,7 +116,7 @@ public class PolicyAgreementTemplateService{
 
 
     /**
-     * @param referenceId         - country Id or organizationId
+     * @param referenceId         - country Id or unitId
      * @param -                   isOrganization boolean to check whether referenceId id country id or unit id
      * @param agreementTemplateId - Agreement Template id
      * @param coverPageLogo       - Agreement Cover page
@@ -160,16 +160,16 @@ public class PolicyAgreementTemplateService{
     }
 
     /**
-     * @param organizationId -
+     * @param unitId -
      * @return return agreement section list with empty section array as per front end requirement
      */
-    public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByUnitId(Long organizationId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.findAllByOrganizationId(organizationId),PolicyAgreementTemplateResponseDTO.class);
+    public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByUnitId(Long unitId) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.findAllByOrganizationId(unitId),PolicyAgreementTemplateResponseDTO.class);
     }
 
 
     /**
-     * @param referenceId                - countryId or organizationId
+     * @param referenceId                - countryId or unitId
      * @param isOrganization                   isOrganization boolean to check whether referenceId id coutry id or unit id
      * @param agreementTemplateId        - Agreement Template id
      * @param policyAgreementTemplateDto
@@ -204,7 +204,7 @@ public class PolicyAgreementTemplateService{
 
 
     /**
-     * @param referenceId         - countryId or organizationId
+     * @param referenceId         - countryId or unitId
      * @param isOrganization            - to check whether referenceId country id or unit id
      * @param agreementTemplateId
      * @return
@@ -352,7 +352,7 @@ public class PolicyAgreementTemplateService{
 
 
     /**
-     * @param referenceId - countryId or organizationId
+     * @param referenceId - countryId or unitId
      * @param isOrganization    - isOrganization boolean to check whether referenceId id country id or unit id
      * @param templateId  - Agreement Template id
      * @return
@@ -369,9 +369,9 @@ public class PolicyAgreementTemplateService{
 
     }
 
-    //get country template by organizationId
-    public List<TemplateType> getAllTemplateType(Long organizationId) {
-        Long countryId= genericRestClient.publishRequest(null, organizationId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() { });
+    //get country template by unitId
+    public List<TemplateType> getAllTemplateType(Long unitId) {
+        Long countryId= genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() { });
         return templateTypeRepository.getAllTemplateType(countryId);
     }
 

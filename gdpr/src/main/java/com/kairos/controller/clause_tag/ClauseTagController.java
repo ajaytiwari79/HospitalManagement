@@ -73,8 +73,8 @@ class ClauseTagController {
 
     @ApiOperation("get all clauseTag of unit ")
     @GetMapping(UNIT_URL + "/clause_tag")
-    public ResponseEntity<Object> getAllClauseTag(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getAllClauseTagByUnitId(organizationId));
+    public ResponseEntity<Object> getAllClauseTag(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getAllClauseTagByUnitId(unitId));
 
     }
 

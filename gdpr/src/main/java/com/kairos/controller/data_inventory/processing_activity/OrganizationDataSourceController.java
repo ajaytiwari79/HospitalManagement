@@ -34,65 +34,65 @@ class OrganizationDataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/data_source")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSources) {
+    public ResponseEntity<Object> createDataSource(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSources) {
         if (CollectionUtils.isEmpty(dataSources.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(organizationId, dataSources.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(unitId, dataSources.getRequestBody()));
 
     }
 
 
     @ApiOperation("get dataSource by id")
     @GetMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> getDataSource(@PathVariable Long organizationId, @PathVariable Long dataSourceId) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> getDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(organizationId, dataSourceId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(unitId, dataSourceId));
     }
 
 
     @ApiOperation("get all dataSource ")
     @GetMapping("/data_source")
-    public ResponseEntity<Object> getAllDataSource(@PathVariable Long organizationId) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> getAllDataSource(@PathVariable Long unitId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(unitId));
     }
 
 
     @ApiOperation("delete dataSource  by id")
     @DeleteMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> deleteDataSource(@PathVariable Long organizationId, @PathVariable Long dataSourceId) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> deleteDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(organizationId, dataSourceId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(unitId, dataSourceId));
 
     }
 
     @ApiOperation("update dataSource by id")
     @PutMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long organizationId, @PathVariable Long dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(organizationId, dataSourceId, dataSource));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(unitId, dataSourceId, dataSource));
 
     }
 
 
     @ApiOperation("save data Source And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/data_source/suggest")
-    public ResponseEntity<Object> saveDataSourceAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSourceDTOs) {
-        if (organizationId == null) {
+    public ResponseEntity<Object> saveDataSourceAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSourceDTOs) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.saveAndSuggestDataSources(countryId, organizationId, dataSourceDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.saveAndSuggestDataSources(countryId, unitId, dataSourceDTOs.getRequestBody()));
 
     }
 

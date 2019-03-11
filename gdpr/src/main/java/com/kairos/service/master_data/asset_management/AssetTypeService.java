@@ -172,25 +172,25 @@ public class AssetTypeService{
         return assetTypesWithAllData;
     }
 
-    public void findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(Long countryId, Long organizationId){
+    public void findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(Long countryId, Long unitId){
         List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypesNotAssociatedWithAsset(countryId);
-        List unitLevelAssetTypes = prepareAssetTypeDataForUnitLevel(assetTypes, organizationId, false);
+        List unitLevelAssetTypes = prepareAssetTypeDataForUnitLevel(assetTypes, unitId, false);
         assetTypeRepository.saveAll(unitLevelAssetTypes);
     }
 
 
-    List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long organizationId, boolean isSubAssetType){
+    List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType){
         List<AssetType> unitLevelAssetTypes = new ArrayList<>();
         assetTypes.forEach(assetType -> {
             AssetType unitLevelAssetType = new AssetType();
             unitLevelAssetType.setName(assetType.getName());
             unitLevelAssetType.setHasSubAssetType(assetType.isHasSubAssetType());
             unitLevelAssetType.setSubAssetType(assetType.isSubAssetType());
-            unitLevelAssetType.setOrganizationId(organizationId);
+            unitLevelAssetType.setOrganizationId(unitId);
             unitLevelAssetType.setCountryId(null);
             unitLevelAssetType.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assetType.getRisks(), Risk.class));
             if(!isSubAssetType) {
-                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), organizationId, true));
+                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true));
             }
             unitLevelAssetTypes.add(unitLevelAssetType);
         });

@@ -92,23 +92,23 @@ public class ProcessingActivityService {
 
 
     @Transactional
-    public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+    public ProcessingActivityDTO createProcessingActivity(Long unitId, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId,  processingActivityDTO.getName());
+        ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(unitId,  processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
         ProcessingActivity processingActivity = new ProcessingActivity();
-        processingActivity = buildProcessingActivity(organizationId, processingActivityDTO, processingActivity);
+        processingActivity = buildProcessingActivity(unitId, processingActivityDTO, processingActivity);
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
-            processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities()));
+            processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities()));
         }
         if (!processingActivityDTO.getRisks().isEmpty()) {
-            processingActivity.setRisks(updateExistingRisksOrCreateNewRisk(organizationId, processingActivityDTO.getRisks(),processingActivity));
+            processingActivity.setRisks(updateExistingRisksOrCreateNewRisk(unitId, processingActivityDTO.getRisks(),processingActivity));
         }
         if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
-            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(organizationId, processingActivityDTO.getDataSubjectSet()));
+            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(unitId, processingActivityDTO.getDataSubjectSet()));
         }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
@@ -137,7 +137,7 @@ public class ProcessingActivityService {
     }
 
 
-    private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long organizationId, List<RelatedDataSubjectDTO> relatedDataSubjects){
+    private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long unitId, List<RelatedDataSubjectDTO> relatedDataSubjects){
         List<RelatedDataSubject> dataSubjects =  new ArrayList<>();
         relatedDataSubjects.forEach( dataSubject -> {
             RelatedDataSubject relatedDataSubject = new RelatedDataSubject(dataSubject.getId(), dataSubject.getName());
@@ -151,24 +151,24 @@ public class ProcessingActivityService {
     }
 
 
-    public ProcessingActivityDTO updateProcessingActivity(Long organizationId, Long id, ProcessingActivityDTO processingActivityDTO) {
+    public ProcessingActivityDTO updateProcessingActivity(Long unitId, Long id, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId,   processingActivityDTO.getName());
+        ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(unitId,   processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
-        processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!processingActivity.isActive()) {
             exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
-        processingActivity = buildProcessingActivity(organizationId, processingActivityDTO, processingActivity);
+        processingActivity = buildProcessingActivity(unitId, processingActivityDTO, processingActivity);
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
-            processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
+            processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(unitId, processingActivityDTO.getSubProcessingActivities()));
 
         }
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getRisks())) {
-            processingActivity.setRisks(updateExistingRisksOrCreateNewRisk(organizationId, processingActivityDTO.getRisks(), processingActivity));
+            processingActivity.setRisks(updateExistingRisksOrCreateNewRisk(unitId, processingActivityDTO.getRisks(), processingActivity));
 
         }
         processingActivityRepository.save(processingActivity);
@@ -176,11 +176,11 @@ public class ProcessingActivityService {
 
     }
 
-    private List<ProcessingActivity> createSubProcessingActivity(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+    private List<ProcessingActivity> createSubProcessingActivity(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
         List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         for (ProcessingActivityDTO processingActivityDTO : subProcessingActivityDTOs) {
             ProcessingActivity subProcessingActivity = new ProcessingActivity();
-            subProcessingActivity = buildProcessingActivity(organizationId, processingActivityDTO,subProcessingActivity);
+            subProcessingActivity = buildProcessingActivity(unitId, processingActivityDTO,subProcessingActivity);
             subProcessingActivity.setSubProcessingActivity(true);
             subProcessingActivities.add(subProcessingActivity);
         }
@@ -188,20 +188,20 @@ public class ProcessingActivityService {
     }
 
 
-    private ProcessingActivity buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
+    private ProcessingActivity buildProcessingActivity(Long unitId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
         processingActivity = ObjectMapperUtils.copyPropertiesByMapper(processingActivityDTO, ProcessingActivity.class);
-        processingActivity.setOrganizationId(organizationId);
-        processingActivity.getRisks().forEach(risk -> risk.setOrganizationId(organizationId));
+        processingActivity.setOrganizationId(unitId);
+        processingActivity.getRisks().forEach(risk -> risk.setOrganizationId(unitId));
        /* processingActivity.setName(processingActivityDTO.getName());
         processingActivity.setDescription(processingActivityDTO.getDescription());
-        processingActivity.setOrganizationId(organizationId);
+        processingActivity.setOrganizationId(unitId);
         processingActivity.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getId(), processingActivityDTO.getManagingDepartment().getName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getId(), processingActivityDTO.getProcessOwner().getFirstName(),processingActivityDTO.getProcessOwner().getLastName()));
-        processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityDTO.getResponsibilityType(), organizationId, false));
+        processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityDTO.getResponsibilityType(), unitId, false));
         processingActivity.setTransferMethods(transferMethodRepository.findAllByIds(processingActivityDTO.getTransferMethods()));
         processingActivity.setProcessingPurposes(processingPurposeRepository.findAllByIds(processingActivityDTO.getProcessingPurposes()));
         processingActivity.setDataSources(dataSourceRepository.findAllByIds(processingActivityDTO.getDataSources()));
@@ -215,7 +215,7 @@ public class ProcessingActivityService {
 
     }
 
-    private List<ProcessingActivity> updateExistingSubProcessingActivitiesAndCreateNewSubProcess(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+    private List<ProcessingActivity> updateExistingSubProcessingActivitiesAndCreateNewSubProcess(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
 
         List<ProcessingActivityDTO> newSubProcessingActivityDTOList = new ArrayList<>();
         Map<Long, ProcessingActivityDTO> existingSubProcessingActivityMap = new HashMap<>();
@@ -228,9 +228,9 @@ public class ProcessingActivityService {
         });
         List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(existingSubProcessingActivityMap.keySet())) {
-            subProcessingActivities.addAll(updateSubProcessingActivities(organizationId, existingSubProcessingActivityMap.keySet(), existingSubProcessingActivityMap));
+            subProcessingActivities.addAll(updateSubProcessingActivities(unitId, existingSubProcessingActivityMap.keySet(), existingSubProcessingActivityMap));
         } else if (CollectionUtils.isNotEmpty(newSubProcessingActivityDTOList)) {
-            subProcessingActivities.addAll(createSubProcessingActivity(organizationId, newSubProcessingActivityDTOList));
+            subProcessingActivities.addAll(createSubProcessingActivity(unitId, newSubProcessingActivityDTOList));
         }
         return subProcessingActivities;
 
@@ -251,14 +251,14 @@ public class ProcessingActivityService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param processingActivityId
      * @return
      * @description method delete processing activity and Sub processing activity is activity is associated with asset then method simply return  without deleting activities
      */
-    public boolean deleteProcessingActivity(Long organizationId, Long processingActivityId) {
+    public boolean deleteProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId, organizationId);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId, unitId);
         processingActivity.delete();
         processingActivityRepository.save(processingActivity);
         return true;
@@ -266,13 +266,13 @@ public class ProcessingActivityService {
     }
 
 
-    public boolean deleteSubProcessingActivity(Long organizationId, Long processingActivityId, Long subProcessingActivityId) {
+    public boolean deleteSubProcessingActivity(Long unitId, Long processingActivityId, Long subProcessingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndProcessingActivityId(subProcessingActivityId,organizationId, processingActivityId);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndProcessingActivityId(subProcessingActivityId,unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", processingActivityId);
         }
-        Integer updateCount = processingActivityRepository.unlinkSubProcessingActivityFromProcessingActivity(subProcessingActivityId,organizationId, processingActivityId);
+        Integer updateCount = processingActivityRepository.unlinkSubProcessingActivityFromProcessingActivity(subProcessingActivityId,unitId, processingActivityId);
         processingActivity.delete();
         processingActivityRepository.save(processingActivity);
         return true;
@@ -280,9 +280,9 @@ public class ProcessingActivityService {
     }
 
 
-    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long organizationId) {
+    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long unitId) {
         List<ProcessingActivityResponseDTO> processingActivityResponseDTOS = new ArrayList<>();
-        List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationId(organizationId);
+        List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationId(unitId);
         processingActivitys.forEach(processingActivity -> {
             processingActivityResponseDTOS.add(prepareProcessingActivityResponseData(processingActivity));
            /* if (!Optional.ofNullable(processingActivityResponseDTO.getSubProcessingActivities().get(0).getId()).isPresent()) {
@@ -320,13 +320,13 @@ public class ProcessingActivityService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param processingActivityId processing activity id
      * @param active               status of processing activity
      * @return
      */
-    public boolean changeStatusOfProcessingActivity(Long organizationId, Long processingActivityId, boolean active) {
-        Integer updateCount = processingActivityRepository.updateProcessingActivityStatus(organizationId, processingActivityId, active);
+    public boolean changeStatusOfProcessingActivity(Long unitId, Long processingActivityId, boolean active) {
+        Integer updateCount = processingActivityRepository.updateProcessingActivityStatus(unitId, processingActivityId, active);
         if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }else{
@@ -352,25 +352,25 @@ public class ProcessingActivityService {
     }
 
     /*
-      @param organizationId
+      @param unitId
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityWithBasicDetailForAsset(Long organizationId) {
-        return processingActivityRepository.getAllProcessingActivityWithBasicDetailForAsset(organizationId);
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityWithBasicDetailForAsset(Long unitId) {
+        return processingActivityRepository.getAllProcessingActivityWithBasicDetailForAsset(unitId);
     }
 
 
     /*
-      @param organizationId
+      @param unitId
      * @param processingActivityId
      * @param activityRelatedDataSubjects list of data subject which contain list of data category and data Element list
      * @return
      */
     //TODO
-    /*public boolean mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long organizationId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
+    /*public boolean mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
 
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -381,15 +381,15 @@ public class ProcessingActivityService {
     }*/
 
     /*
-      @param organizationId
+      @param unitId
      * @param processingActivityId
      * @param assetId              - asset id linked with processing activity
      * @return
      * @description map asset with processing activity (related tab processing activity)
      */
     //TODO
-    /*public boolean mapAssetWithProcessingActivity(Long organizationId, BigInteger processingActivityId, BigInteger assetId) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+    /*public boolean mapAssetWithProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -402,22 +402,22 @@ public class ProcessingActivityService {
     }*/
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param processingActivityId
      * @return
      * @description map Data Subject ,Data category and Data Element with processing activity(related tab processing activity)
      */
-    public List<RelatedDataSubjectDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long organizationId, Long processingActivityId) {
+    public List<RelatedDataSubjectDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId,organizationId);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId,unitId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class);
     }
-  /*  public List<DataSubjectMappingResponseDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long organizationId, BigInteger processingActivityId) {
+  /*  public List<DataSubjectMappingResponseDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -430,7 +430,7 @@ public class ProcessingActivityService {
                 dataSubjectIdList.add(processingActivityRelatedDataSubject.getId());
                 relatedDataCategoryMap.put(processingActivityRelatedDataSubject.getId(), processingActivityRelatedDataSubject.getDataCategories());
             }
-            dataSubjectList = processingActivityMongoRepository.getAllMappedDataSubjectWithDataCategoryAndDataElement(organizationId, dataSubjectIdList);
+            dataSubjectList = processingActivityMongoRepository.getAllMappedDataSubjectWithDataCategoryAndDataElement(unitId, dataSubjectIdList);
             filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(dataSubjectList, relatedDataCategoryMap);
 
         }
@@ -439,15 +439,15 @@ public class ProcessingActivityService {
 
 
     /*
-      @param organizationId
+      @param unitId
      * @param processingActivityId
      * @param dataSubjectId
      * @return
      */
     //TODO
-    /*public boolean removeLinkedDataSubjectFromProcessingActivity(Long organizationId, BigInteger processingActivityId, BigInteger dataSubjectId) {
+    /*public boolean removeLinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
 
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -467,26 +467,26 @@ public class ProcessingActivityService {
 */
 
     /*
-      @param organizationId
+      @param unitId
      * @param processingActivityId
      * @return
      */
     //TODO
-   /* public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long organizationId, BigInteger processingActivityId) {
-        return processingActivityMongoRepository.getAllAssetLinkedWithProcessingActivityById(organizationId, processingActivityId);
+   /* public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
+        return processingActivityMongoRepository.getAllAssetLinkedWithProcessingActivityById(unitId, processingActivityId);
     }*/
 
 
     /*
-      @param organizationId
+      @param unitId
      * @param processingActivityId
      * @param assetId
      * @return
      * @description method removed linked asset id from Processing activity
      */
     //TODO
-    /*public boolean removeLinkedAssetFromProcessingActivity(Long organizationId, BigInteger processingActivityId, BigInteger assetId) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+    /*public boolean removeLinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -531,14 +531,14 @@ public class ProcessingActivityService {
 
 
     /*
-      @param organizationId
+      @param unitId
      * @param processingActivityId
      * @param processingActivityRiskDTO
      */
     //TODO
-    /*public ProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivities(Long organizationId, BigInteger processingActivityId, ProcessingActivityRiskDTO processingActivityRiskDTO) {
+    /*public ProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivities(Long unitId, BigInteger processingActivityId, ProcessingActivityRiskDTO processingActivityRiskDTO) {
 
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivity);
         }
@@ -549,12 +549,12 @@ public class ProcessingActivityService {
         if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {
             Map<BigInteger, List<OrganizationLevelRiskDTO>> subProcessingActivityAndRiskDtoListMap = new HashMap<>();
             processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivityRiskDTO -> subProcessingActivityAndRiskDtoListMap.put(subProcessingActivityRiskDTO.getId(), subProcessingActivityRiskDTO.getRisks()));
-            List<ProcessingActivity> subProcessingActivityList = processingActivityMongoRepository.findSubProcessingActivitiesByIds(organizationId, subProcessingActivityAndRiskDtoListMap.keySet());
+            List<ProcessingActivity> subProcessingActivityList = processingActivityMongoRepository.findSubProcessingActivitiesByIds(unitId, subProcessingActivityAndRiskDtoListMap.keySet());
             subProcessingActivityList.stream().forEach(subProcessingActivity -> riskDTOListCorrespondingToProcessingActivity.put(subProcessingActivity, subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId())));
             processingActivityList.addAll(subProcessingActivityList);
         }
         if (!riskDTOListCorrespondingToProcessingActivity.isEmpty()) {
-            Map<ProcessingActivity, List<Risk>> riskListRelatedProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(organizationId, true, riskDTOListCorrespondingToProcessingActivity);
+            Map<ProcessingActivity, List<Risk>> riskListRelatedProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTOListCorrespondingToProcessingActivity);
             List<Risk> risks = new ArrayList<>();
             processingActivityList.forEach(processingActivityWithRisk -> {
                 processingActivityWithRisk.setRisks(riskListRelatedProcessingActivities.get(processingActivity).stream().map(Risk::getId).collect(Collectors.toSet()));
@@ -573,12 +573,12 @@ public class ProcessingActivityService {
     }
 */
     /*
-      @param organizationId
+      @param unitId
      * @return
      */
     //TODO
-    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long organizationId) {
-        List<ProcessingActivity> processingActivities = processingActivityRepository.findAllByOrganizationId(organizationId);
+    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
+        List<ProcessingActivity> processingActivities = processingActivityRepository.findAllByOrganizationId(unitId);
         List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS =  prepareProcessingActivityRiskResponseDTOData(processingActivities, true);
         return processingActivityRiskResponseDTOS;
     }
@@ -611,13 +611,13 @@ public class ProcessingActivityService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * //@param processingActivityId
      * @return
      */
     //TODO
-    /*public boolean unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(Long organizationId, BigInteger processingActivityId, BigInteger riskId) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, processingActivityId);
+    /*public boolean unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(Long unitId, BigInteger processingActivityId, BigInteger riskId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -628,14 +628,14 @@ public class ProcessingActivityService {
     }
 */
 
-    public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long organizationId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
+    public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
 
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
             processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> subProcessingActivityDTO.setSuggested(true));
         }
         Map<String, ProcessingActivityDTO> result = new HashMap<>();
-        processingActivityDTO = createProcessingActivity(organizationId, processingActivityDTO);
-        ProcessingActivityDTO masterProcessingActivity = masterProcessingActivityService.saveSuggestedMasterProcessingActivityDataFromUnit(countryId, organizationId, processingActivityDTO);
+        processingActivityDTO = createProcessingActivity(unitId, processingActivityDTO);
+        ProcessingActivityDTO masterProcessingActivity = masterProcessingActivityService.saveSuggestedMasterProcessingActivityDataFromUnit(countryId, unitId, processingActivityDTO);
         result.put("new", processingActivityDTO);
         result.put("SuggestedData", masterProcessingActivity);
         return result;
@@ -644,17 +644,17 @@ public class ProcessingActivityService {
 
     /**
      *
-     * @param organizationId
+     * @param unitId
      * @return
      */
-    public Map<String,Object> getProcessingActivityMetaData(Long organizationId){
+    public Map<String,Object> getProcessingActivityMetaData(Long unitId){
         Map<String,Object> processingActivityMetaDataMap=new HashMap<>();
-        processingActivityMetaDataMap.put("responsibilityTypeList", responsibilityTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId));
-        processingActivityMetaDataMap.put("processingPurposeList",processingPurposeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId));
-        processingActivityMetaDataMap.put("dataSourceList",dataSourceRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId));
-        processingActivityMetaDataMap.put("transferMethodList",transferMethodRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId));
-        processingActivityMetaDataMap.put("accessorPartyList", accessorPartyRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId));
-        processingActivityMetaDataMap.put("processingLegalBasisList",processingLegalBasisRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId));
+        processingActivityMetaDataMap.put("responsibilityTypeList", responsibilityTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        processingActivityMetaDataMap.put("processingPurposeList",processingPurposeRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        processingActivityMetaDataMap.put("dataSourceList",dataSourceRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        processingActivityMetaDataMap.put("transferMethodList",transferMethodRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        processingActivityMetaDataMap.put("accessorPartyList", accessorPartyRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        processingActivityMetaDataMap.put("processingLegalBasisList",processingLegalBasisRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
         processingActivityMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return processingActivityMetaDataMap;
 

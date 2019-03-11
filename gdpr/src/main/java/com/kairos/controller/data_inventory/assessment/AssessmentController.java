@@ -39,48 +39,48 @@ class AssessmentController {
 
     @ApiOperation(value = "launch assessment for Asset")
     @PostMapping( "/assessment/asset/{assetId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long organizationId, @PathVariable Long assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForAsset(organizationId,  assetId, assessmentDTO));
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable Long assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForAsset(unitId,  assetId, assessmentDTO));
 
     }
 
 
     @ApiOperation(value = "launch assessment for processing activity")
     @PostMapping( "/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long organizationId, @PathVariable Long processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(organizationId,  processingActivityId, assessmentDTO,subProcessingActivity));
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO,subProcessingActivity));
 
     }
 
     @ApiOperation(value = "get Assessment  By Id")
     @GetMapping( "/assessment/{assessmentId}")
-    public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long organizationId, @PathVariable Long assessmentId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentByUnitIdAndId( organizationId, assessmentId));
+    public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long unitId, @PathVariable Long assessmentId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentByUnitIdAndId( unitId, assessmentId));
     }
 
     @ApiOperation(value = "get All launched Assessment Assign Staff Member")
     @GetMapping("/assessment/staff")
-    public ResponseEntity<Object> getAllLaunchedAssessmentAssignToStaff(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfCurrentLoginUser(organizationId));
+    public ResponseEntity<Object> getAllLaunchedAssessmentAssignToStaff(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfCurrentLoginUser(unitId));
     }
 
     @ApiOperation(value = "get All Assessment of unit")
     @GetMapping("/assessment")
-    public ResponseEntity<ResponseDTO<List<AssessmentResponseDTO>>> getAllAssessmentByUnitId(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(organizationId));
+    public ResponseEntity<ResponseDTO<List<AssessmentResponseDTO>>> getAllAssessmentByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
     }
 
     @ApiOperation(value = "delete Assessment by id")
     @DeleteMapping("/assessment/{assessmentId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long organizationId,@PathVariable Long assessmentId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentById(organizationId,assessmentId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable Long assessmentId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentById(unitId,assessmentId));
     }
 
 
     @ApiOperation(value = "save answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long organizationId, @PathVariable Long assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerDTO> assessmentAnswerValueObjects , @RequestParam(required = true) AssessmentStatus status) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentAnswerByUnitIdAndAssessmentId(organizationId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
+    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable Long assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerDTO> assessmentAnswerValueObjects , @RequestParam(required = true) AssessmentStatus status) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentAnswerByUnitIdAndAssessmentId(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
     }
 
     @ApiOperation(value = "get assessment scheduling frequency enum")
@@ -92,12 +92,12 @@ class AssessmentController {
 
     @ApiOperation(value = "Change Assessment status")
     @PutMapping("/assessment/{assessmentId}/status")
-    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long organizationId, @PathVariable Long assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
+    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable Long assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
         if (!Optional.ofNullable(assessmentStatus).isPresent())
         {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "please enter valid param");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.updateAssessmentStatus(organizationId, assessmentId,assessmentStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.updateAssessmentStatus(unitId, assessmentId,assessmentStatus));
     }
 
 

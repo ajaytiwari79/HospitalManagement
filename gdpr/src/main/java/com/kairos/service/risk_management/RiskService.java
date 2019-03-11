@@ -37,8 +37,8 @@ public class RiskService{
     }
 
 
-    public List<RiskResponseDTO> getAllRiskByUnitId(Long organizationId) {
-        return riskDaoImpl.getAllRiskOfOrganizationId(organizationId);
+    public List<RiskResponseDTO> getAllRiskByUnitId(Long unitId) {
+        return riskDaoImpl.getAllRiskOfOrganizationId(unitId);
     }
 
 

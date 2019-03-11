@@ -121,7 +121,7 @@ public class MasterProcessingActivityService{
 
 
     /**
-     * updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
+     * updateExistingAndCreateNewSubProcessingActivity(countryId, unitId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
      * is used for updating and creating new sub processing activity
      *
      * @param countryId
@@ -384,17 +384,17 @@ public class MasterProcessingActivityService{
 
     /**
      * @param countryId             -country id
-     * @param organizationId                -unit id which suggest Processing Activity to country admin
+     * @param unitId                -unit id which suggest Processing Activity to country admin
      * @param processingActivityDTO -contain basic detail about Processing Activity ,name and description
      * @return
      */
-    public ProcessingActivityDTO saveSuggestedMasterProcessingActivityDataFromUnit(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+    public ProcessingActivityDTO saveSuggestedMasterProcessingActivityDataFromUnit(Long countryId, Long unitId, ProcessingActivityDTO processingActivityDTO) {
   //TODO
         /*      MasterProcessingActivity previousProcessingActivity = masterProcessingActivityRepository.findByName(countryId, processingActivityDTO.getName());
         if (Optional.ofNullable(previousProcessingActivity).isPresent()) {
             return null;
         }
-        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, organizationId, true, IntegrationOperation.GET, "/organization_type/", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
+        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type/", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
         });
         MasterProcessingActivity processingActivity = buildSuggestedProcessingActivityAndSubProcessingActivity(countryId, processingActivityDTO, orgTypeSubTypeServicesAndSubServicesDTO);
         if (Optional.ofNullable(processingActivityDTO.getSubProcessingActivities()).isPresent() && CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {

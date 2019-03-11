@@ -45,21 +45,21 @@ public class OrganizationDataSourceService{
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param dataSourceDTOS
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public List<DataSourceDTO> createDataSource(Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
-        Set<String> existingDataSourceNames = dataSourceRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<DataSourceDTO> createDataSource(Long unitId, List<DataSourceDTO> dataSourceDTOS) {
+        Set<String> existingDataSourceNames = dataSourceRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS,existingDataSourceNames );
             List<DataSource> dataSources = new ArrayList<>();
             if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {
                     DataSource dataSource = new DataSource(name);
-                    dataSource.setOrganizationId(organizationId);
+                    dataSource.setOrganizationId(unitId);
                     dataSources.add(dataSource);
 
                 }
@@ -70,22 +70,22 @@ public class OrganizationDataSourceService{
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @return list of DataSource
      */
-    public List<DataSourceResponseDTO> getAllDataSource(Long organizationId) {
-        return dataSourceRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<DataSourceResponseDTO> getAllDataSource(Long unitId) {
+        return dataSourceRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id             id of DataSource
      * @return DataSource object fetch by given id
      * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
-    public DataSource getDataSource(Long organizationId, Long id) {
+    public DataSource getDataSource(Long unitId, Long id) {
 
-        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeletedFalse( id, organizationId);
+        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeletedFalse( id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -93,33 +93,33 @@ public class OrganizationDataSourceService{
     }
 
 
-    public Boolean deleteDataSource(Long organizationId, Long dataSourceId) {
+    public Boolean deleteDataSource(Long unitId, Long dataSourceId) {
 
-        List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(organizationId, dataSourceId);
+        List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
         }
-       dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, organizationId);
+       dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, unitId);
         return true;
     }
 
     /***
      * @throws DuplicateDataException throw exception if DataSource data not exist for given id
-     * @param organizationId
+     * @param unitId
      * @param id id of DataSource
      * @param dataSourceDTO
      * @return DataSource updated object
      */
-    public DataSourceDTO updateDataSource(Long organizationId, Long id, DataSourceDTO dataSourceDTO) {
+    public DataSourceDTO updateDataSource(Long unitId, Long id, DataSourceDTO dataSourceDTO) {
 
-        DataSource dataSource = dataSourceRepository.findByOrganizationIdAndDeletedAndName(organizationId,  dataSourceDTO.getName());
+        DataSource dataSource = dataSourceRepository.findByOrganizationIdAndDeletedAndName(unitId,  dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
             }
             exceptionService.duplicateDataException("message.duplicate","DataSource",dataSource.getName());
         }
-        Integer resultCount =  dataSourceRepository.updateMetadataName(dataSourceDTO.getName(), id, organizationId);
+        Integer resultCount =  dataSourceRepository.updateMetadataName(dataSourceDTO.getName(), id, unitId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "DataSource", id);
         }else{
@@ -130,9 +130,9 @@ public class OrganizationDataSourceService{
 
     }
 
-    public List<DataSourceDTO> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
+    public List<DataSourceDTO> saveAndSuggestDataSources(Long countryId, Long unitId, List<DataSourceDTO> dataSourceDTOS) {
 
-        List<DataSourceDTO> result = createDataSource(organizationId, dataSourceDTOS);
+        List<DataSourceDTO> result = createDataSource(unitId, dataSourceDTOS);
         dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, dataSourceDTOS);
         return result;
     }

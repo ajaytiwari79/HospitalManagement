@@ -36,46 +36,46 @@ class OrganizationHostingTypeController {
 
     @ApiOperation("add HostingType")
     @PostMapping("/hosting_type")
-    public ResponseEntity<Object> createHostingType(@PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
+    public ResponseEntity<Object> createHostingType(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
 
         if (CollectionUtils.isEmpty(hostingTypeDTOs.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(organizationId, hostingTypeDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(unitId, hostingTypeDTOs.getRequestBody()));
     }
 
 
     @ApiOperation("get HostingType by id")
     @GetMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> getHostingType(@PathVariable Long organizationId, @PathVariable Long hostingTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(organizationId, hostingTypeId));
+    public ResponseEntity<Object> getHostingType(@PathVariable Long unitId, @PathVariable Long hostingTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(unitId, hostingTypeId));
 
     }
 
 
     @ApiOperation("get all HostingType ")
     @GetMapping("/hosting_type")
-    public ResponseEntity<Object> getAllHostingType(@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getAllHostingType(organizationId));
+    public ResponseEntity<Object> getAllHostingType(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getAllHostingType(unitId));
     }
 
     @ApiOperation("delete HostingType  by id")
     @DeleteMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> deleteHostingType(@PathVariable Long organizationId, @PathVariable BigInteger hostingTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(organizationId, hostingTypeId));
+    public ResponseEntity<Object> deleteHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(unitId, hostingTypeId));
 
     }
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long organizationId, @PathVariable Long hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(organizationId, hostingTypeId, hostingTypeDTO));
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable Long hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(unitId, hostingTypeId, hostingTypeDTO));
     }
 
     @ApiOperation("save Hosting type And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/hosting_type/suggest")
-    public ResponseEntity<Object> saveHostingTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.saveAndSuggestHostingTypes(countryId, organizationId, hostingTypeDTOs.getRequestBody()));
+    public ResponseEntity<Object> saveHostingTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.saveAndSuggestHostingTypes(countryId, unitId, hostingTypeDTOs.getRequestBody()));
 
     }
 

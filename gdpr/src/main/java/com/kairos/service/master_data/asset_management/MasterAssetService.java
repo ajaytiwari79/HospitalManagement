@@ -220,16 +220,16 @@ public class MasterAssetService{
 
     /**
      * @param countryId -country id
-     * @param organizationId    -unit id which suggest asset to country admin
+     * @param unitId    -unit id which suggest asset to country admin
      * @param assetDTO  -contain basic detail about asset ,name and description
      * @return
      */
-    public AssetDTO saveSuggestedAssetFromUnit(Long countryId, Long organizationId, AssetDTO assetDTO) {
+    public AssetDTO saveSuggestedAssetFromUnit(Long countryId, Long unitId, AssetDTO assetDTO) {
         MasterAsset previousAsset = masterAssetRepository.findByNameAndCountryId(assetDTO.getName(), countryId);
         if (Optional.ofNullable(previousAsset).isPresent()) {
             return null;
         }
-        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, organizationId, true, IntegrationOperation.GET, "/organization_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
+        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
         });
         MasterAsset masterAsset = new MasterAsset(assetDTO.getName(), assetDTO.getDescription(), countryId, LocalDate.now(), SuggestedDataStatus.PENDING)
                 .setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
