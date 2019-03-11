@@ -17,9 +17,9 @@ import java.util.List;
 public class Asset extends BaseEntity {
 
 
-    @NotBlank(message = "Name can 't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-    @NotBlank(message = "description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private Long countryId;
     private String hostingLocation;

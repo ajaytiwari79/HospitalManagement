@@ -49,7 +49,7 @@ public class StorageFormatService{
             List<StorageFormat> storageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-                    StorageFormat storageFormat = new StorageFormat(name,countryId);
+                    StorageFormat storageFormat = new StorageFormat(countryId, name);
                     if(isSuggestion){
                         storageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         storageFormat.setSuggestedDate(LocalDate.now());

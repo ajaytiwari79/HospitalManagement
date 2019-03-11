@@ -13,7 +13,7 @@ public class AccessorParty extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
     private SuggestedDataStatus suggestedDataStatus;
@@ -59,7 +59,12 @@ public class AccessorParty extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
-    public AccessorParty(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+    public AccessorParty(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long organizationId) {
+        this.name = name;
+        this.organizationId = organizationId;
+    }
+
+    public AccessorParty( Long countryId, @NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.name = name;
         this.countryId = countryId;
     }

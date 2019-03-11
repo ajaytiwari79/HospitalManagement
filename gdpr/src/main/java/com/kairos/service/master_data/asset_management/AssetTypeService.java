@@ -174,12 +174,12 @@ public class AssetTypeService{
 
     public void findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(Long countryId, Long unitId){
         List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypesNotAssociatedWithAsset(countryId);
-        List unitLevelAssetTypes = prepareAssetTypeDataForUnitLevel(assetTypes, unitId, false);
+        List unitLevelAssetTypes = prepareAssetTypeDataForUnitLevel(assetTypes, unitId, false, null);
         assetTypeRepository.saveAll(unitLevelAssetTypes);
     }
 
 
-    List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType){
+    public List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType,AssetType parentAssetType){
         List<AssetType> unitLevelAssetTypes = new ArrayList<>();
         assetTypes.forEach(assetType -> {
             AssetType unitLevelAssetType = new AssetType();
@@ -188,13 +188,52 @@ public class AssetTypeService{
             unitLevelAssetType.setSubAssetType(assetType.isSubAssetType());
             unitLevelAssetType.setOrganizationId(unitId);
             unitLevelAssetType.setCountryId(null);
-            unitLevelAssetType.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assetType.getRisks(), Risk.class));
+            List<Risk> unitLevelAssetTypeRiskList = new ArrayList<>();
+            assetType.getRisks().forEach(risk -> {
+                Risk unitLevelAssetTypeRisk = new Risk(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
+                unitLevelAssetTypeRisk.setOrganizationId(unitId);
+                unitLevelAssetTypeRiskList.add(unitLevelAssetTypeRisk);
+            });
+            unitLevelAssetType.setRisks(unitLevelAssetTypeRiskList);
             if(!isSubAssetType) {
-                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true));
+                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true, assetType));
+                if(!unitLevelAssetType.getSubAssetTypes().isEmpty()) {
+                    unitLevelAssetType.setHasSubAssetType(true);
+                }
+            }
+            if(isSubAssetType){
+                unitLevelAssetType.setAssetType(parentAssetType);
             }
             unitLevelAssetTypes.add(unitLevelAssetType);
         });
             return unitLevelAssetTypes;
+    }
+
+    public AssetType prepareAssetTypeDataForUnitLevel(AssetType assetType, Long unitId, boolean isSubAssetType, AssetType parentAssetType){
+            AssetType unitLevelAssetType = new AssetType();
+            unitLevelAssetType.setName(assetType.getName());
+            //unitLevelAssetType.setHasSubAssetType(assetType.isHasSubAssetType());
+            unitLevelAssetType.setSubAssetType(assetType.isSubAssetType());
+            unitLevelAssetType.setOrganizationId(unitId);
+            unitLevelAssetType.setCountryId(null);
+            List<Risk> unitLevelAssetTypeRiskList = new ArrayList<>();
+            assetType.getRisks().forEach(risk -> {
+                Risk unitLevelAssetTypeRisk = new Risk(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
+                unitLevelAssetTypeRisk.setOrganizationId(unitId);
+                unitLevelAssetTypeRiskList.add(unitLevelAssetTypeRisk);
+            });
+            unitLevelAssetType.setRisks(unitLevelAssetTypeRiskList);
+            if(!isSubAssetType) {
+                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true, unitLevelAssetType));
+                if(!unitLevelAssetType.getSubAssetTypes().isEmpty()) {
+                    unitLevelAssetType.setHasSubAssetType(true);
+                }
+            }
+            if(isSubAssetType){
+                unitLevelAssetType.setAssetType(parentAssetType);
+            }
+
+        return unitLevelAssetType;
     }
 
     /**

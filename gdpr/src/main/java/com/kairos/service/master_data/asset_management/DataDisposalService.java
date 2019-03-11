@@ -48,7 +48,7 @@ public class DataDisposalService{
         List<DataDisposal> dataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposal dataDisposal = new DataDisposal(name, countryId);
+                DataDisposal dataDisposal = new DataDisposal(countryId, name);
                 if (isSuggestion) {
                     dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     dataDisposal.setSuggestedDate(LocalDate.now());

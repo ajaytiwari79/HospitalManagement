@@ -18,7 +18,7 @@ import java.util.List;
 public class MasterAsset extends BaseEntity {
 
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private  String name;
     @NotBlank(message = "error.message.name.cannotbe.null.or.empty")
     private String description;

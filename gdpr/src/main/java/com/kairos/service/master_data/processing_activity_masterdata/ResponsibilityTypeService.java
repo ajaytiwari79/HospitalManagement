@@ -49,7 +49,7 @@ public class ResponsibilityTypeService {
         List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
         if (!responsibilityTypeNames.isEmpty()) {
             for (String name : responsibilityTypeNames) {
-                ResponsibilityType responsibilityType = new ResponsibilityType(name, countryId);
+                ResponsibilityType responsibilityType = new ResponsibilityType(countryId, name);
                 if (isSuggestion) {
                     responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     responsibilityType.setSuggestedDate(LocalDate.now());
