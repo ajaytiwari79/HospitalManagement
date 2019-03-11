@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.AppConstants.HOURS;
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -102,7 +104,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
-                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ HOURS);
             }
         }
     }

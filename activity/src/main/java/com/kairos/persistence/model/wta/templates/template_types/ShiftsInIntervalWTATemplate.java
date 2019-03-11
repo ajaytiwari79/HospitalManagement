@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static com.kairos.constants.AppConstants.HOURS;
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -132,7 +134,7 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
-                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]/60+" "+ HOURS);
             }
         }
     }

@@ -145,7 +145,7 @@ public class RuletemplateUtils {
         return updatedShifts;
     }
 
-    public static void brokeRuleTemplate(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, WTABaseRuleTemplate wtaBaseRuleTemplate) {
+    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, BigInteger wtaRuleTemplateId, String wtaRuleTemplateName) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
             if (counterCount != null) {
@@ -155,9 +155,9 @@ public class RuletemplateUtils {
                     counterCount = 0;
                     canBeIgnore = false;
                 }
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, canBeIgnore);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, counterCount, true, canBeIgnore,counterCount);
             } else {
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), 0, true, false);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, null, true, false,counterCount);
             }
             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
         }

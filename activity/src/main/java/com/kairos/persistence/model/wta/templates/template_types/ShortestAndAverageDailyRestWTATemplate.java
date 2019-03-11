@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -120,7 +121,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
                     }
                 }
                 boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
-                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]/60+" "+ HOURS);
             }
         }
     }

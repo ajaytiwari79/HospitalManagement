@@ -11,7 +11,8 @@ public class WorkTimeAgreementRuleViolation {
 
     private BigInteger ruleTemplateId;
     private String name;
-    private int counter;
+    private Integer counter;
+    private Integer totalCounter;
     private boolean broken;
     private boolean canBeIgnore;
 
@@ -19,12 +20,13 @@ public class WorkTimeAgreementRuleViolation {
     public WorkTimeAgreementRuleViolation() {
     }
 
-    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, int counter, boolean broken, boolean canBeIgnore) {
+    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, Integer counter, boolean broken, boolean canBeIgnore,Integer totalCounter) {
         this.ruleTemplateId = ruleTemplateId;
         this.name = name;
         this.counter = counter;
         this.broken = broken;
         this.canBeIgnore = canBeIgnore;
+        this.totalCounter = totalCounter;
     }
 
     public BigInteger getRuleTemplateId() {
@@ -65,5 +67,17 @@ public class WorkTimeAgreementRuleViolation {
 
     public void setCanBeIgnore(boolean canBeIgnore) {
         this.canBeIgnore = canBeIgnore;
+    }
+
+    public void setCounter(Integer counter) {
+        this.counter = counter;
+    }
+
+    public Integer getTotalCounter() {
+        return totalCounter;
+    }
+
+    public void setTotalCounter(Integer totalCounter) {
+        this.totalCounter = totalCounter;
     }
 }

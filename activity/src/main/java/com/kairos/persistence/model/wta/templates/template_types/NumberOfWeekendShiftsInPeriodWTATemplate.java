@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -168,7 +169,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
                 count = getDayOFF(intervals,dateTimeInterval);
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
-                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ DAYS);
             }
         }
     }
