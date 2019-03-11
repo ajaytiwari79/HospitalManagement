@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class AgreementSectionService{
+public class AgreementSectionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionService.class);
 
@@ -62,7 +62,7 @@ public class AgreementSectionService{
      */
     public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long referenceId, boolean isOrganization, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
         AgreementTemplateSectionResponseDTO agreementTemplateSectionResponseDTO = new AgreementTemplateSectionResponseDTO();
-        PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId,referenceId);
+        PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }
@@ -89,33 +89,33 @@ public class AgreementSectionService{
     }
 
     @SuppressWarnings("unchecked")
-    private List<ClauseBasicDTO> findNewClauses(List<AgreementSectionDTO> sectionDTOList){
-         List<ClauseBasicDTO> list= new ArrayList();
-        sectionDTOList.forEach( section -> {
-            List<ClauseBasicDTO> clauses   = section.getClauses().stream().filter( c -> c.getId() == null).collect(Collectors.toList());
+    private List<ClauseBasicDTO> findNewClauses(List<AgreementSectionDTO> sectionDTOList) {
+        List<ClauseBasicDTO> list = new ArrayList();
+        sectionDTOList.forEach(section -> {
+            List<ClauseBasicDTO> clauses = section.getClauses().stream().filter(c -> c.getId() == null).collect(Collectors.toList());
             clauses.addAll(findNewClauses(section.getAgreementSubSections()));
             list.addAll(clauses);
         });
         return list;
     }
 
-    private void mapClauseIdToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList, Map<UUID,Long > clauseData){
-        sectionDTOList.forEach( section -> {
-            section.getClauses().forEach( clause -> {
-                if(clauseData.containsKey(clause.getTempClauseId())) {
+    private void mapClauseIdToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList, Map<UUID, Long> clauseData) {
+        sectionDTOList.forEach(section -> {
+            section.getClauses().forEach(clause -> {
+                if (clauseData.containsKey(clause.getTempClauseId())) {
                     clause.setId(clauseData.get(clause.getTempClauseId()));
                 }
             });
-            mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(),clauseData);
+            mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(), clauseData);
         });
     }
 
 
-    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList){
+    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList) {
         List<ClauseBasicDTO> newClauses = findNewClauses(sectionDTOList);
         List<Clause> clauses = ObjectMapperUtils.copyPropertiesOfListByMapper(newClauses, Clause.class);
         clauses = clauseRepository.saveAll(clauses);
-        Map<UUID,Long > clauseData = new HashMap<>();
+        Map<UUID, Long> clauseData = new HashMap<>();
         clauses.forEach(clause -> clauseData.put(clause.getTempClauseId(), clause.getId()));
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSection.class);
@@ -130,7 +130,7 @@ public class AgreementSectionService{
 
         AgreementSection agreementSection = isOrganization ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section", sectionId);
         }
         PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         policyAgreementTemplate.getAgreementSections().remove(agreementSection);
@@ -148,10 +148,10 @@ public class AgreementSectionService{
      */
     public boolean deleteAgreementSubSection(Long sectionId, Long subSectionId) {
 
-        Integer updateCount = agreementSectionRepository.deleteAgreementSubSection(sectionId,subSectionId );
+        Integer updateCount = agreementSectionRepository.deleteAgreementSubSection(sectionId, subSectionId);
         if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.subSection" + sectionId);
-        }else{
+        } else {
             LOGGER.info("Sub section with id :: {} is successfully deleted from section with id :: {}", subSectionId, sectionId);
         }
 
@@ -523,7 +523,7 @@ public class AgreementSectionService{
         Integer updateCount = agreementSectionRepository.removeClauseIdFromAgreementSection(sectionId, clauseId);
         if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
-        }else{
+        } else {
             LOGGER.info("Clause with id :: {} removed from section with id :: {}", clauseId, sectionId);
         }
 
