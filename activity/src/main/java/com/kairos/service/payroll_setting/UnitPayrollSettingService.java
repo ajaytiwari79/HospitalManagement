@@ -51,7 +51,8 @@ public class UnitPayrollSettingService extends MongoBaseService {
         List<UnitPayrollSetting> unitPayrollSettings = new ArrayList<>();
         validatePayrollPeriod(unitPayrollSettingDTO, unitId);
         unitPayrollSettingMongoRepository.findAndDeletePayrollPeriodByUnitIdAndPayrollFrequency(unitId, unitPayrollSettingDTO.getPayrollFrequency());
-        List<LocalDate> payrollStartDates = Arrays.asList(unitPayrollSettingDTO.getStartDate());
+        List<LocalDate> payrollStartDates = new ArrayList<>();
+        payrollStartDates.add(unitPayrollSettingDTO.getStartDate());
         if (unitPayrollSettingDTO.getStartDate().plusYears(1).minusDays(1).isAfter(getlastDayOfYear(unitPayrollSettingDTO.getStartDate()))) {
             payrollStartDates.add(getFirstDayOfNextYear(unitPayrollSettingDTO.getStartDate()));
         }
