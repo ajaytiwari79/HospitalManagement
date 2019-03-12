@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -143,22 +142,25 @@ public class UnitPayrollSettingService extends MongoBaseService {
     public List<UnitPayrollSetting> addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency payrollFrequency,Long unitId) {
         List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(payrollFrequency, unitId);
         if(isCollectionNotEmpty(unitPayrollSettings)) {
-            unitPayrollSettings = addPayrollPeriodViaJob(unitPayrollSettings, payrollFrequency);
+            unitPayrollSettings = addPayrollPeriodInUnit(unitPayrollSettings, payrollFrequency);
             unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
+            logger.info("successfully added payroll period in unit");
         }
         return unitPayrollSettings;
     }
 
-    public boolean createJobForAddpayrollPeriod(){
-        List<SchedulerPanelDTO> schedulerPanelDTOS=Arrays.asList(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.CREATE_PAYROLL_PERIOD,true,LocalTime.of(10,30),false));
+    public boolean createJobForAddPayrollPeriod(){
+        List<SchedulerPanelDTO> schedulerPanelDTOS=Arrays.asList(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.CREATE_PAYROLL_PERIOD,true,LocalTime.of(11,20),false));
         logger.info("create job for add payroll period");
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
-        logger.info("job register of add payroll period");
+        logger.info("job registered of add payroll period");
         return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 
-    private List<UnitPayrollSetting> addPayrollPeriodViaJob(List<UnitPayrollSetting> unitPayrollSettings, PayrollFrequency payrollFrequency) {
+
+    //use for add payroll period via job or manual
+    private List<UnitPayrollSetting> addPayrollPeriodInUnit(List<UnitPayrollSetting> unitPayrollSettings, PayrollFrequency payrollFrequency) {
         List<UnitPayrollSetting> updateUnitPayrollSettings = new ArrayList<>();
         UnitPayrollSetting newUnitPayrollSetting = null;
         updateUnitPayrollSettings.addAll(unitPayrollSettings);

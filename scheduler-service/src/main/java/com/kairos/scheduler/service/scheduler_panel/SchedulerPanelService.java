@@ -377,7 +377,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
     private String cronExpressionEveryMonthBuilder(LocalTime localTime) {
-        String cronExpressionRunOnce = "0 {0} {1} 12 * ?";
+        String cronExpressionRunOnce = "0 {0} {1} 11-12 * ?";
         String hours = String.valueOf(localTime.getHour());
         String minutes = String.valueOf(localTime.getMinute());
         logger.info("hours--> " + hours);
