@@ -262,26 +262,29 @@ public class FunctionalPaymentService {
         }
         functionalPayment.get().setPublished(true);
         functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
-
-        FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
-        FunctionalPayment oldFunctionalPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
-        if(oldFunctionalPayment!=null && functionalPaymentDTO.getStartDate().isAfter(oldFunctionalPayment.getStartDate()) && oldFunctionalPayment.getEndDate()==null){
-            exceptionService.actionNotPermittedException("message.already.active");
+        FunctionalPaymentDTO publishedFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
+        FunctionalPayment onGoingFunctionalPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
+        boolean onGoingUpdated=false;
+        if(onGoingFunctionalPayment!=null && functionalPaymentDTO.getStartDate().isAfter(onGoingFunctionalPayment.getStartDate()) && onGoingFunctionalPayment.getEndDate()==null){
+            onGoingFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1));
+            functionalPaymentGraphRepository.save(onGoingFunctionalPayment);
+            functionalPaymentGraphRepository.detachFunctionalPayment(functionalPaymentId,publishedFunctionalPayment.getId());
+            functionalPayment.get().setEndDate(null);
+            onGoingUpdated=true;
         }
-
-        if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
-            if (parentFunctionalPayment.getStartDate().isEqual(functionalPaymentDTO.getStartDate()) || parentFunctionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate())){
+        if (!onGoingUpdated && Optional.ofNullable(publishedFunctionalPayment).isPresent()) {
+            if (publishedFunctionalPayment.getStartDate().isEqual(functionalPaymentDTO.getStartDate()) || publishedFunctionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate())){
                 exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan_or_equals.parent_startDate");
             }
-            functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
+            functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, publishedFunctionalPayment.getId(),
                     functionalPaymentDTO.getStartDate().minusDays(1L).toString());
-            parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
-            if (functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
+            publishedFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
+            if (onGoingFunctionalPayment==null && functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
                 functionalPayment.get().setEndDate(null);
             }
         }
         functionalPaymentGraphRepository.save(functionalPayment.get());
-        return parentFunctionalPayment;
+        return publishedFunctionalPayment;
 
     }
 
