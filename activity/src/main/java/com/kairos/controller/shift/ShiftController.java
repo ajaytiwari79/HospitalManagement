@@ -18,22 +18,20 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 
 /**
  * Created by vipul on 30/8/17.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
-@Api(API_ORGANIZATION_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
+@Api(API_UNIT_URL)
 public class ShiftController {
     @Inject
     private ShiftService shiftService;
@@ -57,7 +55,7 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShift(@RequestParam("type") String type, @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type));
     }
 
 
