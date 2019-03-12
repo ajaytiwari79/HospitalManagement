@@ -14,7 +14,6 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
@@ -43,7 +42,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeR
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
-import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
@@ -61,7 +59,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
@@ -144,7 +141,7 @@ public class ExpertiseService {
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
                     getSector(expertiseDTO.getSector(), country));
-            prepareExpertiseWhileCreate(expertise, expertiseDTO, country,true);
+            prepareExpertise(expertise, expertiseDTO, country,true);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
@@ -265,7 +262,7 @@ public class ExpertiseService {
     }
 
 
-    private void prepareExpertiseWhileCreate(Expertise expertise, ExpertiseDTO expertiseDTO, Country country,boolean create) {
+    private void prepareExpertise(Expertise expertise, ExpertiseDTO expertiseDTO, Country country, boolean create) {
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
@@ -385,7 +382,7 @@ public class ExpertiseService {
             expertiseResponseDTO.getUnion().setId(copiedExpertise.getUnion().getId());
 
         } else {
-            prepareExpertiseWhileCreate(currentExpertise, expertiseDTO, country,false);
+            prepareExpertise(currentExpertise, expertiseDTO, country,false);
             // update in current expertise :)
             if (seniorityLevelToUpdate.isPresent()) {
                 validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
