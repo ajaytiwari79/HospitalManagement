@@ -347,14 +347,9 @@ public class ShiftBreakService {
     }
 
     private ShiftActivity getShiftByStartDuration(Shift shift, Date startDate, Date endDate) {
-        ShiftActivity childShift;
         Optional<ShiftActivity> currentShiftActivity = shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime() <= startDate.getTime() && shiftActivity.getEndDate().getTime() > startDate.getTime())).findFirst();
-        if (currentShiftActivity.isPresent()) {
-            childShift = new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), false, currentShiftActivity.get().getAbsenceReasonCodeId(), null);
-        } else {
-            childShift = new ShiftActivity(shift.getActivities().get(0).getActivityName(), startDate, endDate, shift.getActivities().get(0).getActivityId(), false, shift.getActivities().get(0).getAbsenceReasonCodeId(), null);
-        }
-        return childShift;
+        ShiftActivity childShift = currentShiftActivity.isPresent() ? currentShiftActivity.get() : shift.getActivities().get(0);
+        return new ShiftActivity(childShift.getActivityName(), startDate, endDate, childShift.getActivityId(), false, childShift.getAbsenceReasonCodeId(), null,childShift.getRemarks());
 
     }
 
