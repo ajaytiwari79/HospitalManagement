@@ -703,13 +703,12 @@ public class StaffRetrievalService {
         staffUnitPositionUnitDataWrapper.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
     }
 
-    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, Long unitPositionId, Long unitId) {
+    public StaffAdditionalInfoDTO getStaffEmploymentData(Long unitPositionId, Long unitId) {
         StaffUnitPositionDetails unitPositionDetails = unitPositionService.getUnitPositionDetails(unitPositionId);
         if (!Optional.ofNullable(unitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unitposition.id.notexist", unitPositionId);
         }
         List<AppliedFunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionDetails.getAppliedFunctions(), AppliedFunctionDTO.class);
-        appliedFunctionDTOS.removeIf(localDate -> !localDate.equals(shiftDate));
         unitPositionDetails.setAppliedFunctions(appliedFunctionDTOS);
         List<ReasonCodeResponseDTO> reasonCodeQueryResults = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE);
         List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeQueryResults, ReasonCodeDTO.class);
