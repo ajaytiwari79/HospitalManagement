@@ -5,6 +5,7 @@ import com.kairos.dto.activity.payroll_setting.UnitPayrollSettingDTO;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import org.apache.commons.collections.ComparatorUtils;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -47,18 +48,19 @@ public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollS
     }
 
     @Override
-    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(PayrollFrequency payrollFrequency,Long unitId) {
+    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(PayrollFrequency payrollFrequency, Long unitId) {
         String addFieldOperation = "{'$addFields':{'endDate':{ '$arrayElemAt': [ '$payrollPeriods.endDate', -1 ]}}}";
-        String sortByEndDate="{'$sort':{'endDate':-1}}";
-        Criteria criteria=Criteria.where("payrollFrequency").is(payrollFrequency).and("published").is(true);
-        if(isNotNull(unitId)){
+        String sortByEndDate = "{'$sort':{'unitId':-1,'endDate':-1}}";
+        Criteria criteria = Criteria.where("payrollFrequency").is(payrollFrequency).and("published").is(true);
+        if (isNotNull(unitId)) {
             criteria.and("unitId").is(unitId);
         }
         Aggregation aggregation = newAggregation(
                 match(criteria),
                 new CustomAggregationOperation(Document.parse(addFieldOperation)),
                 new CustomAggregationOperation(Document.parse(sortByEndDate)),
-                limit(1)
+                group("unitId").first("$$ROOT").as("data"),
+                replaceRoot("data")
         );
         AggregationResults<UnitPayrollSetting> results = mongoTemplate.aggregate(aggregation, UnitPayrollSetting.class, UnitPayrollSetting.class);
         return results.getMappedResults();

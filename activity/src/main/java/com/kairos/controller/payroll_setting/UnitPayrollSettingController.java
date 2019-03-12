@@ -70,7 +70,7 @@ public class UnitPayrollSettingController {
 
     @ApiOperation(value = "add PayRoll Period by button")
     @PutMapping(value="/payroll_period_manual")
-    public ResponseEntity<Map<String, Object>> update(Long unitId,@RequestParam PayrollFrequency payrollFrequency) {
+    public ResponseEntity<Map<String, Object>> update(@PathVariable Long unitId,@RequestParam PayrollFrequency payrollFrequency) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(payrollFrequency,unitId));
 
     }
