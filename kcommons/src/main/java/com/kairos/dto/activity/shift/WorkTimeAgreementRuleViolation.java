@@ -45,12 +45,8 @@ public class WorkTimeAgreementRuleViolation {
         this.name = name;
     }
 
-    public int getCounter() {
+    public Integer getCounter() {
         return counter;
-    }
-
-    public void setCounter(int counter) {
-        this.counter = counter;
     }
 
     public boolean isBroken() {

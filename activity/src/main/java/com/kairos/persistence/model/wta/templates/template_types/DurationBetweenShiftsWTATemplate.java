@@ -104,7 +104,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
-                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ HOURS);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ HOURS,limitAndCounter[2]);
             }
         }
     }

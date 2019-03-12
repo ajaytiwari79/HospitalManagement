@@ -134,7 +134,7 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
-                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]/60+" "+ HOURS);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]/60+" "+ HOURS,limitAndCounter[2]);
             }
         }
     }

@@ -103,7 +103,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
             int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
             boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60);
-            brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ HOURS);
+            brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ HOURS,limitAndCounter[2]);
         }
     }
 

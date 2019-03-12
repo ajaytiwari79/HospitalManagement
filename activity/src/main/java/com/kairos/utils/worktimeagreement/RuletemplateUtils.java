@@ -145,7 +145,7 @@ public class RuletemplateUtils {
         return updatedShifts;
     }
 
-    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, BigInteger wtaRuleTemplateId, String wtaRuleTemplateName) {
+    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, BigInteger wtaRuleTemplateId, String wtaRuleTemplateName,Integer totalCounter) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
             if (counterCount != null) {
@@ -155,9 +155,9 @@ public class RuletemplateUtils {
                     counterCount = 0;
                     canBeIgnore = false;
                 }
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, counterCount, true, canBeIgnore,counterCount);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, counterCount, true, canBeIgnore,totalCounter);
             } else {
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, null, true, false,counterCount);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, null, true, false,totalCounter);
             }
             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
         }
@@ -166,11 +166,13 @@ public class RuletemplateUtils {
 
 
     public static Integer[] getValueByPhase(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues, WTABaseRuleTemplate ruleTemplate) {
-        Integer[] limitAndCounter = new Integer[2];
+        Integer[] limitAndCounter = new Integer[3];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName())) {
                 limitAndCounter[0] = (int) (infoWrapper.getUser().getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
-                limitAndCounter[1] = getCounterValue(infoWrapper, phaseTemplateValue, ruleTemplate);
+                Integer[] counterValue = getCounterValue(infoWrapper, phaseTemplateValue, ruleTemplate);
+                limitAndCounter[1] = counterValue[0];
+                limitAndCounter[2] = counterValue[1];
                 break;
             }
         }
@@ -188,20 +190,21 @@ public class RuletemplateUtils {
         return false;
     }
 
-    public static Integer getCounterValue(RuleTemplateSpecificInfo infoWrapper, PhaseTemplateValue phaseTemplateValue, WTABaseRuleTemplate ruleTemplate) {
-        Integer counterValue = null;
+    public static Integer[] getCounterValue(RuleTemplateSpecificInfo infoWrapper, PhaseTemplateValue phaseTemplateValue, WTABaseRuleTemplate ruleTemplate) {
+        Integer totalCounterValue = null;
         if (infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()) {
-            counterValue = ruleTemplate.getStaffCanIgnoreCounter();
-            if (counterValue == null) {
+            totalCounterValue = ruleTemplate.getStaffCanIgnoreCounter();
+            if (totalCounterValue == null) {
                 throwException("message.ruleTemplate.counter.value.notNull", ruleTemplate.getName());
             }
         } else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
-            counterValue = ruleTemplate.getManagementCanIgnoreCounter();
-            if (counterValue == null) {
+            totalCounterValue = ruleTemplate.getManagementCanIgnoreCounter();
+            if (totalCounterValue == null) {
                 throwException("message.ruleTemplate.counter.value.notNull", ruleTemplate.getName());
             }
         }
-        return counterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getName(), counterValue) : null;
+        Integer availableCounter = totalCounterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(), totalCounterValue) : null;
+        return new Integer[]{availableCounter,totalCounterValue};
 
     }
 
