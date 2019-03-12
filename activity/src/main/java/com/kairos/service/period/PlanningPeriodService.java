@@ -91,8 +91,8 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject private ShiftStateService shiftStateService;
 
     // To get list of phases with duration in days
-    public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
-        List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
+    public Map<Long,List<PhaseDTO>> getPhasesWithDurationInDays(Long unitId) {
+        List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByUnitIds(Arrays.asList(unitId), Sort.Direction.DESC);
         phases.forEach(phase -> {
             if (DurationType.DAYS.equals(phase.getDurationType())) {
                 phase.setDurationInDays(phase.getDuration());
@@ -105,7 +105,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 phase.setDurationType(DurationType.HOURS);
             }
         });
-        return phases;
+        return phases.stream().collect(Collectors.groupingBy(k->k.getOrganizationId()));
     }
 
     // Prepare map for phases with id as key and sequence as value
@@ -174,14 +174,14 @@ public class PlanningPeriodService extends MongoBaseService {
         if (requestPlanningPeriods.isEmpty()) {
             exceptionService.actionNotPermittedException("message.period.request.phase.notfound");
         }
-        List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
-        if (!Optional.ofNullable(phases).isPresent()) {
+        Map<Long,List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(unitId);
+        if (!unitIdAndPhasesMap.containsKey(unitId)) {
             exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
         }
         LocalDate startDate = requestPlanningPeriods.get(0).getStartDate();
         LocalDate endDate = requestPlanningPeriods.get(requestPlanningPeriods.size() - 1).getEndDate();
         if (requestPlanningPeriods.size() > 0) {
-            createMigratedPlanningPeriodForTimeDuration(startDate, endDate, unitId, planningPeriodDTO, phases);
+            createMigratedPlanningPeriodForTimeDuration(startDate, endDate, unitId, planningPeriodDTO, unitIdAndPhasesMap.get(unitId));
             for (PlanningPeriod planningPeriod : requestPlanningPeriods) {
                 planningPeriod.setActive(false);
             }
@@ -321,9 +321,9 @@ public class PlanningPeriodService extends MongoBaseService {
 
 
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
-        List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
-        ;
-        if (!Optional.ofNullable(phases).isPresent()) {
+        Map<Long,List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(unitId);
+        
+        if (!unitIdAndPhasesMap.containsKey(unitId)) {
             exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
         }
 
@@ -342,8 +342,13 @@ public class PlanningPeriodService extends MongoBaseService {
                 exceptionService.actionNotPermittedException("error.period.start.date.invalid");
             }
         }
-        createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
+        createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, unitIdAndPhasesMap.get(unitId), planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
+        createScheduleJobOfPanningPeriod(unitId, planningPeriods);
+        return getPlanningPeriods(unitId, planningPeriodDTO.getStartDate(), (planningPeriodDTO.getEndDate() != null) ? planningPeriodDTO.getEndDate() : null);
+    }
+
+    private void createScheduleJobOfPanningPeriod(Long unitId, List<PlanningPeriod> planningPeriods) {
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         planningPeriods.parallelStream().forEach(planningPeriod -> {
             planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
@@ -365,7 +370,6 @@ public class PlanningPeriodService extends MongoBaseService {
             });
             save(planningPeriods);
         }
-        return getPlanningPeriods(unitId, planningPeriodDTO.getStartDate(), (planningPeriodDTO.getEndDate() != null) ? planningPeriodDTO.getEndDate() : null);
     }
 
 
@@ -710,7 +714,12 @@ public class PlanningPeriodService extends MongoBaseService {
         userIntegrationService.restoreFunctionsWithDatesByUnitPositionIds(unitPositionIdWithShiftDateFunctionIdMap, unitId);
     }
 
-    public PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
+    private PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
         return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+    }
+
+    private boolean addPlanningPeriodViaJob(){
+
+        return true;
     }
 }
