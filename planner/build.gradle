@@ -1,7 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.2.RELEASE'
-
+		projectVersion = "0.0.1"
 	}
 	repositories {
 		mavenCentral()
@@ -21,7 +21,7 @@ ext {
 	versionoptaplannerbom='7.14.0.Final'
 	versionlogback='1.2.3'
 }
-
+version = "$projectVersion-SNAPSHOT"
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -46,29 +46,18 @@ repositories {
 	maven { url "http://repo.spring.io/release" }
 	maven {url 'https://repository.jboss.org/' }
 }
-/*Closure cl = { task -> println ".............I'm $task.project.name" }
-project("optaplanner-shiftplanning"){
-    task jello{
-        println "..........."
-
-    }
-}*/
 
 dependencies {
 	compile project('optaplanner-shiftplanning')
 	compile project('optaplanner-taskplanning')
 	compile project('optaplanner-vrp-taskplanning')
-	//compile project('responseWrapper')
 	compile project (':kcommons')
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
-	//compile group: 'org.springframework.data', name: 'spring-data-cassandra', version: '2.0.6.RELEASE'
 	compile group: 'com.google.guava', name: 'guava', version: '19.0'
 	compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.2'
 	compile group: 'io.netty', name: 'netty-all', version: '4.1.15.Final'
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
-	compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")/*{
-		exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
-	}*/
+	compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
 	compile('org.springframework.cloud:spring-cloud-starter-security')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
@@ -79,12 +68,6 @@ dependencies {
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 	compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
-
-
-
-
-
-
 }
 subprojects {
 	repositories {
@@ -108,16 +91,7 @@ subprojects {
 			testCompile group: 'junit', name: 'junit', version: '4.12'
 			compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
 		}
-	}/*else{
-		apply plugin: 'java'
-		dependencies {
-			testCompile group: 'junit', name: 'junit', version: '4.12'
-			compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
-			compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.3'
-			compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
-			compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.4'
-		}
-	}*/
+	}
 
 }
 dependencyManagement {
