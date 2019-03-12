@@ -577,13 +577,6 @@ public class ExpertiseService {
         return expertiseSkillQueryResult.getSkills();
     }
 
-    public List<com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO> getAllFreeExpertise(List<Long> expertiseIds) {
-        return expertiseGraphRepository.getAllFreeExpertises(expertiseIds);
-    }
-
-    public Expertise getExpertiseByCountryId(Long countryId) {
-        return expertiseGraphRepository.getExpertiesByCountry(countryId);
-    }
 
 
     public UnionServiceWrapper getUnionsAndService(Long countryId) {
