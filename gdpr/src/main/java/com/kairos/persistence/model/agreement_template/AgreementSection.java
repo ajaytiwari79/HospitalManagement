@@ -91,15 +91,16 @@ public class AgreementSection extends BaseEntity {
     }
 
 
-    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isOrganization, Long referenceId){
-        this.agreementSubSections.forEach(subSection ->{
-            if(isOrganization){
-                this.setOrganizationId(referenceId);
+    public void linkSubSectionsWithParentSectionAndCountryOrUnitId(boolean isOrganization, Long referenceId) {
+        if (isOrganization)
+            this.setOrganizationId(referenceId);
+        else
+            this.setCountryId(referenceId);
+        this.agreementSubSections.forEach(subSection -> {
+            if (isOrganization)
                 subSection.setOrganizationId(referenceId);
-            }else{
-                this.setCountryId(referenceId);
+            else
                 subSection.setCountryId(referenceId);
-            }
             subSection.setAgreementSection(this);
         });
     }
