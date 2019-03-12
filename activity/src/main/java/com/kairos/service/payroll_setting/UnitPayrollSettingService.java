@@ -138,17 +138,9 @@ public class UnitPayrollSettingService extends MongoBaseService {
         return availableDraftPayroll;
     }
 
-//    public List<UnitPayrollSetting> addPayrollPeriodInUnitByButton(Long unitId, PayrollFrequency payrollFrequency) {
-//        List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(payrollFrequency, unitId);
-//        if(isCollectionNotEmpty(unitPayrollSettings)) {
-//            unitPayrollSettings = addPayrollPeriodViaJob(unitPayrollSettings, payrollFrequency);
-//            unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
-//        }
-//        return unitPayrollSettings;
-//    }
 
-    //in manual add payroll period we need unitId for update payroll period of unit and with job all unit payroll period update
-    public List<UnitPayrollSetting> addPayrollPeriodInUnitViaJobOrManual(Long unitId, PayrollFrequency payrollFrequency) {
+    //in manual add payroll period we need unitId for update payroll period of unit and with job all unit payroll period update and not need unitId
+    public List<UnitPayrollSetting> addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency payrollFrequency,Long unitId) {
         List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(payrollFrequency, unitId);
         if(isCollectionNotEmpty(unitPayrollSettings)) {
             unitPayrollSettings = addPayrollPeriodViaJob(unitPayrollSettings, payrollFrequency);
@@ -158,7 +150,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
     }
 
     public boolean createJobForAddpayrollPeriod(){
-        List<SchedulerPanelDTO> schedulerPanelDTOS=Arrays.asList(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.CREATE_PAYROLL_PERIOD,true,LocalTime.of(23,00),false));
+        List<SchedulerPanelDTO> schedulerPanelDTOS=Arrays.asList(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.CREATE_PAYROLL_PERIOD,true,LocalTime.of(10,30),false));
         logger.info("create job for add payroll period");
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });

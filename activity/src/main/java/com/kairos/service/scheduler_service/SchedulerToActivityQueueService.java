@@ -2,7 +2,9 @@ package com.kairos.service.scheduler_service;
 
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
+import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
+import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.dashboard.SickService;
 import com.kairos.service.shift.ShiftReminderService;
@@ -24,14 +26,16 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     ShiftReminderService shiftReminderService;
     @Inject
     private TimeAndAttendanceService timeAndAttendanceService;
+    @Inject
+    private UnitPayrollSettingService unitPayrollSettingService;
 
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
 
         switch (job.getJobSubType()) {
             case FLIP_PHASE:
-                planningPeriodService.updateFlippingDate(job.getEntityId(),job.getUnitId(),job.getId());
                 logger.info("JOB for flipping phase");
+                planningPeriodService.updateFlippingDate(job.getEntityId(),job.getUnitId(),job.getId());
                 break;
             case UPDATE_USER_ABSENCE:
                 logger.info("Job to update sick absence user and if user is not sick then add more sick shifts");
@@ -44,6 +48,12 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case ATTENDANCE_SETTING:
                 logger.info("Job to update clock out time");
                 timeAndAttendanceService.checkOutBySchedulerJob(job.getUnitId());
+                break;
+            case CREATE_PAYROLL_PERIOD:
+                logger.info("Job to create MONTHLY payroll period via job");
+                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency.MONTHLY,null);
+                logger.info("Job to create FORTNIGHTLY payroll period via job");
+                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency.FORTNIGHTLY,null);
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");
