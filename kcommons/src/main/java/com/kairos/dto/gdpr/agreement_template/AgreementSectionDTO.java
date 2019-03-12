@@ -19,8 +19,6 @@ public class AgreementSectionDTO {
     private String title;
     private Integer orderedIndex;
     private String titleHtml;
-    protected Long countryId;
-    protected Long organizationId;
     @Valid
     private List<ClauseBasicDTO> clauses = new ArrayList<>();
     @Valid
@@ -65,14 +63,6 @@ public class AgreementSectionDTO {
     public void setOrderedIndex(Integer orderedIndex) {
         this.orderedIndex = orderedIndex;
     }
-
-    public Long getCountryId() { return countryId; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public String getTitleHtml() {
         if (titleHtml == null) {
