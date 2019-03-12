@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.organization.services;
+
 import com.kairos.persistence.model.common.UserBaseEntity;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
 
 @NodeEntity
 public class OrganizationService extends UserBaseEntity {
-    @NotEmpty(message = "error.OrganizationService.name.notEmpty") @NotNull(message = "error.OrganizationService.name.notnull")
+    @NotBlank(message = "error.OrganizationService.name.notEmpty")
     private String name;
 
     private String description;
