@@ -263,11 +263,11 @@ public class FunctionalPaymentService {
         functionalPayment.get().setPublished(true);
         functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
-        FunctionalPayment onGoingFunctionalPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
+        FunctionalPayment lastFunctionPayment=functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
         boolean onGoingUpdated=false;
-        if(onGoingFunctionalPayment!=null && functionalPaymentDTO.getStartDate().isAfter(onGoingFunctionalPayment.getStartDate()) && onGoingFunctionalPayment.getEndDate()==null){
-            onGoingFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1));
-            functionalPaymentGraphRepository.save(onGoingFunctionalPayment);
+        if(lastFunctionPayment!=null && functionalPaymentDTO.getStartDate().isAfter(lastFunctionPayment.getStartDate()) && lastFunctionPayment.getEndDate()==null){
+            lastFunctionPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1));
+            functionalPaymentGraphRepository.save(lastFunctionPayment);
             functionalPaymentGraphRepository.detachFunctionalPayment(functionalPaymentId,parentFunctionalPayment.getId());
             functionalPayment.get().setEndDate(null);
             onGoingUpdated=true;
@@ -279,7 +279,7 @@ public class FunctionalPaymentService {
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
                     functionalPaymentDTO.getStartDate().minusDays(1L).toString());
             parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
-            if (onGoingFunctionalPayment==null && functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
+            if (lastFunctionPayment==null && functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
                 functionalPayment.get().setEndDate(null);
             }
         }
