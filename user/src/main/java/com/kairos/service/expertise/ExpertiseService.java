@@ -61,6 +61,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
@@ -143,7 +144,7 @@ public class ExpertiseService {
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
                     getSector(expertiseDTO.getSector(), country));
-            prepareExpertiseWhileCreate(expertise, expertiseDTO, country);
+            prepareExpertiseWhileCreate(expertise, expertiseDTO, country,true);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
@@ -264,7 +265,7 @@ public class ExpertiseService {
     }
 
 
-    private void prepareExpertiseWhileCreate(Expertise expertise, ExpertiseDTO expertiseDTO, Country country) {
+    private void prepareExpertiseWhileCreate(Expertise expertise, ExpertiseDTO expertiseDTO, Country country,boolean create) {
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
@@ -285,9 +286,8 @@ public class ExpertiseService {
         Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
             expertise.setUnion(getUnion(unionIDNameDTO.getId(), unionIDNameDTO.getName(), country));
         });
-        SeniorityLevel seniorityLevel = null;
-        if (expertiseDTO.getSeniorityLevel() != null) {
-            seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
+        if (expertiseDTO.getSeniorityLevel() != null && !create && isCollectionEmpty(expertise.getSeniorityLevel())) {
+            SeniorityLevel  seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
                     expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
             seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
@@ -385,7 +385,7 @@ public class ExpertiseService {
             expertiseResponseDTO.getUnion().setId(copiedExpertise.getUnion().getId());
 
         } else {
-            prepareExpertiseWhileCreate(currentExpertise, expertiseDTO, country);
+            prepareExpertiseWhileCreate(currentExpertise, expertiseDTO, country,false);
             // update in current expertise :)
             if (seniorityLevelToUpdate.isPresent()) {
                 validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
@@ -452,7 +452,12 @@ public class ExpertiseService {
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
-
+        if (expertiseDTO.getSeniorityLevel() != null) {
+            PayGrade payGrade = seniorityLevelGraphRepository.getPayGradeBySeniorityLevelId(expertiseDTO.getSeniorityLevel().getId());
+            if (payGrade != null && !payGrade.getId().equals(expertiseDTO.getSeniorityLevel().getPayGradeId())) {
+                seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(expertiseDTO.getSeniorityLevel().getId());
+            }
+        }
         if (!expertise.getOrganizationLevel().getId().equals(expertiseDTO.getOrganizationLevelId())) {
             Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {
@@ -910,5 +915,6 @@ public class ExpertiseService {
         }
         return getPlannedTimeAndEmploymentType(organization.getCountry().getId());
     }
+
 
 }
