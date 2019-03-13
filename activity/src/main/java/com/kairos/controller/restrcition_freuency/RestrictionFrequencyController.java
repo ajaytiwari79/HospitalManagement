@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by prabjot on 15/9/17.
  */
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/restriction_frequency")
+@RequestMapping(API_UNIT_URL + "/restriction_frequency")
 @RestController
 public class RestrictionFrequencyController {
 

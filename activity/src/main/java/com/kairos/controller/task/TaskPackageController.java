@@ -17,8 +17,8 @@ import java.util.Map;
  * Created by prabjot on 16/11/16.
  */
 @RestController
-@RequestMapping(ApiConstants.API_ORGANIZATION_UNIT_URL+"/task_package" )
-@Api(value = ApiConstants.API_ORGANIZATION_UNIT_URL+"/task_package")
+@RequestMapping(ApiConstants.API_UNIT_URL +"/task_package" )
+@Api(value = ApiConstants.API_UNIT_URL +"/task_package")
 public class TaskPackageController {
 
     @Autowired

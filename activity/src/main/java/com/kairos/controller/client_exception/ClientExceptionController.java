@@ -17,15 +17,15 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by oodles on 7/2/17.
  */
 //TODO configure oauth 2 and uncomment @PreAuthorize
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
-@Api(value = API_ORGANIZATION_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
+@Api(value = API_UNIT_URL)
 public class ClientExceptionController {
 
     @Inject

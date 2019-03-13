@@ -15,14 +15,14 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by oodles on 15/11/16.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL+"/visitator")
-@Api(API_ORGANIZATION_UNIT_URL+"/visitator")
+@RequestMapping(API_UNIT_URL +"/visitator")
+@Api(API_UNIT_URL +"/visitator")
 public class VisitatorController {
 
     @Inject
