@@ -151,8 +151,8 @@ public class SchedulerPanelService extends MongoBaseService {
         save(schedulerPanels);
         if (!Optional.ofNullable(timezone).isPresent())
             timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
-        String defaultTimezone = timezone;
-        schedulerPanels.stream().map(schedulerPanel -> dynamicCronScheduler.setCronScheduling(schedulerPanel, defaultTimezone));
+//        String defaultTimezone = timezone;
+//        schedulerPanels.stream().map(schedulerPanel -> dynamicCronScheduler.setCronScheduling(schedulerPanel, defaultTimezone));
 
         for (SchedulerPanel schedulerPanel : schedulerPanels) {
             dynamicCronScheduler.setCronScheduling(schedulerPanel, timezone);
@@ -377,7 +377,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
     private String cronExpressionEveryMonthBuilder(LocalTime localTime) {
-        String cronExpressionRunOnce = "0 {0} {1} 11-12 * ?";
+        String cronExpressionRunOnce = "0 {0} {1} 1 * ?";
         String hours = String.valueOf(localTime.getHour());
         String minutes = String.valueOf(localTime.getMinute());
         logger.info("hours--> " + hours);

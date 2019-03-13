@@ -49,7 +49,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 logger.info("Job to update clock out time");
                 timeAndAttendanceService.checkOutBySchedulerJob(job.getUnitId());
                 break;
-            case CREATE_PAYROLL_PERIOD:
+            case ADD_PAYROLL_PERIOD:
                 logger.info("Job to create MONTHLY payroll period via job");
                 unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency.MONTHLY,null);
                 logger.info("Job to create FORTNIGHTLY payroll period via job");
