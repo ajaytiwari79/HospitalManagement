@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,8 +43,8 @@ public class OrganizationServiceController {
     // PUT by id
     @RequestMapping(value = "/organization_service/{id}", method = RequestMethod.PUT)
     @ApiOperation("Update a  organization_service by id")
-    public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @RequestBody Map<String, String> data) {
-        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name"), data.get("description"));
+    public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @PathVariable Long countryId,@RequestBody Map<String, String> data) {
+        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name"), data.get("description"),countryId);
         if (organizationService == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -91,7 +92,7 @@ public class OrganizationServiceController {
     // Organization Services Based on Country
     @RequestMapping(value = "/organization_service", method = RequestMethod.POST)
     @ApiOperation("Create a new organization_service")
-    public ResponseEntity<Map<String, Object>> addOrganizationService(@PathVariable long countryId,@Validated @RequestBody OrganizationService organizationService) {
+    public ResponseEntity<Map<String, Object>> addOrganizationService(@PathVariable long countryId,@Valid @RequestBody OrganizationService organizationService) {
         organizationService = organizationServiceService.createCountryOrganizationService(countryId, organizationService);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService);
     }
