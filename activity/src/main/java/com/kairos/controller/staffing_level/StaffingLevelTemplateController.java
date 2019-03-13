@@ -18,11 +18,11 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/staffing_level_template")
-@Api(value = API_ORGANIZATION_UNIT_URL + "/staffing_level_template")
+@RequestMapping(API_UNIT_URL + "/staffing_level_template")
+@Api(value = API_UNIT_URL + "/staffing_level_template")
 public class StaffingLevelTemplateController {
 
     private static final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelTemplateController.class);

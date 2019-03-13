@@ -23,7 +23,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
 public class StaffingLevelGraphController {
@@ -32,7 +32,7 @@ public class StaffingLevelGraphController {
     @Autowired
     private StaffingLevelService staffingLevelService;
 
-    @RequestMapping(value = API_ORGANIZATION_UNIT_URL+"/staffing_level/graph", method = RequestMethod.GET)
+    @RequestMapping(value = API_UNIT_URL +"/staffing_level/graph", method = RequestMethod.GET)
     public PresenceStaffingLevelDto dynamicStaffingLevelGraphSyncResponsetest(){
 
         Duration duration=new Duration(LocalTime.now(),LocalTime.now());
