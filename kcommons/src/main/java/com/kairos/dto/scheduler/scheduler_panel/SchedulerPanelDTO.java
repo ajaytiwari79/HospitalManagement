@@ -41,7 +41,6 @@ public class SchedulerPanelDTO {
     private Long oneTimeTriggerDateMillis;
 
 
-
     public SchedulerPanelDTO() {
 
     }
@@ -63,23 +62,26 @@ public class SchedulerPanelDTO {
         this.entityId = entityId;
     }
 
-    public SchedulerPanelDTO(List<DayOfWeek> days, LocalTime runOnce, JobType jobType, JobSubType jobSubType,String timezone) {
+    public SchedulerPanelDTO(List<DayOfWeek> days, LocalTime runOnce, JobType jobType, JobSubType jobSubType, String timezone) {
         this.days = days;
         this.runOnce = runOnce;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
-        this.timezone=timezone;
+        this.timezone = timezone;
     }
 
-    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
-       this.jobType=jobType;
+    public SchedulerPanelDTO(Long unitId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId,String timezone) {
+        this.unitId = unitId;
+        this.jobType = jobType;
         this.jobSubType = jobSubType;
         this.oneTimeTrigger = oneTimeTrigger;
         this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.entityId = entityId;
+        this.timezone=timezone;
     }
+
     public SchedulerPanelDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
-                             LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger,String filterId) {
+                             LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger, String filterId) {
 
         this.unitId = unitId;
         this.jobType = jobType;
@@ -87,9 +89,10 @@ public class SchedulerPanelDTO {
         this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.entityId = entityId;
         this.oneTimeTrigger = oneTimeTrigger;
-        this.filterId=filterId;
+        this.filterId = filterId;
 
     }
+
     public SchedulerPanelDTO(BigInteger id, LocalDateTime oneTimeTriggerDate) {
         this.id = id;
         this.oneTimeTriggerDate = oneTimeTriggerDate;
@@ -102,6 +105,7 @@ public class SchedulerPanelDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
     public BigInteger getEntityId() {
         return entityId;
     }
@@ -157,7 +161,7 @@ public class SchedulerPanelDTO {
 
     public void setOneTimeTriggerDateMillis(Long oneTimeTriggerDateMillis) {
         this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
-        if(this.oneTimeTrigger && Optional.ofNullable(oneTimeTriggerDateMillis).isPresent()){
+        if (this.oneTimeTrigger && Optional.ofNullable(oneTimeTriggerDateMillis).isPresent()) {
             this.oneTimeTriggerDate = DateUtils.getLocalDateTimeFromMillis(oneTimeTriggerDateMillis);
         }
     }
@@ -203,7 +207,6 @@ public class SchedulerPanelDTO {
     public void setInterval(String interval) {
         this.interval = interval;
     }
-
 
 
     public boolean isActive() {
@@ -254,7 +257,6 @@ public class SchedulerPanelDTO {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-
 
 
     public Integer getStartMinute() {

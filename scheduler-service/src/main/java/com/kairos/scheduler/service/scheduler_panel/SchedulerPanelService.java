@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_INTERVAL_STRING;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ONCE_STRING;
 
@@ -139,7 +140,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
             schedulerPanel.setActive(true);
 
-            schedulerPanel.setUnitId(unitId);
+            schedulerPanel.setUnitId(isNotNull(schedulerPanelDTO.getUnitId()) ? schedulerPanelDTO.getUnitId() : unitId);
             //dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
 
             schedulerPanels.add(schedulerPanel);

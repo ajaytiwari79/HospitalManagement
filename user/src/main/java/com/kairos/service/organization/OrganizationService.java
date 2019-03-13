@@ -1105,6 +1105,10 @@ public class OrganizationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneforAllorganizations(), UnitTimeZoneMappingDTO.class);
     }
 
+    public List<UnitTimeZoneMappingDTO> getTimeZoneStringsByUnitIds(Set<Long> unitIds) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneByUnitIds(unitIds), UnitTimeZoneMappingDTO.class);
+    }
+
     public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization != null && !organization.isDeleted()) {

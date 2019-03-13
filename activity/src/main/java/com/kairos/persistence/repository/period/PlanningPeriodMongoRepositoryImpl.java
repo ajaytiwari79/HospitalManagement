@@ -298,6 +298,18 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     @Override
+    public List<PlanningPeriod> findLastPlanningPeriodOfAllUnit() {
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("deleted").is(false).and("active").is(true)),
+                sort(Sort.Direction.DESC, "unitId","startDate"),
+                group("unitId").first("$$ROOT").as("data"),
+                replaceRoot("data")
+        );
+        AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriod.class);
+        return results.getMappedResults();
+    }
+
+    @Override
     public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),

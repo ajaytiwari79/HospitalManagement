@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -27,6 +28,8 @@ public class PlanningPeriod extends MongoBaseEntity {
     private BigInteger nextPhaseId;
     private List<PeriodPhaseFlippingDate> phaseFlippingDate = new ArrayList<>();
     private Type type;
+    private int duration;
+    private DurationType durationType;
     private boolean active=true;
 
 
@@ -111,6 +114,22 @@ public class PlanningPeriod extends MongoBaseEntity {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public DurationType getDurationType() {
+        return durationType;
+    }
+
+    public void setDurationType(DurationType durationType) {
+        this.durationType = durationType;
     }
 
     public enum Type {

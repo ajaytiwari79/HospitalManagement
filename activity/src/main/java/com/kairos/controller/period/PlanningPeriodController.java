@@ -105,4 +105,13 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.migratePlanningPeriods(unitId, planningPeriodDTO));
     }
 
+
+    @ApiOperation(value = "Migrate Planning Period")
+    @PostMapping(value="/planning_period_job")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> PlanningPeriodViaJob() {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.addPlanningPeriodViaJob());
+    }
+
 }

@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -136,7 +137,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
                  future =  threadPoolTaskScheduler.schedule(task, trigger);
             }
             else {
-                 future =  threadPoolTaskScheduler.schedule(task,DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+                 future =  threadPoolTaskScheduler.schedule(task,DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
             }
 
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
