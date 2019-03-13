@@ -27,11 +27,11 @@ public class Asset extends BaseEntity {
     private ManagingOrganization managingDepartment;
     @Embedded
     private Staff assetOwner;
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<StorageFormat> storageFormats  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<OrganizationalSecurityMeasure> orgSecurityMeasures  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<TechnicalSecurityMeasure> technicalSecurityMeasures  = new ArrayList<>();
     @OneToOne
     private HostingProvider hostingProvider;
