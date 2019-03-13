@@ -143,7 +143,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         List<UnitPayrollSetting> unitPayrollSettings = unitPayrollSettingMongoRepository.getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(payrollFrequency, unitId);
         logger.info("add payroll period in unit");
         if (isCollectionNotEmpty(unitPayrollSettings)) {
-            unitPayrollSettings = addPayrollPeriodInUnit(unitPayrollSettings, payrollFrequency);
+            unitPayrollSettings = addPayrollPeriodInUnits(unitPayrollSettings, payrollFrequency);
             unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
             logger.info("successfully added payroll period in unit");
         }
@@ -161,7 +161,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
 
 
     //use for add payroll period via job or manually
-    private List<UnitPayrollSetting> addPayrollPeriodInUnit(List<UnitPayrollSetting> unitPayrollSettings, PayrollFrequency payrollFrequency) {
+    private List<UnitPayrollSetting> addPayrollPeriodInUnits(List<UnitPayrollSetting> unitPayrollSettings, PayrollFrequency payrollFrequency) {
         List<UnitPayrollSetting> updateUnitPayrollSettings = new ArrayList<>();
         UnitPayrollSetting newUnitPayrollSetting = null;
         updateUnitPayrollSettings.addAll(unitPayrollSettings);
