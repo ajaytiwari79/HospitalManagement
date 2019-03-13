@@ -2,7 +2,6 @@ package com.kairos.service.data_inventory.processing_activity;
 
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
@@ -22,7 +21,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
-import com.kairos.response.dto.common.RiskBasicResponseDTO;
+import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
@@ -104,7 +103,7 @@ public class ProcessingActivityService {
         ProcessingActivity processingActivity = new ProcessingActivity();
         buildProcessingActivity(unitId, processingActivityDTO, processingActivity);
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
-            processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities()));
+            processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
         }
         if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
             processingActivity.setDataSubjects(createRelatedDataProcessingActivity(unitId, processingActivityDTO.getDataSubjectSet()));
@@ -142,7 +141,7 @@ public class ProcessingActivityService {
         }
         buildProcessingActivity(unitId, processingActivityDTO, processingActivity);
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
-            processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(unitId, processingActivityDTO.getSubProcessingActivities()));
+            processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
 
         }
         processingActivityRepository.save(processingActivity);
@@ -150,11 +149,13 @@ public class ProcessingActivityService {
 
     }
 
-    private List<ProcessingActivity> createSubProcessingActivity(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+    private List<ProcessingActivity> createSubProcessingActivity(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs, ProcessingActivity processingActivity) {
         List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         for (ProcessingActivityDTO processingActivityDTO : subProcessingActivityDTOs) {
             ProcessingActivity subProcessingActivity = new ProcessingActivity();
             buildProcessingActivity(unitId, processingActivityDTO, subProcessingActivity);
+            subProcessingActivity.setSubProcessingActivity(true);
+            subProcessingActivity.setProcessingActivity(processingActivity);
             subProcessingActivity.setSubProcessingActivity(true);
             subProcessingActivities.add(subProcessingActivity);
         }
@@ -193,7 +194,7 @@ public class ProcessingActivityService {
         processingActivity.setDpoContactInfo(processingActivityDTO.getDpoContactInfo());
     }
 
-    private List<ProcessingActivity> updateExistingSubProcessingActivitiesAndCreateNewSubProcess(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+    private List<ProcessingActivity> updateExistingSubProcessingActivitiesAndCreateNewSubProcess(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs, ProcessingActivity processingActivity) {
 
         List<ProcessingActivityDTO> newSubProcessingActivityDTOList = new ArrayList<>();
         Map<Long, ProcessingActivityDTO> existingSubProcessingActivityMap = new HashMap<>();
@@ -208,7 +209,7 @@ public class ProcessingActivityService {
         if (CollectionUtils.isNotEmpty(existingSubProcessingActivityMap.keySet())) {
             subProcessingActivities.addAll(updateSubProcessingActivities(unitId, existingSubProcessingActivityMap.keySet(), existingSubProcessingActivityMap));
         } else if (CollectionUtils.isNotEmpty(newSubProcessingActivityDTOList)) {
-            subProcessingActivities.addAll(createSubProcessingActivity(unitId, newSubProcessingActivityDTOList));
+            subProcessingActivities.addAll(createSubProcessingActivity(unitId, newSubProcessingActivityDTOList, processingActivity));
         }
         return subProcessingActivities;
 
@@ -260,20 +261,17 @@ public class ProcessingActivityService {
 
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long unitId) {
         List<ProcessingActivityResponseDTO> processingActivityResponseDTOS = new ArrayList<>();
-        List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationId(unitId);
+        List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationIdAndDeletedFalse(unitId);
         processingActivitys.forEach(processingActivity -> {
             processingActivityResponseDTOS.add(prepareProcessingActivityResponseData(processingActivity));
-           /* if (!Optional.ofNullable(processingActivityResponseDTO.getSubProcessingActivities().get(0).getId()).isPresent()) {
-                processingActivityResponseDTO.setSubProcessingActivities(new ArrayList<>());
-            }*/
         });
         return processingActivityResponseDTOS;
     }
 
 
     private ProcessingActivityResponseDTO prepareProcessingActivityResponseData(ProcessingActivity processingActivity) {
-        /*ProcessingActivityResponseDTO processingActivityResponseDTO = new ProcessingActivityResponseDTO();
-        processingActivityResponseDTO.setId(processingActivityResponseDTO.getId());
+        ProcessingActivityResponseDTO processingActivityResponseDTO = new ProcessingActivityResponseDTO();
+        processingActivityResponseDTO.setId(processingActivity.getId());
         processingActivityResponseDTO.setName(processingActivity.getName());
         processingActivityResponseDTO.setDescription(processingActivity.getDescription());
         processingActivityResponseDTO.setControllerContactInfo(processingActivity.getControllerContactInfo());
@@ -291,8 +289,11 @@ public class ProcessingActivityService {
         processingActivityResponseDTO.setSuggested(processingActivity.isSuggested());
         processingActivityResponseDTO.setDataRetentionPeriod(processingActivity.getDataRetentionPeriod());
         processingActivityResponseDTO.setDpoContactInfo(processingActivity.getDpoContactInfo());
-        processingActivityResponseDTO.setDataSubjects(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject.class));*/
-        return ObjectMapperUtils.copyPropertiesByMapper(processingActivity, ProcessingActivityResponseDTO.class);
+        processingActivityResponseDTO.setDataSubjects(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class));
+        if (CollectionUtils.isNotEmpty(processingActivity.getSubProcessingActivities())) {
+            processingActivity.getSubProcessingActivities().forEach(subProcessingActivity -> processingActivityResponseDTO.getSubProcessingActivities().add(prepareProcessingActivityResponseData(subProcessingActivity)));
+        }
+        return processingActivityResponseDTO;
 
     }
 
