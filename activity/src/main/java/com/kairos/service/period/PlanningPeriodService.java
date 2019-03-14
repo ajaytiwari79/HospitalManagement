@@ -1,11 +1,13 @@
 package com.kairos.service.period;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.period.FlippingDateDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PeriodPhaseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -28,12 +30,13 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelStateMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.SchedulerServiceRestClient;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,7 +49,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,7 +65,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Service
 @Transactional
 public class PlanningPeriodService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PlanningPeriodService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlanningPeriodService.class);
 
     @Inject
     private PhaseService phaseService;
@@ -350,13 +356,13 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     private void createScheduleJobOfPanningPeriod(Long unitId, List<PlanningPeriod> planningPeriods) {
-        List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS=userIntegrationService.getTimeZoneByUnitIds(planningPeriods.stream().distinct().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toSet()));
-        Map<Long,String> unitAndTimeZoneMap=unitTimeZoneMappingDTOS.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v.getTimezone()));
+        List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneByUnitIds(planningPeriods.stream().distinct().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toSet()));
+        Map<Long, String> unitAndTimeZoneMap = unitTimeZoneMappingDTOS.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v.getTimezone()));
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         planningPeriods.parallelStream().forEach(planningPeriod -> {
             planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
                 if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null)
-                    schedulerPanelDTOS.add(new SchedulerPanelDTO(planningPeriod.getUnitId(), JobType.FUNCTIONAL, JobSubType.FLIP_PHASE, true, LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()), planningPeriod.getId(),unitAndTimeZoneMap.get(planningPeriod.getUnitId())));
+                    schedulerPanelDTOS.add(new SchedulerPanelDTO(planningPeriod.getUnitId(), JobType.FUNCTIONAL, JobSubType.FLIP_PHASE, true, LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()), planningPeriod.getId(), unitAndTimeZoneMap.get(planningPeriod.getUnitId())));
             });
         });
         if (!schedulerPanelDTOS.isEmpty()) {
@@ -711,7 +717,6 @@ public class PlanningPeriodService extends MongoBaseService {
                 Map<LocalDate, Long> dateFunctionIdMap = unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shift.getUnitPositionId(), new HashMap<LocalDate, Long>());
                 dateFunctionIdMap.put(DateUtils.asLocalDate(shift.getStartDate()), null);
                 unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shift.getUnitPositionId(), dateFunctionIdMap);
-
             }
         }
         userIntegrationService.restoreFunctionsWithDatesByUnitPositionIds(unitPositionIdWithShiftDateFunctionIdMap, unitId);
@@ -720,6 +725,15 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
         return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
     }
+
+//    public boolean createJobOfPlanningPeriod() {
+//        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PAYROLL_PERIOD, JobTriggerType.MONTHS, getLocalDateTime(getLocalDate(),01,00,00), false));
+//        LOGGER.info("create job for add payroll period");
+//        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+//        });
+//        LOGGER.info("job registered of add payroll period");
+//        return isCollectionNotEmpty(schedulerPanelDTOS);
+//    }
 
     public boolean addPlanningPeriodViaJob() {
         List<PlanningPeriod> planningPeriodsViaJob = new ArrayList<>();
@@ -738,10 +752,9 @@ public class PlanningPeriodService extends MongoBaseService {
                 planningPeriodsViaJob.add(planningPeriodOfUnit);
                 startDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()) : startDate.plusMonths(planningPeriod.getDuration());
             }
-
         }
         planningPeriodMongoRepository.saveEntities(planningPeriodsViaJob);
-        createScheduleJobOfPanningPeriod(null,planningPeriodsViaJob);
+        createScheduleJobOfPanningPeriod(null, planningPeriodsViaJob);
         return true;
     }
 }
