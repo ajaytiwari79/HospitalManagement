@@ -51,6 +51,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.Month;
@@ -105,6 +106,7 @@ public class TimeBankCalculationService {
             int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, DateUtils.asLocalDate(shifts.get(0).getStartDate()), unitPosition.getPositionLines());
             Map<BigInteger, Integer> ctaTimeBankMinMap = new HashMap<>();
             Map<Long, DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+            boolean ruleTemplateValid = false;
             if (isCollectionNotEmpty(unitPosition.getCtaRuleTemplates())) {
                 for (CTARuleTemplateDTO ruleTemplate : unitPosition.getCtaRuleTemplates()) {
                     int ctaTimeBankMin = 0;
@@ -113,7 +115,7 @@ public class TimeBankCalculationService {
                             Interval shiftInterval = new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime());
                             if (interval.overlaps(shiftInterval)) {
                                 shiftInterval = interval.overlap(shiftInterval);
-                                boolean ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, unitPosition, shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), new DateTimeInterval(shiftInterval.getStart().getMillis(), shiftInterval.getEnd().getMillis()), shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                                ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, unitPosition, shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), new DateTimeInterval(shiftInterval.getStart().getMillis(), shiftInterval.getEnd().getMillis()), shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                                 if (ruleTemplateValid) {
                                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
                                         dailyScheduledMin += shiftActivity.getScheduledMinutes();
@@ -137,15 +139,14 @@ public class TimeBankCalculationService {
                             }
                         }
                     }
-                    if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
-
+                    if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {
                         Long functionId = null;
                         if (isNull(unitPosition.getFunctionId())) {
                             Optional<AppliedFunctionDTO> appliedFunctionDTO = unitPosition.getAppliedFunctions().stream().filter(function -> function.getAppliedDates().contains(DateUtils.asLocalDate(interval.getStart().toDate()))).findFirst();
                             functionId = appliedFunctionDTO.isPresent() ? appliedFunctionDTO.get().getId() : null;
                         }
                         if (ruleTemplate.getStaffFunctions().contains(isNotNull(unitPosition.getFunctionId()) ? unitPosition.getFunctionId() : functionId)) {
-                            float value = !getHourlyCostByDate(unitPosition.getPositionLines(), asLocalDate(interval.getStart())).equals(new BigDecimal(0)) ? new BigDecimal(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(unitPosition.getHourlyCost()).multiply(new BigDecimal(60)).intValue() : 0;
+                            float value = !getHourlyCostByDate(unitPosition.getPositionLines(), asLocalDate(interval.getStart())).equals(new BigDecimal(0)) ? new BigDecimal(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(unitPosition.getHourlyCost() ,6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
                             ctaTimeBankMin += value;
                         }
                     }
