@@ -25,7 +25,7 @@ public class DataSubject extends BaseEntity {
     private List<OrganizationType> organizationTypes = new ArrayList<>();
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="DataSubjectCategories",
             joinColumns = @JoinColumn( name="data_subject_id"),

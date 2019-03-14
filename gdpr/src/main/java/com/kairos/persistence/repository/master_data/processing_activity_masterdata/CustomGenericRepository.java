@@ -73,10 +73,10 @@ public interface CustomGenericRepository<T extends BaseEntity> extends JpaReposi
     @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.id IN (?1) and EN.deleted = false")
     List<T>  findAllByIds( Set<Long> ids);
 
-    @Query(value = "Select EN from #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = false")
+    @Query(value = "Select EN from #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = false order by EN.createdAt desc")
     List<T> findAllByOrganizationId(Long orgId);
 
-    @Query(value = "Select EN from #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false")
+    @Query(value = "Select EN from #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false order by EN.createdAt desc")
     List<T> findAllByCountryId(Long countryId);
 
     @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.deleted = false and EN.id = ?1")

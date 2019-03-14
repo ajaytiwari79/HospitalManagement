@@ -164,7 +164,7 @@ public class AssetTypeService{
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRisk(Long countryId) {
-        List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypes(countryId);
+        List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypeByCountryId(countryId);
         List<AssetTypeRiskResponseDTO> assetTypesWithAllData = new ArrayList<>();
         for(AssetType assetType : assetTypes) {
             assetTypesWithAllData.add(buildAssetTypeOrSubTypeResponseData(assetType));
