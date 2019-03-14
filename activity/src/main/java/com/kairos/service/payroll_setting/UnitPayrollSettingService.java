@@ -228,16 +228,18 @@ public class UnitPayrollSettingService extends MongoBaseService {
     }
 
     private List<UnitPayrollSettingDTO> getUnitPayrollSettingData(List<UnitPayrollSettingDTO> unitPayrollSettingDTO) {
-        Map<BigInteger, UnitPayrollSettingDTO> idAndPayrollSettingDTOMap = unitPayrollSettingDTO.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<BigInteger, UnitPayrollSettingDTO> payrollIdAndPayrollSettingDTOMap = unitPayrollSettingDTO.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         UnitPayrollSettingDTO unitPayrollSettingDto = unitPayrollSettingDTO.stream().filter(payrollSetting -> !payrollSetting.isPublished()).findFirst().orElse(null);
-        if (isNotNull(unitPayrollSettingDto) && idAndPayrollSettingDTOMap.containsKey(unitPayrollSettingDto.getParentPayrollId())) {
-            List<PayrollPeriodDTO> payrollPeriod = idAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).getPayrollPeriods();
+        if (isNotNull(unitPayrollSettingDto) && payrollIdAndPayrollSettingDTOMap.containsKey(unitPayrollSettingDto.getParentPayrollId())) {
+            List<PayrollPeriodDTO> payrollPeriod = payrollIdAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).getPayrollPeriods();
             unitPayrollSettingDto.getPayrollPeriods().forEach(payrollPeriodDTO -> {
                 payrollPeriod.removeIf(v -> v.getStartDate().isEqual(payrollPeriodDTO.getStartDate()));
             });
-            idAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).setPayrollPeriods(payrollPeriod);
+            payrollIdAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).setPayrollPeriods(payrollPeriod);
         }
-        return idAndPayrollSettingDTOMap.keySet().stream().map(date -> idAndPayrollSettingDTOMap.get(date)).collect(Collectors.toList());
+        unitPayrollSettingDTO=new ArrayList<>(payrollIdAndPayrollSettingDTOMap.values());
+        unitPayrollSettingDTO.sort((Comparator.comparing(UnitPayrollSettingDTO::getId)));
+        return unitPayrollSettingDTO;
     }
 
     private boolean validatePayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Long unitId) {
