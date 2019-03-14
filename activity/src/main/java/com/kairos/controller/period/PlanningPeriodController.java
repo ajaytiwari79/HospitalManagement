@@ -104,12 +104,12 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.migratePlanningPeriods(unitId, planningPeriodDTO));
     }
 
-//    @ApiOperation(value = "create job for PayRoll Period ")
-//    @PutMapping(value="/payroll_period_job")
-//    public ResponseEntity<Map<String, Object>> createJobForPayrollPeriod() {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobForAddPayrollPeriod());
-//
-//    }
+    @ApiOperation(value = "create job of PayRoll Period ")
+    @PutMapping(value="/planning_period_job")
+    public ResponseEntity<Map<String, Object>> createJobForPlanningPeriod() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobOfPlanningPeriod());
+
+    }
 
 
     @ApiOperation(value = "Migrate Planning Period")
