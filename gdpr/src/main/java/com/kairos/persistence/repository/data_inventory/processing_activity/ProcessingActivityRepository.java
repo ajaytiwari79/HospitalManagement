@@ -19,6 +19,9 @@ public interface ProcessingActivityRepository extends CustomGenericRepository<Pr
     @Query(value = "Select PA from ProcessingActivity PA where PA.organizationId = ?1 and PA.id IN (?2) and PA.deleted = false")
     List<ProcessingActivity> findSubProcessingActivitiesByIdsAndOrganisationId(Long orgId, Set<Long> ids);
 
+    @Query(value = "Select PA from ProcessingActivity PA where PA.organizationId = ?1 and PA.isSubProcessingActivity= false and PA.deleted = false")
+    List<ProcessingActivity> findAllByOrganizationIdAndDeletedFalse(Long orgId);
+
     @Query(value = "Select PA from ProcessingActivity PA where PA.id = ?1 and PA.organizationId = ?2 and PA.processingActivity.id = ?3 and PA.deleted = false and PA.isSubProcessingActivity = true")
     ProcessingActivity findByIdAndOrganizationIdAndProcessingActivityId(Long id, Long orgId, Long parentId);
 

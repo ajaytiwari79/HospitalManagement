@@ -33,7 +33,7 @@ import java.util.*;
 
 
 @Service
-public class MasterAssetService{
+public class MasterAssetService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetService.class);
 
@@ -74,13 +74,13 @@ public class MasterAssetService{
     }
 
     /**
-     *  This method is used to fetch all the metadata related to master asset from DTO like organisationType,
-     *  organisationSubType, Service Category and Sub Service Category
+     * This method is used to fetch all the metadata related to master asset from DTO like organisationType,
+     * organisationSubType, Service Category and Sub Service Category
      *
      * @param masterAssetDto
      * @return
      */
-    private MasterAsset getMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset){
+    private MasterAsset getMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
         masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationTypes(), OrganizationType.class));
         masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationSubServices(), OrganizationSubType.class));
         masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationServices(), ServiceCategory.class));
@@ -89,7 +89,7 @@ public class MasterAssetService{
     }
 
     /**
-     *  This method id used to update existing asset-type or sub asset-type or create new asset-type/sub asset-type
+     * This method id used to update existing asset-type or sub asset-type or create new asset-type/sub asset-type
      *
      * @param countryId
      * @param masterAsset
@@ -101,25 +101,25 @@ public class MasterAssetService{
         if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.getOne(masterAssetDTO.getAssetType().getId());
             masterAsset.setAssetType(assetType);
-        }else {
-            AssetType previousAssetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType( masterAssetDTO.getAssetType().getName(), countryId, false);
+        } else {
+            AssetType previousAssetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType(masterAssetDTO.getAssetType().getName(), countryId, false);
             Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType1.getName()));
             assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
         }
-            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(subAssetTypeBasicDTO -> {
-                if (subAssetTypeBasicDTO.getId() != null) {
-                    masterAsset.setSubAssetType(assetTypeRepository.getOne(subAssetTypeBasicDTO.getId()));
-                } else {
-                    AssetType subAssetType = new AssetType(subAssetTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
-                    subAssetType.setSubAssetType(true);
-                    assetTypeRepository.save(subAssetType);
-                    assetType.getSubAssetTypes().add(subAssetType);
-                    masterAsset.setSubAssetType(subAssetType);
-                }
-            });
-            assetTypeRepository.save(assetType);
-            masterAsset.setAssetType(assetType);
-        }
+        Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(subAssetTypeBasicDTO -> {
+            if (subAssetTypeBasicDTO.getId() != null) {
+                masterAsset.setSubAssetType(assetTypeRepository.getOne(subAssetTypeBasicDTO.getId()));
+            } else {
+                AssetType subAssetType = new AssetType(subAssetTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
+                subAssetType.setSubAssetType(true);
+                assetTypeRepository.save(subAssetType);
+                assetType.getSubAssetTypes().add(subAssetType);
+                masterAsset.setSubAssetType(subAssetType);
+            }
+        });
+        assetTypeRepository.save(assetType);
+        masterAsset.setAssetType(assetType);
+    }
 
 
     /**
@@ -130,7 +130,7 @@ public class MasterAssetService{
     public List<MasterAssetResponseDTO> getAllMasterAsset(Long countryId) {
         List<MasterAssetResponseDTO> masterAssetResponseDTOS = new ArrayList<>();
         List<MasterAsset> assets = masterAssetRepository.findAllByCountryId(countryId);
-        for(MasterAsset asset : assets){
+        for (MasterAsset asset : assets) {
             masterAssetResponseDTOS.add(prepareAssetResponseDTO(asset));
         }
         return masterAssetResponseDTOS;
@@ -143,26 +143,25 @@ public class MasterAssetService{
      * @return MasterAssetResponseDTO
      */
 
-    private MasterAssetResponseDTO prepareAssetResponseDTO(MasterAsset masterAsset){
-        MasterAssetResponseDTO masterAssetResponseDTO = new MasterAssetResponseDTO(masterAsset.getId(),masterAsset.getName(),masterAsset.getDescription(), masterAsset.getSuggestedDate(), masterAsset.getSuggestedDataStatus());
-        masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(masterAsset.getAssetType().getId(),masterAsset.getAssetType().getName(), masterAsset.getAssetType().isSubAssetType()));
-        masterAssetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(masterAsset.getSubAssetType().getId(),masterAsset.getSubAssetType().getName(), masterAsset.getSubAssetType().isSubAssetType()));
-
+    private MasterAssetResponseDTO prepareAssetResponseDTO(MasterAsset masterAsset) {
+        MasterAssetResponseDTO masterAssetResponseDTO = new MasterAssetResponseDTO(masterAsset.getId(), masterAsset.getName(), masterAsset.getDescription(), masterAsset.getSuggestedDate(), masterAsset.getSuggestedDataStatus());
+        masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(masterAsset.getAssetType().getId(), masterAsset.getAssetType().getName(), masterAsset.getAssetType().isSubAssetType()));
+        Optional.ofNullable(masterAsset.getSubAssetType()).ifPresent(subAssetType -> masterAssetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(subAssetType.getId(), subAssetType.getName(), subAssetType.isSubAssetType())));
         List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
         List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
         List<ServiceCategoryDTO> serviceCategories = new ArrayList<>();
         List<SubServiceCategoryDTO> subServiceCategories = new ArrayList<>();
-        for(OrganizationType orgType : masterAsset.getOrganizationTypes()){
-            organizationTypes.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
+        for (OrganizationType orgType : masterAsset.getOrganizationTypes()) {
+            organizationTypes.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName()));
         }
-        for(OrganizationSubType orgSubType : masterAsset.getOrganizationSubTypes()){
-            organizationSubTypes.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
+        for (OrganizationSubType orgSubType : masterAsset.getOrganizationSubTypes()) {
+            organizationSubTypes.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName()));
         }
-        for(ServiceCategory category : masterAsset.getOrganizationServices()){
-            serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName())) ;
+        for (ServiceCategory category : masterAsset.getOrganizationServices()) {
+            serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName()));
         }
-        for(SubServiceCategory subServiceCategory : masterAsset.getOrganizationSubServices()){
-            subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
+        for (SubServiceCategory subServiceCategory : masterAsset.getOrganizationSubServices()) {
+            subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName()));
         }
 
         masterAssetResponseDTO.setOrganizationTypes(organizationTypes);
@@ -198,9 +197,9 @@ public class MasterAssetService{
 
     public Boolean deleteMasterAsset(Long countryId, Long id) {
         Integer updateCount = masterAssetRepository.updateMasterAsset(countryId, id);
-        if(updateCount > 0){
+        if (updateCount > 0) {
             LOGGER.info("Master Asset is deleted successfully with id :: {}", id);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", id);
         }
         return true;
@@ -249,10 +248,10 @@ public class MasterAssetService{
      */
     public boolean updateStatusOfSuggestedMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds,suggestedDataStatus);
-        if(updateCount > 0){
+        Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds, suggestedDataStatus);
+        if (updateCount > 0) {
             LOGGER.info("Master Assets are updated successfully with ids :: {}", assetIds);
-        }else{
+        } else {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", assetIds);
         }
         return true;

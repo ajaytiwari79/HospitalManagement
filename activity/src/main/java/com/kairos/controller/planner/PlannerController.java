@@ -32,14 +32,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by oodles on 17/1/17.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/planner")
-@Api(API_ORGANIZATION_UNIT_URL + "/planner")
+@RequestMapping(API_UNIT_URL + "/planner")
+@Api(API_UNIT_URL + "/planner")
 public class PlannerController {
 
     private static final Logger logger = LoggerFactory.getLogger(PlannerController.class);

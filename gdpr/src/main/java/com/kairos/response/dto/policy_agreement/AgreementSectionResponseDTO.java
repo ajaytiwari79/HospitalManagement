@@ -20,8 +20,6 @@ public class AgreementSectionResponseDTO {
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
-    protected Long countryId;
-    protected Long organizationId;
     //private List<BigInteger> clauseIdOrderedIndex;
     //private List<ClauseBasicResponseDTO> clauses;
     private List<AgreementSectionClause> clauses;
@@ -64,22 +62,6 @@ public class AgreementSectionResponseDTO {
         this.clauses = clauses;
     }*/
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -108,12 +90,10 @@ public class AgreementSectionResponseDTO {
 
     }
 
-    public AgreementSectionResponseDTO(Long id, @NotBlank String title, String titleHtml, Integer orderedIndex, Long countryId, Long organizationId) {
+    public AgreementSectionResponseDTO(Long id, @NotBlank String title, String titleHtml, Integer orderedIndex) {
         this.id = id;
         this.title = title;
         this.titleHtml = titleHtml;
         this.orderedIndex = orderedIndex;
-        this.countryId = countryId;
-        this.organizationId = organizationId;
     }
 }

@@ -66,13 +66,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN count (e) as totalMatched")
     Long findAllExpertiseCountMatchedByIds(List<Long> ids);
 
-    @Query("MATCH (e:Expertise{deleted:false}) WHERE id(e) in {0} \n" +
-            "RETURN id(e) as id,e.name as name,e.description as description")
-    List<ExpertiseDTO> getAllFreeExpertises(List<Long> ids);
-
-    @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} RETURN e LIMIT 1")
-    Expertise getExpertiesByCountry(Long id);
-
     @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} AND id(e) = {1} RETURN e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 

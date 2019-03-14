@@ -101,4 +101,9 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN functionalPayment ORDER BY functionalPayment.startDate DESC LIMIT 1 ")
     FunctionalPayment findByExpertiseId(Long expertiseId);
+
+    @Query("MATCH(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) " +
+            "WHERE id(childFunctionalPayment)={0} AND id(functionalPayment)={1} " +
+            "set functionalPayment.hasDraftCopy=false  detach delete relation")
+    void detachFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId);
 }

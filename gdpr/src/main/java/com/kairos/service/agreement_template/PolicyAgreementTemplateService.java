@@ -269,7 +269,7 @@ public class PolicyAgreementTemplateService {
     public List<AgreementSectionResponseDTO> prepareAgreementSectionResponseDTO(List<? extends AgreementSection> agreementSections) {
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = new ArrayList<>();
         agreementSections.forEach(agreementSection -> {
-            AgreementSectionResponseDTO agreementSectionResponseDTO = new AgreementSectionResponseDTO(agreementSection.getId(), agreementSection.getTitle(), agreementSection.getTitleHtml(), agreementSection.getOrderedIndex(), agreementSection.getCountryId(), agreementSection.getOrganizationId());
+            AgreementSectionResponseDTO agreementSectionResponseDTO = new AgreementSectionResponseDTO(agreementSection.getId(), agreementSection.getTitle(), agreementSection.getTitleHtml(), agreementSection.getOrderedIndex());
             agreementSectionResponseDTO.setClauses(agreementSection.getClauses());
             if (!agreementSection.getAgreementSubSections().isEmpty()) {
                 agreementSectionResponseDTO.setAgreementSubSections(prepareAgreementSectionResponseDTO(agreementSection.getAgreementSubSections()));

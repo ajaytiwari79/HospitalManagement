@@ -8,10 +8,14 @@ import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.persistence.model.embeddables.CoverPage;
+import com.kairos.persistence.model.clause.MasterClause;
+import com.kairos.persistence.model.clause.OrganizationClause;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
+import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepository;
 import com.kairos.persistence.repository.clause.ClauseRepository;
+import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.exception.ExceptionService;
@@ -37,6 +41,8 @@ public class AgreementSectionService {
 
     @Inject
     private ClauseRepository clauseRepository;
+    @Inject
+    private ClauseTagRepository clauseTagRepository;
 
     @Inject
     private PolicyAgreementTemplateService policyAgreementTemplateService;
@@ -68,7 +74,7 @@ public class AgreementSectionService {
         }
         if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getAgreementSections())) {
             checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getAgreementSections());
-            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getAgreementSections());
+            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(referenceId, isOrganization, policyAgreementTemplate, agreementTemplateSectionDTO.getAgreementSections());
             agreementSections.forEach(agreementSection -> {
                 agreementSection.linkSubSectionsWithParentSectionAndCountryOrUnitId(isOrganization, referenceId);
 
@@ -111,9 +117,23 @@ public class AgreementSectionService {
     }
 
 
-    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList) {
+    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(Long referenceId, boolean isOrganization, PolicyAgreementTemplate policyAgreementTemplate, List<AgreementSectionDTO> sectionDTOList) {
         List<ClauseBasicDTO> newClauses = findNewClauses(sectionDTOList);
-        List<Clause> clauses = ObjectMapperUtils.copyPropertiesOfListByMapper(newClauses, Clause.class);
+        List<Clause> clauses = new ArrayList<>();
+        ClauseTag defaultTag = clauseTagRepository.findDefaultTag();
+        for (ClauseBasicDTO clauseBasicDTO : newClauses) {
+            Clause clause;
+            if (isOrganization)
+                clause = new OrganizationClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId());
+            else
+                clause = new MasterClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId(),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getAccountTypes(), AccountType.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationType.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubType.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategory.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategory.class));
+            clauses.add(clause);
+        }
         clauses = clauseRepository.saveAll(clauses);
         Map<UUID, Long> clauseData = new HashMap<>();
         clauses.forEach(clause -> clauseData.put(clause.getTempClauseId(), clause.getId()));
@@ -557,7 +577,6 @@ public class AgreementSectionService {
 
     private void checkDuplicateClauseInAgreementSection(List<ClauseBasicDTO> clauseBasicDTOS, Set<String> clauseTitles, String sectionName) {
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
-
             if (clauseTitles.contains(clauseBasicDTO.getTitle().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate.clause.agreement.section", clauseBasicDTO.getTitle(), sectionName);
             }
