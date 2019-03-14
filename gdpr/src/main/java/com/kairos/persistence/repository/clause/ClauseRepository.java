@@ -26,10 +26,10 @@ public interface ClauseRepository extends JpaRepository<Clause, Long> {
     @Query(value = "update Clause set deleted = true where id = ?1 and deleted = false")
     Integer safeDeleteById(Long id);
 
-    @Query(value = "Select c from Clause c where c.countryId = ?1 and c.deleted = false")
+    @Query(value = "Select c from Clause c where c.countryId = ?1 and c.deleted = false order by c.createdAt desc")
     List<Clause> findAllClauseByCountryId(Long countryId);
 
-    @Query(value = "Select c from Clause c where c.organizationId = ?1 and c.deleted = false")
+    @Query(value = "Select c from Clause c where c.organizationId = ?1 and c.deleted = false order by c.createdAt desc")
     List<Clause> findAllClauseByUnitId(Long organizationId);
 
     @Query(value = "Select c from Clause c where c.id = ?1 and c.countryId = ?2 and c.deleted = false")

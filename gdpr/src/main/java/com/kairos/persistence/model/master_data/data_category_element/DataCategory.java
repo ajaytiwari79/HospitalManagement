@@ -2,10 +2,7 @@ package com.kairos.persistence.model.master_data.data_category_element;
 
 import com.kairos.persistence.model.common.BaseEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
@@ -19,7 +16,7 @@ public class DataCategory extends BaseEntity {
     private String name;
 
     // empty array to get rid of null pointer
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "data_category_id")
     private List<DataElement> dataElements=new ArrayList<>();
     private Long countryId;
@@ -32,7 +29,11 @@ public class DataCategory extends BaseEntity {
         this.dataElements = dataElements;
     }
 
-
+    public DataCategory(@NotBlank(message = "Name cannot be empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
+        this.name = name;
+        this.dataElements = dataElements;
+        this.organizationId = organizationId;
+    }
 
     public DataCategory() {
     }
