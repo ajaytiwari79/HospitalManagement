@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 public class MasterProcessingActivity extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
     private String description;
 

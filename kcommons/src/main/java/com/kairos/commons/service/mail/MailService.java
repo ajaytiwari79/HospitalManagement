@@ -1,6 +1,5 @@
 package com.kairos.commons.service.mail;
 
-import com.kairos.constants.AppConstants;
 import com.sendgrid.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,8 @@ import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
 
-import static com.kairos.constants.AppConstants.NO_REPLY_EMAIL;
-import static com.kairos.constants.AppConstants.SEND_GRID_API_KEY;
+import static com.kairos.constants.CommonConstants.*;
+
 
 //import javax.validation.constraints.Email;
 

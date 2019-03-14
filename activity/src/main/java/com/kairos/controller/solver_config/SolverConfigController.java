@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping(ApiConstants.API_ORGANIZATION_UNIT_URL + "/solverConfig")
+@RequestMapping(ApiConstants.API_UNIT_URL + "/solverConfig")
 public class SolverConfigController {
     private static Logger logger= LoggerFactory.getLogger(SolverConfigController.class);
     @Inject

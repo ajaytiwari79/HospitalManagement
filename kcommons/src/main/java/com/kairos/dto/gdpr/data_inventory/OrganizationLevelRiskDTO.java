@@ -16,6 +16,7 @@ public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
     //private LocalDate dueDate;
     //private Staff riskOwner;
 
+    private Long organizationId;
     private boolean reminderActive;
     private int daysToReminderBefore;
 
@@ -26,4 +27,8 @@ public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
     public int getDaysToReminderBefore() { return daysToReminderBefore; }
 
     public void setDaysToReminderBefore(int daysToReminderBefore) { this.daysToReminderBefore = daysToReminderBefore; }
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId;}
 }

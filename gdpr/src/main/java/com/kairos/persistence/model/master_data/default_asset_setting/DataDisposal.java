@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @Entity
 public class DataDisposal extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
     private SuggestedDataStatus suggestedDataStatus;
@@ -51,14 +51,19 @@ public class DataDisposal extends BaseEntity {
         this.name = name;
     }
 
-    public DataDisposal(@NotBlank(message = "Name can't be empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+    public DataDisposal(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
         this.name = name;
         this.countryId = countryId;
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
 
-    public DataDisposal(@NotBlank(message = "Name can't be empty") String name, Long countryId){
+    public DataDisposal(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, Long organizationId){
+        this.name = name;
+        this.organizationId = organizationId;
+    }
+
+    public DataDisposal(Long countryId, @NotBlank(message = "error.message.name.notNull.orEmpty") String name){
         this.name = name;
         this.countryId = countryId;
     }

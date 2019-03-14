@@ -51,7 +51,7 @@ public class OrganizationalSecurityMeasureService{
             List<OrganizationalSecurityMeasure> orgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
-                    OrganizationalSecurityMeasure orgSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId);
+                    OrganizationalSecurityMeasure orgSecurityMeasure = new OrganizationalSecurityMeasure(countryId, name);
                         if(isSuggestion){
                             orgSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                             orgSecurityMeasure.setSuggestedDate(LocalDate.now());

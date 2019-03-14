@@ -17,9 +17,9 @@ import java.util.List;
 public class Asset extends BaseEntity {
 
 
-    @NotBlank(message = "Name can 't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-    @NotBlank(message = "description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private Long countryId;
     private String hostingLocation;
@@ -27,11 +27,11 @@ public class Asset extends BaseEntity {
     private ManagingOrganization managingDepartment;
     @Embedded
     private Staff assetOwner;
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<StorageFormat> storageFormats  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<OrganizationalSecurityMeasure> orgSecurityMeasures  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<TechnicalSecurityMeasure> technicalSecurityMeasures  = new ArrayList<>();
     @OneToOne
     private HostingProvider hostingProvider;

@@ -9,9 +9,9 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
-import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.persistence.model.payroll_setting.PayrollAccessGroups;
 import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
@@ -111,7 +111,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
             unitPayrollSetting.setPayrollPeriods(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPayrollSettingDTO.getPayrollPeriods(), PayrollPeriod.class));
             unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         } else {
-            unitPayrollSetting.setPayrollPeriods(validatePayrollPeriod(unitPayrollSettingDTO.getPayrollPeriods(), unitPayrollSetting.getPayrollPeriods(), unitPayrollSetting.getPayrollFrequency()));
+            unitPayrollSetting.setPayrollPeriods(validatePayrollPeriod(unitPayrollSettingDTO.getPayrollPeriods(), unitPayrollSetting.getPayrollPeriods()));
             UnitPayrollSetting availableDraftPayroll = unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitIdAndPayrollParentIdNotExist(unitPayrollSetting.getId(), unitId, unitPayrollSetting.getPayrollFrequency());
             if (isNotNull(unitPayrollSetting.getParentPayrollId())) {
                 unitPayrollSettings.add(updateParentPayrollPeriod(unitId, unitPayrollSetting.getParentPayrollId(), unitPayrollSetting.getPayrollPeriods()));
@@ -151,7 +151,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
     }
 
     public boolean createJobForAddPayrollPeriod() {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PAYROLL_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime(getFirstDayOfMonth(getLocalDate()),01,00,00), false));
+        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PAYROLL_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime(getFirstDayOfMonth(getLocalDate()), 01, 00, 00), false));
         LOGGER.info("create job for add payroll period");
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
@@ -267,7 +267,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         return newUnitPayrollSetting;
     }
 
-    private List<PayrollPeriod> validatePayrollPeriod(List<PayrollPeriodDTO> payrollPeriodDTOS, List<PayrollPeriod> payrollPeriods, PayrollFrequency payrollFrequency) {
+    private List<PayrollPeriod> validatePayrollPeriod(List<PayrollPeriodDTO> payrollPeriodDTOS, List<PayrollPeriod> payrollPeriods) {
         Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap = payrollPeriods.stream().collect(Collectors.toMap(PayrollPeriod::getStartDate, Function.identity()));
         for (PayrollPeriodDTO payrollPeriodDTO : payrollPeriodDTOS) {
             if (startDateAndPayrollPeriodMap.containsKey(payrollPeriodDTO.getStartDate())) {
@@ -311,7 +311,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
             });
             idAndPayrollSettingDTOMap.get(unitPayrollSettingDto.getParentPayrollId()).setPayrollPeriods(payrollPeriod);
         }
-        unitPayrollSettingDTO=new ArrayList<>(idAndPayrollSettingDTOMap.values());
+        unitPayrollSettingDTO = new ArrayList<>(idAndPayrollSettingDTOMap.values());
         unitPayrollSettingDTO.sort((Comparator.comparing(UnitPayrollSettingDTO::getId)));
         return unitPayrollSettingDTO;
     }
