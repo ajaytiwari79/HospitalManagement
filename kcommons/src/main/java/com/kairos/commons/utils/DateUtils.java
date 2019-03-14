@@ -906,6 +906,10 @@ public  class DateUtils {
         return localDate.with(TemporalAdjusters.lastDayOfYear());
     }
 
+    public static LocalDate getFirstDayOfMonth(LocalDate localDate){
+        return localDate.withDayOfMonth(1);
+    }
+
     public static LocalDate getFirstDayOfYear(Integer year){
         return LocalDate.of(year,1,1);
     }

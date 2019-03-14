@@ -1,7 +1,7 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel;
 
-import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobTriggerType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 
@@ -44,8 +44,8 @@ public class SchedulerPanel extends MongoBaseEntity {
     private JobType jobType;
     private JobSubType jobSubType;
     private boolean oneTimeTrigger;
-    private boolean everyMonthTrigger;
-    private LocalDateTime oneTimeTriggerDate;
+    private JobTriggerType jobTriggerType;
+    private LocalDateTime jobTriggerDate;
     private BigInteger entityId;
 
 
@@ -73,12 +73,12 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.oneTimeTrigger = oneTimeTrigger;
     }
 
-    public LocalDateTime getOneTimeTriggerDate() {
-        return oneTimeTriggerDate;
+    public LocalDateTime getJobTriggerDate() {
+        return jobTriggerDate;
     }
 
-    public void setOneTimeTriggerDate(LocalDateTime oneTimeTriggerDate) {
-        this.oneTimeTriggerDate = oneTimeTriggerDate;
+    public void setJobTriggerDate(LocalDateTime jobTriggerDate) {
+        this.jobTriggerDate = jobTriggerDate;
     }
 
     public JobType getJobType() {
@@ -243,11 +243,11 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.runOnce = runOnce;
     }
 
-    public boolean isEveryMonthTrigger() {
-        return everyMonthTrigger;
+    public JobTriggerType getJobTriggerType() {
+        return jobTriggerType;
     }
 
-    public void setEveryMonthTrigger(boolean everyMonthTrigger) {
-        this.everyMonthTrigger = everyMonthTrigger;
+    public void setJobTriggerType(JobTriggerType jobTriggerType) {
+        this.jobTriggerType = jobTriggerType;
     }
 }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 
 @Service
 public class SchedulerToActivityQueueService implements JobQueueExecutor {
@@ -50,10 +51,8 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 timeAndAttendanceService.checkOutBySchedulerJob(job.getUnitId());
                 break;
             case ADD_PAYROLL_PERIOD:
-                logger.info("Job to create MONTHLY payroll period via job");
-                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency.MONTHLY,null);
-                logger.info("Job to create FORTNIGHTLY payroll period via job");
-                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(PayrollFrequency.FORTNIGHTLY,null);
+                logger.info("Job to create MONTHLY and FORTNIGHTLY  payroll period ");
+                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(Arrays.asList(PayrollFrequency.MONTHLY,PayrollFrequency.FORTNIGHTLY),null);
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");

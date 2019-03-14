@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -71,7 +72,7 @@ public class UnitPayrollSettingController {
     @ApiOperation(value = "add PayRoll Period by button")
     @PutMapping(value="/payroll_period_manual")
     public ResponseEntity<Map<String, Object>> update(@PathVariable Long unitId,@RequestParam PayrollFrequency payrollFrequency) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(payrollFrequency,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(Arrays.asList(payrollFrequency),unitId));
 
     }
 

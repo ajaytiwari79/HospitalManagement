@@ -48,10 +48,10 @@ public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollS
     }
 
     @Override
-    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(PayrollFrequency payrollFrequency, Long unitId) {
+    public List<UnitPayrollSetting> getAllPayrollPeriodSettingOfUnitsByPayrollFrequency(List<PayrollFrequency> payrollFrequency, Long unitId) {
         String addFieldOperation = "{'$addFields':{'endDate':{ '$arrayElemAt': [ '$payrollPeriods.endDate', -1 ]}}}";
         String sortByEndDate = "{'$sort':{'unitId':-1,'endDate':-1}}";
-        Criteria criteria = Criteria.where("payrollFrequency").is(payrollFrequency).and("published").is(true);
+        Criteria criteria = Criteria.where("payrollFrequency").in(payrollFrequency).and("published").is(true);
         if (isNotNull(unitId)) {
             criteria.and("unitId").is(unitId);
         }
@@ -59,7 +59,7 @@ public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollS
                 match(criteria),
                 new CustomAggregationOperation(Document.parse(addFieldOperation)),
                 new CustomAggregationOperation(Document.parse(sortByEndDate)),
-                group("unitId").first("$$ROOT").as("data"),
+                group("unitId","payrollFrequency").first("$$ROOT").as("data"),
                 replaceRoot("data")
         );
         AggregationResults<UnitPayrollSetting> results = mongoTemplate.aggregate(aggregation, UnitPayrollSetting.class, UnitPayrollSetting.class);

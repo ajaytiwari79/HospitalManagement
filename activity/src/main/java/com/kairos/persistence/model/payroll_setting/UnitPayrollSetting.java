@@ -53,10 +53,8 @@ public class UnitPayrollSetting extends MongoBaseEntity {
     }
 
     public void setPayrollPeriods(List<PayrollPeriod> payrollPeriods) {
-        if (isCollectionNotEmpty(payrollPeriods)) {
-            payrollPeriods.sort(Comparator.comparing(PayrollPeriod::getStartDate));
-        }
         this.payrollPeriods = Optional.ofNullable(payrollPeriods).orElse(new ArrayList<>());
+        this.payrollPeriods.sort(Comparator.comparing(PayrollPeriod::getStartDate));
     }
 
     public PayrollFrequency getPayrollFrequency() {

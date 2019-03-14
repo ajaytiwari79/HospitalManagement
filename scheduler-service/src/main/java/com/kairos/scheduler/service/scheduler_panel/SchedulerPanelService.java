@@ -8,6 +8,7 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobTriggerType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
@@ -33,6 +34,7 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +87,7 @@ public class SchedulerPanelService extends MongoBaseService {
                     }));
 
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
-                if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
+                if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getJobTriggerDate().isBefore(LocalDateTime.now()))) {
                     logger.info("Inside initSchedulerPanels" + schedulerPanel.getUnitId() + " unitId = " + unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
                     dynamicCronScheduler.setCronScheduling(schedulerPanel, unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
                 }
@@ -109,8 +111,8 @@ public class SchedulerPanelService extends MongoBaseService {
         }
         List<SchedulerPanel> schedulerPanels = new ArrayList<>();
         for (SchedulerPanelDTO schedulerPanelDTO : schedulerPanelDTOs) {
-            SchedulerPanel schedulerPanel = new SchedulerPanel();
-            ObjectMapperUtils.copyProperties(schedulerPanelDTO, schedulerPanel);
+            SchedulerPanel schedulerPanel = ObjectMapperUtils.copyPropertiesByMapper(schedulerPanelDTO,SchedulerPanel.class);
+            //ObjectMapperUtils.copyProperties(schedulerPanelDTO, schedulerPanel);
             if (Optional.ofNullable(schedulerPanelDTO.getIntegrationConfigurationId()).isPresent()) {
                 Optional<IntegrationSettings> integrationConfigurationOpt = integrationConfigurationRepository.findById(schedulerPanelDTO.getIntegrationConfigurationId());
                 //    IntegrationSettings integrationSettings = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
@@ -123,8 +125,8 @@ public class SchedulerPanelService extends MongoBaseService {
             //schedulerPanel.setProcessType(integrationConfiguration.getName());
             String interval;
             String cronExpression = null;
-            if (schedulerPanel.isEveryMonthTrigger()) {
-                cronExpression = cronExpressionEveryMonthBuilder(schedulerPanel.getRunOnce());
+            if (JobTriggerType.MONTHS.equals(schedulerPanel.getJobTriggerType())) {
+                cronExpression = cronExpressionEveryMonthBuilder(schedulerPanel.getJobTriggerDate());
             } else if (!schedulerPanel.isOneTimeTrigger()) {
                 if (schedulerPanel.getRunOnce() == null) {
                     cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
@@ -136,7 +138,7 @@ public class SchedulerPanelService extends MongoBaseService {
                 schedulerPanel.setInterval(interval);
 
             } else {
-                schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
+                schedulerPanel.setJobTriggerDate(schedulerPanelDTO.getJobTriggerDate());
             }
             schedulerPanel.setCronExpression(cronExpression);
 
@@ -187,8 +189,8 @@ public class SchedulerPanelService extends MongoBaseService {
                 }
                 panel.setStartMinute(schedulerPanelDTO.getStartMinute());
 
-            } else if (panel.isEveryMonthTrigger()) {
-                cronExpression = cronExpressionEveryMonthBuilder(panel.getRunOnce());
+            } else if (JobTriggerType.MONTHS.equals(panel.getJobTriggerType())) {
+                cronExpression = cronExpressionEveryMonthBuilder(panel.getJobTriggerDate());
             } else {
                 cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
                 panel.setRunOnce(schedulerPanelDTO.getRunOnce());
@@ -197,10 +199,10 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
-            panel.setOneTimeTriggerDate(null);
+            panel.setJobTriggerDate(null);
 
         } else {
-            panel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
+            panel.setJobTriggerDate(schedulerPanelDTO.getJobTriggerDate());
         }
         panel.setOneTimeTrigger(schedulerPanelDTO.isOneTimeTrigger());
         save(panel);
@@ -229,7 +231,7 @@ public class SchedulerPanelService extends MongoBaseService {
         List<SchedulerPanel> schedulerPanelsUpdated = new ArrayList<>();
         for (LocalDateTimeIdDTO localDateTimeIdDTO : localDateTimeIdDTOS) {
             schedulerPanel = schedulerPanelsById.get(localDateTimeIdDTO.getId());
-            schedulerPanel.setOneTimeTriggerDate(localDateTimeIdDTO.getDateTime());
+            schedulerPanel.setJobTriggerDate(localDateTimeIdDTO.getDateTime());
             schedulerPanelsUpdated.add(schedulerPanel);
             dynamicCronScheduler.stopCronJob("scheduler" + localDateTimeIdDTO.getId());
             dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
@@ -260,8 +262,8 @@ public class SchedulerPanelService extends MongoBaseService {
                 schedulerPanelDB.setInterval(interval);
                 if (schedulerPanelDTO.getRunOnce() == null) {
                     cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getStartMinute(), schedulerPanelDTO.getSelectedHours());
-                } else if (schedulerPanelDTO.isEveryMonthTrigger()) {
-                    cronExpression = cronExpressionEveryMonthBuilder(schedulerPanelDTO.getRunOnce());
+                } else if (JobTriggerType.MONTHS.equals(schedulerPanelDTO.getJobTriggerType())) {
+                    cronExpression = cronExpressionEveryMonthBuilder(schedulerPanelDTO.getJobTriggerDate());
                 } else {
                     cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
                 }
@@ -270,7 +272,7 @@ public class SchedulerPanelService extends MongoBaseService {
                 schedulerPanelDB.setSelectedHours(schedulerPanelDTO.getSelectedHours());
 
             } else {
-                schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
+                schedulerPanelDB.setJobTriggerDate(schedulerPanelDTO.getJobTriggerDate());
             }
 
             save(schedulerPanelDB);
@@ -376,17 +378,11 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
 
-    private String cronExpressionEveryMonthBuilder(LocalTime localTime) {
-        String cronExpressionRunOnce = "0 {0} {1} 1 * ?";
-        String hours = String.valueOf(localTime.getHour());
-        String minutes = String.valueOf(localTime.getMinute());
-        logger.info("hours--> " + hours);
-        logger.info("minutes--> " + minutes);
-        String cronExpression = MessageFormat.format(cronExpressionRunOnce, minutes, hours);
-        logger.info("cronExpression for run every month --> " + cronExpression);
+    private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {
+        String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
+        String cronExpression = MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
         return cronExpression;
     }
-
 
     /**
      * @author yatharth
