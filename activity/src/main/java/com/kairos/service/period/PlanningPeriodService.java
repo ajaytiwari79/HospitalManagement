@@ -354,7 +354,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!schedulerPanelDTOS.isEmpty()) {
             List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
             });
-            Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getJobTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
+            Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getOneTimeTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
             planningPeriods.stream().forEach(planningPeriod -> {
                 planningPeriod.getPhaseFlippingDate().stream().forEach(periodPhaseFlippingDate -> {
                     if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null) {

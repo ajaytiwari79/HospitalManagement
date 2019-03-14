@@ -2,7 +2,7 @@ package com.kairos.dto.scheduler.scheduler_panel;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobTriggerType;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;
@@ -36,11 +36,12 @@ public class SchedulerPanelDTO {
     private JobType jobType;
     private JobSubType jobSubType;
     private boolean oneTimeTrigger;
-    private LocalDateTime jobTriggerDate;
+    private LocalDateTime oneTimeTriggerDate;
+    private LocalDateTime monthlyJobTriggerDate;
     private BigInteger entityId;
     private String timezone;
     private Long oneTimeTriggerDateMillis;
-    private JobTriggerType jobTriggerType;
+    private JobFrequencyType jobFrequencyType;
 
 
 
@@ -48,15 +49,15 @@ public class SchedulerPanelDTO {
 
     }
 
-    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, JobTriggerType jobTriggerType,LocalDateTime jobTriggerDate,boolean oneTimeTrigger ) {
-        this.jobTriggerDate=jobTriggerDate;
+    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, JobFrequencyType jobFrequencyType, LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger ) {
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
-        this.jobTriggerType = jobTriggerType;
+        this.jobFrequencyType = jobFrequencyType;
         this.oneTimeTrigger=oneTimeTrigger;
     }
 
-    public SchedulerPanelDTO(String name, boolean active, Integer startMinute, Integer repeat, List<DayOfWeek> days, LocalTime runOnce, List<String> selectedHours, Long unitId, BigInteger integrationConfigurationId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime jobTriggerDate, BigInteger entityId) {
+    public SchedulerPanelDTO(String name, boolean active, Integer startMinute, Integer repeat, List<DayOfWeek> days, LocalTime runOnce, List<String> selectedHours, Long unitId, BigInteger integrationConfigurationId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
         this.name = name;
         this.active = active;
         this.startMinute = startMinute;
@@ -69,7 +70,7 @@ public class SchedulerPanelDTO {
         this.jobType = jobType;
         this.jobSubType = jobSubType;
         this.oneTimeTrigger = oneTimeTrigger;
-        this.jobTriggerDate = jobTriggerDate;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.entityId = entityId;
     }
 
@@ -81,28 +82,28 @@ public class SchedulerPanelDTO {
         this.timezone=timezone;
     }
 
-    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime jobTriggerDate, BigInteger entityId) {
+    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
        this.jobType=jobType;
         this.jobSubType = jobSubType;
         this.oneTimeTrigger = oneTimeTrigger;
-        this.jobTriggerDate = jobTriggerDate;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.entityId = entityId;
     }
     public SchedulerPanelDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
-                             LocalDateTime jobTriggerDate, boolean oneTimeTrigger, String filterId) {
+                             LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger, String filterId) {
 
         this.unitId = unitId;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
-        this.jobTriggerDate = jobTriggerDate;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.entityId = entityId;
         this.oneTimeTrigger = oneTimeTrigger;
         this.filterId=filterId;
 
     }
-    public SchedulerPanelDTO(BigInteger id, LocalDateTime jobTriggerDate) {
+    public SchedulerPanelDTO(BigInteger id, LocalDateTime oneTimeTriggerDate) {
         this.id = id;
-        this.jobTriggerDate = jobTriggerDate;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
     }
 
     public BigInteger getId() {
@@ -128,20 +129,20 @@ public class SchedulerPanelDTO {
         this.oneTimeTrigger = oneTimeTrigger;
     }
 
-    public LocalDateTime getJobTriggerDate() {
-        return jobTriggerDate;
+    public LocalDateTime getOneTimeTriggerDate() {
+        return oneTimeTriggerDate;
     }
 
-    public void setJobTriggerDate(LocalDateTime jobTriggerDate) {
-        this.jobTriggerDate = jobTriggerDate;
+    public void setOneTimeTriggerDate(LocalDateTime oneTimeTriggerDate) {
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
     }
 
-    public JobTriggerType getJobTriggerType() {
-        return jobTriggerType;
+    public JobFrequencyType getJobFrequencyType() {
+        return jobFrequencyType;
     }
 
-    public void setJobTriggerType(JobTriggerType jobTriggerType) {
-        this.jobTriggerType = jobTriggerType;
+    public void setJobFrequencyType(JobFrequencyType jobFrequencyType) {
+        this.jobFrequencyType = jobFrequencyType;
     }
 
     public JobType getJobType() {
@@ -176,7 +177,7 @@ public class SchedulerPanelDTO {
     public void setOneTimeTriggerDateMillis(Long oneTimeTriggerDateMillis) {
         this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
         if(this.oneTimeTrigger && Optional.ofNullable(oneTimeTriggerDateMillis).isPresent()){
-            this.jobTriggerDate = DateUtils.getLocalDateTimeFromMillis(oneTimeTriggerDateMillis);
+            this.oneTimeTriggerDate = DateUtils.getLocalDateTimeFromMillis(oneTimeTriggerDateMillis);
         }
     }
 
@@ -338,5 +339,13 @@ public class SchedulerPanelDTO {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public LocalDateTime getMonthlyJobTriggerDate() {
+        return monthlyJobTriggerDate;
+    }
+
+    public void setMonthlyJobTriggerDate(LocalDateTime monthlyJobTriggerDate) {
+        this.monthlyJobTriggerDate = monthlyJobTriggerDate;
     }
 }

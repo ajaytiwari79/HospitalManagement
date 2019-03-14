@@ -67,7 +67,7 @@ public class DynamicCronScheduler implements DisposableBean {
         if (!schedulerPanel.isOneTimeTrigger() ) {
             future = threadPoolTaskScheduler.schedule(runnable, trigger);
         } else {
-            future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getJobTriggerDate().atZone(ZoneId.of(timezone))));
+            future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
 
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
@@ -125,7 +125,7 @@ public class DynamicCronScheduler implements DisposableBean {
         if (!schedulerPanel.isOneTimeTrigger()) {
             future = threadPoolTaskScheduler.schedule(task, trigger);
         } else {
-            future = threadPoolTaskScheduler.schedule(task, DateUtils.asDate(schedulerPanel.getJobTriggerDate()));
+            future = threadPoolTaskScheduler.schedule(task, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
         }
 
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
@@ -149,7 +149,7 @@ public class DynamicCronScheduler implements DisposableBean {
                 if (!schedulerPanel.isOneTimeTrigger()) {
                     schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
                 } else {
-                    schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getJobTriggerDate()));
+                    schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
                 }
                 schedulerPanelService.setScheduleLastRunTime(schedulerPanel);
                 IntegrationSettingsDTO integrationSettingsDTO = null;
@@ -160,7 +160,7 @@ public class DynamicCronScheduler implements DisposableBean {
                 }
 
                 KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(), schedulerPanel.getUnitId(), schedulerPanel.getJobType(), schedulerPanel.getJobSubType(), schedulerPanel.getEntityId(),
-                        integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getJobTriggerDate()));
+                        integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
 
                 kafkaProducer.pushToQueue(jobToExecute);
             }

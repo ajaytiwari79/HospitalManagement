@@ -1,7 +1,7 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel;
 
 import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobTriggerType;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 
@@ -44,8 +44,8 @@ public class SchedulerPanel extends MongoBaseEntity {
     private JobType jobType;
     private JobSubType jobSubType;
     private boolean oneTimeTrigger;
-    private JobTriggerType jobTriggerType;
-    private LocalDateTime jobTriggerDate;
+    private JobFrequencyType jobFrequencyType;
+    private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
 
 
@@ -73,12 +73,12 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.oneTimeTrigger = oneTimeTrigger;
     }
 
-    public LocalDateTime getJobTriggerDate() {
-        return jobTriggerDate;
+    public LocalDateTime getOneTimeTriggerDate() {
+        return oneTimeTriggerDate;
     }
 
-    public void setJobTriggerDate(LocalDateTime jobTriggerDate) {
-        this.jobTriggerDate = jobTriggerDate;
+    public void setOneTimeTriggerDate(LocalDateTime oneTimeTriggerDate) {
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
     }
 
     public JobType getJobType() {
@@ -243,11 +243,11 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.runOnce = runOnce;
     }
 
-    public JobTriggerType getJobTriggerType() {
-        return jobTriggerType;
+    public JobFrequencyType getJobFrequencyType() {
+        return jobFrequencyType;
     }
 
-    public void setJobTriggerType(JobTriggerType jobTriggerType) {
-        this.jobTriggerType = jobTriggerType;
+    public void setJobFrequencyType(JobFrequencyType jobFrequencyType) {
+        this.jobFrequencyType = jobFrequencyType;
     }
 }

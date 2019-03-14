@@ -147,7 +147,7 @@ public class RuleTemplateService extends MongoBaseService {
         numberofWeekendShiftsInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(numberofWeekendShiftsInPeriodWTATemplate);
 
-        /*ChildCareDaysCheckWTATemplate careDayCheckWTATemplate = new ChildCareDaysCheckWTATemplate("Care days check",true,"Care days check",2, dateInMillis, MONTHS, 1);
+        /*ChildCareDaysCheckWTATemplate careDayCheckWTATemplate = new ChildCareDaysCheckWTATemplate("Care days check",true,"Care days check",2, dateInMillis, MONTHLY, 1);
         careDayCheckWTATemplate.setCountryId(countryDTO.getId());
         careDayCheckWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         careDayCheckWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

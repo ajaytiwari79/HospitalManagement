@@ -149,7 +149,7 @@ public class AppConstants {
 
 
     //RuleTemplate
-    public static final String MONTHS = "MONTHS";
+    public static final String MONTHS = "MONTHLY";
     public static final String WEEKS = "WEEKS";
     public static final String DAYS = "DAYS";
     public static final String YEARS = "YEARS";

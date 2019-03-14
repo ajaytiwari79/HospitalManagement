@@ -11,7 +11,7 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
-import com.kairos.enums.scheduler.JobTriggerType;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.persistence.model.payroll_setting.PayrollAccessGroups;
 import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -152,7 +151,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
     }
 
     public boolean createJobForAddPayrollPeriod() {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PAYROLL_PERIOD, JobTriggerType.MONTHS, getLocalDateTime(getFirstDayOfMonth(getLocalDate()),01,00,00), false));
+        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PAYROLL_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime(getFirstDayOfMonth(getLocalDate()),01,00,00), false));
         LOGGER.info("create job for add payroll period");
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });

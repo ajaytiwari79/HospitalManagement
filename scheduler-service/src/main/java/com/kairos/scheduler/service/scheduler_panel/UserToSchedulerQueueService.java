@@ -21,7 +21,7 @@ public class UserToSchedulerQueueService implements JobQueueHandler {
         SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO();
         ObjectMapperUtils.copyProperties(scheduleJobDTO,schedulerPanelDTO);
         if(schedulerPanelDTO.isOneTimeTrigger()) {
-            schedulerPanelDTO.setJobTriggerDate(DateUtils.getLocalDatetimeFromLong(scheduleJobDTO.getOneTimeTriggerDateMillis()));
+            schedulerPanelDTO.setOneTimeTriggerDate(DateUtils.getLocalDatetimeFromLong(scheduleJobDTO.getOneTimeTriggerDateMillis()));
         }
 
         switch (scheduleJobDTO.getIntegrationOperation()) {
