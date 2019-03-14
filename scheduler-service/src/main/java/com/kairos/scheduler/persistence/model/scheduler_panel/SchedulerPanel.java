@@ -1,7 +1,7 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel;
 
-import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 
@@ -44,6 +44,7 @@ public class SchedulerPanel extends MongoBaseEntity {
     private JobType jobType;
     private JobSubType jobSubType;
     private boolean oneTimeTrigger;
+    private JobFrequencyType jobFrequencyType;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
 
@@ -242,4 +243,11 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.runOnce = runOnce;
     }
 
+    public JobFrequencyType getJobFrequencyType() {
+        return jobFrequencyType;
+    }
+
+    public void setJobFrequencyType(JobFrequencyType jobFrequencyType) {
+        this.jobFrequencyType = jobFrequencyType;
+    }
 }
