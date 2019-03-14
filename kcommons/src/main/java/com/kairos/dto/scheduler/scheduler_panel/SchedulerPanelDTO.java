@@ -2,6 +2,7 @@ package com.kairos.dto.scheduler.scheduler_panel;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;
@@ -36,14 +37,24 @@ public class SchedulerPanelDTO {
     private JobSubType jobSubType;
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
+    private LocalDateTime monthlyJobTriggerDate;
     private BigInteger entityId;
     private String timezone;
     private Long oneTimeTriggerDateMillis;
+    private JobFrequencyType jobFrequencyType;
 
 
 
     public SchedulerPanelDTO() {
 
+    }
+
+    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, JobFrequencyType jobFrequencyType, LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger ) {
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.jobFrequencyType = jobFrequencyType;
+        this.oneTimeTrigger=oneTimeTrigger;
     }
 
     public SchedulerPanelDTO(String name, boolean active, Integer startMinute, Integer repeat, List<DayOfWeek> days, LocalTime runOnce, List<String> selectedHours, Long unitId, BigInteger integrationConfigurationId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
@@ -79,7 +90,7 @@ public class SchedulerPanelDTO {
         this.entityId = entityId;
     }
     public SchedulerPanelDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
-                             LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger,String filterId) {
+                             LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger, String filterId) {
 
         this.unitId = unitId;
         this.jobType = jobType;
@@ -124,6 +135,14 @@ public class SchedulerPanelDTO {
 
     public void setOneTimeTriggerDate(LocalDateTime oneTimeTriggerDate) {
         this.oneTimeTriggerDate = oneTimeTriggerDate;
+    }
+
+    public JobFrequencyType getJobFrequencyType() {
+        return jobFrequencyType;
+    }
+
+    public void setJobFrequencyType(JobFrequencyType jobFrequencyType) {
+        this.jobFrequencyType = jobFrequencyType;
     }
 
     public JobType getJobType() {
@@ -320,5 +339,13 @@ public class SchedulerPanelDTO {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public LocalDateTime getMonthlyJobTriggerDate() {
+        return monthlyJobTriggerDate;
+    }
+
+    public void setMonthlyJobTriggerDate(LocalDateTime monthlyJobTriggerDate) {
+        this.monthlyJobTriggerDate = monthlyJobTriggerDate;
     }
 }
