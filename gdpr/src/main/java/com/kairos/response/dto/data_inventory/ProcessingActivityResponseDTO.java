@@ -38,6 +38,8 @@ public class ProcessingActivityResponseDTO {
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
     private List<RelatedDataSubjectDTO> dataSubjects = new ArrayList<>();
 
+    public ProcessingActivityResponseDTO() {
+    }
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
 

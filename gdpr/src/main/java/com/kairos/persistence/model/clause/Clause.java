@@ -41,20 +41,9 @@ public class Clause extends BaseEntity {
     @Nullable
     private UUID tempClauseId;
 
-    public Clause(Long countryId, String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
     public Clause(@NotBlank String title, @NotNull String description) {
         this.title = title;
         this.description = description;
-    }
-
-    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags) {
-        this.title = title;
-        this.description = description;
-        this.tags=tags;
     }
 
     public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes) {
@@ -64,11 +53,13 @@ public class Clause extends BaseEntity {
         this.templateTypes=templateTypes;
     }
 
-    public Clause(String title, String description, Long countryId) {
+    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes,UUID tempClauseId) {
         this.title = title;
         this.description = description;
+        this.tags=tags;
+        this.templateTypes=templateTypes;
+        this.tempClauseId=tempClauseId;
     }
-
     public Clause() {
     }
 

@@ -25,14 +25,14 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by vipul on 5/12/17.
  */
 @RestController
-@Api(API_ORGANIZATION_UNIT_URL)
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
 public class OrganizationActivityController {
     @Inject
     private OrganizationActivityService organizationActivityService;

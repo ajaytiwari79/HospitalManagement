@@ -15,14 +15,14 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by vipul on 25/9/17.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL+"/phase")
-@Api(API_ORGANIZATION_UNIT_URL+"/phase")
+@RequestMapping(API_UNIT_URL +"/phase")
+@Api(API_UNIT_URL +"/phase")
 public class PhaseController {
 
     @Inject

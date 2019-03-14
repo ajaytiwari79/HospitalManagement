@@ -39,8 +39,8 @@ import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
  * Created by prabjot on 14/10/16.
  */
 @RestController
-@RequestMapping(ApiConstants.API_ORGANIZATION_UNIT_URL)
-@Api(value = ApiConstants.API_ORGANIZATION_UNIT_URL)
+@RequestMapping(ApiConstants.API_UNIT_URL)
+@Api(value = ApiConstants.API_UNIT_URL)
 public class TaskController {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskController.class);

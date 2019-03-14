@@ -13,14 +13,14 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by prerna on 30/3/18.
  */
 @RestController()
-@Api(API_ORGANIZATION_UNIT_URL)
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
 public class PeriodSettingsController {
 
     @Inject

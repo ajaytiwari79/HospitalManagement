@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.AppConstants.TEAM;
 
@@ -31,7 +33,7 @@ import static com.kairos.constants.AppConstants.TEAM;
 public class OrganizationServiceService{
 
     @Inject
-    OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
@@ -39,7 +41,7 @@ public class OrganizationServiceService{
     @Inject
     private CountryGraphRepository countryGraphRepository;
     //TODO move this dependency in task
-   @Inject
+    @Inject
     private OrganizationExternalServiceRelationshipRepository organizationExternalServiceRelationshipRepository;
     @Inject
     private TeamGraphRepository teamGraphRepository;
@@ -47,13 +49,20 @@ public class OrganizationServiceService{
     @Inject
     private ExceptionService exceptionService;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationServiceService.class);
 
 
-    public Map<String, Object> updateOrganizationService(long id, String name, String description) {
+    public Map<String, Object> updateOrganizationService(long id, String name, String description,Long countryId) {
+        if(isNull(name) || name.trim().isEmpty()){
+            exceptionService.actionNotPermittedException("error.OrganizationService.name.notEmpty");
+        }
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
             return null;
+        }
+        boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, "(?i)" + name.trim(),id);
+        if (alreadyExistWithSameName) {
+            exceptionService.duplicateDataException("message.organizationService.service.duplicate");
         }
         organizationService.setName(name);
         organizationService.setDescription(description);
@@ -162,17 +171,13 @@ public class OrganizationServiceService{
         }
     }
 
-    public Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
+    private Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
         return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
 
-    ;
-
-    public Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId) {
+    private Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId) {
         return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId, teamId);
     }
-
-    ;
 
     public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected, String type) {
 
@@ -270,36 +275,15 @@ public class OrganizationServiceService{
     }
 
 
-    public OrganizationService createOrganizationService(long countryId, OrganizationService organizationService) {
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            return null;
-        }
-        String name = "(?i)" + organizationService.getName();
-        OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
-        if (organizationService1 != null) {
-            return organizationService1;
-            //throw  new DuplicateDataException("Can't create organization service");
-        }
-        List<OrganizationService> organizationServices = country.getOrganizationServices();
-        organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
-        organizationServices.add(organizationService);
-        country.setOrganizationServices(organizationServices);
-        countryGraphRepository.save(country);
-        return organizationService;
-    }
-
     public OrganizationService createCountryOrganizationService(long countryId, OrganizationService organizationService) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             return null;
         }
-        String name = "(?i)" + organizationService.getName();
-        OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
-        if (organizationService1 != null) {
-            //exceptionService.duplicateDataException();
+        String name = "(?i)" + organizationService.getName().trim();
+        boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, name,-1L);
+        if (alreadyExistWithSameName) {
             exceptionService.duplicateDataException("message.organizationService.service.duplicate");
-
         }
         List<OrganizationService> organizationServices = country.getOrganizationServices();
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
@@ -308,11 +292,6 @@ public class OrganizationServiceService{
         countryGraphRepository.save(country);
         return organizationService;
     }
-
-    public OrganizationService getByName(String name) {
-        return organizationServiceRepository.findByName(name);
-    }
-
 
     public Map<String, Object> organizationServiceData(long id, String type) {
 
@@ -385,89 +364,6 @@ public class OrganizationServiceService{
         return null;
     }
 
-   /* public HashMap<String, Object> getTaskTypes(long id, long subServiceId,String type) {
-
-        List<Map<String,Object>> visibleTaskTypes = new ArrayList<>();;
-        List<Map<String,Object>> selectedTaskTypes = new ArrayList<>();
-        if(ORGANIZATION.equalsIgnoreCase(type)){
-            Organization organization = organizationGraphRepository.findOne(id);
-            if (organization == null) {
-                return null;
-            }
-            Organization parent;
-            if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
-
-            } else {
-                parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-            }
-            if(parent == null){
-                for(TaskType taskType : taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,0,true)){
-                    visibleTaskTypes.add(taskType.getBasicTaskTypeInfo());
-                }
-            } else {
-                visibleTaskTypes = new ArrayList<>();
-                for(TaskType taskType :  taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,parent.getId(),true)){
-                    visibleTaskTypes.add(taskType.getBasicTaskTypeInfo());
-                }
-            }
-            for(TaskType taskType : taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,id,true)){
-                selectedTaskTypes.add(taskType.getBasicTaskTypeInfo());
-            }
-        } else if(TEAM.equalsIgnoreCase(type)){
-            Organization unit = organizationGraphRepository.getOrganizationByTeamId(id);
-            if(unit == null){
-                throw new InternalError("team can not exist without organization,organization not found");
-            }
-            for(TaskType taskType :  taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,unit.getId(),true)){
-                visibleTaskTypes.add(taskType.getBasicTaskTypeInfo());
-            }
-
-            for(TaskType taskType : taskTypeMongoRepository.findByTeamIdAndSubServiceIdAndIsEnabled(id,subServiceId,true)){
-                selectedTaskTypes.add(taskType.getBasicTaskTypeInfo());
-            }
-
-        }
-
-        HashMap<String,Object> response = new HashMap<>();
-        response.put("parentOrganizationTypes",visibleTaskTypes);
-        response.put("unitTaskTypes",selectedTaskTypes);
-        return response;
-    }
-
-    /**
-     * @author prabjot
-     * to update task type in organization/team based on type of node
-     * @param id id of organization or team will be decided by type parameter
-     * @param subServiceId
-     * @param taskTypeId
-     * @param isSelected if true task type will be added otherwise
-     * @param type type can be {organization},{team}
-     * @return
-     */
-    /*public Map<String,Object> updateTaskType(long id, long subServiceId, String taskTypeId, boolean isSelected, String type) {
-
-        if(ORGANIZATION.equalsIgnoreCase(type)){
-            if(isSelected){
-                taskTypeService.linkTaskTypesWithOrg(taskTypeId,id,subServiceId);
-            } else {
-                taskTypeService.deleteTaskType(taskTypeId,id,subServiceId);
-            }
-        } else if(TEAM.equalsIgnoreCase(type)){
-            TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
-            if(taskType == null){
-                throw new InternalError("Task type can not null");
-            }
-            if(isSelected){
-                taskType.setTeamId(id);
-                taskTypeService.save(taskType);
-            } else {
-                taskType.setEnabled(false);
-                taskTypeService.save(taskType);
-            }
-        }
-        return getTaskTypes(id,subServiceId,type);
-    }*/
 
     public OrganizationService saveImportedServices(OrganizationService organizationService) {
         organizationServiceRepository.save(organizationService);
@@ -475,16 +371,12 @@ public class OrganizationServiceService{
     }
 
     public Map<String, Object> organizationImportedServiceData(long id) {
-
-        Map<String, Object> response = null;
         Organization unit = organizationGraphRepository.findOne(id);
         if (unit == null) {
             return null;
         }
-        response = filterSkillData(organizationGraphRepository.getImportedServicesForUnit(unit.getId()));
+        return filterSkillData(organizationGraphRepository.getImportedServicesForUnit(unit.getId()));
 
-
-        return response;
     }
 
     public OrganizationService mapImportedService(Long importedServiceId, Long serviceId) {

@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class MasterClause extends Clause {
@@ -34,9 +35,15 @@ public class MasterClause extends Clause {
     private List<AccountType> accountTypes = new ArrayList<>();
 
 
-    public MasterClause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes, Long countryId) {
-        super(title, description, tags, templateTypes);
+    public MasterClause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes, Long countryId, UUID tempClauseId,List<AccountType> accountTypes
+                          ,List<OrganizationType> organizationTypes,List <OrganizationSubType> organizationSubTypes ,List <ServiceCategory> organizationServices,List<SubServiceCategory> organizationSubServices ) {
+        super(title, description, tags, templateTypes,tempClauseId);
         this.countryId = countryId;
+        this.accountTypes=accountTypes;
+        this.organizationTypes=organizationTypes;
+        this.organizationServices=organizationServices;
+        this.organizationSubTypes=organizationSubTypes;
+        this.organizationSubServices=organizationSubServices;
     }
 
     public MasterClause(){

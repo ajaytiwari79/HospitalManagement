@@ -474,6 +474,14 @@ public class StaffService {
                         staffErrorList.add(staffDTO);
                         continue;
                     }
+                    // Check if Staff exists in organization with CPR Number
+                    if (staffGraphRepository.isStaffExistsByCPRNumber(cprAsLong.toString(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)) {
+                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Staff already exist with CPR Number "+cprAsLong);
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                        staffErrorList.add(staffDTO);
+                        continue;
+                    }
+
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
