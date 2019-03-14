@@ -43,6 +43,10 @@ public class ObjectUtils {
         return !Optional.ofNullable(object).isPresent();
     }
 
+    public static <T> T isNullOrElse(T object,T elseObject){
+        return Optional.ofNullable(object).orElse(elseObject);
+    }
+
     public static <T> boolean isNotNull(T object){
         return Optional.ofNullable(object).isPresent();
     }

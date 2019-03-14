@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * Created by vipul on 30/8/17.
@@ -70,7 +72,7 @@ public class ShiftDTO {
     private BigInteger planningPeriodId;
     private BigInteger phaseId;
     private int restingMinutes;
-    private Set<ShiftEscalationReason>
+    private Set<ShiftEscalationReason> escalationReasons;
 
     public ShiftDTO() {
         //default Const
@@ -438,6 +440,14 @@ public class ShiftDTO {
 
     public void setRestingMinutes(int restingMinutes) {
         this.restingMinutes = restingMinutes;
+    }
+
+    public Set<ShiftEscalationReason> getEscalationReasons() {
+        return escalationReasons;
+    }
+
+    public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
+        this.escalationReasons = isNullOrElse(escalationReasons,new HashSet<>());
     }
 
     @Override

@@ -19,3 +19,11 @@ c.employmentTypes = [];
 }
 db.cTARuleTemplate.save(c);
 });
+
+db.shiftViolatedRules.find().forEach(function(e){
+    if(e.shift._id){
+        e.shiftId = e.shift._id;
+        delete e.shift;
+        db.shiftViolatedRules.save(e);
+        }
+    });

@@ -4,11 +4,14 @@ package com.kairos.service.wta;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.template_types.DurationBetweenShiftsWTATemplate;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.DateUtils.getEndOfDay;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValueByPhase;
 import static java.util.Comparator.comparing;
 
@@ -34,12 +35,15 @@ public class WTARuleTemplateCalculationService {
 
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
 
     public List<ShiftDTO> updateRestingTimeInShifts(List<ShiftDTO> shifts, UserAccessRoleDTO userAccessRole){
         if(isCollectionNotEmpty(shifts)){
             shifts.sort(comparing(ShiftDTO::getStartDate));
             Date startDate = shifts.get(0).getStartDate();
             Date endDate = shifts.get(shifts.size()-1).getEndDate();
+            List<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toList());
+            Map<BigInteger,ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds).stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
             List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDatesWithRuleTemplateType(shifts.get(0).getUnitPositionId(),startDate,endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
             List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndBetweenDates(shifts.get(0).getUnitId(),startDate,endDate);
             Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap = getIntervalWTARuletemplateMap(workingTimeAgreements,asLocalDate(endDate).plusDays(1));
@@ -57,14 +61,13 @@ public class WTARuleTemplateCalculationService {
                     }
                 }
                 shift.setRestingMinutes(restingMinutes);
-
+                shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? newHashSet(ShiftEscalationReason.WORK_TIME_AGREEMENT) : new HashSet<>());
             }
-
         }
         return shifts;
     }
 
-    public Map<LocalDate, BigInteger> getMapofDateAndMap(List<PlanningPeriod> planningPeriods,List<ShiftDTO> shifts){
+    private Map<LocalDate, BigInteger> getMapofDateAndMap(List<PlanningPeriod> planningPeriods,List<ShiftDTO> shifts){
         Map<LocalDate, BigInteger> dateAndPhaseMap = new HashMap<>(shifts.size());
         for (ShiftDTO shift : shifts) {
             for (PlanningPeriod planningPeriod : planningPeriods) {
@@ -76,7 +79,7 @@ public class WTARuleTemplateCalculationService {
         return dateAndPhaseMap;
     }
 
-    public Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> getIntervalWTARuletemplateMap(List<WTAQueryResultDTO> workingTimeAgreements,LocalDate endDate){
+    private Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> getIntervalWTARuletemplateMap(List<WTAQueryResultDTO> workingTimeAgreements,LocalDate endDate){
         Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> dateTimeIntervalListMap = new HashMap<>(workingTimeAgreements.size());
         for (WTAQueryResultDTO workingTimeAgreement : workingTimeAgreements) {
             DateTimeInterval dateTimeInterval = new DateTimeInterval(workingTimeAgreement.getStartDate(),isNotNull(workingTimeAgreement.getEndDate()) ? workingTimeAgreement.getEndDate() : endDate);
