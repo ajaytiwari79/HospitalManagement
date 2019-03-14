@@ -615,7 +615,7 @@ public  class DateUtils {
     public static String getDurationOfTwoLocalDates(LocalDate startDate, LocalDate endDate) {
         // Get duration of period
         Period period = Period.between(startDate, endDate);
-        return (period.getMonths() > 0 ? period.getMonths() + " MONTHLY " : "") +
+        return (period.getMonths() > 0 ? period.getMonths() + " MONTHS " : "") +
                 (period.getDays() >= 7 ? period.getDays() / 7 + " WEEKS " : "") +
                 (period.getDays() % 7 > 0 ? period.getDays() % 7 + " DAYS " : "");
 
