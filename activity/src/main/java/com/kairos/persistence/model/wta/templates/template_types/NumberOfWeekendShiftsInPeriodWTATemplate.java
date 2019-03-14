@@ -159,7 +159,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)) {
             int count = 0;
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
@@ -167,7 +167,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
             if (intervals.size() > 2) {
                 count = getDayOFF(intervals,dateTimeInterval);
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ DAYS,limitAndCounter[2]);
             }

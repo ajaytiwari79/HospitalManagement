@@ -121,13 +121,13 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)){
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
             if(timeInterval!=null) {
                 DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
                 List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
+                Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ DAYS,limitAndCounter[2]);
             }

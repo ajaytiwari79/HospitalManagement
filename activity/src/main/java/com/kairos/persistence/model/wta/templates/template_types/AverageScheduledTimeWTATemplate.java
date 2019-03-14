@@ -134,13 +134,13 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
             if (intervalLength == 0l || StringUtils.isEmpty(intervalUnit)) {
                 throwException("message.ruleTemplate.interval.notNull");
             }
-            if (isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds())) {
+            if (isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds())) {
                 DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
                 List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                 shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
                 shifts.add(infoWrapper.getShift());
                 List<DateTimeInterval> intervals = getIntervals(interval);
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                 for (DateTimeInterval dateTimeInterval : intervals) {
                     int totalMin = 0;
                     for (ShiftWithActivityDTO shift : shifts) {

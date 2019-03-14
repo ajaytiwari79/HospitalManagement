@@ -117,7 +117,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)) {
             if (CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
                 if (timeInterval != null) {
@@ -127,7 +127,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     List<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities);
                     int consecutiveDays = getConsecutiveDaysInDate(shiftDates);
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
+                    Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ DAYS,limitAndCounter[2]);
                 }

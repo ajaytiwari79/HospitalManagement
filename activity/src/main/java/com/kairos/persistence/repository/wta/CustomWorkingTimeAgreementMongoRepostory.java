@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.wta;
 
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.wrapper.wta.CTAWTADTO;
@@ -63,5 +64,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId,Date startDate,Date endDate);
 
     List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate);
+
+    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long unitPositionId, Date startDate, Date endDate, WTATemplateType templateType);
 
 }

@@ -69,6 +69,8 @@ public class ShiftDTO {
     private boolean multipleActivity;
     private BigInteger planningPeriodId;
     private BigInteger phaseId;
+    private int restingMinutes;
+    private Set<ShiftEscalationReason>
 
     public ShiftDTO() {
         //default Const
@@ -428,6 +430,14 @@ public class ShiftDTO {
 
     public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
+    }
+
+    public int getRestingMinutes() {
+        return restingMinutes;
+    }
+
+    public void setRestingMinutes(int restingMinutes) {
+        this.restingMinutes = restingMinutes;
     }
 
     @Override

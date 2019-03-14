@@ -1,7 +1,6 @@
 package com.kairos.wrapper.wta;
 
 import com.kairos.dto.activity.shift.ViolatedRulesDTO;
-import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
@@ -26,7 +25,7 @@ public class RuleTemplateSpecificInfo {
     private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
     private ShiftWithActivityDTO shift;
     private Map<String,TimeSlotWrapper> timeSlotWrapperMap;
-    private String phase;
+    private BigInteger phaseId;
     private DateTimeInterval planningPeriod;
     private Map<BigInteger,Integer> counterMap;
     private Map<Long, DayTypeDTO> dayTypeMap;
@@ -42,11 +41,11 @@ public class RuleTemplateSpecificInfo {
 
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
-        this.phase = phase;
+        this.phaseId = this.phaseId;
         this.planningPeriod = planningPeriod;
         this.counterMap = counterMap;
         this.dayTypeMap = dayTypeMap;
@@ -157,12 +156,12 @@ public class RuleTemplateSpecificInfo {
         this.timeSlotWrapperMap = timeSlotWrapperMap;
     }
 
-    public String getPhase() {
-        return phase;
+    public BigInteger getPhaseId() {
+        return phaseId;
     }
 
-    public void setPhase(String phase) {
-        this.phase = phase;
+    public void setPhaseId(BigInteger phaseId) {
+        this.phaseId = phaseId;
     }
 
     public DateTimeInterval getPlanningPeriod() {
