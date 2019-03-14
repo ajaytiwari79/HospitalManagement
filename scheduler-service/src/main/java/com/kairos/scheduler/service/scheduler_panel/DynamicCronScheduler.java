@@ -4,10 +4,8 @@ package com.kairos.scheduler.service.scheduler_panel;
 import com.kairos.commons.utils.BeanFactoryUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -23,16 +21,12 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
-
-import static com.kairos.scheduler.constants.AppConstants.activitySubTypes;
-import static com.kairos.scheduler.constants.AppConstants.userSubTypes;
-
 
 
 /**
@@ -40,12 +34,11 @@ import static com.kairos.scheduler.constants.AppConstants.userSubTypes;
  */
 
 @Service
-public class DynamicCronScheduler implements  DisposableBean  {
+public class DynamicCronScheduler implements DisposableBean {
 
 
     @Inject
     private SchedulerPanelService schedulerPanelService;
-
 
 
     @Inject
@@ -57,13 +50,12 @@ public class DynamicCronScheduler implements  DisposableBean  {
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
 
-
     private static final Logger logger = LoggerFactory.getLogger(DynamicCronScheduler.class);
 
     public String setCronScheduling(SchedulerPanel schedulerPanel, String timezone) {
         logger.debug("cron----> " + schedulerPanel.getCronExpression());
         CronTrigger trigger = null;
-        if(!schedulerPanel.isOneTimeTrigger()) {
+        if (!schedulerPanel.isOneTimeTrigger()) {
             trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone(timezone));
         }
 
@@ -72,12 +64,10 @@ public class DynamicCronScheduler implements  DisposableBean  {
         threadPoolTaskScheduler.initialize();
         Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
-        if(!schedulerPanel.isOneTimeTrigger()) {
-           future =  threadPoolTaskScheduler.schedule(runnable, trigger);
-        }
-        else {
-
-            future = threadPoolTaskScheduler.schedule(runnable,DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+        if (!schedulerPanel.isOneTimeTrigger() ) {
+            future = threadPoolTaskScheduler.schedule(runnable, trigger);
+        } else {
+            future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
 
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
@@ -89,7 +79,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     }
 
-    private Date getNextExecutionTime(CronTrigger trigger, Date lastScheduledExecutionTime, TimeZone timeZone){
+    private Date getNextExecutionTime(CronTrigger trigger, Date lastScheduledExecutionTime, TimeZone timeZone) {
         TriggerContext triggerContext = getTriggerContext(lastScheduledExecutionTime);
         triggerContext.lastActualExecutionTime();
         return trigger.nextExecutionTime(triggerContext);
@@ -101,43 +91,42 @@ public class DynamicCronScheduler implements  DisposableBean  {
         return context;
     }
 
-    public void stopCronJob(String scheduler){
+    public void stopCronJob(String scheduler) {
         try {
-             logger.info("Check scheduler --> "+scheduler);
+            logger.info("Check scheduler --> " + scheduler);
 
-             ScheduledFuture<?> future =  BeanFactoryUtil.getDefaultListableBeanFactory()
+            ScheduledFuture<?> future = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean(scheduler, ScheduledFuture.class);
 
 
-            if (future != null){
+            if (future != null) {
                 future.cancel(true);
                 BeanFactoryUtil.getDefaultListableBeanFactory().destroySingleton(scheduler);
             }
-        }catch (NoSuchBeanDefinitionException exception){
+        } catch (NoSuchBeanDefinitionException exception) {
             logger.error("No bean registered for cron job, May be this is your first time to scheduling cron job!!");
         }
 
     }
 
-    public void startCronJob(SchedulerPanel schedulerPanel, String timezone){
+    public void startCronJob(SchedulerPanel schedulerPanel, String timezone) {
 
-            String scheduler = "scheduler"+schedulerPanel.getId();
-            logger.info("Start scheduler from BootStrap--> "+scheduler);
-            CronTrigger trigger = null;
-            if(!schedulerPanel.isOneTimeTrigger()) {
-                trigger = new CronTrigger(schedulerPanel.getCronExpression(),  TimeZone.getTimeZone(timezone));
-            }
+        String scheduler = "scheduler" + schedulerPanel.getId();
+        logger.info("Start scheduler from BootStrap--> " + scheduler);
+        CronTrigger trigger = null;
+        if (!schedulerPanel.isOneTimeTrigger()) {
+            trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone(timezone));
+        }
         ScheduledFuture<?> future;
-            Runnable task = getTask(schedulerPanel,  trigger, TimeZone.getTimeZone(timezone));
+        Runnable task = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
            /* ThreadPoolTaskScheduler scheduler2 = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean(scheduler, ThreadPoolTaskScheduler.class);*/
-            if(!schedulerPanel.isOneTimeTrigger()) {
-                 future =  threadPoolTaskScheduler.schedule(task, trigger);
-            }
-            else {
-                 future =  threadPoolTaskScheduler.schedule(task,DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
-            }
+        if (!schedulerPanel.isOneTimeTrigger()) {
+            future = threadPoolTaskScheduler.schedule(task, trigger);
+        } else {
+            future = threadPoolTaskScheduler.schedule(task, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+        }
 
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
 
@@ -145,33 +134,33 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     /**
      * This method is useed to execute a job.
+     *
      * @param schedulerPanel
      * @param trigger
      * @param timeZone
      * @return
      */
-    private Runnable getTask(SchedulerPanel schedulerPanel,  CronTrigger trigger, TimeZone timeZone){
+    private Runnable getTask(SchedulerPanel schedulerPanel, CronTrigger trigger, TimeZone timeZone) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 logger.info("control pannel exist--> " + schedulerPanel.getId());
                 schedulerPanel.setLastRunTime(DateUtils.getCurrentDate());
-                if(!schedulerPanel.isOneTimeTrigger()) {
+                if (!schedulerPanel.isOneTimeTrigger()) {
                     schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
-                }
-                else {
+                } else {
                     schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
                 }
                 schedulerPanelService.setScheduleLastRunTime(schedulerPanel);
                 IntegrationSettingsDTO integrationSettingsDTO = null;
-                if(Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
+                if (Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
                     integrationSettingsDTO = new IntegrationSettingsDTO();
                     Optional<IntegrationSettings> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
                     ObjectMapperUtils.copyProperties(integrationConfiguration.get(), integrationSettingsDTO);
                 }
 
-                KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(),schedulerPanel.getUnitId(),schedulerPanel.getJobType(), schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
-                        integrationSettingsDTO,DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
+                KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(), schedulerPanel.getUnitId(), schedulerPanel.getJobType(), schedulerPanel.getJobSubType(), schedulerPanel.getEntityId(),
+                        integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
 
                 kafkaProducer.pushToQueue(jobToExecute);
             }
@@ -181,17 +170,15 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     }
 
-    public void destroy(){
+    public void destroy() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelService.getAllControlPanels();
-        if(schedulerPanels.size() != 0) {
+        if (schedulerPanels.size() != 0) {
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 logger.info("Shutdown Cron Job of process name " + schedulerPanel.getName());
-                stopCronJob("scheduler"+schedulerPanel.getId());
+                stopCronJob("scheduler" + schedulerPanel.getId());
             }
         }
     }
-
-
 
 
 }

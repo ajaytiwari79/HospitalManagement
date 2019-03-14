@@ -1,16 +1,13 @@
 package com.kairos.dto.activity.payroll_setting;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
