@@ -298,7 +298,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     @Override
-    public List<PlanningPeriod> findLastPlanningPeriodOfAllUnit() {
+    public List<PlanningPeriod> findLastPlanningPeriodOfAllUnits() {
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("deleted").is(false).and("active").is(true)),
                 sort(Sort.Direction.DESC, "unitId","startDate"),

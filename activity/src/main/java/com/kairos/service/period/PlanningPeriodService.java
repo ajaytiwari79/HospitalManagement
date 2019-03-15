@@ -496,7 +496,7 @@ public class PlanningPeriodService extends MongoBaseService {
         // Check if period is in request phase
         // We are checking request phase by its name, can be done by sequence, need to ask
         // TO DO check phase by sequence
-        if (!phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), "REQUEST")) {
+        if (!phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_NAME)) {
             exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
@@ -755,7 +755,7 @@ public class PlanningPeriodService extends MongoBaseService {
     //add planning period in unit via job
     public boolean addPlanningPeriodViaJob() {
         List<PlanningPeriod> planningPeriodsViaJob = new ArrayList<>();
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findLastPlanningPeriodOfAllUnit();
+        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findLastPlanningPeriodOfAllUnits();
         LOGGER.info("add planning period via job");
         if(isCollectionNotEmpty(planningPeriods)) {
             Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(planningPeriods.stream().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toList()));
