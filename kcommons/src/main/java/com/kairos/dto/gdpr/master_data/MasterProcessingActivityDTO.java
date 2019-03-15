@@ -11,7 +11,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityDTO {
@@ -28,19 +30,19 @@ public class MasterProcessingActivityDTO {
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationTypeDTO> organizationTypes =new ArrayList<>();
+    private Set<OrganizationTypeDTO> organizationTypes =new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubTypeDTO> organizationSubTypes =new ArrayList<>();
+    private Set<OrganizationSubTypeDTO> organizationSubTypes =new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
-    private List<ServiceCategoryDTO> organizationServices=new ArrayList<>();
+    private Set<ServiceCategoryDTO> organizationServices=new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
-    private List<SubServiceCategoryDTO> organizationSubServices=new ArrayList<>();
+    private Set<SubServiceCategoryDTO> organizationSubServices=new HashSet<>();
 
     private List<MasterProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
 
@@ -56,9 +58,7 @@ public class MasterProcessingActivityDTO {
         return subProcessingActivities;
     }
 
-   public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) {
-        this.subProcessingActivities = subProcessingActivities;
-    }
+   public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
     public String getName() {
         return name;
@@ -76,35 +76,21 @@ public class MasterProcessingActivityDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypes;
-    }
+    public Set<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypes; }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
+    public void setOrganizationTypes(Set<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
+    public Set<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
 
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
+    public void setOrganizationSubTypes(Set<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() {
-        return organizationServices;
-    }
+    public Set<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
 
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
+    public void setOrganizationServices(Set<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
+    public Set<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
 
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
+    public void setOrganizationSubServices(Set<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 
