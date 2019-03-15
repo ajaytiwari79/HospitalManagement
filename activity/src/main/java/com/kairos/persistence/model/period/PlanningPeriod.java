@@ -42,6 +42,16 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
+
+    }
+
+    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId,DurationType durationType,int duration) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.unitId = unitId;
+        this.durationType=durationType;
+        this.duration=duration;
     }
 
     public LocalDate getStartDate() {

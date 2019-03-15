@@ -275,9 +275,7 @@ public class PlanningPeriodService extends MongoBaseService {
         LocalDate endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO);
         // Set name of period dynamically
         String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
-        PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId);
-        planningPeriod.setDuration(planningPeriodDTO.getDuration());
-        planningPeriod.setDurationType(planningPeriodDTO.getDurationType());
+        PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId,planningPeriodDTO.getDurationType(),planningPeriodDTO.getDuration());
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
         planningPeriods.add(planningPeriod);
@@ -356,11 +354,11 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, unitIdAndPhasesMap.get(unitId), planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
-        createScheduleJobOfPanningPeriod(unitId, planningPeriods);
+        createScheduleJobOfPanningPeriod(planningPeriods);
         return getPlanningPeriods(unitId, planningPeriodDTO.getStartDate(), (planningPeriodDTO.getEndDate() != null) ? planningPeriodDTO.getEndDate() : null);
     }
 
-    private void createScheduleJobOfPanningPeriod(Long unitId, List<PlanningPeriod> planningPeriods) {
+    private void createScheduleJobOfPanningPeriod(List<PlanningPeriod> planningPeriods) {
         List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneByUnitIds(planningPeriods.stream().distinct().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toSet()));
         Map<Long, String> unitAndTimeZoneMap = unitTimeZoneMappingDTOS.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v.getTimezone()));
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
@@ -371,18 +369,32 @@ public class PlanningPeriodService extends MongoBaseService {
             });
         });
         if (!schedulerPanelDTOS.isEmpty()) {
-            List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-            });
-            Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getOneTimeTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
-            planningPeriods.stream().forEach(planningPeriod -> {
-                planningPeriod.getPhaseFlippingDate().stream().forEach(periodPhaseFlippingDate -> {
-                    if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
-                        SchedulerPanelDTO schedulerPanelDTO = schedulerPanelDTOMap.get(planningPeriod.getId() + "-" + LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()));
-                        periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
+            List<SchedulerPanelDTO> schedulerPanelRestDTOS=new ArrayList<>();
+            try {
+                LOGGER.info("send rest call for create job of planning period flippng date of unit");
+                 schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+                });
+                LOGGER.info("successfully created job of planning period flippng date");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if(isCollectionNotEmpty(schedulerPanelRestDTOS)) {
+                Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getOneTimeTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
+                planningPeriods.stream().forEach(planningPeriod -> {
+                    try {
+                        planningPeriod.getPhaseFlippingDate().stream().forEach(periodPhaseFlippingDate -> {
+                            if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
+                                SchedulerPanelDTO schedulerPanelDTO = schedulerPanelDTOMap.get(planningPeriod.getId() + "-" + LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()));
+                                periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
+                            }
+                        });
+                    }catch (Exception e){
+                        LOGGER.info("error in set schedulerPanel job id in planning period via job in " + planningPeriod.getUnitId());
+                        e.printStackTrace();
                     }
                 });
-            });
-            save(planningPeriods);
+                save(planningPeriods);
+            }
         }
     }
 
@@ -740,26 +752,34 @@ public class PlanningPeriodService extends MongoBaseService {
         return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 
+    //add planning period in unit via job
     public boolean addPlanningPeriodViaJob() {
         List<PlanningPeriod> planningPeriodsViaJob = new ArrayList<>();
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findLastPlanningPeriodOfAllUnit();
-        Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(planningPeriods.stream().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toList()));
-        for (PlanningPeriod planningPeriod : planningPeriods) {
-            LocalDate startDate = planningPeriod.getEndDate().plusDays(1);
-            LocalDate endDate = startDate.plusMonths(1);
-            while (startDate.isBefore(endDate)) {
-                LocalDate planningPeriodEndDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()).minusDays(1) : startDate.plusMonths(planningPeriod.getDuration()).minusDays(1);
-                String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(planningPeriodEndDate, AppConstants.DATE_FORMET_STRING);
-                PlanningPeriod planningPeriodOfUnit = new PlanningPeriod(name, startDate, planningPeriodEndDate, planningPeriod.getUnitId());
-                planningPeriodOfUnit.setDurationType(planningPeriod.getDurationType());
-                planningPeriodOfUnit.setDuration(planningPeriod.getDuration());
-                planningPeriodOfUnit = setPhaseFlippingDatesForPlanningPeriod(startDate, unitIdAndPhasesMap.get(planningPeriod.getUnitId()), planningPeriodOfUnit);
-                planningPeriodsViaJob.add(planningPeriodOfUnit);
-                startDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()) : startDate.plusMonths(planningPeriod.getDuration());
+        LOGGER.info("add planning period via job");
+        if(isCollectionNotEmpty(planningPeriods)) {
+            Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(planningPeriods.stream().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toList()));
+            for (PlanningPeriod planningPeriod : planningPeriods) {
+                try {
+                    LocalDate startDate = planningPeriod.getEndDate().plusDays(1);
+                    LocalDate endDate = startDate.plusMonths(1);
+                    while (startDate.isBefore(endDate)) {
+                        LocalDate planningPeriodEndDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()).minusDays(1) : startDate.plusMonths(planningPeriod.getDuration()).minusDays(1);
+                        String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(planningPeriodEndDate, AppConstants.DATE_FORMET_STRING);
+                        PlanningPeriod planningPeriodOfUnit = new PlanningPeriod(name, startDate, planningPeriodEndDate, planningPeriod.getUnitId(), planningPeriod.getDurationType(), planningPeriod.getDuration());
+                        planningPeriodOfUnit = setPhaseFlippingDatesForPlanningPeriod(startDate, unitIdAndPhasesMap.get(planningPeriod.getUnitId()), planningPeriodOfUnit);
+                        planningPeriodsViaJob.add(planningPeriodOfUnit);
+                        startDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()) : startDate.plusMonths(planningPeriod.getDuration());
+                    }
+                } catch (Exception e) {
+                    LOGGER.info("error of added planning period via job in " + planningPeriod.getUnitId());
+                    e.printStackTrace();
+                }
+                planningPeriodMongoRepository.saveEntities(planningPeriodsViaJob);
+                createScheduleJobOfPanningPeriod(planningPeriodsViaJob);
+                LOGGER.info("successfully added planning period via job");
             }
         }
-        planningPeriodMongoRepository.saveEntities(planningPeriodsViaJob);
-        createScheduleJobOfPanningPeriod(null, planningPeriodsViaJob);
         return true;
     }
 }

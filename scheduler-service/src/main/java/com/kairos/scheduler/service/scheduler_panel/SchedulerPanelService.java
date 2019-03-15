@@ -1,28 +1,26 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.scheduler.JobDetailsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
-import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobFrequencyType;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
-import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
 import com.kairos.scheduler.persistence.repository.job_details.JobDetailsRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
 import com.kairos.scheduler.persistence.repository.scheduler_panel.SchedulerPanelRepository;
 import com.kairos.scheduler.service.MongoBaseService;
-
 import com.kairos.scheduler.service.UserIntegrationService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-
 import com.kairos.scheduler.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -381,12 +379,13 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
 
+
     private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {
-        //String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
-        String cronExpressionRunOnce = "*/2 * * * ? *";
+        String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
         String cronExpression = MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
         return cronExpression;
     }
+
 
     /**
      * @author yatharth
