@@ -322,9 +322,15 @@ public class ShiftService extends MongoBaseService {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate());
         //reason code will be sanem for all shifts.
+
         Set<Long> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()).collect(Collectors.toSet());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftStartDate), shiftDTO.getStaffId(), type, shift.getUnitPositionId(), reasonCodeIds);
         List<BigInteger> activityIds = shiftDTO.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
+        Shift oldShift = null;
+        if(isNotNull(shift.getId())){
+            oldShift = shiftMongoRepository.findOne(shift.getId());
+            activityIds.addAll(oldShift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+        }
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftStartDate);
@@ -349,7 +355,7 @@ public class ShiftService extends MongoBaseService {
         if (!breakActivities.isEmpty()) {
             shift.setActivities(breakActivities);
         }
-        ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()));
+        ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()));
         if (isIgnoredAllRuletemplate(shiftWithViolatedInfo,updatedShiftWithViolatedInfo)) {
             shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, false);
             updateWTACounter(staffAdditionalInfoDTO,updatedShiftWithViolatedInfo,shift);
