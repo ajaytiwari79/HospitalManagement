@@ -234,17 +234,22 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public List<ActivityDTO> findAllActivityByUnitId(Long unitId) {
+    public List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted) {
+        ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime")
+                .and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart")
+                .and("balanceSettingsActivityTab").as("balanceSettingsActivityTab")
+                .and("id").as("id").and("name").as("name")
+                .and("activity_type_category.id").as("categoryId").and("activity_type_category.name")
+                .as("categoryName");
+
         Aggregation aggregation = Aggregation.newAggregation(
-                //"unitId").is(unitId).and(
-                match(Criteria.where("deleted").is(false).and("unitId").is(unitId))
-                //lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType")
-                , project("unitId")
-                        .andInclude("deleted")
-                        /*.andInclude("name")
-                        .andInclude("expertises")
-                        .andInclude("skillActivityTab")
-                        .and("timeType").arrayElementAt(0).as("timeType")*/);
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true)),
+                unwind("generalActivityTab"),
+                lookup("activity_category", "generalActivityTab.categoryId", "_id",
+                        "activity_type_category"),
+                unwind("activity_type_category"),
+                projectionOperation
+        );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }

@@ -42,7 +42,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(long unitId);
 
-    List<ActivityDTO> findAllActivityByUnitId(Long unitId);
+    List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted);
 
     Activity getActivityByNameAndUnitId(Long unitId,String name);
 

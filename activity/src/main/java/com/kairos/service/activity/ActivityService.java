@@ -66,6 +66,7 @@ import com.kairos.utils.external_plateform_shift.Transstatus;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -989,6 +990,11 @@ public class ActivityService extends MongoBaseService {
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
+    }
+
+    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
+        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
+        return activityTypeList;
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {

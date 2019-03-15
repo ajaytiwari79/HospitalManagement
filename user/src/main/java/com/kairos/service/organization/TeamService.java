@@ -147,6 +147,7 @@ public class TeamService {
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         map.put("staffList", staffPersonalDetailDTOS);
         map.put("skillList", skillService.getSkillsOfOrganization(unitId));
+        map.put("activityList", activityIntegrationService.getActivitiesWithCategories(unitId));
         return map;
     }
 
