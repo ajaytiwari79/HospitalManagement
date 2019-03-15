@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -145,7 +146,7 @@ public class RuletemplateUtils {
         return updatedShifts;
     }
 
-    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, BigInteger wtaRuleTemplateId, String wtaRuleTemplateName,Integer totalCounter) {
+    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, WTABaseRuleTemplate wtaBaseRuleTemplate, Integer totalCounter, DurationType unitType,Integer unitValue) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
             if (counterCount != null) {
@@ -155,9 +156,9 @@ public class RuletemplateUtils {
                     counterCount = 0;
                     canBeIgnore = false;
                 }
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, counterCount, true, canBeIgnore,totalCounter);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, canBeIgnore,totalCounter,unitType,unitValue.floatValue());
             } else {
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaRuleTemplateId, wtaRuleTemplateName, null, true, false,totalCounter);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), null, true, false,totalCounter,unitType,unitValue.floatValue());
             }
             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
         }
