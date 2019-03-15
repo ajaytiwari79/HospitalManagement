@@ -19,3 +19,8 @@ c.employmentTypes = [];
 }
 db.cTARuleTemplate.save(c);
 });
+
+
+//add duration and duration type in planning period
+//first check existing planning period duration and duration type
+db.getCollection('planningPeriod').updateMany({},{$set:{ "duration" :NumberInt(1),"durationType" : "MONTHS"}})
