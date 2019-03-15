@@ -149,7 +149,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                         }
                     }
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin / (60 * (int) dateTimeInterval.getDays()));
-                    brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]/60+" "+ HOURS,limitAndCounter[2]);
                 }
             }
         }

@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class OrganizationClause extends Clause {
@@ -22,8 +23,8 @@ public class OrganizationClause extends Clause {
         this.organizationId = organizationId;
     }
 
-    public OrganizationClause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes, Long organizationId) {
-        super(title, description, tags, templateTypes);
+    public OrganizationClause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes, Long organizationId, UUID tempClauseId) {
+        super(title, description, tags, templateTypes,tempClauseId);
         this.organizationId = organizationId;
     }
 

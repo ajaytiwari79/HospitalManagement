@@ -519,9 +519,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/unit_position/{unitPositionId}/functions", method = RequestMethod.GET)
     @ApiOperation("API for check unit position of staff and available functions and reasoncodes on unit")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate,
-                                                                      @PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(shiftDate, unitPositionId, unitId));
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(unitPositionId, unitId));
     }
 
     @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)

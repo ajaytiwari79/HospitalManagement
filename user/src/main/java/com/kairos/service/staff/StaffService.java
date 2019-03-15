@@ -354,16 +354,16 @@ public class StaffService {
 
     /*******************************************************************************************************/
     //Function to validate staff Mandatory Fields
-    private boolean validateStaffData(Row row, int[] mandatoryCellColumnIndexs) {
-        boolean isPerStaffMandatoryFieldsExists = true;
+    private List<String> validateStaffData(Row row, int[] mandatoryCellColumnIndexs,  XSSFSheet sheet) {
+        List<String> errorMessage = new ArrayList<>();
+        Row headerRow = sheet.getRow(0);
         for (int mandatoryCellColumnIndex : mandatoryCellColumnIndexs) {
-            Cell cell = row.getCell(mandatoryCellColumnIndex);
+            Cell cell = row.getCell(mandatoryCellColumnIndex, Row.RETURN_BLANK_AS_NULL);
             if (cell == null) {
-                isPerStaffMandatoryFieldsExists = false;
-                break;
+                errorMessage.add(headerRow.getCell(mandatoryCellColumnIndex).getStringCellValue());
             }
         }
-        return isPerStaffMandatoryFieldsExists;
+        return errorMessage;
     }
 
     public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
@@ -407,6 +407,7 @@ public class StaffService {
                 exceptionService.internalServerError("error.xssfsheet.noMoreRow", 0);
 
             }
+
             Set<Long> externalIdsOfStaffToBeSaved = new HashSet<>();
             boolean headerSkipped = false;
             for (Row row : sheet) { // For each Row.
@@ -439,28 +440,28 @@ public class StaffService {
                     continue;
                 }
                 // to check mandatory fields
-                int[] mandatoryCellColumnIndexs = {2, 20, 21, 23, 28, 41};
-                boolean isPerStaffMandatoryFieldsExists = validateStaffData(row, mandatoryCellColumnIndexs);
+                int[] mandatoryCellColumnIndexs = {2, 20, 21, 23, 24, 25, 28, 41};
+                List<String> missingMandatoryFields = validateStaffData(row, mandatoryCellColumnIndexs, sheet);
                 Long cprAsLong = null;
                 String firstName = "";
                 String lastName = "";
                 String privateEmail = "";
                 String externalIdValueAsString = "";
-                if (isNotNull(row.getCell(41))) {
+                if (isNotNull(row.getCell(41, Row.RETURN_BLANK_AS_NULL))) {
                     cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
                 }
-                if (isNotNull(row.getCell(20))) {
+                if (isNotNull(row.getCell(20, Row.RETURN_BLANK_AS_NULL))) {
                     firstName = getStringValueOfIndexedCell(row, 20);
                 }
-                if (isNotNull(row.getCell(21))) {
+                if (isNotNull(row.getCell(21, Row.RETURN_BLANK_AS_NULL))) {
                     lastName = getStringValueOfIndexedCell(row, 21);
                 }
-                if (isNotNull(row.getCell(28))) {
+                if (isNotNull(row.getCell(28, Row.RETURN_BLANK_AS_NULL))) {
                     privateEmail = getStringValueOfIndexedCell(row, 28);
                 }
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
-                if (!isPerStaffMandatoryFieldsExists || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
-                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Some of the mandatory fields are missing");
+                if (isCollectionNotEmpty(missingMandatoryFields) || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
+                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Missing field(s) : "+ StringUtils.join(missingMandatoryFields, ", "));
                     if (isNotNull(cprAsLong)) {
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                     }
@@ -473,6 +474,14 @@ public class StaffService {
                         staffErrorList.add(staffDTO);
                         continue;
                     }
+                    // Check if Staff exists in organization with CPR Number
+                    if (staffGraphRepository.isStaffExistsByCPRNumber(cprAsLong.toString(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)) {
+                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Staff already exist with CPR Number "+cprAsLong);
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                        staffErrorList.add(staffDTO);
+                        continue;
+                    }
+
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
@@ -491,7 +500,7 @@ public class StaffService {
                     staff.setContactDetail(contactDetail);
                     staff.setContactAddress(contactAddress);
                     User user = null;
-                    if (isPerStaffMandatoryFieldsExists) {
+                    if (isCollectionEmpty(missingMandatoryFields)) {
                         user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail);
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();

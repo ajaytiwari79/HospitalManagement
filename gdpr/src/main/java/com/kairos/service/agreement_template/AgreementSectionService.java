@@ -8,10 +8,14 @@ import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.persistence.model.embeddables.CoverPage;
+import com.kairos.persistence.model.clause.MasterClause;
+import com.kairos.persistence.model.clause.OrganizationClause;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
+import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepository;
 import com.kairos.persistence.repository.clause.ClauseRepository;
+import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.exception.ExceptionService;
@@ -27,7 +31,7 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class AgreementSectionService{
+public class AgreementSectionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionService.class);
 
@@ -37,6 +41,8 @@ public class AgreementSectionService{
 
     @Inject
     private ClauseRepository clauseRepository;
+    @Inject
+    private ClauseTagRepository clauseTagRepository;
 
     @Inject
     private PolicyAgreementTemplateService policyAgreementTemplateService;
@@ -62,13 +68,13 @@ public class AgreementSectionService{
      */
     public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long referenceId, boolean isOrganization, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
         AgreementTemplateSectionResponseDTO agreementTemplateSectionResponseDTO = new AgreementTemplateSectionResponseDTO();
-        PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId,referenceId);
+        PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }
         if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getAgreementSections())) {
             checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getAgreementSections());
-            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getAgreementSections());
+            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(referenceId, isOrganization, policyAgreementTemplate, agreementTemplateSectionDTO.getAgreementSections());
             agreementSections.forEach(agreementSection -> {
                 agreementSection.linkSubSectionsWithParentSectionAndCountryOrUnitId(isOrganization, referenceId);
 
@@ -84,38 +90,52 @@ public class AgreementSectionService{
         policyAgreementTemplate.setIncludeContentPage(agreementTemplateSectionDTO.isIncludeContentPage());
 
         policyAgreementRepository.save(policyAgreementTemplate);
-        //return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, templateId);
-        return agreementTemplateSectionResponseDTO;
+        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, templateId);
+        //return agreementTemplateSectionResponseDTO;
     }
 
     @SuppressWarnings("unchecked")
-    private List<ClauseBasicDTO> findNewClauses(List<AgreementSectionDTO> sectionDTOList){
-         List<ClauseBasicDTO> list= new ArrayList();
-        sectionDTOList.forEach( section -> {
-            List<ClauseBasicDTO> clauses   = section.getClauses().stream().filter( c -> c.getId() == null).collect(Collectors.toList());
+    private List<ClauseBasicDTO> findNewClauses(List<AgreementSectionDTO> sectionDTOList) {
+        List<ClauseBasicDTO> list = new ArrayList();
+        sectionDTOList.forEach(section -> {
+            List<ClauseBasicDTO> clauses = section.getClauses().stream().filter(c -> c.getId() == null).collect(Collectors.toList());
             clauses.addAll(findNewClauses(section.getAgreementSubSections()));
             list.addAll(clauses);
         });
         return list;
     }
 
-    private void mapClauseIdToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList, Map<UUID,Long > clauseData){
-        sectionDTOList.forEach( section -> {
-            section.getClauses().forEach( clause -> {
-                if(clauseData.containsKey(clause.getTempClauseId())) {
+    private void mapClauseIdToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList, Map<UUID, Long> clauseData) {
+        sectionDTOList.forEach(section -> {
+            section.getClauses().forEach(clause -> {
+                if (clauseData.containsKey(clause.getTempClauseId())) {
                     clause.setId(clauseData.get(clause.getTempClauseId()));
                 }
             });
-            mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(),clauseData);
+            mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(), clauseData);
         });
     }
 
 
-    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList){
+    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(Long referenceId, boolean isOrganization, PolicyAgreementTemplate policyAgreementTemplate, List<AgreementSectionDTO> sectionDTOList) {
         List<ClauseBasicDTO> newClauses = findNewClauses(sectionDTOList);
-        List<Clause> clauses = ObjectMapperUtils.copyPropertiesOfListByMapper(newClauses, Clause.class);
+        List<Clause> clauses = new ArrayList<>();
+        ClauseTag defaultTag = clauseTagRepository.findDefaultTag();
+        for (ClauseBasicDTO clauseBasicDTO : newClauses) {
+            Clause clause;
+            if (isOrganization)
+                clause = new OrganizationClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId());
+            else
+                clause = new MasterClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId(),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getAccountTypes(), AccountType.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationType.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubType.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategory.class),
+                        ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategory.class));
+            clauses.add(clause);
+        }
         clauses = clauseRepository.saveAll(clauses);
-        Map<UUID,Long > clauseData = new HashMap<>();
+        Map<UUID, Long> clauseData = new HashMap<>();
         clauses.forEach(clause -> clauseData.put(clause.getTempClauseId(), clause.getId()));
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSection.class);
@@ -130,7 +150,7 @@ public class AgreementSectionService{
 
         AgreementSection agreementSection = isOrganization ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section", sectionId);
         }
         PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         policyAgreementTemplate.getAgreementSections().remove(agreementSection);
@@ -148,10 +168,10 @@ public class AgreementSectionService{
      */
     public boolean deleteAgreementSubSection(Long sectionId, Long subSectionId) {
 
-        Integer updateCount = agreementSectionRepository.deleteAgreementSubSection(sectionId,subSectionId );
+        Integer updateCount = agreementSectionRepository.deleteAgreementSubSection(sectionId, subSectionId);
         if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.subSection" + sectionId);
-        }else{
+        } else {
             LOGGER.info("Sub section with id :: {} is successfully deleted from section with id :: {}", subSectionId, sectionId);
         }
 
@@ -523,7 +543,7 @@ public class AgreementSectionService{
         Integer updateCount = agreementSectionRepository.removeClauseIdFromAgreementSection(sectionId, clauseId);
         if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
-        }else{
+        } else {
             LOGGER.info("Clause with id :: {} removed from section with id :: {}", clauseId, sectionId);
         }
 
@@ -557,7 +577,6 @@ public class AgreementSectionService{
 
     private void checkDuplicateClauseInAgreementSection(List<ClauseBasicDTO> clauseBasicDTOS, Set<String> clauseTitles, String sectionName) {
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
-
             if (clauseTitles.contains(clauseBasicDTO.getTitle().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate.clause.agreement.section", clauseBasicDTO.getTitle(), sectionName);
             }

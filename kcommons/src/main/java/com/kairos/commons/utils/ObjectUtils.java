@@ -53,4 +53,13 @@ public class ObjectUtils {
         return set;
     }
 
+    //Due to UnsupportedMethodException on calling add method of Arrays.asList
+    public static <E> List<E> newArrayList(E... elements) {
+        List<E> list = new ArrayList<>(elements.length);
+        Collections.addAll(list, elements);
+        return list;
+    }
+
+
+
 }

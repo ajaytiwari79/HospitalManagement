@@ -28,7 +28,7 @@ public class RuleTemplateSpecificInfo {
     private Map<String,TimeSlotWrapper> timeSlotWrapperMap;
     private String phase;
     private DateTimeInterval planningPeriod;
-    private Map<String,Integer> counterMap;
+    private Map<BigInteger,Integer> counterMap;
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
     private int totalTimeBank;
@@ -42,7 +42,7 @@ public class RuleTemplateSpecificInfo {
 
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -125,11 +125,11 @@ public class RuleTemplateSpecificInfo {
         this.dayTypeMap = dayTypeMap;
     }
 
-    public Map<String, Integer> getCounterMap() {
+    public Map<BigInteger, Integer> getCounterMap() {
         return counterMap;
     }
 
-    public void setCounterMap(Map<String, Integer> counterMap) {
+    public void setCounterMap(Map<BigInteger, Integer> counterMap) {
         this.counterMap = counterMap;
     }
 

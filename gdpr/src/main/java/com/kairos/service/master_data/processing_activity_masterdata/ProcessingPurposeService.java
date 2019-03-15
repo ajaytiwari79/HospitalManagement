@@ -50,7 +50,7 @@ public class ProcessingPurposeService {
         List<ProcessingPurpose> processingPurposes = new ArrayList<>();
         if (!processingPurposesNames.isEmpty()) {
             for (String name : processingPurposesNames) {
-                ProcessingPurpose processingPurpose = new ProcessingPurpose(name, countryId);
+                ProcessingPurpose processingPurpose = new ProcessingPurpose(countryId, name);
                 if (isSuggestion) {
                     processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     processingPurpose.setSuggestedDate(LocalDate.now());

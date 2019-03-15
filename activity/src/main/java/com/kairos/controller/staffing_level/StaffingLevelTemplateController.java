@@ -7,26 +7,26 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/staffing_level_template")
-@Api(value = API_ORGANIZATION_UNIT_URL + "/staffing_level_template")
+@RequestMapping(API_UNIT_URL + "/staffing_level_template")
+@Api(value = API_UNIT_URL + "/staffing_level_template")
 public class StaffingLevelTemplateController {
 
-    private Logger logger= LoggerFactory.getLogger(StaffingLevelTemplateController.class);
-    @Autowired
+    private static final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelTemplateController.class);
+    @Inject
     private StaffingLevelTemplateService staffingLevelTemplateService;
 
     @PostMapping(value = "/")

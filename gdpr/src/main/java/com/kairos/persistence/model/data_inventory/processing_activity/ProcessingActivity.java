@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 public class ProcessingActivity extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
     @NotBlank(message = "Description can't be empty")
     private String description;
@@ -25,17 +25,17 @@ public class ProcessingActivity extends BaseEntity {
     @Embedded
     private Staff processOwner;
     private Long countryId;
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<ProcessingPurpose> processingPurposes  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<DataSource> dataSources  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<TransferMethod> transferMethods  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<AccessorParty> accessorParties  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<ProcessingLegalBasis> processingLegalBasis  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Asset> linkedAssets  = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name="processingActivity_id")

@@ -78,7 +78,7 @@ class MasterAssetController {
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateSuggestedStatusOfMasterAsset(countryId, assetIds, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateStatusOfSuggestedMasterAsset(countryId, assetIds, suggestedDataStatus));
 
     }
 

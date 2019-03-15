@@ -8,6 +8,7 @@ import com.kairos.persistence.model.template_type.TemplateType;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -23,7 +24,7 @@ public class Clause extends BaseEntity {
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String title;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<ClauseTag> tags  = new ArrayList<>();
 
     // Mandatory or not to be discussed with Ulrik
@@ -41,20 +42,9 @@ public class Clause extends BaseEntity {
     @Nullable
     private UUID tempClauseId;
 
-    public Clause(Long countryId, String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
     public Clause(@NotBlank String title, @NotNull String description) {
         this.title = title;
         this.description = description;
-    }
-
-    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags) {
-        this.title = title;
-        this.description = description;
-        this.tags=tags;
     }
 
     public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes) {
@@ -64,11 +54,13 @@ public class Clause extends BaseEntity {
         this.templateTypes=templateTypes;
     }
 
-    public Clause(String title, String description, Long countryId) {
+    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes,UUID tempClauseId) {
         this.title = title;
         this.description = description;
+        this.tags=tags;
+        this.templateTypes=templateTypes;
+        this.tempClauseId=tempClauseId;
     }
-
     public Clause() {
     }
 

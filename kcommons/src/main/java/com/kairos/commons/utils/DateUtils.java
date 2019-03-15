@@ -897,4 +897,28 @@ public  class DateUtils {
         return localDate.format(DateTimeFormatter.ofPattern(pattern));
 
     }
+
+    public static LocalDate getlastDayOfYear(Integer year){
+        return LocalDate.of(year,1,1).with(TemporalAdjusters.lastDayOfYear());
+    }
+
+    public static LocalDate getlastDayOfYear(LocalDate localDate){
+        return localDate.with(TemporalAdjusters.lastDayOfYear());
+    }
+
+    public static LocalDate getFirstDayOfMonth(LocalDate localDate){
+        return localDate.withDayOfMonth(1);
+    }
+
+    public static LocalDate getFirstDayOfYear(Integer year){
+        return LocalDate.of(year,1,1);
+    }
+
+    public static LocalDate getFirstDayOfYear(LocalDate localDate){
+        return localDate.with(TemporalAdjusters.firstDayOfYear());
+    }
+
+    public static LocalDate getFirstDayOfNextYear(LocalDate localDate){
+        return localDate.with(TemporalAdjusters.firstDayOfNextYear());
+    }
 }

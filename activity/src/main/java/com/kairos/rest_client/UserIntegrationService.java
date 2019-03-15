@@ -390,10 +390,8 @@ public class UserIntegrationService {
         }, staffId, unitEmploymentId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(LocalDate shiftDate, Long staffId, Long unitPositionId) {
-        List<NameValuePair> queryParamList = new ArrayList<>();
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+    public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(Long staffId, Long unitPositionId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitPositionId);
     }
     public StaffDTO getStaffByUser(Long userId) {
@@ -401,8 +399,8 @@ public class UserIntegrationService {
         }, userId);
     }
 
-    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId, List<Long> expertiesIdList) {
-        return genericRestClient.publishRequest(expertiesIdList, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId, Set<Long> expertiseIds) {
+        return genericRestClient.publishRequest(expertiseIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 

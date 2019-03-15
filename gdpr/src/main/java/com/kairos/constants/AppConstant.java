@@ -41,7 +41,7 @@ public class AppConstant {
 
     //metaData reference key for asset and processing activity
     public static final String ASSET_TYPE_KEY = "assetTypeId";
-    public static final String ASSET_SUB_TYPE_KEY = "assetSubTypeId";
+    public static final String ASSET_SUB_TYPE_KEY = "subAssetTypeId";
     public static final String STORAGE_FORMAT_KEY = "storageFormats";
     public static final String ORG_SECURITY_MEASURE_KEY = "orgSecurityMeasures";
     public static final String TECHNICAL_SECURITY_MEASURE_KEY = "technicalSecurityMeasures";

@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 public class QuestionnaireTemplate extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
     @NotBlank(message = "Description cannot be empty")
     private String description;
@@ -24,7 +24,7 @@ public class QuestionnaireTemplate extends BaseEntity {
     @OneToOne
     private AssetType assetType;
     @OneToOne
-    private AssetType assetSubType;
+    private AssetType subAssetType;
     private Long countryId;
     private boolean isDefaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
@@ -41,7 +41,7 @@ public class QuestionnaireTemplate extends BaseEntity {
         this.description = description;
     }
 
-    public QuestionnaireTemplate(@NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
+    public QuestionnaireTemplate(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
         this.name = name;
         this.description = description;
         this.templateStatus=templateStatus;
@@ -74,11 +74,11 @@ public class QuestionnaireTemplate extends BaseEntity {
     }
 
     public AssetType getAssetSubType() {
-        return assetSubType;
+        return subAssetType;
     }
 
-    public void setAssetSubType(AssetType assetSubType) {
-        this.assetSubType = assetSubType;
+    public void setAssetSubType(AssetType subAssetType) {
+        this.subAssetType = subAssetType;
     }
 
     public List<QuestionnaireSection> getSections() {

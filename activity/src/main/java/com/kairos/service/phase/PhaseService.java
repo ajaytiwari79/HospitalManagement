@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
 /**
@@ -303,6 +304,9 @@ public class PhaseService extends MongoBaseService {
             Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), Function.identity()));
             phase= getActualPhaseApplicableForDate(startDateTime,endDateTime,previousMonday,phaseMap,untilTentativeDate,timeZone);
         }
+        if (isNull(phase)) {
+            exceptionService.dataNotFoundException("message.phaseSettings.absent");
+        }
         return phase;
     }
 
@@ -359,11 +363,9 @@ public class PhaseService extends MongoBaseService {
         DateTimeInterval realtimeInterval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(localDateTimeAfterMinus),DateUtils.asDate(localDateTimeAfterPlus)):null;
         boolean realTime=Optional.ofNullable(endDateTime).isPresent()?shiftInterval.overlaps(realtimeInterval):
                 startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
-        if (startDateTime.isBefore(previousMondayLocalDateTime)) {phase= phaseMap.get(PhaseDefaultName.REALTIME.toString());
-            phase= phaseMap.get(PhaseDefaultName.PAYROLL.toString());
-        }else if(realTime){
+         if(realTime){
             phase= phaseMap.get(PhaseDefaultName.REALTIME.toString());
-        }else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime)) {
+        }else if (startDateTime.isBefore(localDateTimeAfterMinus)) {
             phase= phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString());
         }else if ((startDateTime).isBefore(untilTentativeDate) && startDateTime.isAfter(localDateTimeAfterPlus)) {
             phase=phaseMap.get(PhaseDefaultName.TENTATIVE.toString());

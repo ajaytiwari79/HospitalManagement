@@ -51,7 +51,7 @@ public class ProcessingLegalBasisService {
         List<ProcessingLegalBasis> processingLegalBases = new ArrayList<>();
         if (!legalBasisNames.isEmpty()) {
             for (String name : legalBasisNames) {
-                ProcessingLegalBasis legalBasis = new ProcessingLegalBasis(name, countryId);
+                ProcessingLegalBasis legalBasis = new ProcessingLegalBasis(countryId, name);
                 if (isSuggestion) {
                     legalBasis.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     legalBasis.setSuggestedDate(LocalDate.now());

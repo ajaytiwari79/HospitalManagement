@@ -44,21 +44,21 @@ public class OrganizationDataDisposalService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param dataDisposalDTOS
      * @return return map which contain list of new data disposal and list of existing data disposal if data disposal already exist
      * @description this method create new data Disposal if data disposal not exist with same name ,
      * and if exist then simply add  data disposal to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
-    public List<DataDisposalDTO> createDataDisposal(Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
-        Set<String> existingDataDisposalNames = dataDisposalRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<DataDisposalDTO> createDataDisposal(Long unitId, List<DataDisposalDTO> dataDisposalDTOS) {
+        Set<String> existingDataDisposalNames = dataDisposalRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> dataDisposalsNames = ComparisonUtils.getNewMetaDataNames(dataDisposalDTOS,existingDataDisposalNames );
         List<DataDisposal> dataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
                 DataDisposal newDataDisposal = new DataDisposal(name);
-                newDataDisposal.setOrganizationId(organizationId);
+                newDataDisposal.setOrganizationId(unitId);
                 dataDisposals.add(newDataDisposal);
             }
 
@@ -69,23 +69,23 @@ public class OrganizationDataDisposalService {
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @return list of DataDisposal
      */
-    public List<DataDisposalResponseDTO> getAllDataDisposal(Long organizationId) {
-        return dataDisposalRepository.findAllByUnitIdAndSortByCreatedDate(organizationId);
+    public List<DataDisposalResponseDTO> getAllDataDisposal(Long unitId) {
+        return dataDisposalRepository.findAllByUnitIdAndSortByCreatedDate(unitId);
     }
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id             id of data disposal
      * @return object of data disposal
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
-    public DataDisposal getDataDisposalById(Long organizationId, Long id) {
+    public DataDisposal getDataDisposalById(Long unitId, Long id) {
 
-        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -111,23 +111,23 @@ public class OrganizationDataDisposalService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id              id of Data Disposal
      * @param dataDisposalDTO
      * @return updated data disposal object
      * @throws DuplicateDataException if data disposal exist with same name then throw exception
      */
-    public DataDisposalDTO updateDataDisposal(Long organizationId, Long id, DataDisposalDTO dataDisposalDTO) {
+    public DataDisposalDTO updateDataDisposal(Long unitId, Long id, DataDisposalDTO dataDisposalDTO) {
 
 
-        DataDisposal dataDisposal = dataDisposalRepository.findByOrganizationIdAndDeletedAndName(organizationId, dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalRepository.findByOrganizationIdAndDeletedAndName(unitId, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
         }
-        Integer resultCount = dataDisposalRepository.updateMetadataName(dataDisposalDTO.getName(), id, organizationId);
+        Integer resultCount = dataDisposalRepository.updateMetadataName(dataDisposalDTO.getName(), id, unitId);
         if (resultCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
         } else {
@@ -137,9 +137,9 @@ public class OrganizationDataDisposalService {
 
     }
 
-    public List<DataDisposalDTO> saveAndSuggestDataDisposal(Long countryId, Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
+    public List<DataDisposalDTO> saveAndSuggestDataDisposal(Long countryId, Long unitId, List<DataDisposalDTO> dataDisposalDTOS) {
         dataDisposalService.saveSuggestedDataDisposalFromUnit(countryId, dataDisposalDTOS);
-        return createDataDisposal(organizationId, dataDisposalDTOS);
+        return createDataDisposal(unitId, dataDisposalDTOS);
     }
 
 

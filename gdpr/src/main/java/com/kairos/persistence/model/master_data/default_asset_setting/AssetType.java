@@ -15,22 +15,22 @@ import java.util.List;
 @Entity
 public class AssetType extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty or null")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty or null")
+    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
     private Long organizationId;
-    private boolean subAssetType;
-    private boolean hasSubAsset;
+    private boolean isSubAssetType;
+    private boolean hasSubAssetType;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "assetType_id")
     private List<Risk> risks  = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name="assetType_id")
     private AssetType assetType;
-    @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<AssetType> subAssetTypes= new ArrayList<>();
 
 
@@ -62,13 +62,9 @@ public class AssetType extends BaseEntity {
 
     public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
-    public boolean isHasSubAsset() { return hasSubAsset; }
+    public boolean isHasSubAssetType() { return hasSubAssetType; }
 
-    public void setHasSubAsset(boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
-
-    public boolean isSubAssetType() { return subAssetType; }
-
-    public void setSubAssetType(boolean subAssetType) { this.subAssetType = subAssetType; }
+    public void setHasSubAssetType(boolean hasSubAssetType) { this.hasSubAssetType = hasSubAssetType; }
 
     public Long getCountryId() {
         return countryId;
@@ -100,6 +96,14 @@ public class AssetType extends BaseEntity {
 
     public void setSubAssetTypes(List<AssetType> subAssetTypes) {
         this.subAssetTypes = subAssetTypes;
+    }
+
+    public boolean isSubAssetType() {
+        return isSubAssetType;
+    }
+
+    public void setSubAssetType(boolean subAssetType) {
+        isSubAssetType = subAssetType;
     }
 
     public AssetType() {

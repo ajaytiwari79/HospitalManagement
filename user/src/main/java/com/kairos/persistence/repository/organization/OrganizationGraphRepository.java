@@ -549,7 +549,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     // This 8 is hardCoded because we only need to get the last Integer value of the organization's company Id
     // OOD-KAI-01    OOD-KAI-    >>  8
-    @Query("OPTIONAL MATCH (org:Organization{isEnable:true}) WHERE org.desiredUrl=~{0} WITH  case when count(org)>0 THEN  true ELSE false END as desiredUrl\n" +
+    @Query("OPTIONAL MATCH (org:Organization{isEnable:true}) WHERE org.desiredUrl=~{0} with org,\n" +
+            "CASE WHEN {0} is NOT NULL THEN \n" +
+            "    CASE WHEN count(org)>0 THEN  TRUE ELSE FALSE  END\n" +
+            "ELSE FALSE END  AS desiredUrl\n" +
             "OPTIONAL MATCH (org:Organization{isEnable:true}) WHERE org.name =~{1} WITH desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
             "OPTIONAL MATCH(org:Organization)" +
             "RETURN name,desiredUrl,org.kairosCompanyId as kairosCompanyId  ORDER BY subString(org.kairosCompanyId,8,size(org.kairosCompanyId)) DESC LIMIT 1")

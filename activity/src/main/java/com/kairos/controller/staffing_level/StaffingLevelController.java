@@ -30,11 +30,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/staffing_level")
-@Api(value = API_ORGANIZATION_UNIT_URL + "/staffing_level")
+@RequestMapping(API_UNIT_URL + "/staffing_level")
+@Api(value = API_UNIT_URL + "/staffing_level")
 public class StaffingLevelController {
 
     private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);

@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static com.kairos.constants.AppConstants.HOURS;
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -106,7 +109,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                     ShiftWithActivityDTO shift = infoWrapper.getShift();
                     Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
-                    brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]/60+" "+ HOURS,limitAndCounter[2]);
 
                 }
             }
