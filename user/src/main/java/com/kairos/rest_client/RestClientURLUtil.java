@@ -88,8 +88,7 @@ public class RestClientURLUtil {
             return baseUrl;
         } else {
             if (hasUnitInUrl) {
-                String baseUrl = new StringBuilder(gdprServiceUrl + "unit/")
-                        .append(Optional.ofNullable(UserContext.getOrgId()).isPresent() ? UserContext.getOrgId() : "24").append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                String baseUrl = new StringBuilder(gdprServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 return baseUrl;
             } else {
                 String baseUrl = new StringBuilder(gdprServiceUrl + "unit/").append(Optional.ofNullable(UserContext.getOrgId()).isPresent() ? UserContext.getOrgId() : "24").append("/country/").append(id).toString();

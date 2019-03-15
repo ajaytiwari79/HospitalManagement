@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationSubTypeDTO {
@@ -37,5 +38,20 @@ public class OrganizationSubTypeDTO {
     public OrganizationSubTypeDTO(@NotNull(message = "id can't be null") Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrganizationSubTypeDTO that = (OrganizationSubTypeDTO) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, name);
     }
 }

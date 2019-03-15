@@ -85,10 +85,10 @@ public class MasterProcessingActivityService {
      * @return
      */
     private MasterProcessingActivity setMetadataOfMasterProcessingActivity(MasterProcessingActivityDTO masterProcessingActivityDto, MasterProcessingActivity masterProcessingActivity) {
-        masterProcessingActivity.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationTypes(), OrganizationType.class));
-        masterProcessingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationSubTypes(), OrganizationSubType.class));
-        masterProcessingActivity.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationServices(), ServiceCategory.class));
-        masterProcessingActivity.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationSubServices(), SubServiceCategory.class));
+        masterProcessingActivity.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationTypes()), OrganizationType.class));
+        masterProcessingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationSubTypes()), OrganizationSubType.class));
+        masterProcessingActivity.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationServices()), ServiceCategory.class));
+        masterProcessingActivity.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationSubServices()), SubServiceCategory.class));
         return masterProcessingActivity;
     }
 
