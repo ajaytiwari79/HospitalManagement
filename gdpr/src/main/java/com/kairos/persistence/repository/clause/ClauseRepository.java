@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -32,11 +33,11 @@ public interface ClauseRepository extends JpaRepository<Clause, Long> {
     @Query(value = "Select c from Clause c where c.organizationId = ?1 and c.deleted = false order by c.createdAt desc")
     List<Clause> findAllClauseByUnitId(Long organizationId);
 
+    @Query(value = "Select c from Clause c JOIN c.templateTypes as t  where c.organizationId = ?1 and t.id in ?2 and c.deleted = false order by c.createdAt desc")
+    List<Clause> findAllClauseByUnitIdAndTemplateTypeId(Long organizationId, List<Long> templateTypeIds);
+
     @Query(value = "Select c from Clause c where c.id = ?1 and c.countryId = ?2 and c.deleted = false")
     Clause findByIdAndCountryId(Long id, Long countryId);
-
-    @Query(value = "Select c from Clause c where c.tempClauseId != null")
-    List<Clause> getAllClausesHavingTempId();
 
     @Query(value = "Select DISTINCT c from MasterClause c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
     List<Clause> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, List<Long> organizationTypeIds, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds, Long templateTypeId);

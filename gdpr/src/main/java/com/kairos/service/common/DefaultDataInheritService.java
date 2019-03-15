@@ -239,6 +239,7 @@ public class DefaultDataInheritService {
         Callable<Boolean> assetTask = () -> {
             List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
             copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);
+            LOGGER.info(" asset creation on inheriting data ");
             return true;
         };
         Callable<Boolean> dataSubjectTask = () -> {
@@ -356,23 +357,23 @@ public class DefaultDataInheritService {
 
 
     private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAsset> masterAssets, Map<Long, AssetType> longAssetTypeMap) {
+
+        LOGGER.info("Data inheriting Master Asset Size : " + masterAssets.size());
         try {
             List<Asset> unitLevelAssets = new ArrayList<>();
             masterAssets.forEach(masterAsset -> {
-                Asset unitLevelAsset = new Asset();
-                unitLevelAsset.setName(masterAsset.getName());
-                unitLevelAsset.setDescription(masterAsset.getDescription());
-                unitLevelAsset.setOrganizationId(unitId);
+                Asset asset = new Asset();
+                asset.setName(masterAsset.getName());
+                asset.setDescription(masterAsset.getDescription());
+                asset.setOrganizationId(unitId);
                 if (longAssetTypeMap.containsKey(masterAsset.getAssetType().getId())) {
-                    unitLevelAsset.setAssetType(longAssetTypeMap.get(masterAsset.getAssetType().getId()));
+                    asset.setAssetType(longAssetTypeMap.get(masterAsset.getAssetType().getId()));
                 }
-                Optional.ofNullable(masterAsset.getSubAssetType()).ifPresent(assetType -> {
-                    unitLevelAsset.setSubAssetType(longAssetTypeMap.get(assetType.getId()));
-
-                });
-                unitLevelAssets.add(unitLevelAsset);
+                Optional.ofNullable(masterAsset.getSubAssetType()).ifPresent(assetType -> asset.setSubAssetType(longAssetTypeMap.get(assetType.getId())));
+                unitLevelAssets.add(asset);
             });
             assetRepository.saveAll(unitLevelAssets);
+            LOGGER.info("Data inheriting Unit Asset Size : " + unitLevelAssets.size());
         } catch (Exception ex) {
             LOGGER.error("Error in asset processing==" + ex.getMessage());
         }
@@ -385,6 +386,7 @@ public class DefaultDataInheritService {
             List<Clause> clauseList = new ArrayList<>();
             clauses.forEach(clauseResponse -> {
                 OrganizationClause clause = new OrganizationClause(clauseResponse.getTitle(), clauseResponse.getDescription(), unitId);
+                clause.setTemplateTypes(clauseResponse.getTemplateTypes());
                 Set<ClauseTag> tags = new HashSet<>();
                 clauseResponse.getTags().forEach(clauseTag -> {
                     if (clauseTag.isDefaultTag()) {
