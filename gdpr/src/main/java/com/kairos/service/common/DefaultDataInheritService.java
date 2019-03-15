@@ -239,6 +239,7 @@ public class DefaultDataInheritService {
         Callable<Boolean> assetTask = () -> {
             List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
             copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);
+            LOGGER.info(" asset creation on inheriting data ");
             return true;
         };
         Callable<Boolean> dataSubjectTask = () -> {
@@ -356,6 +357,8 @@ public class DefaultDataInheritService {
 
 
     private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAsset> masterAssets, Map<Long, AssetType> longAssetTypeMap) {
+
+        LOGGER.info("Data inheriting Master Asset Size : " + masterAssets.size());
         try {
             List<Asset> unitLevelAssets = new ArrayList<>();
             masterAssets.forEach(masterAsset -> {
@@ -370,6 +373,7 @@ public class DefaultDataInheritService {
                 unitLevelAssets.add(asset);
             });
             assetRepository.saveAll(unitLevelAssets);
+            LOGGER.info("Data inheriting Unit Asset Size : " + unitLevelAssets.size());
         } catch (Exception ex) {
             LOGGER.error("Error in asset processing==" + ex.getMessage());
         }
