@@ -6,6 +6,9 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -62,6 +65,12 @@ public class ObjectUtils {
         List<E> list = new ArrayList<>(elements.length);
         Collections.addAll(list, elements);
         return list;
+    }
+
+    private void test(){
+        /*ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+        Set<ConstraintViolation<List<Searching>> violations = validator.validate(searchingList);*/
     }
 
 

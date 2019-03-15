@@ -14,9 +14,11 @@ import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -37,7 +39,10 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.AppConstants.WEEKS;
 
 
@@ -58,6 +63,7 @@ public class RuleTemplateService extends MongoBaseService {
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
+    @Inject private PhaseMongoRepository phaseMongoRepository;
 
     @Autowired
     private ExceptionService exceptionService;
@@ -85,13 +91,18 @@ public class RuleTemplateService extends MongoBaseService {
         AgeRange range = new AgeRange(0, 0, 0);
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        phaseTemplateValues.add(new PhaseTemplateValue(1, "REQUEST", (short) 0, (short) 0, true, false, false,1));
-        phaseTemplateValues.add(new PhaseTemplateValue(2, "PUZZLE", (short) 0, (short) 0, true, false, false,2));
-        phaseTemplateValues.add(new PhaseTemplateValue(4, "CONSTRUCTION", (short) 0, (short) 0, true, false, false,3));
-        phaseTemplateValues.add(new PhaseTemplateValue(3, "DRAFT", (short) 0, (short) 0, true, false, false,4));
-        phaseTemplateValues.add(new PhaseTemplateValue(7, "TENTATIVE", (short) 0, (short) 0, true, false, false,5));
-        phaseTemplateValues.add(new PhaseTemplateValue(5, "REALTIME", (short) 0, (short) 0, true, false, false,6));
-        phaseTemplateValues.add(new PhaseTemplateValue(6, "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false,7));
+        List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(countryId);
+        if(isCollectionEmpty(countryPhase)){
+            exceptionService.actionNotPermittedException("");
+        }
+        Map<String,BigInteger> phaseMap = countryPhase.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(),v->v.getId()));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("REQUEST"), "REQUEST", (short) 0, (short) 0, true, false, false,1));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("PUZZLE"), "PUZZLE", (short) 0, (short) 0, true, false, false,2));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("CONSTRUCTION"), "CONSTRUCTION", (short) 0, (short) 0, true, false, false,3));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("DRAFT"), "DRAFT", (short) 0, (short) 0, true, false, false,4));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("TENTATIVE"), "TENTATIVE", (short) 0, (short) 0, true, false, false,5));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("REALTIME"), "REALTIME", (short) 0, (short) 0, true, false, false,6));
+        phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("TIME_ATTENDANCE"), "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false,7));
 
         //phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false,8));
 

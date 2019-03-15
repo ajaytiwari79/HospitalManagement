@@ -710,11 +710,14 @@ public class StaffRetrievalService {
         if (!Optional.ofNullable(unitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unitposition.id.notexist", unitPositionId);
         }
+        UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
         List<AppliedFunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionDetails.getAppliedFunctions(), AppliedFunctionDTO.class);
         unitPositionDetails.setAppliedFunctions(appliedFunctionDTOS);
         List<ReasonCodeResponseDTO> reasonCodeQueryResults = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE);
         List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeQueryResults, ReasonCodeDTO.class);
-        return new StaffAdditionalInfoDTO(reasonCodeDTOS, unitPositionDetails);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(reasonCodeDTOS, unitPositionDetails);
+        staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRole);
+        return staffAdditionalInfoDTO;
     }
 
     public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds, List<Long> unitPositionIds, long id, String type) {

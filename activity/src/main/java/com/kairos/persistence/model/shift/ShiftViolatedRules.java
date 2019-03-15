@@ -21,6 +21,13 @@ public class ShiftViolatedRules extends MongoBaseEntity{
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
 
+    public ShiftViolatedRules() {
+    }
+
+    public ShiftViolatedRules(BigInteger shiftId) {
+        this.shiftId = shiftId;
+    }
+
     public BigInteger getShiftId() {
         return shiftId;
     }

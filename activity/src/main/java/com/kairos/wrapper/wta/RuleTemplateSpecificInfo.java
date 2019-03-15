@@ -45,7 +45,7 @@ public class RuleTemplateSpecificInfo {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
-        this.phaseId = this.phaseId;
+        this.phaseId = phaseId;
         this.planningPeriod = planningPeriod;
         this.counterMap = counterMap;
         this.dayTypeMap = dayTypeMap;

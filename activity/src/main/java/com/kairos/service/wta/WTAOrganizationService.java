@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 
 /**
  * Created by vipul on 19/12/17.
@@ -84,7 +86,7 @@ public class WTAOrganizationService extends MongoBaseService {
             logger.info("Expertise cant be changed at unit level :", wtaId);
             exceptionService.actionNotPermittedException("message.expertise.unitlevel.update",wtaId);
         }
-        OrganizationDTO organization = userIntegrationService.getOrganization();
+        OrganizationDTO organization = userIntegrationService.getOrganizationWithCountryId(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
         }
@@ -111,8 +113,11 @@ public class WTAOrganizationService extends MongoBaseService {
         oldWta.setParentId(newWta.getId());
         oldWta.setDisabled(false);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (updateDTO.getRuleTemplates().size() > 0) {
+        if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(),true);
+            for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
+                wtaService.updateExistingPhaseIdOfCTA(ruleTemplate.getPhaseTemplateValues(),organization.getId(),organization.getCountryId(),true);
+            }
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate->ruleTemplate.getId()).collect(Collectors.toList());
             oldWta.setRuleTemplateIds(ruleTemplatesIds);

@@ -4,6 +4,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -296,11 +298,27 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("startDate","endDate").and("ruleTemplates").filter("ruleTemplates",ComparisonOperators.Eq.valueOf("$$ruleTemplates.wtaTemplateType").equalTo("SHIFT_LENGTH")),
-                project("name", "description", "disabled",  "startDate", "endDate", "expiryDate", "ruleTemplates", "unitPositionId")
+                new CustomAggregationOperation(Document.parse(getProjectionWithFilter(templateType)))
+
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
+    }
+
+    private String getProjectionWithFilter(WTATemplateType templateType){
+       return  "{  \n" +
+                "      \"$project\":{  \n" +
+                "         \"startDate\":1,\n" +
+                "         \"endDate\":1,\n" +
+                "          \"ruleTemplates\":{\n" +
+                "              \"$filter\":{\n" +
+                "                  \"input\":\"$ruleTemplates\",\n" +
+                "                  \"as\":\"ruleTemplates\",\n" +
+                "                  \"cond\":{\"$eq\":[\"$$ruleTemplates.wtaTemplateType\",'"+templateType.toString()+"']}\n" +
+                "                  }\n" +
+                "              }\n" +
+                "      }\n" +
+                "   }";
     }
 
 
