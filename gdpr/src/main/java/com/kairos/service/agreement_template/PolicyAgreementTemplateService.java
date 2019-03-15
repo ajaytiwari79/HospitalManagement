@@ -30,6 +30,7 @@ import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -163,7 +164,12 @@ public class PolicyAgreementTemplateService {
      * @return return agreement section list with empty section array as per front end requirement
      */
     public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByUnitId(Long unitId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.findAllByOrganizationId(unitId), PolicyAgreementTemplateResponseDTO.class);
+
+        List<PolicyAgreementTemplate> templates = policyAgreementRepository.findAllByOrganizationId(unitId);
+        if (CollectionUtils.isEmpty(templates)) {
+            return new ArrayList<>();
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(templates, PolicyAgreementTemplateResponseDTO.class);
     }
 
 
@@ -218,7 +224,7 @@ public class PolicyAgreementTemplateService {
         List<ClauseBasicResponseDTO> clauseListForPolicyAgreementTemplate;
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = prepareAgreementSectionResponseDTO(template.getAgreementSections());
         if (isOrganization) {
-            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitIdAndTemplateTypeId(referenceId,Arrays.asList(template.getTemplateType().getId())), ClauseBasicResponseDTO.class);
+            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitIdAndTemplateTypeId(referenceId, Arrays.asList(template.getTemplateType().getId())), ClauseBasicResponseDTO.class);
         } else {
             List<Long> organizationTypeIds = template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList());
             List<Long> organizationSubTypeIds = template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList());
