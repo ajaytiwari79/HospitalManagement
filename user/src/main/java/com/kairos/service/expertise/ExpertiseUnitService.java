@@ -99,4 +99,8 @@ public class ExpertiseUnitService {
         return true;
     }
 
+    public List<ExpertiseQueryResult> findAllExpertiseWithUnits() {
+        return expertiseGraphRepository.findAllExpertiseWithUnitIds();
+    }
+
 }

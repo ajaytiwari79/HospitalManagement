@@ -4,28 +4,30 @@ package com.kairos.response.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class ProcessingActivityRiskResponseDTO {
+public class ProcessingActivityRiskResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private Boolean mainParent;
     private List<RiskBasicResponseDTO> risks;
     private List<ProcessingActivityRiskResponseDTO> processingActivities;
 
-    public ProcessingActivityRiskResponseDTO(BigInteger id, String name, Boolean mainParent, List<RiskBasicResponseDTO> risks) {
+    public ProcessingActivityRiskResponseDTO(Long id, String name, Boolean mainParent, List<RiskBasicResponseDTO> risks) {
         this.id = id;
         this.name = name;
         this.mainParent = mainParent;
         this.risks = risks;
     }
 
-    public BigInteger getId() { return id; }
+    public ProcessingActivityRiskResponseDTO() {
+    }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public Boolean getMainParent() { return mainParent; }
 

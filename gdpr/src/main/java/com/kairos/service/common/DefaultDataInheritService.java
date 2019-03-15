@@ -2,23 +2,23 @@ package com.kairos.service.common;
 
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServiceCategoryVO;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.clause.Clause;
+import com.kairos.persistence.model.clause.OrganizationClause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.data_inventory.asset.AssetDeprecated;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.persistence.model.master_data.data_category_element.DataSubject;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
-import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateDeprecated;
-import com.kairos.persistence.model.risk_management.RiskDeprecated;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -44,9 +44,6 @@ import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.data_subject_management.DataCategoryService;
 import com.kairos.service.data_subject_management.DataSubjectService;
@@ -140,10 +137,8 @@ public class DefaultDataInheritService{
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
-       /* List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(countryId);
-        List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryService.getAllDataCategoryWithDataElementByCountryId(countryId);
-        saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
-        copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);*/
+        assetTypeService.findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(countryId, unitId);
+        dataCategoryService.findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(countryId, unitId);
 
 
         List<Callable<Boolean>> callables = new ArrayList<>();
@@ -241,8 +236,8 @@ public class DefaultDataInheritService{
             return true;
         };*/
         Callable<Boolean> dataSubjectTask = () -> {
-            List<DataSubjectResponseDTO> dataSubjectMappingDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
-            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
+            List<DataSubjectResponseDTO> dataSubjectDTOS = dataSubjectService.getAllDataSubjectWithDataCategoryByCountryId(countryId, false);
+            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectDTOS);
             return true;
         };
         Callable<Boolean> clauseTask = () -> {
@@ -252,23 +247,23 @@ public class DefaultDataInheritService{
         };
 
 
-//        callables.add(technicalSecurityMeasureTask);
-//        callables.add(storageFormatTask);
-//        callables.add(orgSecurityMeasureTask);
-//        callables.add(accessorPartyTask);
-//        callables.add(dataSourceTask);
-//        callables.add(legalBasisTask);
-//        callables.add(processingPurposeTask);
-//        callables.add(responsibilityTypeTask);
-//        callables.add(transferMethodTask);
- //       callables.add(processingActivityTask);
-//        callables.add(questionniareTemplateTask);
-//        callables.add(assetTask);
+        callables.add(technicalSecurityMeasureTask);
+        callables.add(storageFormatCreationTask);
+        callables.add(orgSecurityMeasureTask);
+        callables.add(accessorPartyTask);
+        callables.add(dataSourceTask);
+        callables.add(legalBasisTask);
+        callables.add(processingPurposeTask);
+        callables.add(responsibilityTypeTask);
+        callables.add(transferMethodTask);
+        callables.add(processingActivityTask);
+        /*callables.add(questionniareTemplateTask);
+        callables.add(assetTask);*/
         callables.add(dataSubjectTask);
- //       callables.add(clauseTask);
-        //callables.add(dataDisposalCreationlTask);
-        /*callables.add(hostingProviderCreationTask);
-        callables.add(hostingTypeCreationTask);*/
+        callables.add(clauseTask);
+        callables.add(dataDisposalCreationlTask);
+        callables.add(hostingProviderCreationTask);
+        callables.add(hostingTypeCreationTask);
         asynchronousService.executeAsynchronously(callables);
         return true;
     }
@@ -276,14 +271,14 @@ public class DefaultDataInheritService{
 
     private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAssetResponseDTO> masterAssetDTOS) {
         if (CollectionUtils.isNotEmpty(masterAssetDTOS)) {
-            List<AssetDeprecated> assets = new ArrayList<>();
+            List<Asset> assets = new ArrayList<>();
             for (MasterAssetResponseDTO masterAssetDTO : masterAssetDTOS) {
-                AssetDeprecated asset = new AssetDeprecated(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
+                Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
                // asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
 //                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
-                if (Optional.of(masterAssetDTO.getAssetSubType()).isPresent()) {
-                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getAssetSubType().getName().toLowerCase().trim()));
+                if (Optional.of(masterAssetDTO.getSubAssetType()).isPresent()) {
+                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getSubAssetType().getName().toLowerCase().trim()));
                 }
                 assets.add(asset);
             }
@@ -297,8 +292,7 @@ public class DefaultDataInheritService{
             Set<Long> clauseTagIds = new HashSet<>();
             List<Clause> clauseList = new ArrayList<>();
             clauses.forEach(clauseResponse -> {
-                Clause clause = new Clause(clauseResponse.getTitle(), clauseResponse.getDescription());
-                clause.setOrganizationId(unitId);
+                OrganizationClause clause = new OrganizationClause(clauseResponse.getTitle(), clauseResponse.getDescription(), unitId);
                 List<ClauseTag> tags = new ArrayList<>();
                 clauseResponse.getTags().forEach(clauseTag -> {
                     if (!clauseTagIds.contains(clauseTag.getId())) {
@@ -309,10 +303,10 @@ public class DefaultDataInheritService{
                         tags.add(tag);
                     }
                 });
+                clauseTagRepository.saveAll(tags);
                 clause.setTags(tags);
                 clauseList.add(clause);
             });
-           // clauseTagRepository.saveAll(clauseTags);
             clauseRepository.saveAll(clauseList);
         }
 
@@ -390,7 +384,7 @@ public class DefaultDataInheritService{
     }
 
 
-    private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
+    /*private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
 
 
         Map<QuestionnaireTemplateDeprecated, List<QuestionnaireSectionDeprecated>> questionnaireTemplateAndSectionListMap = new HashMap<>();
@@ -471,7 +465,7 @@ public class DefaultDataInheritService{
 
         return questionnaireTemplate;
 
-    }
+    }*/
 
 
     private void saveDataDisposal(Long unitId, List<DataDisposalResponseDTO> dataDisposalDTOS) {
@@ -490,8 +484,8 @@ public class DefaultDataInheritService{
             Class[] argumentType = { String.class, Long.class };
             if (!metadataDTOList.isEmpty()) {
                 Class dtoClass = metadataDTOList.get(0).getClass();
-                for (T dataDisposalDTO : metadataDTOList) {
-                    String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dataDisposalDTO);
+                for (T dto : metadataDTOList) {
+                    String name = (String)new PropertyDescriptor("name", dtoClass).getReadMethod().invoke(dto);
                     Constructor<?> cons = entityClass.getConstructor(argumentType);
                     baseEntityList.add((BaseEntity)cons.newInstance(name,unitId));
                 }
@@ -540,10 +534,19 @@ public class DefaultDataInheritService{
 
 
     private void saveAssetTypeAndAssetSubType(Long unitId, List<AssetTypeRiskResponseDTO> assetTypeDTOS) {
-
+        List<AssetType> assetTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeDTOS)) {
-            List<AssetType> assetTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTOS, AssetType.class);
-            assetTypes = updateOrganizationIdAndCountryIdOfAssetTypeAndMetaData(assetTypes, unitId);
+            assetTypeDTOS.forEach( assetTypeDTO -> {
+                AssetType assetType = new AssetType();
+                assetType.setId(assetTypeDTO.getId());
+                assetType.setName(assetTypeDTO.getName());
+                assetType.setSubAssetType(assetTypeDTO.getHasSubAsset());
+                assetType.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTO.getRisks(), Risk.class));
+                assetType.setSubAssetTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTO.getSubAssetTypes(), AssetType.class));
+                assetTypes.add(assetType);
+            });
+            //List<AssetType> assetTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDTOS, AssetType.class);
+            updateOrganizationIdAndCountryIdOfAssetTypeAndMetaData(assetTypes, unitId);
             assetTypeRepository.saveAll(assetTypes);
 
         }
@@ -564,19 +567,7 @@ public class DefaultDataInheritService{
     }
 
 
-    private List<RiskDeprecated> buildRisks(Long unitId, List<RiskBasicResponseDTO> riskDTOS) {
 
-        List<RiskDeprecated> risks = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(riskDTOS)) {
-            riskDTOS.forEach(riskDTO -> {
-                RiskDeprecated risk = new RiskDeprecated(riskDTO.getName(), riskDTO.getDescription(), riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
-                //risk.setOrganizationId(unitId);
-                risks.add(risk);
-            });
-        }
-        return risks;
-
-    }
 
 
 }

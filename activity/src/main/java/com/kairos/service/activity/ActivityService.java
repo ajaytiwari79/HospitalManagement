@@ -15,6 +15,7 @@ import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -55,6 +56,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
@@ -146,6 +148,8 @@ public class ActivityService extends MongoBaseService {
     private MongoSequenceRepository mongoSequenceRepository;
     @Inject
     private GlideTimeSettingsService glideTimeSettingsService;
+    @Inject
+    private PlanningPeriodService planningPeriodService;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -201,7 +205,7 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-        List<ActivityTagDTO> activityTagDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId),ActivityTagDTO.class);
+        List<ActivityTagDTO> activityTagDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId), ActivityTagDTO.class);
         //In Country Module any Activity can be copied
         activityTagDTOS.forEach(activityTagDTO -> {
             activityTagDTO.setActivityCanBeCopied(true);
@@ -413,7 +417,7 @@ public class ActivityService extends MongoBaseService {
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
             Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
-            if(optionalCompositeActivity.isPresent()){
+            if (optionalCompositeActivity.isPresent()) {
                 CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.get();
                 compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
                 compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
@@ -458,7 +462,7 @@ public class ActivityService extends MongoBaseService {
 
     public IndividualPointsActivityTab getIndividualPointsTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
-        return  activity.getIndividualPointsActivityTab();
+        return activity.getIndividualPointsActivityTab();
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
@@ -751,8 +755,11 @@ public class ActivityService extends MongoBaseService {
         }
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
-
-        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes());
+        PlanningPeriodDTO planningPeriodDTO = planningPeriodService.getStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        if(isNull(planningPeriodDTO)){
+            exceptionService.dataNotFoundException("message.periodsetting.notFound");
+        }
+        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
 
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
@@ -963,7 +970,7 @@ public class ActivityService extends MongoBaseService {
         return new ActivityTabsWrapper(locationActivityTab);
     }
 
-    public PlannerSyncResponseDTO initialOptaplannerSync( Long unitId) {
+    public PlannerSyncResponseDTO initialOptaplannerSync(Long unitId) {
         List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitId(unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)), DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
         plannerSyncService.publishActivities(unitId, activities, IntegrationOperation.CREATE);
@@ -1057,15 +1064,15 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes){
+    public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (isNull(activity)) {
             exceptionService.dataNotFoundByIdException("message.organization.id", activityId);
         }
-        if(removeNotes) {
+        if (removeNotes) {
             activity.getNotesActivityTab().setOriginalDocumentName(null);
             activity.getNotesActivityTab().setModifiedDocumentName(null);
-        }else {
+        } else {
             activity.getGeneralActivityTab().setOriginalIconName(null);
             activity.getGeneralActivityTab().setModifiedIconName(null);
         }
@@ -1074,7 +1081,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<ActivityDTO> findAllActivityByDeletedFalseAndUnitId(List<Long> unitIds) {
-     return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
+        return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
     }
 
 }

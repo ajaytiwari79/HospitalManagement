@@ -8,7 +8,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,8 +18,8 @@ public class DataCategoryDTO {
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNull(message = "Data Element can't be  Empty")
-    @NotEmpty(message = "Data Element can't be empty")
+    @NotNull(message = "error.message.dataelement.notNull")
+    @NotEmpty(message = "error.message.dataelement.notNull")
     @Valid
     List<DataElementDTO> dataElements;
 

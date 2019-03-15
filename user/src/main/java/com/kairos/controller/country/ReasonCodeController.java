@@ -84,7 +84,7 @@ public class ReasonCodeController {
     }
 
     @ApiOperation(value = "Get ReasonCodes by UnitId")
-    @RequestMapping(value = UNIT_URL + "/reason_codes", method = RequestMethod.GET)
+    @GetMapping(value = UNIT_URL + "/reason_codes")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getReasonCodesByUnitId(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType ,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesByUnitId(unitId,reasonCodeType));
@@ -97,6 +97,7 @@ public class ReasonCodeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.anyReasonCodeLinkedWithTimeType(timeTypeId));
 
     }
+
 
 
 }

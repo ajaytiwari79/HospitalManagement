@@ -3,12 +3,12 @@ package com.kairos.persistence.model.clause;
 
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
-import org.springframework.data.annotation.Transient;
 
 import javax.annotation.Nullable;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -20,53 +20,28 @@ import java.util.UUID;
 @Entity
 public class Clause extends BaseEntity {
 
-    @NotBlank
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String title;
 
-    @OneToMany
+    @ManyToMany
     private List<ClauseTag> tags  = new ArrayList<>();
 
+    // Mandatory or not to be discussed with Ulrik
     @NotNull
+    @Column(columnDefinition = "text")
     private String description;
 
-    @ElementCollection
-    private List<OrganizationType> organizationTypes = new ArrayList<>();
 
-    @ElementCollection
-    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
-
-    @ElementCollection
-    private List <ServiceCategory> organizationServices = new ArrayList<>();
-
-    @ElementCollection
-    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
-
-    @ElementCollection
-    private List<AccountType> accountTypes = new ArrayList<>();
-    private Long countryId;
-    private Long organizationId;
-
-    //TODO
-    //private List<Long> organizationList;
     private Long parentClauseId;
 
-    @OneToMany
+    @ManyToMany
     private List<TemplateType> templateTypes  = new ArrayList<>();
 
-    @Transient
-    private Integer orderedIndex;
-    @Transient
-    private String titleHtml;
-    @Transient
-    private String descriptionHtml;
-
+    // TODO  check usability and setter and value generator
     @Nullable
     private UUID tempClauseId;
 
-
-
     public Clause(Long countryId, String title, String description) {
-        this.countryId = countryId;
         this.title = title;
         this.description = description;
     }
@@ -92,19 +67,10 @@ public class Clause extends BaseEntity {
     public Clause(String title, String description, Long countryId) {
         this.title = title;
         this.description = description;
-        this.countryId = countryId;
     }
 
     public Clause() {
     }
-
-   /* public List<Long> getOrganizationList() {
-        return organizationList;
-    }
-
-    public void setOrganizationList(List<Long> organizationList) {
-        this.organizationList = organizationList;
-    }*/
 
     public List<TemplateType> getTemplateTypes() {
         return templateTypes;
@@ -114,13 +80,6 @@ public class Clause extends BaseEntity {
         this.templateTypes = templateTypes;
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 
     public Long getParentClauseId() {
         return parentClauseId;
@@ -154,69 +113,6 @@ public class Clause extends BaseEntity {
         this.description = description;
     }
 
-    public List<AccountType> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(List<AccountType> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
-
-    public Integer getOrderedIndex() {
-        return orderedIndex;
-    }
-
-    public void setOrderedIndex(Integer orderedIndex) {
-        this.orderedIndex = orderedIndex;
-    }
-
-    public String getTitleHtml() {
-        return titleHtml;
-    }
-
-    public void setTitleHtml(String titleHtml) {
-        this.titleHtml = titleHtml;
-    }
-
-    public String getDescriptionHtml() {
-        return descriptionHtml;
-    }
-
-    public void setDescriptionHtml(String descriptionHtml) {
-        this.descriptionHtml = descriptionHtml;
-    }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<ServiceCategory> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<SubServiceCategory> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
 
     public UUID getTempClauseId() {
         return tempClauseId;
@@ -224,14 +120,6 @@ public class Clause extends BaseEntity {
 
     public void setTempClauseId(UUID tempClauseId) {
         this.tempClauseId = tempClauseId;
-    }
-
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
     }
 
 

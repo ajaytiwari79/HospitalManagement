@@ -40,19 +40,19 @@ public class DataCategoryService{
      * @return return data category object.
      * @descitpion this method create new data category and add new data elements to data Category
      */
-    public DataCategoryDTO saveDataCategoryAndDataElement(Long referenceId, boolean isUnitId, DataCategoryDTO dataCategoryDto) {
+    public DataCategoryDTO saveDataCategoryAndDataElement(Long referenceId, boolean isOrganization, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory previousDataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
+        DataCategory previousDataCategory = isOrganization ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(previousDataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
 
         DataCategory dataCategory = new DataCategory(dataCategoryDto.getName());
-        if (isUnitId)
+        if (isOrganization)
             dataCategory.setOrganizationId(referenceId);
         else
             dataCategory.setCountryId(referenceId);
-        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isUnitId, dataCategoryDto.getDataElements(), dataCategory);
+        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isOrganization, dataCategoryDto.getDataElements(), dataCategory);
         dataCategory.setDataElements(dataElementList);
         dataCategoryRepository.save(dataCategory);
         dataCategoryDto.setId(dataCategory.getId());
@@ -67,9 +67,9 @@ public class DataCategoryService{
      * @return Data category with updated data elements and new Data Elements
      * @description this method update data category , data elements and create new data elements if add to data category
      */
-    public DataCategoryDTO updateDataCategoryAndDataElement(Long referenceId, boolean isUnitId, Long dataCategoryId, DataCategoryDTO dataCategoryDto) {
+    public DataCategoryDTO updateDataCategoryAndDataElement(Long referenceId, boolean isOrganization, Long dataCategoryId, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
+        DataCategory dataCategory = isOrganization ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !dataCategoryId.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
@@ -77,7 +77,7 @@ public class DataCategoryService{
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isUnitId, dataCategoryDto.getDataElements());
+        List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isOrganization, dataCategoryDto.getDataElements());
         dataCategory.setName(dataCategoryDto.getName());
        // dataCategory.setDataElements(dataElements);
         dataCategoryRepository.save(dataCategory);
@@ -87,15 +87,15 @@ public class DataCategoryService{
     }
 
 
-    public boolean deleteDataCategoryById(Long referenceId, boolean isUnitId, Long dataCategoryId) {
+    public boolean deleteDataCategoryById(Long referenceId, boolean isOrganization, Long dataCategoryId) {
 
-        List<String> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(referenceId, dataCategoryId)
+        List<String> dataSubjectLinkedWithDataCategory = isOrganization ? dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(referenceId, dataCategoryId)
                 : dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(referenceId, dataCategoryId);
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
             exceptionService.invalidRequestException("message.cannot.delete.dataCategory", StringUtils.join(dataSubjectLinkedWithDataCategory , ","));
         }
         Integer updateCount = 0;
-        updateCount = isUnitId ? dataCategoryRepository.safelyDeleteDataCategory(dataCategoryId, referenceId) : dataCategoryRepository.safelyDeleteMasterDataCategory(dataCategoryId, referenceId);
+        updateCount = isOrganization ? dataCategoryRepository.safelyDeleteDataCategory(dataCategoryId, referenceId) : dataCategoryRepository.safelyDeleteMasterDataCategory(dataCategoryId, referenceId);
         if(updateCount > 0){
             LOGGER.info("Data Category with id :: {} deleted safely and successfully", dataCategoryId);
         }else{
@@ -142,6 +142,28 @@ public class DataCategoryService{
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByCountryId(Long countryId) {
         List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
+    }
+
+
+    /**
+     * @param countryId
+     * @return void
+     */
+    public void findAndSaveAllDataCategoryWithDataElementByCountryIdNotLinkedWithDataSubject(Long countryId, Long unitId) {
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryIdNotLinkedWithDataSubject(countryId);
+        List<DataCategory> unitLevelDataCategories = new ArrayList<>();
+        dataCategories.forEach(dataCategory -> {
+            DataCategory unitLevelDataCategory = new DataCategory();
+            unitLevelDataCategory.setName(dataCategory.getName());
+            List<DataElement> unitLevelDataElements = new ArrayList<>();
+            dataCategory.getDataElements().forEach(dataElement -> {
+                unitLevelDataElements.add(new DataElement(unitId,dataElement.getName()));
+            });
+            unitLevelDataCategory.setOrganizationId(unitId);
+            unitLevelDataCategory.setDataElements(unitLevelDataElements);
+            unitLevelDataCategories.add(unitLevelDataCategory);
+        });
+        dataCategoryRepository.saveAll(unitLevelDataCategories);
     }
 
 

@@ -34,26 +34,11 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Override
     OrganizationService findOne(Long aLong);
 
-    OrganizationService findByName(String name);
+    @Query("MATCH (c:Country)-[:"+HAS_ORGANIZATION_SERVICES+"]->(os:OrganizationService{isEnabled:true}) WHERE id(c)={0} AND os.name=~ {1} AND id(os)<>{2} return CASE WHEN COUNT(os)>0 THEN TRUE ELSE FALSE END AS result ")
+    boolean checkDuplicateService(long countryId, String name,Long id);
 
-
-    @Query("MATCH (c:Country)-[:"+HAS_ORGANIZATION_SERVICES+"]->(os:OrganizationService) WHERE id(c)={0} AND os.name=~ {1} return os ")
-    OrganizationService checkDuplicateService(long countryId, String name);
-
-    @Query("MATCH (c:Country)-[:"+HAS_ORGANIZATION_SERVICES+"]->(os:OrganizationService) WHERE id(c)={0} AND os.name=~ {1} return os ")
-    List<OrganizationService> getByServiceName(long countryId, String name);
-
-    @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE id(os)={0} AND ss.name=~ {1} return ss")
+    @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService{isEnabled:true}) WHERE id(os)={0} AND ss.name=~ {1} return ss")
     OrganizationService checkDuplicateSubService(Long id, String name);
-
-    @Query("MATCH (os:OrganizationService) where id(os) ={0} return {id:id(os) ,name:os.name } as result ")
-    List<Map<String,Object>> findOneById(Long subServiceId);
-
-    @Query("MATCH (o:Organization)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return id(os) ")
-    List<Long> getServiceIdsByOrgId(Long organizationId);
-
-    @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE os.name=~ {0} AND ss.name=~ {1} return ss")
-    OrganizationService checkDuplicateSubServiceByName(String serviceName, String subServiceName);
 
     @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE id(os)={0} AND ss.name= {1} return ss")
     OrganizationService checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
@@ -85,6 +70,4 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +
             " RETURN {children: case when os  is NULL then [] else collect({id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")
     List<Map<String,Object>> getOrgServicesByOrgSubTypesIds(Set<Long> organizationSubTypeIds);
-
-
 }

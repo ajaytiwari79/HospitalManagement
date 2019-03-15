@@ -12,14 +12,16 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetTypeRiskResponseDTO {
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotBlank
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
     private List<RiskBasicResponseDTO> risks=new ArrayList<>();
     private Boolean hasSubAsset;
     private List<AssetTypeRiskResponseDTO> subAssetTypes=new ArrayList<>();
 
+    public AssetTypeRiskResponseDTO() {
+    }
 
     public Long getId() { return id; }
 

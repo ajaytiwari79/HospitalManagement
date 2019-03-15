@@ -24,20 +24,20 @@ public class QuestionnaireTemplateDTO {
     @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
     private Long assetType;
-    private Long assetSubType;
+    private Long subAssetType;
     private boolean defaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
     private QuestionnaireTemplateType riskAssociatedEntity;
     @Valid
     private List<QuestionnaireSectionDTO> sections=new ArrayList<>();
 
-    public Long getAssetSubType() { return assetSubType; }
+    public Long getAssetSubType() { return subAssetType; }
 
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 
     public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
 
-    public void setAssetSubType(Long assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(Long subAssetType) { this.subAssetType = subAssetType; }
 
     public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
 

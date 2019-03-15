@@ -13,7 +13,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessingActivityRiskDTO {
 
-    @NotNull(message = "id can't be Null")
+    @NotNull(message = "error.message.id.notnull")
     private BigInteger id;
 
     @Valid

@@ -10,10 +10,10 @@ import java.util.Objects;
 public class ManagingOrganization {
 
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
-    @NotBlank(message = "ManagingOrganization name can't be empty")
+    @NotBlank(message = "error.message.managingDepartment.notNull")
     private String name;
 
     public Long getId() { return id; }
@@ -25,7 +25,7 @@ public class ManagingOrganization {
     public void setName(String name) { this.name = name; }
 
 
-    public ManagingOrganization(Long id, String name, String email) {
+    public ManagingOrganization(Long id, String name) {
         this.id = id;
         this.name = name;
     }

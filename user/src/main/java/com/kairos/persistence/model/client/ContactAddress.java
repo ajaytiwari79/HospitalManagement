@@ -348,15 +348,7 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         return contactAddress;
     }
 
-    public ContactAddress copyProperties(ContactAddress source){
-        this.street = source.street;
-        this.zipCode = source.getZipCode();
-        this.city = source.getCity();
-        this.floorNumber = source.getFloorNumber();
-        this.houseNumber = source.getHouseNumber();
-        this.isVerifiedByVisitour = source.isVerifiedByVisitour;
-        return this;
-    }
+
     public ContactAddress(String houseNumber, Integer floorNumber, String street, String city, String regionName, String country, Float latitude, Float longitude,
                           String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
         this.houseNumber = houseNumber;

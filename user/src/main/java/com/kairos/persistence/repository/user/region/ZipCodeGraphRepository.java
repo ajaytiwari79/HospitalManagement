@@ -53,6 +53,9 @@ public interface ZipCodeGraphRepository extends Neo4jBaseRepository<ZipCode,Long
             " zipCodes" )
     ZipCodeSectorQueryResult getZipCodesAndSectors(Long countryId);
 
+    @Query("MATCH (n:ZipCode{isEnable:true}) WHERE n.zipCode IN {0} RETURN n")
+    List<ZipCode> findAllByZipCode(List<Integer> zipCodeValues);
+
 
 
 

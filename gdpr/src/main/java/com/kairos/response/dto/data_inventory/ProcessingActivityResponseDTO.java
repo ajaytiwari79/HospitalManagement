@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
+import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
 import com.kairos.response.dto.common.*;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class ProcessingActivityResponseDTO {
     private Boolean active;
     private Boolean suggested;
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+    private List<RelatedDataSubjectDTO> dataSubjects = new ArrayList<>();
 
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
@@ -175,11 +175,11 @@ public class ProcessingActivityResponseDTO {
         this.dataRetentionPeriod = dataRetentionPeriod;
     }
 
-    public List<ProcessingActivityRelatedDataSubject> getDataSubjects() {
+    public List<RelatedDataSubjectDTO> getDataSubjects() {
         return dataSubjects;
     }
 
-    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) {
+    public void setDataSubjects(List<RelatedDataSubjectDTO> dataSubjects) {
         this.dataSubjects = dataSubjects;
     }
 }

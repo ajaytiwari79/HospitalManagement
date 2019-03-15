@@ -25,6 +25,9 @@ public interface DataCategoryRepository extends JpaRepository<DataCategory,Long>
     @Query("Select DC from DataCategory DC where DC.countryId = ?1 and DC.deleted = false")
     List<DataCategory> getAllDataCategoriesByCountryId(Long countryId);
 
+    @Query(value = "select * from data_category as DC left join data_subject_categories DSC ON DC.id = DSC.data_category_id where DC.country_id = ?1 and DC.deleted=false and DSC.data_category_id IS NULL", nativeQuery = true)
+    List<DataCategory> getAllDataCategoriesByCountryIdNotLinkedWithDataSubject(Long countryId);
+
 
     @Query("Select DC from DataCategory DC where DC.organizationId = ?1 and DC.deleted = false")
     List<DataCategory> getAllDataCategoriesByUnitId(Long unitId);

@@ -172,7 +172,7 @@ public class ProcessingActivity extends BaseEntity {
         this.processingActivity = processingActivity;
     }
 
-    private List<ProcessingActivity> getSubProcessingActivities() {
+    public List<ProcessingActivity> getSubProcessingActivities() {
         return subProcessingActivities;
     }
 

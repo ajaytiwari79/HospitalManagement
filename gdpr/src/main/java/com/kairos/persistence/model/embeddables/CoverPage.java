@@ -4,6 +4,7 @@ package com.kairos.persistence.model.embeddables;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.annotation.Nullable;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
@@ -12,8 +13,13 @@ import java.util.Objects;
 public class CoverPage {
 
     @Nullable
+    @Column(columnDefinition = "text")
     private String coverPageContent;
+
+    @Column(columnDefinition = "text")
     private String coverPageTitle;
+
+    @Column(columnDefinition = "text")
     private String coverPageLogoUrl;
     private boolean logoPositionLeft = false;
     private boolean logoPositionRight = false;
@@ -21,8 +27,14 @@ public class CoverPage {
     private boolean coverPageContentAdded = false;
     private boolean coverPageContentPartAdded = false;
     private boolean coverPageContentFullAdded = false;
+
+    @Column(columnDefinition = "text")
     private String  coverPageContentOneTextSection;
+
+    @Column(columnDefinition = "text")
     private String coverPageContentTwoTextSectionLeft;
+
+    @Column(columnDefinition = "text")
     private String coverPageContentTwoTextSectionRight;
     public boolean isCoverPageContentPartAdded() { return coverPageContentPartAdded; }
 

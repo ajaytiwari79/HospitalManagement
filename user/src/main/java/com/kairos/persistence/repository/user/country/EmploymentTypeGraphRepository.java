@@ -77,7 +77,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     boolean findByNameExcludingCurrent(Long countryId, String name, Long employmentTypeId);
 
 
-    // Get Employment Type data for filters by countryId
+    // Get Position Type data for filters by countryId
     @Query("MATCH (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} return toString(id(employmentType)) as id, employmentType.name as value")
     List<FilterSelectionQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
 

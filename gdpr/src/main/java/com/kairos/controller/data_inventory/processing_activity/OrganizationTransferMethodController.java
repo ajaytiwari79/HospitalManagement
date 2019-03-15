@@ -46,7 +46,7 @@ class OrganizationTransferMethodController {
     @GetMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> getTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(unitId, transferMethodId));
 
@@ -57,7 +57,7 @@ class OrganizationTransferMethodController {
     @GetMapping("/transfer_method")
     public ResponseEntity<Object> getAllTransferMethod(@PathVariable Long unitId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllTransferMethod(unitId));
 
@@ -68,7 +68,7 @@ class OrganizationTransferMethodController {
     @DeleteMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(unitId, transferMethodId));
 
@@ -78,7 +78,7 @@ class OrganizationTransferMethodController {
     @PutMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(unitId, transferMethodId, transferMethod));
 
@@ -89,7 +89,7 @@ class OrganizationTransferMethodController {
     @PostMapping(COUNTRY_URL + "/transfer_method/suggest")
     public ResponseEntity<Object> saveTransferMethodAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethodDTOs) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.saveAndSuggestTransferMethods(countryId, unitId, transferMethodDTOs.getRequestBody()));
 

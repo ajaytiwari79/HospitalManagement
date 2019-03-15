@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.kairos.constants.AppConstants.KAIROS;
+import static com.kairos.constants.AppConstants.KAIROS_EMAIL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 
 
@@ -317,7 +317,7 @@ public class ClientBatchService {
                 if (createClient) {
                     if (user.getEmail() == null) {
                         logger.info("Creating email with CPR");
-                        String email = user.getCprNumber() + KAIROS;
+                        String email = user.getCprNumber() + KAIROS_EMAIL;
                         user.setEmail(email);
                         user.setUserName(email);
                     }

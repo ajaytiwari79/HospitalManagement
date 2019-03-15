@@ -5,8 +5,8 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
@@ -18,11 +18,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class StorageFormatService{
@@ -45,18 +44,8 @@ public class StorageFormatService{
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
     public List<StorageFormatDTO> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS, boolean isSuggestion) {
-        //TODO still need to optimize we can get name of list in string from here
-        Set<String> storageFormatNames = new HashSet<>();
-            for (StorageFormatDTO storageFormat : storageFormatDTOS) {
-                storageFormatNames.add(storageFormat.getName());
-            }
-            List<String> nameInLowerCase = storageFormatNames.stream().map(String::toLowerCase)
-                    .collect(Collectors.toList());
-
-            //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<StorageFormat> previousStorageFormates = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
-            storageFormatNames = ComparisonUtils.getNameListForMetadata(previousStorageFormates, storageFormatNames);
-
+        Set<String> existingStorageFormatNames = storageFormatRepository.findNameByCountryIdAndDeleted(countryId);
+        Set<String> storageFormatNames = ComparisonUtils.getNewMetaDataNames(storageFormatDTOS,existingStorageFormatNames );
             List<StorageFormat> storageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
@@ -123,7 +112,7 @@ public class StorageFormatService{
      * @throws DuplicateDataException throw exception if data not exist for given id
      */
     public StorageFormatDTO updateStorageFormat(Long countryId, Long id, StorageFormatDTO storageFormatDTO) {
-        //TODO What actually this code is doing?
+
         StorageFormat storageFormat = storageFormatRepository.findByCountryIdAndName(countryId,  storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {

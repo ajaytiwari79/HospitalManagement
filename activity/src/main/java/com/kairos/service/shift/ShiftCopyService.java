@@ -10,6 +10,7 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -30,7 +31,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.utils.ShiftValidatorService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -46,11 +46,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.utils.ShiftValidatorService.convertMessage;
-import static com.kairos.utils.ShiftValidatorService.getValidDays;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -153,40 +153,49 @@ public class ShiftCopyService extends MongoBaseService {
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
         int counter = 0;
-        LocalDate shiftCreationStartDate = copyShiftDTO.getStartDate();
-        LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
-
-        ShiftResponse shiftResponse;
-        while (shiftCreationLastDate.isAfter(shiftCreationStartDate) || shiftCreationLastDate.equals(shiftCreationStartDate)) {
-                ShiftResponseDTO shiftResponseDTO = shifts.get(counter);
-                List<String> validationMessages = new ArrayList<>();
-                for (Shift sourceShift : shiftResponseDTO.getShifts()) {
-                    PlanningPeriodDTO planningPeriod = getCurrentPlanningPeriod(planningPeriodMap, shiftCreationStartDate);
-                    Date startDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, asLocalTime(sourceShift.getStartDate()));
-                    Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, asLocalTime(sourceShift.getEndDate()));
-                    if ((shiftCreationStartDate.equals(staffUnitPosition.getStartDate()) || shiftCreationStartDate.isAfter(staffUnitPosition.getStartDate())) &&
-                            (staffUnitPosition.getEndDate() == null || shiftCreationStartDate.equals(staffUnitPosition.getEndDate()) || shiftCreationStartDate.isBefore(staffUnitPosition.getEndDate()))) {
-                        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap);
-                        shiftWithActivityDTO.setEndDate(endDate);
-                        shiftWithActivityDTO.setStartDate(startDate);
-                        String shiftExistsMessage = validateShiftExistanceBetweenDuration(shiftCreationStartDate, sourceShift, currentStaffPreviousShifts);
-                        if (shiftExistsMessage != null) {
-                            validationMessages.add(shiftExistsMessage);
-                        }
-
-                        validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffUnitPosition, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs));
-                    }else {
-                        validationMessages.add(convertMessage("message.unit_position.not.active",shiftCreationStartDate));
-                    }
-                    shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
-                    if (shiftResponse.isSuccess()) {
-                        successfullyCopiedShifts.add(shiftResponse);
-                        newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap));
-                    } else {
-                        errorInCopyingShifts.add(shiftResponse);
-                    }
+        LocalDate copyShiftStartDate = copyShiftDTO.getStartDate();
+        LocalDate copyShiftEndDate = copyShiftDTO.getEndDate();
+        List<LocalDate> shiftCreationlocalDates = new ArrayList<>();
+        if (isCollectionNotEmpty(copyShiftDTO.getSelectedDays())) {
+            Set<DayOfWeek> dayOfWeeks =  copyShiftDTO.getSelectedDays().stream().map(day -> DayOfWeek.valueOf(day.toString())).collect(Collectors.toSet()) ;
+            while (copyShiftEndDate.isAfter(copyShiftStartDate) || copyShiftEndDate.equals(copyShiftStartDate)) {
+                if (dayOfWeeks.contains(copyShiftStartDate.getDayOfWeek())) {
+                    shiftCreationlocalDates.add(copyShiftStartDate);
                 }
-            shiftCreationStartDate = shiftCreationStartDate.plusDays(1);
+                copyShiftStartDate = copyShiftStartDate.plusDays(1);
+            }
+        } else {
+            shiftCreationlocalDates.add(copyShiftDTO.getStartDate());
+        }
+        ShiftResponse shiftResponse;
+        for (LocalDate shiftCreationStartDate : shiftCreationlocalDates) {
+            ShiftResponseDTO shiftResponseDTO = shifts.get(counter);
+            List<String> validationMessages = new ArrayList<>();
+            for (Shift sourceShift : shiftResponseDTO.getShifts()) {
+                PlanningPeriodDTO planningPeriod = getCurrentPlanningPeriod(planningPeriodMap, shiftCreationStartDate);
+                Date startDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getStartDate()));
+                Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
+                if ((shiftCreationStartDate.equals(staffUnitPosition.getStartDate()) || shiftCreationStartDate.isAfter(staffUnitPosition.getStartDate())) &&
+                        (staffUnitPosition.getEndDate() == null || shiftCreationStartDate.equals(staffUnitPosition.getEndDate()) || shiftCreationStartDate.isBefore(staffUnitPosition.getEndDate()))) {
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap);
+                    shiftWithActivityDTO.setEndDate(endDate);
+                    shiftWithActivityDTO.setStartDate(startDate);
+                    String shiftExistsMessage = validateShiftExistanceBetweenDuration(shiftCreationStartDate, sourceShift, currentStaffPreviousShifts);
+                    if (shiftExistsMessage != null) {
+                        validationMessages.add(shiftExistsMessage);
+                    }
+                    validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffUnitPosition, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs));
+                } else {
+                    validationMessages.add(convertMessage("message.unit_position.not.active", shiftCreationStartDate));
+                }
+                shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
+                if (shiftResponse.isSuccess()) {
+                    successfullyCopiedShifts.add(shiftResponse);
+                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap));
+                } else {
+                    errorInCopyingShifts.add(shiftResponse);
+                }
+            }
             if (counter++ == shifts.size() - 1) {
                 counter = 0;
             }
@@ -197,7 +206,7 @@ public class ShiftCopyService extends MongoBaseService {
         if (!newShifts.isEmpty()) {
 
             save(newShifts);
-            timeBankService.updateDailyTimeBankEntries(newShifts, staffUnitPosition,dataWrapper.getDayTypes());
+            timeBankService.updateDailyTimeBankEntries(newShifts, staffUnitPosition, dataWrapper.getDayTypes());
             payOutService.savePayOuts(staffUnitPosition, newShifts, null, activityMap, dataWrapper.getDayTypes());
 
         }
@@ -215,10 +224,12 @@ public class ShiftCopyService extends MongoBaseService {
                     sourceShift.getRemarks(), shiftActivities, staffUnitPosition.getStaff().getId(), sourceShift.getUnitId(),
                     sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getParentOpenShiftId(), sourceShift.getId()
                     , planningPeriod.getCurrentPhaseId(), planningPeriod.getId(), staffUnitPosition.getUserId(), sourceShift.getShiftType());
-
+            Activity activity = activityMap.get(sourceShift.getActivities().get(0).getActivityId()).getActivity();
+            ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
             shiftActivities = shiftBreakService.addBreakInShiftsWhileCopy(activityMap, copiedShift, null, dataWrapper.getTimeSlotWrappers(), breakSettings);
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffUnitPosition, planningPeriod, activityConfigurations);
+            copiedShift.setShiftType(shiftType);
             newShifts.add(copiedShift);
 
             return new ShiftResponse(sourceShift.getId(), sourceShift.getActivities().get(0).getActivityName(), Collections.singletonList(NO_CONFLICTS), true, asLocalDate(startDate));

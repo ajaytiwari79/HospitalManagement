@@ -11,6 +11,7 @@ import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -20,13 +21,17 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ClauseResponseDTO {
 
-    @NotNull
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotBlank
+
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String title;
+
+    @Valid
     @NotNull
     private List<ClauseTag> tags = new ArrayList<>();
-    @NotBlank
+
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     private List<TemplateTypeResponseDTO> templateTypes;

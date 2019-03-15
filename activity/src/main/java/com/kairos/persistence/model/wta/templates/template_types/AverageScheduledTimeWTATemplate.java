@@ -3,7 +3,6 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -22,7 +21,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.utils.ShiftValidatorService.*;
+import static com.kairos.service.shift.ShiftValidatorService.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,7 +23,7 @@ public class RelatedDataCategory  {
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<RelatedDataElements> dataElements;
+    private List<RelatedDataElements> dataElements= new ArrayList<>();
 
     public RelatedDataCategory() {
     }

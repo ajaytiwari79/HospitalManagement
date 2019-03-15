@@ -4,15 +4,11 @@ package com.kairos.service.clause;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.dto.gdpr.ServiceCategoryDTO;
-import com.kairos.dto.gdpr.SubServiceCategoryDTO;
-import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
-import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.persistence.model.clause.Clause;
+import com.kairos.persistence.model.clause.MasterClause;
+import com.kairos.persistence.model.clause.OrganizationClause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
@@ -21,7 +17,6 @@ import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
-import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.exception.ExceptionService;
@@ -65,57 +60,59 @@ public class ClauseService{
 
     /**
      * @param referenceId country id or unit id
-     * @param isUnitId    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is unitId or not
      * @param clauseDto   contain data about clause and template type which belong to clause
      * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
      * @throws DuplicateDataException : if clause already exist for id ,if account type is not selected}
      * @desciption this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
-    public <E extends ClauseDTO> E createClause(Long referenceId, boolean isUnitId, E clauseDto) {
+    public <E extends ClauseDTO> E createClause(Long referenceId, boolean isOrganization, E clauseDto) {
 
-        Clause previousClause = isUnitId ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
+        Clause previousClause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
         }
-        Clause clause = buildOrUpdateClause(referenceId, isUnitId, clauseDto, null);
-        clauseRepository.save(clause);
-        clauseDto.setId(clause.getId());
+        if(isOrganization) {
+            previousClause = prepareOrganizationClauseData(referenceId, clauseDto, new OrganizationClause());
+        }else{
+            previousClause = prepareMasterClauseData(referenceId, clauseDto, new MasterClause());
+        }
+        clauseRepository.save(previousClause);
+        clauseDto.setId(previousClause.getId());
         return clauseDto;
     }
 
-
-    private <E extends ClauseDTO> Clause buildOrUpdateClause(Long referenceId, boolean isUnitId, E clauseDto, Clause clause) {
-
+    private <E extends ClauseDTO> Clause prepareOrganizationClauseData(Long referenceId, E clauseDto, OrganizationClause clause) {
         List<ClauseTag> clauseTags = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(clauseDto.getTags())) {
-            clauseTags = clauseTagService.saveClauseTagList(referenceId, isUnitId, clauseDto.getTags());
+            clauseTags = clauseTagService.saveClauseTagList(referenceId, true, clauseDto.getTags());
         } else {
             clauseTags.add(clauseTagRepository.findDefaultTag());
         }
         List<TemplateType> templateTypes = templateTypeRepository.findAllById(clauseDto.getTemplateTypes());
-        if (Optional.ofNullable(clause).isPresent()) {
-            if (isUnitId) {
-                ObjectMapperUtils.copyProperties(clauseDto, clause);
-            } else {
-                MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
-                clause.setTitle(masterClauseDTO.getTitle());
-                clause.setDescription(masterClauseDTO.getDescription());
-                getMetadataOfMasterClause(masterClauseDTO, clause);
-                clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
-                clause.setTemplateTypes(templateTypes);
-            }
-            clause.setTags(clauseTags);
+        clause.setOrganizationId(referenceId);
+        clause.setTemplateTypes(templateTypes);
+        clause.setTitle(clauseDto.getTitle());
+        clause.setDescription(clauseDto.getDescription());
+        clause.setTags(clauseTags);
+        return clause;
+    }
+
+    private <E extends ClauseDTO> Clause prepareMasterClauseData(Long referenceId, E clauseDto, MasterClause clause) {
+        List<ClauseTag> clauseTags = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(clauseDto.getTags())) {
+            clauseTags = clauseTagService.saveClauseTagList(referenceId, false, clauseDto.getTags());
         } else {
-            clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags,templateTypes);
-            if (isUnitId) {
-                clause.setOrganizationId(referenceId);
-            } else {
-                MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
-                clause = getMetadataOfMasterClause(masterClauseDTO, clause);
-                clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
-                clause.setCountryId(referenceId);
-            }
+            clauseTags.add(clauseTagRepository.findDefaultTag());
         }
+        List<TemplateType> templateTypes = templateTypeRepository.findAllById(clauseDto.getTemplateTypes());
+        MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
+        setMetadataOfMasterClause(masterClauseDTO,  clause);
+        clause.setCountryId(referenceId);
+        clause.setTemplateTypes(templateTypes);
+        clause.setTitle(clauseDto.getTitle());
+        clause.setDescription(clauseDto.getDescription());
+        clause.setTags(clauseTags);
         return clause;
     }
 
@@ -126,33 +123,36 @@ public class ClauseService{
      * @param masterClauseDTO
      * @return
      */
-    //TODO need to make common method for asset and processing activity and others
-    private Clause getMetadataOfMasterClause(MasterClauseDTO masterClauseDTO, Clause clause){
-        clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationTypes(), OrganizationType.class));
-        clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubServices(), OrganizationSubType.class));
-        clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationServices(), ServiceCategory.class));
-        clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubServices(), SubServiceCategory.class));
-        return clause;
-    }
+    private void setMetadataOfMasterClause(MasterClauseDTO masterClauseDTO, MasterClause clause) {
+            clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationTypes(), OrganizationType.class));
+            clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubTypes(), OrganizationSubType.class));
+            clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationServices(), ServiceCategory.class));
+            clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubServices(), SubServiceCategory.class));
+            clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
 
+    }
     /**
      * @param referenceId country id or unit id
-     * @param isUnitId    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is unitId or not
      * @param clauseDto   contain update data for clause
      * @return updated clause object
      * @throws DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
      * @description this method update clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
-    public <E extends ClauseDTO> E updateClause(Long referenceId, boolean isUnitId, Long clauseId, E clauseDto) {
+    public <E extends ClauseDTO> E updateClause(Long referenceId, boolean isOrganization, Long clauseId, E clauseDto) {
 
-        Clause clause = isUnitId ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
+        Clause clause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
         Optional<Clause> existingClause = clauseRepository.findById(clauseId);
         if(existingClause.isPresent()) {
             clause = existingClause.get();
-            buildOrUpdateClause(referenceId, isUnitId, clauseDto, clause);
+            if (isOrganization) {
+                prepareOrganizationClauseData(referenceId, clauseDto, (OrganizationClause) clause);
+            } else {
+                prepareMasterClauseData(referenceId, clauseDto, (MasterClause) clause);
+            }
             clauseRepository.save(clause);
         }
         return clauseDto;
@@ -166,70 +166,35 @@ public class ClauseService{
      * @description
      */
     public List<ClauseResponseDTO> getAllClauseByCountryId(Long countryId) {
-        List<ClauseResponseDTO> clauseResponseDTOS =  new ArrayList<>();
         List<Clause> clauses = clauseRepository.findAllClauseByCountryId(countryId);
-        for(Clause clause : clauses){
-            clauseResponseDTOS.add(prepareClauseResponseDTO(clause));
-        }
-        return clauseResponseDTOS;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
     }
 
     public List<UnitLevelClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
-        List<UnitLevelClauseResponseDTO> clauseResponseDTOS =  new ArrayList<>();
         List<Clause> clauses = clauseRepository.findAllClauseByUnitId(unitId);
-        for(Clause clause : clauses){
-            clauseResponseDTOS.add(prepareClauseResponseDTOForUnitLevel(clause));
-        }
-        return clauseResponseDTOS;
+       return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
     }
 
-
-    private ClauseResponseDTO prepareClauseResponseDTO(Clause clause){
-        ClauseResponseDTO clauseResponseDTO =  new ClauseResponseDTO();
-        clauseResponseDTO.setId(clause.getId());
-        clauseResponseDTO.setTitle(clause.getTitle());
-        clauseResponseDTO.setDescription(clause.getDescription());
-        clauseResponseDTO.setTags(clause.getTags());
-        clauseResponseDTO.setTemplateTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getTemplateTypes(), TemplateTypeResponseDTO.class));
-        clauseResponseDTO.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getAccountTypes(), AccountTypeVO.class));
-        clauseResponseDTO.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationTypes(), OrganizationTypeDTO.class));
-        clauseResponseDTO.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationServices(), ServiceCategoryDTO.class));
-        clauseResponseDTO.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubServices(), SubServiceCategoryDTO.class));
-        clauseResponseDTO.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
-        return clauseResponseDTO;
-    }
-
-    private UnitLevelClauseResponseDTO prepareClauseResponseDTOForUnitLevel(Clause clause){
-        UnitLevelClauseResponseDTO clauseResponseDTO =  new UnitLevelClauseResponseDTO();
-        clauseResponseDTO.setId(clause.getId());
-        clauseResponseDTO.setTitle(clause.getTitle());
-        clauseResponseDTO.setTitleHtml(clause.getTitleHtml());
-        clauseResponseDTO.setDescription(clause.getDescription());
-        clauseResponseDTO.setDescriptionHtml(clause.getDescriptionHtml());
-        clauseResponseDTO.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getTags(), ClauseTagDTO.class));
-        clauseResponseDTO.setTemplateTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getTemplateTypes(), TemplateTypeResponseDTO.class));
-        return clauseResponseDTO;
-    }
 
     public ClauseResponseDTO getClauseById(Long countryId, Long id) {
         Clause clause = clauseRepository.findByIdAndCountryId(id, countryId);
         if (!Optional.ofNullable(clause).isPresent()) {
             throw new DataNotFoundByIdException("message.clause.data.not.found.for " + id);
         }
-        return prepareClauseResponseDTO(clause);
+        return ObjectMapperUtils.copyPropertiesByMapper(clause, ClauseResponseDTO.class);
     }
 
 
     /**
      * @param referenceId country id or unit id
-     * @param isUnitId    boolean to verify is reference id is unitId or not
+     * @param isOrganization    boolean to verify is reference id is unitId or not
      * @return boolean true if data deleted successfully
      * @throws DataNotFoundByIdException; if clause not found for id
      */
-    public Boolean deleteClauseById(Long referenceId, boolean isUnitId, Long clauseId) {
+    public Boolean deleteClauseById(Long referenceId, boolean isOrganization, Long clauseId) {
 
         //TODO refactor When done Policy Agreement template
-       /* List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+       /* List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isOrganization, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }*/
@@ -242,8 +207,11 @@ public class ClauseService{
      * @param countryId
      * @return
      */
+    //TODO try to use DTO instead of map
     public Map<String,Object> getClauseMetaDataByCountryId(Long countryId) {
         Map<String,Object> clauseMetaDataMap=new HashMap<>();
+
+        // TODO call repository direct here instead of service method
         clauseMetaDataMap.put("clauseTagList", clauseTagService.getAllClauseTagByCountryId(countryId));
         clauseMetaDataMap.put("templateTypeList",templateTypeService.getAllTemplateType(countryId));
         return clauseMetaDataMap;
@@ -254,6 +222,8 @@ public class ClauseService{
      * @param unitId
      * @return
      */
+
+    //TODO try to use DTO instead of map
     public Map<String,Object> getClauseMetadataByOrganizationId(Long unitId) {
         Map<String,Object> clauseMetaDataMap=new HashMap<>();
         clauseMetaDataMap.put("clauseTagList",clauseTagService.getAllClauseTagByUnitId(unitId));

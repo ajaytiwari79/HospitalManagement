@@ -2,15 +2,16 @@ package com.kairos.service.unit_position;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.employment.Employment;
-import com.kairos.persistence.model.staff.employment.EmploymentQueryResult;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.PositionQueryResult;
+import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
@@ -18,7 +19,7 @@ import com.kairos.persistence.model.user.unit_position.query_result.UnitPosition
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
@@ -44,7 +45,7 @@ public class UnitPositionJobService {
     @Inject private KafkaProducer kafkaProducer;
     @Inject private UnitPositionEmploymentTypeRelationShipGraphRepository unitPositionEmploymentTypeRelationShipGraphRepository;
     @Inject private OrganizationGraphRepository organizationGraphRepository;
-    @Inject private EmploymentGraphRepository employmentGraphRepository;
+    @Inject private PositionGraphRepository positionGraphRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject private UserToSchedulerQueueService userToSchedulerQueueService;
@@ -124,20 +125,18 @@ public class UnitPositionJobService {
         // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId, Long accessGroupId) throws Exception {
-
-        Organization unit = organizationGraphRepository.findOne(unitId);
-        Long endDateMillis = DateUtils.getIsoDateInLong(employmentEndDate);
-        LocalDate unitPositionStartDateMax = unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
-        if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(unitPositionStartDateMax)) {
-            exceptionService.actionNotPermittedException("message.employmentdata.greaterthan.unitpositiondate", unitPositionStartDateMax);
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, Long unitId,PositionDTO positionDTO) {
+        Organization unit=organizationGraphRepository.findOne(unitId);
+        Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
+        String unitPositionStartDateMax=unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
+        if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(unitPositionStartDateMax))) {
+            exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", unitPositionStartDateMax);
 
         }
-        List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis));
-        Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(reasonCodeId, 0);
+        List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
+        Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(positionDTO.getReasonCodeId(), 0);
         if (!reasonCode.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", reasonCodeId);
-
+            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
         }
 
         for (UnitPosition unitPosition : unitPositions) {
@@ -147,27 +146,20 @@ public class UnitPositionJobService {
             }
         }
 
-        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-        if (employment.getMainEmploymentEndDate() != null) {
-            Long mainEmploymentEndDate = DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate());
-            if (endDateMillis > mainEmploymentEndDate) {
-                exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
-            }
-        }
+        Position position = positionGraphRepository.findByStaffId(staffId);
+//        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
+//                unit.getTimeZone());
 
-        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, employment.getEndDateMillis(), unit.getId(), employment.getId(),
-                unit.getTimeZone());
+        position.setEndDateMillis(endDateMillis);
+        positionGraphRepository.deletePositionReasonCodeRelation(staffId);
 
-        employment.setEndDateMillis(endDateMillis);
-        employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
-
-        employment.setReasonCode(reasonCode.get());
-        employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+        position.setReasonCode(reasonCode.get());
+        position.setAccessGroupIdOnPositionEnd(positionDTO.getAccessGroupIdOnPositionEnd());
         unitPositionGraphRepository.saveAll(unitPositions);
-        employmentGraphRepository.save(employment);
+        positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
-        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), employment.getReasonCode().getId(), employment.getAccessGroupIdOnEmploymentEnd());
-        return new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
+        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
+        return new EmploymentUnitPositionDTO(positionQueryResult, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
 
     }
 

@@ -13,7 +13,7 @@ public class AssessmentAnswerDTO {
 
 
     private Long id;
-    @NotNull(message = "Question id can't be null for Assessment Answer")
+    @NotNull(message = "error.message.question.id.notNull")
     private Long questionId;
     @NotBlank(message = "error.message.attribute.name.null")
     private String attributeName;

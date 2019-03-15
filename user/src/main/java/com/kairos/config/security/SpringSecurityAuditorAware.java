@@ -19,8 +19,6 @@ import java.util.Optional;
 public class SpringSecurityAuditorAware implements AuditorAware<Long> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringSecurityAuditorAware.class);
-    @Inject
-    private UserGraphRepository userGraphRepository;
 
     public Optional<Long> getCurrentAuditor() {
         if (Optional.ofNullable(UserContext.getUserDetails()).isPresent() && Optional.ofNullable(UserContext.getUserDetails().getId()).isPresent()) {
