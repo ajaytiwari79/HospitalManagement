@@ -166,9 +166,6 @@ public class PolicyAgreementTemplateService {
     public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByUnitId(Long unitId) {
 
         List<PolicyAgreementTemplate> templates = policyAgreementRepository.findAllByOrganizationId(unitId);
-        if (CollectionUtils.isEmpty(templates)) {
-            return new ArrayList<>();
-        }
         return templates.stream().map(policyAgreementTemplate -> {
             return new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class));
         }).collect(Collectors.toList());
