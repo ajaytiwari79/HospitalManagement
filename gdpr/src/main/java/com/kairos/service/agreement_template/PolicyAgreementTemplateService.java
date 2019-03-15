@@ -169,7 +169,9 @@ public class PolicyAgreementTemplateService {
         if (CollectionUtils.isEmpty(templates)) {
             return new ArrayList<>();
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(templates, PolicyAgreementTemplateResponseDTO.class);
+        return templates.stream().map(policyAgreementTemplate -> {
+            return new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class));
+        }).collect(Collectors.toList());
     }
 
 
