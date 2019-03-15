@@ -21,7 +21,6 @@ import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepos
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
-import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
@@ -216,45 +215,18 @@ public class PolicyAgreementTemplateService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
-        // OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO=null;
-        List<UnitLevelClauseResponseDTO> clauseListForUnitLevelPolicyAgreementTemplate = new ArrayList<>();
-        List<ClauseBasicResponseDTO> clauseListForMasterPolicyAgreementTemplate = new ArrayList<>();
+        List<ClauseBasicResponseDTO> clauseListForPolicyAgreementTemplate;
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = prepareAgreementSectionResponseDTO(template.getAgreementSections());
         if (isOrganization) {
-            clauseListForUnitLevelPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitId(referenceId), UnitLevelClauseResponseDTO.class);
+            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitIdAndTemplateTypeId(referenceId,Arrays.asList(template.getTemplateType().getId())), ClauseBasicResponseDTO.class);
         } else {
             List<Long> organizationTypeIds = template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList());
             List<Long> organizationSubTypeIds = template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList());
             List<Long> serviceCategoryIds = template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList());
             List<Long> subServiceCategoryIds = template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList());
-            //organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds
-            clauseListForMasterPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds, serviceCategoryIds, subServiceCategoryIds, template.getTemplateType().getId()), ClauseBasicResponseDTO.class);
+            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds, serviceCategoryIds, subServiceCategoryIds, template.getTemplateType().getId()), ClauseBasicResponseDTO.class);
         }
-
-        //List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId, isOrganization, agreementTemplateId);
-        /*agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
-                {
-                    Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS = agreementSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
-                    sortClauseOfAgreementSectionAndSubSectionInResponseDTO(clauseBasicResponseDTOS, agreementSectionResponseDTO);
-                    if (!Optional.ofNullable(agreementSectionResponseDTO.getAgreementSubSections().get(0).getId()).isPresent()) {
-                        agreementSectionResponseDTO.getAgreementSubSections().clear();
-                    } else {
-                        agreementSectionResponseDTO.getAgreementSubSections().forEach(agreementSubSectionResponseDTO -> {
-                            Map<BigInteger, ClauseBasicResponseDTO> subSectionClauseBasicResponseDTOS = agreementSubSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
-                            sortClauseOfAgreementSectionAndSubSectionInResponseDTO(subSectionClauseBasicResponseDTOS, agreementSubSectionResponseDTO);
-                        });
-                    }
-                }
-        );*/
-      /*  List<ClauseBasicResponseDTO> clauseBasicResponseDTOS=policyAgreementTemplateRepository.getAllClausesByAgreementTemplateIdNotEquals(referenceId,isOrganization,agreementTemplateId);
-       Map<BigInteger,ClauseBasicResponseDTO> clauseBasicResponseDTOMap=clauseBasicResponseDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v ,(p1, p2) -> p1));
-        clauseListForTemplate.stream().forEach(clauseBasicResponseDTO -> {
-            if(clauseBasicResponseDTOMap.get(clauseBasicResponseDTO.getId())!=null){
-                clauseBasicResponseDTO.setLinkedWithOtherTemplate(true);
-            }
-        });*/
-        agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelPolicyAgreementTemplate);
-        agreementTemplateResponse.setClauseListForTemplate(clauseListForMasterPolicyAgreementTemplate);
+        agreementTemplateResponse.setClauseListForTemplate(clauseListForPolicyAgreementTemplate);
         agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
         agreementTemplateResponse.setAgreementSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
