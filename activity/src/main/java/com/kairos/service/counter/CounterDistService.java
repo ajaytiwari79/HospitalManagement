@@ -739,18 +739,6 @@ public class CounterDistService extends MongoBaseService {
             categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(), categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId()), null, unitId, ConfLevel.UNIT));
         });
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
-//        Map<String,String> dashboardsNameMap=new HashMap<>();
-//        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
-//            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
-//        });
-//        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT)).collect(Collectors.toList());
-//        if(!kpiDashboards.isEmpty()){
-//            save(kpiDashboards);
-//        }
-//        kpiDashboards.stream().forEach(kpiDashboard -> {
-//            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
-//        });
-//        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
         List<String> oldDashboardsIds = kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds, oldDashboardsIds, refId, level);
         dashboardKPIConfList.stream().forEach(dashboardKPIConf -> {
@@ -789,7 +777,7 @@ public class CounterDistService extends MongoBaseService {
 
     private void createTabs(Long refId, ConfLevel level, Long unitId) {
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
-        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, unitId, null, ConfLevel.UNIT, false)).collect(Collectors.toList());
+        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, unitId, null, ConfLevel.UNIT, dashboard.isDefaultTab())).collect(Collectors.toList());
         if (!kpiDashboards.isEmpty()) {
             save(kpiDashboards);
         }
