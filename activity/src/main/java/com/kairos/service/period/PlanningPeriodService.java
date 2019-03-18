@@ -492,7 +492,7 @@ public class PlanningPeriodService extends MongoBaseService {
         // Check if period is in request phase
         // We are checking request phase by its name, can be done by sequence, need to ask
         // TO DO check phase by sequence
-        if (!phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_NAME)) {
+        if (!phaseMongoRepository.checkPhaseByPhaseIdAndPhaseEnum(planningPeriod.getCurrentPhaseId(), PhaseDefaultName.REQUEST)) {
             exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());

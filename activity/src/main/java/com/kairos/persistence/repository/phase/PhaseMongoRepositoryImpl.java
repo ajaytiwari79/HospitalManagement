@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.phase;
 
 
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
@@ -80,8 +81,8 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     }
 
-    public Boolean checkPhaseByName(BigInteger phaseId, String name) {
-        Query query = Query.query(Criteria.where("name").is(name).and("id").is(phaseId));
+    public Boolean checkPhaseByPhaseIdAndPhaseEnum(BigInteger phaseId, PhaseDefaultName phaseEnum) {
+        Query query = Query.query(Criteria.where("phaseEnum").is(phaseEnum).and("id").is(phaseId));
         return mongoTemplate.exists(query, Phase.class);
     }
 
