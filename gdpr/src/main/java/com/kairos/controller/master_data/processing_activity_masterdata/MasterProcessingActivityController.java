@@ -108,7 +108,7 @@ class MasterProcessingActivityController {
 
     @ApiOperation(value = "Update Sugessted status of Processing Activity")
     @PutMapping("/master_processing_activity/{processingActivityId}/subProcess/status")
-    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long processingActivityId, @RequestBody Set<BigInteger> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long processingActivityId, @RequestBody Set<Long> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(subProcessingActivityIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Sub Processing Activity is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

@@ -23,6 +23,7 @@ import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseD
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -61,7 +62,7 @@ public class MasterProcessingActivityService {
     public MasterProcessingActivityDTO createMasterProcessingActivity(Long countryId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
         if (masterProcessingActivityRepository.findByNameAndCountryId(masterProcessingActivityDto.getName(), countryId) != null) {
-            exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
+            exceptionService.duplicateDataException("message.duplicate", "message.processingActivity", masterProcessingActivityDto.getName().toLowerCase());
         }
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, countryId);
         setMetadataOfMasterProcessingActivity(masterProcessingActivityDto, masterProcessingActivity);
@@ -234,7 +235,7 @@ public class MasterProcessingActivityService {
         if (updateCount > 0) {
             LOGGER.info("Master Processing Activity is deleted successfully with id :: {}", id);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Processing Activity", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", id);
         }
         return true;
 
@@ -251,7 +252,7 @@ public class MasterProcessingActivityService {
     public boolean deleteSubProcessingActivity(Long countryId, Long processingActivityId, Long subProcessingActivityId) {
         Integer updateCount = masterProcessingActivityRepository.deleteSubProcessingActivityFromMasterProcessingActivity(countryId, processingActivityId, subProcessingActivityId);
         if (updateCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
         } else {
             LOGGER.info("Sub processing Activity deleted successfully");
         }
@@ -261,9 +262,9 @@ public class MasterProcessingActivityService {
 
 
     public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, Long id) {
-        MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.getMasterAssetByCountryIdAndId(countryId, id);
+        MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, id);
         if (!Optional.of(masterProcessingActivity).isPresent()) {
-            throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", id);
         }
         return prepareMasterProcessingActivityResponseDTO(masterProcessingActivity, new ArrayList<>());
 
@@ -310,9 +311,9 @@ public class MasterProcessingActivityService {
      * @return
      */
     public MasterProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(Long countryId, Long processingActivityId, MasterProcessingActivityRiskDTO processingActivityRiskDTO) {
-        MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.getMasterAssetByCountryIdAndId(countryId, processingActivityId);
+        MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, processingActivityId);
         if (!Optional.ofNullable(masterProcessingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
         }
         if (!processingActivityRiskDTO.getRisks().isEmpty()) {
             List<Risk> processingActivityRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivityRiskDTO.getRisks(), Risk.class);
@@ -400,14 +401,17 @@ public class MasterProcessingActivityService {
         MasterProcessingActivity processingActivity = new MasterProcessingActivity(processingActivityDTO.getName(), processingActivityDTO.getDescription(), SuggestedDataStatus.PENDING, countryId);
         addMetaDataToSuggestedProcessingActivity(orgTypeSubTypeServicesAndSubServicesDTO, processingActivity);
         List<MasterProcessingActivity> subProcessingActivities = new ArrayList<>();
-        processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> {
-                    MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), SuggestedDataStatus.PENDING, countryId);
-                    subProcessingActivity.setSubProcessActivity(true);
-                    addMetaDataToSuggestedProcessingActivity(orgTypeSubTypeServicesAndSubServicesDTO, subProcessingActivity);
-                    subProcessingActivity.setMasterProcessingActivity(processingActivity);
-                    subProcessingActivities.add(subProcessingActivity);
-                }
-        );
+        if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
+            processingActivity.setHasSubProcessingActivity(true);
+            processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> {
+                        MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), SuggestedDataStatus.PENDING, countryId);
+                        subProcessingActivity.setSubProcessActivity(true);
+                        addMetaDataToSuggestedProcessingActivity(orgTypeSubTypeServicesAndSubServicesDTO, subProcessingActivity);
+                        subProcessingActivity.setMasterProcessingActivity(processingActivity);
+                        subProcessingActivities.add(subProcessingActivity);
+                    }
+            );
+        }
         processingActivity.setSubProcessingActivities(subProcessingActivities);
         masterProcessingActivityRepository.save(processingActivity);
         return processingActivityDTO;
@@ -439,7 +443,7 @@ public class MasterProcessingActivityService {
     }
 
 
-    public boolean updateSuggestedStatusOfSubProcessingActivities(Long countryId, Long processingActivityId, Set<BigInteger> subProcessingActivityIds, SuggestedDataStatus suggestedDataStatus) {
+    public boolean updateSuggestedStatusOfSubProcessingActivities(Long countryId, Long processingActivityId, Set<Long> subProcessingActivityIds, SuggestedDataStatus suggestedDataStatus) {
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, processingActivityId);
         if (!SuggestedDataStatus.APPROVED.value.equals(processingActivity.getSuggestedDataStatus().value)) {
             exceptionService.invalidRequestException("message.processingActivity.notApproved", processingActivity.getName(), processingActivity.getSuggestedDataStatus(), SuggestedDataStatus.APPROVED);

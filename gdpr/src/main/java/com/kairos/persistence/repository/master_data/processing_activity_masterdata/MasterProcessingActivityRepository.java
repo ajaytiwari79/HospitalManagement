@@ -29,9 +29,6 @@ public interface MasterProcessingActivityRepository extends JpaRepository<Master
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id = ?2 and MPA.deleted = false")
     MasterProcessingActivity findByCountryIdAndId(Long countryId, Long id);
 
-    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id = ?2 and MPA.deleted = false")
-    MasterProcessingActivity getMasterAssetByCountryIdAndId(Long countryId, Long id);
-
     @Transactional
     @Modifying
     @Query(value = "update MasterProcessingActivity set deleted = true where countryId = ?1 and id = ?2 and deleted = false")
