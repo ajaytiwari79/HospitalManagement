@@ -93,7 +93,7 @@ public class RuleTemplateService extends MongoBaseService {
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(countryId);
         if(isCollectionEmpty(countryPhase)){
-            exceptionService.actionNotPermittedException("");
+            exceptionService.actionNotPermittedException("message.country.phase.notFound");
         }
         Map<String,BigInteger> phaseMap = countryPhase.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(),v->v.getId()));
         phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("REQUEST"), "REQUEST", (short) 0, (short) 0, true, false, false,1));

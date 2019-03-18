@@ -21,9 +21,29 @@ db.cTARuleTemplate.save(c);
 });
 
 db.shiftViolatedRules.find().forEach(function(e){
-    if(e.shift._id){
+    if(e.shift && e.shift._id){
         e.shiftId = e.shift._id;
         delete e.shift;
         db.shiftViolatedRules.save(e);
         }
     });
+
+db.wtaBaseRuleTemplate.find({"countryId" : NumberLong(18712)}).forEach(function(e){
+    var phases = {
+        "Request":5,
+        "Draft":8,
+        "Construction":7,
+        "Puzzle":6,
+        "Payroll":4,
+        "Tentative":3,
+        "Time & Attendance":2,
+        "Realtime":1
+        }
+    e.phaseTemplateValues.forEach(function(phase){
+        phase.phaseId = phases[phase.phaseName];
+        });
+    db.wtaBaseRuleTemplate.save(e);
+    });
+
+Please hit this API to update phaseId in WTARuletemplate
+{Server-Url}kairos/activity/api/v1/unit/1172/update_phases_in_ruletemplate

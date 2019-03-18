@@ -189,4 +189,11 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unionService.getUnitPositionDefaultData(unitId, type, staffId));
     }
+
+
+    @ApiOperation(value = "get unit By unit position")
+    @GetMapping(value = "/unit_position/{unitPositionId}/get_unit")
+    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitByUnitPositionId(unitPositionId));
+    }
 }

@@ -116,7 +116,7 @@ public class WTAOrganizationService extends MongoBaseService {
         if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(),true);
             for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
-                wtaService.updateExistingPhaseIdOfCTA(ruleTemplate.getPhaseTemplateValues(),organization.getId(),organization.getCountryId(),true);
+                wtaService.updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(),organization.getId(),organization.getCountryId(),true);
             }
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate->ruleTemplate.getId()).collect(Collectors.toList());
