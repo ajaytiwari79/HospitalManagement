@@ -139,7 +139,7 @@ public class QuestionnaireSectionService {
       public boolean deleteQuestionnaireSectionFromTemplate( Long templateId, Long questionnaireSectionId) {
           QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByIdAndDeletedFalse(questionnaireSectionId);
           if (!Optional.ofNullable(questionnaireSection).isPresent()) {
-              exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  section", templateId);
+              exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireSection", questionnaireSectionId);
           }
           questionnaireSectionRepository.deleteById(questionnaireSectionId);
           return true;
@@ -234,7 +234,7 @@ public class QuestionnaireSectionService {
                 questionTitles.add(questionDTO.getQuestion().toLowerCase());
             }
             if (titles.contains(questionnaireSectionDto.getTitle().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "Questionnaire section", questionnaireSectionDto.getTitle());
+                exceptionService.duplicateDataException("message.duplicate", "message.questionnaireSection", questionnaireSectionDto.getTitle());
             }
             titles.add(questionnaireSectionDto.getTitle().toLowerCase());
 

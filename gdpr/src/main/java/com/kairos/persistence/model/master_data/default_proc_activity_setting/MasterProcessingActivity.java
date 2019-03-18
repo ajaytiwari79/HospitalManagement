@@ -11,6 +11,7 @@ import com.kairos.persistence.model.risk_management.Risk;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,9 @@ import java.util.List;
 public class MasterProcessingActivity extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @ElementCollection

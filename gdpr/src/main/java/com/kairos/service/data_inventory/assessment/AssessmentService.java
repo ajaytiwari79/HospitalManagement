@@ -200,7 +200,7 @@ public class AssessmentService {
 
         Assessment previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, assessmentDTO.getName());
         if (Optional.ofNullable(previousAssessment).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.assessment", assessmentDTO.getName());
         }
         if (assessmentDTO.getStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.startdate");
@@ -510,7 +510,7 @@ public class AssessmentService {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assessment", assessmentId);
         } else if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
         } else if ((AssessmentStatus.NEW.equals(assessment.getAssessmentStatus()) && AssessmentStatus.COMPLETED.equals(status)) || AssessmentStatus.NEW.equals(status)) {
