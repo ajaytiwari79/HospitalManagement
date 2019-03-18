@@ -22,19 +22,13 @@ import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.ComparisonUtils;
-import com.kairos.utils.ValidateRequestBodyList;
-import com.kairos.utils.user_context.BeanValidationUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -58,10 +52,6 @@ public class MasterAssetService {
 
     @Inject
     private AssetTypeRepository assetTypeRepository;
-
-    @Inject
-    private BeanValidationUtils beanValidationUtils;
-
 
     /**
      * @param countryId
@@ -260,7 +250,7 @@ public class MasterAssetService {
     public boolean updateStatusOfSuggestedMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
         if (SuggestedDataStatus.APPROVED.equals(suggestedDataStatus)) {
             List<MasterAsset> masterAssetList = masterAssetRepository.findAllByCountryIdAndIds(countryId, assetIds);
-            beanValidationUtils.validateConstriantOfJavaBean(masterAssetList);
+            masterAssetList.forEach(masterAsset -> validateMasterAsset(masterAsset));
         }
         Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds, suggestedDataStatus);
         if (updateCount > 0) {
@@ -271,5 +261,21 @@ public class MasterAssetService {
         return true;
     }
 
+    private void validateMasterAsset(MasterAsset masterAsset) {
+        if (!Optional.ofNullable(masterAsset.getAssetType()).isPresent())
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+        if (!Optional.ofNullable(masterAsset.getName()).isPresent())
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+        if (!Optional.ofNullable(masterAsset.getDescription()).isPresent())
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+        if (CollectionUtils.isEmpty(masterAsset.getOrganizationTypes()))
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+        if (CollectionUtils.isEmpty(masterAsset.getOrganizationSubTypes()))
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+        if (CollectionUtils.isEmpty(masterAsset.getOrganizationServices()))
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+        if (CollectionUtils.isEmpty(masterAsset.getOrganizationSubServices()))
+            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+    }
 
 }

@@ -33,7 +33,6 @@ public class MasterAsset extends BaseEntity {
     private List<SubServiceCategory> organizationSubServices = new ArrayList<>();
     private Long countryId;
     @OneToOne(fetch = FetchType.EAGER)
-    @NotNull(message = "error.message.assetType.notNull")
     private AssetType assetType;
     @OneToOne(fetch = FetchType.EAGER)
     private AssetType subAssetType;
