@@ -269,13 +269,13 @@ public class CounterDistController {
     //save and copy kpi and default data of kpi
 
     @GetMapping(COUNTRY_URL + KPI_URL + "/kpi_default_data")
-    public ResponseEntity<Map<String, Object>> getDefaultKpiFilterDataOfCountry(@PathVariable Long countryId, @PathVariable BigInteger kpiId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getDefaultFilterDataOfKpi(kpiId, countryId, ConfLevel.COUNTRY));
+    public ResponseEntity<Map<String, Object>> getDefaultKpiFilterDataOfCountry(@RequestParam(value = "tabId", required = false) String tabId,@PathVariable Long countryId, @PathVariable BigInteger kpiId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getDefaultFilterDataOfKpi(tabId,kpiId, countryId, ConfLevel.COUNTRY));
     }
 
     @GetMapping(UNIT_URL + KPI_URL + "/kpi_default_data")
-    public ResponseEntity<Map<String, Object>> getDefaultKpiFilterDataOfUnit(@PathVariable Long unitId, @PathVariable BigInteger kpiId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getDefaultFilterDataOfKpi(kpiId, unitId, ConfLevel.UNIT));
+    public ResponseEntity<Map<String, Object>> getDefaultKpiFilterDataOfUnit(@RequestParam(value = "tabId", required = false) String tabId,@PathVariable Long unitId, @PathVariable BigInteger kpiId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getDefaultFilterDataOfKpi(tabId,kpiId, unitId, ConfLevel.UNIT));
     }
 
     @PutMapping(COUNTRY_URL + KPI_URL + "/save_kpi")
