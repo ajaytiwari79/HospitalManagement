@@ -113,7 +113,7 @@ public class AccessorPartyService {
         }
         Integer resultCount = accessorPartyRepository.updateMasterMetadataName(accessorPartyDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }
@@ -146,7 +146,7 @@ public class AccessorPartyService {
         if (updateCount > 0) {
             LOGGER.info("Accessor Parties are updated successfully with ids :: {}", accessorPartyIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", accessorPartyIds);
         }
         return accessorPartyRepository.findAllByIds(accessorPartyIds);
     }

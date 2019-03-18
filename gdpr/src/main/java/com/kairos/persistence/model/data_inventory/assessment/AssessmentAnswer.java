@@ -15,7 +15,6 @@ public class AssessmentAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull(message = "Question id can't be null for Assessment Answer")
     private Long questionId;
     private String attributeName;
     @OneToOne(cascade = CascadeType.ALL)

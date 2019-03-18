@@ -126,7 +126,7 @@ public class HostingProviderService {
         }
         Integer resultCount = hostingProviderRepository.updateMasterMetadataName(hostingProviderDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvider", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }
@@ -160,7 +160,7 @@ public class HostingProviderService {
         if (updateCount > 0) {
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingProviderIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingProviderIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvider", hostingProviderIds);
         }
         return hostingProviderRepository.findAllByIds(hostingProviderIds);
     }

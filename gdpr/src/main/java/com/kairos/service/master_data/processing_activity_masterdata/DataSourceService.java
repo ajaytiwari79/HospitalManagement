@@ -118,7 +118,7 @@ public class DataSourceService {
         }
         Integer resultCount = dataSourceRepository.updateMasterMetadataName(dataSourceDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSource", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataSourceDTO.getName());
         }
@@ -151,7 +151,7 @@ public class DataSourceService {
         if (updateCount > 0) {
             LOGGER.info("Data Sources are updated successfully with ids :: {}", dataSourceIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", dataSourceIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSource", dataSourceIds);
         }
         return dataSourceRepository.findAllByIds(dataSourceIds);
     }
