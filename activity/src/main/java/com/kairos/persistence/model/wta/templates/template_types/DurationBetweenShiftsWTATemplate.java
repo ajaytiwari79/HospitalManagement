@@ -2,6 +2,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
@@ -103,7 +104,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
-                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this.id,this.name+" - "+limitAndCounter[0]+" "+ HOURS,limitAndCounter[2]);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,limitAndCounter[0]/60);
             }
         }
     }

@@ -15,8 +15,8 @@ import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.exception.ExceptionService;
@@ -124,10 +124,10 @@ public class ClauseService{
      * @return
      */
     private void setMetadataOfMasterClause(MasterClauseDTO masterClauseDTO, MasterClause clause) {
-            clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationTypes(), OrganizationType.class));
-            clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubTypes(), OrganizationSubType.class));
-            clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationServices(), ServiceCategory.class));
-            clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getOrganizationSubServices(), SubServiceCategory.class));
+            clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationTypes()), OrganizationType.class));
+            clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubTypes()), OrganizationSubType.class));
+            clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationServices()), ServiceCategory.class));
+            clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubServices()), SubServiceCategory.class));
             clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
 
     }
@@ -170,7 +170,7 @@ public class ClauseService{
         return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
     }
 
-    public List<UnitLevelClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
+    public List<ClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
         List<Clause> clauses = clauseRepository.findAllClauseByUnitId(unitId);
        return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
     }

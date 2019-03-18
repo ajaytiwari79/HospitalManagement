@@ -81,10 +81,10 @@ public class MasterAssetService {
      * @return
      */
     private MasterAsset getMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
-        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationTypes(), OrganizationType.class));
-        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationSubServices(), OrganizationSubType.class));
-        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationServices(), ServiceCategory.class));
-        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationSubServices(), SubServiceCategory.class));
+        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubServices()), SubServiceCategory.class));
         return masterAsset;
     }
 

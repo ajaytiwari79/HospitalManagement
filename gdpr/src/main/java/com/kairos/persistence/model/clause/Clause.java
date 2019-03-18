@@ -8,6 +8,7 @@ import com.kairos.persistence.model.template_type.TemplateType;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -23,7 +24,7 @@ public class Clause extends BaseEntity {
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String title;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<ClauseTag> tags  = new ArrayList<>();
 
     // Mandatory or not to be discussed with Ulrik

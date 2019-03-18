@@ -2,6 +2,7 @@ package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
+import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class ClauseBasicResponseDTO {
     private String descriptionHtml;
     private List<ClauseTagDTO> tags = new ArrayList<>();
     private boolean linkedWithOtherTemplate;
+    private List<TemplateTypeResponseDTO> templateTypes = new ArrayList<>();
+
 
     public Long getId() {
         return id;
@@ -67,9 +70,11 @@ public class ClauseBasicResponseDTO {
         return linkedWithOtherTemplate;
     }
 
-    public void setLinkedWithOtherTemplate(boolean linkedWithOtherTemplate) {
-        this.linkedWithOtherTemplate = linkedWithOtherTemplate;
-    }
+    public void setLinkedWithOtherTemplate(boolean linkedWithOtherTemplate) { this.linkedWithOtherTemplate = linkedWithOtherTemplate; }
+
+    public List<TemplateTypeResponseDTO> getTemplateTypes() { return templateTypes; }
+
+    public void setTemplateTypes(List<TemplateTypeResponseDTO> templateTypes) { this.templateTypes = templateTypes; }
 
     public ClauseBasicResponseDTO() {
     }

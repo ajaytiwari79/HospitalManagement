@@ -331,10 +331,10 @@ public class ShiftService extends MongoBaseService {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate());
         //reason code will be sanem for all shifts.
+
         Set<Long> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()).collect(Collectors.toSet());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftStartDate), shiftDTO.getStaffId(), type, shift.getUnitPositionId(), reasonCodeIds);
         List<BigInteger> activityIds = shiftDTO.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
-
         Shift oldShift = null;
         if(isNotNull(shift.getId())){
             oldShift = shiftMongoRepository.findOne(shift.getId());
@@ -364,7 +364,6 @@ public class ShiftService extends MongoBaseService {
         if (!breakActivities.isEmpty()) {
             shift.setActivities(breakActivities);
         }
-
         ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()));
         List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
         if (isIgnoredAllRuletemplate(shiftWithViolatedInfo,updatedShiftWithViolatedInfo)) {
