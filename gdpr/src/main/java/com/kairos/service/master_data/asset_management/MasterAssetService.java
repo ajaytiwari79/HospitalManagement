@@ -22,12 +22,19 @@ import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.ComparisonUtils;
+import com.kairos.utils.ValidateRequestBodyList;
+import com.kairos.utils.user_context.BeanValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -52,6 +59,9 @@ public class MasterAssetService {
     @Inject
     private AssetTypeRepository assetTypeRepository;
 
+    @Inject
+    private BeanValidationUtils beanValidationUtils;
+
 
     /**
      * @param countryId
@@ -66,8 +76,8 @@ public class MasterAssetService {
             exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
         }
         MasterAsset masterAsset = new MasterAsset(masterAssetDto.getName(), masterAssetDto.getDescription(), countryId, SuggestedDataStatus.APPROVED);
-        getMetadataOfMasterAsset(masterAssetDto, masterAsset);
-        saveOrUpdateAssetType(countryId, masterAsset, masterAssetDto);
+        addMetadataOfMasterAsset(masterAssetDto, masterAsset);
+        addAssetTypeToMasterAsset(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
         masterAssetDto.setId(masterAsset.getId());
         return masterAssetDto;
@@ -80,7 +90,7 @@ public class MasterAssetService {
      * @param masterAssetDto
      * @return
      */
-    private MasterAsset getMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
+    private MasterAsset addMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
         masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
         masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
         masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
@@ -95,7 +105,7 @@ public class MasterAssetService {
      * @param masterAsset
      * @param masterAssetDTO
      */
-    private void saveOrUpdateAssetType(Long countryId, MasterAsset masterAsset, MasterAssetDTO masterAssetDTO) {
+    private void addAssetTypeToMasterAsset(Long countryId, MasterAsset masterAsset, MasterAssetDTO masterAssetDTO) {
 
         AssetType assetType;
         if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
@@ -145,7 +155,8 @@ public class MasterAssetService {
 
     private MasterAssetResponseDTO prepareAssetResponseDTO(MasterAsset masterAsset) {
         MasterAssetResponseDTO masterAssetResponseDTO = new MasterAssetResponseDTO(masterAsset.getId(), masterAsset.getName(), masterAsset.getDescription(), masterAsset.getSuggestedDate(), masterAsset.getSuggestedDataStatus());
-        masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(masterAsset.getAssetType().getId(), masterAsset.getAssetType().getName(), masterAsset.getAssetType().isSubAssetType()));
+
+        Optional.ofNullable(masterAsset.getAssetType()).ifPresent(assetType -> masterAssetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(assetType.getId(), assetType.getName(), assetType.isSubAssetType())));
         Optional.ofNullable(masterAsset.getSubAssetType()).ifPresent(subAssetType -> masterAssetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(subAssetType.getId(), subAssetType.getName(), subAssetType.isSubAssetType())));
         List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
         List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
@@ -185,11 +196,11 @@ public class MasterAssetService {
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        getMetadataOfMasterAsset(masterAssetDto, masterAsset);
+        addMetadataOfMasterAsset(masterAssetDto, masterAsset);
         masterAsset = masterAssetRepository.getOne(id);
         masterAsset.setName(masterAssetDto.getName());
         masterAsset.setDescription(masterAssetDto.getDescription());
-        saveOrUpdateAssetType(countryId, masterAsset, masterAssetDto);
+        addAssetTypeToMasterAsset(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
         return masterAssetDto;
     }
@@ -247,7 +258,10 @@ public class MasterAssetService {
      * @description update status of asset (suggest by unit)
      */
     public boolean updateStatusOfSuggestedMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
-
+        if (SuggestedDataStatus.APPROVED.equals(suggestedDataStatus)) {
+            List<MasterAsset> masterAssetList = masterAssetRepository.findAllByCountryIdAndIds(countryId, assetIds);
+            beanValidationUtils.validateConstriantOfJavaBean(masterAssetList);
+        }
         Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds, suggestedDataStatus);
         if (updateCount > 0) {
             LOGGER.info("Master Assets are updated successfully with ids :: {}", assetIds);

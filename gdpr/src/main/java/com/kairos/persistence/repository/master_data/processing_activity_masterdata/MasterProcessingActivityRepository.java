@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 ////@JaversSpringDataAuditable
 @Repository
-public interface MasterProcessingActivityRepository extends JpaRepository<MasterProcessingActivity,Long>{
+public interface MasterProcessingActivityRepository extends JpaRepository<MasterProcessingActivity, Long> {
 
 
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?2 and lower(MPA.name) = lower(?1) and MPA.deleted = false")
@@ -21,6 +22,12 @@ public interface MasterProcessingActivityRepository extends JpaRepository<Master
 
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.deleted = false and MPA.subProcessActivity = false")
     List<MasterProcessingActivity> findAllByCountryId(Long countryId);
+
+    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id in (?2) and MPA.deleted = false")
+    List<MasterProcessingActivity> findAllByCountryIdAndIds(Long countryId, Set<Long> ids);
+
+    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id = ?2 and MPA.deleted = false")
+    MasterProcessingActivity findByCountryIdAndId(Long countryId, Long id);
 
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id = ?2 and MPA.deleted = false")
     MasterProcessingActivity getMasterAssetByCountryIdAndId(Long countryId, Long id);
