@@ -401,18 +401,18 @@ public class MasterProcessingActivityService {
         MasterProcessingActivity processingActivity = new MasterProcessingActivity(processingActivityDTO.getName(), processingActivityDTO.getDescription(), SuggestedDataStatus.PENDING, countryId);
         addMetaDataToSuggestedProcessingActivity(orgTypeSubTypeServicesAndSubServicesDTO, processingActivity);
         List<MasterProcessingActivity> subProcessingActivities = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
+        processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> {
+                    MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), SuggestedDataStatus.PENDING, countryId);
+                    subProcessingActivity.setSubProcessActivity(true);
+                    addMetaDataToSuggestedProcessingActivity(orgTypeSubTypeServicesAndSubServicesDTO, subProcessingActivity);
+                    subProcessingActivity.setMasterProcessingActivity(processingActivity);
+                    subProcessingActivities.add(subProcessingActivity);
+                }
+        );
+        if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
             processingActivity.setHasSubProcessingActivity(true);
-            processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> {
-                        MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), SuggestedDataStatus.PENDING, countryId);
-                        subProcessingActivity.setSubProcessActivity(true);
-                        addMetaDataToSuggestedProcessingActivity(orgTypeSubTypeServicesAndSubServicesDTO, subProcessingActivity);
-                        subProcessingActivity.setMasterProcessingActivity(processingActivity);
-                        subProcessingActivities.add(subProcessingActivity);
-                    }
-            );
+            processingActivity.setSubProcessingActivities(subProcessingActivities);
         }
-        processingActivity.setSubProcessingActivities(subProcessingActivities);
         masterProcessingActivityRepository.save(processingActivity);
         return processingActivityDTO;
     }
