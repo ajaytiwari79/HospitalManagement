@@ -101,7 +101,7 @@ public class OrganizationHostingProviderService {
     public Boolean deleteHostingProvider(Long unitId, Long hostingProviderId) {
         List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, hostingProviderId);
         if (CollectionUtils.isNotEmpty(assetNames)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.hostingProvide", StringUtils.join(assetNames, ','));
         }
         Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, unitId);
         if (resultCount > 0) {
@@ -128,11 +128,11 @@ public class OrganizationHostingProviderService {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Hosting Provider", hostingProvider.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.hostingProvide", hostingProvider.getName());
         }
         Integer resultCount = hostingProviderRepository.updateMetadataName(hostingProviderDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting provider", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvide", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }

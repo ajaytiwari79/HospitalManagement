@@ -153,14 +153,14 @@ public class AssetService {
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.findById(assetDTO.getAssetType().getId()).orElse(null);
             if (assetType==null) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType().getId());
+                exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetType().getId());
             }
             linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
                 if (assetDTO.getAssetSubType().getId() != null) {
                     Optional<AssetType> subAssetTypeObj = assetTypeRepository.findById(assetDTO.getAssetSubType().getId());
                     if (!Optional.ofNullable(subAssetTypeObj).isPresent()) {
-                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Asset Type", assetDTO.getAssetSubType().getId());
+                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetSubType().getId());
                     }
                     subAssetType = subAssetTypeObj.get();
                 }else {
@@ -253,7 +253,7 @@ public class AssetService {
     public boolean updateStatusOfAsset(Long unitId, Long assetId, boolean active) {
         Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetId, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
         asset.setActive(active);
         assetRepository.save(asset);
@@ -270,7 +270,7 @@ public class AssetService {
     public AssetResponseDTO getAssetWithRelatedDataAndRiskByUnitIdAndId(Long unitId, Long id) {
         Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + id);
         }
 
         /*if (!Optional.ofNullable(asset.getProcessingActivities().get(0).getId()).isPresent()) {

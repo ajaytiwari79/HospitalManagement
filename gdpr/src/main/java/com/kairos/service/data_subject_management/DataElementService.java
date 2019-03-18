@@ -39,7 +39,7 @@ public class DataElementService{
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
         List<DataElement> existingDataElement = isOrganization ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         if (CollectionUtils.isNotEmpty(existingDataElement)) {
-            exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataElement", existingDataElement.iterator().next().getName());
         }
         List<DataElement> dataElementList = new ArrayList<>();
         for (String name : dataElementNames) {
@@ -84,7 +84,7 @@ public class DataElementService{
         previousDataElementList.forEach(dataElement -> {
 
             if (!dataElementDTOMap.containsKey(dataElement.getId())) {
-                exceptionService.duplicateDataException("message.duplicate", "Data Element", dataElement.getName());
+                exceptionService.duplicateDataException("message.duplicate", "message.dataElement", dataElement.getName());
             }
         });
         previousDataElementList = isOrganization ? dataElementRepository.findByUnitIdAndIds(referenceId, dataElementDTOMap.keySet()) : dataElementRepository.findByCountryIdAndIds(referenceId, dataElementDTOMap.keySet());
@@ -102,7 +102,7 @@ public class DataElementService{
         List<String> dataElementNamesLowerCase = new ArrayList<>();
         dataElementDTOs.forEach(dataElementDTO -> {
             if (dataElementNamesLowerCase.contains(dataElementDTO.getName().toLowerCase())) {
-                throw new DuplicateDataException("Duplicate Entry with name " + dataElementDTO.getName());
+                exceptionService.duplicateDataException("message.duplicate", "message.dataElement",dataElementDTO.getName());
             }
             dataElementNames.add(dataElementDTO.getName());
             dataElementNamesLowerCase.add(dataElementDTO.getName().toLowerCase());

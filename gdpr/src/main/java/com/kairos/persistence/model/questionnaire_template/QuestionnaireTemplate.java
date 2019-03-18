@@ -9,6 +9,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +17,11 @@ import java.util.List;
 public class QuestionnaireTemplate extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-    @NotBlank(message = "Description cannot be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-    @NotNull(message = "Template type cannot be empty ")
+    @NotNull(message = "error.message.templateType.notNull")
     private QuestionnaireTemplateType templateType;
     @OneToOne
     private AssetType assetType;
@@ -41,7 +43,7 @@ public class QuestionnaireTemplate extends BaseEntity {
         this.description = description;
     }
 
-    public QuestionnaireTemplate(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
+    public QuestionnaireTemplate(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, QuestionnaireTemplateStatus templateStatus) {
         this.name = name;
         this.description = description;
         this.templateStatus=templateStatus;

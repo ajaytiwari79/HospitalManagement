@@ -184,7 +184,7 @@ public class MasterAssetService {
     public MasterAssetDTO updateMasterAsset(Long countryId, Long id, MasterAssetDTO masterAssetDto) {
         MasterAsset masterAsset = masterAssetRepository.findByNameAndCountryId(masterAssetDto.getName(), countryId);
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
-            throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
+           exceptionService.duplicateDataException("message.duplicate","message.asset",masterAssetDto.getName());
         }
         addMetadataOfMasterAsset(masterAssetDto, masterAsset);
         masterAsset = masterAssetRepository.getOne(id);
@@ -201,7 +201,7 @@ public class MasterAssetService {
         if (updateCount > 0) {
             LOGGER.info("Master Asset is deleted successfully with id :: {}", id);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", id);
         }
         return true;
 
@@ -256,7 +256,7 @@ public class MasterAssetService {
         if (updateCount > 0) {
             LOGGER.info("Master Assets are updated successfully with ids :: {}", assetIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", assetIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetIds);
         }
         return true;
     }

@@ -122,7 +122,7 @@ public class StorageFormatService{
         }
         Integer resultCount =  storageFormatRepository.updateMasterMetadataName(storageFormatDTO.getName(), id, countryId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.storageFormat", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, storageFormatDTO.getName());
         }
@@ -155,7 +155,7 @@ public class StorageFormatService{
         if(updateCount > 0){
             LOGGER.info("Storage Formats are updated successfully with ids :: {}", storageFormatIds);
         }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", storageFormatIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.storageFormat", storageFormatIds);
         }
         return storageFormatRepository.findAllByIds(storageFormatIds);
     }

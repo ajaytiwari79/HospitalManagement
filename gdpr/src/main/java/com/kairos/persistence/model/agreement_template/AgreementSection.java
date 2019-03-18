@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class AgreementSection extends BaseEntity {
 
 
-    @NotBlank(message = "Section Title cannot be empty")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Column(columnDefinition = "text")
     protected String title;
 
