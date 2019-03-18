@@ -4,16 +4,15 @@ package com.kairos.service.staffing_level;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
@@ -32,9 +31,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.event.ShiftNotificationEvent;
 import com.kairos.utils.service_util.StaffingLevelUtil;
-import com.kairos.utils.external_plateform_shift.Transstatus;
-import com.kairos.wrapper.activity.ActivityTagDTO;
-import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
+import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -52,22 +49,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.socket.client.WebSocketClient;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -89,10 +76,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.AppConstants.KETTLE_EXECUTE_TRANS;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static org.springframework.http.MediaType.APPLICATION_XML;
 
 @Service
 @Transactional
@@ -385,10 +370,10 @@ public class StaffingLevelService extends MongoBaseService {
     public Map<String, Object> getActivityTypesAndSkillsByUnitId(Long unitId) {
         OrganizationSkillAndOrganizationTypesDTO organizationSkillAndOrganizationTypesDTO =
                 userIntegrationService.getOrganizationSkillOrganizationSubTypeByUnitId(unitId);
-        List<ActivityTagDTO> activityTypeList = activityMongoRepository.findAllActivityByOrganizationGroupWithCategoryName(unitId, false);
+        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByOrganizationGroupWithCategoryName(unitId, false);
 
-        Map<ActivityCategory, List<ActivityTagDTO>> activityTypeCategoryListMap = activityTypeList.stream().collect(
-                Collectors.groupingBy(activityType -> new ActivityCategory(activityType.getCategoryId(), activityType.getCategoryName()))
+        Map<ActivityCategoryDTO, List<ActivityDTO>> activityTypeCategoryListMap = activityTypeList.stream().collect(
+                Collectors.groupingBy(activityType -> new ActivityCategoryDTO(activityType.getCategoryId(), activityType.getCategoryName()))
         );
         List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
                 activity.getValue())).collect(Collectors.toList());

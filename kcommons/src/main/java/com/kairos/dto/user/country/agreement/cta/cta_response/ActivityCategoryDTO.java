@@ -14,6 +14,11 @@ public class ActivityCategoryDTO {
         // default constructor
     }
 
+    public ActivityCategoryDTO(BigInteger id, String name) {
+        this.name = name;
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }

@@ -42,7 +42,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
+    public List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
         ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime")
                 .and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart")
                 .and("balanceSettingsActivityTab").as("balanceSettingsActivityTab")
@@ -58,7 +58,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 unwind("activity_type_category"),
                 projectionOperation
         );
-        AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
 

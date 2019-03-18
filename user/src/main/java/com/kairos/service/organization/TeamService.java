@@ -2,6 +2,9 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -31,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 
@@ -147,7 +151,13 @@ public class TeamService {
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         map.put("staffList", staffPersonalDetailDTOS);
         map.put("skillList", skillService.getSkillsOfOrganization(unitId));
-        map.put("activityList", activityIntegrationService.getActivitiesWithCategories(unitId));
+
+        List<ActivityDTO> activityDTOList = activityIntegrationService.getActivitiesWithCategories(unitId);
+        Map<ActivityCategoryDTO, List<ActivityDTO>> activityTypeCategoryListMap = activityDTOList.stream().collect(
+                Collectors.groupingBy(activityType -> new ActivityCategoryDTO(activityType.getCategoryId(), activityType.getCategoryName())));
+        List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
+                activity.getValue())).collect(Collectors.toList());
+        map.put("activityList", activityCategoryListDTOS);
         return map;
     }
 
