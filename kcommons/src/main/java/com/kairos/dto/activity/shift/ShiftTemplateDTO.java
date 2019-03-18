@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -19,15 +21,6 @@ public class ShiftTemplateDTO {
     public ShiftTemplateDTO() {
         //Default Constructor
     }
-
-    public ShiftTemplateDTO(BigInteger id, String name, List<IndividualShiftTemplateDTO> shiftList, Long createdBy, Long unitId) {
-        this.id = id;
-        this.name = name;
-        this.shiftList = shiftList;
-        this.createdBy = createdBy;
-        this.unitId = unitId;
-    }
-
 
     public LocalDate getStartDate() {
         return startDate;
