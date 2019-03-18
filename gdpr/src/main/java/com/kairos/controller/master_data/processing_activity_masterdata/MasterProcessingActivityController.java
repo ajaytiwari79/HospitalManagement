@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -97,17 +98,17 @@ class MasterProcessingActivityController {
 
 
     @ApiOperation(value = "Update Sugessted status of Processing Activity")
-    @PutMapping("/master_processing_activity/{processingActivityId}/status")
-    public ResponseEntity<Object> updateSuggestedStatusOfProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    @PutMapping("/master_processing_activity/status")
+    public ResponseEntity<Object> updateSuggestedStatusOfProcessingActivity(@PathVariable Long countryId, @PathVariable Set<Long> ids, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfMasterProcessingActivity(countryId, processingActivityId, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfMasterProcessingActivities(countryId, ids, suggestedDataStatus));
     }
 
     @ApiOperation(value = "Update Sugessted status of Processing Activity")
     @PutMapping("/master_processing_activity/{processingActivityId}/subProcess/status")
-    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestBody Set<BigInteger> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long processingActivityId, @RequestBody Set<Long> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(subProcessingActivityIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Sub Processing Activity is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
