@@ -8,7 +8,6 @@ import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
-import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -76,15 +75,7 @@ public class SchedulerPanelService extends MongoBaseService {
         if (!schedulerPanels.isEmpty()) {
             List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
                     collect(Collectors.toList());
-            List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneOfAllUnits();
-
-            Map<Long, String> unitIdTimeZoneMap = unitTimeZoneMappingDTOS.stream().filter(unitTimeZoneMappingDTO -> Optional.ofNullable(unitTimeZoneMappingDTO.getTimezone()).isPresent()).
-                    collect(Collectors.toMap(unitTimeZoneMapping -> {
-                        return unitTimeZoneMapping.getUnitId();
-                    }, unitTimeZoneMapping -> {
-                        return unitTimeZoneMapping.getTimezone();
-                    }));
-
+            Map<Long, String> unitIdTimeZoneMap = userIntegrationService.getTimeZoneOfAllUnits();
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
                     logger.info("Inside initSchedulerPanels" + schedulerPanel.getUnitId() + " unitId = " + unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));

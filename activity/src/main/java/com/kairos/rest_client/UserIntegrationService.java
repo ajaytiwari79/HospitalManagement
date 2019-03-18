@@ -718,8 +718,8 @@ public class UserIntegrationService {
         });
     }
 
-    public List<UnitTimeZoneMappingDTO> getTimeZoneByUnitIds(Set<Long> unitIds){
-        return genericRestClient.publishRequest(unitIds,null,RestClientUrlType.ORGANIZATION,HttpMethod.POST,UNITS_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitTimeZoneMappingDTO>>>() {
+    public Map<Long,String> getTimeZoneByUnitIds(Set<Long> unitIds){
+        return genericRestClient.publishRequest(unitIds,null,RestClientUrlType.ORGANIZATION,HttpMethod.POST,UNITS_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
         });
     }
 

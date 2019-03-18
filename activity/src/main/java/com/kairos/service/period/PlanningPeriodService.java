@@ -11,7 +11,6 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -58,9 +57,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getFirstDayOfMonth;
-import static com.kairos.commons.utils.DateUtils.getLocalDate;
-import static com.kairos.commons.utils.DateUtils.getLocalDateTime;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
@@ -359,8 +356,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     private void createScheduleJobOfPanningPeriod(List<PlanningPeriod> planningPeriods) {
-        List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneByUnitIds(planningPeriods.stream().distinct().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toSet()));
-        Map<Long, String> unitAndTimeZoneMap = unitTimeZoneMappingDTOS.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v.getTimezone()));
+        Map<Long, String> unitAndTimeZoneMap = userIntegrationService.getTimeZoneByUnitIds(planningPeriods.stream().distinct().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toSet()));
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         planningPeriods.parallelStream().forEach(planningPeriod -> {
             planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
