@@ -15,15 +15,12 @@ import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -32,8 +29,6 @@ import java.util.*;
 
 @Service
 public class ClauseService{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClauseService.class);
 
     @Inject
     private ClauseTagService clauseTagService;
@@ -192,9 +187,7 @@ public class ClauseService{
      * @throws DataNotFoundByIdException; if clause not found for id
      */
     public Boolean deleteClauseById(Long referenceId, boolean isOrganization, Long clauseId) {
-
-        //TODO refactor When done Policy Agreement template
-       /* List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isOrganization, clauseId);
+        /* List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isOrganization, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }*/
@@ -207,11 +200,8 @@ public class ClauseService{
      * @param countryId
      * @return
      */
-    //TODO try to use DTO instead of map
     public Map<String,Object> getClauseMetaDataByCountryId(Long countryId) {
         Map<String,Object> clauseMetaDataMap=new HashMap<>();
-
-        // TODO call repository direct here instead of service method
         clauseMetaDataMap.put("clauseTagList", clauseTagService.getAllClauseTagByCountryId(countryId));
         clauseMetaDataMap.put("templateTypeList",templateTypeService.getAllTemplateType(countryId));
         return clauseMetaDataMap;
@@ -222,8 +212,6 @@ public class ClauseService{
      * @param unitId
      * @return
      */
-
-    //TODO try to use DTO instead of map
     public Map<String,Object> getClauseMetadataByOrganizationId(Long unitId) {
         Map<String,Object> clauseMetaDataMap=new HashMap<>();
         clauseMetaDataMap.put("clauseTagList",clauseTagService.getAllClauseTagByUnitId(unitId));

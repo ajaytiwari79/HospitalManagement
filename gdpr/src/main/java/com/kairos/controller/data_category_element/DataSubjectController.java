@@ -97,23 +97,4 @@ class DataSubjectController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.updateOrganizationDataSubject(unitId, dataSubjectId, dataSubjectDTO));
     }
 
-
-
-
-
-
-
-
-  /*  @ApiOperation("get data Subject mapping with data Category and data elements of unit by id ")
-    @GetMapping(UNIT_URL + "/dataSubject_mapping/{dataSubjectId}")
-    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelectionById(unitId, dataSubjectId));
-    }
-
-    @ApiOperation("get all data Subject mapping of Unit ")
-    @GetMapping(UNIT_URL + "/dataSubject_mapping/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElementOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelection(unitId));
-    }*/
-
 }

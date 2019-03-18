@@ -38,7 +38,6 @@ public class Clause extends BaseEntity {
     @ManyToMany
     private List<TemplateType> templateTypes  = new ArrayList<>();
 
-    // TODO  check usability and setter and value generator
     @Nullable
     private UUID tempClauseId;
 

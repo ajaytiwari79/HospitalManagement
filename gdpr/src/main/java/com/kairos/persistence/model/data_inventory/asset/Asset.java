@@ -43,8 +43,6 @@ public class Asset extends BaseEntity {
     private AssetType assetType;
     @OneToOne
     private AssetType subAssetType;
-   /* private Set<BigInteger> processingActivityIds;
-    private Set<BigInteger> subProcessingActivityIds;*/
     private Integer dataRetentionPeriod;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;

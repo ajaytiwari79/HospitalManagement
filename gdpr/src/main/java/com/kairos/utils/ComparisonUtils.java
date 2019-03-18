@@ -1,16 +1,8 @@
 package com.kairos.utils;
 
-import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-
-import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -22,7 +14,7 @@ public class ComparisonUtils{
 
     public static <T> Set<String> getNewNameListOfMetadata(List<T> existingObject, Set<String> namesList) {
 
-        if (existingObject.size() == 0) {
+        if (existingObject.isEmpty()) {
             return namesList;
         } else {
             Map<String, String> existingNamesMapData = new HashMap<>();
