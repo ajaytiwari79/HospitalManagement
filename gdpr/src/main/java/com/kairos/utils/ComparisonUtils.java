@@ -1,15 +1,22 @@
 package com.kairos.utils;
 
+import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class ComparisonUtils {
+public class ComparisonUtils{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonUtils.class);
 
@@ -65,13 +72,10 @@ public class ComparisonUtils {
                     }
                 });
             }
-        }catch (Exception ex){
-            LOGGER.error("Error in getMetadataNameListInLowerCase::"+ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.error("Error in getMetadataNameListInLowerCase::" + ex.getMessage());
         }
         return lowerCaseNewNameList;
     }
-
-
-
 
 }

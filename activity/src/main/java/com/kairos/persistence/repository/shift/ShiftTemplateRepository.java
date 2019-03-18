@@ -16,5 +16,6 @@ public interface ShiftTemplateRepository extends MongoBaseRepository<ShiftTempla
     @Query("{deleted:false,id:?0}")
     ShiftTemplate findOneById(BigInteger id);
 
-    boolean existsByNameIgnoreCaseAndDeletedFalseAndUnitId(String name,Long unitId);
+    @Query(value = "{'createdBy._id':?2,deleted:false,unitId:?1,name: {$regex : ?0, $options: 'i'}}",exists = true)
+    boolean existsByNameIgnoreCaseAndDeletedFalseAndUnitId(String name,Long unitId,Long createdBy);
 }

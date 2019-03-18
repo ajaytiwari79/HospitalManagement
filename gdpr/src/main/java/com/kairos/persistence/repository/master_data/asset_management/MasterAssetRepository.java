@@ -21,6 +21,9 @@ public interface MasterAssetRepository extends JpaRepository<MasterAsset,Long>{
     @Query(value = "Select MA from MasterAsset MA where MA.countryId = ?1 and MA.deleted = false")
     List<MasterAsset> findAllByCountryId(Long countryId);
 
+    @Query(value = "Select MA from MasterAsset MA where MA.countryId = ?1 and MA.id in (?2) and MA.deleted = false")
+    List<MasterAsset> findAllByCountryIdAndIds(Long countryId,Set<Long> ids);
+
     @Query(value = "Select MA from MasterAsset MA where MA.countryId = ?1 and MA.id = ?2 and MA.deleted = false")
     MasterAsset getMasterAssetByCountryIdAndId(Long countryId, Long id);
 
