@@ -49,7 +49,7 @@ public class TimeInterval {
         if(endTo<startFrom){
             contains =  endTo > minutes || startFrom<=minutes;
         }else {
-            contains = startFrom<minutes?minutes<endTo:false;
+            contains = startFrom<=minutes && minutes<endTo;
         }
         return contains;
     }

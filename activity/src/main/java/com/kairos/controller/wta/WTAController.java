@@ -290,4 +290,12 @@ public class WTAController {
                                                                            @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWorktimeAgreementBalance(unitId, unitPositionId,startDate,endDate));
     }
+
+    @ApiOperation(value = "Update Phases in Ruletemplates")
+    @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
+    public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updatePhasesInRuletemplate());
+    }
+
+
 }

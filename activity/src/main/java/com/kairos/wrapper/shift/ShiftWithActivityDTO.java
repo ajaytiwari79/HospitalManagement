@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 
@@ -217,6 +218,13 @@ public class ShiftWithActivityDTO {
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public LocalDate getEndLocalDate() {
+        return asLocalDate(endDate);
+    }
+    public LocalDate getStartLocalDate() {
+        return asLocalDate(startDate);
     }
 
 

@@ -34,5 +34,11 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query(value = "{'organization._id':?0, name:?1, deleted:false}", exists = true)
     boolean isWTAExistByOrganizationIdAndName(long organizationId, String wtaName);
 
+    @Query(value = "{organization:{$exists:true},deleted:false}")
+    List<WorkingTimeAgreement> findWTAofOrganization();
+
+    @Query(value = "{unitPositionId:{$exists:true},deleted:false}")
+    List<WorkingTimeAgreement> findWTAofUnitPositions();
+
 
 }
