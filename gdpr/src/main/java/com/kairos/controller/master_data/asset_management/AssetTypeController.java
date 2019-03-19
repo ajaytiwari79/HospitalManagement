@@ -29,8 +29,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class AssetTypeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeController.class);
-
     @Inject
     private AssetTypeService assetTypeService;
 
@@ -74,21 +72,5 @@ class AssetTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(countryId, assetTypeId, assetType));
 
     }
-
-    /*@ApiOperation("unlink RISK From Asset Type and delete risk")
-    @DeleteMapping("/asset_type/{assetTypeId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId,@PathVariable BigInteger riskId ) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(countryId, assetTypeId, riskId));
-
-    }*/
-
-
-    /*@ApiOperation("unlink RISK From Sub Asset Type and delete risk")
-    @DeleteMapping("/asset_type/sub_asset_type/{subAssetTypeId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromSubAssetType(@PathVariable Long countryId, @PathVariable BigInteger subAssetTypeId,@PathVariable BigInteger riskId ) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(countryId, subAssetTypeId, riskId));
-
-    }*/
-
 
 }

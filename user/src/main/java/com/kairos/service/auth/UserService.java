@@ -454,10 +454,6 @@ public class UserService {
             List<AccessPageDTO> modules = accessPageRepository.getMainActiveTabs(countryId);
             List<Long> accessibleModules = modules.stream().map(AccessPageDTO::getId).collect(Collectors.toList());
             for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
-                /*List<Long> accessibleModules = unitModuleAccesses.stream()
-                        .filter(unitModuleAccess -> unitModuleAccess.getUnitId().equals(userPermissionQueryResult.getUnitId()))
-                        .findAny().map(u -> u.getAccessibleModules())
-                        .orElse(new ArrayList<>());*/
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }

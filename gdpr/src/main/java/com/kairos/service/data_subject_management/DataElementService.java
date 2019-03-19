@@ -34,7 +34,7 @@ public class DataElementService{
      * @return map of Data Elements  List  and new Data Elements ids
      * @decription method create new Data Elements throw exception if data element already exist
      */
-    public List<DataElement> createDataElements(Long referenceId, boolean isOrganization, List<DataElementDTO> dataElementsDto, DataCategory dataCategory) {
+    public List<DataElement> createDataElements(Long referenceId, boolean isOrganization, List<DataElementDTO> dataElementsDto) {
 
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
         List<DataElement> existingDataElement = isOrganization ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
@@ -62,7 +62,6 @@ public class DataElementService{
      * @desciption method create new data Data elements and update data Element if data element already exist.
      */
 
-    //TODO need to refactor
     public List<DataElement> updateDataElementAndCreateNewDataElement(Long referenceId, boolean isOrganization, List<DataElementDTO> dataElementsDto) {
 
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
@@ -109,41 +108,5 @@ public class DataElementService{
         });
         return dataElementNames;
     }
-
-
-
-    /*
-      @param countryId
-     * @return get country data elements
-     */
-   /* public List<DataElement> getAllDataElementByCountryId(Long countryId) {
-        return dataElementMongoRepository.getAllDataElementByCountryId(countryId);
-    }*/
-
-
-    /*
-      @param unitId
-     * @return get organizational data elements
-     */
-   /* public List<DataElement> getAllDataElementByUnitId(Long unitId) {
-        return dataElementMongoRepository.getAllDataElementByUnitId(unitId);
-    }*/
-
-
-   /* public Boolean deleteDataElementById(BigInteger dataElementId) {
-        dataElementMongoRepository.safeDeleteById(dataElementId);
-        return true;
-
-    }*/
-
-    /*public DataElement getDataElementById(BigInteger dataElementId) {
-        DataElement dataElement = dataElementMongoRepository.getByIdAndNonDeleted(dataElementId);
-        if (!Optional.ofNullable(dataElement).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", dataElementId);
-        }
-        return dataElement;
-
-    }*/
-
 
 }
