@@ -196,7 +196,7 @@ public class AssetService {
         asset.setSubAssetType(subAssetType);
     }
 
-    private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, List<OrganizationLevelRiskDTO> risks) {
+    private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, Set<OrganizationLevelRiskDTO> risks) {
         List<Risk> assetTypeRisks = new ArrayList<>();
         Map<Long, OrganizationLevelRiskDTO> riskIdMap = new HashMap<>();
         risks.forEach(risk -> {
