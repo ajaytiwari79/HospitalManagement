@@ -66,4 +66,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}",exists = true)
     boolean existsByTimeTypeId(BigInteger timeTypeId);
 
+    @Query(value = "{'_id':{'$ne':?0},deleted:false,'compositeActivities.activityId':{$in:?1}}",fields = "{'name':1}")
+    List<Activity> existsByActivityIdInCompositeActivitiesAndDeletedFalseExcludingCurrent(BigInteger id,List<BigInteger> allowedActivityIds);
+
 }

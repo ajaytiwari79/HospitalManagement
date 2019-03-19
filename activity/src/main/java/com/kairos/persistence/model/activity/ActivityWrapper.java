@@ -3,6 +3,7 @@ package com.kairos.persistence.model.activity;
 public class ActivityWrapper {
     private Activity activity;
     private String timeType;
+    private TimeType timeTypeData;
 
 
     public ActivityWrapper() {
@@ -27,5 +28,13 @@ public class ActivityWrapper {
 
     public void setTimeType(String timeType) {
         this.timeType = timeType;
+    }
+
+    public TimeType getTimeTypeData() {
+        return timeTypeData;
+    }
+
+    public void setTimeTypeData(TimeType timeTypeData) {
+        this.timeTypeData = timeTypeData;
     }
 }

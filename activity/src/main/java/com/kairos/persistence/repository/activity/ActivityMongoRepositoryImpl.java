@@ -545,11 +545,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public ActivityDTO eligibleForCopy(BigInteger activityId) {
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("_id").is(activityId).and("deleted").is(false))
-                ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType")
-                ,project().and("id").as("id").and("timeType.activityCanBeCopied").as("activityCanBeCopied"));
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
+    public List<ActivityWrapper> findActivityAndTimeTypeByIds(Set<BigInteger> activityIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("id").in(activityIds).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "timeType"),
+                project().and("id").as("activity._id").and("name").as("activity.name")
+                        .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
+                        .and("rulesActivityTab").as("activity.rulesActivityTab")
+                        .and("timeType").arrayElementAt(0).as("timeTypeData")
+        );
+        AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
+        return result.getMappedResults();
     }
 }
