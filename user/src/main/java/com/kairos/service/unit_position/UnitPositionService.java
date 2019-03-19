@@ -81,8 +81,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -973,6 +972,11 @@ public class UnitPositionService {
             BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
             positionLine.setHourlyCost(hourlyCost);
         });
+    }
+
+    public Long getUnitByUnitPositionId(Long unitPositionId){
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
+        return isNotNull(unitPosition) ? isNotNull(unitPosition.getUnit()) ? unitPosition.getUnit().getId(): null:null;
     }
 }
 
