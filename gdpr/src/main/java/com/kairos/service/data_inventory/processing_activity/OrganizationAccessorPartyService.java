@@ -90,7 +90,7 @@ public class OrganizationAccessorPartyService {
 
         List<String> processingActivitiesLinkedWithAccessorParty = processingActivityRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.accessorParty", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
         }
         accessorPartyRepository.deleteByIdAndOrganizationId(accessorPartyId, unitId);
         return true;
@@ -111,11 +111,11 @@ public class OrganizationAccessorPartyService {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Accessor Party", accessorParty.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.accessorParty", accessorParty.getName());
         }
         Integer resultCount = accessorPartyRepository.updateMetadataName(accessorPartyDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }

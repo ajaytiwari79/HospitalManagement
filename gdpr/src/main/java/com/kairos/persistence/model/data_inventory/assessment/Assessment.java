@@ -15,6 +15,7 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,10 @@ import java.util.List;
 @Entity
 public class Assessment extends BaseEntity {
 
-    @NotBlank
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-    @NotNull
+    @NotNull(message = "error.message.due.date.not.Selected")
     private LocalDate endDate;
     private LocalDate completedDate;
     private String comment;
