@@ -239,7 +239,7 @@ public class QuestionnaireTemplateService {
      * This method is used to prepare Questionnaire template Response object from actual entity object
      */
     QuestionnaireTemplateResponseDTO prepareQuestionnaireTemplateResponseData(QuestionnaireTemplate questionnaireTemplate) {
-        QuestionnaireTemplateResponseDTO questionnaireTemplateResponseDTO = new QuestionnaireTemplateResponseDTO(questionnaireTemplate.getId(), questionnaireTemplate.getName(), questionnaireTemplate.getDescription(), questionnaireTemplate.getTemplateType(), questionnaireTemplate.isDefaultAssetTemplate(), questionnaireTemplate.getTemplateStatus());
+        QuestionnaireTemplateResponseDTO questionnaireTemplateResponseDTO = new QuestionnaireTemplateResponseDTO(questionnaireTemplate.getId(), questionnaireTemplate.getName(), questionnaireTemplate.getDescription(), questionnaireTemplate.getTemplateType(), questionnaireTemplate.isDefaultAssetTemplate(), questionnaireTemplate.getTemplateStatus(),questionnaireTemplate.getRiskAssociatedEntity());
         if(Optional.ofNullable(questionnaireTemplate.getAssetType()).isPresent()) {
             questionnaireTemplateResponseDTO.setAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetType().getName(), questionnaireTemplate.getAssetType().isSubAssetType()));
         }
@@ -249,18 +249,6 @@ public class QuestionnaireTemplateService {
         questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
 
         return questionnaireTemplateResponseDTO;
-    }
-
-        /**
-         * @param referenceId
-         * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
-         * @description we get  section[ {} ] as query response from mongo on using group operation,
-         * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
-         * and filter section in application layer and send empty array of section []
-         */
-    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateByCountryIdOrOrganizationId(Long referenceId, boolean isOrganization) {
-        return isOrganization ? questionnaireTemplateRepository.getAllQuestionnaireTemplateByOrganizationId(referenceId) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateByCountryId(referenceId);
-
     }
 
     /**
@@ -282,7 +270,7 @@ public class QuestionnaireTemplateService {
                 template.setSections(new ArrayList<>());
             }
         });*/
-        return questionnaireTemplateResponseDTOS;
+            return questionnaireTemplateResponseDTOS;
     }
 
 

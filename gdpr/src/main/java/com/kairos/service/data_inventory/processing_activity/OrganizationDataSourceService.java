@@ -97,7 +97,7 @@ public class OrganizationDataSourceService{
 
         List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.dataSource", StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
         }
        dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, unitId);
         return true;
@@ -117,11 +117,11 @@ public class OrganizationDataSourceService{
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate","DataSource",dataSource.getName());
+            exceptionService.duplicateDataException("message.duplicate","message.dataSource",dataSource.getName());
         }
         Integer resultCount =  dataSourceRepository.updateMetadataName(dataSourceDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "DataSource", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSource", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataSourceDTO.getName());
         }

@@ -2,10 +2,7 @@ package com.kairos.persistence.model.master_data.data_category_element;
 
 import com.kairos.persistence.model.common.BaseEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
@@ -14,12 +11,12 @@ import java.util.List;
 @Entity
 public class DataCategory extends BaseEntity {
 
-    @NotBlank(message = "Name cannot be empty")
-    @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     // empty array to get rid of null pointer
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "data_category_id")
     private List<DataElement> dataElements=new ArrayList<>();
     private Long countryId;
@@ -32,7 +29,11 @@ public class DataCategory extends BaseEntity {
         this.dataElements = dataElements;
     }
 
-
+    public DataCategory(@NotBlank(message = "Name cannot be empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
+        this.name = name;
+        this.dataElements = dataElements;
+        this.organizationId = organizationId;
+    }
 
     public DataCategory() {
     }

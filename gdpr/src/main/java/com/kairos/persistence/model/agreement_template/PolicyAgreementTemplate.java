@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Entity
 public class PolicyAgreementTemplate extends BaseEntity {
 
-    @NotBlank(message = "Name cannot be empty")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String name;
 
     @Column(columnDefinition = "text")

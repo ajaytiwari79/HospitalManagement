@@ -98,7 +98,7 @@ public class ProcessingActivityService {
 
         ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(unitId, processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", processingActivityDTO.getName());
         }
         ProcessingActivity processingActivity = new ProcessingActivity();
         buildProcessingActivity(unitId, processingActivityDTO, processingActivity);
@@ -133,7 +133,7 @@ public class ProcessingActivityService {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(unitId, processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", processingActivityDTO.getName());
         }
         processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!processingActivity.isActive()) {
@@ -151,12 +151,16 @@ public class ProcessingActivityService {
 
     private List<ProcessingActivity> createSubProcessingActivity(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs, ProcessingActivity processingActivity) {
         List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
+        Set<String> subProcessNames = new HashSet<>();
         for (ProcessingActivityDTO processingActivityDTO : subProcessingActivityDTOs) {
+            if (subProcessNames.contains(processingActivityDTO.getName().toLowerCase().trim())) {
+                exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", processingActivityDTO.getName());
+            }
+            subProcessNames.add(processingActivityDTO.getName().trim().toLowerCase());
             ProcessingActivity subProcessingActivity = new ProcessingActivity();
             buildProcessingActivity(unitId, processingActivityDTO, subProcessingActivity);
             subProcessingActivity.setSubProcessingActivity(true);
             subProcessingActivity.setProcessingActivity(processingActivity);
-            subProcessingActivity.setSubProcessingActivity(true);
             subProcessingActivities.add(subProcessingActivity);
         }
         return subProcessingActivities;
@@ -249,7 +253,7 @@ public class ProcessingActivityService {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndProcessingActivityId(subProcessingActivityId, unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
         }
         Integer updateCount = processingActivityRepository.unlinkSubProcessingActivityFromProcessingActivity(subProcessingActivityId, unitId, processingActivityId);
         processingActivity.delete();
@@ -289,6 +293,10 @@ public class ProcessingActivityService {
         processingActivityResponseDTO.setSuggested(processingActivity.isSuggested());
         processingActivityResponseDTO.setDataRetentionPeriod(processingActivity.getDataRetentionPeriod());
         processingActivityResponseDTO.setDpoContactInfo(processingActivity.getDpoContactInfo());
+        processingActivityResponseDTO.setActive(processingActivity.isActive());
+        if (CollectionUtils.isNotEmpty(processingActivity.getRisks())) {
+            processingActivityResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
+        }
         processingActivityResponseDTO.setDataSubjects(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class));
         if (CollectionUtils.isNotEmpty(processingActivity.getSubProcessingActivities())) {
             processingActivity.getSubProcessingActivities().forEach(subProcessingActivity -> processingActivityResponseDTO.getSubProcessingActivities().add(prepareProcessingActivityResponseData(subProcessingActivity)));
@@ -307,7 +315,7 @@ public class ProcessingActivityService {
     public boolean changeStatusOfProcessingActivity(Long unitId, Long processingActivityId, boolean active) {
         Integer updateCount = processingActivityRepository.updateProcessingActivityStatus(unitId, processingActivityId, active);
         if (updateCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
         } else {
             LOGGER.info("Processing activity is updated successfully with id :: {}", processingActivityId);
         }
@@ -390,7 +398,7 @@ public class ProcessingActivityService {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(processingActivityId, unitId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class);
     }

@@ -30,8 +30,8 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     @Query(value = "update DataDisposal set name = ?1 where id= ?2")
     Integer updateMasterAssetTypeName(String name, Long id);
 
-    @Query(value = "SELECT at FROM AssetType at WHERE at.countryId = ?1 and at.isSubAssetType = false and at.deleted = false")
-    List<AssetType> getAllAssetTypes(Long countryId);
+    @Query(value = "SELECT at FROM AssetType at WHERE at.countryId = ?1 and at.isSubAssetType = false and at.deleted = false order by at.createdAt desc")
+    List<AssetType> getAllAssetTypeByCountryId(Long countryId);
 
     @Query(value = "SELECT at FROM AssetType at LEFT JOIN MasterAsset MA ON at.id = MA.assetType.id WHERE at.countryId = ?1 and at.isSubAssetType = false and at.deleted = false and MA.id IS NULL")
     List<AssetType> getAllAssetTypesNotAssociatedWithAsset(Long countryId);
@@ -55,7 +55,7 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     @Query(value = "update DataDisposal set name = ?1 where id= ?2 and organizationId = ?3")
     Integer updateAssetTypeName(String name, Long id, Long orgId);
 
-    @Query(value = "SELECT at FROM AssetType at WHERE at.organizationId = ?1 and at.isSubAssetType = false and at.deleted = false")
+    @Query(value = "SELECT at FROM AssetType at WHERE at.organizationId = ?1 and at.isSubAssetType = false and at.deleted = false order by at.createdAt desc")
     List<AssetType> getAllAssetTypesByOrganization(Long orgId);
 
 

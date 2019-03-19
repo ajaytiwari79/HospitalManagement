@@ -103,7 +103,7 @@ public class OrganizationTechnicalSecurityMeasureService {
         List<String> assetsLinked = assetRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
 
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", StringUtils.join(assetsLinked, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.tecnicalSecurityMeasure", StringUtils.join(assetsLinked, ','));
         }
         technicalSecurityMeasureRepository.deleteByIdAndOrganizationId(techSecurityMeasureId, unitId);
         return true;
@@ -123,11 +123,11 @@ public class OrganizationTechnicalSecurityMeasureService {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Technical Security Measure", technicalSecurityMeasure.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.tecnicalSecurityMeasure", technicalSecurityMeasure.getName());
         }
         Integer resultCount = technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Format", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.tecnicalSecurityMeasure", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, technicalSecurityMeasureDTO.getName());
         }

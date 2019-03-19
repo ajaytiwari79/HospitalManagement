@@ -9,8 +9,8 @@ import java.util.Optional;
 @Component
 public class RestClientURLUtil {
 
-    private static  String userServiceUrl;
-    private static  String plannerServiceUrl;
+    private static String userServiceUrl;
+    private static String plannerServiceUrl;
     private static String schedulerServiceUrl;
     private static String gdprServiceUrl;
 
@@ -25,7 +25,7 @@ public class RestClientURLUtil {
     }
 
     @Value("${gateway.activityservice.url}")
-    public  void setUserServiceUrl(String userServiceUrl) {
+    public void setUserServiceUrl(String userServiceUrl) {
         RestClientURLUtil.userServiceUrl = userServiceUrl;
     }
 
@@ -34,39 +34,39 @@ public class RestClientURLUtil {
         RestClientURLUtil.gdprServiceUrl = gdprServiceUrl;
     }
 
-    public final static String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
+    public final static String getBaseUrl(boolean hasUnitInUrl) {
+        if (hasUnitInUrl) {
+            String baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
             return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder(userServiceUrl).toString();
+        } else {
+            String baseUrl = new StringBuilder(userServiceUrl).toString();
             return baseUrl;
         }
     }
 
-    public final static String getBaseUrl(boolean hasUnitInUrl, Long id){
-        if(!Optional.ofNullable(id).isPresent()) {
+    public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
+        if (!Optional.ofNullable(id).isPresent()) {
             String baseUrl = userServiceUrl;
             return baseUrl;
-        }else {
-            if(hasUnitInUrl){
-                String baseUrl=new StringBuilder(userServiceUrl)
-                        .append("/unit/").append((Optional.ofNullable(id).isPresent()?id:UserContext.getUnitId())).toString();
+        } else {
+            if (hasUnitInUrl) {
+                String baseUrl = new StringBuilder(userServiceUrl)
+                        .append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 return baseUrl;
-            }else{
-                String baseUrl=new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
+            } else {
+                String baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
                 return baseUrl;
             }
         }
 
     }
 
-    public final static String getBaseUrl(){
+    public final static String getBaseUrl() {
         return userServiceUrl;
     }
 
-    public static final String getPlannerBaseUrl(){
-        String baseUrl=new StringBuilder(plannerServiceUrl+"unit/").toString();
+    public static final String getPlannerBaseUrl() {
+        String baseUrl = new StringBuilder(plannerServiceUrl + "unit/").toString();
         return baseUrl;
 
     }
@@ -82,17 +82,16 @@ public class RestClientURLUtil {
         }
     }
 
-    public final static String getGdprServiceBaseUrl(boolean hasUnitInUrl, Long id){
-        if(!Optional.ofNullable(id).isPresent()) {
+    public final static String getGdprServiceBaseUrl(boolean hasUnitInUrl, Long id) {
+        if (!Optional.ofNullable(id).isPresent()) {
             String baseUrl = gdprServiceUrl;
             return baseUrl;
-        }else {
-            if(hasUnitInUrl){
-                String baseUrl=new StringBuilder(gdprServiceUrl+"organization/")
-                        .append(Optional.ofNullable(UserContext.getOrgId()).isPresent()?UserContext.getOrgId():"24").append("/unit/").append((Optional.ofNullable(id).isPresent()?id:UserContext.getUnitId())).toString();
+        } else {
+            if (hasUnitInUrl) {
+                String baseUrl = new StringBuilder(gdprServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 return baseUrl;
-            }else{
-                String baseUrl=new StringBuilder(gdprServiceUrl+"organization/").append(Optional.ofNullable(UserContext.getOrgId()).isPresent()?UserContext.getOrgId():"24").append("/country/").append(id).toString();
+            } else {
+                String baseUrl = new StringBuilder(gdprServiceUrl + "unit/").append(Optional.ofNullable(UserContext.getOrgId()).isPresent() ? UserContext.getOrgId() : "24").append("/country/").append(id).toString();
                 return baseUrl;
             }
         }
