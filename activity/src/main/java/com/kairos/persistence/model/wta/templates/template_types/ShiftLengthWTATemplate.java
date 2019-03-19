@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.kairos.constants.AppConstants.HOURS;
-import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -102,13 +101,13 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues)) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
             if (timeInterval != null) {
                 boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()));
                 if (isValidShift && isValidForDay(dayTypeIds, infoWrapper)) {
                     ShiftWithActivityDTO shift = infoWrapper.getShift();
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                    Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2],DurationType.HOURS,limitAndCounter[0]/60);
 

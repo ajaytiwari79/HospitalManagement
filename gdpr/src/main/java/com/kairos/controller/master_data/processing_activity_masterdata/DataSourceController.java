@@ -33,7 +33,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class DataSourceController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceController.class);
 
     @Inject
     private DataSourceService dataSourceService;

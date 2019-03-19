@@ -17,11 +17,6 @@ public class DataElement extends BaseEntity {
     private Long countryId;
     private Long organizationId;
 
-
-   /* @ManyToOne
-    @JoinColumn(name="dataCategory_id")
-    private DataCategory dataCategory;*/
-
     public Long getOrganizationId() { return organizationId; }
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }

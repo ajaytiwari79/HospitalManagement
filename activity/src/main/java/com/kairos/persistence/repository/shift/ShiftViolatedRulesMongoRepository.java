@@ -12,6 +12,9 @@ import java.util.Set;
 @Repository
 public interface ShiftViolatedRulesMongoRepository extends MongoBaseRepository<ShiftViolatedRules,BigInteger> {
 
-    @Query(value = "{'shift.id':{'$in':?0}}",fields ="{'workTimeAgreements':1,'shift.id':1}" )
+    @Query(value = "{'shiftId':{'$in':?0}}",fields ="{'workTimeAgreements':1,'shiftId':1}" )
     List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds);
+
+    @Query(value = "{shiftId:?0}" )
+    ShiftViolatedRules findOneViolatedRulesByShiftId(BigInteger shiftId);
 }

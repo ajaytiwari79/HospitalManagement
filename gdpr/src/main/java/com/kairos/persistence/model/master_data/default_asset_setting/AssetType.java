@@ -109,12 +109,6 @@ public class AssetType extends BaseEntity {
     public AssetType() {
     }
 
-    List<Risk> getRiskOfAssetTypeAndSubAssetType(){
-        List<Risk> risks = this.getRisks();
-        this.getSubAssetTypes().forEach( subAssetType -> risks.addAll(subAssetType.getRisks()));
-        return risks;
-    }
-
     @Override
     public void delete() {
         this.setDeleted(true);

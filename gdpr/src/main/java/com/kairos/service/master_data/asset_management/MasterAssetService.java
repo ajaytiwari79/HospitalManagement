@@ -98,6 +98,7 @@ public class MasterAssetService {
     private void addAssetTypeToMasterAsset(Long countryId, MasterAsset masterAsset, MasterAssetDTO masterAssetDTO) {
 
         AssetType assetType;
+        AssetType subAssetType = null;
         if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.getOne(masterAssetDTO.getAssetType().getId());
             masterAsset.setAssetType(assetType);
@@ -106,19 +107,23 @@ public class MasterAssetService {
             Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType1.getName()));
             assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
         }
-        Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(subAssetTypeBasicDTO -> {
-            if (subAssetTypeBasicDTO.getId() != null) {
-                masterAsset.setSubAssetType(assetTypeRepository.getOne(subAssetTypeBasicDTO.getId()));
+
+        if (Optional.ofNullable(masterAssetDTO.getAssetSubType()).isPresent()) {
+            if (masterAssetDTO.getAssetSubType().getId() != null) {
+                Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getAssetSubType().getId())).findAny();
+                masterAsset.setSubAssetType(subAssetTypeObj.get());
             } else {
-                AssetType subAssetType = new AssetType(subAssetTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
+                subAssetType = new AssetType(masterAssetDTO.getAssetSubType().getName(), countryId, SuggestedDataStatus.APPROVED);
                 subAssetType.setSubAssetType(true);
-                assetTypeRepository.save(subAssetType);
-                assetType.getSubAssetTypes().add(subAssetType);
-                masterAsset.setSubAssetType(subAssetType);
             }
-        });
+        }
         assetTypeRepository.save(assetType);
         masterAsset.setAssetType(assetType);
+        if (subAssetType != null) {
+            subAssetType.setAssetType(assetType);
+            assetTypeRepository.save(subAssetType);
+            masterAsset.setSubAssetType(subAssetType);
+        }
     }
 
 
@@ -184,7 +189,7 @@ public class MasterAssetService {
     public MasterAssetDTO updateMasterAsset(Long countryId, Long id, MasterAssetDTO masterAssetDto) {
         MasterAsset masterAsset = masterAssetRepository.findByNameAndCountryId(masterAssetDto.getName(), countryId);
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
-           exceptionService.duplicateDataException("message.duplicate","message.asset",masterAssetDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
         }
         addMetadataOfMasterAsset(masterAssetDto, masterAsset);
         masterAsset = masterAssetRepository.getOne(id);

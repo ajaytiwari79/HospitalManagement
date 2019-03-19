@@ -8,6 +8,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
@@ -202,10 +203,10 @@ public class RuletemplateUtils {
 
 
 
-    public static Integer[] getValueByPhase(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues, WTABaseRuleTemplate ruleTemplate) {
+    public static Integer[] getValueByPhaseAndCounter(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues, WTABaseRuleTemplate ruleTemplate) {
         Integer[] limitAndCounter = new Integer[3];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName())) {
+            if (infoWrapper.getPhaseId().equals(phaseTemplateValue.getPhaseId())) {
                 limitAndCounter[0] = (int) (infoWrapper.getUser().getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
                 Integer[] counterValue = getCounterValue(infoWrapper, phaseTemplateValue, ruleTemplate);
                 limitAndCounter[1] = counterValue[0];
@@ -218,19 +219,19 @@ public class RuletemplateUtils {
 
 
 
-    public static boolean isValidForPhase(String phase, List<PhaseTemplateValue> phaseTemplateValues) {
+    public static boolean isValidForPhase(BigInteger phaseId, List<PhaseTemplateValue> phaseTemplateValues) {
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (phase.equals(phaseTemplateValue.getPhaseName())) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
                 return !phaseTemplateValue.isDisabled();
             }
         }
         return false;
     }
 
-    public static boolean isValidShift(String phase,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
+    public static boolean isValidShift(BigInteger phaseId,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
         boolean valid = false;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (phase.equals(phaseTemplateValue.getPhaseName())) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
                 if(!phaseTemplateValue.isDisabled()){
                     valid = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (isCollectionNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
                     break;
@@ -304,7 +305,7 @@ public class RuletemplateUtils {
 
     public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
         List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
-        dates.sort((date1, date2) -> date1.compareTo(date2));
+        dates.sort(Comparator.naturalOrder());
         return dates;
     }
 
@@ -483,6 +484,17 @@ public class RuletemplateUtils {
             ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
             ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
         });
+    }
+
+    public static Integer getValueByPhase(UserAccessRoleDTO userAccessRole, List<PhaseTemplateValue> phaseTemplateValues,BigInteger phaseId) {
+        Integer limitAndCounter = null;
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
+                limitAndCounter = (int) (userAccessRole.getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
+                break;
+            }
+        }
+        return limitAndCounter;
     }
 
 

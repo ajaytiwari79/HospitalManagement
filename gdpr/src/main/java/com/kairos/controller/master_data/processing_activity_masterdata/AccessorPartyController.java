@@ -33,8 +33,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class AccessorPartyController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccessorPartyController.class);
-
     @Inject
     private AccessorPartyService accessorPartyService;
 
