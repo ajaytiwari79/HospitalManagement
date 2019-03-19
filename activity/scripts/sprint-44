@@ -20,6 +20,34 @@ c.employmentTypes = [];
 db.cTARuleTemplate.save(c);
 });
 
+db.shiftViolatedRules.find().forEach(function(e){
+    if(e.shift && e.shift._id){
+        e.shiftId = e.shift._id;
+        delete e.shift;
+        db.shiftViolatedRules.save(e);
+        }
+    });
+
+db.wtaBaseRuleTemplate.find({"countryId" : NumberLong(18712)}).forEach(function(e){
+    var phases = {
+        "Request":5,
+        "Draft":8,
+        "Construction":7,
+        "Puzzle":6,
+        "Payroll":4,
+        "Tentative":3,
+        "Time & Attendance":2,
+        "Realtime":1
+        }
+    e.phaseTemplateValues.forEach(function(phase){
+        phase.phaseId = phases[phase.phaseName];
+        });
+    db.wtaBaseRuleTemplate.save(e);
+    });
+
+Please hit this API to update phaseId in WTARuletemplate
+{Server-Url}kairos/activity/api/v1/unit/1172/update_phases_in_ruletemplate
+
 
 //add duration and duration type in planning period
 //first check existing planning period duration and duration type
@@ -37,3 +65,7 @@ db.counter.updateMany({"type" :{$nin:[
     {$set:{"deleted":true}})
 
 db.applicableKPI.updateMany({"baseKpiId":{"$in":["10","11","12","13","14","15","2","3","4","5","6","7","8","9"]}},{$set:{"deleted":true}})
+
+db.wtaBaseRuleTemplate.updateMany({"name":"Maximum number of consecutive days"},{$set:{"name":"Maximum number of consecutive shifts"}});
+
+db.wtaBaseRuleTemplate.updateMany({"name":"Minimum days off after a series of night shifts in sequence"},{$set:{"name":"Night worker - Minimum days off after a series of night shifts in sequence"}});

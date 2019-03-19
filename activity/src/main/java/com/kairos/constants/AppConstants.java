@@ -153,6 +153,7 @@ public class AppConstants {
     public static final String WEEKS = "WEEKS";
     public static final String DAYS = "DAYS";
     public static final String YEARS = "YEARS";
+    public static final int MINIMUM_WTA_RULE_TEMPLATE_COUNTER = 0;
 
 
     // Default Unit Age Settings

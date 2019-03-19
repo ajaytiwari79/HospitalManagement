@@ -485,6 +485,8 @@ public class TimeBankService extends MongoBaseService {
             updateTimeBankForMultipleShifts(staffAdditionalInfoDTO, startDate,endDate);
         }
     }
+
+    @Deprecated
     public ShiftDTO updateShiftDTOWithTimebankDetails(ShiftDTO shiftDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getUnitPositionDetailDTO(staffAdditionalInfoDTO);
         LocalDate startDate = unitPositionWithCtaDetailsDTO.getStartDate();

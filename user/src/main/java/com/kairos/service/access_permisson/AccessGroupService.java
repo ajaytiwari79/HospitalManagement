@@ -856,15 +856,6 @@ public class AccessGroupService {
         return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, role.toString());
     }
 
-    public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {
-        Long userId = UserContext.getUserDetails().getId();
-        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        Long staff = staffGraphRepository.findStaffIdByUserId(userId, unitId);
-        //changes by pavan
-        boolean isStaff = staff != null ? accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(), userId) : false;
-        boolean isManagementStaff = staff != null ? accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(), userId) : true;
-        return new UserAccessRoleDTO(userId, unitId, isStaff, isManagementStaff);
-    }
 
     public UserAccessRoleDTO findUserAccessRole(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();

@@ -35,6 +35,7 @@ public abstract class MongoBaseEntity {
         return createdBy;
     }
 
+    @JsonIgnore
     public void setCreatedBy(UserInfo createdBy) {
         this.createdBy = createdBy;
     }
@@ -43,6 +44,7 @@ public abstract class MongoBaseEntity {
         return lastModifiedBy;
     }
 
+    @JsonIgnore
     public void setLastModifiedBy(UserInfo lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }

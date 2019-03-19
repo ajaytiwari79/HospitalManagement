@@ -8,6 +8,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
@@ -35,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.AppConstants.YEARS;
@@ -98,6 +100,29 @@ public class RuletemplateUtils {
         return timeInterval;
     }
 
+    public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
+        TimeInterval[] timeIntervals = new TimeInterval[partOfDays.size()];
+        int i=0;
+        boolean valid = false;
+        for (PartOfDay partOfDay : partOfDays) {
+            if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
+                TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
+                if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
+                    int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
+                    int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
+                    TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
+                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    timeIntervals[i] = interval;
+                    i++;
+                    if (!valid && (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay))) {
+                        valid = true;
+                    }
+                }
+            }
+        }
+        return valid ? timeIntervals : new TimeInterval[0];
+    }
+
     public static List<DateTimeInterval> getDaysIntervals(DateTimeInterval dateTimeInterval) {
         List<DateTimeInterval> intervals = new ArrayList<>();
         ZonedDateTime endDate;
@@ -139,8 +164,20 @@ public class RuletemplateUtils {
     public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval timeInterval) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.contains(s.getEndDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZoneDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZoneDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
                 updatedShifts.add(s);
+            }
+        });
+        return updatedShifts;
+    }
+
+    public static Set<BigInteger> getShiftIdsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval[] timeIntervals) {
+        Set<BigInteger> updatedShifts = new HashSet<>();
+        shifts.forEach(s -> {
+            for (TimeInterval timeInterval : timeIntervals) {
+                if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndDate().equals(s.getStartDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZoneDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+                    updatedShifts.add(s.getId());
+                }
             }
         });
         return updatedShifts;
@@ -166,10 +203,10 @@ public class RuletemplateUtils {
 
 
 
-    public static Integer[] getValueByPhase(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues, WTABaseRuleTemplate ruleTemplate) {
+    public static Integer[] getValueByPhaseAndCounter(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues, WTABaseRuleTemplate ruleTemplate) {
         Integer[] limitAndCounter = new Integer[3];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName())) {
+            if (infoWrapper.getPhaseId().equals(phaseTemplateValue.getPhaseId())) {
                 limitAndCounter[0] = (int) (infoWrapper.getUser().getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
                 Integer[] counterValue = getCounterValue(infoWrapper, phaseTemplateValue, ruleTemplate);
                 limitAndCounter[1] = counterValue[0];
@@ -182,13 +219,26 @@ public class RuletemplateUtils {
 
 
 
-    public static boolean isValidForPhase(String phase, List<PhaseTemplateValue> phaseTemplateValues) {
+    public static boolean isValidForPhase(BigInteger phaseId, List<PhaseTemplateValue> phaseTemplateValues) {
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (phase.equals(phaseTemplateValue.getPhaseName())) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
                 return !phaseTemplateValue.isDisabled();
             }
         }
         return false;
+    }
+
+    public static boolean isValidShift(BigInteger phaseId,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
+        boolean valid = false;
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
+                if(!phaseTemplateValue.isDisabled()){
+                    valid = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (isCollectionNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
+                    break;
+                }
+            }
+        }
+        return valid;
     }
 
     public static Integer[] getCounterValue(RuleTemplateSpecificInfo infoWrapper, PhaseTemplateValue phaseTemplateValue, WTABaseRuleTemplate ruleTemplate) {
@@ -255,7 +305,7 @@ public class RuletemplateUtils {
 
     public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
         List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
-        dates.sort((date1, date2) -> date1.compareTo(date2));
+        dates.sort(Comparator.naturalOrder());
         return dates;
     }
 
@@ -330,11 +380,6 @@ public class RuletemplateUtils {
                     validateRuleTemplate(shortestAndAverageDailyRestWTATemplate.getIntervalLength(), shortestAndAverageDailyRestWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shortestAndAverageDailyRestWTATemplate.getIntervalUnit(), shortestAndAverageDailyRestWTATemplate.getIntervalLength()));
 
-                    break;
-                case NUMBER_OF_SHIFTS_IN_INTERVAL:
-                    ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate = (ShiftsInIntervalWTATemplate) ruleTemplate;
-                    validateRuleTemplate(shiftsInIntervalWTATemplate.getIntervalLength(), shiftsInIntervalWTATemplate.getIntervalUnit());
-                    interval = interval.addInterval(getIntervalByRuleTemplate(shift, shiftsInIntervalWTATemplate.getIntervalUnit(), shiftsInIntervalWTATemplate.getIntervalLength()));
                     break;
                 case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
@@ -439,6 +484,17 @@ public class RuletemplateUtils {
             ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
             ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
         });
+    }
+
+    public static Integer getValueByPhase(UserAccessRoleDTO userAccessRole, List<PhaseTemplateValue> phaseTemplateValues,BigInteger phaseId) {
+        Integer limitAndCounter = null;
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
+                limitAndCounter = (int) (userAccessRole.getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
+                break;
+            }
+        }
+        return limitAndCounter;
     }
 
 
