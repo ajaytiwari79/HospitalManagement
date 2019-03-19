@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataCategoryDTO;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.*;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
@@ -22,6 +23,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
@@ -42,6 +44,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProcessingActivityService {
@@ -108,6 +111,9 @@ public class ProcessingActivityService {
         if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
             processingActivity.setDataSubjects(createRelatedDataProcessingActivity(unitId, processingActivityDTO.getDataSubjectSet()));
         }
+        if (CollectionUtils.isNotEmpty(processingActivityDTO.getAssetIds())) {
+            processingActivity.setAssets(assetRepository.findAllByUnitIdAndIds(unitId, processingActivityDTO.getAssetIds()));
+        }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
         return processingActivityDTO;
@@ -123,7 +129,6 @@ public class ProcessingActivityService {
             relatedDataSubject.setDataCategories(dataCategories);
             dataSubjects.add(relatedDataSubject);
         });
-
         return relatedDataSubjectRepository.saveAll(dataSubjects);
     }
 
@@ -152,13 +157,13 @@ public class ProcessingActivityService {
     private List<ProcessingActivity> createSubProcessingActivity(Long unitId, List<ProcessingActivityDTO> subProcessingActivityDTOs, ProcessingActivity processingActivity) {
         List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         Set<String> subProcessNames = new HashSet<>();
-        for (ProcessingActivityDTO processingActivityDTO : subProcessingActivityDTOs) {
-            if (subProcessNames.contains(processingActivityDTO.getName().toLowerCase().trim())) {
-                exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", processingActivityDTO.getName());
+        for (ProcessingActivityDTO subProcessingActivityDTO : subProcessingActivityDTOs) {
+            if (subProcessNames.contains(subProcessingActivityDTO.getName().toLowerCase().trim())) {
+                exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", subProcessingActivityDTO.getName());
             }
-            subProcessNames.add(processingActivityDTO.getName().trim().toLowerCase());
+            subProcessNames.add(subProcessingActivityDTO.getName().trim().toLowerCase());
             ProcessingActivity subProcessingActivity = new ProcessingActivity();
-            buildProcessingActivity(unitId, processingActivityDTO, subProcessingActivity);
+            buildProcessingActivity(unitId, subProcessingActivityDTO, subProcessingActivity);
             subProcessingActivity.setSubProcessingActivity(true);
             subProcessingActivity.setProcessingActivity(processingActivity);
             subProcessingActivities.add(subProcessingActivity);
@@ -266,9 +271,8 @@ public class ProcessingActivityService {
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long unitId) {
         List<ProcessingActivityResponseDTO> processingActivityResponseDTOS = new ArrayList<>();
         List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationIdAndDeletedFalse(unitId);
-        processingActivitys.forEach(processingActivity -> {
-            processingActivityResponseDTOS.add(prepareProcessingActivityResponseData(processingActivity));
-        });
+        processingActivitys.forEach(processingActivity ->
+                processingActivityResponseDTOS.add(prepareProcessingActivityResponseData(processingActivity)));
         return processingActivityResponseDTOS;
     }
 
@@ -296,6 +300,9 @@ public class ProcessingActivityService {
         processingActivityResponseDTO.setActive(processingActivity.isActive());
         if (CollectionUtils.isNotEmpty(processingActivity.getRisks())) {
             processingActivityResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
+        }
+        if (CollectionUtils.isNotEmpty(processingActivity.getAssets())) {
+            processingActivityResponseDTO.setAssets(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getAssets(), AssetBasicResponseDTO.class));
         }
         processingActivityResponseDTO.setDataSubjects(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class));
         if (CollectionUtils.isNotEmpty(processingActivity.getSubProcessingActivities())) {
