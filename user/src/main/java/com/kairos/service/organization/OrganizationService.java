@@ -1101,8 +1101,15 @@ public class OrganizationService {
         return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
     }
 
-    public List<UnitTimeZoneMappingDTO> getTimeZoneStringsOfAllUnits() {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneforAllorganizations(), UnitTimeZoneMappingDTO.class);
+    public Map<Long,String> getTimeZoneStringsOfAllUnits() {
+        List<OrganizationBasicResponse> organizationBasicResponses=organizationGraphRepository.findTimezoneforAllorganizations();
+        return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId,OrganizationBasicResponse::getTimezone));
+    }
+
+
+    public Map<Long,String> getTimeZoneStringsByUnitIds(Set<Long> unitIds) {
+        List<OrganizationBasicResponse> organizationBasicResponses=organizationGraphRepository.findTimezoneByUnitIds(unitIds);
+        return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId,OrganizationBasicResponse::getTimezone));
     }
 
     public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {

@@ -34,7 +34,7 @@ public class OrganizationBasicResponse {
     private boolean workcentre;
     private Long hubId;
     private Long levelId;
-
+    private String timezone;
 
     public OrganizationBasicResponse() {
     }
@@ -210,5 +210,13 @@ public class OrganizationBasicResponse {
 
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 }

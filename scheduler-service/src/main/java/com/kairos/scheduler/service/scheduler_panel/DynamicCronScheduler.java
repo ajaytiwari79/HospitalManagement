@@ -64,7 +64,7 @@ public class DynamicCronScheduler implements DisposableBean {
         threadPoolTaskScheduler.initialize();
         Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
-        if (!schedulerPanel.isOneTimeTrigger() ) {
+        if (!schedulerPanel.isOneTimeTrigger()) {
             future = threadPoolTaskScheduler.schedule(runnable, trigger);
         } else {
             future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
@@ -125,7 +125,7 @@ public class DynamicCronScheduler implements DisposableBean {
         if (!schedulerPanel.isOneTimeTrigger()) {
             future = threadPoolTaskScheduler.schedule(task, trigger);
         } else {
-            future = threadPoolTaskScheduler.schedule(task, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+            future = threadPoolTaskScheduler.schedule(task, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
 
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
