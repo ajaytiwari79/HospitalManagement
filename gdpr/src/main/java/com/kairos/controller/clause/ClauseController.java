@@ -33,8 +33,6 @@ import static com.kairos.constants.ApiConstant.*;
 @Api(API_ORGANIZATION_URL)
 class ClauseController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClauseController.class);
-
     @Inject
     private ClauseService clauseService;
 

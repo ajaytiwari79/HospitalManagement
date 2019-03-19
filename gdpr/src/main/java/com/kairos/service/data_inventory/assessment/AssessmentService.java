@@ -59,9 +59,6 @@ import java.util.stream.Collectors;
 @Service
 public class AssessmentService {
 
-
-    private static Logger logger = LoggerFactory.getLogger(AssessmentService.class);
-
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
     @Inject
@@ -142,11 +139,11 @@ public class AssessmentService {
 
     private boolean validateRelativeDeadLineDate(AssessmentDTO assessmentDTO) {
         boolean result = true;
-        if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 30)) {
+        if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS) && (assessmentDTO.getRelativeDeadlineDuration() > 30)) {
             result = false;
-        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 24)) {
+        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS) && (assessmentDTO.getRelativeDeadlineDuration() > 24)) {
             result = false;
-        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 12)) {
+        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS) && (assessmentDTO.getRelativeDeadlineDuration() > 12)) {
             result = false;
         } else {
             LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadlineType(), 1);
@@ -207,10 +204,9 @@ public class AssessmentService {
         } else if (assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), assessmentDTO.getStartDate());
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), assessmentDTO.getStartDate(), unitId);
         assessment.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class));
         assessment.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class));
-        assessment.setOrganizationId(unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
@@ -231,14 +227,6 @@ public class AssessmentService {
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
         }
-        /*if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
-            if (!Optional.ofNullable(assessmentDTO.getAssessmentLaunchedDate()).isPresent()) {
-                exceptionService.invalidRequestException("message.assessment.scheduling.date.not.Selected");
-            } else if (LocalDate.now().equals(assessmentDTO.getAssessmentLaunchedDate()) || assessmentDTO.getAssessmentLaunchedDate().isBefore(LocalDate.now())) {
-                exceptionService.invalidRequestException("message.assessment.enter.valid.date");
-
-            assessment.setAssessmentLaunchedDate(assessmentDTO.getAssessmentLaunchedDate());
-        }}*/
         assessment.setAssessmentLaunchedDate(LocalDate.now());
         assessment.setAssessmentSchedulingFrequency(assessmentDTO.getAssessmentSchedulingFrequency());
         assessment.setQuestionnaireTemplate(questionnaireTemplate);
@@ -276,7 +264,6 @@ public class AssessmentService {
             risks = asset.getAssetType().getRisks();
             if (Optional.ofNullable(asset.getSubAssetType()).isPresent())
                 risks.addAll(asset.getSubAssetType().getRisks());
-            //todo change method
             questionnaireTemplate = Optional.ofNullable(asset.getSubAssetType()).isPresent() ? questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED)
                     : questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, asset.getAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED);
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
@@ -402,7 +389,6 @@ public class AssessmentService {
      * @param //assessmentId
      * @return
      */
-    //TODO
     public List<QuestionnaireSectionResponseDTO> getAssessmentByUnitIdAndId(Long unitId, Long assessmentId) {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
@@ -775,14 +761,14 @@ public class AssessmentService {
     * @description get all Previous Assessment Launched for Asset
      */
     public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, Long assetId) {
-        List<Assessment> assessments =  assessmentRepository.findAllAssetAssessmentByAssetIdAndUnitId(unitId, assetId);
+        List<Assessment> assessments = assessmentRepository.findAllAssetAssessmentByAssetIdAndUnitId(unitId, assetId);
         return prepareAssessmentResponseDTO(assessments);
     }
 
-    private List<AssessmentBasicResponseDTO> prepareAssessmentResponseDTO(List<Assessment> assessments){
+    private List<AssessmentBasicResponseDTO> prepareAssessmentResponseDTO(List<Assessment> assessments) {
         List<AssessmentBasicResponseDTO> assessmentBasicResponseDTOList = new ArrayList<>();
         assessments.forEach(assessment -> {
-            AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(),assessment.getName(),assessment.getEndDate(),assessment.getCompletedDate(),assessment.getStartDate(),assessment.getComment(),assessment.getAssessmentStatus(),assessment.getAssessmentLaunchedDate(),assessment.getAssessmentSchedulingFrequency());
+            AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(), assessment.getName(), assessment.getEndDate(), assessment.getCompletedDate(), assessment.getStartDate(), assessment.getComment(), assessment.getAssessmentStatus(), assessment.getAssessmentLaunchedDate(), assessment.getAssessmentSchedulingFrequency());
             assessmentBasicResponseDTO.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessment.getApprover(), Staff.class));
             assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessment.getAssigneeList(), Staff.class));
             assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
@@ -790,8 +776,6 @@ public class AssessmentService {
         });
         return assessmentBasicResponseDTOList;
     }
-
-
 
 
 }

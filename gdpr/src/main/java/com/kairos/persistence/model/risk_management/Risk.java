@@ -50,8 +50,6 @@ public class Risk extends BaseEntity {
     private String riskRecommendation;
     private boolean isReminderActive;
     private int daysToReminderBefore;
-   // private LocalDate dueDate;
-    // private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
     private Long organizationId;

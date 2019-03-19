@@ -19,5 +19,13 @@ public interface PolicyAgreementRepository extends CustomGenericRepository<Polic
     @Query(value = "Select PAT from PolicyAgreementTemplate PAT where PAT.organizationId = ?1 and PAT.id = ?2 and PAT.deleted = false")
     List<PolicyAgreementTemplate> getAllAgreementSectionsAndSubSectionByOrganizationIdAndAgreementTemplateId(Long orgId, Long agreementTemplateId);
 
+    @Query(value = "Select PAT from PolicyAgreementTemplate PAT JOIN PAT.agreementSections AGS left join AGS.agreementSubSections AGSS on AGS.id = AGSS.agreementSection.id " +
+            " left Join AGS.clauses AGSC left join AGSS.clauses AGSSC where PAT.organizationId = ?1  and (AGSC.id = ?2 or AGSSC.id =?2)  and PAT.deleted = false group by PAT.id")
+    List<PolicyAgreementTemplate> getAllPolicyAgreementTemplateContainClauseByUnitIdAndClauseId(Long unitId, Long clauseId);
+
+    @Query(value = "Select PAT from PolicyAgreementTemplate PAT JOIN PAT.agreementSections AGS left join AGS.agreementSubSections AGSS on AGS.id = AGSS.agreementSection.id " +
+            " left Join AGS.clauses AGSC left join AGSS.clauses AGSSC where PAT.countryId = ?1  and (AGSC.id = ?2 or AGSSC.id =?2)  and PAT.deleted = false group by PAT.id")
+    List<PolicyAgreementTemplate> getAllPolicyAgreementTemplateContainClauseByCountryIdAndClauseId(Long countryId, Long clauseId);
+
 
 }

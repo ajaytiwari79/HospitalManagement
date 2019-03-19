@@ -34,8 +34,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class ProcessingPurposeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPurposeController.class);
-
     @Inject
     private ProcessingPurposeService processingPurposeService;
 
