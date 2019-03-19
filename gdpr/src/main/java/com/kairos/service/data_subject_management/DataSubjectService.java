@@ -46,7 +46,7 @@ public class DataSubjectService {
 
         DataSubject previousDataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectDto.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubjectDto.getName());
         }
         DataSubject dataSubject = new DataSubject(dataSubjectDto.getName(), dataSubjectDto.getDescription());
         dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
@@ -62,7 +62,7 @@ public class DataSubjectService {
     public DataSubjectResponseDTO getDataSubjectAndMappingWithDataByCountryIdAndId(Long countryId, Long id) {
         DataSubject dataSubject = dataSubjectRepository.getDataSubjectByCountryIdAndId(countryId, id);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSubject", id);
         }
         return prepareDataSubjectResponseDTO(dataSubject, true);
     }
@@ -104,11 +104,11 @@ public class DataSubjectService {
     public MasterDataSubjectDTO updateDataSubjectAndMapping(Long countryId, Long dataSubjectId, MasterDataSubjectDTO dataSubjectDto) {
         DataSubject dataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectDto.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubjectDto.getName());
         }
         dataSubject = dataSubjectRepository.getDataSubjectByCountryIdAndId(countryId, dataSubjectId);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", dataSubjectId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSubject", dataSubjectId);
         }
         dataSubject.setName(dataSubjectDto.getName());
         dataSubject.setDescription(dataSubjectDto.getDescription());
@@ -130,7 +130,7 @@ public class DataSubjectService {
 
         DataSubject previousDataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, subjectDTO.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Data Subject", subjectDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", subjectDTO.getName());
         }
         DataSubject dataSubject = new DataSubject(subjectDTO.getName(), subjectDTO.getDescription(), dataCategoryService.getAllDataCategoriesByIds(subjectDTO.getDataCategories()));
         dataSubject.setOrganizationId(unitId);
@@ -166,7 +166,7 @@ public class DataSubjectService {
 
         DataSubject dataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, dataSubjectDTO.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "Data Subject", dataSubject.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubject.getName());
         }
         dataSubject = dataSubjectRepository.getOne(dataSubjectId);
         dataSubject.setName(dataSubjectDTO.getName());
@@ -181,7 +181,7 @@ public class DataSubjectService {
     public DataSubjectResponseDTO getDataSubjectWithDataCategoryAndElementByUnitIdAndId(Long unitId, Long datSubjectId) {
         DataSubject dataSubject = dataSubjectRepository.getDataSubjectByUnitIdAndId(unitId, datSubjectId);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", datSubjectId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSubject", datSubjectId);
         }
 
         return prepareDataSubjectResponseDTO(dataSubject, false);

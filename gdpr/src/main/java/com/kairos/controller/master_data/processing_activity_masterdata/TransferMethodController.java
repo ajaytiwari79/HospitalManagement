@@ -34,7 +34,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class TransferMethodController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodController.class);
 
     @Inject
     private TransferMethodService transferMethodDestinationService;

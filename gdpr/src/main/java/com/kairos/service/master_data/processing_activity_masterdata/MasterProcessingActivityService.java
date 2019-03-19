@@ -136,11 +136,11 @@ public class MasterProcessingActivityService {
 
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByNameAndCountryId(masterProcessingActivityDto.getName(), countryId);
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
-            throw new DuplicateDataException("processing Activity with name Already Exist" + processingActivity.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.processingActivity", masterProcessingActivityDto.getName());
         }
         processingActivity = masterProcessingActivityRepository.getOne(id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", id);
         } else {
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                 List<MasterProcessingActivity> subProcessingActivities = updateExistingAndCreateNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), processingActivity);
@@ -151,12 +151,7 @@ public class MasterProcessingActivityService {
             setMetadataOfMasterProcessingActivity(masterProcessingActivityDto, processingActivity);
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
             processingActivity.setName(masterProcessingActivityDto.getName());
-            try {
-                masterProcessingActivityRepository.save(processingActivity);
-
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
-            }
+            masterProcessingActivityRepository.save(processingActivity);
         }
         return masterProcessingActivityDto;
     }

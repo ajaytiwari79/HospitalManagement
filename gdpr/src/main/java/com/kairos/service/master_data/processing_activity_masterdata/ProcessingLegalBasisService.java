@@ -125,7 +125,7 @@ public class ProcessingLegalBasisService {
         }
         Integer resultCount = processingLegalBasisRepository.updateMasterMetadataName(processingLegalBasisDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.legalBasis", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingLegalBasisDTO.getName());
         }
@@ -157,7 +157,7 @@ public class ProcessingLegalBasisService {
         if (updateCount > 0) {
             LOGGER.info("Legal Basis are updated successfully with ids :: {}", processingLegalBasisIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", processingLegalBasisIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.legalBasis", processingLegalBasisIds);
         }
         return processingLegalBasisRepository.findAllByIds(processingLegalBasisIds);
     }

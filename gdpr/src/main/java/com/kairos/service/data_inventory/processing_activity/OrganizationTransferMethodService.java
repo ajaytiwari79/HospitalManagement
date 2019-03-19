@@ -94,7 +94,7 @@ public class OrganizationTransferMethodService {
 
         List<String> processingActivitiesLinkedWithTransferMethod = processingActivityRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", StringUtils.join(processingActivitiesLinkedWithTransferMethod, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.transferMethod", StringUtils.join(processingActivitiesLinkedWithTransferMethod, ','));
         }
         transferMethodRepository.deleteByIdAndOrganizationId(transferMethodId, unitId);
         return true;
@@ -114,11 +114,11 @@ public class OrganizationTransferMethodService {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Transfer Method", transferMethod.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.transferMethod", transferMethod.getName());
         }
         Integer resultCount = transferMethodRepository.updateMetadataName(transferMethodDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.transferMethod", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, transferMethodDTO.getName());
         }

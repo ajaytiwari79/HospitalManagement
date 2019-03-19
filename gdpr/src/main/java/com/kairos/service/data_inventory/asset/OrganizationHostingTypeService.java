@@ -118,11 +118,11 @@ public class OrganizationHostingTypeService {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Hosting Type", hostingType.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.hostingType", hostingType.getName());
         }
         Integer resultCount = hostingTypeRepository.updateMetadataName(hostingTypeDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingType", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingTypeDTO.getName());
         }

@@ -247,7 +247,7 @@ public class AssetTypeService{
             if(!assetType.getRisks().isEmpty()){
                 assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
             }
-            if(assetType.isHasSubAssetType()){
+            if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes())){
                 assetType.getSubAssetTypes().forEach( subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
                 assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
             }

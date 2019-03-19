@@ -60,11 +60,6 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.id = ?2 and QT.deleted = false")
     QuestionnaireTemplate getQuestionnaireTemplateWithSectionsByOrganizationId(Long orgId, Long questionnaireTemplateId);
 
-   /* @Modifying
-    @Transactional
-    @Query(value = "delete from questionnaire_templatemd_sections where questionnaire_templatemd_id = ?1 and sections_id = ?2", nativeQuery = true)
-    Integer removeSectionFromQuestionnaireTemplate(Long templateId, Long sectionId);*/
-
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and  QT.templateStatus = ?3  and QT.deleted = false")
     QuestionnaireTemplate findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(Long orgId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus status);
 

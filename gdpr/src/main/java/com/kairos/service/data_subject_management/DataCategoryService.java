@@ -95,8 +95,8 @@ public class DataCategoryService {
         updateCount = isOrganization ? dataCategoryRepository.safelyDeleteDataCategory(dataCategoryId, referenceId) : dataCategoryRepository.safelyDeleteMasterDataCategory(dataCategoryId, referenceId);
         if (updateCount > 0) {
             LOGGER.info("Data Category with id :: {} deleted safely and successfully", dataCategoryId);
-        } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
         return true;
 
@@ -111,7 +111,7 @@ public class DataCategoryService {
     public DataCategoryResponseDTO getDataCategoryWithDataElementByCountryIdAndId(Long countryId, Long dataCategoryId) {
         DataCategory dataCategory = dataCategoryRepository.getDataCategoryByCountryIdAndId(countryId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
@@ -125,7 +125,7 @@ public class DataCategoryService {
     public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, Long dataCategoryId) {
         DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
