@@ -98,6 +98,7 @@ public class MasterAssetService {
     private void addAssetTypeToMasterAsset(Long countryId, MasterAsset masterAsset, MasterAssetDTO masterAssetDTO) {
 
         AssetType assetType;
+        AssetType subAssetType = null;
         if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.getOne(masterAssetDTO.getAssetType().getId());
             masterAsset.setAssetType(assetType);
@@ -108,21 +109,21 @@ public class MasterAssetService {
         }
 
         if (Optional.ofNullable(masterAssetDTO.getAssetSubType()).isPresent()) {
-            AssetType subAssetType;
             if (masterAssetDTO.getAssetSubType().getId() != null) {
                 Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getAssetSubType().getId())).findAny();
-                subAssetType = subAssetTypeObj.get();
+                masterAsset.setSubAssetType(subAssetTypeObj.get());
             } else {
                 subAssetType = new AssetType(masterAssetDTO.getAssetSubType().getName(), countryId, SuggestedDataStatus.APPROVED);
                 subAssetType.setSubAssetType(true);
             }
-            subAssetType.setAssetType(assetType);
-            assetType.getSubAssetTypes().add(subAssetType);
-            assetTypeRepository.save(subAssetType);
-            masterAsset.setSubAssetType(subAssetType);
         }
         assetTypeRepository.save(assetType);
         masterAsset.setAssetType(assetType);
+        if (subAssetType != null) {
+            subAssetType.setAssetType(assetType);
+            assetTypeRepository.save(subAssetType);
+            masterAsset.setSubAssetType(subAssetType);
+        }
     }
 
 
