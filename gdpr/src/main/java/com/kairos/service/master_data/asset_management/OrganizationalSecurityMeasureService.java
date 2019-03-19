@@ -127,7 +127,7 @@ public class OrganizationalSecurityMeasureService{
 
         Integer resultCount =  organizationalSecurityMeasureRepository.updateMasterMetadataName(securityMeasureDTO.getName(), id, countryId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organizational Security Measure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.orgSecurityMeasure", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, securityMeasureDTO.getName());
         }
@@ -160,7 +160,7 @@ public class OrganizationalSecurityMeasureService{
         if(updateCount > 0){
             LOGGER.info("Organizational Security Measures are updated successfully with ids :: {}", orgSecurityMeasureIds);
         }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organizational Security Measure", orgSecurityMeasureIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.orgSecurityMeasure", orgSecurityMeasureIds);
         }
         return organizationalSecurityMeasureRepository.findAllByIds(orgSecurityMeasureIds);
     }

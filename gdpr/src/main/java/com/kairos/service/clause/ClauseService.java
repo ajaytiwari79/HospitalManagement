@@ -70,7 +70,7 @@ public class ClauseService{
 
         Clause previousClause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
+            exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle().toLowerCase());
         }
         if(isOrganization) {
             previousClause = prepareOrganizationClauseData(referenceId, clauseDto, new OrganizationClause());
@@ -179,7 +179,7 @@ public class ClauseService{
     public ClauseResponseDTO getClauseById(Long countryId, Long id) {
         Clause clause = clauseRepository.findByIdAndCountryId(id, countryId);
         if (!Optional.ofNullable(clause).isPresent()) {
-            throw new DataNotFoundByIdException("message.clause.data.not.found.for " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","message.clause",id);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(clause, ClauseResponseDTO.class);
     }

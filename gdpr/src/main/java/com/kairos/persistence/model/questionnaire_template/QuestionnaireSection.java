@@ -4,11 +4,14 @@ package com.kairos.persistence.model.questionnaire_template;
 import com.kairos.persistence.model.common.BaseEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Entity
 public class QuestionnaireSection extends BaseEntity {
 
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.EAGER)

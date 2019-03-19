@@ -98,7 +98,7 @@ public class ProcessingActivityService {
 
         ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(unitId, processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", processingActivityDTO.getName());
         }
         ProcessingActivity processingActivity = new ProcessingActivity();
         buildProcessingActivity(unitId, processingActivityDTO, processingActivity);
@@ -133,7 +133,7 @@ public class ProcessingActivityService {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(unitId, processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.ProcessingActivity", processingActivityDTO.getName());
         }
         processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!processingActivity.isActive()) {
