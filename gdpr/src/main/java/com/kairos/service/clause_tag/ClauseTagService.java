@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 @Service
 public class ClauseTagService{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClauseTagService.class);
-
     @Inject
     private
     MessageSource messageSource;
@@ -30,28 +28,6 @@ public class ClauseTagService{
     @Inject
     private ClauseTagRepository clauseTagRepository;
 
-    /**
-     * @param countryId
-     * @param //clauseTag tag name
-     * @return tag object
-     * @description method create tag and if tag already exist with same name then throw exception
-     */
-    //TODO clause tag creation test
-    /*public ClauseTag createClauseTag(Long countryId, String clauseTag) {
-        if (StringUtils.isEmpty(clauseTag)) {
-            throw new InvalidRequestException("requested param name is null or empty");
-        }
-        ClauseTag exist = clauseTagMongoRepository.findByNameAndCountryId(countryId, clauseTag);
-        if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("tag already exist for  " + clauseTag);
-        } else {
-            ClauseTag newClauseTag = new ClauseTag();
-            newClauseTag.setName(clauseTag);
-            newClauseTag.setCountryId(countryId);
-            return clauseTagMongoRepository.save(newClauseTag);
-        }
-    }*/
-
 
     public List<ClauseTag> getAllClauseTagByCountryId(Long countryId) {
         return clauseTagRepository.findAllByCountryId(countryId);
@@ -61,46 +37,7 @@ public class ClauseTagService{
         return clauseTagRepository.findAllClauseTagByUnitId(unitId);
     }
 
-//TODO
-    /*public ClauseTag getClauseTagById(Long countryId, BigInteger id) {
 
-        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("clause tag not exist for id " + id);
-        } else {
-            return exist;
-
-        }
-    }*/
-
-
-   /* public Boolean deleteClauseTagById(Long countryId, BigInteger id) {
-
-        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            delete(exist);
-            return true;
-
-        }
-    }
-
-
-    public ClauseTag updateClauseTag(Long countryId, BigInteger id, String clauseTag) {
-        if (StringUtils.isBlank(clauseTag)) {
-            throw new InvalidRequestException("requested param name is null or empty");
-        }
-        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
-        }
-        clauseTagMongoRepository.save(exist);
-        return exist;
-
-
-    }
-*/
     /**
      * @param referenceId
      * @param tagList     list of clause tags

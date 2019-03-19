@@ -124,8 +124,8 @@ public class AccessPageService {
             return false;
         }
 
-        Boolean isKairosHub = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.HUB) ? true : false;
-        Boolean isUnion = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.UNION) ? true : false;
+        Boolean isKairosHub = OrganizationCategory.HUB.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
+        Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
 
         if(orgCategoryTabAccessDTO.isAccessStatus()){
             accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );

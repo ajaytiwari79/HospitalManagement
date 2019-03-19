@@ -20,8 +20,6 @@ public class AgreementSectionResponseDTO {
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
-    //private List<BigInteger> clauseIdOrderedIndex;
-    //private List<ClauseBasicResponseDTO> clauses;
     private List<AgreementSectionClause> clauses;
     private List<AgreementSectionResponseDTO> agreementSubSections = new ArrayList<>();
 
@@ -33,11 +31,6 @@ public class AgreementSectionResponseDTO {
         this.orderedIndex = orderedIndex;
     }
 
-    /*public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
-
-    public void setClauseIdOrderedIndex(List<BigInteger> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }
-
-    */
     public Long getId() {
         return id;
     }
@@ -50,17 +43,7 @@ public class AgreementSectionResponseDTO {
         return agreementSubSections;
     }
 
-    public void setAgreementSubSections(List<AgreementSectionResponseDTO> agreementSubSections) {
-        this.agreementSubSections = agreementSubSections;
-    }
-
-    /*public List<ClauseBasicResponseDTO> getClauses() {
-        return clauses;
-    }
-
-    public void setClauses(List<ClauseBasicResponseDTO> clauses) {
-        this.clauses = clauses;
-    }*/
+    public void setAgreementSubSections(List<AgreementSectionResponseDTO> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
 
     public String getTitle() {
         return title;

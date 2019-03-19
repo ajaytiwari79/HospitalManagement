@@ -23,4 +23,6 @@ public class ValidateRequestBodyList<T> {
 
     public ValidateRequestBodyList() {
     }
+
+
 }

@@ -24,9 +24,6 @@ import static com.kairos.constants.ApiConstant.*;
 class TemplateTypeController {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateTypeController.class);
-
-
     @Inject
     private TemplateTypeService templateTypeService;
 

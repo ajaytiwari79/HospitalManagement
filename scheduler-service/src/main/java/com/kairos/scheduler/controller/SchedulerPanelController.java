@@ -46,7 +46,7 @@ public class SchedulerPanelController {
 
     @GetMapping("")
     @ApiOperation("Get Control Panel List ")
-    public ResponseEntity<Map<String, Object>> getSchedulerPanelList(@PathVariable  long unitId) throws IOException {
+    public ResponseEntity<Map<String, Object>> getSchedulerPanelList(@PathVariable  Long unitId) throws IOException {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getSchedulerPanelByUnitId(unitId));
 
@@ -55,7 +55,7 @@ public class SchedulerPanelController {
 
     @PostMapping
     @ApiOperation("Create Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable  long unitId,
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable  Long unitId,
                                                                  @RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTOs));
     }

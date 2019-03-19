@@ -35,7 +35,7 @@ public class QuestionService{
     public boolean deleteQuestionOfQuestionnaireSection(Long questionId, Long sectionId) {
         Question question = questionRepository.findByIdAndDeletedFalse( questionId);
         if (!Optional.ofNullable(question).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Question", questionId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.question", questionId);
         }
         questionRepository.delete(question);
         return true;

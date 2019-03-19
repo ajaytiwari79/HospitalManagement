@@ -47,3 +47,22 @@ db.wtaBaseRuleTemplate.find({"countryId" : NumberLong(18712)}).forEach(function(
 
 Please hit this API to update phaseId in WTARuletemplate
 {Server-Url}kairos/activity/api/v1/unit/1172/update_phases_in_ruletemplate
+
+
+//add duration and duration type in planning period
+//first check existing planning period duration and duration type
+db.getCollection('planningPeriod').updateMany({},{$set:{ "duration" :NumberInt(1),"durationType" : "MONTHS"}})
+
+//for delete unimplemented KPI of unit
+
+db.counter.updateMany({"type" :{$nin:[
+    "RESTING_HOURS_PER_PRESENCE_DAY",
+    "PLANNED_HOURS",
+    "DAYTYPE_AND_TIMESLOT",
+    "SHIFT_AND_ACTIVITY_DURATION",
+    "CONTRACTUAL_AND_PLANNED_HOURS",
+    "TIMEBANK"]}},
+    {$set:{"deleted":true}})
+
+db.applicableKPI.updateMany({"baseKpiId":{"$in":["10","11","12","13","14","15","2","3","4","5","6","7","8","9"]}},{$set:{"deleted":true}})
+

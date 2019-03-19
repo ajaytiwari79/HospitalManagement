@@ -11,8 +11,8 @@ import java.util.List;
 @Entity
 public class DataCategory extends BaseEntity {
 
-    @NotBlank(message = "Name cannot be empty")
-    @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     // empty array to get rid of null pointer
