@@ -61,7 +61,7 @@ public class PhaseService extends MongoBaseService {
 
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        if(isCollectionNotEmpty(phases)) {
+        if(isCollectionEmpty(phases)) {
             List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
             phases = new ArrayList<>();
             for (PhaseDTO phaseDTO : countryPhases) {

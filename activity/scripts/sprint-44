@@ -66,3 +66,6 @@ db.counter.updateMany({"type" :{$nin:[
 
 db.applicableKPI.updateMany({"baseKpiId":{"$in":["10","11","12","13","14","15","2","3","4","5","6","7","8","9"]}},{$set:{"deleted":true}})
 
+db.wtaBaseRuleTemplate.updateMany({"name":"Maximum number of consecutive days"},{$set:{"name":"Maximum number of consecutive shifts"}});
+
+db.wtaBaseRuleTemplate.updateMany({"name":"Minimum days off after a series of night shifts in sequence"},{$set:{"name":"Night worker - Minimum days off after a series of night shifts in sequence"}});
