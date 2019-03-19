@@ -7,7 +7,9 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static org.neo4j.ogm.annotation.Relationship.INCOMING;
@@ -86,7 +88,7 @@ public class PayTable extends UserBaseEntity {
     }
 
     public void setPayGrades(List<PayGrade> payGrades) {
-        this.payGrades = payGrades;
+        this.payGrades = Optional.ofNullable(payGrades).orElse(new ArrayList<>());
     }
 
     public String getDescription() {
