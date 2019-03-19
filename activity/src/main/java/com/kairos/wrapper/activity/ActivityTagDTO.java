@@ -2,6 +2,7 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
@@ -41,6 +42,7 @@ public class ActivityTagDTO {
     private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
     private Long parentId;
     private ActivityStateEnum state;
+    private List<CompositeShiftActivityDTO> compositeActivities;
 
     public ActivityTagDTO() {
         //default constructor
@@ -207,6 +209,15 @@ public class ActivityTagDTO {
 
     public void setActivityCanBeCopiedForOrganizationHierarchy(Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
+    }
+
+
+    public List<CompositeShiftActivityDTO> getCompositeActivities() {
+        return compositeActivities;
+    }
+
+    public void setCompositeActivities(List<CompositeShiftActivityDTO> compositeActivities) {
+        this.compositeActivities = compositeActivities;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
