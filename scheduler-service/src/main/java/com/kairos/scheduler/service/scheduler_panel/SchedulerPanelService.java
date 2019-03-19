@@ -1,28 +1,25 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.scheduler.JobDetailsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
-import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
-import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobFrequencyType;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
-import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
 import com.kairos.scheduler.persistence.repository.job_details.JobDetailsRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
 import com.kairos.scheduler.persistence.repository.scheduler_panel.SchedulerPanelRepository;
 import com.kairos.scheduler.service.MongoBaseService;
-
 import com.kairos.scheduler.service.UserIntegrationService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-
 import com.kairos.scheduler.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_INTERVAL_STRING;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ONCE_STRING;
 
@@ -77,15 +75,7 @@ public class SchedulerPanelService extends MongoBaseService {
         if (!schedulerPanels.isEmpty()) {
             List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
                     collect(Collectors.toList());
-            List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneOfAllUnits();
-
-            Map<Long, String> unitIdTimeZoneMap = unitTimeZoneMappingDTOS.stream().filter(unitTimeZoneMappingDTO -> Optional.ofNullable(unitTimeZoneMappingDTO.getTimezone()).isPresent()).
-                    collect(Collectors.toMap(unitTimeZoneMapping -> {
-                        return unitTimeZoneMapping.getUnitId();
-                    }, unitTimeZoneMapping -> {
-                        return unitTimeZoneMapping.getTimezone();
-                    }));
-
+            Map<Long, String> unitIdTimeZoneMap = userIntegrationService.getTimeZoneOfAllUnits();
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
                     logger.info("Inside initSchedulerPanels" + schedulerPanel.getUnitId() + " unitId = " + unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
@@ -144,17 +134,19 @@ public class SchedulerPanelService extends MongoBaseService {
 
             schedulerPanel.setActive(true);
 
-            schedulerPanel.setUnitId(unitId);
+            schedulerPanel.setUnitId(isNotNull(schedulerPanelDTO.getUnitId()) ? schedulerPanelDTO.getUnitId() : unitId);
             //dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
 
             schedulerPanels.add(schedulerPanel);
             timezone = schedulerPanelDTO.getTimezone();
         }
         save(schedulerPanels);
-        if (!Optional.ofNullable(timezone).isPresent())
-            timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
-//        String defaultTimezone = timezone;
-//        schedulerPanels.stream().map(schedulerPanel -> dynamicCronScheduler.setCronScheduling(schedulerPanel, defaultTimezone));
+
+        if(!Optional.ofNullable(timezone).isPresent())
+        timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
+//        String defaultTimezone=timezone;
+//        schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,defaultTimezone));
+
 
         for (SchedulerPanel schedulerPanel : schedulerPanels) {
             dynamicCronScheduler.setCronScheduling(schedulerPanel, timezone);
@@ -378,11 +370,13 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
 
+
     private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {
         String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
         String cronExpression = MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
         return cronExpression;
     }
+
 
     /**
      * @author yatharth
