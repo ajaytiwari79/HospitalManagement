@@ -1,0 +1,3 @@
+// for set time zone of units
+
+MATCH(org:Organization{deleted:false}) where org.timeZone is null set org.timeZone="UTC"

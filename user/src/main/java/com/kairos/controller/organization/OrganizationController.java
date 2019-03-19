@@ -53,10 +53,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -1314,6 +1311,14 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getTimeZoneOfAllUnits() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getTimeZoneStringsOfAllUnits());
+    }
+
+    @PostMapping("/units_time_zone")
+    @ApiOperation("Get Time Zone of given Organizations")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllTimeZoneByUnitIds(@RequestBody Set<Long> unitIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getTimeZoneStringsByUnitIds(unitIds));
     }
 //    @Pavan
 //    Add Apis for Time slots for Shift planning

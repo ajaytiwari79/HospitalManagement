@@ -718,6 +718,11 @@ public class UserIntegrationService {
         });
     }
 
+    public Map<Long,String> getTimeZoneByUnitIds(Set<Long> unitIds){
+        return genericRestClient.publishRequest(unitIds,null,RestClientUrlType.ORGANIZATION,HttpMethod.POST,UNITS_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
+        });
+    }
+
 
     public List<StaffKpiFilterDTO> getStaffsByFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, STAFF_BY_KPI_FILTER, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffKpiFilterDTO>>>() {

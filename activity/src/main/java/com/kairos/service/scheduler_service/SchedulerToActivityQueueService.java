@@ -18,7 +18,7 @@ import java.util.Arrays;
 @Service
 public class SchedulerToActivityQueueService implements JobQueueExecutor {
 
-   @Inject
+    @Inject
     private PlanningPeriodService planningPeriodService;
     private static final Logger logger = LoggerFactory.getLogger(SchedulerToActivityQueueService.class);
     @Inject
@@ -36,7 +36,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
         switch (job.getJobSubType()) {
             case FLIP_PHASE:
                 logger.info("JOB for flipping phase");
-                planningPeriodService.updateFlippingDate(job.getEntityId(),job.getUnitId(),job.getId());
+                planningPeriodService.updateFlippingDate(job.getEntityId(), job.getUnitId(), job.getId());
                 break;
             case UPDATE_USER_ABSENCE:
                 logger.info("Job to update sick absence user and if user is not sick then add more sick shifts");
@@ -52,7 +52,11 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case ADD_PAYROLL_PERIOD:
                 logger.info("Job to create MONTHLY and FORTNIGHTLY  payroll period ");
-                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(Arrays.asList(PayrollFrequency.MONTHLY,PayrollFrequency.FORTNIGHTLY),null);
+                unitPayrollSettingService.addPayrollPeriodInUnitViaJobOrManual(Arrays.asList(PayrollFrequency.MONTHLY, PayrollFrequency.FORTNIGHTLY), null);
+                break;
+            case ADD_PLANNING_PERIOD:
+                logger.info("Job to add planning period ");
+                planningPeriodService.addPlanningPeriodViaJob();
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");
