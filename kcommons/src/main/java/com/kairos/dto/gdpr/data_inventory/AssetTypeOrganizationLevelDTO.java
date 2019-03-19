@@ -28,7 +28,7 @@ public class AssetTypeOrganizationLevelDTO {
 
     public void setId(Long id) { this.id = id; }
 
-    public String getName() { return name; }
+    public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
 
