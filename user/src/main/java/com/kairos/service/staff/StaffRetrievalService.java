@@ -346,8 +346,8 @@ public class StaffRetrievalService {
         }
         /*staff = filterStaffByRoles((List<StaffPersonalDetailDTO>) map.get("staffList"), unitId, UserContext.getUserDetails().getId());
         map.put("staffList", staff);*/
-        map.put("engineerTypes", engineerTypes);
-        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
+//        map.put("engineerTypes", engineerTypes);
+//        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
         map.put("roles", roles);
         return map;
     }

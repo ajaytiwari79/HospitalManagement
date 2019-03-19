@@ -126,9 +126,6 @@ public class StaffFilterService {
             case STAFF_STATUS: {
                 return dtoToQueryesultConverter(StaffStatusEnum.getListOfStaffStatusForFilters(), objectMapper);
             }
-            case ENGINEER_TYPE: {
-                return engineerTypeGraphRepository.getEngineerTypeByCountryIdForFilters(countryId);
-            }
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
