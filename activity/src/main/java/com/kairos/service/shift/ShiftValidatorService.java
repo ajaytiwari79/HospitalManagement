@@ -390,6 +390,8 @@ public class ShiftValidatorService {
         return shiftQueryResultWithActivities;
     }
 
+
+
     public void verifyRankAndStaffingLevel(List<ShiftActivityDTO> shiftActivities, Long unitId, List<ActivityWrapper> activities, Phase phase, UserAccessRoleDTO userAccessRoleDTO) {
         if (!shiftActivities.isEmpty()) {
             PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(unitId, phase.getId());

@@ -171,12 +171,13 @@ public class PlanningPeriod extends MongoBaseEntity {
         }
 
         public static List<Type> getListByValue(List<String> values) {
-            if(Optional.ofNullable(values).isPresent()){
+            if (Optional.ofNullable(values).isPresent()) {
                 return values.stream().map(Type::valueOf)
                         .collect(Collectors.toList());
             }
             return null;
 
         }
+    }
     
 }

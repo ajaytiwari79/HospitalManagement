@@ -693,8 +693,6 @@ public class StaffRetrievalService {
         ).collect(Collectors.toList());
         staffUnitPositionUnitDataWrapper.setDayTypes(dayTypeDTOS);
         staffUnitPositionUnitDataWrapper.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
-        UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(organization.getId());
-        staffUnitPositionUnitDataWrapper.setUser(userAccessRole);
         staffUnitPositionUnitDataWrapper.setUnitTimeZone(organization.getTimeZone());
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organization.getId());
         SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(expertiseId);
@@ -710,7 +708,7 @@ public class StaffRetrievalService {
         if (!Optional.ofNullable(unitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unitposition.id.notexist", unitPositionId);
         }
-        UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
+        UserAccessRoleDTO userAccessRole = accessGroupService.findUserAccessRole(unitId);
         List<AppliedFunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionDetails.getAppliedFunctions(), AppliedFunctionDTO.class);
         unitPositionDetails.setAppliedFunctions(appliedFunctionDTOS);
         List<ReasonCodeResponseDTO> reasonCodeQueryResults = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE);
