@@ -19,10 +19,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DAYS;
@@ -127,17 +124,17 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
-            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
-            if(timeInterval!=null) {
+        if(!isDisabled() && isValidShift(infoWrapper.getPhase(),infoWrapper.getShift(),this.phaseTemplateValues,timeTypeIds,plannedTimeIds)){
+            TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
+            if(timeIntervals.length>0) {
                 DateTimeInterval[] dateTimeIntervals = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
                 List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                 for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-                    shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
+                    Set<BigInteger> shiftIds = getShiftIdsByInterval(dateTimeInterval, shifts, timeIntervals);
                     Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shiftIds.size()+1);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.DAYS,limitAndCounter[0]);
-                    if(isValid){
+                    if(!isValid){
                         break;
                     }
                 }
@@ -146,7 +143,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     public static DateTimeInterval[] getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
-        DateTimeInterval[] interval = null;
+        DateTimeInterval[] interval = new DateTimeInterval[2];
         if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
             throwException("message.ruleTemplate.interval.notNull");
         }
