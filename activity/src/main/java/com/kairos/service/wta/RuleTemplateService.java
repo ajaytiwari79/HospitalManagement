@@ -112,7 +112,7 @@ public class RuleTemplateService extends MongoBaseService {
         shiftLengthWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shiftLengthWTATemplate);
 
-        ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",  "Maximum number of consecutive days");
+        ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive shifts",  "Maximum number of consecutive shifts");
         consecutiveWorking.setCountryId(countryDTO.getId());
         consecutiveWorking.setIntervalLength(12);
         consecutiveWorking.setIntervalUnit(weeks);
@@ -202,7 +202,7 @@ public class RuleTemplateService extends MongoBaseService {
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
 
-        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence", false, "Minimum days off after a series of night shifts in sequence", 1, weeks, 1);
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Night worker - Minimum days off after a series of night shifts in sequence", false, "Night worker - Minimum days off after a series of night shifts in sequence", 1, weeks, 1);
         daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         daysOffAfterASeriesWTATemplate.setCountryId(countryDTO.getId());
         daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
