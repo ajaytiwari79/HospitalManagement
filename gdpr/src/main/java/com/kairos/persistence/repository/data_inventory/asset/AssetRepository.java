@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.data_inventory.asset;
 
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,8 @@ public interface AssetRepository extends CustomGenericRepository<Asset> {
     @Query(value = "Select name from Asset where organizationId = ?1 and deleted = false and (assetType.id  = ?2 OR subAssetType.id = ?2)")
     List<String> findAllAssetLinkedWithAssetType(Long orgId, Long assetTypeId);
 
+    @Query(name = "getAllAssetRelatedProcessingActivityData",nativeQuery = true)
+    List<AssetBasicResponseDTO> getAllAssetRelatedProcessingActivityByOrgId(Long orgId);
 
     @Query(value = "Select asset from #{#entityName} asset WHERE asset.organizationId = ?1 and asset.deleted = false and asset.active =  true order by asset.createdAt desc")
     List<Asset> findAllActiveAssetByOrganizationId(Long orgId);

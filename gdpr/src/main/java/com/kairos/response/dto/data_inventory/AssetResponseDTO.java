@@ -34,7 +34,6 @@ public class AssetResponseDTO {
     private boolean active;
     private AssetAssessor assetAssessor;
     private boolean suggested;
-    private List<ProcessingActivityBasicResponseDTO> processingActivities;
 
     public boolean isSuggested() {
         return suggested;
@@ -196,11 +195,4 @@ public class AssetResponseDTO {
         this.active = active;
     }
 
-    public List<ProcessingActivityBasicResponseDTO> getProcessingActivities() {
-        return processingActivities;
     }
-
-    public void setProcessingActivities(List<ProcessingActivityBasicResponseDTO> processingActivities) {
-        this.processingActivities = processingActivities;
-    }
-}

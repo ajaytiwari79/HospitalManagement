@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.master_data.asset_management.storage_fo
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -146,7 +147,6 @@ public class AssetService {
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         return asset;
     }
-
 
 
     private void saveAssetTypeSubTypeAndRisk(Long unitId, Asset asset, AssetDTO assetDTO) {
@@ -315,6 +315,8 @@ public class AssetService {
     public List<AssetResponseDTO> getAllAssetByUnitId(Long unitId) {
         List<AssetResponseDTO> assetResponseDTOS = new ArrayList<>();
         List<Asset> assets = assetRepository.findAllByOrganizationId(unitId);
+        //todo  fix result set expection
+        List<AssetBasicResponseDTO> assetBasicResponseDTOS = assetRepository.getAllAssetRelatedProcessingActivityByOrgId(unitId);
         assets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, false)));
         return assetResponseDTOS;
     }
