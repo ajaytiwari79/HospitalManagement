@@ -76,6 +76,9 @@ public class StaffingLevelUtil {
             }
             staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
             i++;
+            if(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().size()==i) {
+                break ;
+            }
         }
         staffingLevel.setUnitId(unitId);
         staffingLevel.setId(staffingLevelId);
