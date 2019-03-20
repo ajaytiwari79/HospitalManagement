@@ -6,6 +6,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -16,16 +17,23 @@ import java.util.List;
 public class ShiftViolatedRules extends MongoBaseEntity{
 
     //TODO We need proper discussion it should be per phase
-    private Shift shift;
+    private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
 
-    public Shift getShift() {
-        return shift;
+    public ShiftViolatedRules() {
     }
 
-    public void setShift(Shift shift) {
-        this.shift = shift;
+    public ShiftViolatedRules(BigInteger shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public BigInteger getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(BigInteger shiftId) {
+        this.shiftId = shiftId;
     }
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {

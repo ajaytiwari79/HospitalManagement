@@ -40,6 +40,7 @@ public class StaffAdditionalInfoDTO {
     private String cprNumber;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes;
+    private UserAccessRoleDTO userAccessRoleDTO;
 
 
     public StaffAdditionalInfoDTO() {
@@ -95,14 +96,6 @@ public class StaffAdditionalInfoDTO {
         this.publicHoliday = publicHoliday;
     }
 
-    public UserAccessRoleDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserAccessRoleDTO user) {
-        this.user = user;
-    }
-
     public List<TimeSlotWrapper> getTimeSlotSets() {
         return timeSlotSets;
     }
@@ -110,8 +103,6 @@ public class StaffAdditionalInfoDTO {
     public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
         this.timeSlotSets = timeSlotSets;
     }
-
-    private UserAccessRoleDTO userAccessRoleDTO;
 
     public ZoneId getUnitTimeZone() {
         return unitTimeZone;
