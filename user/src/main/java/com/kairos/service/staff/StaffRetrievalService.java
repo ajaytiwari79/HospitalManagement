@@ -348,6 +348,8 @@ public class StaffRetrievalService {
         map.put("engineerTypes", engineerTypes);
         map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
         map.put("roles", roles);
+        List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
+        map.put("teamList", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
         return map;
     }
 

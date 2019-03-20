@@ -49,12 +49,12 @@ import static com.kairos.constants.AppConstants.TEAM;
         }
 
 
-        @ApiOperation(value = "Get All Teams")
-        @RequestMapping(value = "/teams", method = RequestMethod.GET)
+        @ApiOperation(value = "Get All Teams with additional data")
+        @RequestMapping(value = "/teams_prerequisite", method = RequestMethod.GET)
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> getTeams(@PathVariable long unitId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.getTeams(unitId));
+                    teamService.getTeamsAndPrerequisite(unitId));
 
         }
 
@@ -67,9 +67,9 @@ import static com.kairos.constants.AppConstants.TEAM;
         }
 
         @ApiOperation(value = "Update Activities in Team")
-        @RequestMapping(value = "/team/{teamId}/activities", method = RequestMethod.PUT)
+        @RequestMapping(value = "/team/{teamId}/update_activities", method = RequestMethod.PUT)
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId, @RequestParam(value = "activityIds") List<BigInteger> activityIds) {
+        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId,  @RequestBody List<BigInteger> activityIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.updateActivitiesOfTeam(teamId, activityIds));
         }
@@ -83,10 +83,9 @@ import static com.kairos.constants.AppConstants.TEAM;
 
 
         @ApiOperation(value = "Add Skill to Team")
-        @RequestMapping(value = "/skill/{teamId}", method = RequestMethod.PUT)
+        @RequestMapping(value = "/team/{teamId}/update_skills", method = RequestMethod.PUT)
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> addTeamSkills(@PathVariable Long teamId, @RequestBody Map<String, Long[]> data) {
-            Long[] skillIds = data.get("data");
+        public ResponseEntity<Map<String, Object>> addTeamSkills(@PathVariable Long teamId, @RequestBody List<Long> skillIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.addTeamSelectedSkills(teamId, skillIds));
         }
 

@@ -128,8 +128,9 @@ public class TeamService {
         organization.getTeams().add(team);
         organizationGraphRepository.save(organization, 2);
 
-        teamGraphRepository.assignTeamLeaderToTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
-
+        if(ObjectUtils.isNotNull(teamDTO.getTeamLeaderStaffId())){
+            teamGraphRepository.assignTeamLeaderToTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
+        }
         return teamDTO;
     }
 
@@ -175,7 +176,7 @@ public class TeamService {
         return teamDetails;
     }
 
-    public Map<String, Object> getTeams(long unitId) {
+    public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
         Map<String, Object> map = new HashMap<>();
         map.put("teams", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
@@ -272,8 +273,13 @@ public class TeamService {
 
     }
 
-    public List<Skill> addTeamSelectedSkills(Long teamId, Long[] skill) {
-        return teamGraphRepository.saveSkill(teamId, skill);
+    public boolean addTeamSelectedSkills(Long teamId, List<Long> skillIds) {
+        if(ObjectUtils.isCollectionEmpty(skillIds)){
+            teamGraphRepository.saveSkill(teamId, skillIds);
+        } else {
+            teamGraphRepository.removeAllSkillsFromTeam(teamId);
+        }
+        return true;
     }
 
     public List<Map<String, Object>> getTeamSelectedSkills(Long teamId) {

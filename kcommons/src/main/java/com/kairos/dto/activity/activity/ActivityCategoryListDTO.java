@@ -7,20 +7,20 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityCategoryListDTO {
-    private ActivityCategoryDTO activityCategoryDTO;
+    private ActivityCategoryDTO activityCategory;
     private List<ActivityDTO> activities;
 
-    public ActivityCategoryListDTO(ActivityCategoryDTO activityCategoryDTO, List<ActivityDTO> activities) {
-        this.activityCategoryDTO = activityCategoryDTO;
+    public ActivityCategoryListDTO(ActivityCategoryDTO activityCategory, List<ActivityDTO> activities) {
+        this.activityCategory = activityCategory;
         this.activities = activities;
     }
 
-    public ActivityCategoryDTO getActivityCategoryDTO() {
-        return activityCategoryDTO;
+    public ActivityCategoryDTO getActivityCategory() {
+        return activityCategory;
     }
 
-    public void setActivityCategoryDTO(ActivityCategoryDTO activityCategoryDTO) {
-        this.activityCategoryDTO = activityCategoryDTO;
+    public void setActivityCategory(ActivityCategoryDTO activityCategory) {
+        this.activityCategory = activityCategory;
     }
 
     public List<ActivityDTO> getActivities() {

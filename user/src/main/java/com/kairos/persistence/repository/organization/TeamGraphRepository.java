@@ -27,9 +27,9 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("Match (team:Team) where id(team)={0} with team\n" +
             "OPTIONAL Match (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:true}]->(teamLead:Staff) with team,teamLead\n" +
-            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) with team, teamLead, teamMembers \n"+
-            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, teamLead, teamMembers, COLLECT (id(skills)) as skillIds \n"+
-            "RETURN {id:id(team), name:team.name, description:team.description, activityIds:team.activityIds, teamMemberIds:id(teamMembers), skillIds:skillIds, teamLeaderStaffId:id(teamLead)}")
+            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) with team, teamLead,  COLLECT (id(teamMembers)) as teamMemberIds  \n"+
+            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, teamLead, teamMemberIds, COLLECT (id(skills)) as skillIds \n"+
+            "RETURN {id:id(team), name:team.name, description:team.description, activityIds:team.activityIds, teamMemberIds:teamMemberIds, skillIds:skillIds, teamLeaderStaffId:id(teamLead)}")
     Map<String,Object> getTeamDetailsById(long teamId);
 
     @Query("MATCH (t:Team)-[:"+TEAM_HAS_MEMBER+"]->(u:Staff) where id(t)={0} RETURN u")
@@ -40,7 +40,10 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query(" Match (t:Team),(s:Skill) where id(s) IN {1} AND id(t)={0}  " +
             " CREATE UNIQUE (t)-[:"+TEAM_HAS_SKILLS+"]->(s) RETURN s")
-    List<Skill> saveSkill(Long teamId, Long[] skill);
+    List<Skill> saveSkill(Long teamId, List<Long> skill);
+
+    @Query("MATCH (team:Team)-[skillTeamRel:"+TEAM_HAS_SKILLS+"]->(skill:Skill) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    void removeAllSkillsFromTeam(Long teamId);
 
     @Query(" Match (t:Team),(os:OrganizationService) where id(t) IN {0} AND id(os)={1}  " +
             " CREATE (t)-[:"+TEAM_HAS_SERVICES+"]->(os) RETURN os")

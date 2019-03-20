@@ -527,7 +527,7 @@ public class StaffService {
                             } else {
                                 user.setEmail(user.getFirstName().trim() + KAIROS_EMAIL);
                             }
-                            String defaultPassword = user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH;
+                            String defaultPassword = user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH;
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                             user.setAccessToken(defaultPassword);
                         }
@@ -827,7 +827,7 @@ public class StaffService {
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
         user.setLastName(staffCreationDTO.getLastName());
-        user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent() ? new BCryptPasswordEncoder().encode(user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH) : null);
+        user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent() ? new BCryptPasswordEncoder().encode(user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH) : null);
         user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
@@ -1100,7 +1100,7 @@ public class StaffService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-            final String password = unitManagerDTO.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH;
+            final String password = unitManagerDTO.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH;
         ObjectMapper mapper = new ObjectMapper();
         Map unitManagerDTOMap = mapper.convertValue(unitManagerDTO, Map.class);
         if (user == null) {
@@ -1483,7 +1483,7 @@ public class StaffService {
         Map<String, String> auth = new HashMap<>();
         auth.put("type", "m.login.dummy");
         auth.put("session", staff.getEmail());
-        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH);
+        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH);
         StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
         staff.setAccess_token(chatDetails.getAccess_token());
         staff.setUser_id(chatDetails.getUser_id());
