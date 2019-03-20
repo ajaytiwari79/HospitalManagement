@@ -126,9 +126,6 @@ public class StaffFilterService {
             case STAFF_STATUS: {
                 return dtoToQueryesultConverter(StaffStatusEnum.getListOfStaffStatusForFilters(), objectMapper);
             }
-            case ENGINEER_TYPE: {
-                return engineerTypeGraphRepository.getEngineerTypeByCountryIdForFilters(countryId);
-            }
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
@@ -175,7 +172,8 @@ public class StaffFilterService {
 
     public StaffFilterDTO addFavouriteFilter(Long unitId, StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, unitId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
 
 
         if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
@@ -204,8 +202,9 @@ public class StaffFilterService {
 
     public StaffFilterDTO updateFavouriteFilter(Long filterId, Long organizationId, StaffFilterDTO favouriteFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
+        Organization parent = organizationService.fetchParentOrganization(organizationId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
-                userId, organizationId, filterId);
+                userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 
@@ -235,8 +234,9 @@ public class StaffFilterService {
 
     public Boolean deleteFavouriteFilter(Long filterId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
-                userId, unitId, filterId);
+                userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 
