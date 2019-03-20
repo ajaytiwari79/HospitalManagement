@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -81,7 +82,6 @@ public class TimeTypeService extends MongoBaseService {
             List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(timetype -> timetype.getId()).collect(Collectors.toList());
             List<TimeType> leafTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
             Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
-
             if (timeType.getUpperLevelTimeTypeId() == null && !timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
                 //User Cannot Update NAME for TimeTypes of Second Level
                 exceptionService.actionNotPermittedException("message.timetype.rename.notAllowed", timeType.getLabel());
@@ -102,17 +102,25 @@ public class TimeTypeService extends MongoBaseService {
                 timeType.setActivityCanBeCopiedForOrganizationHierarchy(Collections.EMPTY_SET);
             }
             List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
+            boolean partOfTeamUpdated=false;
             if (Optional.ofNullable(childTimeTypeList).isPresent()) {
-                childTimeTypeList.forEach(childTimeType -> {
+                for(TimeType childTimeType:childTimeTypeList){
+                    if(childTimeType.isPartOfTeam()!=timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()){
+                        childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+                        partOfTeamUpdated=true;
+                    }
                     childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                     List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
                     if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
-                        leafTimeTypeList.forEach(leafTimeType -> {
+                        for(TimeType leafTimeType:childTimeTypeList) {
                             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                        });
+                            if(leafTimeType.isPartOfTeam()!=timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId()!=null){
+                                childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+                            }
+                        }
                         timeTypes.addAll(leafTimeTypeList);
                     }
-                });
+                }
                 timeTypes.addAll(childTimeTypeList);
             }
             timeTypes.add(timeType);

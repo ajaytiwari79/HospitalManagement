@@ -22,6 +22,7 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -510,26 +511,35 @@ public class OrganizationActivityService extends MongoBaseService {
         }
     }
 
+    /**
+     *
+     * @param activities
+     * @param parentActivity
+     * @Desc this method is being used to validate the cases of allowed activities
+     */
     public void verifyTeamActivity(List<ActivityWrapper> activities, Activity parentActivity) {
-        int timeType = activities.stream().map(ActivityWrapper::getTimeTypeData).filter(TimeType::isPartOfTeam).collect(Collectors.toList()).size();
-        if (timeType > 1) {
-            exceptionService.actionNotPermittedException("please select same time type of activities");
-        }2
-        if (timeType != 0) {
-            activities=activities.stream().filter(k->!k.getActivity().getId().equals(parentActivity.getId())).collect(Collectors.toList());
-            if (activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(parentActivity.getId())) {
-                exceptionService.actionNotPermittedException("Parent Activity is being used as child activity");
-            }
-            List<Activity> activityList = activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalseExcludingCurrent(parentActivity.getId(), activities.stream().map(k -> k.getActivity().getId()).collect(Collectors.toList()));
-            if (isCollectionNotEmpty(activityList)) {
-                List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
-                exceptionService.actionNotPermittedException(activityNames + "activities is being used else where");
-            }
-            for (ActivityWrapper activityWrapper : activities) {
-                if (isCollectionNotEmpty(activityWrapper.getActivity().getCompositeActivities())) {
-                    exceptionService.actionNotPermittedException("this activity is already being used as parent activity");
+        if(parentActivity.getRulesActivityTab().isEligibleForStaffingLevel() && activities.stream().anyMatch(k->!k.getActivity().getRulesActivityTab().isEligibleForStaffingLevel())){
+            exceptionService.actionNotPermittedException("message.child_activities.not_support.staffing_level");
+        }
+        TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType.isPartOfTeam()) {
+                int partOfTeamTimeTypes = activities.stream().map(a -> a.getTimeTypeData().isPartOfTeam()).collect(Collectors.toSet()).size();
+                if (activities.size() != partOfTeamTimeTypes) {
+                    exceptionService.actionNotPermittedException("message.all_activity_same.time_type");
                 }
-            }
+                if (activityMongoRepository.existsByActivityIdInCompositeActivities(parentActivity.getId())) {
+                    exceptionService.actionNotPermittedException("message.activity.being_used_as_child", parentActivity.getName());
+                }
+                List<Activity> activityList = activityMongoRepository.findByActivityIdInCompositeActivities(parentActivity.getId(), activities.stream().map(k -> k.getActivity().getId()).collect(Collectors.toList()));
+                if (isCollectionNotEmpty(activityList)) {
+                    List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
+                    exceptionService.actionNotPermittedException("message.activity.being_used_as_child", activityNames);
+                }
+                activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getActivity().getCompositeActivities())).collect(Collectors.toList());
+                if (isCollectionNotEmpty(activities)) {
+                    List<String> activityNames = activities.stream().map(k -> k.getActivity().getName()).collect(Collectors.toList());
+                    exceptionService.actionNotPermittedException("message.activity.being_used_as_parent", activityNames);
+                }
         }
     }
 

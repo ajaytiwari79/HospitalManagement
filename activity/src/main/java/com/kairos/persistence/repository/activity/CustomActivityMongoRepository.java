@@ -74,4 +74,8 @@ public interface CustomActivityMongoRepository {
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
     List<ActivityWrapper> findActivityAndTimeTypeByIds(Set<BigInteger> activityIds);
+
+    boolean existsByActivityIdInCompositeActivities(BigInteger activityId);
+
+    List<Activity> findByActivityIdInCompositeActivities(BigInteger activityId,List<BigInteger> allowedActivityIds);
 }
