@@ -81,7 +81,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void assignTeamLeaderToTeam(long teamId, long staffId);
 
     @Query("MATCH (team:Team),(staff:Staff) where id(team)={0} AND id(staff)={1} \n" +
-            "OPTIONAL MATCH (team)-[existingStaffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:true}]->(staff) where id(staff) <> {1} SET existingStaffTeamRel.teamLeader=false \n"+
+            "OPTIONAL MATCH (team)-[existingStaffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:true}]->(teamStaffs:Staff) where id(teamStaffs) <> {1} DETACH DELETE existingStaffTeamRel \n"+
             "CREATE UNIQUE (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{isEnabled:true, teamLeader:true}]->(staff)")
     void updateTeamLeaderOfTeam(long teamId, long staffId);
 
