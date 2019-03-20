@@ -6,7 +6,6 @@ import com.kairos.dto.response.ResponseDTO;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
-import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswer;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;

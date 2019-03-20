@@ -90,6 +90,7 @@ public class MasterAssetDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
+
     public AssetTypeBasicDTO getSubAssetType() {
         return subAssetType;
     }

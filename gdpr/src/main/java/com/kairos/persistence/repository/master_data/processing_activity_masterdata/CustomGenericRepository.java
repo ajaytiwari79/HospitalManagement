@@ -10,7 +10,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
-//TODO make generic for metadata only and create a generic for rest of the application
 
 @NoRepositoryBean
 public interface CustomGenericRepository<T extends BaseEntity> extends JpaRepository<T, Long> {

@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
 /**
@@ -60,16 +60,19 @@ public class PhaseService extends MongoBaseService {
 
 
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
-        List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
-        List<Phase> phases = new ArrayList<>();
-        for (PhaseDTO phaseDTO : countryPhases) {
-            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime(),phaseDTO.getGracePeriodByStaff(),phaseDTO.getGracePeriodByManagement(),phaseDTO.getUntilNextDay(),phaseDTO.getRealtimeDuration());
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        if(isCollectionNotEmpty(phases)) {
+            List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
+            phases = new ArrayList<>();
+            for (PhaseDTO phaseDTO : countryPhases) {
+                Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
+                        unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(), phaseDTO.getColor(), phaseDTO.getFlippingDefaultTime(), phaseDTO.getGracePeriodByStaff(), phaseDTO.getGracePeriodByManagement(), phaseDTO.getUntilNextDay(), phaseDTO.getRealtimeDuration());
 
-            phases.add(phase);
-        }
-        if (!phases.isEmpty()) {
-            save(phases);
+                phases.add(phase);
+            }
+            if (!phases.isEmpty()) {
+                save(phases);
+            }
         }
         return phases;
     }
@@ -181,6 +184,10 @@ public class PhaseService extends MongoBaseService {
     public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId, Sort.Direction direction) {
            return  phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
         }
+
+    public List<PhaseDTO> getApplicablePlanningPhasesByUnitIds(List<Long> orgIds, Sort.Direction direction) {
+        return  phaseMongoRepository.getApplicablePlanningPhasesByUnitIds(orgIds, direction);
+    }
 
     public List<PhaseDTO> getActualPhasesByOrganizationId(Long orgId) {
         return phaseMongoRepository.getActualPhasesByUnit(orgId);

@@ -121,7 +121,7 @@ public class TransferMethodService {
         }
         Integer resultCount = transferMethodRepository.updateMasterMetadataName(transferMethodDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.transferMethod", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, transferMethodDTO.getName());
         }
@@ -153,7 +153,7 @@ public class TransferMethodService {
         if (updateCount > 0) {
             LOGGER.info("Transfer Methods are updated successfully with ids :: {}", transferMethodIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", transferMethodIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.transferMethod", transferMethodIds);
         }
         return transferMethodRepository.findAllByIds(transferMethodIds);
     }

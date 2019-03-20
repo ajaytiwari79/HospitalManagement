@@ -10,9 +10,9 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Question extends BaseEntity {
 
-    @NotBlank(message = "Question cant'be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String question;
-    @NotBlank(message = "Description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private boolean required;
     @NotNull

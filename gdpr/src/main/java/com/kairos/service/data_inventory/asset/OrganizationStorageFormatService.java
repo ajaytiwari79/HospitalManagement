@@ -99,7 +99,7 @@ public class OrganizationStorageFormatService {
 
         List<String> assetsLinked = assetRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", StringUtils.join(assetsLinked, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.storageFormat", StringUtils.join(assetsLinked, ','));
         }
         storageFormatRepository.deleteByIdAndOrganizationId(storageFormatId, unitId);
         return true;
@@ -121,11 +121,11 @@ public class OrganizationStorageFormatService {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Storage Format", storageFormat.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.storageFormat", storageFormat.getName());
         }
         Integer resultCount = storageFormatRepository.updateMetadataName(storageFormatDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.storageFormat", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, storageFormatDTO.getName());
         }

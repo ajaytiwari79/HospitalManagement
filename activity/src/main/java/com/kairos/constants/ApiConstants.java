@@ -139,10 +139,12 @@ public final class ApiConstants {
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION="/updateFunctionOnPhaseRestoration";
     public static final String GET_FUNCTIONS_OF_UNIT_POSITION=STAFF_WITH_STAFF_ID+"/unit_position/{unitPositionId}/functions";
     public static final String UNIT_TIMEZONE="/time_zone";
+    public static final String UNITS_TIMEZONE="units_time_zone";
 
     public static final String STAFF_EMPLOYMENT_BY_UNIT_POSITION_ID=STAFF_URL+"/staff_employment_by_unit_position/{unitPositionId}";
 
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
+    public static final String GET_UNIT_BY_UNIT_POSITION= GET_UNIT_POSITION+"/get_unit";
 
     // /staff_by_employment_type
     public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";

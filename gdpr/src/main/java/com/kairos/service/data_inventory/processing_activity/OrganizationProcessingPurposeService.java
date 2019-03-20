@@ -98,7 +98,7 @@ public class OrganizationProcessingPurposeService{
 
         List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", StringUtils.join(processingActivities,','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.processingPurpose", StringUtils.join(processingActivities,','));
         }
         processingPurposeRepository.deleteByIdAndOrganizationId(processingPurposeId, unitId);
         return true;
@@ -118,11 +118,11 @@ public class OrganizationProcessingPurposeService{
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Processing Purpose", processingPurpose.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.processingPurpose", processingPurpose.getName());
         }
         Integer resultCount =  processingPurposeRepository.updateMetadataName(processingPurposeDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingPurpose", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingPurposeDTO.getName());
         }

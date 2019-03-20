@@ -29,7 +29,6 @@ import static com.kairos.constants.ApiConstant.*;
 @Api(API_ORGANIZATION_URL)
 class AgreementSectionController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionController.class);
 
     @Inject
     private AgreementSectionService agreementSectionService;

@@ -10,6 +10,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class Asset extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
@@ -43,8 +45,6 @@ public class Asset extends BaseEntity {
     private AssetType assetType;
     @OneToOne
     private AssetType subAssetType;
-   /* private Set<BigInteger> processingActivityIds;
-    private Set<BigInteger> subProcessingActivityIds;*/
     private Integer dataRetentionPeriod;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;

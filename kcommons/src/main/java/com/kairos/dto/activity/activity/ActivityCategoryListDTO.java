@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 
 import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityCategoryListDTO {
     private ActivityCategoryDTO activityCategoryDTO;

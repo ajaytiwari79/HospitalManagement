@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -610,8 +611,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization) WHERE id(org) IN {0} DETACH DELETE org")
     void removeOrganizationCompletely(List<Long> organizationIdsToDelete);
 
-    @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as unitId, org.timeZone as timezone ORDER BY unitId")
-    List<UnitTimeZoneQueryResult> findTimezoneforAllorganizations();
+    @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
+    List<OrganizationBasicResponse> findTimezoneforAllorganizations();
+
+    @Query("MATCH(org:Organization{deleted:false}) WHERE id(org) IN {0} RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
+    List<OrganizationBasicResponse> findTimezoneByUnitIds(Set<Long> unitIds);
 
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:" + BELONGS_TO + "]-(country:Country) WITH union,country OPTIONAL " +
             "MATCH(union)-[:" + HAS_SECTOR + "]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:" + CONTACT_ADDRESS + "]-" +

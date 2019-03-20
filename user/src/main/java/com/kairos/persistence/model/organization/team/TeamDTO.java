@@ -16,6 +16,7 @@ public class TeamDTO {
     private String name;
     private String description;
     private boolean hasAddressOfUnit;
+    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
     public Long getId() {
         return id;
@@ -47,5 +48,13 @@ public class TeamDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getTeamLeaderStaffId() {
+        return teamLeaderStaffId;
+    }
+
+    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
+        this.teamLeaderStaffId = teamLeaderStaffId;
     }
 }

@@ -289,39 +289,6 @@ public class PolicyAgreementTemplateService {
         return new ArrayList<>();
     }
 
-
-    /*
-      @param referenceId
-     * @param agreementTemplateClauseUpdateDTO - agreement template ids , clause previous id and new clause id
-     * @Description method update agreement template section containing previous clause with new clause
-     */
-    //TODO
-   /* public boolean updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(Long referenceId, boolean isOrganization, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-
-        List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(referenceId, isOrganization, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
-        Clause clause = clauseMongoRepository.findOne(agreementTemplateClauseUpdateDTO.getNewClauseId());
-
-        if (CollectionUtils.isNotEmpty(agreementSectionsAndSubSectionsContainingClause)) {
-            agreementSectionsAndSubSectionsContainingClause.forEach(agreementSection -> {
-              //  ClauseCkEditorVO clauseCkEditorVO = new ClauseCkEditorVO(agreementTemplateClauseUpdateDTO.getNewClauseId(), "<p>" + clause.getTitle() + "</p>", "<p>" + clause.getDescription() + "</p>");
-                List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>(agreementSection.getClauseCkEditorVOS());
-                ListIterator<ClauseCkEditorVO> clauseCkEditorVOIterator = clauseCkEditorVOS.listIterator();
-                while (clauseCkEditorVOIterator.hasNext()) {
-                    ClauseCkEditorVO clauseCkEditorVO1 = clauseCkEditorVOIterator.next();
-                    if (agreementTemplateClauseUpdateDTO.getPreviousClauseId().equals(clauseCkEditorVO1.getId())) {
-                       //clauseCkEditorVOIterator.set(clauseCkEditorVO);
-                    }
-                }
-                agreementSection.setClauseCkEditorVOS(new HashSet<>(clauseCkEditorVOS));
-                int clauseIndex = agreementSection.getClauseIdOrderedIndex().indexOf(agreementTemplateClauseUpdateDTO.getPreviousClauseId());
-                agreementSection.getClauseIdOrderedIndex().set(clauseIndex, agreementTemplateClauseUpdateDTO.getNewClauseId());
-            });
-            agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionsAndSubSectionsContainingClause));
-        }
-        return true;
-    }*/
-
-
     /**
      * @param referenceId    - countryId or unitId
      * @param isOrganization - isOrganization boolean to check whether referenceId id country id or unit id

@@ -712,6 +712,11 @@ public class UserIntegrationService {
         });
     }
 
+    public Map<Long,String> getTimeZoneByUnitIds(Set<Long> unitIds){
+        return genericRestClient.publishRequest(unitIds,null,RestClientUrlType.ORGANIZATION,HttpMethod.POST,UNITS_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
+        });
+    }
+
 
     public List<StaffKpiFilterDTO> getStaffsByFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, STAFF_BY_KPI_FILTER, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffKpiFilterDTO>>>() {
@@ -742,6 +747,11 @@ public class UserIntegrationService {
     public boolean isReasonCodeLinkedToTimeType(Long countryId,BigInteger timeTypeId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, REASON_CODE_LINK_WITH_TIME_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         },timeTypeId);
+    }
+
+    public Long getUnitByUnitPositionId(Long unitPositionId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        },unitPositionId);
     }
 }
 

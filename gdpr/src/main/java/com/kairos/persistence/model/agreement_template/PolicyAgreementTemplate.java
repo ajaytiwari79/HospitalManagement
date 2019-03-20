@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Entity
 public class PolicyAgreementTemplate extends BaseEntity {
 
-    @NotBlank(message = "Name cannot be empty")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String name;
 
     @Column(columnDefinition = "text")
@@ -54,8 +54,6 @@ public class PolicyAgreementTemplate extends BaseEntity {
     @Embedded
     private CoverPage coverPageData = new CoverPage();
     private Long organizationId;
-    /*@Transient
-    private ClauseTag defaultClauseTag;*/
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -146,10 +144,6 @@ public class PolicyAgreementTemplate extends BaseEntity {
 
     public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
 
-   /* public ClauseTag getDefaultClauseTag() { return defaultClauseTag; }
-
-    public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
-*/
     public List<AgreementSection> getAgreementSections() {
         return agreementSections.stream().filter(agreementSection -> !agreementSection.isDeleted()).collect(Collectors.toList());
     }

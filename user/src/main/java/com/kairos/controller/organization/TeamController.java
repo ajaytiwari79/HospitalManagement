@@ -10,7 +10,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.Map;
+    import java.math.BigInteger;
+    import java.util.List;
+    import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.AppConstants.TEAM;
@@ -39,6 +41,13 @@ import static com.kairos.constants.AppConstants.TEAM;
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeam(unitId, teamId, teamDTO));
         }
 
+        @ApiOperation(value = "Get Team Details")
+        @RequestMapping(value = "/team/{teamId}", method = RequestMethod.GET)
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> getTeamDetails(@PathVariable Long teamId) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getTeamDetails( teamId));
+        }
+
 
         @ApiOperation(value = "Get All Teams")
         @RequestMapping(value = "/teams", method = RequestMethod.GET)
@@ -55,6 +64,14 @@ import static com.kairos.constants.AppConstants.TEAM;
         public ResponseEntity<Map<String, Object>> deleteTeamByTeamId(@PathVariable Long unitId, @PathVariable Long teamId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.deleteTeamByTeamId(teamId));
+        }
+
+        @ApiOperation(value = "Update Activities in Team")
+        @RequestMapping(value = "/team/{teamId}/activities", method = RequestMethod.PUT)
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId, @RequestParam(value = "activityIds") List<BigInteger> activityIds) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.updateActivitiesOfTeam(teamId, activityIds));
         }
 
         @ApiOperation(value = "Get Team Selected Skills")
@@ -108,6 +125,14 @@ import static com.kairos.constants.AppConstants.TEAM;
             }
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false,
                     false);
+        }
+
+        @ApiOperation(value = "Update Staffs in Team")
+        @RequestMapping(value = "/team/{teamId}/update_staffs", method = RequestMethod.PUT)
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody List<Long> staffIds) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.updateStaffsInTeam(teamId,staffIds));
         }
 
         @ApiOperation(value = "get staff of unit")

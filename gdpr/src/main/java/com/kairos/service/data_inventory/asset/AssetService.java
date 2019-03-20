@@ -29,6 +29,7 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -109,29 +110,32 @@ public class AssetService {
     private Asset buildAsset(Long unitId, AssetDTO assetDTO) {
 
         Asset asset;
-        if (Optional.ofNullable(assetDTO.getId()).isPresent())
-            asset = assetRepository.findById(assetDTO.getId()).orElse(null);
-        else
+        if (Optional.ofNullable(assetDTO.getId()).isPresent()) {
+            asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getId(), unitId);
+            if (!Optional.ofNullable(asset).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetDTO.getId());
+            }
+        } else
             asset = new Asset();
         asset.setOrganizationId(unitId);
         asset.setName(assetDTO.getName());
         asset.setDescription(assetDTO.getDescription());
-        if(assetDTO.getHostingProvider() != null) {
+        if (assetDTO.getHostingProvider() != null) {
             asset.setHostingProvider(hostingProviderRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getHostingProvider(), unitId));
         }
-        if(assetDTO.getHostingType()!= null) {
+        if (assetDTO.getHostingType() != null) {
             asset.setHostingType(hostingTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getHostingType(), unitId));
         }
-        if(!assetDTO.getOrgSecurityMeasures().isEmpty()) {
+        if (!assetDTO.getOrgSecurityMeasures().isEmpty()) {
             asset.setOrgSecurityMeasures(organizationalSecurityMeasureRepository.findAllByIds(assetDTO.getOrgSecurityMeasures()));
         }
-        if(!assetDTO.getTechnicalSecurityMeasures().isEmpty()) {
+        if (!assetDTO.getTechnicalSecurityMeasures().isEmpty()) {
             asset.setTechnicalSecurityMeasures(technicalSecurityMeasureRepository.findAllByIds(assetDTO.getTechnicalSecurityMeasures()));
         }
-        if(!assetDTO.getStorageFormats().isEmpty()) {
+        if (!assetDTO.getStorageFormats().isEmpty()) {
             asset.setStorageFormats(storageFormatRepository.findAllByIds(assetDTO.getStorageFormats()));
         }
-        if(assetDTO.getDataDisposal() != null) {
+        if (assetDTO.getDataDisposal() != null) {
             asset.setDataDisposal(dataDisposalRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getDataDisposal(), unitId));
         }
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
@@ -141,50 +145,48 @@ public class AssetService {
         asset.setAssetOwner(new Staff(assetDTO.getAssetOwner().getStaffId(), assetDTO.getAssetOwner().getFirstName(), assetDTO.getAssetOwner().getLastName()));
         asset.setHostingLocation(assetDTO.getHostingLocation());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
-        //asset.setProcessingActivityIds(assetDTO.getProcessingActivityIds());
-        //asset.setSubProcessingActivityIds(assetDTO.getSubProcessingActivityIds());
         return asset;
     }
 
 
+
     private void saveAssetTypeSubTypeAndRisk(Long unitId, Asset asset, AssetDTO assetDTO) {
-        AssetType assetType= null;
+        AssetType assetType;
         AssetType subAssetType = null;
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.findById(assetDTO.getAssetType().getId()).orElse(null);
-            if (assetType==null) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType().getId());
+            if (!Optional.ofNullable(assetType).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetType().getId());
             }
             linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
                 if (assetDTO.getAssetSubType().getId() != null) {
-                    Optional<AssetType> subAssetTypeObj = assetTypeRepository.findById(assetDTO.getAssetSubType().getId());
-                    if (!Optional.ofNullable(subAssetTypeObj).isPresent()) {
-                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Asset Type", assetDTO.getAssetSubType().getId());
+                    Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(assetDTO.getAssetSubType().getId())).findAny();
+                    if (!subAssetTypeObj.isPresent()) {
+                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetSubType().getId());
                     }
                     subAssetType = subAssetTypeObj.get();
-                }else {
+                } else {
                     subAssetType = new AssetType(assetDTO.getAssetSubType().getName());
                 }
-                subAssetType.setOrganizationId(unitId);
-                subAssetType.setSubAssetType(true);
                 linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getAssetSubType().getRisks());
             }
         } else {
             AssetType previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetDTO.getAssetType().getName(), unitId, false);
             if (Optional.ofNullable(previousAssetType).isPresent()) {
-                exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
+                exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetDTO.getAssetType().getName());
             }
             assetType = new AssetType(assetDTO.getAssetType().getName());
             assetType.setOrganizationId(unitId);
             linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
                 subAssetType = new AssetType(assetDTO.getAssetSubType().getName());
-                subAssetType.setOrganizationId(unitId);
-                subAssetType.setSubAssetType(true);
                 linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getAssetSubType().getRisks());
             }
             if (Optional.ofNullable(subAssetType).isPresent()) {
+                subAssetType.setOrganizationId(unitId);
+                subAssetType.setSubAssetType(true);
+                subAssetType.setAssetType(assetType);
                 assetType.getSubAssetTypes().add(subAssetType);
             }
 
@@ -194,7 +196,7 @@ public class AssetService {
         asset.setSubAssetType(subAssetType);
     }
 
-    private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, List<OrganizationLevelRiskDTO> risks) {
+    private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, Set<OrganizationLevelRiskDTO> risks) {
         List<Risk> assetTypeRisks = new ArrayList<>();
         Map<Long, OrganizationLevelRiskDTO> riskIdMap = new HashMap<>();
         risks.forEach(risk -> {
@@ -229,7 +231,7 @@ public class AssetService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + assetId);
         }
-        List<String> linkedProcessingActivities = new ArrayList<>();//processingActivityRepository.findAllProcessingActivityLinkWithAssetById(unitId, assetId);
+        List<String> linkedProcessingActivities = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         if (!linkedProcessingActivities.isEmpty()) {
             result.put(IS_SUCCESS, false);
@@ -253,7 +255,7 @@ public class AssetService {
     public boolean updateStatusOfAsset(Long unitId, Long assetId, boolean active) {
         Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetId, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
         asset.setActive(active);
         assetRepository.save(asset);
@@ -270,12 +272,8 @@ public class AssetService {
     public AssetResponseDTO getAssetWithRelatedDataAndRiskByUnitIdAndId(Long unitId, Long id) {
         Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + id);
         }
-
-        /*if (!Optional.ofNullable(asset.getProcessingActivities().get(0).getId()).isPresent()) {
-            asset.getProcessingActivities().clear();
-        }*/
         return prepareAssetResponseData(asset, false);
     }
 
@@ -301,7 +299,7 @@ public class AssetService {
             assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
             assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));
             assetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(asset.getAssetType().getId(), asset.getAssetType().getName(), asset.getAssetType().isSubAssetType(), organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getAssetType().getRisks())));
-            if(Optional.ofNullable(asset.getSubAssetType()).isPresent()) {
+            if (Optional.ofNullable(asset.getSubAssetType()).isPresent()) {
                 assetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName(), asset.getSubAssetType().isSubAssetType(), organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getSubAssetType().getRisks())));
             }
         }
@@ -329,7 +327,7 @@ public class AssetService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivitiesHistory(Long assetId) throws ClassNotFoundException{
+    public List<Map<String, Object>> getAssetActivitiesHistory(Long assetId) throws ClassNotFoundException {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -345,45 +343,6 @@ public class AssetService {
         activeAssets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, true)));
         return assetResponseDTOS;
     }
-
-    /**
-     * @param unitId
-     * @param assetId              - asset Id
-     * @param processingActivityId Processing Activity id link with Asset
-     * @return
-     */
-    //TODO
-   /*public boolean unLinkProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger processingActivityId) {
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
-        }
-        asset.getProcessingActivityIds().remove(processingActivityId);
-        assetMongoRepository.save(asset);
-        return true;
-
-    }
-
-
-    *//**
-     * @param unitId
-     * @param //assetId                 -Asset Id
-     * @param //subProcessingActivityId - Sub Processing Activity Id Link with Asset
-     * @return
-     *//*
-    public boolean unLinkSubProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger subProcessingActivityId) {
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
-        }
-        asset.getSubProcessingActivityIds().remove(subProcessingActivityId);
-        assetMongoRepository.save(asset);
-        return true;
-
-    }
-
-
-
 
 
     /**

@@ -10,6 +10,7 @@ import com.kairos.persistence.model.risk_management.Risk;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +18,9 @@ import java.util.List;
 public class ProcessingActivity extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-    @NotBlank(message = "Description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     @Embedded
     private ManagingOrganization managingDepartment;
@@ -58,6 +60,8 @@ public class ProcessingActivity extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Risk> risks  = new ArrayList<>();
     private boolean suggested;
+    @ManyToMany
+    private List<Asset> assets;
 
     public ProcessingActivity() {
     }
@@ -259,6 +263,10 @@ public class ProcessingActivity extends BaseEntity {
     public void setRisks(List<Risk> risks) {
         this.risks = risks;
     }
+
+    public List<Asset> getAssets() { return assets; }
+
+    public void setAssets(List<Asset> assets) { this.assets = assets; }
 
     @Override
     public void delete() {

@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,6 +127,9 @@ public class TeamService {
 
         organization.getTeams().add(team);
         organizationGraphRepository.save(organization, 2);
+
+        teamGraphRepository.assignTeamLeaderToTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
+
         return teamDTO;
     }
 
@@ -141,7 +146,33 @@ public class TeamService {
         } else {
             exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound");
         }
+        teamGraphRepository.updateTeamLeaderOfTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
         return teamDTO;
+    }
+
+    public boolean updateActivitiesOfTeam(Long teamId, List<BigInteger> activityIds) {
+        Team team = teamGraphRepository.findOne(teamId);
+        if (team != null) {
+            team.setActivityIds(activityIds);
+            teamGraphRepository.save(team);
+        } else {
+            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound");
+        }
+        return true;
+    }
+
+    public boolean updateStaffsInTeam(Long teamId, List<Long> staffIds) {
+        if(ObjectUtils.isCollectionEmpty(staffIds)){
+            teamGraphRepository.removeAllStaffsFromTeam(teamId);
+        }else{
+            teamGraphRepository.updateStaffsInTeam(teamId,staffIds);
+        }
+        return true;
+    }
+
+    public Map<String, Object> getTeamDetails(Long teamId) {
+        Map<String, Object> teamDetails = teamGraphRepository.getTeamDetailsById(teamId);
+        return teamDetails;
     }
 
     public Map<String, Object> getTeams(long unitId) {

@@ -3,18 +3,12 @@ package com.kairos.scheduler.service;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.UserRestClientAuth;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.dto.user.auth.AccessTokenDTO;
-import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.scheduler.config.EnvConfig;
 import com.kairos.scheduler.rest_client.UserRestClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.util.HashMap;
-import java.util.List;
 import javax.inject.Inject;
 import java.util.Map;
 
@@ -38,8 +32,8 @@ public class UserIntegrationService {
 
     }
 
-    public List<UnitTimeZoneMappingDTO> getTimeZoneOfAllUnits() {
-        List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userRestClient.publishRequest(null, null, false, IntegrationOperation.GET, "time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitTimeZoneMappingDTO>>>() {
+    public Map<Long,String> getTimeZoneOfAllUnits() {
+        Map<Long,String> unitTimeZoneMappingDTOS = userRestClient.publishRequest(null, null, false, IntegrationOperation.GET, "time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
         },true);
 
         return unitTimeZoneMappingDTOS;

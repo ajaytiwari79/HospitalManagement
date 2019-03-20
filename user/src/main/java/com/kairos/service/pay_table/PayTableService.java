@@ -196,7 +196,7 @@ public class PayTableService {
             }
         }
         PayTable payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), payTableId);
-        if (Optional.ofNullable(payTableToValidate).isPresent() ) {
+        if (Optional.ofNullable(payTableToValidate).isPresent()) {
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         }
         payTable.setName(payTableDTO.getName().trim());
@@ -259,6 +259,7 @@ public class PayTableService {
                             = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
                     payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
                 });
+                payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
                 payGradesObjects.add(newPayGrade);
                 PayGradeResponse payGradeResponse =
                         new PayGradeResponse(copiedPayTable.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
@@ -273,7 +274,7 @@ public class PayTableService {
             payGradesObjects.addAll(payGrades);
         }
         // Adding new Grade in PayTable
-        copiedPayTable.setPayGrades(payGradesObjects);
+        copiedPayTable.getPayGrades().addAll(payGradesObjects);
         payTableGraphRepository.save(copiedPayTable);
         if (payGradeResponses.isEmpty()) {
             payGradeResponses.add(new PayGradeResponse(copiedPayTable.getId()));
@@ -289,13 +290,8 @@ public class PayTableService {
 
         }
         PayGrade payGrade = new PayGrade(payGradeDTO.getPayGradeLevel());
-        if (Optional.ofNullable(payTable.getPayGrades()).isPresent()) {
-            payTable.getPayGrades().add(payGrade);
-        } else {
-            List<PayGrade> payGrades = new ArrayList<>();
-            payGrades.add(payGrade);
-            payTable.setPayGrades(payGrades);
-        }
+        payTable.getPayGrades().add(payGrade);
+
         payTableGraphRepository.save(payTable);
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
         // contains all

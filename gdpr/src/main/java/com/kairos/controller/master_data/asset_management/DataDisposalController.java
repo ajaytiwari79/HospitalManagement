@@ -32,7 +32,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class DataDisposalController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalController.class);
 
     @Inject
     private DataDisposalService dataDisposalService;

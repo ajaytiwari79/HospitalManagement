@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class AgreementSection extends BaseEntity {
 
 
-    @NotBlank(message = "Section Title cannot be empty")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Column(columnDefinition = "text")
     protected String title;
 
@@ -35,7 +35,7 @@ public class AgreementSection extends BaseEntity {
     protected Long organizationId;
 
     public List<AgreementSubSection> getAgreementSubSections() {
-        return agreementSubSections.stream().filter(subSection -> subSection.isDeleted() == false).collect(Collectors.toList());
+        return agreementSubSections.stream().filter(subSection -> !subSection.isDeleted()).collect(Collectors.toList());
     }
 
     public void setAgreementSubSections(List<AgreementSubSection> agreementSubSections) {
@@ -63,7 +63,7 @@ public class AgreementSection extends BaseEntity {
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
     public List<AgreementSectionClause> getClauses() {
-        return clauses.stream().filter(clause -> clause.isDeleted() == false).collect(Collectors.toList());
+        return clauses.stream().filter(clause -> !clause.isDeleted()).collect(Collectors.toList());
     }
 
     public void setClauses(List<AgreementSectionClause> clauses) {

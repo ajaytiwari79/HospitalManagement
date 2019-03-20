@@ -17,7 +17,7 @@ import java.util.*;
 
 
 @Service
-public class DataCategoryService{
+public class DataCategoryService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
 
@@ -44,7 +44,7 @@ public class DataCategoryService{
 
         DataCategory previousDataCategory = isOrganization ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(previousDataCategory).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataCategory", dataCategoryDto.getName());
         }
 
         DataCategory dataCategory = new DataCategory(dataCategoryDto.getName());
@@ -52,8 +52,7 @@ public class DataCategoryService{
             dataCategory.setOrganizationId(referenceId);
         else
             dataCategory.setCountryId(referenceId);
-        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isOrganization, dataCategoryDto.getDataElements(), dataCategory);
-        dataCategory.setDataElements(dataElementList);
+        dataCategory.setDataElements(dataElementService.createDataElements(referenceId, isOrganization, dataCategoryDto.getDataElements()));
         dataCategoryRepository.save(dataCategory);
         dataCategoryDto.setId(dataCategory.getId());
         return dataCategoryDto;
@@ -71,17 +70,15 @@ public class DataCategoryService{
 
         DataCategory dataCategory = isOrganization ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !dataCategoryId.equals(dataCategory.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.dataCategory", dataCategoryDto.getName());
         }
         dataCategory = dataCategoryRepository.getOne(dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
-        List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isOrganization, dataCategoryDto.getDataElements());
+        dataCategory.setDataElements(dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isOrganization, dataCategoryDto.getDataElements()));
         dataCategory.setName(dataCategoryDto.getName());
-       // dataCategory.setDataElements(dataElements);
         dataCategoryRepository.save(dataCategory);
-
         return dataCategoryDto;
 
     }
@@ -92,14 +89,14 @@ public class DataCategoryService{
         List<String> dataSubjectLinkedWithDataCategory = isOrganization ? dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(referenceId, dataCategoryId)
                 : dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(referenceId, dataCategoryId);
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
-            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", StringUtils.join(dataSubjectLinkedWithDataCategory , ","));
+            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", StringUtils.join(dataSubjectLinkedWithDataCategory, ","));
         }
         Integer updateCount = 0;
         updateCount = isOrganization ? dataCategoryRepository.safelyDeleteDataCategory(dataCategoryId, referenceId) : dataCategoryRepository.safelyDeleteMasterDataCategory(dataCategoryId, referenceId);
-        if(updateCount > 0){
+        if (updateCount > 0) {
             LOGGER.info("Data Category with id :: {} deleted safely and successfully", dataCategoryId);
         }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
         return true;
 
@@ -114,9 +111,9 @@ public class DataCategoryService{
     public DataCategoryResponseDTO getDataCategoryWithDataElementByCountryIdAndId(Long countryId, Long dataCategoryId) {
         DataCategory dataCategory = dataCategoryRepository.getDataCategoryByCountryIdAndId(countryId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
-        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory , DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
     }
 
@@ -128,9 +125,9 @@ public class DataCategoryService{
     public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, Long dataCategoryId) {
         DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
         }
-        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory , DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
     }
 

@@ -98,7 +98,7 @@ public class OrganizationDataDisposalService {
     public Boolean deleteDataDisposalById(Long unitId, Long dataDisposalId) {
         List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
         if (CollectionUtils.isNotEmpty(assetNames)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.dataDisposal", StringUtils.join(assetNames, ','));
         }
         Integer resultCount = dataDisposalRepository.deleteByIdAndOrganizationId(dataDisposalId, unitId);
         if (resultCount > 0) {
@@ -129,7 +129,7 @@ public class OrganizationDataDisposalService {
         }
         Integer resultCount = dataDisposalRepository.updateMetadataName(dataDisposalDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataDisposalDTO.getName());
         }

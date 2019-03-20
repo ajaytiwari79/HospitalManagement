@@ -47,6 +47,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -185,6 +186,8 @@ public class StaffService {
     @Inject
     @Lazy
     private PasswordEncoder passwordEncoder;
+    @Inject
+    private TeamGraphRepository teamGraphRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
@@ -321,6 +324,13 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
+
+        if(isCollectionEmpty(staffPersonalDetail.getTeamIdsOfStaff())){
+            teamGraphRepository.removeStaffFromAllTeams(staffPersonalDetail.getId());
+        }else{
+            teamGraphRepository.assignStaffInTeams(staffPersonalDetail.getId(), staffPersonalDetail.getTeamIdsOfStaff());
+        }
+
         return staffPersonalDetail;
     }
 
