@@ -110,9 +110,6 @@ public class ProcessingActivityService {
         if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
             processingActivity.setDataSubjects(createRelatedDataProcessingActivity(unitId, processingActivityDTO.getDataSubjectSet()));
         }
-        if (CollectionUtils.isNotEmpty(processingActivityDTO.getAssetIds())) {
-            processingActivity.setAssets(assetRepository.findAllByUnitIdAndIds(unitId, processingActivityDTO.getAssetIds()));
-        }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
         return processingActivityDTO;
