@@ -1,7 +1,9 @@
 package com.kairos.persistence.model.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.DurationType;
+
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.DateUtils.asDate;
 
 /**
  * Created by prerna on 6/4/18.
@@ -126,6 +130,15 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.active = active;
     }
 
+
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(asDate(startDate),asDate(endDate));
+    }
+
+    public boolean contains(LocalDate localDate){
+        return getInterval().contains(asDate(localDate)) || endDate.equals(localDate);
+    }
+
     public int getDuration() {
         return duration;
     }
@@ -158,7 +171,7 @@ public class PlanningPeriod extends MongoBaseEntity {
         }
 
         public static List<Type> getListByValue(List<String> values) {
-            if(Optional.ofNullable(values).isPresent()){
+            if (Optional.ofNullable(values).isPresent()) {
                 return values.stream().map(Type::valueOf)
                         .collect(Collectors.toList());
             }
@@ -166,4 +179,5 @@ public class PlanningPeriod extends MongoBaseEntity {
 
         }
     }
+    
 }

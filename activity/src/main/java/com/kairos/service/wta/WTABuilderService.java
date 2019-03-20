@@ -139,9 +139,6 @@ public class WTABuilderService extends MongoBaseService {
             case SHORTEST_AND_AVERAGE_DAILY_REST:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ShortestAndAverageDailyRestWTATemplate.class);
                 break;
-            case NUMBER_OF_SHIFTS_IN_INTERVAL:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ShiftsInIntervalWTATemplate.class);
-                break;
             case TIME_BANK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, TimeBankWTATemplate.class);
                 break;

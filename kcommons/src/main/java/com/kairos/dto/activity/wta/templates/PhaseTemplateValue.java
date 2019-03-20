@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.wta.templates;
 
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Objects;
  */
 
 public class PhaseTemplateValue {
-    private int phaseId;
+    private BigInteger phaseId;
     private String phaseName;
     private short staffValue;
     private short managementValue;
@@ -18,11 +19,11 @@ public class PhaseTemplateValue {
     private boolean managementCanIgnore;
 
 
-    public int getPhaseId() {
+    public BigInteger getPhaseId() {
         return phaseId;
     }
 
-    public void setPhaseId(int phaseId) {
+    public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
     }
 
@@ -33,7 +34,7 @@ public class PhaseTemplateValue {
         //Default Constructor
     }
 
-    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, boolean staffCanIgnore, boolean managementCanIgnore, int sequence) {
+    public PhaseTemplateValue(BigInteger phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, boolean staffCanIgnore, boolean managementCanIgnore, int sequence) {
         this.phaseId = phaseId;
         this.phaseName = phaseName;
         this.staffValue = staffValue;

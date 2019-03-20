@@ -23,6 +23,7 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,7 @@ public class AbsenceShiftService {
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private TimeBankService timeBankService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
 
     public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
@@ -93,6 +95,7 @@ public class AbsenceShiftService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
         if (!shiftDTOS.isEmpty()) {
             shiftWithViolatedInfoDTO = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS);
+
         }
         return shiftWithViolatedInfoDTO;
     }
@@ -163,7 +166,7 @@ public class AbsenceShiftService {
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndBetweenDates(staffAdditionalInfoDTO.getUnitId(),startDate,endDate);
         for (ShiftDTO shiftDTO : shiftDTOS) {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap);
+            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap,staffAdditionalInfoDTO,phaseListByDate.get(shiftDTO.getStartDate()));
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseListByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO, Shift.class);
             Optional<PlanningPeriod> planningPeriodByShift = planningPeriods.stream().filter(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()),asDate(planningPeriod.getEndDate())).contains(shift.getStartDate()) || planningPeriod.getEndDate().equals(asLocalDate(shift.getStartDate()))).findAny();
@@ -180,6 +183,7 @@ public class AbsenceShiftService {
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
             shiftDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
+            shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS,staffAdditionalInfoDTO.getUserAccessRoleDTO());
             LocalDate startLocalDate = staffAdditionalInfoDTO.getUnitPosition().getStartDate();
             LocalDate endLocalDate = asLocalDate(shiftDTOS.get(shiftDTOS.size() - 1).getStartDate());
             shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS, startLocalDate, endLocalDate, staffAdditionalInfoDTO);

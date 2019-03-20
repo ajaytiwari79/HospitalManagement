@@ -60,6 +60,8 @@ public class ProcessingActivity extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Risk> risks  = new ArrayList<>();
     private boolean suggested;
+    @ManyToMany
+    private List<Asset> assets;
 
     public ProcessingActivity() {
     }
@@ -261,6 +263,10 @@ public class ProcessingActivity extends BaseEntity {
     public void setRisks(List<Risk> risks) {
         this.risks = risks;
     }
+
+    public List<Asset> getAssets() { return assets; }
+
+    public void setAssets(List<Asset> assets) { this.assets = assets; }
 
     @Override
     public void delete() {
