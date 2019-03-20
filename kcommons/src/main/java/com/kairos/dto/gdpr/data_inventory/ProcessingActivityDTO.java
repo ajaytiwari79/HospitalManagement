@@ -47,6 +47,7 @@ public class ProcessingActivityDTO {
     private Integer dataRetentionPeriod;
     private boolean suggestToCountryAdmin;
     private boolean suggested=false;
+    private Set<Long> assetIds;
 
     @Valid
     private List<OrganizationLevelRiskDTO> risks = new ArrayList<>();
@@ -146,6 +147,10 @@ public class ProcessingActivityDTO {
     public void setRisks(List<OrganizationLevelRiskDTO> risks) {
         this.risks = risks;
     }
+
+    public Set<Long> getAssetIds() { return assetIds; }
+
+    public void setAssetIds(Set<Long> assetIds) { this.assetIds = assetIds; }
 
     public ProcessingActivityDTO() {
     }

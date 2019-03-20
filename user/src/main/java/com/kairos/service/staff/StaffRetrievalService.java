@@ -36,13 +36,13 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
-import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
@@ -185,8 +185,8 @@ public class StaffRetrievalService {
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
 
-         personalInfo.putAll(staffAddressService.getAddress(unitId,staffId));
-         return personalInfo;
+        personalInfo.putAll(staffAddressService.getAddress(unitId, staffId));
+        return personalInfo;
     }
 
     public List<ExpertiseQueryResult> getExpertisesOfUnitByCountryId(Long countryId, long unitId) {
@@ -325,7 +325,7 @@ public class StaffRetrievalService {
         Long countryId = null;
         List<AccessGroup> roles = null;
         List<EngineerTypeDTO> engineerTypes = null;
-        Map<String, Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 //            staff = getStaffWithBasicInfo(id, allStaffRequired);
             map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId).getStaffList());
@@ -343,10 +343,6 @@ public class StaffRetrievalService {
         if (Optional.ofNullable(staff).isPresent()) {
             map.put("staffList", staff);
         }
-        /*staff = filterStaffByRoles((List<StaffPersonalDetailDTO>) map.get("staffList"), unitId, UserContext.getUserDetails().getId());
-        map.put("staffList", staff);*/
-        map.put("engineerTypes", engineerTypes);
-        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
         map.put("roles", roles);
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
         map.put("teamList", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
@@ -408,8 +404,8 @@ public class StaffRetrievalService {
             if (CollectionUtils.isNotEmpty(dayTypeList)) {
                 for (DayTypeCountryHolidayCalenderQueryResult dayType : dayTypeList) {
                     if (!dayType.isHolidayType()) {
-                        if(isNull(dayType.getValidDays())){
-                            exceptionService.dataNotMatchedException("message.day_type.absent",accessGroupDayTypes.getAccessGroup().getName());
+                        if (isNull(dayType.getValidDays())) {
+                            exceptionService.dataNotMatchedException("message.day_type.absent", accessGroupDayTypes.getAccessGroup().getName());
                         }
                         List<String> validDays = dayType.getValidDays().stream().map(day -> day.name()).collect(Collectors.toList());
                         if (validDays.contains(loginDay.toString()) || validDays.contains(EVERYDAY)) {
@@ -641,7 +637,7 @@ public class StaffRetrievalService {
             Long functionId = null;
             if (Optional.ofNullable(shiftDate).isPresent()) {
                 functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
-                staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(),shiftDate));
+                staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), shiftDate));
             }
             unitPosition.setCountryId(countryId);
             unitPosition.setUnitTimeZone(organization.getTimeZone());
@@ -652,7 +648,7 @@ public class StaffRetrievalService {
                 staffAdditionalInfoDTO.setReasonCodes(ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes, ReasonCodeDTO.class));
             }
             List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(organization.getId()), TimeSlotType.SHIFT_PLANNING);
-            if(isCollectionEmpty(timeSlotWrappers)){
+            if (isCollectionEmpty(timeSlotWrappers)) {
                 exceptionService.actionNotPermittedException("timeslot.not.found");
             }
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));

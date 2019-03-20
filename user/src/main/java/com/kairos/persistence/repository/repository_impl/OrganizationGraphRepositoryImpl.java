@@ -56,9 +56,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             matchRelationshipQueryForStaff += "MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
-                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp \n" +
                     "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
+                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp,employmentType,positionLine \n" +
                     "OPTIONAL MATCH(positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
                     "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,positionLine,exp,employmentType\n" +
                     "WITH staff,organization,unitPos,user, COLLECT(distinct {id:id(positionLine),startDate:positionLine.startDate,endDate:positionLine.endDate,functions:functions}) as positionLines,exp,employmentType\n" +
@@ -86,15 +86,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
 
         matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, " +
-                "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList";
-
-        if (Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,employments, user, employmentList,expertiseList  Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds}  ";
-
-        } else {
-            matchRelationshipQueryForStaff += " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) ";
-        }
-        matchRelationshipQueryForStaff += " with engineerType,employments, staff, user, employmentList, expertiseList";
+                "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
+        " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
+        " with engineerType,employments, staff, user, employmentList, expertiseList";
         return matchRelationshipQueryForStaff;
     }
 
@@ -120,10 +114,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             queryParameters.put("employmentTypeIds",
                     convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
-        }
-        if (Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()) {
-            queryParameters.put("engineerTypeIds",
-                    convertListOfStringIntoLong(filters.get(FilterType.ENGINEER_TYPE)));
         }
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
             queryParameters.put("expertiseIds",

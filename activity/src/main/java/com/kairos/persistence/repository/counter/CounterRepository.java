@@ -352,6 +352,10 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         mongoTemplate.remove(query, TabKPIConf.class);
     }
 
+    public void removeDashboardTabOfStaff(Long staffId,Long unitId, ConfLevel level) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("staffId").in(staffId).and("unitId").is(unitId).and("level").is(level));
+        mongoTemplate.remove(query, KPIDashboard.class);
+    }
 
     public List<ApplicableKPI> getKPIByKPIId(List<BigInteger> kpiIds, Long refId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
@@ -518,7 +522,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     }
 
     public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("supportedModuleTypes").in(supportedModuleType).and("deleted").is(false));
+        Query query = new Query(Criteria.where("deleted").is(false).and("supportedModuleTypes").in(supportedModuleType));
         query.fields().include("id").include("title");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, Counter.class), CounterDTO.class);
     }
