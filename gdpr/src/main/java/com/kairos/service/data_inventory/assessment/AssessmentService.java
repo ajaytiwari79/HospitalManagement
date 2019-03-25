@@ -42,6 +42,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicR
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
@@ -97,6 +98,8 @@ public class AssessmentService {
     private TransferMethodRepository transferMethodRepository;
     @Inject
     private AssetTypeRepository assetTypeRepository;
+    @Inject
+    private AssetTypeService assetTypeService;
 
 
     private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
@@ -446,7 +449,7 @@ public class AssessmentService {
             case HOSTING_TYPE:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeRepository.getAllAssetTypesByOrganization(unitId), MetaDataCommonResponseDTO.class);
+                return assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(unitId);
             case STORAGE_FORMAT:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
@@ -504,6 +507,8 @@ public class AssessmentService {
             exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
+        assessment.setAssessmentStatus(status);
+        assessmentRepository.save(assessment);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
@@ -511,10 +516,7 @@ public class AssessmentService {
             assessment.setCompletedDate(LocalDate.now());
             mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
         }
-        assessment.setAssessmentStatus(status);
-        assessmentRepository.save(assessment);
         return assessmentAnswerValueObjects;
-
     }
 
 
