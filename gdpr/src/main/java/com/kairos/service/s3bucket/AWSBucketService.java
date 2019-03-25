@@ -45,9 +45,9 @@ public class AWSBucketService {
             imageUrl = amazonS3Client.getResourceUrl(bucketName, key);
             inputStream.close();
         } catch (IOException e) {
-            LOGGER.warn("{ IO Exception Exception cause" + e.getCause() + "}");
+            LOGGER.info("IO Exception Exception cause {0} ", e.getCause());
         } catch (SdkClientException e) {
-            LOGGER.warn("{ Sdk Client Exception cause" + e.getCause() + "}");
+            LOGGER.info("Sdk Client Exception cause {0} ", e.getCause());
         }
         return imageUrl;
 

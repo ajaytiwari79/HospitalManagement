@@ -1,8 +1,6 @@
 package com.kairos.service.data_subject_management;
 
-import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.master_data.DataElementDTO;
-import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementRepository;
 import com.kairos.service.exception.ExceptionService;

@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.embeddables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.data_inventory.assessment.SelectedChoice;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;

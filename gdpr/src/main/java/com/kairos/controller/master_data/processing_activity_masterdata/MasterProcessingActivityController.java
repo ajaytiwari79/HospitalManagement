@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -85,7 +83,7 @@ class MasterProcessingActivityController {
 
     @ApiOperation(value = "unlink risk from Processing Activity ")
     @DeleteMapping("/master_processing_activity/{processingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
+    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable Long processingActivityId, @PathVariable Long riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, processingActivityId, riskId));
     }
 

@@ -81,20 +81,6 @@ class AssetController {
     }
 
 
-    /*@ApiOperation(value = "Unlink Processing Activity From asset ")
-    @DeleteMapping("/asset/{assetId}/processing_activity/{processingActivityId}")
-    public ResponseEntity<Object> unLinkProcessingActivityFromAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @PathVariable BigInteger processingActivityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetService.unLinkProcessingActivityFromAsset(unitId, assetId, processingActivityId));
-    }
-
-
-    @ApiOperation(value = "Unlink Sub Processing Activity From asset ")
-    @DeleteMapping("/asset/{assetId}/processing_activity/sub_processing_activity/{subProcessingActivityId}")
-    public ResponseEntity<Object> unLinkSubProcessingActivityFromAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @PathVariable BigInteger subProcessingActivityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetService.unLinkSubProcessingActivityFromAsset(unitId, assetId, subProcessingActivityId));
-
-    }*/
-
     @ApiOperation(value = "get all active asset used in processing activity related tab")
     @GetMapping("/asset/related")
     public ResponseEntity<Object> getAllActiveAsset(@PathVariable Long unitId) {

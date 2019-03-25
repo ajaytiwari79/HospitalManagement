@@ -66,15 +66,6 @@ public class MasterProcessingActivity extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public MasterProcessingActivity(String name, String description, Long countryId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.subProcessActivity = subProcessActivity;
-        this.suggestedDataStatus=suggestedDataStatus;
-        this.suggestedDate=suggestedDate;
-    }
-
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
     public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }

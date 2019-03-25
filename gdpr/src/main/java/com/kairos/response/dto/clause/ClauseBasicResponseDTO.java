@@ -77,5 +77,6 @@ public class ClauseBasicResponseDTO {
     public void setTemplateTypes(List<TemplateTypeResponseDTO> templateTypes) { this.templateTypes = templateTypes; }
 
     public ClauseBasicResponseDTO() {
+
     }
 }
