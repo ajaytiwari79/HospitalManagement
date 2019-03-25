@@ -53,7 +53,7 @@ public class AccessPageController {
     public ResponseEntity<Map<String,Object>> getMainTabsForUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabsForUnit(unitId));
     }
-    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
+    @RequestMapping(value = "/tab/{tabId}/tabs",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId));
     }
