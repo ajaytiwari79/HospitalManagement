@@ -212,7 +212,7 @@ public class ShiftService extends MongoBaseService {
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false);
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
-            //shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
+            shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
             ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(mainShift.getId());
             if(isNull(shiftViolatedRules)){
                 shiftViolatedRules = new ShiftViolatedRules(mainShift.getId());
@@ -371,7 +371,7 @@ public class ShiftService extends MongoBaseService {
             shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, false);
             payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-            //shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
+            shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
             ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(shift.getId());
             if(isNull(shiftViolatedRules)){
                 shiftViolatedRules = new ShiftViolatedRules(shift.getId());
@@ -444,7 +444,7 @@ public class ShiftService extends MongoBaseService {
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(shift.getActivities(), shiftDTO.getActivities());
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), asDate(shiftDTO.getShiftDate()), asDate(shiftDTO.getShiftDate()));
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate());
         Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = phaseService.constructMapOfActivityAndPhaseTemplateValue(phase, activities);
         List<ShiftActivityDTO> shiftActivities = shiftValidatorService.findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(), staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap, shiftActivityIdsDTO);
@@ -487,7 +487,7 @@ public class ShiftService extends MongoBaseService {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift);
                 shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-               // shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
+                shiftDTO = timeBankService.updateShiftDTOWithTimebankDetails(shiftDTO, staffAdditionalInfoDTO);
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
                 //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
                 Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
@@ -571,6 +571,7 @@ public class ShiftService extends MongoBaseService {
             }
         }
         if (isNotNull(staffAdditionalInfoDTO)) {
+            shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts, staffAdditionalInfoDTO.getUnitPosition().getStartDate(), endDate, staffAdditionalInfoDTO);
             shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts,staffAdditionalInfoDTO.getUserAccessRoleDTO());
         }
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
@@ -766,12 +767,12 @@ public class ShiftService extends MongoBaseService {
     public ShiftWithViolatedInfoDTO updateShiftByTandA(Long unitId, ShiftDTO shiftDTO,
                                                        String type, Boolean validatedByStaff) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
-        if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
+        Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
+        if (!userAccessRoleDTO.getStaff() && validatedByStaff && !shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
             exceptionService.actionNotPermittedException("message.shift.save.access");
         } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.save.access");
         }
-        Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         Map<String, Phase> phaseMap = new HashMap<String, Phase>() {{
             put(phase.getPhaseEnum().toString(), phase);
         }};

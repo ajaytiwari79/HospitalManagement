@@ -294,7 +294,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     @Override
     public List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long unitPositionId, Date startDate, Date endDate,WTATemplateType templateType) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),

@@ -6,7 +6,6 @@ import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,7 +15,6 @@ import java.util.List;
 
 @Entity
 public class Asset extends BaseEntity {
-
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")

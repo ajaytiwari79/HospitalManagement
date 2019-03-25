@@ -35,7 +35,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
@@ -398,7 +398,9 @@ public class RuletemplateUtils {
                     validateRuleTemplate(consecutiveWorkWTATemplate.getIntervalLength(), consecutiveWorkWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, consecutiveWorkWTATemplate.getIntervalUnit(), consecutiveWorkWTATemplate.getIntervalLength()));
                     break;
-
+                case DURATION_BETWEEN_SHIFTS:
+                    interval = interval.addInterval(new DateTimeInterval(minusMonths(shift.getStartDate(),1),plusMonths(shift.getStartDate(),1)));
+                break;
             }
         }
         return interval;
