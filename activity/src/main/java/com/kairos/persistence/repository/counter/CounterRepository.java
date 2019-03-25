@@ -96,8 +96,8 @@ public class CounterRepository {
     }
 
     //removal of counters
-    public void removeAll(String fieldName, List values, Class claz) {
-        Query query = new Query(Criteria.where("deleted").is(false).and(fieldName).in(values));
+    public void removeAll(String fieldName, List values, Class claz , ConfLevel level ) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("level").is(level).and(fieldName).in(values));
         mongoTemplate.remove(query, claz);
     }
 
@@ -564,8 +564,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
-    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(ConfLevel level, List<Long> staffIds) {
-        Criteria matchCriteria = Criteria.where("deleted").is(false).and("staffId").in(staffIds).and("level").is(level);
+    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(Long unitId,ConfLevel level, List<Long> staffIds) {
+        Criteria matchCriteria = Criteria.where("deleted").is(false).and("unitId").is(unitId).and("staffId").in(staffIds).and("level").is(level);
         Query query = new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }

@@ -130,8 +130,8 @@ public class CounterConfService extends MongoBaseService {
         List<KPICategoryDTO> existingCategories = getExistingCategories(categories.getUpdatedCategories(), level, refId);
         List<KPICategory> kpiCategories=modifyCategories(categories.getUpdatedCategories(), existingCategories, level, refId);
         List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
-        counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
-        counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class);
+        counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class,level);
+        counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class,level);
        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiCategories, KPICategoryDTO.class);
     }
 
