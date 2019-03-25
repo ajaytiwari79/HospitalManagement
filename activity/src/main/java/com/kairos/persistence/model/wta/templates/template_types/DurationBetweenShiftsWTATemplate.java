@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.HOURS;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -95,7 +97,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues) && timeTypeIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeTypeId())) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues) && isCollectionNotEmpty(plannedTimeIds) && containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())&& isCollectionNotEmpty(timeTypeIds) && containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())) {
             int timefromPrevShift = 0;
             List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
             shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.asZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())) || shift1.getEndDate().equals(infoWrapper.getShift().getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
@@ -105,7 +107,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
                 if(isValid){
-                    shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.asZoneDateTime(shift1.getStartDate()).isAfter(DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())) || shift1.getStartDate().equals(infoWrapper.getShift().getEndDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
+                    shifts = (List<ShiftWithActivityDTO>) infoWrapper.getShifts().stream().filter(shift1 -> infoWrapper.getShift().getEndDate().before(shift1.getStartDate()) || shift1.getStartDate().equals(infoWrapper.getShift().getEndDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
                     if(!shifts.isEmpty()){
                         ZonedDateTime prevShiftstart = DateUtils.asZoneDateTime(shifts.get(0).getStartDate());
                         timefromPrevShift = (int)new DateTimeInterval(DateUtils.asZoneDateTime(infoWrapper.getShift().getEndDate()), prevShiftstart).getMinutes();
