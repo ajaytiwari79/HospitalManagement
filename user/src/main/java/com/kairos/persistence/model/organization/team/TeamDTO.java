@@ -14,8 +14,9 @@ public class TeamDTO {
     private Long id;
     @NotBlank(message = "error.name.notnull")
     private String name;
-    private AddressDTO contactAddress;
+    private String description;
     private boolean hasAddressOfUnit;
+    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
     public Long getId() {
         return id;
@@ -41,12 +42,19 @@ public class TeamDTO {
         this.name = name;
     }
 
-    public AddressDTO getContactAddress() {
-        return contactAddress;
+    public String getDescription() {
+        return description;
     }
 
-    public void setContactAddress(AddressDTO contactAddress) {
-        this.contactAddress = contactAddress;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
+    public Long getTeamLeaderStaffId() {
+        return teamLeaderStaffId;
+    }
+
+    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
+        this.teamLeaderStaffId = teamLeaderStaffId;
+    }
 }

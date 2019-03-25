@@ -131,8 +131,6 @@ public class AbsencePlanningService {
                 teamStaffList.add(anonymousData);
             }
             //call via rest API anilm2
-            Map<String, Object> teamStaffAndStaffSkill = userIntegrationService.getTeamStaffAndStaffSkill(staffIds);
-            data.putAll(teamStaffAndStaffSkill);
             data.put("tasks", taskAggregationData((List<BigInteger>) object.get("taskLists")));
             data.put("staffs", staffList);
             data.put("taskTypeStaffs", taskTypesAggregationData((List<ObjectId>) object.get("taskLists")));

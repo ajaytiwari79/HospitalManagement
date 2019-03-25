@@ -32,7 +32,7 @@ import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
-import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
+import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -47,6 +47,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -153,7 +154,7 @@ public class StaffService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
-    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
@@ -185,6 +186,8 @@ public class StaffService {
     @Inject
     @Lazy
     private PasswordEncoder passwordEncoder;
+    @Inject
+    private TeamGraphRepository teamGraphRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
@@ -321,6 +324,13 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
+
+        if(isCollectionEmpty(staffPersonalDetail.getTeamIdsOfStaff())){
+            teamGraphRepository.removeStaffFromAllTeams(staffId);
+        }else{
+            teamGraphRepository.assignStaffInTeams(staffId, staffPersonalDetail.getTeamIdsOfStaff());
+        }
+
         return staffPersonalDetail;
     }
 
@@ -517,7 +527,7 @@ public class StaffService {
                             } else {
                                 user.setEmail(user.getFirstName().trim() + KAIROS_EMAIL);
                             }
-                            String defaultPassword = user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH;
+                            String defaultPassword = user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH;
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                             user.setAccessToken(defaultPassword);
                         }
@@ -710,9 +720,9 @@ public class StaffService {
             UnitPermission unitPermission = new UnitPermission();
             unitPermission.setOrganization(organization);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-            unitEmpAccessRelationship.setEnabled(true);
-            unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+            UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
+            unitPermissionAccessPermissionRelationship.setEnabled(true);
+            unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
             accessPageService.setPagePermissionToAdmin(accessPermission);
             position.getUnitPermissions().add(unitPermission);
             organization.getPositions().add(position);
@@ -817,7 +827,7 @@ public class StaffService {
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
         user.setLastName(staffCreationDTO.getLastName());
-        user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent() ? new BCryptPasswordEncoder().encode(user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH) : null);
+        user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent() ? new BCryptPasswordEncoder().encode(user.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH) : null);
         user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
@@ -931,9 +941,9 @@ public class StaffService {
 
     private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessRelationship.setEnabled(true);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
+        unitPermissionAccessPermissionRelationship.setEnabled(true);
+        unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
         accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroup.getId());
     }
 
@@ -1090,7 +1100,7 @@ public class StaffService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-            final String password = unitManagerDTO.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH;
+            final String password = unitManagerDTO.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH;
         ObjectMapper mapper = new ObjectMapper();
         Map unitManagerDTOMap = mapper.convertValue(unitManagerDTO, Map.class);
         if (user == null) {
@@ -1105,7 +1115,7 @@ public class StaffService {
             userGraphRepository.save(user);
             Staff staff = createStaff(user);
             unitManagerDTOMap.put("id", staff.getId());
-            positionService.createEmploymentForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
+            positionService.createPositionForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
             sendEmailToUnitManager(unitManagerDTO, password);
             return unitManagerDTOMap;
         } else {
@@ -1113,7 +1123,7 @@ public class StaffService {
             if (staffGraphRepository.countOfUnitEmployment(organizationId, unitId, user.getEmail()) == 0) {
                 Staff staff = createStaff(user);
                 unitManagerDTOMap.put("id", staff.getId());
-                positionService.createEmploymentForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
+                positionService.createPositionForUnitManager(staff, parent, unit, unitManagerDTO.getAccessGroupId());
                 userGraphRepository.save(user);
                 sendEmailToUnitManager(unitManagerDTO, password);
                 return unitManagerDTOMap;
@@ -1218,28 +1228,6 @@ public class StaffService {
         }
         return staffTaskDTOS;
     }
-
-
-    public Map<String, Object> getTeamStaffAndStaffSkill(Long organizationId, List<Long> staffIds) {
-        Map<String, Object> responseMap = new HashMap();
-        List<Object> teamStaffList = new ArrayList<>();
-        List<Object> staffList = new ArrayList<>();
-        List<Map<String, Object>> teamStaffs = staffGraphRepository.getTeamStaffList(organizationId, staffIds);
-        List<Map<String, Object>> staffs = staffGraphRepository.getSkillsOfStaffs(staffIds);
-        for (Map<String, Object> map : teamStaffs) {
-            Object o = map.get("data");
-            teamStaffList.add(o);
-        }
-        for (Map<String, Object> map : staffs) {
-            Object o = map.get("data");
-            staffList.add(o);
-        }
-
-        responseMap.put("teamStaffList", teamStaffList);
-        responseMap.put("staffs", staffList);
-        return responseMap;
-    }
-
 
     /**
      * @return
@@ -1495,7 +1483,7 @@ public class StaffService {
         Map<String, String> auth = new HashMap<>();
         auth.put("type", "m.login.dummy");
         auth.put("session", staff.getEmail());
-        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSWORD_ENDS_WITH);
+        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH);
         StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
         staff.setAccess_token(chatDetails.getAccess_token());
         staff.setUser_id(chatDetails.getUser_id());

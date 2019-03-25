@@ -320,18 +320,18 @@ public class AssessmentService {
                         new SingleSelectChoice(Optional.ofNullable(asset.getHostingType()).isPresent() ? new MetaDataVO(asset.getHostingType().getId(), asset.getHostingType().getName()) : new MetaDataVO()), question.getQuestionType());
             case DATA_DISPOSAL:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getDataDisposal().getId(), asset.getDataDisposal().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getDataDisposal()).isPresent() ? new MetaDataVO(asset.getDataDisposal().getId(), asset.getDataDisposal().getName()) : new MetaDataVO()), question.getQuestionType());
             case HOSTING_PROVIDER:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
                         new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getHostingProvider().getId(), asset.getHostingProvider().getName()) : new MetaDataVO()), question.getQuestionType());
             case ASSET_TYPE:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getAssetType().getId(), asset.getAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getAssetType()).isPresent() ? new MetaDataVO(asset.getAssetType().getId(), asset.getAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
             case STORAGE_FORMAT:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(), new MultipleSelectChoice(asset.getStorageFormats().stream().map(storageFormat -> new MetaDataVO(storageFormat.getId(), storageFormat.getName())).collect(Collectors.toList())), question.getQuestionType());
             case ASSET_SUB_TYPE:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getSubAssetType()).isPresent() ? new MetaDataVO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
             case TECHNICAL_SECURITY_MEASURES:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(), new MultipleSelectChoice(asset.getTechnicalSecurityMeasures().stream().map(technicalSecurityMeasure -> new MetaDataVO(technicalSecurityMeasure.getId(), technicalSecurityMeasure.getName())).collect(Collectors.toList())), question.getQuestionType());
             case ORGANIZATION_SECURITY_MEASURES:
