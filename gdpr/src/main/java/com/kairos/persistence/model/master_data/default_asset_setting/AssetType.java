@@ -41,9 +41,8 @@ public class AssetType extends BaseEntity {
         this.suggestedDataStatus=suggestedDataStatus;
     }
 
-    public AssetType(@NotBlank(message = "error.message.name.notNull.orEmpty or null") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId, Long organizationId, boolean isSubAssetType) {
+    public AssetType(@NotBlank(message = "error.message.name.notNull.orEmpty or null") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name,Long organizationId, boolean isSubAssetType) {
         this.name = name;
-        this.countryId = countryId;
         this.organizationId = organizationId;
         this.isSubAssetType = isSubAssetType;
     }
@@ -54,10 +53,6 @@ public class AssetType extends BaseEntity {
 
     public void setRisks(List<Risk> risks) {
         this.risks = risks;
-    }
-
-    public AssetType(String name) {
-        this.name = name;
     }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }

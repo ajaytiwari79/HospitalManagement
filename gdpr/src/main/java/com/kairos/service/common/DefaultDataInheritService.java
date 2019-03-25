@@ -312,14 +312,11 @@ public class DefaultDataInheritService {
         List<AssetType> assetTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(masterAssetTypes)) {
             masterAssetTypes.forEach(masterAssetType -> {
-                AssetType assetType = new AssetType(masterAssetType.getName());
-                assetType.setOrganizationId(unitId);
+                AssetType assetType = new AssetType(masterAssetType.getName(),unitId,false);
                 if (CollectionUtils.isNotEmpty(masterAssetType.getSubAssetTypes())) {
                     List<AssetType> unitSubAssetTypes = new ArrayList<>();
                     masterAssetType.getSubAssetTypes().forEach(masterSubAssetType -> {
-                        AssetType assetSubType = new AssetType(masterSubAssetType.getName());
-                        assetSubType.setOrganizationId(unitId);
-                        assetSubType.setSubAssetType(true);
+                        AssetType assetSubType = new AssetType(masterSubAssetType.getName(),unitId,true);
                         assetSubType.setRisks(buildRiskForAssetType(unitId, masterSubAssetType.getRisks()));
                         assetType.setHasSubAssetType(true);
                         unitSubAssetTypes.add(assetSubType);

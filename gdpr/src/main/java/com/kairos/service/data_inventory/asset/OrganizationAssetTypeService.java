@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class OrganizationAssetTypeService {
 
 
-
     @Inject
     private ExceptionService exceptionService;
 
@@ -65,9 +64,7 @@ public class OrganizationAssetTypeService {
             exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
         }
         checkForDuplicacyInNameOfAssetType(assetTypeDto);
-        AssetType assetType = new AssetType(assetTypeDto.getName());
-        assetType.setOrganizationId(unitId);
-        assetType.setSubAssetType(false);
+        AssetType assetType = new AssetType(assetTypeDto.getName(),  unitId, false);
         List<Risk> assetTypeRisks = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeDto.getSubAssetTypes())) {
             List<AssetType> subAssetTypeList = buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, assetTypeDto.getSubAssetTypes(), assetType);
@@ -92,9 +89,7 @@ public class OrganizationAssetTypeService {
         List<AssetType> subAssetTypes = new ArrayList<>();
         List<Risk> subAssetRisks = new ArrayList<>();
         for (AssetTypeOrganizationLevelDTO subAssetTypeDto : subAssetTypesDto) {
-            AssetType subAssetType = new AssetType(subAssetTypeDto.getName());
-            subAssetType.setSubAssetType(true);
-            subAssetType.setOrganizationId(unitId);
+            AssetType subAssetType = new AssetType(subAssetTypeDto.getName(),  unitId, true);
             subAssetType.setAssetType(assetType);
             subAssetType.setHasSubAssetType(false);
             for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
@@ -337,17 +332,14 @@ public class OrganizationAssetTypeService {
     @SuppressWarnings("unchecked")
     private Map<String, AssetTypeBasicDTO> createAssetTypeAndSubAssetTypeWithBasicDetail(Long unitId, AssetTypeBasicDTO assetTypeBasicDTO) {
 
-        AssetType assetType = new AssetType(assetTypeBasicDTO.getName());
-        assetType.setOrganizationId(unitId);
+        AssetType assetType = new AssetType(assetTypeBasicDTO.getName(),unitId,false);
         List<AssetType> subAssetTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeBasicDTO.getSubAssetTypes())) {
             for (AssetTypeBasicDTO subAssetTypeDTO : assetTypeBasicDTO.getSubAssetTypes()) {
-                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
-                subAssetType.setOrganizationId(unitId);
+                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName(),unitId,true);
                 subAssetType.setAssetType(assetType);
                 subAssetType.setSuggestedDate(LocalDate.now());
                 assetType.setHasSubAssetType(true);
-                subAssetType.setSubAssetType(true);
                 subAssetTypes.add(subAssetType);
             }
         }
