@@ -166,7 +166,7 @@ public class AssetService {
                             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetSubType().getId());
                         }
                     } else {
-                        subAssetType = new AssetType(assetDTO.getAssetSubType().getName(), null, unitId, true);
+                        subAssetType = new AssetType(assetDTO.getAssetSubType().getName(),  unitId, true);
                         subAssetType.setAssetType(assetType);
                         assetType.getSubAssetTypes().add(subAssetType);
                     }
@@ -179,10 +179,10 @@ public class AssetService {
             if (Optional.ofNullable(previousAssetType).isPresent()) {
                 exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetDTO.getAssetType().getName());
             }
-            assetType = new AssetType(assetDTO.getAssetType().getName(), null, unitId, false);
+            assetType = new AssetType(assetDTO.getAssetType().getName(),  unitId, false);
             linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
-                subAssetType = new AssetType(assetDTO.getAssetSubType().getName(), null, unitId, true);
+                subAssetType = new AssetType(assetDTO.getAssetSubType().getName(),  unitId, true);
                 subAssetType.setAssetType(assetType);
                 assetType.getSubAssetTypes().add(subAssetType);
                 linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getAssetSubType().getRisks());
