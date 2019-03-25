@@ -14,6 +14,7 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
@@ -232,13 +233,13 @@ public class ActivityUtil {
 
     }
 
-    public static List<String> verifyCompositeActivities(boolean breakAllowed, List<Activity> activities){
+    public static List<String> verifyCompositeActivities(boolean breakAllowed, List<ActivityWrapper> activities){
         List<String> invalidActivities=new ArrayList<>();
         activities.forEach(activity -> {
-            if (activity.getRulesActivityTab().isBreakAllowed() != breakAllowed
-                    && !TimeTypeEnum.PAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())
-                    && !TimeTypeEnum.UNPAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())) {
-                invalidActivities.add(activity.getName());
+            if (activity.getActivity().getRulesActivityTab().isBreakAllowed() != breakAllowed
+                    && !TimeTypeEnum.PAID_BREAK.equals(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())
+                    && !TimeTypeEnum.UNPAID_BREAK.equals(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())) {
+                invalidActivities.add(activity.getActivity().getName());
             }
         });
         return invalidActivities;
