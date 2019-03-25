@@ -74,7 +74,7 @@ public class RiskResponseDTO {
     public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
 
 
-    //used in native query contructor result
+    //used in native query constructor result
     public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, int riskLevel, String processingActivityName, BigInteger processingActivityId, boolean isSubProcessingActivity){
         this.id = id;
         this.name = name;
@@ -87,7 +87,7 @@ public class RiskResponseDTO {
 
     }
 
-    //used in native query contructor result
+    //used in native query constructor result
     public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, int riskLevel,  BigInteger assetTypeId,String assetTypeName,boolean isSubAssetType){
         this.id = id;
         this.name = name;
