@@ -113,7 +113,7 @@ public class ProcessingActivityService {
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
         return processingActivityDTO;
-    }
+        }
 
 
     private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long unitId, List<RelatedDataSubjectDTO> relatedDataSubjects) {
