@@ -47,6 +47,7 @@ import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -490,6 +491,7 @@ public class AssessmentService {
     }
 
 
+    @Transactional
     public List<AssessmentAnswerDTO> saveAssessmentAnswerByUnitIdAndAssessmentId(Long unitId, Long assessmentId, List<AssessmentAnswerDTO> assessmentAnswerValueObjects, AssessmentStatus status) {
 
 
@@ -508,12 +510,14 @@ public class AssessmentService {
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
         assessment.setAssessmentStatus(status);
-        assessmentRepository.save(assessment);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setCompletedDate(LocalDate.now());
+        }
+        assessmentRepository.save(assessment);
+        if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
         }
         return assessmentAnswerValueObjects;
