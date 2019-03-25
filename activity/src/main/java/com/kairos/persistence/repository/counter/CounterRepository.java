@@ -1,13 +1,12 @@
 package com.kairos.persistence.repository.counter;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
-import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIMappingDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
@@ -15,15 +14,11 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
-import com.kairos.persistence.model.counter.KPIDashboard;
-import com.kairos.dto.user.access_page.KPIAccessPageDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
-
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.data.domain.Sort;
-
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -34,16 +29,16 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -96,8 +91,8 @@ public class CounterRepository {
     }
 
     //removal of counters
-    public void removeAll(String fieldName, List values, Class claz) {
-        Query query = new Query(Criteria.where("deleted").is(false).and(fieldName).in(values));
+    public void removeAll(String fieldName, List values, Class claz , ConfLevel level ) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("level").is(level).and(fieldName).in(values));
         mongoTemplate.remove(query, claz);
     }
 
@@ -564,8 +559,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
-    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(ConfLevel level, List<Long> staffIds) {
-        Criteria matchCriteria = Criteria.where("deleted").is(false).and("staffId").in(staffIds).and("level").is(level);
+    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(Long unitId,ConfLevel level, List<Long> staffIds) {
+        Criteria matchCriteria = Criteria.where("deleted").is(false).and("unitId").is(unitId).and("staffId").in(staffIds).and("level").is(level);
         Query query = new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
