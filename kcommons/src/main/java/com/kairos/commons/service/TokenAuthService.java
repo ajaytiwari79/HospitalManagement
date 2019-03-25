@@ -3,6 +3,7 @@ package com.kairos.commons.service;
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.utils.BeanFactoryUtil;
 import com.kairos.commons.utils.UserRestClientAuth;
+import com.kairos.constants.CommonConstants;
 import com.kairos.enums.IntegrationOperation;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,25 +19,27 @@ public class TokenAuthService {
 private EnvConfigCommon envConfigCommon;
 @Inject
 private UserRestClientAuth userRestClientAuth;
+
     public String getAuthToken() {
 
         String authToken;
-        if(BeanFactoryUtil.getDefaultListableBeanFactory().containsBean("authToken")) {
+        if(BeanFactoryUtil.getDefaultListableBeanFactory().containsBean(CommonConstants.AUTH_TOKEN)) {
             authToken = BeanFactoryUtil.getDefaultListableBeanFactory()
-                    .getBean("authToken", String.class);
+                    .getBean(CommonConstants.AUTH_TOKEN, String.class);
             return authToken;
 
         }
         else {
                 authToken = getAuthTokenFromUser();
-                BeanFactoryUtil.registerSingleton("authToken",authToken);
+                BeanFactoryUtil.registerSingleton(CommonConstants.AUTH_TOKEN,authToken);
             }
         return authToken;
     }
+
     public String getNewAuthToken() {
         String authToken = getAuthTokenFromUser();
-        BeanFactoryUtil.getDefaultListableBeanFactory().destroySingleton("authToken");
-        BeanFactoryUtil.registerSingleton("authToken",authToken);
+        BeanFactoryUtil.getDefaultListableBeanFactory().destroySingleton(CommonConstants.AUTH_TOKEN);
+        BeanFactoryUtil.registerSingleton(CommonConstants.AUTH_TOKEN,authToken);
         return authToken;
     }
 

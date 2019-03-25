@@ -327,12 +327,6 @@ public class UserIntegrationService {
         });
     }
 
-    //StaffRestClient
-    public Map<String, Object> getTeamStaffAndStaffSkill(List<Long> staffIds) {
-        return genericRestClient.publishRequest(staffIds, null, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_SKILL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        });
-    }
-
     public StaffDTO getStaff(Long staffId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, staffId);

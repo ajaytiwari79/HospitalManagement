@@ -73,7 +73,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -115,7 +114,7 @@ public class ActivityService extends MongoBaseService {
     private ActivityCategoryRepository activityCategoryRepository;
     @Inject
     private ShiftService shiftService;
-    @Autowired
+    @Inject
     private PhaseService phaseService;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
@@ -133,7 +132,7 @@ public class ActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Autowired
+    @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -993,6 +992,11 @@ public class ActivityService extends MongoBaseService {
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
+    }
+
+    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
+        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
+        return activityTypeList;
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {

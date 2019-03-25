@@ -467,22 +467,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.createStaffFromPlanningWorkflow(staffDTO, unitId));
     }
 
-
-    /**
-     * @param unitId
-     * @param staffIds
-     * @return
-     * @auther anil maurya
-     * this endpoint is called from task micro service
-     */
-    @RequestMapping(value = "/getsfAndsfSkill", method = RequestMethod.POST)
-    @ApiOperation("getTeamStaffAndStaffSkill")
-    public ResponseEntity<Map<String, Object>> getTeamStaffAndStaffSkill(@PathVariable Long unitId, @RequestBody List<Long> staffIds) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getTeamStaffAndStaffSkill(unitId, staffIds));
-    }
-
-    /**
+     /**
      * @return
      * @auther anil maurya
      * this endpoint is called from task micro service

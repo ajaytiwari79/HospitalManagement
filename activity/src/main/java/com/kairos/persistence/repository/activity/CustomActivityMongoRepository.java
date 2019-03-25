@@ -20,7 +20,7 @@ import java.util.Set;
 
 public interface CustomActivityMongoRepository {
 
-    List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted);
+    List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted);
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
 
@@ -39,6 +39,8 @@ public interface CustomActivityMongoRepository {
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(long unitId);
+
+    List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted);
 
     Activity getActivityByNameAndUnitId(Long unitId,String name);
 
