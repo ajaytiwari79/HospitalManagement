@@ -36,6 +36,7 @@ public class ProcessingActivityDTO {
     private Set<Long> transferMethods;
     private Set<Long> accessorParties;
     private Set<Long> processingLegalBasis;
+    @Valid
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
     private List<RelatedDataSubjectDTO> dataSubjectSet=new ArrayList<>();
     private Long responsibilityType;

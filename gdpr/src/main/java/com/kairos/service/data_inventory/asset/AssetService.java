@@ -20,7 +20,9 @@ import com.kairos.persistence.repository.master_data.asset_management.storage_fo
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.RelatedProcessingActivityResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.asset_management.*;
@@ -148,7 +150,6 @@ public class AssetService {
     }
 
 
-
     private void saveAssetTypeSubTypeAndRisk(Long unitId, Asset asset, AssetDTO assetDTO) {
         AssetType assetType;
         AssetType subAssetType = null;
@@ -273,11 +274,11 @@ public class AssetService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + id);
         }
-        return prepareAssetResponseData(asset, false);
+        return prepareAssetResponseData(asset, null, false);
     }
 
 
-    private AssetResponseDTO prepareAssetResponseData(Asset asset, boolean isBasicDataOnly) {
+    private AssetResponseDTO prepareAssetResponseData(Asset asset, Map<Long, List<RelatedProcessingActivityResponseDTO>> assetIdAndProcessingActivityListMap, boolean isBasicDataOnly) {
         AssetResponseDTO assetResponseDTO = new AssetResponseDTO();
         assetResponseDTO.setId(asset.getId());
         assetResponseDTO.setName(asset.getName());
@@ -285,6 +286,9 @@ public class AssetService {
         assetResponseDTO.setHostingLocation(asset.getHostingLocation());
         assetResponseDTO.setActive(asset.isActive());
         assetResponseDTO.setManagingDepartment(asset.getManagingDepartment());
+        if (assetIdAndProcessingActivityListMap != null) {
+            assetResponseDTO.setProcessingActivities(assetIdAndProcessingActivityListMap.get(asset.getId()));
+        }
         if (!isBasicDataOnly) {
             assetResponseDTO.setDataRetentionPeriod(asset.getDataRetentionPeriod());
             assetResponseDTO.setSuggested(asset.isSuggested());
@@ -315,7 +319,18 @@ public class AssetService {
     public List<AssetResponseDTO> getAllAssetByUnitId(Long unitId) {
         List<AssetResponseDTO> assetResponseDTOS = new ArrayList<>();
         List<Asset> assets = assetRepository.findAllByOrganizationId(unitId);
-        assets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, false)));
+        List<AssetBasicResponseDTO> assetsWithRelatedProcessingActivities = assetRepository.getAllAssetRelatedProcessingActivityByOrgId(unitId);
+        Map<Long, List<RelatedProcessingActivityResponseDTO>> assetIdAndProcessingActivityListMap = new HashMap<>();
+        assetsWithRelatedProcessingActivities.forEach(assetBasicResponseDTO -> {
+            if (assetIdAndProcessingActivityListMap.containsKey(assetBasicResponseDTO.getId())) {
+                List<RelatedProcessingActivityResponseDTO> relatedProcessingActivityResponseDTOS = assetIdAndProcessingActivityListMap.get(assetBasicResponseDTO.getId());
+                relatedProcessingActivityResponseDTOS.add(assetBasicResponseDTO.getProcessingActivity());
+                assetIdAndProcessingActivityListMap.put(assetBasicResponseDTO.getId(), relatedProcessingActivityResponseDTOS);
+            } else {
+                assetIdAndProcessingActivityListMap.put(assetBasicResponseDTO.getId(), new ArrayList<>(Arrays.asList(assetBasicResponseDTO.getProcessingActivity())));
+            }
+        });
+        assets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, assetIdAndProcessingActivityListMap, false)));
         return assetResponseDTOS;
     }
 
@@ -339,7 +354,7 @@ public class AssetService {
     public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
         List<Asset> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);
         List<AssetResponseDTO> assetResponseDTOS = new ArrayList<>();
-        activeAssets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, true)));
+        activeAssets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, null, true)));
         return assetResponseDTOS;
     }
 

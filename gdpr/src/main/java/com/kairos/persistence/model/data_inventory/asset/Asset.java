@@ -6,14 +6,42 @@ import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SqlResultSetMappings({
+        @SqlResultSetMapping(
+                name = "assetWithProcessingActivity",
+                classes = @ConstructorResult(
+                        targetClass = AssetBasicResponseDTO.class,
+                        columns = {
+                                @ColumnResult(name = "id"),
+                                @ColumnResult(name = "name"),
+                                @ColumnResult(name = "processingActivityId", type= BigInteger.class),
+                                @ColumnResult(name = "processingActivityName", type=String.class),
+                                @ColumnResult(name = "subProcessingActivity", type = boolean.class),
+                                @ColumnResult(name = "parentProcessingActivityId",type = BigInteger.class),
+                                @ColumnResult(name = "parentProcessingActivityName",type = String.class)
+                        }
+                )
+        )
+})
+@NamedNativeQueries({
+        @NamedNativeQuery(name = "getAllAssetRelatedProcessingActivityData",resultSetMapping = "assetWithProcessingActivity",resultClass = AssetBasicResponseDTO.class,
+                query = " select AST.id as id,AST.name  as name,PA.id as processingActivityId , PA.name as processingActivityName , PA.is_sub_processing_activity as subProcessingActivity , PPA.id as parentProcessingActivityId ,PPA.name as parentProcessingActivityName from asset AST" +
+                        " left join processing_activity_assets PAA on PAA.assets_id=AST.id " +
+                        " left join processing_activity PA on PA.id = PAA.processing_activity_id " +
+                        " left join processing_activity PPA on PA.processing_activity_id = PPA.id" +
+                        " where AST.organization_id = ?1 and AST.deleted = false and PA.id is not null"),
+})
 public class Asset extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
