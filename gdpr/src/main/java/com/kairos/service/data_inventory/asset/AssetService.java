@@ -327,9 +327,7 @@ public class AssetService {
                 relatedProcessingActivityResponseDTOS.add(assetBasicResponseDTO.getProcessingActivity());
                 assetIdAndProcessingActivityListMap.put(assetBasicResponseDTO.getId(), relatedProcessingActivityResponseDTOS);
             } else {
-                assetIdAndProcessingActivityListMap.put(assetBasicResponseDTO.getId(), new ArrayList<RelatedProcessingActivityResponseDTO>() {{
-                    add(assetBasicResponseDTO.getProcessingActivity());
-                }});
+                assetIdAndProcessingActivityListMap.put(assetBasicResponseDTO.getId(), new ArrayList<>(Arrays.asList(assetBasicResponseDTO.getProcessingActivity())));
             }
         });
         assets.forEach(asset -> assetResponseDTOS.add(prepareAssetResponseData(asset, assetIdAndProcessingActivityListMap, false)));
