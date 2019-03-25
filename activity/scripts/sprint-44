@@ -51,7 +51,7 @@ Please hit this API to update phaseId in WTARuletemplate
 
 //add duration and duration type in planning period
 //first check existing planning period duration and duration type
-db.getCollection('planningPeriod').updateMany({},{$set:{ "duration" :NumberInt(1),"durationType" : "MONTHS"}})
+db.getCollection('planningPeriod').updateMany({},{$set:{ "duration" :NumberInt(1),"durationType" : "WEEKS"}})
 
 //for delete unimplemented KPI of unit
 

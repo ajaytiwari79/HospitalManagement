@@ -73,13 +73,12 @@ public class SchedulerPanelService extends MongoBaseService {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");
         if (!schedulerPanels.isEmpty()) {
-            List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
-                    collect(Collectors.toList());
             Map<Long, String> unitIdTimeZoneMap = userIntegrationService.getTimeZoneOfAllUnits();
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
                     logger.info("Inside initSchedulerPanels" + schedulerPanel.getUnitId() + " unitId = " + unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
-                    dynamicCronScheduler.setCronScheduling(schedulerPanel, unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+                    //if there is no timezone of unit/organization then we set "UTC" timezone of that unit
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel, unitIdTimeZoneMap.getOrDefault(schedulerPanel.getUnitId(),"UTC"));
                 }
             }
         }
@@ -372,7 +371,8 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
     private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {
-        String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
+        //String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
+        String cronExpressionRunOnce = "0 * * * * *";
         String cronExpression = MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
         return cronExpression;
     }
