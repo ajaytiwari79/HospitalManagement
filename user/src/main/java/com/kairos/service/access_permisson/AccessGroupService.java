@@ -1,13 +1,13 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -51,7 +51,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
+import static com.kairos.constants.AppConstants.SUPER_ADMIN;
 
 
 /**
@@ -213,7 +213,7 @@ public class AccessGroupService {
             // Remove AG_COUNTRY_ADMIN access group to be copied
             List<AccessGroup> accessGroups = new ArrayList<>(parent.getAccessGroups());
             for (AccessGroup accessGroup : accessGroups) {
-                if (accessGroup.getName().equals(AG_COUNTRY_ADMIN)) {
+                if (accessGroup.getName().equals(SUPER_ADMIN)) {
                     accessGroups.remove(accessGroup);
                 }
             }

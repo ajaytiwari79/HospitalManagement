@@ -54,8 +54,8 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabsForUnit(unitId));
     }
     @RequestMapping(value = "/country/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId, @PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId, countryId));
+    public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId));
     }
 
     @RequestMapping(value = "/tab/{tabId}/status",method = RequestMethod.PUT)

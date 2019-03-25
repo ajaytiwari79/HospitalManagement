@@ -108,11 +108,11 @@ public class AccessPageService {
         return accessPageRepository.getMainTabsForUnit(unitId);
     }
 
-    public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
+    public List<AccessPageDTO> getChildTabs(Long tabId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();
         }
-        return accessPageRepository.getChildTabs(tabId, countryId);
+        return accessPageRepository.getChildTabs(tabId);
     }
 
     public Boolean updateStatus(boolean active,Long tabId){

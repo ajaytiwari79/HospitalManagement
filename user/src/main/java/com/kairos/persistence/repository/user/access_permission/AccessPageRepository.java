@@ -171,7 +171,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
-            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage) WHERE id(country)={1}\n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage) \n" +
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
             "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
             "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
@@ -181,7 +181,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization "
     )
-    List<AccessPageDTO> getChildTabs(Long tabId, Long countryId);
+    List<AccessPageDTO> getChildTabs(Long tabId);
 
     @Query("MATCH (accessPage:AccessPage) WHERE id(accessPage)={0} set accessPage.name={1} RETURN accessPage")
     AccessPage updateAccessTab(Long id, String name);
