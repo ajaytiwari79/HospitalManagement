@@ -40,7 +40,7 @@ import java.util.List;
                         " left join processing_activity_assets PAA on PAA.assets_id=AST.id " +
                         " left join processing_activity PA on PA.id = PAA.processing_activity_id " +
                         " left join processing_activity PPA on PA.processing_activity_id = PPA.id" +
-                        " where AST.organization_id = ?1 and AST.deleted = false and PA.id is not null"),
+                        " where AST.organization_id = ?1 and AST.deleted = false and PA.id is not null")
 })
 public class Asset extends BaseEntity {
 
