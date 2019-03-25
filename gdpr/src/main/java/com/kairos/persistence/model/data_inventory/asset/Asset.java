@@ -28,17 +28,19 @@ import java.util.List;
                                 @ColumnResult(name = "processingActivityId", type= BigInteger.class),
                                 @ColumnResult(name = "processingActivityName", type=String.class),
                                 @ColumnResult(name = "subProcessingActivity", type = boolean.class),
+                                @ColumnResult(name = "parentProcessingActivityId",type = BigInteger.class),
+                                @ColumnResult(name = "parentProcessingActivityName",type = String.class)
                         }
                 )
         )
 })
 @NamedNativeQueries({
         @NamedNativeQuery(name = "getAllAssetRelatedProcessingActivityData",resultSetMapping = "assetWithProcessingActivity",resultClass = AssetBasicResponseDTO.class,
-                query = "select AST.id as id,AST.name  as name,PA.id as processingActivityId , PA.name as processingActivityName , PA.is_sub_processing_activity as subProcessingActivity from asset AST" +
+                query = " select AST.id as id,AST.name  as name,PA.id as processingActivityId , PA.name as processingActivityName , PA.is_sub_processing_activity as subProcessingActivity , PPA.id as parentProcessingActivityId ,PPA.name as parentProcessingActivityName from asset AST" +
                         " left join processing_activity_assets PAA on PAA.assets_id=AST.id " +
-                        "left join processing_activity PA on PA.id = PAA.processing_activity_id " +
-                        "left join processing_activity PPA on PA.processing_activity_id = PPA.id" +
-                        " where AST.organization_id =?1 and PA.id is not null"),
+                        " left join processing_activity PA on PA.id = PAA.processing_activity_id " +
+                        " left join processing_activity PPA on PA.processing_activity_id = PPA.id" +
+                        " where AST.organization_id = ?1 and AST.deleted = false and PA.id is not null"),
 })
 public class Asset extends BaseEntity {
 

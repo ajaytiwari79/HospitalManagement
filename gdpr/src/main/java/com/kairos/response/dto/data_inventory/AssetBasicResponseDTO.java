@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -29,10 +27,10 @@ public class AssetBasicResponseDTO {
     private RelatedProcessingActivityResponseDTO processingActivity;
 
 
-    public AssetBasicResponseDTO(BigInteger id, String name,BigInteger processingActivityId,String processingActivityName, boolean subProcessingActivity) {
+    public AssetBasicResponseDTO(BigInteger id, String name,BigInteger processingActivityId,String processingActivityName, boolean subProcessingActivity,BigInteger parentProcessingActivityId ,String parentProcessingActivityName) {
         this.id =id.longValue();
         this.name = name;
-        this.processingActivity = new RelatedProcessingActivityResponseDTO(processingActivityId.longValue(), processingActivityName, subProcessingActivity);
+        this.processingActivity = new RelatedProcessingActivityResponseDTO(processingActivityId.longValue(), processingActivityName, subProcessingActivity,parentProcessingActivityId,parentProcessingActivityName);
     }
 
     public AssetBasicResponseDTO() {
