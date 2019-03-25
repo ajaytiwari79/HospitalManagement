@@ -6,3 +6,9 @@ MATCH(org:Organization{deleted:false}) where org.timeZone is null set org.timeZo
 
 MATCH (filterGroup:FilterGroup)
 SET filterGroup.filterTypes = FILTER(x IN filterGroup.filterTypes WHERE x <> "ENGINEER_TYPE");
+
+
+
+//Delete Group and replace group relationship with teams
+MATCH(organization:Organization)-[gr:HAS_GROUP]->(group:Group)-[tr:HAS_TEAM]->(team:Team) delete gr
+CREATE UNIQUE(organization)-[r1:HAS_TEAMS]->(team);
