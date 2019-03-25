@@ -1,8 +1,9 @@
 package com.kairos.service.counter;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.counter.KPIDashboard;
@@ -10,7 +11,6 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +18,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.mockito.ArgumentMatchers.isNotNull;
 
 @Service
 public class DynamicTabService extends MongoBaseService {
@@ -126,7 +124,6 @@ public class DynamicTabService extends MongoBaseService {
         List<KPIDashboardDTO> existingDashboardTab = getExistingDashboardTab(dashboardTabs.getUpdateDashboardTab(), level, refId);
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
         List<String> deletableCategoryIds = deletableDashboardTab.stream().filter(k->!k.isDefaultTab()).map(kpiCategoryDTO -> kpiCategoryDTO.getModuleId()).collect(Collectors.toList());
-        // counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
         counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class,level);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
