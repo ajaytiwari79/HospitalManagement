@@ -326,9 +326,9 @@ public class StaffService {
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
 
         if(isCollectionEmpty(staffPersonalDetail.getTeamIdsOfStaff())){
-            teamGraphRepository.removeStaffFromAllTeams(staffPersonalDetail.getId());
+            teamGraphRepository.removeStaffFromAllTeams(staffId);
         }else{
-            teamGraphRepository.assignStaffInTeams(staffPersonalDetail.getId(), staffPersonalDetail.getTeamIdsOfStaff());
+            teamGraphRepository.assignStaffInTeams(staffId, staffPersonalDetail.getTeamIdsOfStaff());
         }
 
         return staffPersonalDetail;
