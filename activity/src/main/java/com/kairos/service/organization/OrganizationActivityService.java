@@ -22,7 +22,6 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -70,7 +69,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
 
 /**
  * Created by vipul on 5/12/17.
@@ -523,7 +521,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(timeType.isPartOfTeam()) {
-                int partOfTeamTimeTypes = activities.stream().map(a -> a.getTimeTypeData().isPartOfTeam()).collect(Collectors.toSet()).size();
+                int partOfTeamTimeTypes = activities.stream().filter(a -> a.getTimeTypeInfo().isPartOfTeam()).collect(Collectors.toList()).size();
                 if (activities.size() != partOfTeamTimeTypes) {
                     exceptionService.actionNotPermittedException("message.all_activity_same.time_type");
                 }
