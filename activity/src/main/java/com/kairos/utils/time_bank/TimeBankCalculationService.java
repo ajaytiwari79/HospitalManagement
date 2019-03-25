@@ -159,16 +159,16 @@ public class TimeBankCalculationService {
             int totalDailyTimebank = totalDailyPlannedMinutes - contractualMin;
             int timeBankMinWithoutCta = dailyScheduledMin - contractualMin;
             dailyTimeBank.setStaffId(unitPosition.getStaffId());
-            dailyTimeBank.setTimeBankMinWithoutCta(timeBankMinWithoutCta);
+            dailyTimeBank.setTimeBankMinutesWithoutCta(timeBankMinWithoutCta);
             int deltaAccumulatedTimebankMinutes = 0;
             if (someShiftPublish) {
                 deltaAccumulatedTimebankMinutes = totalPublishedDailyPlannedMinutes - contractualMin;
             }
             dailyTimeBank.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes);
-            dailyTimeBank.setTimeBankMinWithCta(ctaTimeBankMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
-            dailyTimeBank.setContractualMin(contractualMin);
-            dailyTimeBank.setScheduledMin(dailyScheduledMin);
-            dailyTimeBank.setTotalTimeBankMin(totalDailyTimebank);
+            dailyTimeBank.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
+            dailyTimeBank.setContractualMinutes(contractualMin);
+            dailyTimeBank.setScheduledMinutesOfTimeBank(dailyScheduledMin);
+            dailyTimeBank.setTotalTimeBankMinutes(totalDailyTimebank);
             dailyTimeBank.setTimeBankCTADistributionList(getBlankTimeBankDistribution(unitPosition.getCtaRuleTemplates(), ctaTimeBankMinMap));
         } else if (dailyTimeBankEntryMap.containsKey(unitPosition.getId() + "-" + DateUtils.getLocalDate(interval.getStart().getMillis()))) {
             dailyTimeBank = dailyTimeBankEntryMap.get(unitPosition.getId() + "-" + DateUtils.getLocalDate(interval.getStart().getMillis()));
@@ -202,7 +202,7 @@ public class TimeBankCalculationService {
 
     public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<com.kairos.dto.user.employment.UnitPositionLinesDTO> positionLines) {
         Date date = asDate(localDate);
-        int contractualOrTimeBankMinutes = 0;
+        int contractualMinutes = 0;
         if(CollectionUtils.isNotEmpty(positionLines)) {
             boolean valid = false;
             for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
@@ -215,13 +215,13 @@ public class TimeBankCalculationService {
                 for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
                     DateTimeInterval positionInterval = positionLine.getInterval();
                     if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate)))) {
-                        contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
+                        contractualMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
                         break;
                     }
                 }
             }
         }
-        return contractualOrTimeBankMinutes;
+        return contractualMinutes;
     }
 
 
@@ -499,8 +499,8 @@ public class TimeBankCalculationService {
         List<CTADistributionDTO> timeBankDistributionsDto = getDistributionOfTimeBank(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
         long presenceScheduledMin = getScheduledMinOfActivityByTimeType(presenceAbsenceTimeTypeMap.get("Presence"), shifts);
         long absenceScheduledMin = getScheduledMinOfActivityByTimeType(presenceAbsenceTimeTypeMap.get("Absence"), shifts);
-        long totalTimeBankChange = dailyTimeBankEntries.stream().mapToLong(t -> t.getTotalTimeBankMin()).sum();
-        long accumulatedTimeBankBefore = dailyTimeBankEntry.getAccumultedTimeBankMin();
+        long totalTimeBankChange = dailyTimeBankEntries.stream().mapToLong(t -> t.getTotalTimeBankMinutes()).sum();
+        long accumulatedTimeBankBefore = dailyTimeBankEntry.getAccumultedTimeBankMinutes();
         long totalTimeBank = accumulatedTimeBankBefore + totalTimeBankChange;
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = getVisualViewTimebankInterval(dailyTimeBankEntries, interval);
         return new TimeBankVisualViewDTO(totalTimeBank, presenceScheduledMin, absenceScheduledMin, totalTimeBankChange, timeBankIntervalDTOS, scheduledActivitiesDTOS, timeBankDistributionsDto);
@@ -516,8 +516,8 @@ public class TimeBankCalculationService {
             String title = byMonth ? localDate.getDayOfMonth() + " " + localDate.getMonth() : localDate.getDayOfWeek().toString();
             TimeBankIntervalDTO timeBankIntervalDTO = new TimeBankIntervalDTO(0, 0, title);
             if (Optional.ofNullable(dailyTimeBankEntry).isPresent()) {
-                long scheduledMin = dailyTimeBankEntry.getScheduledMin() + dailyTimeBankEntry.getTimeBankMinWithCta();
-                long totalTimeBankChange = dailyTimeBankEntry.getTotalTimeBankMin() < 0 ? 0 : dailyTimeBankEntry.getTotalTimeBankMin();
+                long scheduledMin = dailyTimeBankEntry.getScheduledMinutesOfTimeBank() + dailyTimeBankEntry.getCtaBonusMinutesOfTimeBank();
+                long totalTimeBankChange = dailyTimeBankEntry.getTotalTimeBankMinutes() < 0 ? 0 : dailyTimeBankEntry.getTotalTimeBankMinutes();
                 timeBankIntervalDTO = new TimeBankIntervalDTO(scheduledMin, totalTimeBankChange, title);
             }
             timeBankIntervalDTOS.add(timeBankIntervalDTO);
@@ -608,9 +608,9 @@ public class TimeBankCalculationService {
                 int calculateTimeBankForInterval = calculateTimeBankForInterval(planningPeriodIntervals,interval, unitPositionWithCtaDetailsDTO, true, dailyTimeBankEntries, false);
                 timeBankIntervalDTO.setTotalTimeBankMin(-calculateTimeBankForInterval);
                 if (dailyTimeBankEntries != null && !dailyTimeBankEntries.isEmpty()) {
-                    int totalTimeBank = dailyTimeBankEntries.stream().mapToInt(dailyTimeBankEntry -> dailyTimeBankEntry.getTotalTimeBankMin()).sum();
-                    int scheduledMinutes = dailyTimeBankEntries.stream().mapToInt(t -> t.getScheduledMin()).sum();
-                    int timebankMinutesAfterCta = dailyTimeBankEntries.stream().mapToInt(t -> t.getTimeBankMinWithCta()).sum();
+                    int totalTimeBank = dailyTimeBankEntries.stream().mapToInt(dailyTimeBankEntry -> dailyTimeBankEntry.getTotalTimeBankMinutes()).sum();
+                    int scheduledMinutes = dailyTimeBankEntries.stream().mapToInt(t -> t.getScheduledMinutesOfTimeBank()).sum();
+                    int timebankMinutesAfterCta = dailyTimeBankEntries.stream().mapToInt(t -> t.getCtaBonusMinutesOfTimeBank()).sum();
                     timeBankIntervalDTO.setTotalTimeBankDiff(scheduledMinutes + timebankMinutesAfterCta);
                     timeBankIntervalDTO.setTotalTimeBankMin(totalTimeBank - calculateTimeBankForInterval);
                 }
@@ -761,15 +761,15 @@ public class TimeBankCalculationService {
             timeBankIntervalDTO.setHeaderName(getHeaderName(query, interval));
             if (dailyTimeBankEntries != null && !dailyTimeBankEntries.isEmpty()) {
                 timeBankIntervalDTO.setTitle(getTitle(query, interval));
-                int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(ti -> ti.getTotalTimeBankMin()).sum();
+                int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(ti -> ti.getTotalTimeBankMinutes()).sum();
                 int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
-                int minutesFromCTA = dailyTimeBankEntries.stream().mapToInt(t -> t.getTimeBankMinWithCta()).sum();
+                int minutesFromCTA = dailyTimeBankEntries.stream().mapToInt(t -> t.getCtaBonusMinutesOfTimeBank()).sum();
                 timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore);
                 totalTimeBankBefore += totalTimeBank;
                 timeBankIntervalDTO.setTotalTimeBankAfterCtaMin(totalTimeBankBefore - approvePayOut);
                 timeBankIntervalDTO.setTotalTimeBankMin(totalTimeBank - approvePayOut);
                 timeBankIntervalDTO.setTotalTimeBankDiff(totalTimeBank - approvePayOut);
-                int scheduledMinutes = dailyTimeBankEntries.stream().mapToInt(tb -> tb.getScheduledMin()).sum();
+                int scheduledMinutes = dailyTimeBankEntries.stream().mapToInt(tb -> tb.getScheduledMinutesOfTimeBank()).sum();
                 timeBankIntervalDTO.setTotalScheduledMin(scheduledMinutes);
                 List<TimeBankCTADistribution> timeBankDistributions = dailyTimeBankEntries.stream().filter(tb -> (interval.getStart().equals(DateUtils.toJodaDateTime(tb.getDate())) || interval.contains(asDate(tb.getDate()).getTime()))).flatMap(tb -> tb.getTimeBankCTADistributionList().stream()).collect(Collectors.toList());
                 Map<String, Integer> ctaDistributionMap = timeBankDistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaName(), Collectors.summingInt(tb -> tb.getMinutes())));
@@ -1160,7 +1160,7 @@ public class TimeBankCalculationService {
             int totalTimeBankMinutes;
             if (dateDailyTimeBankEntryMap.containsKey(unitPositionStartDate)) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(unitPositionStartDate);
-                totalTimeBankMinutes = dailyTimeBankEntry.getTotalTimeBankMin();
+                totalTimeBankMinutes = dailyTimeBankEntry.getTotalTimeBankMinutes();
                 accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
             } else {
                 totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, unitPositionStartDate, unitPositionWithCtaDetailsDTO.getPositionLines()));

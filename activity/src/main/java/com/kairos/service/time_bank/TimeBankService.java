@@ -111,6 +111,7 @@ public class TimeBankService extends MongoBaseService {
     /**
      * @param staffAdditionalInfoDTO
      * @param shift
+     * @Description This method is used for update DailyTimebankEntry when Shift Create,Update,Delete
      */
     public void updateTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
         staffAdditionalInfoDTO.getUnitPosition().setStaffId(shift.getStaffId());
@@ -277,7 +278,7 @@ public class TimeBankService extends MongoBaseService {
             Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, interval.getStart().toDate(), interval.getEnd().toDate());
             int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBanksBeforeStartDate, false);
             totalTimeBankBeforeStartDate = isCollectionNotEmpty(dailyTimeBanksBeforeStartDate)
-                    ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getTotalTimeBankMin()).sum() : 0;
+                    ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getTotalTimeBankMinutes()).sum() : 0;
             totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;
         }
         totalTimeBankBeforeStartDate+=unitPositionWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
@@ -497,7 +498,7 @@ public class TimeBankService extends MongoBaseService {
         //TODO This code calculate the Accumulated timebank till shiftStartDate
         while (startDate.isBefore(endDate)){
             if(dateDailyTimeBankEntryMap.containsKey(startDate)){
-                accumulatedTimebank+= dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMin();
+                accumulatedTimebank+= dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMinutes();
             }else {
                 accumulatedTimebank+= (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
             }
@@ -506,7 +507,7 @@ public class TimeBankService extends MongoBaseService {
         int totalTimeBankMinutes;
         //TODO This code calculate the Delta timebank till shiftStartDate
         if(dateDailyTimeBankEntryMap.containsKey(startDate)){
-            totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMin();
+            totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMinutes();
         }else {
             totalTimeBankMinutes = (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
         }
@@ -533,7 +534,7 @@ public class TimeBankService extends MongoBaseService {
                 if(startDate.isAfter(unitPositionWithCtaDetailsDTO.getStartDate()) || startDate.equals(unitPositionWithCtaDetailsDTO.getStartDate())){
                     int totalTimeBankMinutes;
                     if(dateDailyTimeBankEntryMap.containsKey(startDate)){
-                        totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMin();
+                        totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMinutes();
                     }else {
                         totalTimeBankMinutes = (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
                     }

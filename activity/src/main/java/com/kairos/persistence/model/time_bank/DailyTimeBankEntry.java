@@ -17,12 +17,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private Long unitPositionId;
     private Long staffId;
     //In minutes
-    private int totalTimeBankMin; //It is Delta timebank
-    private int contractualMin;
-    private int scheduledMin;
-    private int timeBankMinWithoutCta;
-    private int timeBankMinWithCta;      //It is the sum of timeBankCTADistributionList
-    private long accumultedTimeBankMin;
+    private int totalTimeBankMinutes; //It is Delta timebank
+    private int contractualMinutes;
+    private int scheduledMinutesOfTimeBank;
+    private int timeBankMinutesWithoutCta;// It is the sum of scheduledMinutesOfTimeBank - contractualMinutes
+    private int ctaBonusMinutesOfTimeBank;      //It is the sum of timeBankCTADistributionList minutes
+    private long accumultedTimeBankMinutes;
     private LocalDate date;
     private List<TimeBankCTADistribution> timeBankCTADistributionList;
     private int deltaAccumulatedTimebankMinutes;
@@ -47,12 +47,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     }
 
 
-    public long getAccumultedTimeBankMin() {
-        return accumultedTimeBankMin;
+    public long getAccumultedTimeBankMinutes() {
+        return accumultedTimeBankMinutes;
     }
 
-    public void setAccumultedTimeBankMin(long accumultedTimeBankMin) {
-        this.accumultedTimeBankMin = accumultedTimeBankMin;
+    public void setAccumultedTimeBankMinutes(long accumultedTimeBankMinutes) {
+        this.accumultedTimeBankMinutes = accumultedTimeBankMinutes;
     }
 
     public LocalDate getDate() {
@@ -63,28 +63,28 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.date = date;
     }
 
-    public int getScheduledMin() {
-        return scheduledMin;
+    public int getScheduledMinutesOfTimeBank() {
+        return scheduledMinutesOfTimeBank;
     }
 
-    public void setScheduledMin(int scheduledMin) {
-        this.scheduledMin = scheduledMin;
+    public void setScheduledMinutesOfTimeBank(int scheduledMinutesOfTimeBank) {
+        this.scheduledMinutesOfTimeBank = scheduledMinutesOfTimeBank;
     }
 
-    public int getTimeBankMinWithoutCta() {
-        return timeBankMinWithoutCta;
+    public int getTimeBankMinutesWithoutCta() {
+        return timeBankMinutesWithoutCta;
     }
 
-    public void setTimeBankMinWithoutCta(int timeBankMinWithoutCta) {
-        this.timeBankMinWithoutCta = timeBankMinWithoutCta;
+    public void setTimeBankMinutesWithoutCta(int timeBankMinutesWithoutCta) {
+        this.timeBankMinutesWithoutCta = timeBankMinutesWithoutCta;
     }
 
-    public int getTimeBankMinWithCta() {
-        return timeBankMinWithCta;
+    public int getCtaBonusMinutesOfTimeBank() {
+        return ctaBonusMinutesOfTimeBank;
     }
 
-    public void setTimeBankMinWithCta(int timeBankMinWithCta) {
-        this.timeBankMinWithCta = timeBankMinWithCta;
+    public void setCtaBonusMinutesOfTimeBank(int ctaBonusMinutesOfTimeBank) {
+        this.ctaBonusMinutesOfTimeBank = ctaBonusMinutesOfTimeBank;
     }
 
     public Long getUnitPositionId() {
@@ -103,20 +103,20 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
-    public int getTotalTimeBankMin() {
-        return totalTimeBankMin;
+    public int getTotalTimeBankMinutes() {
+        return totalTimeBankMinutes;
     }
 
-    public void setTotalTimeBankMin(int totalTimeBankMin) {
-        this.totalTimeBankMin = totalTimeBankMin;
+    public void setTotalTimeBankMinutes(int totalTimeBankMinutes) {
+        this.totalTimeBankMinutes = totalTimeBankMinutes;
     }
 
-    public int getContractualMin() {
-        return contractualMin;
+    public int getContractualMinutes() {
+        return contractualMinutes;
     }
 
-    public void setContractualMin(int contractualMin) {
-        this.contractualMin = contractualMin;
+    public void setContractualMinutes(int contractualMinutes) {
+        this.contractualMinutes = contractualMinutes;
     }
 
     public int getDeltaAccumulatedTimebankMinutes() {
