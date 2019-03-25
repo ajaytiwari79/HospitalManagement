@@ -921,4 +921,7 @@ public  class DateUtils {
     public static LocalDate getFirstDayOfNextYear(LocalDate localDate){
         return localDate.with(TemporalAdjusters.firstDayOfNextYear());
     }
+    public static Date minusMonths(Date date,int minusMonths) {
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusMonths(minusMonths));
+    }
 }
