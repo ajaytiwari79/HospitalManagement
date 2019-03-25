@@ -137,8 +137,8 @@ public class TechnicalSecurityMeasureService {
      * @return
      * @description method save technical security measure  suggested by unit
      */
-    public List<TechnicalSecurityMeasureDTO> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
-        return createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
+    public void saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+         createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
 
     }
 

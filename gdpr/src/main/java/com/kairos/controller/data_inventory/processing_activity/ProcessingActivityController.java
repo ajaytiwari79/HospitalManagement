@@ -2,7 +2,6 @@ package com.kairos.controller.data_inventory.processing_activity;
 
 
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
-//import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;

@@ -162,10 +162,11 @@ public class AssetService {
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
                 if (assetDTO.getAssetSubType().getId() != null) {
                     Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(assetDTO.getAssetSubType().getId())).findAny();
-                    if (!subAssetTypeObj.isPresent()) {
+                    if (subAssetTypeObj.isPresent()) {
+                        subAssetType = subAssetTypeObj.get();
+                    } else {
                         exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetSubType().getId());
                     }
-                    subAssetType = subAssetTypeObj.get();
                 } else {
                     subAssetType = new AssetType(assetDTO.getAssetSubType().getName());
                 }

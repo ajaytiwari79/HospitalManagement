@@ -20,6 +20,9 @@ public class AccessorPartyResponseDTO {
 
     private LocalDate suggestedDate;
 
+    /**
+     * used in query result
+     * */
     public AccessorPartyResponseDTO(Long id, String name, Long organizationId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
         this.id = id;
         this.name = name;

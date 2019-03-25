@@ -138,8 +138,8 @@ public class ResponsibilityTypeService {
      * @return
      * @description method save ResponsibilityType suggested by unit
      */
-    public List<ResponsibilityTypeDTO> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
-        return createResponsibilityType(countryId, responsibilityTypeDTOS, true);
+    public void saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+         createResponsibilityType(countryId, responsibilityTypeDTOS, true);
     }
 
 

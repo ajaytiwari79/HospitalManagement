@@ -23,6 +23,11 @@ public class AssetTypeRiskResponseDTO {
     public AssetTypeRiskResponseDTO() {
     }
 
+    public AssetTypeRiskResponseDTO(@NotNull(message = "error.message.id.notnull") Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() { return id; }
 
     public void setId(Long id) { this.id = id; }

@@ -12,6 +12,7 @@ public class AssetRepositoryImpl implements CustomAssetRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<AssetBasicResponseDTO> getAllAssetRelatedProcessingActivityByOrgId(Long orgId) {
         Query query = entityManager.createNamedQuery("getAllAssetRelatedProcessingActivityData").setParameter(1, orgId);

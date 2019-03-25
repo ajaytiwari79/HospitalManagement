@@ -80,12 +80,11 @@ public class MasterAssetService {
      * @param masterAssetDto
      * @return
      */
-    private MasterAsset addMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
+    private void addMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
         masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
         masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
         masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
         masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubServices()), SubServiceCategory.class));
-        return masterAsset;
     }
 
     /**
@@ -111,11 +110,16 @@ public class MasterAssetService {
         if (Optional.ofNullable(masterAssetDTO.getAssetSubType()).isPresent()) {
             if (masterAssetDTO.getAssetSubType().getId() != null) {
                 Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getAssetSubType().getId())).findAny();
-                masterAsset.setSubAssetType(subAssetTypeObj.get());
+                if (subAssetTypeObj.isPresent()) {
+                    subAssetType = subAssetTypeObj.get();
+                } else {
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", masterAssetDTO.getAssetSubType().getId());
+                }
             } else {
                 subAssetType = new AssetType(masterAssetDTO.getAssetSubType().getName(), countryId, SuggestedDataStatus.APPROVED);
                 subAssetType.setSubAssetType(true);
             }
+            masterAsset.setSubAssetType(subAssetType);
         }
         assetTypeRepository.save(assetType);
         masterAsset.setAssetType(assetType);
@@ -236,11 +240,11 @@ public class MasterAssetService {
         }
         OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
         });
-        MasterAsset masterAsset = new MasterAsset(assetDTO.getName(), assetDTO.getDescription(), countryId, LocalDate.now(), SuggestedDataStatus.PENDING)
-                .setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
-                .setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class))
-                .setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class))
-                .setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
+        MasterAsset masterAsset = new MasterAsset(assetDTO.getName(), assetDTO.getDescription(), countryId, LocalDate.now(), SuggestedDataStatus.PENDING);
+        masterAsset.setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
         masterAssetRepository.save(masterAsset);
         assetDTO.setId(masterAsset.getId());
         return assetDTO;
