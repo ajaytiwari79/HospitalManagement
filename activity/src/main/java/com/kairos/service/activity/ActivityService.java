@@ -1093,9 +1093,11 @@ public class ActivityService extends MongoBaseService {
     }
 
     //remove expertise from activity via schedular job
-    public boolean removeExpertiseFromActivities(BigInteger expertiseId){
-
-        return false;
+    public boolean removeExpertiseFromActivities(Long expertiseId){
+        logger.info("remove expertise from activities by job");
+        activityMongoRepository.removeExpertiseFromActivitiesByExpertiesId(expertiseId);
+        logger.info("successfully remove expertise from activities by job");
+        return true;
     }
 
 }
