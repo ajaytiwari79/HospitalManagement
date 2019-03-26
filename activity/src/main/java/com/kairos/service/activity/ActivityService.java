@@ -793,39 +793,6 @@ public class ActivityService extends MongoBaseService {
         return true;
     }
 
-    public String getActivitesFromTimeCare() {
-        String plainClientCredentials = "cluster:cluster";
-        String base64ClientCredentials = new String(org.apache.commons.codec.binary.Base64.encodeBase64(plainClientCredentials.getBytes()));
-        HttpHeaders headers = new HttpHeaders();
-        List<MediaType> mediaTypes = new ArrayList<>();
-        mediaTypes.add(APPLICATION_XML);
-        headers.setAccept(mediaTypes);
-        headers.add("Authorization", "Basic " + base64ClientCredentials);
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-
-        String importShiftURI = envConfig.getCarteServerHost() + KETTLE_EXECUTE_TRANS + "/home/prabjot/Desktop/Pentaho/data-integration/TimeCareIntegration/GetActivities.ktr";
-        logger.info("importShiftURI----> " + importShiftURI);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> importResult = restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-        System.out.println(importResult.getStatusCode());
-        if (importResult.getStatusCodeValue() == HttpStatus.OK.value()) {
-            System.out.println(importResult);
-            String importShiftStatusXMLURI = envConfig.getCarteServerHost() + "/kettle/transStatus/?name=GetActivities&xml=y";
-            ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
-            try {
-                JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
-                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                StringReader reader = new StringReader(resultStatusXml.getBody());
-                Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
-                logger.info("trans status---> " + transstatus.getId());
-            } catch (JAXBException exception) {
-                logger.info("trans status---exception > " + exception);
-            }
-
-        }
-        return importResult.toString();
-    }
-
 
     public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
