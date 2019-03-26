@@ -585,7 +585,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "         \"_id\":\"$_id.id\",\n" +
                 "         \"name\":\"$_id.name\",\n" +
                 "         \"categoryId\":\"$_id.categoryId\",\n" +
-                "         \"categoryName\":\"$_id.categoryId\"\n" +
+                "         \"categoryName\":\"$_id.categoryName\"\n" +
                 "      }\n" +
                 "   }";
 
