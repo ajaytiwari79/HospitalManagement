@@ -76,7 +76,7 @@ public class ShiftStateService {
         List<ShiftState> timeAndAttendanceShiftStates=null;
         List<ShiftState> oldRealtimeShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(s->s.getId()).collect(Collectors.toList()),phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
         newShiftState=createRealTimeShiftState(newShiftState,oldRealtimeShiftStates,shifts,phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        newShiftState.addAll(createDraftShiftState(newShiftState,shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
+        newShiftState.addAll(createDraftShiftState(new ArrayList<>(),shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
         if( !newShiftState.isEmpty()) {
              shiftMongoRepository.saveEntities(newShiftState);
           }
@@ -176,7 +176,7 @@ public class ShiftStateService {
     public List<ShiftState> checkAndCreateRealtimeAndDraftState(List<Shift> shifts, List<ShiftState> shiftStates, Map<String, Phase> phaseMap) {
         List<ShiftState> newShiftStates = new ArrayList<>();
         newShiftStates = createRealTimeShiftState(newShiftStates, shiftStates, shifts, phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        newShiftStates.addAll(createDraftShiftState(newShiftStates, shifts, phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
+        newShiftStates.addAll(createDraftShiftState(new ArrayList<>(), shifts, phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
         if (!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
         return newShiftStates;
     }
