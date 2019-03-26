@@ -12,6 +12,7 @@ public class AgreementSubSection extends AgreementSection {
     @JoinColumn(name = "agreementSection_id")
     private AgreementSection agreementSection;
 
+
     public AgreementSection getAgreementSection() {
         return agreementSection;
     }

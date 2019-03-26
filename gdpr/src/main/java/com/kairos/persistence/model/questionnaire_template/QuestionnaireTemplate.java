@@ -37,16 +37,19 @@ public class QuestionnaireTemplate extends BaseEntity {
     private Long organizationId;
 
 
-    public QuestionnaireTemplate(String name, Long countryId, String description) {
+    public QuestionnaireTemplate(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, Long countryId,@NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotNull(message = "error.message.templateType.notNull")QuestionnaireTemplateType templateType) {
         this.name = name;
         this.countryId = countryId;
         this.description = description;
+        this.templateType=templateType;
     }
 
-    public QuestionnaireTemplate(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, QuestionnaireTemplateStatus templateStatus) {
+    public QuestionnaireTemplate(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotNull(message = "error.message.templateType.notNull") QuestionnaireTemplateType templateType,QuestionnaireTemplateStatus templateStatus,Long organizationId) {
         this.name = name;
         this.description = description;
         this.templateStatus=templateStatus;
+        this.templateType=templateType;
+        this.organizationId=organizationId;
     }
     public Long getOrganizationId() { return organizationId; }
 

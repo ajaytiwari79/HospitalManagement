@@ -143,8 +143,8 @@ public class HostingProviderService {
      * @return
      * @description method save Hosting provider suggested by unit
      */
-    public List<HostingProviderDTO> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
-        return createHostingProviders(countryId, hostingProviderDTOS, true);
+    public void saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+         createHostingProviders(countryId, hostingProviderDTOS, true);
     }
 
 

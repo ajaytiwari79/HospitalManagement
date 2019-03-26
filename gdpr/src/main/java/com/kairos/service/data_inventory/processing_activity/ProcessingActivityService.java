@@ -5,10 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
-import com.kairos.dto.gdpr.data_inventory.RelatedDataCategoryDTO;
 import com.kairos.persistence.model.data_inventory.processing_activity.*;
-//import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
-//import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.risk_management.Risk;
@@ -22,12 +19,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
+import com.kairos.response.dto.data_inventory.*;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
@@ -108,7 +100,7 @@ public class ProcessingActivityService {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
         }
         if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
-            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(unitId, processingActivityDTO.getDataSubjectSet()));
+            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectSet()));
         }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
@@ -116,7 +108,7 @@ public class ProcessingActivityService {
     }
 
 
-    private List<RelatedDataSubject> createRelatedDataProcessingActivity(Long unitId, List<RelatedDataSubjectDTO> relatedDataSubjects) {
+    private List<RelatedDataSubject> createRelatedDataProcessingActivity(List<RelatedDataSubjectDTO> relatedDataSubjects) {
         List<RelatedDataSubject> dataSubjects = new ArrayList<>();
         relatedDataSubjects.forEach(dataSubject -> {
             RelatedDataSubject relatedDataSubject = new RelatedDataSubject(dataSubject.getId(), dataSubject.getName());
@@ -180,7 +172,7 @@ public class ProcessingActivityService {
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getId(), processingActivityDTO.getManagingDepartment().getName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getStaffId(), processingActivityDTO.getProcessOwner().getFirstName(), processingActivityDTO.getProcessOwner().getLastName()));
-        Optional.ofNullable(processingActivityDTO.getResponsibilityType()).ifPresent(resposibilityTypeId -> processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(resposibilityTypeId, unitId)));
+        Optional.ofNullable(processingActivityDTO.getResponsibilityType()).ifPresent(responsibilityTypeId -> processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(responsibilityTypeId, unitId)));
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getTransferMethods()))
             processingActivity.setTransferMethods(transferMethodRepository.findAllByIds(processingActivityDTO.getTransferMethods()));
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getProcessingPurposes()))
@@ -249,7 +241,6 @@ public class ProcessingActivityService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
         }
-        Integer updateCount = processingActivityRepository.unlinkSubProcessingActivityFromProcessingActivity(subProcessingActivityId, unitId, processingActivityId);
         processingActivity.delete();
         processingActivityRepository.save(processingActivity);
         return true;
@@ -344,7 +335,6 @@ public class ProcessingActivityService {
     }
 
 
-
     /**
      * @param unitId
      * @param processingActivityId
@@ -364,11 +354,9 @@ public class ProcessingActivityService {
       @param unitId
      * @return
      */
-    //TODO
     public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
         List<ProcessingActivity> processingActivities = processingActivityRepository.findAllByOrganizationId(unitId);
-        List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = prepareProcessingActivityRiskResponseDTOData(processingActivities, true);
-        return processingActivityRiskResponseDTOS;
+        return prepareProcessingActivityRiskResponseDTOData(processingActivities, true);
     }
 
     private List<ProcessingActivityRiskResponseDTO> prepareProcessingActivityRiskResponseDTOData(List<ProcessingActivity> processingActivities, boolean isParentProcessingActivity) {
@@ -396,22 +384,7 @@ public class ProcessingActivityService {
     }
 
 
-    /**
-     * @param unitId //@param processingActivityId
-     * @return
-     */
-    //TODO
-    /*public boolean unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(Long unitId, BigInteger processingActivityId, BigInteger riskId) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
-        }
-        processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.safeDeleteById(riskId);
-        processingActivityMongoRepository.save(processingActivity);
-        return true;
-    }
-*/
+    @Transactional
     public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
 
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {

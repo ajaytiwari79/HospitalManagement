@@ -183,4 +183,14 @@ public class ShiftController {
     }
 
 
+    //TODO We need to remove this API After closing sprint 44
+    @ApiOperation("delete Duplicate Entry Of ShiftViolatedInfo")
+    @DeleteMapping(value = "/delete_duplicate_entry_of_shift_violated_info")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteDuplicateEntryOfShiftViolatedInfo() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftValidatorService.deleteDuplicateEntryOfShiftViolatedInfo());
+    }
+
+
+
 }

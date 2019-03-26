@@ -71,5 +71,6 @@ public class QuestionBasicResponseDTO {
     public void setAssessmentAnswerChoices(Object assessmentAnswerChoices) { this.assessmentAnswerChoices = assessmentAnswerChoices; }
 
     public QuestionBasicResponseDTO() {
+        // default constructor
     }
 }

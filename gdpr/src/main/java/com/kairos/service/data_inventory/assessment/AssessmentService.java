@@ -42,12 +42,12 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicR
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -99,6 +99,8 @@ public class AssessmentService {
     private TransferMethodRepository transferMethodRepository;
     @Inject
     private AssetTypeRepository assetTypeRepository;
+    @Inject
+    private AssetTypeService assetTypeService;
 
 
     private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
@@ -204,9 +206,7 @@ public class AssessmentService {
         } else if (assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), assessmentDTO.getStartDate(), unitId);
-        assessment.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class));
-        assessment.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class));
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getStartDate(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class), ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class), unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
@@ -320,18 +320,18 @@ public class AssessmentService {
                         new SingleSelectChoice(Optional.ofNullable(asset.getHostingType()).isPresent() ? new MetaDataVO(asset.getHostingType().getId(), asset.getHostingType().getName()) : new MetaDataVO()), question.getQuestionType());
             case DATA_DISPOSAL:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getDataDisposal().getId(), asset.getDataDisposal().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getDataDisposal()).isPresent() ? new MetaDataVO(asset.getDataDisposal().getId(), asset.getDataDisposal().getName()) : new MetaDataVO()), question.getQuestionType());
             case HOSTING_PROVIDER:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
                         new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getHostingProvider().getId(), asset.getHostingProvider().getName()) : new MetaDataVO()), question.getQuestionType());
             case ASSET_TYPE:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getAssetType().getId(), asset.getAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getAssetType()).isPresent() ? new MetaDataVO(asset.getAssetType().getId(), asset.getAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
             case STORAGE_FORMAT:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(), new MultipleSelectChoice(asset.getStorageFormats().stream().map(storageFormat -> new MetaDataVO(storageFormat.getId(), storageFormat.getName())).collect(Collectors.toList())), question.getQuestionType());
             case ASSET_SUB_TYPE:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getSubAssetType()).isPresent() ? new MetaDataVO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
             case TECHNICAL_SECURITY_MEASURES:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(), new MultipleSelectChoice(asset.getTechnicalSecurityMeasures().stream().map(technicalSecurityMeasure -> new MetaDataVO(technicalSecurityMeasure.getId(), technicalSecurityMeasure.getName())).collect(Collectors.toList())), question.getQuestionType());
             case ORGANIZATION_SECURITY_MEASURES:
@@ -450,7 +450,7 @@ public class AssessmentService {
             case HOSTING_TYPE:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeRepository.getAllAssetTypesByOrganization(unitId), MetaDataCommonResponseDTO.class);
+                return assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(unitId);
             case STORAGE_FORMAT:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
@@ -491,6 +491,7 @@ public class AssessmentService {
     }
 
 
+    @Transactional
     public List<AssessmentAnswerDTO> saveAssessmentAnswerByUnitIdAndAssessmentId(Long unitId, Long assessmentId, List<AssessmentAnswerDTO> assessmentAnswerValueObjects, AssessmentStatus status) {
 
 
@@ -508,17 +509,18 @@ public class AssessmentService {
             exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
+        assessment.setAssessmentStatus(status);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setCompletedDate(LocalDate.now());
+        }
+        assessmentRepository.save(assessment);
+        if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
         }
-        assessment.setAssessmentStatus(status);
-        assessmentRepository.save(assessment);
         return assessmentAnswerValueObjects;
-
     }
 
 

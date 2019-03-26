@@ -73,17 +73,12 @@ public class Risk extends BaseEntity {
         this.riskLevel = riskLevel;
     }
 
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
     public Risk() {
     }
 
+    public Long getOrganizationId() { return organizationId; }
 
-    public Risk(Long id){
-        this.id= id;
-    }
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public String getName() {
         return name;

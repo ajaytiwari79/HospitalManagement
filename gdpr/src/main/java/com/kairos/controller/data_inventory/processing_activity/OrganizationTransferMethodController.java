@@ -7,8 +7,6 @@ import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +22,6 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @Api(API_ORGANIZATION_UNIT_URL)
 class OrganizationTransferMethodController {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationTransferMethodController.class);
 
     @Inject
     private OrganizationTransferMethodService transferMethodDestinationService;
@@ -45,9 +41,6 @@ class OrganizationTransferMethodController {
     @ApiOperation("get transfer Method by id")
     @GetMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> getTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(unitId, transferMethodId));
 
     }
@@ -56,9 +49,6 @@ class OrganizationTransferMethodController {
     @ApiOperation("get all transfer Method")
     @GetMapping("/transfer_method")
     public ResponseEntity<Object> getAllTransferMethod(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllTransferMethod(unitId));
 
     }
@@ -67,9 +57,6 @@ class OrganizationTransferMethodController {
     @ApiOperation("delete transfer Method by id")
     @DeleteMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(unitId, transferMethodId));
 
     }
@@ -77,9 +64,6 @@ class OrganizationTransferMethodController {
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(unitId, transferMethodId, transferMethod));
 
     }

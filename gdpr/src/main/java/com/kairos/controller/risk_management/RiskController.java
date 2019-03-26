@@ -42,9 +42,4 @@ class RiskController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, riskService.getAllRiskByUnitId(unitId));
     }
 
-    /*@ApiOperation(value = "delete risk by id")
-    @DeleteMapping(UNIT_URL + "/risk/{riskId}")
-    public ResponseEntity<Object> deleteRiskById(@PathVariable BigInteger riskId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, riskService.deleteRiskById(riskId));
-    }*/
 }
