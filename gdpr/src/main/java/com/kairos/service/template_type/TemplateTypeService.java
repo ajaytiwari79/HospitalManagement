@@ -4,6 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 
+import com.kairos.dto.gdpr.master_data.TemplateTypeDTO;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -39,10 +40,10 @@ public class TemplateTypeService {
      * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
      * @author vikash patwal
      */
-    public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateType> templateTypeList) {
+    public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateTypeDTO> templateTypeList) {
         Map<String, List<TemplateType>> result = new HashMap<>();
         Set<String> templateNames = new HashSet<>();
-        for (TemplateType templateType : templateTypeList) {
+        for (TemplateTypeDTO templateType : templateTypeList) {
             templateNames.add(templateType.getName());
         }
         List<String> nameInLowerCase = templateNames.stream().map(String::toLowerCase)
@@ -76,7 +77,7 @@ public class TemplateTypeService {
      * @description this method is used for update template by id
      * @author vikash patwal
      */
-    public TemplateType updateTemplateName(Long templateId, Long countryId, TemplateType templateType) {
+    public TemplateType updateTemplateName(Long templateId, Long countryId, TemplateTypeDTO templateType) {
 
         TemplateType previousTemplateType = templateTypeRepository.findByCountryIdAndName(countryId, templateType.getName());
         if (Optional.ofNullable(previousTemplateType).isPresent() && !templateId.equals(previousTemplateType.getId())) {
