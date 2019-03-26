@@ -73,6 +73,8 @@ public class ShiftDTO {
     private BigInteger phaseId;
     private int restingMinutes;
     private Set<ShiftEscalationReason> escalationReasons;
+    private boolean removeFunction;
+    private Long functionId;
 
     public ShiftDTO() {
         //default Const
@@ -315,25 +317,6 @@ public class ShiftDTO {
         this.endDate = endDate;
     }
 
-    /*public ShiftQueryResult getQueryResults(){
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setStatus(this.status);
-        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
-        return shiftQueryResult;
-    }*/
-
-
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
     }
@@ -448,6 +431,22 @@ public class ShiftDTO {
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
         this.escalationReasons = isNullOrElse(escalationReasons,new HashSet<>());
+    }
+
+    public boolean isRemoveFunction() {
+        return removeFunction;
+    }
+
+    public void setRemoveFunction(boolean removeFunction) {
+        this.removeFunction = removeFunction;
+    }
+
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
     }
 
     @Override
