@@ -36,9 +36,8 @@ class OrganizationTechnicalSecurityController {
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
-        if (CollectionUtils.isEmpty(securityMeasures.getRequestBody()))
-        {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,null);
+        if (CollectionUtils.isEmpty(securityMeasures.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(unitId, securityMeasures.getRequestBody()));
 

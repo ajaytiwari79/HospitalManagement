@@ -31,7 +31,7 @@ public class ComparisonUtils{
                     existingNamesMapData.put(name.toLowerCase(), name);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
                 throw new RuntimeException(e);
             }
             Set<String> newNamesList = new HashSet<>();
