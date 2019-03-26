@@ -26,13 +26,13 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleToBeForced;
     private List<Long> dayTypes= new ArrayList<>();
     private boolean eligibleForStaffingLevel;
-
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals;
+    private boolean transferToNextCutOff;
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
@@ -51,37 +51,6 @@ public class RulesActivityTab implements Serializable{
 
     public RulesActivityTab() {
         //Default Constructor
-    }
-
-
-
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, boolean eligibleForStaffingLevel, boolean breakAllowed, boolean approvalAllowed
-            , LocalTime earliestStartTime, LocalTime latestStartTime, Short shortestTime, Short longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,PQLSettings pqlSettings,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
-
-        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
-        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
-        this.eligibleForRequest = eligibleForRequest;
-        this.lockLengthPresent = lockLengthPresent;
-        this.eligibleToBeForced = eligibleToBeForced;
-        this.dayTypes = dayTypes;
-        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
-        this.breakAllowed = breakAllowed;
-        this.approvalAllowed = approvalAllowed;
-        this.earliestStartTime=earliestStartTime;
-        this.latestStartTime=latestStartTime;
-        this.shortestTime = shortestTime;
-        this.longestTime = longestTime;
-        this.eligibleForCopy=eligibleForCopy;
-        this.plannedTimeInAdvance=plannedTimeInAdvance;
-        this.pqlSettings=pqlSettings;
-        this.maximumEndTime=maximumEndTime;
-        this.cutOffdayValue = cutOffdayValue;
-        this.cutOffIntervalUnit = cutOffIntervalUnit;
-        this.cutOffStartFrom = cutOffStartFrom;
-        this.recurrenceDays=recurrenceDays;
-        this.recurrenceTimes=recurrenceTimes;
-        this.allowedAutoAbsence=allowedAutoAbsence;
     }
 
     public LocalDate getCutOffStartFrom() {
@@ -291,5 +260,13 @@ public class RulesActivityTab implements Serializable{
 
     public void setReasonCodeRequired(boolean reasonCodeRequired) {
         this.reasonCodeRequired = reasonCodeRequired;
+    }
+
+    public boolean isTransferToNextCutOff() {
+        return transferToNextCutOff;
+    }
+
+    public void setTransferToNextCutOff(boolean transferToNextCutOff) {
+        this.transferToNextCutOff = transferToNextCutOff;
     }
 }

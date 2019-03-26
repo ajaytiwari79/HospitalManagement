@@ -31,6 +31,7 @@ public class RulesActivityTabDTO {
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals = new ArrayList<>();
+    private boolean transferToNextCutOff;
 
     // in Minutes
     private LocalTime earliestStartTime;
@@ -266,5 +267,13 @@ public class RulesActivityTabDTO {
 
     public void setReasonCodeRequired(boolean reasonCodeRequired) {
         this.reasonCodeRequired = reasonCodeRequired;
+    }
+
+    public boolean isTransferToNextCutOff() {
+        return transferToNextCutOff;
+    }
+
+    public void setTransferToNextCutOff(boolean transferToNextCutOff) {
+        this.transferToNextCutOff = transferToNextCutOff;
     }
 }

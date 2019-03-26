@@ -32,7 +32,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
-    private boolean carryForwardLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
 
 
@@ -54,13 +53,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
 
     private float recommendedValue;
 
-    public boolean isCarryForwardLeave() {
-        return carryForwardLeave;
-    }
-
-    public void setCarryForwardLeave(boolean carryForwardLeave) {
-        this.carryForwardLeave = carryForwardLeave;
-    }
 
     public boolean isBorrowLeave() {
         return borrowLeave;
@@ -130,7 +122,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate;
         return (this != seniorDaysPerYearWTATemplate) && !(borrowLeave == seniorDaysPerYearWTATemplate.borrowLeave &&
-                carryForwardLeave == seniorDaysPerYearWTATemplate.carryForwardLeave &&
                 Float.compare(seniorDaysPerYearWTATemplate.recommendedValue, recommendedValue) == 0 &&
                 Objects.equals(ageRange, seniorDaysPerYearWTATemplate.ageRange) &&
                 Objects.equals(activityIds, seniorDaysPerYearWTATemplate.activityIds) &&
