@@ -172,7 +172,7 @@ public class ProcessingActivityService {
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getId(), processingActivityDTO.getManagingDepartment().getName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getStaffId(), processingActivityDTO.getProcessOwner().getFirstName(), processingActivityDTO.getProcessOwner().getLastName()));
-        Optional.ofNullable(processingActivityDTO.getResponsibilityType()).ifPresent(resposibilityTypeId -> processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(resposibilityTypeId, unitId)));
+        Optional.ofNullable(processingActivityDTO.getResponsibilityType()).ifPresent(responsibilityTypeId -> processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(responsibilityTypeId, unitId)));
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getTransferMethods()))
             processingActivity.setTransferMethods(transferMethodRepository.findAllByIds(processingActivityDTO.getTransferMethods()));
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getProcessingPurposes()))
@@ -384,6 +384,7 @@ public class ProcessingActivityService {
     }
 
 
+    @Transactional
     public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
 
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
