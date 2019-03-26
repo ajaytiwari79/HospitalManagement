@@ -2,9 +2,8 @@ package com.kairos.dto.activity.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -30,9 +29,9 @@ public class TaskDTO {
     private String taskTypeName;
     private Integer duration;
     private Boolean active;
-    @NotEmpty(message = "error.TaskDTO.startAddress.notEmpty") @NotNull(message = "error.TaskDTO.startAddress.notnull")
+    @NotBlank(message = "error.TaskDTO.startAddress.notEmpty")
     private String startAddress;
-    @NotEmpty(message = "error.TaskDTO.endAddress.notEmpty") @NotNull(message = "error.TaskDTO.endAddress.notnull")
+    @NotBlank(message = "error.TaskDTO.endAddress.notEmpty")
     private String endAddress;
     private Integer priority;
     private Long anonymousStaffId;
