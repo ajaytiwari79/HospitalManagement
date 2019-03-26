@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by prerna on 1/5/18.
@@ -303,8 +303,10 @@ public class StaffFilterService {
                 if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
                     staffListByRole = staffList;
                 } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staff);
+                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().orElse(new HashMap());
+                    if (isNotEmpty(staff)) {
+                        staffListByRole.add(staff);
+                    }
                 }
             }
         }
