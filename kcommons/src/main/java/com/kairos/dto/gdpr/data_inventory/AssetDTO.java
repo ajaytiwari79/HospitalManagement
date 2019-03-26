@@ -141,8 +141,6 @@ public class AssetDTO {
 
     public AssetTypeOrganizationLevelDTO getAssetSubType() { return subAssetType; }
 
-    public void setAssetSubType(AssetTypeOrganizationLevelDTO subAssetType) { this.subAssetType = subAssetType; }
-
     public Set<BigInteger> getProcessingActivityIds() { return processingActivityIds; }
 
     public void setProcessingActivityIds(Set<BigInteger> processingActivityIds) { this.processingActivityIds = processingActivityIds; }
@@ -150,6 +148,14 @@ public class AssetDTO {
     public Set<BigInteger> getSubProcessingActivityIds() { return subProcessingActivityIds; }
 
     public void setSubProcessingActivityIds(Set<BigInteger> subProcessingActivityIds) { this.subProcessingActivityIds = subProcessingActivityIds; }
+
+    public void setSubAssetType(AssetTypeOrganizationLevelDTO subAssetType) {
+        this.subAssetType = subAssetType;
+    }
+
+    public AssetTypeOrganizationLevelDTO getSubAssetType() {
+        return subAssetType;
+    }
 
     public AssetDTO() {
     }

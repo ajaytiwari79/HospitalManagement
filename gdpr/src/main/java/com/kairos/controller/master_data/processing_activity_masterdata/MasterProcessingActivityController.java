@@ -8,15 +8,12 @@ import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,8 +23,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class MasterProcessingActivityController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterProcessingActivityController.class);
 
     @Inject
     private MasterProcessingActivityService masterProcessingActivityService;
@@ -84,7 +79,7 @@ class MasterProcessingActivityController {
 
     @ApiOperation(value = "unlink risk from Processing Activity ")
     @DeleteMapping("/master_processing_activity/{processingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
+    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable Long processingActivityId, @PathVariable Long riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, processingActivityId, riskId));
     }
 
@@ -97,17 +92,17 @@ class MasterProcessingActivityController {
 
 
     @ApiOperation(value = "Update Sugessted status of Processing Activity")
-    @PutMapping("/master_processing_activity/{processingActivityId}/status")
-    public ResponseEntity<Object> updateSuggestedStatusOfProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    @PutMapping("/master_processing_activity/status")
+    public ResponseEntity<Object> updateSuggestedStatusOfProcessingActivity(@PathVariable Long countryId, @PathVariable Set<Long> ids, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfMasterProcessingActivity(countryId, processingActivityId, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfMasterProcessingActivities(countryId, ids, suggestedDataStatus));
     }
 
     @ApiOperation(value = "Update Sugessted status of Processing Activity")
     @PutMapping("/master_processing_activity/{processingActivityId}/subProcess/status")
-    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestBody Set<BigInteger> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long processingActivityId, @RequestBody Set<Long> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(subProcessingActivityIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Sub Processing Activity is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

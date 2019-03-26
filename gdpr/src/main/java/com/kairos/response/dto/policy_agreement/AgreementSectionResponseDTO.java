@@ -2,6 +2,7 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.clause.AgreementSectionClause;
 
 import javax.validation.constraints.NotBlank;
@@ -10,6 +11,7 @@ import java.util.List;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgreementSectionResponseDTO {
 
     private Long id;
@@ -18,10 +20,8 @@ public class AgreementSectionResponseDTO {
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
-    //private List<BigInteger> clauseIdOrderedIndex;
-    //private List<ClauseBasicResponseDTO> clauses;
     private List<AgreementSectionClause> clauses;
-    private List<AgreementSectionResponseDTO> agreementSubSections =new ArrayList<>();
+    private List<AgreementSectionResponseDTO> agreementSubSections = new ArrayList<>();
 
     public Integer getOrderedIndex() {
         return orderedIndex;
@@ -31,11 +31,6 @@ public class AgreementSectionResponseDTO {
         this.orderedIndex = orderedIndex;
     }
 
-    /*public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
-
-    public void setClauseIdOrderedIndex(List<BigInteger> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }
-
-    */
     public Long getId() {
         return id;
     }
@@ -48,17 +43,7 @@ public class AgreementSectionResponseDTO {
         return agreementSubSections;
     }
 
-    public void setAgreementSubSections(List<AgreementSectionResponseDTO> agreementSubSections) {
-        this.agreementSubSections = agreementSubSections;
-    }
-
-    /*public List<ClauseBasicResponseDTO> getClauses() {
-        return clauses;
-    }
-
-    public void setClauses(List<ClauseBasicResponseDTO> clauses) {
-        this.clauses = clauses;
-    }*/
+    public void setAgreementSubSections(List<AgreementSectionResponseDTO> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
 
     public String getTitle() {
         return title;
@@ -76,9 +61,13 @@ public class AgreementSectionResponseDTO {
         this.clauses = clauses;
     }
 
-    public String getTitleHtml() { return titleHtml; }
+    public String getTitleHtml() {
+        return titleHtml;
+    }
 
-    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
+    public void setTitleHtml(String titleHtml) {
+        this.titleHtml = titleHtml;
+    }
 
     public AgreementSectionResponseDTO() {
 

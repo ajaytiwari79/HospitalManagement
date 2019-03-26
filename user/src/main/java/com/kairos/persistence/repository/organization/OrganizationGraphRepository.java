@@ -6,7 +6,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
@@ -14,13 +13,13 @@ import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
-import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -47,20 +46,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH(n:Organization {isEnable:true}),(d:Department),(u:User) WHERE id(n)={0} And id(d)={1} And id(u)={2}  create(d)-[:has_staff]->(u)")
     Organization addStaff(long organzationId, long departmentId, long userId);
-
-    @Query("MATCH(d:Department {isEnable:true} ),(t:Team) WHERE id(d)={0} and id(t)in {1} create(d)-[:HAS_MANAGE]->(t)")
-    Department linkDeptWithTeams(long departmentId, List<Long> childIds);
-
-    @Query("MATCH (o:Organization)-[:HAS_GROUP]->(g:Group {isEnabled:true}) WHERE id(o)={0} RETURN COLLECT({id:id(g),name:g.name}) as groups")
-    List<Map<String, Object>> getGroups(long id);
-
-    @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_GROUP + "]->(g:Group {isEnabled:true}) WHERE id(o)={0} AND id(g) = {1} RETURN g")
-    Group getGroups(Long organizationId, Long groupId);
-
-    @Query("MATCH(organization:Organization)-[:" + HAS_GROUP + "]->(group:Group {isEnabled:true}) WHERE id(organization)={0} AND id(group)<>{2} AND group.name =~{1}  " +
-            " WITH count(group) as totalCount " +
-            " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
-    Boolean groupExistInOrganizationByName(Long organizationId, String name, Long currentGroupId);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
             "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) RETURN org limit 1")
@@ -118,56 +103,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfParentOrganizationWithActualName(long unitId);
 
-    @Query("MATCH (g:Group)-[:" + HAS_TEAM + "]-(t:Team) WHERE id(t) ={0}  WITH g as group MATCH(group)-[:" + GROUP_HAS_SKILLS + "]->(s:Skill) " +
-            " WITH s AS skill " +
-            "MATCH (sc:SkillCategory)-[:" + HAS_CATEGORY + "]-(skill) RETURN  " +
-            "{ id:id(sc), " +
-            "  name:sc.name, " +
-            "  skills:COLLECT({ " +
-            "  id:id(skill), " +
-            "  name:skill.name " +
-            "}) " +
-            "} AS skillList ")
-    List<Map<String, Object>> getTeamGroupSkill(Long teamId);
-
     @Query("MATCH (o:Organization)-[:CONTACT_ADDRESS]->(ca:ContactAddress) WHERE id(o)={0} RETURN ca")
     ContactAddress getOrganizationAddressDetails(Long organizationId);
-
-    @Query("MATCH (o:Organization)-[:" + HAS_GROUP + "]->(g:Group) WHERE id(g) ={0}  WITH o as org " +
-            "MATCH (org)-[:" + PROVIDE_SERVICE + "]->(s:OrganizationService) WITH s " +
-            "MATCH (os:OrganizationService)-[:ORGANIZATION_SUB_SERVICE]-(s)" +
-            "RETURN { " +
-            "id:id(os), " +
-            "name:os.name, " +
-            "subServices: COLLECT({ " +
-            " id:id(s), " +
-            " name:s.name " +
-            "}) " +
-            "} as serviceList ")
-    List<Map<String, Object>> getGroupOrganizationServices(Long groupId);
-
-
-    @Query("MATCH (g:Group)-[:" + HAS_TEAM + "]->(t:Team) WHERE id(t) ={0} WITH g as grp " +
-            "MATCH (grp)-[:" + GROUP_HAS_SERVICES + "]->(s:OrganizationService)  WITH s as ss" +
-            " MATCH (os:OrganizationService)-[:ORGANIZATION_SUB_SERVICE]-(ss) " +
-            "RETURN { id:id(os), name:os.name, subServices:" +
-            " COLLECT({  id:id(ss), " +
-            " name:ss.name }) } as serviceList ")
-    List<Map<String, Object>> getTeamGroupServices(Long teamId);
-
-
-    // Services
-    @Query("MATCH (g:Group)-[:" + GROUP_HAS_SERVICES + "]-(os:OrganizationService) WHERE id(g) = {0} WITH os as ss " +
-            "MATCH (os:OrganizationService)-[:" + ORGANIZATION_SUB_SERVICE + "]-(ss) " +
-            "RETURN { " +
-            "id:id(os), " +
-            "name:os.name, " +
-            "subServices: COLLECT({ " +
-            " id:id(ss), " +
-            " name:ss.name " +
-            "}) " +
-            "} as serviceList")
-    List<Map<String, Object>> getGroupAllSelectedServices(Long groupId);
 
     @Query("MATCH(t:Team)-[:" + TEAM_HAS_SERVICES + "]-(os:OrganizationService) WHERE id(t)={0} WITH os as ss " +
             "MATCH (os:OrganizationService)-[:" + ORGANIZATION_SUB_SERVICE + "]-(ss) " +
@@ -224,19 +161,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
     int isServiceAlreadyExist(long unitId, long serviceId);
 
-    @Query("MATCH (o:Organization)-[:" + ORGANIZATION_HAS_DEPARTMENT + "]->(dept:Department) WHERE id(o)={0} RETURN dept")
-    List<Department> getAllDepartments(Long organizationId);
-
-
-    @Query("MATCH (o:Organization)-[:" + ORGANIZATION_HAS_DEPARTMENT + "]-(d:Department) WHERE id(d)={0} RETURN id(o)")
-    Long getOrganizationByDepartmentId(Long departmentId);
-
     @Query("MATCH (o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*..4]-(co:Organization) WHERE id(o)={0}  RETURN " +
             "COLLECT ({name:co.name,id:id(co),level:co.organizationLevel}) as organizationList")
     List<Map<String, Object>> getOrganizationChildList(Long id);
 
 
-    @Query("MATCH (o:Organization)-[:HAS_GROUP]-(g:Group) WHERE id(o)={0} WITH g as grp MATCH (grp)-[:HAS_TEAM]-(t:Team) RETURN { id:id(t) , name:t.name} as result")
+    @Query("MATCH (o:Organization)-[:"+HAS_TEAMS+"]-(t:Team) WHERE id(o)={0} RETURN { id:id(t) , name:t.name} as result")
     List<Map<String, Object>> getUnitTeams(Long unitId);
 
     @Query("MATCH (o:Organization {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) WHERE id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) RETURN oh order by oh.index")
@@ -428,10 +358,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Map<String, Object> getBillingAddress(long unitId);
 
 
-    @Query("MATCH (organization:Organization)-[:HAS_GROUP*1..3]->(group:Group) WHERE id(group)={0} MATCH (organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress) MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) MATCH (contactAddress)-[:MUNICIPALITY]->(municipality:Municipality) RETURN organization,contactAddress,zipCode,municipality")
-    OrganizationContactAddress getOrganizationByGroupId(long groupId);
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0} MATCH (organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress) MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) MATCH (contactAddress)-[:MUNICIPALITY]->(municipality:Municipality) RETURN organization,contactAddress,zipCode,municipality")
+    OrganizationContactAddress getOrganizationByOrganizationId(long organizationId);
 
-    @Query("MATCH (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) WHERE id(team)={0} RETURN organization")
+    @Query("MATCH (organization:Organization)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(team)={0} RETURN organization")
     Organization getOrganizationByTeamId(long groupId);
 
     @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization " +
@@ -681,8 +611,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization) WHERE id(org) IN {0} DETACH DELETE org")
     void removeOrganizationCompletely(List<Long> organizationIdsToDelete);
 
-    @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as unitId, org.timeZone as timezone ORDER BY unitId")
-    List<UnitTimeZoneQueryResult> findTimezoneforAllorganizations();
+    @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
+    List<OrganizationBasicResponse> findTimezoneforAllorganizations();
+
+    @Query("MATCH(org:Organization{deleted:false}) WHERE id(org) IN {0} RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
+    List<OrganizationBasicResponse> findTimezoneByUnitIds(Set<Long> unitIds);
 
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:" + BELONGS_TO + "]-(country:Country) WITH union,country OPTIONAL " +
             "MATCH(union)-[:" + HAS_SECTOR + "]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:" + CONTACT_ADDRESS + "]-" +

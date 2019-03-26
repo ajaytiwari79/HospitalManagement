@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /*
  *Created By Pavan on 17/8/18
  *
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL+"/staff")
-@Api(API_ORGANIZATION_UNIT_URL+"/staff")
+@RequestMapping(API_UNIT_URL +"/staff")
+@Api(API_UNIT_URL +"/staff")
 public class StaffOpenShiftBlockSettingController {
 
     @Inject private StaffOpenShiftBlockSettingService staffOpenShiftBlockSettingService;

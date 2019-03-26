@@ -1,11 +1,13 @@
 package com.kairos.persistence.repository.wta;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -289,5 +291,35 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
+
+    @Override
+    public List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long unitPositionId, Date startDate, Date endDate,WTATemplateType templateType) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                new CustomAggregationOperation(Document.parse(getProjectionWithFilter(templateType)))
+
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+    }
+
+    private String getProjectionWithFilter(WTATemplateType templateType){
+       return  "{  \n" +
+                "      \"$project\":{  \n" +
+                "         \"startDate\":1,\n" +
+                "         \"endDate\":1,\n" +
+                "          \"ruleTemplates\":{\n" +
+                "              \"$filter\":{\n" +
+                "                  \"input\":\"$ruleTemplates\",\n" +
+                "                  \"as\":\"ruleTemplates\",\n" +
+                "                  \"cond\":{\"$eq\":[\"$$ruleTemplates.wtaTemplateType\",'"+templateType.toString()+"']}\n" +
+                "                  }\n" +
+                "              }\n" +
+                "      }\n" +
+                "   }";
+    }
+
 
 }

@@ -1,16 +1,19 @@
 package com.kairos.service.attendence_setting;
+
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
-import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
-import com.kairos.persistence.model.shift.Shift;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
+import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -20,18 +23,18 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.shift.ShiftStateService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
 

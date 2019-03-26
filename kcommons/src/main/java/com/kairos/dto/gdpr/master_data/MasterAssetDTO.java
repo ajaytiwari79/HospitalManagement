@@ -14,7 +14,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -32,19 +34,19 @@ public class MasterAssetDTO {
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationTypeDTO> organizationTypes =new ArrayList<>();
+    private Set<OrganizationTypeDTO> organizationTypes =new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubTypeDTO> organizationSubTypes =new ArrayList<>();
+    private Set<OrganizationSubTypeDTO> organizationSubTypes =new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
-    private List<ServiceCategoryDTO> organizationServices=new ArrayList<>();
+    private Set<ServiceCategoryDTO> organizationServices=new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
-    private List<SubServiceCategoryDTO> organizationSubServices=new ArrayList<>();
+    private Set<SubServiceCategoryDTO> organizationSubServices=new HashSet<>();
 
     @NotNull(message = "error.message.assetType.notNull")
     private AssetTypeBasicDTO assetType;
@@ -66,29 +68,36 @@ public class MasterAssetDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypes;
+    public Set<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypes; }
+
+    public void setOrganizationTypes(Set<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
+
+    public Set<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
+
+    public void setOrganizationSubTypes(Set<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+
+    public Set<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
+
+    public void setOrganizationServices(Set<ServiceCategoryDTO> organizationServices) {
+        this.organizationServices = organizationServices;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
-
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
-
-    public List<ServiceCategoryDTO> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
-
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
+    public Set<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+    public void setOrganizationSubServices(Set<SubServiceCategoryDTO> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
+    }
+
+
+    public AssetTypeBasicDTO getSubAssetType() {
+        return subAssetType;
+    }
+
+    public void setSubAssetType(AssetTypeBasicDTO subAssetType) {
+        this.subAssetType = subAssetType;
+    }
 
     public Long getId() {
         return id;

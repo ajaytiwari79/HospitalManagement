@@ -2,6 +2,7 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
@@ -55,7 +56,7 @@ public class ShiftTemplateService extends MongoBaseService {
 
         //Check for validating duplicate by name
         boolean alreadyExistsByName=shiftTemplateRepository.
-                existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(),unitId);
+                existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(),unitId,UserContext.getUserDetails().getId());
         if(alreadyExistsByName){
             exceptionService.duplicateDataException("message.shiftTemplate.exists",shiftTemplateDTO.getName());
         }
@@ -99,11 +100,12 @@ public class ShiftTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(shiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
         }
+        UserInfo userInfo=shiftTemplate.getCreatedBy();
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
         shiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(shiftTemplateDTO,ShiftTemplate.class);
-       // ObjectMapperUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
+        shiftTemplate.setCreatedBy(userInfo);
         save(shiftTemplate);
         return shiftTemplateDTO;
     }
@@ -182,13 +184,15 @@ public class ShiftTemplateService extends MongoBaseService {
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
-            ShiftWithViolatedInfoDTO result=shiftService.createShift(unitId, newShiftDTO, "Organization",false);
+            ShiftWithViolatedInfoDTO result=shiftService.createShift(unitId, newShiftDTO, "Organization");
             shiftWithViolatedInfoDTO.setShifts(result.getShifts());
+
             if(CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())){
                 shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(result.getViolatedRules().getActivities());
             }
-            shifts.add(newShiftDTO);
+            shifts.addAll(result.getShifts());
         });
+        shiftWithViolatedInfoDTO.setShifts(shifts);
         return shiftWithViolatedInfoDTO;
     }
 

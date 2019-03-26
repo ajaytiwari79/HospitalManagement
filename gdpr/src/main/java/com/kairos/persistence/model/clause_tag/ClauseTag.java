@@ -4,6 +4,7 @@ import com.kairos.persistence.model.common.BaseEntity;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 
 @Entity
@@ -50,4 +51,19 @@ public class ClauseTag extends BaseEntity {
     public Long getOrganizationId() { return organizationId; }
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClauseTag clauseTag = (ClauseTag) o;
+        return defaultTag == clauseTag.defaultTag &&
+                Objects.equals(name, clauseTag.name);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(name, defaultTag);
+    }
 }

@@ -37,6 +37,7 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -72,7 +73,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -114,7 +114,7 @@ public class ActivityService extends MongoBaseService {
     private ActivityCategoryRepository activityCategoryRepository;
     @Inject
     private ShiftService shiftService;
-    @Autowired
+    @Inject
     private PhaseService phaseService;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
@@ -132,7 +132,7 @@ public class ActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Autowired
+    @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -395,25 +395,27 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
-        Optional<Activity> activity = activityMongoRepository.findById(activityId);
-        if (!activity.isPresent()) {
+        Activity activity = activityMongoRepository.findById(activityId).orElse(null);
+        if (activity==null) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
-        List<Activity> activityMatched = activityMongoRepository.findAllActivitiesByIds(compositeShiftIds);
+        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(compositeShiftIds);
         if (activityMatched.size() != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
-        organizationActivityService.verifyBreakAllowedOfActivities(activity.get().getRulesActivityTab().isBreakAllowed(), activityMatched);
+        organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
+        organizationActivityService.verifyTeamActivity(activityMatched,activity);
+
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
-        activity.get().setCompositeActivities(compositeActivities);
-        updateCompositeActivity(activityMatched, activity.get(), compositeActivities);
-        save(activity.get());
+        activity.setCompositeActivities(compositeActivities);
+        updateCompositeActivity(activityMatched, activity, compositeActivities);
+        save(activity);
         return compositeShiftActivityDTOs;
     }
 
-    private void updateCompositeActivity(List<Activity> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
-        Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+    private void updateCompositeActivity(List<ActivityWrapper> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
+        Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v.getActivity()));
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
             Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
@@ -424,7 +426,8 @@ public class ActivityService extends MongoBaseService {
             }
         }
         if (!activityMatched.isEmpty()) {
-            save(activityMatched);
+            List<Activity> activities=activityMatched.stream().map(k->k.getActivity()).collect(Collectors.toList());
+            save(activities);
         }
     }
 
@@ -989,6 +992,11 @@ public class ActivityService extends MongoBaseService {
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
+    }
+
+    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
+        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
+        return activityTypeList;
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {

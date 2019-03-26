@@ -6,6 +6,9 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -43,6 +46,10 @@ public class ObjectUtils {
         return !Optional.ofNullable(object).isPresent();
     }
 
+    public static <T> T isNullOrElse(T object,T elseObject){
+        return Optional.ofNullable(object).orElse(elseObject);
+    }
+
     public static <T> boolean isNotNull(T object){
         return Optional.ofNullable(object).isPresent();
     }
@@ -52,5 +59,20 @@ public class ObjectUtils {
         Collections.addAll(set, elements);
         return set;
     }
+
+    //Due to UnsupportedMethodException on calling add method of Arrays.asList
+    public static <E> List<E> newArrayList(E... elements) {
+        List<E> list = new ArrayList<>(elements.length);
+        Collections.addAll(list, elements);
+        return list;
+    }
+
+    private void test(){
+        /*ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+        Set<ConstraintViolation<List<Searching>> violations = validator.validate(searchingList);*/
+    }
+
+
 
 }

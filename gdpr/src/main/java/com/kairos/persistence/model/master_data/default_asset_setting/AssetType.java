@@ -15,8 +15,8 @@ import java.util.List;
 @Entity
 public class AssetType extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty or null")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty or null")
+    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
     private Long organizationId;
@@ -24,13 +24,13 @@ public class AssetType extends BaseEntity {
     private boolean hasSubAssetType;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "assetType_id")
     private List<Risk> risks  = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name="assetType_id")
     private AssetType assetType;
-    @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<AssetType> subAssetTypes= new ArrayList<>();
 
 
@@ -41,6 +41,11 @@ public class AssetType extends BaseEntity {
         this.suggestedDataStatus=suggestedDataStatus;
     }
 
+    public AssetType(@NotBlank(message = "error.message.name.notNull.orEmpty or null") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name,Long organizationId, boolean isSubAssetType) {
+        this.name = name;
+        this.organizationId = organizationId;
+        this.isSubAssetType = isSubAssetType;
+    }
 
     public List<Risk> getRisks() {
         return risks;
@@ -48,10 +53,6 @@ public class AssetType extends BaseEntity {
 
     public void setRisks(List<Risk> risks) {
         this.risks = risks;
-    }
-
-    public AssetType(String name) {
-        this.name = name;
     }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }
@@ -107,12 +108,6 @@ public class AssetType extends BaseEntity {
     }
 
     public AssetType() {
-    }
-
-    List<Risk> getRiskOfAssetTypeAndSubAssetType(){
-        List<Risk> risks = this.getRisks();
-        this.getSubAssetTypes().forEach( subAssetType -> risks.addAll(subAssetType.getRisks()));
-        return risks;
     }
 
     @Override

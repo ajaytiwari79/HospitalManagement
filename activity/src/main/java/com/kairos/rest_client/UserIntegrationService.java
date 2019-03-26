@@ -41,7 +41,6 @@ import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
@@ -327,12 +326,6 @@ public class UserIntegrationService {
         });
     }
 
-    //StaffRestClient
-    public Map<String, Object> getTeamStaffAndStaffSkill(List<Long> staffIds) {
-        return genericRestClient.publishRequest(staffIds, null, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_SKILL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        });
-    }
-
     public StaffDTO getStaff(Long staffId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, staffId);
@@ -396,10 +389,8 @@ public class UserIntegrationService {
         }, staffId, unitEmploymentId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(LocalDate shiftDate, Long staffId, Long unitPositionId) {
-        List<NameValuePair> queryParamList = new ArrayList<>();
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+    public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(Long staffId, Long unitPositionId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitPositionId);
     }
     public StaffDTO getStaffByUser(Long userId) {
@@ -720,6 +711,11 @@ public class UserIntegrationService {
         });
     }
 
+    public Map<Long,String> getTimeZoneByUnitIds(Set<Long> unitIds){
+        return genericRestClient.publishRequest(unitIds,null,RestClientUrlType.ORGANIZATION,HttpMethod.POST,UNITS_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
+        });
+    }
+
 
     public List<StaffKpiFilterDTO> getStaffsByFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, STAFF_BY_KPI_FILTER, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffKpiFilterDTO>>>() {
@@ -750,6 +746,11 @@ public class UserIntegrationService {
     public boolean isReasonCodeLinkedToTimeType(Long countryId,BigInteger timeTypeId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, REASON_CODE_LINK_WITH_TIME_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         },timeTypeId);
+    }
+
+    public Long getUnitByUnitPositionId(Long unitPositionId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        },unitPositionId);
     }
 }
 

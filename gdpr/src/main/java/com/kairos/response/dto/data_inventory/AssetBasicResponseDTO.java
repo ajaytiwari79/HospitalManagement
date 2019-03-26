@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 
+import java.math.BigInteger;
+
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetBasicResponseDTO {
@@ -21,27 +24,72 @@ public class AssetBasicResponseDTO {
 
     private boolean active;
 
-    public Long getId() { return id; }
+    private RelatedProcessingActivityResponseDTO processingActivity;
 
-    public void setId(Long id) { this.id = id;
+
+    public AssetBasicResponseDTO(BigInteger id, String name,BigInteger processingActivityId,String processingActivityName, boolean subProcessingActivity,BigInteger parentProcessingActivityId ,String parentProcessingActivityName) {
+        this.id =id.longValue();
+        this.name = name;
+        this.processingActivity = new RelatedProcessingActivityResponseDTO(processingActivityId.longValue(), processingActivityName, subProcessingActivity,parentProcessingActivityId,parentProcessingActivityName);
     }
-    public String getName() { return name; }
 
-    public void setName(String name) { this.name = name; }
+    public AssetBasicResponseDTO() {
+    }
 
-    public String getDescription() { return description; }
 
-    public void setDescription(String description) { this.description = description; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getHostingLocation() { return hostingLocation; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
+    public String getName() {
+        return name;
+    }
 
-    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public String getDescription() {
+        return description;
+    }
 
-    public boolean isActive() { return active; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public void setActive(boolean active) { this.active = active; }
+    public String getHostingLocation() {
+        return hostingLocation;
+    }
+
+    public void setHostingLocation(String hostingLocation) {
+        this.hostingLocation = hostingLocation;
+    }
+
+    public ManagingOrganization getManagingDepartment() {
+        return managingDepartment;
+    }
+
+    public void setManagingDepartment(ManagingOrganization managingDepartment) {
+        this.managingDepartment = managingDepartment;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public RelatedProcessingActivityResponseDTO getProcessingActivity() {
+        return processingActivity;
+    }
+
+    public void setProcessingActivity(RelatedProcessingActivityResponseDTO processingActivity) {
+        this.processingActivity = processingActivity;
+    }
 }

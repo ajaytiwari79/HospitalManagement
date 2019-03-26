@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 public class QuestionBasicResponseDTO {
 
     private Long id;
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String question;
     private String description;
     private Object value;
@@ -71,5 +71,6 @@ public class QuestionBasicResponseDTO {
     public void setAssessmentAnswerChoices(Object assessmentAnswerChoices) { this.assessmentAnswerChoices = assessmentAnswerChoices; }
 
     public QuestionBasicResponseDTO() {
+        // default constructor
     }
 }

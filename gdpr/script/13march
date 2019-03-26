@@ -1,0 +1,21 @@
+1. // drop unique contraint from processing activity and asset metadata
+// for processing activity
+1. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'processing_activity_transfer_methods';
+   alter table processing_activity_transfer_methods drop constraint (indexname return from above query);
+2. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'processing_activity_processing_purposes';
+   alter table processing_activity_processing_purposes drop constraint (indexname return from above query);
+3. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'processing_activity_data_sources';
+   alter table processing_activity_data_sources drop constraint (indexname return from above query);
+4. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'processing_activity_accessor_parties';
+   alter table processing_activity_accessor_parties drop constraint (indexname return from above query);
+5. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'processing_activity_processing_legal_basis';
+   alter table processing_activity_processing_legal_basis drop constraint (indexname return from above query);
+
+// for Asset
+1. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'asset_org_security_measures';
+   alter table asset_org_security_measures drop constraint (indexname return from above query);
+2. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'asset_technical_security_measures';
+   alter table asset_technical_security_measures drop constraint (indexname return from above query);
+3. SELECT p.indexname FROM pg_indexes p  WHERE tablename = 'asset_storage_formats';
+   alter table asset_storage_formats drop constraint (indexname return from above query);
+

@@ -9,7 +9,9 @@ import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,19 +19,19 @@ public class MasterClauseDTO extends ClauseDTO{
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationTypeDTO> organizationTypes =new ArrayList<>();
+    private Set<OrganizationTypeDTO> organizationTypes =new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubTypeDTO> organizationSubTypes =new ArrayList<>();
+    private Set<OrganizationSubTypeDTO> organizationSubTypes =new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
-    private List<ServiceCategoryDTO> organizationServices=new ArrayList<>();
+    private Set<ServiceCategoryDTO> organizationServices=new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
-    private List<SubServiceCategoryDTO> organizationSubServices=new ArrayList<>();
+    private Set<SubServiceCategoryDTO> organizationSubServices=new HashSet<>();
 
     @Valid
     @NotEmpty(message = "error.message.accountType.not.Selected")
@@ -41,28 +43,21 @@ public class MasterClauseDTO extends ClauseDTO{
 
     private List<Long> organizationList;
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypes;
-    }
+    public Set<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypes; }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
+    public void setOrganizationTypes(Set<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+    public Set<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() {
-        return organizationServices;
-    }
+    public void setOrganizationSubTypes(Set<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
+    public Set<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
+    public void setOrganizationServices(Set<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
 
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+    public Set<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
+
+    public void setOrganizationSubServices(Set<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
     public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }

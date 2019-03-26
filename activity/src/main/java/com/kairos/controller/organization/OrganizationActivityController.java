@@ -25,14 +25,14 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by vipul on 5/12/17.
  */
 @RestController
-@Api(API_ORGANIZATION_UNIT_URL)
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
 public class OrganizationActivityController {
     @Inject
     private OrganizationActivityService organizationActivityService;
@@ -371,6 +371,13 @@ public class OrganizationActivityController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
+    }
+
+    @ApiOperation("Get all unit activities with categories ")
+    @GetMapping(value = "/activities_categories")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivitiesWithCategories(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithCategories(unitId));
     }
 
 }

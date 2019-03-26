@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationAccessorPartyService {
@@ -40,21 +42,21 @@ public class OrganizationAccessorPartyService {
     private AccessorPartyRepository accessorPartyRepository;
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param accessorPartyDTOS
      * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
-    public List<AccessorPartyDTO> createAccessorParty(Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
-        Set<String> existingAccessorPartyNames = accessorPartyRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<AccessorPartyDTO> createAccessorParty(Long unitId, List<AccessorPartyDTO> accessorPartyDTOS) {
+        Set<String> existingAccessorPartyNames = accessorPartyRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> accessorPartyNames = ComparisonUtils.getNewMetaDataNames(accessorPartyDTOS,existingAccessorPartyNames );
         List<AccessorParty> accessorParties = new ArrayList<>();
         if (!accessorPartyNames.isEmpty()) {
             for (String name : accessorPartyNames) {
                 AccessorParty accessorParty = new AccessorParty(name);
-                accessorParty.setOrganizationId(organizationId);
+                accessorParty.setOrganizationId(unitId);
                 accessorParties.add(accessorParty);
             }
            accessorPartyRepository.saveAll(accessorParties);
@@ -62,19 +64,19 @@ public class OrganizationAccessorPartyService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(accessorParties, AccessorPartyDTO.class);
     }
 
-    public List<AccessorPartyResponseDTO> getAllAccessorParty(Long organizationId) {
-        return accessorPartyRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<AccessorPartyResponseDTO> getAllAccessorParty(Long unitId) {
+        return accessorPartyRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id             id of AccessorParty
      * @return AccessorParty object fetch by given id
      * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
-    public AccessorParty getAccessorPartyById(Long organizationId, Long id) {
+    public AccessorParty getAccessorPartyById(Long unitId, Long id) {
 
-        AccessorParty exist = accessorPartyRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        AccessorParty exist = accessorPartyRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -88,32 +90,32 @@ public class OrganizationAccessorPartyService {
 
         List<String> processingActivitiesLinkedWithAccessorParty = processingActivityRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.accessorParty", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
         }
         accessorPartyRepository.deleteByIdAndOrganizationId(accessorPartyId, unitId);
         return true;
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id               id of AccessorParty
      * @param accessorPartyDTO
      * @return AccessorParty updated object
      * @throws DuplicateDataException throw exception if AccessorParty data not exist for given id
      */
-    public AccessorPartyDTO updateAccessorParty(Long organizationId, Long id, AccessorPartyDTO accessorPartyDTO) {
+    public AccessorPartyDTO updateAccessorParty(Long unitId, Long id, AccessorPartyDTO accessorPartyDTO) {
 
 
-        AccessorParty accessorParty = accessorPartyRepository.findByOrganizationIdAndDeletedAndName(organizationId, accessorPartyDTO.getName());
+        AccessorParty accessorParty = accessorPartyRepository.findByOrganizationIdAndDeletedAndName(unitId, accessorPartyDTO.getName());
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Accessor Party", accessorParty.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.accessorParty", accessorParty.getName());
         }
-        Integer resultCount = accessorPartyRepository.updateMetadataName(accessorPartyDTO.getName(), id, organizationId);
+        Integer resultCount = accessorPartyRepository.updateMetadataName(accessorPartyDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }
@@ -122,9 +124,9 @@ public class OrganizationAccessorPartyService {
 
     }
 
-    public List<AccessorPartyDTO> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
+    public List<AccessorPartyDTO> saveAndSuggestAccessorParties(Long countryId, Long unitId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
-        List<AccessorPartyDTO> result = createAccessorParty(organizationId, accessorPartyDTOS);
+        List<AccessorPartyDTO> result = createAccessorParty(unitId, accessorPartyDTOS);
         accessorPartyService.saveSuggestedAccessorPartiesFromUnit(countryId, accessorPartyDTOS);
         return result;
     }

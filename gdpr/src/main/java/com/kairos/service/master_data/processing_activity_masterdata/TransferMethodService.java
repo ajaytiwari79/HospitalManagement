@@ -50,7 +50,7 @@ public class TransferMethodService {
         List<TransferMethod> transferMethods = new ArrayList<>();
         if (!transferMethodNames.isEmpty()) {
             for (String name : transferMethodNames) {
-                TransferMethod transferMethod = new TransferMethod(name, countryId);
+                TransferMethod transferMethod = new TransferMethod(countryId, name);
                 if (isSuggestion) {
                     transferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     transferMethod.setSuggestedDate(LocalDate.now());
@@ -121,7 +121,7 @@ public class TransferMethodService {
         }
         Integer resultCount = transferMethodRepository.updateMasterMetadataName(transferMethodDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.transferMethod", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, transferMethodDTO.getName());
         }
@@ -135,9 +135,8 @@ public class TransferMethodService {
      * @return
      * @description method save TransferMethod suggested by unit
      */
-    public List<TransferMethodDTO> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
-        return createTransferMethod(countryId, transferMethodDTOS, true);
-
+    public void saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+        createTransferMethod(countryId, transferMethodDTOS, true);
     }
 
 
@@ -153,7 +152,7 @@ public class TransferMethodService {
         if (updateCount > 0) {
             LOGGER.info("Transfer Methods are updated successfully with ids :: {}", transferMethodIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", transferMethodIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.transferMethod", transferMethodIds);
         }
         return transferMethodRepository.findAllByIds(transferMethodIds);
     }

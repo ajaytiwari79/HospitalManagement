@@ -49,7 +49,7 @@ public class AccessorPartyService {
         List<AccessorParty> accessorParties = new ArrayList<>();
         if (!accessorPartyNames.isEmpty()) {
             for (String name : accessorPartyNames) {
-                AccessorParty accessorParty = new AccessorParty(name, countryId);
+                AccessorParty accessorParty = new AccessorParty(countryId, name);
                 if (isSuggestion) {
                     accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     accessorParty.setSuggestedDate(LocalDate.now());
@@ -113,7 +113,7 @@ public class AccessorPartyService {
         }
         Integer resultCount = accessorPartyRepository.updateMasterMetadataName(accessorPartyDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }
@@ -129,8 +129,8 @@ public class AccessorPartyService {
      * @return
      * @description method save Accessor Party suggested by unit
      */
-    public List<AccessorPartyDTO> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
-        return createAccessorParty(countryId, accessorPartyDTOS, true);
+    public void saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
+         createAccessorParty(countryId, accessorPartyDTOS, true);
     }
 
 
@@ -146,7 +146,7 @@ public class AccessorPartyService {
         if (updateCount > 0) {
             LOGGER.info("Accessor Parties are updated successfully with ids :: {}", accessorPartyIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", accessorPartyIds);
         }
         return accessorPartyRepository.findAllByIds(accessorPartyIds);
     }

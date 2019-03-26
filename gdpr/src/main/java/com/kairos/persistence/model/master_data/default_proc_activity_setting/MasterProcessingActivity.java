@@ -11,6 +11,7 @@ import com.kairos.persistence.model.risk_management.Risk;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,10 @@ import java.util.List;
 @Entity
 public class MasterProcessingActivity extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @ElementCollection
@@ -34,7 +37,7 @@ public class MasterProcessingActivity extends BaseEntity {
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "processingActivity_id")
     private List<Risk> risks  = new ArrayList<>();
 
@@ -42,7 +45,7 @@ public class MasterProcessingActivity extends BaseEntity {
     @JoinColumn(name="masterProcessingActivity_id")
     private MasterProcessingActivity masterProcessingActivity;
 
-    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<MasterProcessingActivity> subProcessingActivities = new ArrayList<>();
 
     private Long countryId;
@@ -61,15 +64,6 @@ public class MasterProcessingActivity extends BaseEntity {
         this.description = description;
         this.suggestedDataStatus=suggestedDataStatus;
         this.countryId = countryId;
-    }
-
-    public MasterProcessingActivity(String name, String description, Long countryId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.subProcessActivity = subProcessActivity;
-        this.suggestedDataStatus=suggestedDataStatus;
-        this.suggestedDate=suggestedDate;
     }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }

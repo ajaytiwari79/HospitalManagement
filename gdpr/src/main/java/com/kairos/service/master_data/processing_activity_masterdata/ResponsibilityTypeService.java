@@ -49,7 +49,7 @@ public class ResponsibilityTypeService {
         List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
         if (!responsibilityTypeNames.isEmpty()) {
             for (String name : responsibilityTypeNames) {
-                ResponsibilityType responsibilityType = new ResponsibilityType(name, countryId);
+                ResponsibilityType responsibilityType = new ResponsibilityType(countryId, name);
                 if (isSuggestion) {
                     responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     responsibilityType.setSuggestedDate(LocalDate.now());
@@ -122,7 +122,7 @@ public class ResponsibilityTypeService {
         }
         Integer resultCount = responsibilityTypeRepository.updateMasterMetadataName(responsibilityTypeDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.resposibilityType", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, responsibilityTypeDTO.getName());
         }
@@ -138,8 +138,8 @@ public class ResponsibilityTypeService {
      * @return
      * @description method save ResponsibilityType suggested by unit
      */
-    public List<ResponsibilityTypeDTO> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
-        return createResponsibilityType(countryId, responsibilityTypeDTOS, true);
+    public void saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+         createResponsibilityType(countryId, responsibilityTypeDTOS, true);
     }
 
 
@@ -155,7 +155,7 @@ public class ResponsibilityTypeService {
         if (updateCount > 0) {
             LOGGER.info("Responsibility Types are updated successfully with ids :: {}", responsibilityTypeIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", responsibilityTypeIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.resposibilityType", responsibilityTypeIds);
         }
         return responsibilityTypeRepository.findAllByIds(responsibilityTypeIds);
     }

@@ -42,12 +42,12 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicR
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -58,9 +58,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class AssessmentService {
-
-
-    private static Logger logger = LoggerFactory.getLogger(AssessmentService.class);
 
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
@@ -102,6 +99,8 @@ public class AssessmentService {
     private TransferMethodRepository transferMethodRepository;
     @Inject
     private AssetTypeRepository assetTypeRepository;
+    @Inject
+    private AssetTypeService assetTypeService;
 
 
     private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
@@ -142,11 +141,11 @@ public class AssessmentService {
 
     private boolean validateRelativeDeadLineDate(AssessmentDTO assessmentDTO) {
         boolean result = true;
-        if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 30)) {
+        if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS) && (assessmentDTO.getRelativeDeadlineDuration() > 30)) {
             result = false;
-        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 24)) {
+        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS) && (assessmentDTO.getRelativeDeadlineDuration() > 24)) {
             result = false;
-        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS) && !(assessmentDTO.getRelativeDeadlineDuration() <= 12)) {
+        } else if (assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS) && (assessmentDTO.getRelativeDeadlineDuration() > 12)) {
             result = false;
         } else {
             LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadlineType(), 1);
@@ -200,17 +199,14 @@ public class AssessmentService {
 
         Assessment previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, assessmentDTO.getName());
         if (Optional.ofNullable(previousAssessment).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.assessment", assessmentDTO.getName());
         }
         if (assessmentDTO.getStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.startdate");
         } else if (assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), assessmentDTO.getStartDate());
-        assessment.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class));
-        assessment.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class));
-        assessment.setOrganizationId(unitId);
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getStartDate(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class), ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class), unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
@@ -231,14 +227,6 @@ public class AssessmentService {
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
         }
-        /*if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
-            if (!Optional.ofNullable(assessmentDTO.getAssessmentLaunchedDate()).isPresent()) {
-                exceptionService.invalidRequestException("message.assessment.scheduling.date.not.Selected");
-            } else if (LocalDate.now().equals(assessmentDTO.getAssessmentLaunchedDate()) || assessmentDTO.getAssessmentLaunchedDate().isBefore(LocalDate.now())) {
-                exceptionService.invalidRequestException("message.assessment.enter.valid.date");
-
-            assessment.setAssessmentLaunchedDate(assessmentDTO.getAssessmentLaunchedDate());
-        }}*/
         assessment.setAssessmentLaunchedDate(LocalDate.now());
         assessment.setAssessmentSchedulingFrequency(assessmentDTO.getAssessmentSchedulingFrequency());
         assessment.setQuestionnaireTemplate(questionnaireTemplate);
@@ -276,7 +264,6 @@ public class AssessmentService {
             risks = asset.getAssetType().getRisks();
             if (Optional.ofNullable(asset.getSubAssetType()).isPresent())
                 risks.addAll(asset.getSubAssetType().getRisks());
-            //todo change method
             questionnaireTemplate = Optional.ofNullable(asset.getSubAssetType()).isPresent() ? questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED)
                     : questionnaireTemplateRepository.findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(unitId, asset.getAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED);
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
@@ -333,18 +320,18 @@ public class AssessmentService {
                         new SingleSelectChoice(Optional.ofNullable(asset.getHostingType()).isPresent() ? new MetaDataVO(asset.getHostingType().getId(), asset.getHostingType().getName()) : new MetaDataVO()), question.getQuestionType());
             case DATA_DISPOSAL:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getDataDisposal().getId(), asset.getDataDisposal().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getDataDisposal()).isPresent() ? new MetaDataVO(asset.getDataDisposal().getId(), asset.getDataDisposal().getName()) : new MetaDataVO()), question.getQuestionType());
             case HOSTING_PROVIDER:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
                         new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getHostingProvider().getId(), asset.getHostingProvider().getName()) : new MetaDataVO()), question.getQuestionType());
             case ASSET_TYPE:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getAssetType().getId(), asset.getAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getAssetType()).isPresent() ? new MetaDataVO(asset.getAssetType().getId(), asset.getAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
             case STORAGE_FORMAT:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(), new MultipleSelectChoice(asset.getStorageFormats().stream().map(storageFormat -> new MetaDataVO(storageFormat.getId(), storageFormat.getName())).collect(Collectors.toList())), question.getQuestionType());
             case ASSET_SUB_TYPE:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(),
-                        new SingleSelectChoice(Optional.ofNullable(asset.getHostingProvider()).isPresent() ? new MetaDataVO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
+                        new SingleSelectChoice(Optional.ofNullable(asset.getSubAssetType()).isPresent() ? new MetaDataVO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName()) : new MetaDataVO()), question.getQuestionType());
             case TECHNICAL_SECURITY_MEASURES:
                 return new AssessmentAnswer(question.getId(), question.getAttributeName(), new MultipleSelectChoice(asset.getTechnicalSecurityMeasures().stream().map(technicalSecurityMeasure -> new MetaDataVO(technicalSecurityMeasure.getId(), technicalSecurityMeasure.getName())).collect(Collectors.toList())), question.getQuestionType());
             case ORGANIZATION_SECURITY_MEASURES:
@@ -402,7 +389,6 @@ public class AssessmentService {
      * @param //assessmentId
      * @return
      */
-    //TODO
     public List<QuestionnaireSectionResponseDTO> getAssessmentByUnitIdAndId(Long unitId, Long assessmentId) {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
@@ -464,7 +450,7 @@ public class AssessmentService {
             case HOSTING_TYPE:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeRepository.getAllAssetTypesByOrganization(unitId), MetaDataCommonResponseDTO.class);
+                return assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(unitId);
             case STORAGE_FORMAT:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
@@ -505,12 +491,13 @@ public class AssessmentService {
     }
 
 
+    @Transactional
     public List<AssessmentAnswerDTO> saveAssessmentAnswerByUnitIdAndAssessmentId(Long unitId, Long assessmentId, List<AssessmentAnswerDTO> assessmentAnswerValueObjects, AssessmentStatus status) {
 
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assessment", assessmentId);
         } else if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
         } else if ((AssessmentStatus.NEW.equals(assessment.getAssessmentStatus()) && AssessmentStatus.COMPLETED.equals(status)) || AssessmentStatus.NEW.equals(status)) {
@@ -522,17 +509,18 @@ public class AssessmentService {
             exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
+        assessment.setAssessmentStatus(status);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setCompletedDate(LocalDate.now());
+        }
+        assessmentRepository.save(assessment);
+        if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
         }
-        assessment.setAssessmentStatus(status);
-        assessmentRepository.save(assessment);
         return assessmentAnswerValueObjects;
-
     }
 
 
@@ -775,14 +763,14 @@ public class AssessmentService {
     * @description get all Previous Assessment Launched for Asset
      */
     public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, Long assetId) {
-        List<Assessment> assessments =  assessmentRepository.findAllAssetAssessmentByAssetIdAndUnitId(unitId, assetId);
+        List<Assessment> assessments = assessmentRepository.findAllAssetAssessmentByAssetIdAndUnitId(unitId, assetId);
         return prepareAssessmentResponseDTO(assessments);
     }
 
-    private List<AssessmentBasicResponseDTO> prepareAssessmentResponseDTO(List<Assessment> assessments){
+    private List<AssessmentBasicResponseDTO> prepareAssessmentResponseDTO(List<Assessment> assessments) {
         List<AssessmentBasicResponseDTO> assessmentBasicResponseDTOList = new ArrayList<>();
         assessments.forEach(assessment -> {
-            AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(),assessment.getName(),assessment.getEndDate(),assessment.getCompletedDate(),assessment.getStartDate(),assessment.getComment(),assessment.getAssessmentStatus(),assessment.getAssessmentLaunchedDate(),assessment.getAssessmentSchedulingFrequency());
+            AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(), assessment.getName(), assessment.getEndDate(), assessment.getCompletedDate(), assessment.getStartDate(), assessment.getComment(), assessment.getAssessmentStatus(), assessment.getAssessmentLaunchedDate(), assessment.getAssessmentSchedulingFrequency());
             assessmentBasicResponseDTO.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessment.getApprover(), Staff.class));
             assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessment.getAssigneeList(), Staff.class));
             assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
@@ -790,8 +778,6 @@ public class AssessmentService {
         });
         return assessmentBasicResponseDTOList;
     }
-
-
 
 
 }

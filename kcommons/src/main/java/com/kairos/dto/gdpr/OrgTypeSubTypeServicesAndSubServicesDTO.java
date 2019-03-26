@@ -35,4 +35,5 @@ public class OrgTypeSubTypeServicesAndSubServicesDTO {
     public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
 
+
 }

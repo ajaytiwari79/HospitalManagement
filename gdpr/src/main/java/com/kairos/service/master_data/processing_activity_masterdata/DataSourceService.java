@@ -45,12 +45,12 @@ public class DataSourceService {
      */
     public List<DataSourceDTO> createDataSource(Long countryId, List<DataSourceDTO> dataSourceDTOS, boolean isSuggestion) {
         Set<String> existingDataSourceNames = dataSourceRepository.findNameByCountryIdAndDeleted(countryId);
-        Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS,existingDataSourceNames );
+        Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS, existingDataSourceNames);
 
         List<DataSource> dataSources = new ArrayList<>();
         if (!dataSourceNames.isEmpty()) {
             for (String name : dataSourceNames) {
-                DataSource dataSource = new DataSource(name, countryId);
+                DataSource dataSource = new DataSource(countryId, name);
                 if (isSuggestion) {
                     dataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     dataSource.setSuggestedDate(LocalDate.now());
@@ -118,7 +118,7 @@ public class DataSourceService {
         }
         Integer resultCount = dataSourceRepository.updateMasterMetadataName(dataSourceDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSource", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataSourceDTO.getName());
         }
@@ -133,9 +133,8 @@ public class DataSourceService {
      * @return
      * @description method save Data Source suggested by unit
      */
-    public List<DataSourceDTO> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
-
-        return createDataSource(countryId, dataSourceDTOS, true);
+    public void saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
+        createDataSource(countryId, dataSourceDTOS, true);
     }
 
 
@@ -151,7 +150,7 @@ public class DataSourceService {
         if (updateCount > 0) {
             LOGGER.info("Data Sources are updated successfully with ids :: {}", dataSourceIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", dataSourceIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSource", dataSourceIds);
         }
         return dataSourceRepository.findAllByIds(dataSourceIds);
     }

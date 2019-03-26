@@ -467,22 +467,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.createStaffFromPlanningWorkflow(staffDTO, unitId));
     }
 
-
-    /**
-     * @param unitId
-     * @param staffIds
-     * @return
-     * @auther anil maurya
-     * this endpoint is called from task micro service
-     */
-    @RequestMapping(value = "/getsfAndsfSkill", method = RequestMethod.POST)
-    @ApiOperation("getTeamStaffAndStaffSkill")
-    public ResponseEntity<Map<String, Object>> getTeamStaffAndStaffSkill(@PathVariable Long unitId, @RequestBody List<Long> staffIds) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getTeamStaffAndStaffSkill(unitId, staffIds));
-    }
-
-    /**
+     /**
      * @return
      * @auther anil maurya
      * this endpoint is called from task micro service
@@ -534,9 +519,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/unit_position/{unitPositionId}/functions", method = RequestMethod.GET)
     @ApiOperation("API for check unit position of staff and available functions and reasoncodes on unit")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate,
-                                                                      @PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(shiftDate, unitPositionId, unitId));
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(unitPositionId, unitId));
     }
 
     @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)

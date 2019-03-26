@@ -51,7 +51,7 @@ public class OrganizationalSecurityMeasureService{
             List<OrganizationalSecurityMeasure> orgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
-                    OrganizationalSecurityMeasure orgSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId);
+                    OrganizationalSecurityMeasure orgSecurityMeasure = new OrganizationalSecurityMeasure(countryId, name);
                         if(isSuggestion){
                             orgSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                             orgSecurityMeasure.setSuggestedDate(LocalDate.now());
@@ -127,7 +127,7 @@ public class OrganizationalSecurityMeasureService{
 
         Integer resultCount =  organizationalSecurityMeasureRepository.updateMasterMetadataName(securityMeasureDTO.getName(), id, countryId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organizational Security Measure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.orgSecurityMeasure", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, securityMeasureDTO.getName());
         }
@@ -142,8 +142,8 @@ public class OrganizationalSecurityMeasureService{
      * @param organizationalSecurityMeasureDTOS
      * @return
      */
-    public List<OrganizationalSecurityMeasureDTO> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
-        return createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
+    public void saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
+        createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
     }
 
 
@@ -160,7 +160,7 @@ public class OrganizationalSecurityMeasureService{
         if(updateCount > 0){
             LOGGER.info("Organizational Security Measures are updated successfully with ids :: {}", orgSecurityMeasureIds);
         }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organizational Security Measure", orgSecurityMeasureIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.orgSecurityMeasure", orgSecurityMeasureIds);
         }
         return organizationalSecurityMeasureRepository.findAllByIds(orgSecurityMeasureIds);
     }

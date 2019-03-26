@@ -283,7 +283,7 @@ public class ExpertiseService {
         Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
             expertise.setUnion(getUnion(unionIDNameDTO.getId(), unionIDNameDTO.getName(), country));
         });
-        if (expertiseDTO.getSeniorityLevel() != null && !create && isCollectionEmpty(expertise.getSeniorityLevel())) {
+        if (expertiseDTO.getSeniorityLevel() != null &&  (create || isCollectionEmpty(expertise.getSeniorityLevel()))) {
             SeniorityLevel  seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
                     expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
             seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
@@ -403,10 +403,10 @@ public class ExpertiseService {
 
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
-            if (Optional.ofNullable(currentExpertise.getSector()).isPresent()) {
+            if (Optional.ofNullable(currentExpertise.getSector()).isPresent() && Optional.ofNullable(expertiseResponseDTO.getSector()).isPresent()) {
                 expertiseResponseDTO.getSector().setId(currentExpertise.getSector().getId());
             }
-            if (Optional.ofNullable(currentExpertise.getUnion()).isPresent()) {
+            if (Optional.ofNullable(currentExpertise.getUnion()).isPresent() && Optional.ofNullable(expertiseResponseDTO.getUnion()).isPresent()) {
                 expertiseResponseDTO.getUnion().setId(currentExpertise.getUnion().getId());
             }
             if (currentExpertise.getUnion() != null && currentExpertise.getSector() != null) {
@@ -577,13 +577,6 @@ public class ExpertiseService {
         return expertiseSkillQueryResult.getSkills();
     }
 
-    public List<com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO> getAllFreeExpertise(List<Long> expertiseIds) {
-        return expertiseGraphRepository.getAllFreeExpertises(expertiseIds);
-    }
-
-    public Expertise getExpertiseByCountryId(Long countryId) {
-        return expertiseGraphRepository.getExpertiesByCountry(countryId);
-    }
 
 
     public UnionServiceWrapper getUnionsAndService(Long countryId) {

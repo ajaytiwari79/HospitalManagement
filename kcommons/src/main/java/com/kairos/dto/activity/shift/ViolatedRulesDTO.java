@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,9 @@ public class ViolatedRulesDTO {
     private List<ActivityRuleViolation> activities = new ArrayList<>();
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
-        return workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());
+        workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());
+        workTimeAgreements.sort(Comparator.comparing(WorkTimeAgreementRuleViolation::isCanBeIgnore));
+        return workTimeAgreements;
     }
 
     public void setWorkTimeAgreements(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {

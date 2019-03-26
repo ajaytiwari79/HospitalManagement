@@ -10,33 +10,35 @@ import com.kairos.persistence.model.risk_management.Risk;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class ProcessingActivity extends BaseEntity {
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-    @NotBlank(message = "Description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     @Embedded
     private ManagingOrganization managingDepartment;
     @Embedded
     private Staff processOwner;
     private Long countryId;
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<ProcessingPurpose> processingPurposes  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<DataSource> dataSources  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<TransferMethod> transferMethods  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<AccessorParty> accessorParties  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<ProcessingLegalBasis> processingLegalBasis  = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Asset> linkedAssets  = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Asset> assets  = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name="processingActivity_id")
     private ProcessingActivity processingActivity;
@@ -91,6 +93,9 @@ public class ProcessingActivity extends BaseEntity {
 
     public void setActive(boolean active) { this.active = active; }
 
+    public List<Asset> getAssets() { return assets; }
+
+    public void setAssets(List<Asset> assets) { this.assets = assets; }
 
     public String getName() { return name; }
 
@@ -104,9 +109,7 @@ public class ProcessingActivity extends BaseEntity {
         return managingDepartment;
     }
 
-    public void setManagingDepartment(ManagingOrganization managingDepartment) {
-        this.managingDepartment = managingDepartment;
-    }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
 
     public Staff getProcessOwner() {
         return processOwner;
@@ -120,9 +123,7 @@ public class ProcessingActivity extends BaseEntity {
         return processingPurposes;
     }
 
-    public void setProcessingPurposes(List<ProcessingPurpose> processingPurposes) {
-        this.processingPurposes = processingPurposes;
-    }
+    public void setProcessingPurposes(List<ProcessingPurpose> processingPurposes) { this.processingPurposes = processingPurposes; }
 
     public List<DataSource> getDataSources() {
         return dataSources;
@@ -155,46 +156,29 @@ public class ProcessingActivity extends BaseEntity {
     public void setProcessingLegalBasis(List<ProcessingLegalBasis> processingLegalBasis) {
         this.processingLegalBasis = processingLegalBasis;
     }
-
-    public List<Asset> getLinkedAssets() {
-        return linkedAssets;
-    }
-
-    public void setLinkedAssets(List<Asset> linkedAssets) {
-        this.linkedAssets = linkedAssets;
-    }
-
     public ProcessingActivity getProcessingActivity() {
         return processingActivity;
     }
 
-    public void setProcessingActivity(ProcessingActivity processingActivity) {
-        this.processingActivity = processingActivity;
-    }
+    public void setProcessingActivity(ProcessingActivity processingActivity) { this.processingActivity = processingActivity; }
 
     public List<ProcessingActivity> getSubProcessingActivities() {
         return subProcessingActivities;
     }
 
-    public void setSubProcessingActivities(List<ProcessingActivity> subProcessingActivities) {
-        this.subProcessingActivities = subProcessingActivities;
-    }
+    public void setSubProcessingActivities(List<ProcessingActivity> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
     public ResponsibilityType getResponsibilityType() {
         return responsibilityType;
     }
 
-    public void setResponsibilityType(ResponsibilityType responsibilityType) {
-        this.responsibilityType = responsibilityType;
-    }
+    public void setResponsibilityType(ResponsibilityType responsibilityType) { this.responsibilityType = responsibilityType; }
 
     public Integer getControllerContactInfo() {
         return controllerContactInfo;
     }
 
-    public void setControllerContactInfo(Integer controllerContactInfo) {
-        this.controllerContactInfo = controllerContactInfo;
-    }
+    public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
 
     public Integer getDpoContactInfo() {
         return dpoContactInfo;
@@ -208,9 +192,7 @@ public class ProcessingActivity extends BaseEntity {
         return jointControllerContactInfo;
     }
 
-    public void setJointControllerContactInfo(Integer jointControllerContactInfo) {
-        this.jointControllerContactInfo = jointControllerContactInfo;
-    }
+    public void setJointControllerContactInfo(Integer jointControllerContactInfo) { this.jointControllerContactInfo = jointControllerContactInfo; }
 
     public Long getMinDataSubjectVolume() {
         return minDataSubjectVolume;
@@ -240,9 +222,7 @@ public class ProcessingActivity extends BaseEntity {
         return isSubProcessingActivity;
     }
 
-    public void setSubProcessingActivity(boolean subProcessingActivity) {
-        this.isSubProcessingActivity = subProcessingActivity;
-    }
+    public void setSubProcessingActivity(boolean subProcessingActivity) { this.isSubProcessingActivity = subProcessingActivity; }
 
     public Long getCountryId() {
         return countryId;
@@ -259,6 +239,7 @@ public class ProcessingActivity extends BaseEntity {
     public void setRisks(List<Risk> risks) {
         this.risks = risks;
     }
+
 
     @Override
     public void delete() {

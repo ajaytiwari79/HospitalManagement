@@ -25,7 +25,7 @@ import com.kairos.persistence.model.staff.PartialLeave;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
-import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
+import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
@@ -96,7 +96,7 @@ public class PositionService {
     @Inject
     private PartialLeaveGraphRepository partialLeaveGraphRepository;
     @Inject
-    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
@@ -273,7 +273,7 @@ public class PositionService {
     }
 
 
-    public void createEmploymentForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
+    public void createPositionForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup == null) {
@@ -289,8 +289,8 @@ public class PositionService {
 
         //set permission in unit position
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
+        unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         position.getUnitPermissions().add(unitPermission);
         if (parent == null) {

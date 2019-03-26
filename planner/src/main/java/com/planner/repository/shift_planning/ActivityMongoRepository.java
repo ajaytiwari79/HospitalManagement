@@ -7,7 +7,6 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
-import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.domain.shift_planning.Shift;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +16,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
-import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -65,7 +63,7 @@ public class ActivityMongoRepository {
                 lookup(TIME_TYPE,"balanceSettingsActivityTab.timeTypeId","_id","timeTypes"),
                 project("id","name","expertises","countryId","parentId","employmentTypes")
                         .and("timeTypes").arrayElementAt(0).as("timeType"));
-        AggregationResults<ActivityDTO> aggregationResults = mongoTemplate.aggregate(aggregation, ACTIVITYIES, ActivityDTO.class);
+        AggregationResults<ActivityDTO> aggregationResults = mongoTemplate.aggregate(aggregation, ACTIVITIES, ActivityDTO.class);
         List<ActivityDTO> activityDTOS=aggregationResults.getMappedResults();
         return activityDTOS;
     }

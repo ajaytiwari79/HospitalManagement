@@ -17,11 +17,11 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
-@Api(API_ORGANIZATION_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
+@Api(API_UNIT_URL)
 public class UnitSettingController {
 
     @Inject

@@ -39,21 +39,21 @@ public class OrganizationHostingTypeService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param hostingTypeDTOS
      * @return return map which contain list of new HostingType and list of existing HostingType if HostingType already exist
      * @description this method create new HostingType if HostingType not exist with same name ,
      * and if exist then simply add  HostingType to existing list and return list ;
      * findByOrganizationIdAndNamesList()  return list of existing HostingType using collation ,used for case insensitive result
      */
-    public List<HostingTypeDTO> createHostingType(Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
-        Set<String> existingHostingTypeNames = hostingTypeRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<HostingTypeDTO> createHostingType(Long unitId, List<HostingTypeDTO> hostingTypeDTOS) {
+        Set<String> existingHostingTypeNames = hostingTypeRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> hostingTypeNames = ComparisonUtils.getNewMetaDataNames(hostingTypeDTOS,existingHostingTypeNames );
         List<HostingType> hostingTypes = new ArrayList<>();
         if (!hostingTypeNames.isEmpty()) {
             for (String name : hostingTypeNames) {
                 HostingType hostingType = new HostingType(name);
-                hostingType.setOrganizationId(organizationId);
+                hostingType.setOrganizationId(unitId);
                 hostingTypes.add(hostingType);
             }
             hostingTypeRepository.saveAll(hostingTypes);
@@ -64,24 +64,24 @@ public class OrganizationHostingTypeService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @return list of HostingType
      */
-    public List<HostingTypeResponseDTO> getAllHostingType(Long organizationId) {
-        return hostingTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<HostingTypeResponseDTO> getAllHostingType(Long unitId) {
+        return hostingTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param id             of HostingType
      * @return HostingType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if HostingType not found for given id
      */
-    public HostingType getHostingType(Long organizationId, Long id) {
+    public HostingType getHostingType(Long unitId, Long id) {
 
-        HostingType exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        HostingType exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -104,25 +104,25 @@ public class OrganizationHostingTypeService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param id             id of HostingType
      * @param hostingTypeDTO
      * @return HostingType updated object
      * @throws DuplicateDataException if HostingType already exist with same name
      */
-    public HostingTypeDTO updateHostingType(Long organizationId, Long id, HostingTypeDTO hostingTypeDTO) {
+    public HostingTypeDTO updateHostingType(Long unitId, Long id, HostingTypeDTO hostingTypeDTO) {
 
 
-        HostingType hostingType = hostingTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, hostingTypeDTO.getName());
+        HostingType hostingType = hostingTypeRepository.findByOrganizationIdAndDeletedAndName(unitId, hostingTypeDTO.getName());
         if (Optional.ofNullable(hostingType).isPresent()) {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Hosting Type", hostingType.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.hostingType", hostingType.getName());
         }
-        Integer resultCount = hostingTypeRepository.updateMetadataName(hostingTypeDTO.getName(), id, organizationId);
+        Integer resultCount = hostingTypeRepository.updateMetadataName(hostingTypeDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingType", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingTypeDTO.getName());
         }
@@ -132,9 +132,9 @@ public class OrganizationHostingTypeService {
     }
 
 
-    public List<HostingTypeDTO> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
+    public List<HostingTypeDTO> saveAndSuggestHostingTypes(Long countryId, Long unitId, List<HostingTypeDTO> hostingTypeDTOS) {
 
-        List<HostingTypeDTO> result = createHostingType(organizationId, hostingTypeDTOS);
+        List<HostingTypeDTO> result = createHostingType(unitId, hostingTypeDTOS);
         hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, hostingTypeDTOS);
         return result;
     }
