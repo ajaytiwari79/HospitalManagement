@@ -32,6 +32,7 @@ public class RulesActivityTab implements Serializable{
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals;
+    private CutOffIntervalUnit.CutOffActivity cutOffActivity;
     private boolean transferToNextCutOff;
     // in Minutes
     private LocalTime earliestStartTime;
