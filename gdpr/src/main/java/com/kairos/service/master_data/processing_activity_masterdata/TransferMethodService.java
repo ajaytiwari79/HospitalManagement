@@ -135,9 +135,8 @@ public class TransferMethodService {
      * @return
      * @description method save TransferMethod suggested by unit
      */
-    public List<TransferMethodDTO> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
-        return createTransferMethod(countryId, transferMethodDTOS, true);
-
+    public void saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+        createTransferMethod(countryId, transferMethodDTOS, true);
     }
 
 

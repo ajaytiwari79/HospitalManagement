@@ -143,8 +143,8 @@ public class HostingTypeService {
      * @return
      * @description method save Hosting type suggested by unit
      */
-    public List<HostingTypeDTO> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
-        return createHostingType(countryId, hostingTypeDTOS, true);
+    public void saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
+        createHostingType(countryId, hostingTypeDTOS, true);
     }
 
 

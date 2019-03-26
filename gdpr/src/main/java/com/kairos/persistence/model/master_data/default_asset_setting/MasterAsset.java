@@ -10,7 +10,6 @@ import com.kairos.persistence.model.embeddables.SubServiceCategory;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,85 +57,58 @@ public class MasterAsset extends BaseEntity {
 
     }
 
+    public void setName(String name) { this.name = name; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
+
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
+
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
+
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+
     public LocalDate getSuggestedDate() {
         return suggestedDate;
-    }
-
-    public MasterAsset setSuggestedDate(LocalDate suggestedDate) {
-        this.suggestedDate = suggestedDate;
-        return this;
     }
 
     public SuggestedDataStatus getSuggestedDataStatus() {
         return suggestedDataStatus;
     }
 
-    public MasterAsset setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) {
-        this.suggestedDataStatus = suggestedDataStatus;
-        return this;
-    }
-
     public Long getCountryId() {
         return countryId;
-    }
-
-    public MasterAsset setCountryId(Long countryId) {
-        this.countryId = countryId;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public MasterAsset setName(String name) {
-        this.name = name;
-        return this;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public MasterAsset setDescription(String description) {
-        this.description = description;
-        return this;
     }
 
     public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public MasterAsset setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-        return this;
-    }
-
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
-    }
-
-    public MasterAsset setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-        return this;
     }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public MasterAsset setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-        return this;
-    }
-
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
-    }
-
-    public MasterAsset setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-        return this;
     }
 
     public AssetType getAssetType() {
@@ -154,6 +126,7 @@ public class MasterAsset extends BaseEntity {
     public void setSubAssetType(AssetType subAssetType) {
         this.subAssetType = subAssetType;
     }
+
 
     public MasterAsset() {
     }

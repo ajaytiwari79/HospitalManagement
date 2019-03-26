@@ -140,8 +140,8 @@ public class ProcessingLegalBasisService {
      * @param processingLegalBasisDTOS - processing legal basis suggested by Unit
      * @return
      */
-    public List<ProcessingLegalBasisDTO> saveSuggestedProcessingLegalBasisFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
-        return createProcessingLegalBasis(countryId, processingLegalBasisDTOS, true);
+    public void saveSuggestedProcessingLegalBasisFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
+         createProcessingLegalBasis(countryId, processingLegalBasisDTOS, true);
     }
 
 

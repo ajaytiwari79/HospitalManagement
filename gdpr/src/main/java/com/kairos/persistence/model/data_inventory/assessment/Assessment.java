@@ -62,23 +62,18 @@ public class Assessment extends BaseEntity {
 
 
 
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver, String comment, @NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate) {
+    public Assessment(@NotBlank String name, @NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate,@NotNull LocalDate endDate, String comment, @NotNull List<Staff> assigneeList, @NotNull Staff approver,@NotNull Long organizationId) {
         this.name = name;
         this.endDate = endDate;
         this.assigneeList = assigneeList;
         this.approver = approver;
         this.comment=comment;
         this.startDate=startDate;
-    }
-
-
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, String comment, @NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate,@NotNull Long organizationId) {
-        this.name = name;
-        this.endDate = endDate;
-        this.comment=comment;
-        this.startDate=startDate;
         this.organizationId=organizationId;
     }
+
+
+
 
     public Assessment() {
     }

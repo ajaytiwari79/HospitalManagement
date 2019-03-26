@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-//@JaversSpringDataAuditable
 public interface DataElementRepository extends JpaRepository<DataElement, Long> {
 
     @Query(value = "SELECT DE FROM DataElement DE WHERE DE.organizationId = ?1 and lower(DE.name) IN ?2 and DE.deleted = false")
