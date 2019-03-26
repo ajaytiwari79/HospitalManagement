@@ -179,7 +179,7 @@ public class MasterProcessingActivityService {
             subProcessingActivityList.addAll(createNewSubProcessingActivity(countryId, createNewSubProcessingActivities, parentProcessingActivity));
         }
         if (!updateSubProcessingActivities.isEmpty()) {
-            subProcessingActivityList.addAll(updateSubProcessingActivities(countryId, updateSubProcessingActivities, parentProcessingActivity));
+            subProcessingActivityList.addAll(updateSubProcessingActivities( updateSubProcessingActivities, parentProcessingActivity));
         }
         return subProcessingActivityList;
 
@@ -187,12 +187,11 @@ public class MasterProcessingActivityService {
 
 
     /**
-     * @param countryId
      * @param subProcessingActivities  list of existing Sub processing activities
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return map which contain list of ids and list of sub processing activities
      */
-    private List<MasterProcessingActivity> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> updateSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
 
         Map<Long, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();

@@ -62,9 +62,6 @@ class ProcessingActivityController {
     @PutMapping("/processing_activity/update/{id}")
     public ResponseEntity<Object> updateProcessingActivityDetail(@PathVariable Long unitId, @PathVariable Long id, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
 
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateProcessingActivity(unitId, id, processingActivityDTO));
     }
 
@@ -72,9 +69,6 @@ class ProcessingActivityController {
     @GetMapping("/processing_activity/{processingActivityId}/history")
     public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long processingActivityId) throws ClassNotFoundException{
 
-        if (processingActivityId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId));
     }
 
@@ -88,19 +82,12 @@ class ProcessingActivityController {
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/status")
     public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId, @RequestParam boolean active) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.changeStatusOfProcessingActivity(unitId, processingActivityId, active));
     }
 
     @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
     @GetMapping("/processing_activity/{processingActivityId}/data_subject")
     public ResponseEntity<Object> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(unitId, processingActivityId));
     }
 
