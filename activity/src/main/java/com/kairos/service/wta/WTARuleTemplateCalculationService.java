@@ -62,9 +62,11 @@ public class WTARuleTemplateCalculationService {
                 if(isNotNull(dateTimeIntervalListEntry)) {
                     List<DurationBetweenShiftsWTATemplate> durationBetweenShiftsWTATemplates = dateTimeIntervalListEntry.getValue();
                     for (DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate : durationBetweenShiftsWTATemplates) {
-                        Integer currentRuletemplateRestingMinutes = getValueByPhase(userAccessRole, durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
-                        if(isNotNull(currentRuletemplateRestingMinutes) && restingMinutes<currentRuletemplateRestingMinutes){
-                            restingMinutes = currentRuletemplateRestingMinutes;
+                        if(phaseMapByDate.containsKey(shift.getStartDate())) {
+                            Integer currentRuletemplateRestingMinutes = getValueByPhase(userAccessRole, durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
+                            if (isNotNull(currentRuletemplateRestingMinutes) && restingMinutes < currentRuletemplateRestingMinutes) {
+                                restingMinutes = currentRuletemplateRestingMinutes;
+                            }
                         }
                     }
                 }
