@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
-import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
-import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
+import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 
 import java.io.Serializable;
@@ -32,8 +32,7 @@ public class RulesActivityTab implements Serializable{
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals;
-    private CutOffIntervalUnit.CutOffActivity cutOffActivity;
-    private boolean transferToNextCutOff;
+    private CutOffIntervalUnit.CutOffBalances cutOffBalances;
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
@@ -263,11 +262,11 @@ public class RulesActivityTab implements Serializable{
         this.reasonCodeRequired = reasonCodeRequired;
     }
 
-    public boolean isTransferToNextCutOff() {
-        return transferToNextCutOff;
+    public CutOffIntervalUnit.CutOffBalances getCutOffBalances() {
+        return cutOffBalances;
     }
 
-    public void setTransferToNextCutOff(boolean transferToNextCutOff) {
-        this.transferToNextCutOff = transferToNextCutOff;
+    public void setCutOffBalances(CutOffIntervalUnit.CutOffBalances cutOffBalances) {
+        this.cutOffBalances = cutOffBalances;
     }
 }

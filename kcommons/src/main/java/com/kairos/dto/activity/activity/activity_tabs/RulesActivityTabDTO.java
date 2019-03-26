@@ -31,8 +31,7 @@ public class RulesActivityTabDTO {
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals = new ArrayList<>();
-    private boolean transferToNextCutOff;
-
+    private CutOffIntervalUnit.CutOffBalances cutOffBalances;
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
@@ -269,11 +268,11 @@ public class RulesActivityTabDTO {
         this.reasonCodeRequired = reasonCodeRequired;
     }
 
-    public boolean isTransferToNextCutOff() {
-        return transferToNextCutOff;
+    public CutOffIntervalUnit.CutOffBalances getCutOffBalances() {
+        return cutOffBalances;
     }
 
-    public void setTransferToNextCutOff(boolean transferToNextCutOff) {
-        this.transferToNextCutOff = transferToNextCutOff;
+    public void setCutOffBalances(CutOffIntervalUnit.CutOffBalances cutOffBalances) {
+        this.cutOffBalances = cutOffBalances;
     }
 }

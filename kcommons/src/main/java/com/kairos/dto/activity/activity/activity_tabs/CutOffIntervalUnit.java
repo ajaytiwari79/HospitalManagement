@@ -8,7 +8,8 @@ package com.kairos.dto.activity.activity.activity_tabs;
 public enum CutOffIntervalUnit {
     DAYS,WEEKS,MONTHS,QUARTERS,YEARS,HALF_YEARLY;
 
-    public enum CutOffActivity{
+    public enum CutOffBalances {
         EXPIRE,TRANSFER;
     }
 }
+
