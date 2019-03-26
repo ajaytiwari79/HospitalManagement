@@ -781,10 +781,10 @@ public class ShiftValidatorService {
         List<ShiftViolatedRules> violatedRules = new ArrayList<>();
         for (ShiftViolatedRules shiftViolatedRules1 : shiftViolatedRules) {
             if(longShiftViolatedRulesTreeMap.containsKey(shiftViolatedRules1.getShiftId())){
-                ShiftViolatedRules ShiftViolatedRules = longShiftViolatedRulesTreeMap.get(shiftViolatedRules1.getShiftId());
-                    if(ShiftViolatedRules.getUpdatedAt().after(shiftViolatedRules1.getUpdatedAt())){
+                //ShiftViolatedRules ShiftViolatedRules = longShiftViolatedRulesTreeMap.get(shiftViolatedRules1.getShiftId());
+                  //  if(ShiftViolatedRules.getUpdatedAt().after(shiftViolatedRules1.getUpdatedAt())){
                         violatedRules.add(shiftViolatedRules1);
-                    }
+                    //}
             }else {
                 longShiftViolatedRulesTreeMap.put(shiftViolatedRules1.getShiftId(),shiftViolatedRules1);
             }
