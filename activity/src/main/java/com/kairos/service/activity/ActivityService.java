@@ -1092,4 +1092,10 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
     }
 
+    //remove expertise from activity via schedular job
+    public boolean removeExpertiseFromActivities(BigInteger expertiseId){
+
+        return false;
+    }
+
 }
