@@ -58,7 +58,7 @@ public class QuestionnaireSectionService {
         if (isOrganization) {
             List<String> assessmentNames = assessmentRepository.findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(referenceId, templateId, AssessmentStatus.IN_PROGRESS);
             if (CollectionUtils.isNotEmpty(assessmentNames)) {
-                exceptionService.invalidRequestException("message.cannot.update.questionnareTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
+                exceptionService.invalidRequestException("message.cannot.update.questionnaireTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
             }
         }
         QuestionnaireTemplate questionnaireTemplate = isOrganization ? questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
@@ -142,7 +142,7 @@ public class QuestionnaireSectionService {
         if (isOrganizationId) {
             List<String> assessmentNames = assessmentRepository.findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(referenceId, templateId, AssessmentStatus.IN_PROGRESS);
             if (CollectionUtils.isNotEmpty(assessmentNames)) {
-                exceptionService.invalidRequestException("message.cannot.update.questionnareTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
+                exceptionService.invalidRequestException("message.cannot.update.questionnaireTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
             }
         }
         QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByIdAndDeletedFalse(questionnaireSectionId);
@@ -182,7 +182,7 @@ public class QuestionnaireSectionService {
     }
 
 
-    // to check if already a questionnaire tepmlate of same asset type is present in published state , duplicate template with same asset type and risk in draft state is accepted
+    // to check if already a questionnaire template of same asset type is present in published state , duplicate template with same asset type and risk in draft state is accepted
     private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
 
         QuestionnaireTemplate previousTemplate;
