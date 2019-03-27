@@ -77,39 +77,39 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
 
     @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n \n" +
             "OPTIONAL MATCH (n)-[:SUB_PAGE*]->(subPage:AccessPage)  WITH collect(subPage)+collect(n) AS coll UNWIND coll AS pages WITH distinct pages WITH collect(pages) AS listOfPage \n" +
-            "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
+            "MATCH (c:Country)  WITH c, listOfPage\n" +
             "UNWIND listOfPage AS page\n" +
-            "MATCH (c)-[r:" + HAS_ACCESS_GROUP + "]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} WITH accessGroup, page\n" +
+            "MATCH (c)-[r:" + HAS_ACCESS_GROUP + "]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {1} WITH accessGroup, page\n" +
             "CREATE UNIQUE (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "{isEnabled:true, read:true, write:true}]->(page)")
-    void addAccessPageRelationshipForCountryAccessGroups(Long accessPageId, Long countryId, String organizationCategory);
+    void addAccessPageRelationshipForCountryAccessGroups(Long accessPageId, String organizationCategory);
 
     @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n \n" +
             "OPTIONAL MATCH (n)-[:SUB_PAGE*]->(subPage:AccessPage)  WITH collect(subPage)+collect(n) AS coll UNWIND coll AS pages WITH distinct pages WITH collect(pages) AS listOfPage \n" +
-            "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage \n" +
+            "MATCH (c:Country)  WITH c, listOfPage \n" +
             "UNWIND listOfPage AS page \n" +
-            "MATCH (c)-[r:" + HAS_ACCESS_GROUP + "]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} AND accessGroup.name<> '" + SUPER_ADMIN + "' WITH accessGroup, page \n" +
+            "MATCH (c)-[r:" + HAS_ACCESS_GROUP + "]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {1} AND accessGroup.name<> '" + SUPER_ADMIN + "' WITH accessGroup, page \n" +
             "MATCH (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "]->(page) DELETE r")
-    void removeAccessPageRelationshipForCountryAccessGroup(Long accessPageId, Long countryId, String organizationCategory);
+    void removeAccessPageRelationshipForCountryAccessGroup(Long accessPageId, String organizationCategory);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
-            "Match (org:Organization)-[:" + BELONGS_TO + "]-(c:Country) where id(c)={1} AND org.isKairosHub ={2} AND org.union={3} with org,listOfPage \n" +
-            "OPTIONAL Match (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  where childOrg.isKairosHub ={2} AND childOrg.union={3} with org+[childOrg] as allOrg,listOfPage \n" +
+            "Match (org:Organization)-[:" + BELONGS_TO + "]-(c:Country) where  org.isKairosHub ={1} AND org.union={2} with org,listOfPage \n" +
+            "OPTIONAL Match (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  where childOrg.isKairosHub ={1} AND childOrg.union={2} with org+[childOrg] as allOrg,listOfPage \n" +
             "UNWIND listOfPage as page\n" +
             "UNWIND allOrg as org \n" +
             "Match (org)-[r:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessGroup:AccessGroup) WITH accessGroup, page \n" +
             "create unique (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "{isEnabled:true, read:true, write:true}]->(page)")
-    void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
+    void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n \n" +
             "OPTIONAL MATCH (n)-[:SUB_PAGE*]->(subPage:AccessPage)  WITH collect(subPage)+collect(n) AS coll UNWIND coll AS pages WITH distinct pages WITH collect(pages) AS listOfPage \n" +
-            "MATCH (org:Organization)-[:" + BELONGS_TO + "]-(c:Country) WHERE id(c)={1} AND org.isKairosHub ={2} AND org.union={3} WITH org,listOfPage \n" +
-            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  WHERE childOrg.isKairosHub ={2} AND childOrg.union={3} WITH org+[childOrg] AS allOrg,listOfPage \n" +
+            "MATCH (org:Organization)-[:" + BELONGS_TO + "]-(c:Country) WHERE  org.isKairosHub ={1} AND org.union={2} WITH org,listOfPage \n" +
+            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  WHERE childOrg.isKairosHub ={1} AND childOrg.union={2} WITH org+[childOrg] AS allOrg,listOfPage \n" +
             "UNWIND listOfPage AS page\n" +
             "UNWIND allOrg AS org \n" +
             "MATCH (org)-[r:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessGroup:AccessGroup) WHERE accessGroup.name <> '" + SUPER_ADMIN + "' WITH accessGroup, page \n" +
             "MATCH (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "]->(page) DELETE r")
-    void removeAccessPageRelationshipForOrganizationAccessGroup(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
+    void removeAccessPageRelationshipForOrganizationAccessGroup(Long accessPageId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n\n" +
             "OPTIONAL MATCH (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) WITH n+[subPage] AS coll UNWIND coll AS pages WITH distinct pages \n" +
