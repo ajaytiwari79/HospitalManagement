@@ -682,7 +682,7 @@ public class ShiftService extends MongoBaseService {
         ButtonConfig buttonConfig = null;
 
         if (Optional.ofNullable(viewType).isPresent() && viewType.toString().equalsIgnoreCase(ViewType.WEEKLY.toString())) {
-            buttonConfig = findButtonConfig(assignedShifts, startDate, endDate, userAccessRoleDTO.getManagement());
+            buttonConfig = findButtonConfig(assignedShifts,userAccessRoleDTO.getManagement());
         }
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {
@@ -705,13 +705,9 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO, buttonConfig);
     }
 
-    public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, Date startDate, Date endDate, boolean management) {
+    public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, boolean management) {
         ButtonConfig buttonConfig = new ButtonConfig();
-        if (management) {
-            if (!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY) ||
-                    !DateUtils.getLocalDateFromDate(endDate).getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-                exceptionService.invalidRequestException("message.weeklyview.incorrect.date");
-            }
+        if (management && isCollectionNotEmpty(shifts)) {
             Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
             List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds, AccessGroupRole.MANAGEMENT);
             Set<BigInteger> shiftStateIds = shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toSet());
