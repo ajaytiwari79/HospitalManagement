@@ -67,8 +67,12 @@ public class ShiftTemplateService extends MongoBaseService {
             individualShiftTemplates.add(individualShiftTemplate);
         });
         save(individualShiftTemplates);
-        Set<BigInteger> individualShiftTemplateIds= individualShiftTemplates.stream().map(i->i.getId()).collect(Collectors.toSet());
-        ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId);
+        Set<BigInteger> individualShiftTemplateIds = new HashSet<>();
+        for (int i = 0; i < individualShiftTemplates.size(); i++) {
+            shiftTemplateDTO.getShiftList().get(i).setId(individualShiftTemplates.get(i).getId());
+            individualShiftTemplateIds.add(individualShiftTemplates.get(i).getId());
+        }
+        ShiftTemplate shiftTemplate = new ShiftTemplate(shiftTemplateDTO.getName(), individualShiftTemplateIds, unitId);
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
         shiftTemplateDTO.setUnitId(unitId);
