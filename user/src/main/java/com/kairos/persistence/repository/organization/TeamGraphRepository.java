@@ -43,7 +43,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             " CREATE UNIQUE (t)-[:"+TEAM_HAS_SKILLS+"]->(s) RETURN s")
     List<Skill> saveSkill(Long teamId, List<Long> skill);
 
-    @Query("MATCH (team:Team)-[skillTeamRel:"+TEAM_HAS_SKILLS+"]->(skill:Skill) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team)-[skillTeamRel:"+TEAM_HAS_SKILLS+"]->(skill:Skill) WHERE id(team)={0} DETACH DELETE skillTeamRel")
     void removeAllSkillsFromTeam(Long teamId);
 
     @Query(" MATCH (t:Team),(os:OrganizationService) WHERE id(t) IN {0} AND id(os)={1}  " +

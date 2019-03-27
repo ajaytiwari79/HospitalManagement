@@ -275,7 +275,7 @@ public class TeamService {
     }
 
     public boolean addTeamSelectedSkills(Long teamId, List<Long> skillIds) {
-        if(ObjectUtils.isCollectionEmpty(skillIds)){
+        if(ObjectUtils.isCollectionNotEmpty(skillIds)){
             teamGraphRepository.saveSkill(teamId, skillIds);
         } else {
             teamGraphRepository.removeAllSkillsFromTeam(teamId);
