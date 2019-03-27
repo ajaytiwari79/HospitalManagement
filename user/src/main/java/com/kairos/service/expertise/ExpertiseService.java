@@ -75,6 +75,7 @@ import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.DateUtils.getLocalDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
@@ -616,6 +617,7 @@ public class ExpertiseService {
 
      * */
     public ExpertiseQueryResult publishExpertise(Long expertiseId, Long publishedDateMillis) {
+        List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
@@ -648,10 +650,16 @@ public class ExpertiseService {
             parentExp.setHistory(true);
             parentExp.setId(expertise.getId());
             expertiseGraphRepository.save(parentExp);
+            if(isNotNull(parentExp.getEndDateMillis()) && parentExp.getEndDateMillis().after(DateUtils.getDate())) {
+                schedulerPanelDTOS.add(new SchedulerPanelDTO(-1l,JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(parentExp.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+            }
             expertise.setId(parentExpertise.getId());
             expertiseGraphRepository.save(expertise);
         }
-
+        if(isNotNull(expertise.getEndDateMillis()) && expertise.getEndDateMillis().after(DateUtils.getDate())){
+            schedulerPanelDTOS.add(new SchedulerPanelDTO(-1l, JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(expertise.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+        }
+        registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
         return parentExpertise;
     }
 
@@ -925,9 +933,9 @@ public class ExpertiseService {
         return getPlannedTimeAndEmploymentType(organization.getCountry().getId());
     }
 
-    public boolean registerJobOfExperties(Date expertiseEndDate,Long expertiseId)
+    //register a job for unassign expertise from activity and this method call when set enddate of publish expertise
+    public boolean registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS)
     {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(expertiseEndDate), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         LOGGER.info("create job for add planning period");
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });

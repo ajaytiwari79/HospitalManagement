@@ -91,15 +91,6 @@ public class SchedulerPanelDTO {
         this.timezone=timezone;
     }
 
-    public SchedulerPanelDTO( JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId,String timezone) {
-        this.jobType = jobType;
-        this.jobSubType = jobSubType;
-        this.oneTimeTrigger = oneTimeTrigger;
-        this.oneTimeTriggerDate = oneTimeTriggerDate;
-        this.entityId = entityId;
-        this.timezone=timezone;
-    }
-
     public SchedulerPanelDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
                              LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger, String filterId) {
 

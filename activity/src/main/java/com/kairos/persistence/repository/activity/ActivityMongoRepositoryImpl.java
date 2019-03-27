@@ -553,7 +553,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public boolean removeExpertiseFromActivitiesByExpertiesId(Long expertiseId) {
+    public boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId) {
         Update update=new Update().pull("expertises",expertiseId);
         return mongoTemplate.updateMulti(new Query(),update,Activity.class).wasAcknowledged();
     }

@@ -399,9 +399,9 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
     }
 
-    @ApiOperation("test only")
-    @DeleteMapping(value = "/activity/expertise/{expertiseId}")
-    ResponseEntity<Map<String, Object>> testExpertiseJon(@PathVariable Long expertiseId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeExpertiseFromActivities(expertiseId));
-    }
+//    @ApiOperation("test only")
+//    @DeleteMapping(value = "/activity/expertise/{expertiseId}")
+//    ResponseEntity<Map<String, Object>> testExpertiseJon(@PathVariable Long expertiseId){
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.unassighExpertiseFromActivities(expertiseId));
+//    }
 }
