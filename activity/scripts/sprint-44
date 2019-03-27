@@ -46,7 +46,8 @@ db.wtaBaseRuleTemplate.find({"countryId" : NumberLong(18712)}).forEach(function(
     });
 
 Please hit this API to update phaseId in WTARuletemplate
-{Server-Url}kairos/activity/api/v1/unit/1172/update_phases_in_ruletemplate
+{Server-Url}/kairos/activity/api/v1/unit/1172/update_phases_in_ruletemplate  GET
+{Server-Url}/kairos/activity/api/v1/unit/1172/delete_duplicate_entry_of_shift_violated_info  DELETE
 
 
 //add duration and duration type in planning period

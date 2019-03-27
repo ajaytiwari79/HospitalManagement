@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 
 
 import com.kairos.enums.gdpr.AssessmentStatus;
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,5 +44,8 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> ,C
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.asset.id = ?2 and assessment.deleted = false")
     List<Assessment> findAllAssetAssessmentByAssetIdAndUnitId(Long organizationId, Long assetId);
+
+    @Query(value = "SELECT assessment.name FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.questionnaireTemplate.id = ?2 and assessment.assessmentStatus =?3 and assessment.deleted = false")
+    List<String> findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(Long orgId, Long questionnaireTemplateId, AssessmentStatus assessmentStatus);
 
 }
