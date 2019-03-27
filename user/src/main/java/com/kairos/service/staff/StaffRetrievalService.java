@@ -294,18 +294,18 @@ public class StaffRetrievalService {
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         Long staffId = getStaffIdOfLoggedInUser(unitId);
         long loggedinUserId = UserContext.getUserDetails().getId();
-        Boolean isCountryAdmin = false;
+        Boolean isSuperAdmin = false;
         staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         if (!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()) {
             staffAccessGroupQueryResult = new StaffAccessGroupQueryResult();
-            isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+            isSuperAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.SUPER_ADMIN);
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
             staffAccessGroupQueryResult.setCountryId(organizationGraphRepository.getCountryId(parentOrganization.getId()));
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
-        staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
+        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }
@@ -321,27 +321,11 @@ public class StaffRetrievalService {
 
     public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, StaffFilterDTO staffFilterDTO, String moduleId) {
 
-        List<StaffPersonalDetailDTO> staff = null;
-        Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerTypeDTO> engineerTypes = null;
         Map<String, Object> map = new HashMap<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-//            staff = getStaffWithBasicInfo(id, allStaffRequired);
             map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId).getStaffList());
             roles = accessGroupService.getAccessGroups(unitId);
-            countryId = countryGraphRepository.getCountryIdByUnitId(id);
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
-            roles = accessGroupService.getAccessGroups(organization.getId());
-            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
-        }
-
-
-        if (Optional.ofNullable(staff).isPresent()) {
-            map.put("staffList", staff);
         }
         map.put("roles", roles);
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);

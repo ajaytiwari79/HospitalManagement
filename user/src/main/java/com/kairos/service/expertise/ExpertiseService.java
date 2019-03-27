@@ -651,13 +651,13 @@ public class ExpertiseService {
             parentExp.setId(expertise.getId());
             expertiseGraphRepository.save(parentExp);
             if(isNotNull(parentExp.getEndDateMillis()) && parentExp.getEndDateMillis().after(DateUtils.getDate())) {
-                schedulerPanelDTOS.add(new SchedulerPanelDTO(-1l,JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(parentExp.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+                schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(parentExp.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
             }
             expertise.setId(parentExpertise.getId());
             expertiseGraphRepository.save(expertise);
         }
         if(isNotNull(expertise.getEndDateMillis()) && expertise.getEndDateMillis().after(DateUtils.getDate())){
-            schedulerPanelDTOS.add(new SchedulerPanelDTO(-1l, JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(expertise.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+            schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(expertise.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
         registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
         return parentExpertise;
@@ -935,11 +935,12 @@ public class ExpertiseService {
 
     //register a job for unassign expertise from activity and this method call when set enddate of publish expertise
     public boolean registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS)
-    {
+    {   if(isCollectionNotEmpty(schedulerPanelDTOS)) {
         LOGGER.info("create job for add planning period");
-        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
         LOGGER.info("successfully job registered of add planning period");
+    }
         return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 

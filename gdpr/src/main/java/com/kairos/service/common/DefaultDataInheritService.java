@@ -360,7 +360,7 @@ public class DefaultDataInheritService {
                 unitLevelAssets.add(asset);
             });
             assetRepository.saveAll(unitLevelAssets);
-            LOGGER.info("Data inheriting Unit Asset Size : " + unitLevelAssets.size());
+            LOGGER.info("Data inheriting Unit Asset Size : {0}" , unitLevelAssets.size());
         } catch (Exception ex) {
             LOGGER.error("Error in asset processing==" + ex.getMessage());
         }

@@ -173,9 +173,8 @@ public class TeamService {
         return true;
     }
 
-    public Map<String, Object> getTeamDetails(Long teamId) {
-        Map<String, Object> teamDetails = teamGraphRepository.getTeamDetailsById(teamId);
-        return teamDetails;
+    public TeamDTO getTeamDetails(Long teamId) {
+        return teamGraphRepository.getTeamDetailsById(teamId);
     }
 
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
@@ -276,7 +275,7 @@ public class TeamService {
     }
 
     public boolean addTeamSelectedSkills(Long teamId, List<Long> skillIds) {
-        if(ObjectUtils.isCollectionEmpty(skillIds)){
+        if(ObjectUtils.isCollectionNotEmpty(skillIds)){
             teamGraphRepository.saveSkill(teamId, skillIds);
         } else {
             teamGraphRepository.removeAllSkillsFromTeam(teamId);

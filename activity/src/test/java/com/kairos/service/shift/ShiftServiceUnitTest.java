@@ -66,8 +66,6 @@ public class ShiftServiceUnitTest {
         LocalDate startdate = LocalDate.now();
         startdate = startdate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         LocalDate enddate=startdate.plusDays(7);
-        Date startDate = DateUtils.asDate(startdate);
-        Date endDate = DateUtils.asDate(enddate);
         List<ShiftDTO> shifts = new ArrayList<>();
 
         ShiftDTO shift = new ShiftDTO(BigInteger.valueOf(13870L),new Date(2018,11,19,13,0),new Date(2018,11,19,16,0),35602L,14139L);
@@ -86,7 +84,7 @@ public class ShiftServiceUnitTest {
 
         when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
 
-        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,startDate,endDate,true);
+        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),false);;
 
 
@@ -102,8 +100,6 @@ public class ShiftServiceUnitTest {
         LocalDate startdate = LocalDate.now();
         startdate = startdate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         LocalDate enddate=startdate.plusDays(7);
-        Date startDate = DateUtils.asDate(startdate);
-        Date endDate = DateUtils.asDate(enddate);
         List<ShiftDTO> shifts = new ArrayList<>();
 
         ShiftDTO shift = new ShiftDTO(BigInteger.valueOf(13879L),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
@@ -121,7 +117,7 @@ public class ShiftServiceUnitTest {
 
         when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
 
-        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,startDate,endDate,true);
+        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),true);;
 
 
@@ -194,7 +190,7 @@ public class ShiftServiceUnitTest {
         shiftDTO.setShiftId(BigInteger.valueOf(354));
         when(userIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
-        when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
+        when(phaseService.shiftEditableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
         try {
             shiftValidatorService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
         }catch (Exception e){

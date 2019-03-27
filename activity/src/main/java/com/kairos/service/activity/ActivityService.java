@@ -714,7 +714,6 @@ public class ActivityService extends MongoBaseService {
         int year = date.getYear();
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeek = date.get(weekOfWeekBasedYear);
-        int currentDayOfWeek = date.getDayOfWeek().getValue();
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
 
         // Set access Role of staff
@@ -786,7 +785,6 @@ public class ActivityService extends MongoBaseService {
         return true;
     }
 
-
     public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
         List<TimeCareActivity> timeCareActivities = getAllActivitiesResponse.getGetAllActivitiesResult();
@@ -831,15 +829,12 @@ public class ActivityService extends MongoBaseService {
 
 
     private void mapActivitiesInOrganization(List<Activity> countryActivities, Long unitId, List<String> externalIds) {
-
         List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(unitId, externalIds);
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
         List<Activity> organizationActivities = new ArrayList<>();
         for (Activity countryActivity : countryActivities) {
             Optional<Activity> result = unitActivities.stream().filter(unitActivity -> unitActivity.getExternalId().equals(countryActivity.getExternalId())).findFirst();
             if (!result.isPresent()) {
                 Activity activity = SerializationUtils.clone(countryActivity);
-                List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
                 activity.setCountryParentId(countryActivity.getId());

@@ -31,7 +31,6 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
-    private boolean carryForwardLeave;
     private float recommendedValue;
     private CutOffIntervalUnit cutOffIntervalUnit;
 
@@ -41,15 +40,6 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     public void setRecommendedValue(float recommendedValue) {
         this.recommendedValue = recommendedValue;
-    }
-
-
-    public boolean isCarryForwardLeave() {
-        return carryForwardLeave;
-    }
-
-    public void setCarryForwardLeave(boolean carryForwardLeave) {
-        this.carryForwardLeave = carryForwardLeave;
     }
 
     public boolean isBorrowLeave() {
@@ -111,7 +101,6 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)wtaBaseRuleTemplate;
         return (this != childCareDaysCheckWTATemplate) && !(borrowLeave == childCareDaysCheckWTATemplate.borrowLeave &&
-                carryForwardLeave == childCareDaysCheckWTATemplate.carryForwardLeave &&
                 Float.compare(childCareDaysCheckWTATemplate.recommendedValue, recommendedValue) == 0 &&
                 Objects.equals(activityIds, childCareDaysCheckWTATemplate.activityIds) &&
                 cutOffIntervalUnit == childCareDaysCheckWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues,childCareDaysCheckWTATemplate.phaseTemplateValues));
