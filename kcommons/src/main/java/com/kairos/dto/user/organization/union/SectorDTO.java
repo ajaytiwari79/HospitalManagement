@@ -1,12 +1,11 @@
 package com.kairos.dto.user.organization.union;
 
-import com.kairos.commons.utils.NotNullOrEmpty;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 public class SectorDTO {
-    @NotEmpty
+    @NotBlank
     private String name;
     private Long id;
 
@@ -19,7 +18,7 @@ public class SectorDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
