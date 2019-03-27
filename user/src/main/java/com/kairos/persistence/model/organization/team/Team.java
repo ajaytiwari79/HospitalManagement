@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_LOCATION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
@@ -40,7 +41,7 @@ public class Team extends UserBaseEntity {
 
     private boolean isEnabled = true;
 
-    private List<BigInteger> activityIds;
+    private Set<BigInteger> activityIds;
 
     public Team() {
     }
@@ -104,11 +105,11 @@ public class Team extends UserBaseEntity {
     }
 
 
-    public List<BigInteger> getActivityIds() {
+    public Set<BigInteger> getActivityIds() {
         return activityIds;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
+    public void setActivityIds(Set<BigInteger> activityIds) {
         this.activityIds = activityIds;
     }
 }

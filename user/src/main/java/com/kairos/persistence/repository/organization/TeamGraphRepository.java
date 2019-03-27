@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -41,7 +42,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query(" MATCH (t:Team),(s:Skill) WHERE id(s) IN {1} AND id(t)={0}  " +
             " CREATE UNIQUE (t)-[:"+TEAM_HAS_SKILLS+"]->(s) RETURN s")
-    List<Skill> saveSkill(Long teamId, List<Long> skill);
+    List<Skill> saveSkill(Long teamId, Set<Long> skill);
 
     @Query("MATCH (team:Team)-[skillTeamRel:"+TEAM_HAS_SKILLS+"]->(skill:Skill) WHERE id(team)={0} DETACH DELETE skillTeamRel")
     void removeAllSkillsFromTeam(Long teamId);
@@ -88,14 +89,14 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (team:Team),(staff:Staff) WHERE id(team)={0} AND id(staff) IN {1}  " +
             "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
-    void updateStaffsInTeam(long teamId, List<Long> staffIds);
+    void updateStaffsInTeam(long teamId, Set<Long> staffIds);
 
-    @Query("MATCH (team:Team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:false}]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
     @Query("MATCH (team:Team),(staff:Staff) WHERE id(staff)={0} AND id(team) IN {1}  " +
             "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
-    void assignStaffInTeams(long staffId, List<Long> teamIds);
+    void assignStaffInTeams(long staffId, Set<Long> teamIds);
 
     @Query("MATCH (team:Team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
     void removeStaffFromAllTeams(long staffId);
