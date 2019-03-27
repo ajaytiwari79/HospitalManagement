@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.asset;
 
 
-import com.kairos.controller.master_data.asset_management.TechnicalSecurityController;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.service.data_inventory.asset.OrganizationTechnicalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
@@ -9,8 +8,6 @@ import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +24,6 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 class OrganizationTechnicalSecurityController {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TechnicalSecurityController.class);
-
     @Inject
     private OrganizationTechnicalSecurityMeasureService technicalSecurityMeasureService;
 
@@ -36,9 +31,8 @@ class OrganizationTechnicalSecurityController {
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
-        if (CollectionUtils.isEmpty(securityMeasures.getRequestBody()))
-        {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,null);
+        if (CollectionUtils.isEmpty(securityMeasures.getRequestBody())) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(unitId, securityMeasures.getRequestBody()));
 

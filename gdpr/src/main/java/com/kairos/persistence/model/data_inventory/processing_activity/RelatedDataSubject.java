@@ -23,10 +23,6 @@ public class RelatedDataSubject  {
     public RelatedDataSubject() {
     }
 
-    public RelatedDataSubject(Long id ) {
-        this.id = id;
-    }
-
     public Long getId() {
         return id;
     }

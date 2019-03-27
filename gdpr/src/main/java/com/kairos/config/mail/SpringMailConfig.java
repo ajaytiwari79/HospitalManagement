@@ -37,7 +37,7 @@ class SpringMailConfig implements ApplicationContextAware, EnvironmentAware {
 
 
     @Bean
-    public JavaMailSender mailSender() throws IOException {
+    public JavaMailSender mailSender() {
 
         final JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 

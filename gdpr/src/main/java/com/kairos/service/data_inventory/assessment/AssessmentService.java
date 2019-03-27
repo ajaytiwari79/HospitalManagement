@@ -42,10 +42,12 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicR
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -97,6 +99,8 @@ public class AssessmentService {
     private TransferMethodRepository transferMethodRepository;
     @Inject
     private AssetTypeRepository assetTypeRepository;
+    @Inject
+    private AssetTypeService assetTypeService;
 
 
     private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
@@ -110,16 +114,17 @@ public class AssessmentService {
      */
     public AssessmentDTO launchAssessmentForAsset(Long unitId, Long assetId, AssessmentDTO assessmentDTO) {
 
-        if (!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()) {
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetId, unitId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
+        } else if (!asset.isActive()) {
+            exceptionService.invalidRequestException("message.asset.inactive");
+        } else if (!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()) {
             exceptionService.illegalArgumentException("message.assessment.relativeDeadline.require");
         }
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, false);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
-        }
-        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetId, unitId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
         validateRelativeDeadLineDate(assessmentDTO);
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
@@ -150,7 +155,7 @@ public class AssessmentService {
             }
         }
         if (!result) {
-            exceptionService.illegalArgumentException("message.assessment.relativedeadline.value.invalid");
+            exceptionService.illegalArgumentException("message.assessment.relativeDeadLine.value.invalid");
         }
         return result;
     }
@@ -163,25 +168,27 @@ public class AssessmentService {
      */
     public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO, boolean subProcessingActivity) {
 
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId, unitId, false);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
+        } else if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
+        }
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId, assessmentStatusList, false);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
+            exceptionService.invalidRequestException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
+        validateRelativeDeadLineDate(assessmentDTO);
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.PROCESSING_ACTIVITY);
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId, unitId, false);
-        try {
-            Assessment assessment = assessmentDTO.isRiskAssessment() ? validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivity) : validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivity);
-            assessment.setProcessingActivity(processingActivity);
-            if (!assessmentDTO.isRiskAssessment()) {
-                mapEntityValueAsAssessmentAnswer(assessment, null, processingActivity);
-            } else {
-                mapRiskValueAsAssessmentAnswer(assessment);
-            }
-            assessmentRepository.save(assessment);
-            assessmentDTO.setId(assessment.getId());
-        } catch (EntityNotFoundException ene) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
+        Assessment assessment = assessmentDTO.isRiskAssessment() ? validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivity) : validateLaunchAssessment(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivity);
+        assessment.setProcessingActivity(processingActivity);
+        if (!assessmentDTO.isRiskAssessment()) {
+            mapEntityValueAsAssessmentAnswer(assessment, null, processingActivity);
+        } else {
+            mapRiskValueAsAssessmentAnswer(assessment);
         }
+        assessmentRepository.save(assessment);
+        assessmentDTO.setId(assessment.getId());
         return assessmentDTO;
     }
 
@@ -446,7 +453,7 @@ public class AssessmentService {
             case HOSTING_TYPE:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeRepository.getAllAssetTypesByOrganization(unitId), MetaDataCommonResponseDTO.class);
+                return assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(unitId);
             case STORAGE_FORMAT:
                 return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
@@ -487,6 +494,7 @@ public class AssessmentService {
     }
 
 
+    @Transactional
     public List<AssessmentAnswerDTO> saveAssessmentAnswerByUnitIdAndAssessmentId(Long unitId, Long assessmentId, List<AssessmentAnswerDTO> assessmentAnswerValueObjects, AssessmentStatus status) {
 
 
@@ -504,17 +512,18 @@ public class AssessmentService {
             exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
+        assessment.setAssessmentStatus(status);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setCompletedDate(LocalDate.now());
+        }
+        assessmentRepository.save(assessment);
+        if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
         }
-        assessment.setAssessmentStatus(status);
-        assessmentRepository.save(assessment);
         return assessmentAnswerValueObjects;
-
     }
 
 

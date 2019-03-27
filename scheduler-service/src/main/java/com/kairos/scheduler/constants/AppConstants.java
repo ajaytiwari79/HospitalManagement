@@ -34,6 +34,7 @@ public class AppConstants {
     public static final String BODY = "Body";
     public static final String TO = "To";
     public static final String FROM = "From";
+    public static final String TIMEZONE_UTC = "UTC";
 
 
 }

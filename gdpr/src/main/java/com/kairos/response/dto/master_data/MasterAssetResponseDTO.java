@@ -8,9 +8,6 @@ import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,11 +15,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MasterAssetResponseDTO {
 
-    @NotNull(message = "error.message.id.notnull")
     private Long id;
-    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private List<OrganizationTypeDTO> organizationTypes;
     private List<OrganizationSubTypeDTO> organizationSubTypes;
@@ -36,7 +30,7 @@ public class MasterAssetResponseDTO {
     public MasterAssetResponseDTO() {
     }
 
-    public MasterAssetResponseDTO(@NotNull(message = "error.message.id.notnull") Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
+    public MasterAssetResponseDTO(Long id, String name,  String description, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
         this.id = id;
         this.name = name;
         this.description = description;
