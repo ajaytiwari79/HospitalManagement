@@ -13,7 +13,6 @@ import java.util.List;
 
 
 @Repository
-//@JaversSpringDataAuditable
 public interface TemplateTypeRepository extends CustomGenericRepository<TemplateType> {
 
     @Query(value = "Select TT from TemplateType TT where TT.id IN (?1) and TT.deleted = false")

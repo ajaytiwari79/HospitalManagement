@@ -333,7 +333,7 @@ public class QuestionnaireTemplateService {
     public boolean deleteQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId) {
         List<String> assessmentNames = assessmentRepository.findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(unitId, questionnaireTemplateId, AssessmentStatus.IN_PROGRESS);
         if (CollectionUtils.isNotEmpty(assessmentNames)) {
-            exceptionService.invalidRequestException("message.cannot.update.questionnareTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
+            exceptionService.invalidRequestException("message.cannot.update.questionnaireTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
         }
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(questionnaireTemplateId, unitId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {

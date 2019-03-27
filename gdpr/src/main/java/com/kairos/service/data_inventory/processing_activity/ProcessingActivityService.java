@@ -250,8 +250,8 @@ public class ProcessingActivityService {
 
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long unitId) {
         List<ProcessingActivityResponseDTO> processingActivityResponseDTOS = new ArrayList<>();
-        List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationIdAndDeletedFalse(unitId);
-        processingActivitys.forEach(processingActivity ->
+        List<ProcessingActivity> processingActivities = processingActivityRepository.findAllByOrganizationIdAndDeletedFalse(unitId);
+        processingActivities.forEach(processingActivity ->
                 processingActivityResponseDTOS.add(prepareProcessingActivityResponseData(processingActivity)));
         return processingActivityResponseDTOS;
     }

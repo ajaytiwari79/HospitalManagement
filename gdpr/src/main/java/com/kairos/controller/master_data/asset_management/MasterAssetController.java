@@ -8,8 +8,6 @@ import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +31,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class MasterAssetController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetController.class);
 
     @Inject
     private MasterAssetService masterAssetService;
