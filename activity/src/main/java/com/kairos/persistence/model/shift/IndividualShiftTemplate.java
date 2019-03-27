@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.shift;
 
 
+import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.dto.activity.shift.ShiftTemplateActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
@@ -14,6 +15,7 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     private String remarks;
     private LocalTime startTime;
     private LocalTime endTime;
+    @NotNullOrEmpty
     private List<ShiftTemplateActivity> activities;
     private int durationMinutes;
 

@@ -544,9 +544,7 @@ public class ShiftValidatorService {
                 if (activityWrapper.getActivity().getRulesActivityTab().isEligibleForStaffingLevel()) {
                     int lowerLimit = 0;
                     int upperLimit = 0;
-                    List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
-                    if (ShiftType.PRESENCE.equals(shift.getShiftType())) {
-                        applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
+                    List<StaffingLevelInterval> applicableIntervals =ShiftType.PRESENCE.equals(shift.getShiftType())?staffingLevel.getPresenceStaffingLevelInterval(): staffingLevel.getAbsenceStaffingLevelInterval();
                         if (!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                             lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                             upperLimit = 95;
@@ -566,7 +564,6 @@ public class ShiftValidatorService {
                             upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
                             checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shiftActivities, checkOverStaffing, shiftActivity);
                         }
-                    }
                 }
             }
         }
@@ -723,7 +720,7 @@ public class ShiftValidatorService {
         String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
         ShiftState shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
         Map<BigInteger, ShiftActivity> activityMap = shiftState.getActivities().stream().filter(distinctByKey(a -> a.getId())).collect(Collectors.toMap(k -> k.getId(), v -> v));
-        boolean realtime = phaseService.shiftEdititableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
+        boolean realtime = phaseService.shiftEditableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
         if (realtime) {
             shiftDTO.getActivities().forEach(shiftActivity -> {
                 ShiftActivity shiftActivity1 = activityMap.get(shiftActivity.getId());

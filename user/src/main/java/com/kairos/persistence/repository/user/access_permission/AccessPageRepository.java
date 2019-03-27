@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
 import static com.kairos.constants.AppConstants.ACCESS_PAGE_HAS_LANGUAGE;
+import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -94,57 +94,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,sequence:accessPage.sequence,children:[]} as data")
     List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
 
-    @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
-            "MATCH (org)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={1}  WITH org,position\n" +
-            "MATCH (position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) WITH org,unitPermission\n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WITH accessGroup,org,unitPermission\n" +
-            "MATCH (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) WITH unitPermission, accessPage,r\n" +
-            "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) \n"+
-            "RETURN id(accessPage) as id,accessPage.name as name," +
-            "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END  as write," +
-            "accessPage.moduleId as moduleId,accessPage.active as active")
-    List<AccessPageQueryResult> getPermissionOfMainModule(long orgId, long userId);
-
-    @Query("MATCH (org:Organization),(pOrg:Organization) WHERE id(org) IN {0} AND id(pOrg)={2} \n" +
-            "MATCH (pOrg)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={1}  WITH org,position\n" +
-            "MATCH (position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) WITH org,unitPermission\n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WITH accessGroup,org,unitPermission\n" +
-            "MATCH (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) WITH unitPermission, accessPage,r\n" +
-            "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage)\n"+
-            "RETURN id(accessPage) as id,accessPage.name as name," +
-            "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END  as write," +
-            "accessPage.moduleId as moduleId,accessPage.active as active")
-    List<AccessPageQueryResult> getPermissionOfMainModule(List<Long> orgIds, long userId, Long parentOrganizationId);
-
-
-
-    // TODO For HUB permission for module is not AccessGroup wise, we are giving access of all modules to every user of hub
-
-    @Query("MATCH (accessPage:AccessPage{isModule:true})\n" +
-            "RETURN id(accessPage) as id,accessPage.name as name,true as read,true as write,accessPage.moduleId as moduleId,accessPage.active as active")
-    List<AccessPageQueryResult> getPermissionOfMainModuleForHubMembers();
-
-
-
-    @Query("MATCH (org:Organization),(parentOrganization:Organization) WHERE id(org)={0} AND id(parentOrganization)={2} WITH org,parentOrganization\n" +
-            "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={1} WITH org,position\n" +
-            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH unitPermission,org\n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WITH accessGroup,org,unitPermission\n" +
-            "MATCH (module:AccessPage{isModule:true})<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) WITH module,modulePermission,unitPermission,accessGroup\n" +
-            "OPTIONAL MATCH (unitPermission)-[moduleCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(module) WITH module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
-            "MATCH (module)-[:SUB_PAGE*]->(subPage:AccessPage)<-[subPagePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) WITH modulePermission,subPagePermission,subPage,module,unitPermission,moduleCustomRel\n" +
-            "OPTIONAL MATCH (unitPermission)-[subPageCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(subPage)\n" +
-            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as isModule,module.active as active,collect( DISTINCT {name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:CASE WHEN subPageCustomRel IS NULL THEN subPagePermission.read ELSE subPageCustomRel.read END,write:CASE WHEN subPageCustomRel IS NULL THEN subPagePermission.write ELSE subPageCustomRel.write END,isModule:subPage.isModule,active:subPage.active}) as children")
-    List<AccessPageQueryResult> getTabPermissionForUnit(long unitId, long userId, Long parentOrganizationId);
-
-
-    @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage as module\n" +
-            "MATCH (module)-[:SUB_PAGE*]->(subPage:AccessPage) WITH module,subPage\n" +
-            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true as read,true as write,module.isModule as isModule," +
-            "module.active as active,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:true,write:true," +
-            "isModule:subPage.isModule,active:subPage.active}) as children")
-    List<AccessPageQueryResult> getTabsPermissionForHubMember();
-
     AccessPage findByModuleId(String moduleId);
 
 
@@ -171,7 +120,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
-            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage) WHERE id(country)={1}\n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage) \n" +
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
             "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
             "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
@@ -181,7 +130,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization "
     )
-    List<AccessPageDTO> getChildTabs(Long tabId, Long countryId);
+    List<AccessPageDTO> getChildTabs(Long tabId);
 
     @Query("MATCH (accessPage:AccessPage) WHERE id(accessPage)={0} set accessPage.name={1} RETURN accessPage")
     AccessPage updateAccessTab(Long id, String name);
@@ -203,14 +152,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE r.accessibleForOrganization END)\n" +
             " RETURN DISTINCT true")
     Boolean updateAccessStatusOfCountryByCategory(Long tabId, Long countryId, String organizationCategory, Boolean accessStatus);
-
-
-    @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage as module\n" +
-            "MATCH (module)-[:SUB_PAGE*]->(subPage:AccessPage) WITH module,subPage\n" +
-            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true as read,true as write,module.isModule as module," +
-            "module.active as active,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:true,write:true," +
-            "active:subPage.active}) as tabPermissions")
-    List<StaffPermissionQueryResult> getTabsPermissionForHubUserForUnit();
 
     @Query("MATCH (position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} WITH position\n" +
             "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) WITH collect(org.isKairosHub) as hubList\n" +
