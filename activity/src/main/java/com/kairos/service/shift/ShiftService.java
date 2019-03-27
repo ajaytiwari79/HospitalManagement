@@ -451,11 +451,11 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities, phase, staffAdditionalInfoDTO.getUserAccessRoleDTO());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
-        ActivityWrapper activityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(),activityWrapperMap);
-        if(isNotNull(activityWrapper)) {
-            boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(activityWrapper.getActivity().getId())).findAny().isPresent();
+        ActivityWrapper absenceActivityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(),activityWrapperMap);
+        if(isNotNull(absenceActivityWrapper)) {
+            boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
             if(!updatingSameActivity) {
-                shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO);
+                shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(absenceActivityWrapper, shiftDTO, staffAdditionalInfoDTO);
             }
         } else {
             if (staffAdditionalInfoDTO.getUnitId() == null) {
@@ -469,6 +469,7 @@ public class ShiftService extends MongoBaseService {
             Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
+            phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate());
             shift.setPhaseId(phase.getId());
             if (byTAndAView) {
                 shift.setId(shiftDTO.getShiftId());
