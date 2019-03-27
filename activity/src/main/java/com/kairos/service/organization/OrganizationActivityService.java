@@ -55,6 +55,7 @@ import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.slf4j.Logger;
@@ -541,5 +542,8 @@ public class OrganizationActivityService extends MongoBaseService {
         }
     }
 
-
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId,Long staffId){
+        List<BigInteger> activityList=userIntegrationService.getTeamActivitiesOfStaff(unitId,staffId);
+        return activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(activityList);
+    }
 }

@@ -164,7 +164,7 @@ public class TeamService {
         return true;
     }
 
-    public boolean updateStaffsInTeam(Long teamId, List<Long> staffIds) {
+    public boolean updateStaffsInTeam(Long teamId, Set<Long> staffIds) {
         if(ObjectUtils.isCollectionEmpty(staffIds)){
             teamGraphRepository.removeAllStaffsFromTeam(teamId);
         }else{
@@ -330,5 +330,9 @@ public class TeamService {
             response.add(o);
         }
         return response;
+    }
+
+    public List<BigInteger> getTeamActivitiesOfStaff(Long staffId) {
+       return teamGraphRepository.getTeamActivitiesOfStaff(staffId);
     }
 }

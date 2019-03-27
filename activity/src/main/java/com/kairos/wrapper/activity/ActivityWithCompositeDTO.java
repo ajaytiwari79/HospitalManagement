@@ -31,6 +31,7 @@ public class ActivityWithCompositeDTO {
     private SkillActivityTab skillActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
+    private boolean allowChildActivities;
 
 
     public ActivityWithCompositeDTO() {
@@ -125,5 +126,13 @@ public class ActivityWithCompositeDTO {
 
     public void setBalanceSettingsActivityTab(BalanceSettingsActivityTab balanceSettingsActivityTab) {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
+    }
+
+    public boolean isAllowChildActivities() {
+        return allowChildActivities;
+    }
+
+    public void setAllowChildActivities(boolean allowChildActivities) {
+        this.allowChildActivities = allowChildActivities;
     }
 }
