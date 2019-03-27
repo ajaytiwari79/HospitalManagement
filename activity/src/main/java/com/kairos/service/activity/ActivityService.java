@@ -406,16 +406,17 @@ public class ActivityService extends MongoBaseService {
         }
         organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
         organizationActivityService.verifyTeamActivity(activityMatched,activity);
+        List<Activity> activityList=activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k->k.getActivity().getId()).collect(Collectors.toSet()));
 
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
-        updateCompositeActivity(activityMatched, activity, compositeActivities);
+        updateCompositeActivity(activityList, activity, compositeActivities);
         save(activity);
         return compositeShiftActivityDTOs;
     }
 
-    private void updateCompositeActivity(List<ActivityWrapper> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
-        Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v.getActivity()));
+    private void updateCompositeActivity(List<Activity> activityList, Activity activity, List<CompositeActivity> compositeActivities) {
+        Map<BigInteger, Activity> activityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
             Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
@@ -425,9 +426,8 @@ public class ActivityService extends MongoBaseService {
                 compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
             }
         }
-        if (!activityMatched.isEmpty()) {
-            List<Activity> activities=activityMatched.stream().map(k->k.getActivity()).collect(Collectors.toList());
-            save(activities);
+        if (isCollectionNotEmpty(activityList)) {
+            save(activityList);
         }
     }
 
