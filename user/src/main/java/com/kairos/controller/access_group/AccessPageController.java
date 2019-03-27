@@ -31,8 +31,6 @@ public class AccessPageController {
     @Inject
     private AccessPageService accessPageService;
 
-    @Inject
-    private UserService userService;
     @RequestMapping(value="/tab", method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> createAccessPage(@Valid @RequestBody AccessPageDTO accessPageDTO){
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.createAccessPage(accessPageDTO));
@@ -44,9 +42,9 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessPage(tabId,accessPageDTO));
     }
 
-    @RequestMapping(value="/country/{countryId}/tab",method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getMainTabs(@PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabs(countryId));
+    @RequestMapping(value="/tab",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getMainTabs(){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabs());
     }
 
     @RequestMapping(value=UNIT_URL+"/tab",method = RequestMethod.GET)
@@ -64,10 +62,10 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getActive(),tabId));
     }
 
-    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/access_status",method = RequestMethod.PUT)
-    public ResponseEntity<Map<String,Object>> updateAccessStatusOfTab(@PathVariable Long tabId,@PathVariable Long countryId,
+    @RequestMapping(value = "/tab/{tabId}/access_status",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateAccessStatusOfTab(@PathVariable Long tabId,
                                                                 @Valid @RequestBody OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessForOrganizationCategory(countryId, tabId, orgCategoryTabAccessDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessForOrganizationCategory(tabId, orgCategoryTabAccessDTO));
     }
 
 

@@ -394,8 +394,8 @@ public class BootDataService {
         //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
 
         // Create AccessGroup for Ulrik as AG_COUNTRY_ADMIN
-        createPosition();
         createSuperAdminAccessGroup();
+        createPosition();
         createTeam();
 
         linkingOfStaffAndTeam();

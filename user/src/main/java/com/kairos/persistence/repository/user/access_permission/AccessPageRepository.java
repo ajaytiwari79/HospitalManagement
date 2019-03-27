@@ -98,7 +98,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
-            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} " +
+            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) " +
             "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
             "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs \n" +
             "RETURN \n" +
@@ -107,7 +107,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
-    List<AccessPageDTO> getMainTabs(Long countryId);
+    List<AccessPageDTO> getMainTabs();
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
             "MATCH(org)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) WITH accessgroup\n" +
@@ -141,17 +141,17 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n \n" +
             "OPTIONAL MATCH (n)-[:SUB_PAGE*]->(subPage:AccessPage)  WITH collect(subPage)+collect(n) as coll unwind coll as pages WITH DISTINCT pages WITH collect(pages) as listOfPage \n" +
-            "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
+            "MATCH (c:Country)  WITH c, listOfPage\n" +
             "UNWIND listOfPage as page\n" +
             "MERGE (c)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]->(page)\n" +
-            "ON CREATE SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE false END), \n" +
-            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE false END), \n" +
-            "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE false END)\n" +
-            "ON MATCH SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE r.accessibleForHub  END), \n" +
-            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE r.accessibleForUnion  END),\n" +
-            "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE r.accessibleForOrganization END)\n" +
+            "ON CREATE SET r.accessibleForHub = (CASE WHEN {1}='HUB' THEN {2} ELSE false END), \n" +
+            "r.accessibleForUnion = (CASE WHEN {1}='UNION' THEN {2} ELSE false END), \n" +
+            "r.accessibleForOrganization= (CASE WHEN {1}='ORGANIZATION' THEN {2} ELSE false END)\n" +
+            "ON MATCH SET r.accessibleForHub = (CASE WHEN {1}='HUB' THEN {2} ELSE r.accessibleForHub  END), \n" +
+            "r.accessibleForUnion = (CASE WHEN {1}='UNION' THEN {2} ELSE r.accessibleForUnion  END),\n" +
+            "r.accessibleForOrganization= (CASE WHEN {1}='ORGANIZATION' THEN {2} ELSE r.accessibleForOrganization END)\n" +
             " RETURN DISTINCT true")
-    Boolean updateAccessStatusOfCountryByCategory(Long tabId, Long countryId, String organizationCategory, Boolean accessStatus);
+    Boolean updateAccessStatusOfCountryByCategory(Long tabId, String organizationCategory, Boolean accessStatus);
 
     @Query("MATCH (position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} WITH position\n" +
             "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) WITH collect(org.isKairosHub) as hubList\n" +
