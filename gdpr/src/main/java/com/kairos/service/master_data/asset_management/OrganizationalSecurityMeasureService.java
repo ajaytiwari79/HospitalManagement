@@ -142,8 +142,8 @@ public class OrganizationalSecurityMeasureService{
      * @param organizationalSecurityMeasureDTOS
      * @return
      */
-    public List<OrganizationalSecurityMeasureDTO> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
-        return createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
+    public void saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
+        createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
     }
 
 

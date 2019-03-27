@@ -2,23 +2,10 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.task_type.*;
-import com.kairos.enums.task_type.TaskTypeEnum;
-import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.model.task_type.*;
-import com.kairos.persistence.model.task_type.TaskTypeSkill;
-import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
-import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.persistence.repository.task_type.TaskMongoRepository;
-import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
-import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoRepository;
-import com.kairos.rest_client.*;
-import com.kairos.service.MongoBaseService;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.tag.TagDTO;
@@ -28,15 +15,24 @@ import com.kairos.dto.user.organization.OrganizationLevel;
 import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.dto.user.organization.skill.Skill;
-import com.kairos.commons.utils.DateUtils;
+import com.kairos.enums.task_type.TaskTypeEnum;
+import com.kairos.persistence.model.task.Task;
+import com.kairos.persistence.model.task_type.TaskTypeSkill;
+import com.kairos.persistence.model.task_type.*;
+import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
+import com.kairos.persistence.repository.tag.TagMongoRepository;
+import com.kairos.persistence.repository.task_type.TaskMongoRepository;
+import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
+import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FileUtil;
-import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
-import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
 import org.apache.commons.validator.GenericValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,9 +51,7 @@ import static com.kairos.utils.FileUtil.createDirectory;
  */
 @Service
 public class TaskTypeService extends MongoBaseService {
-
     private static final Logger logger = LoggerFactory.getLogger(TaskTypeService.class);
-
     @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
@@ -66,38 +60,21 @@ public class TaskTypeService extends MongoBaseService {
     private TaskTypeSlaConfigMongoRepository taskTypeSlaConfigMongoRepository;
     @Inject
     private EnvConfig envConfig;
-
     @Inject private UserIntegrationService userIntegrationService;
-
     @Inject
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
-
-
-
     @Inject
     private TagMongoRepository tagMongoRepository;
-    @Autowired
+    @Inject
     private ExceptionService exceptionService;
     @Inject private TaskMongoRepository taskMongoRepository;
 
-
-
     public TaskTypeDTO createTaskType(TaskTypeDTO taskTypeDTO, long subServiceId) throws ParseException {
-
         TaskType taskType = new TaskType(taskTypeDTO.getTitle(), taskTypeDTO.getDescription(),subServiceId, taskTypeDTO.getExpiresOn(), taskTypeDTO.getDuration());
         taskType.setTags(taskTypeDTO.getTags());
         save(taskType);
         return taskType.getBasicTaskTypeInfo();
     }
-
-    /*public List<Map<String, Object>> getTaskTypes(Long subServiceId) {
-        List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId,0L);
-        List<Map<String, Object>> response = new ArrayList<>(taskTypes.size());
-        for (TaskType taskType : taskTypes) {
-            response.add(taskType.getBasicTaskTypeInfo());
-        }
-        return response;
-    }*/
 
     public List<TaskTypeDTO> getTaskTypes(Long subServiceId) {
         List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId,0L);
@@ -308,23 +285,11 @@ public class TaskTypeService extends MongoBaseService {
             return null;
         }
         Map<String, Object> response = new HashMap<>();
-        // anil maurya used rest template here
-        /*for (Map<String, Object> map : countryGraphRepository.getCountryAndOrganizationTypes()) {
-            response.put("countries", map.get("countries"));
-            response.put("organizationTypes", map.get("types"));
-        }
-
-        List<Map<String,Object>> organizationTypes = Collections.emptyList();
-        Country country = countryGraphRepository.getCountryByOrganizationService(taskType.getSubServiceId());
-        if(country != null){
-            OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult = organizationTypeGraphRepository.getOrganizationTypeHierarchy(country.getId(),taskType.getOrganizationSubTypes());
-            organizationTypes = organizationTypeHierarchyQueryResult.getOrganizationTypes();
-        }*/
         CountryDTO countryDTO = userIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
         OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult =
                 userIntegrationService.getOrgTypesHierarchy(countryDTO.getId(),taskType.getOrganizationSubTypes());
         Map<String ,Object> generalSettings = taskType.getGeneralSettings(filePath);
-        List<TagDTO> tags = new ArrayList<>();
+        List<TagDTO> tags;
         if(type != null  && type.equals("Organization")){
             tags = tagMongoRepository.getTagsById(taskType.getTags());
         } else {
@@ -486,9 +451,7 @@ public class TaskTypeService extends MongoBaseService {
         TaskTypeResourceDTO taskTypeResourceDTO = new TaskTypeResourceDTO();
         taskTypeResourceDTO.setVehicleRequired(taskType.isVehicleRequired());
         taskTypeResourceDTO.setResources(taskType.getResources());
-
         return taskTypeResourceDTO;
-
     }
 
     public void saveRestingTime(String taskTypeId, String time) {
@@ -516,17 +479,13 @@ public class TaskTypeService extends MongoBaseService {
     }
 
     public void saveSkillsForTaskType(String taskTypeId, List<Map<String, Object>> data) {
-
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
         if (isNullOrDeleted(taskType)) {
             return;
         }
-
         List<TaskTypeSkill> taskTypeSkills = new ArrayList<>();
-        TaskTypeSkill taskTypeSkill = null;
-
+        TaskTypeSkill taskTypeSkill;
         ObjectMapper objectMapper = new ObjectMapper();
-
         for (Map<String, Object> skill : data) {
             taskTypeSkill = objectMapper.convertValue(skill, TaskTypeSkill.class);
             if( skill.get("id") != null  && GenericValidator.isLong(skill.get("id").toString())){
@@ -539,8 +498,6 @@ public class TaskTypeService extends MongoBaseService {
     }
 
     public Map<String, Object> getSkills(String taskTypeId) {
-
-
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
         if (isNullOrDeleted(taskType)) {
             return null;
@@ -553,7 +510,6 @@ public class TaskTypeService extends MongoBaseService {
         } else {
             skills = userIntegrationService.getSkillsOfOrganization(taskType.getOrganizationId());
         }
-
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
         for (Map<String, Object> map : skills) {
             filterSkillData.add((Map<String, Object>) map.get("data"));
@@ -573,13 +529,11 @@ public class TaskTypeService extends MongoBaseService {
         List<String> assigneeList = (List<String>) data.get("assignee");
         List<String> employees = (List<String>) data.get("employees");
         boolean hasSubcontractors = (boolean) data.get("hasSubcontractors");
-
         List<TaskTypeEnum.TaskTypeStaff> assigneeEnums = new ArrayList<>();
         List<TaskTypeEnum.TaskTypeStaff> employeeEnums = new ArrayList<>();
         for (String assignee : assigneeList) {
             assigneeEnums.add(TaskTypeEnum.TaskTypeStaff.getByValue(assignee));
         }
-
         for (String employee : employees) {
             employeeEnums.add(TaskTypeEnum.TaskTypeStaff.getByValue(employee));
         }
@@ -618,19 +572,9 @@ public class TaskTypeService extends MongoBaseService {
         if (isNullOrDeleted(taskType)) {
             return;
         }
-        /*List<TaskTypeEnum.TaskTypeDays> taskTypeDaysList = new ArrayList<>();
-        for (String forbiddenDay : (List<String>) data.get("forbiddenDays")) {
-            taskTypeDaysList.add(TaskTypeEnum.TaskTypeDays.getByValue(forbiddenDay));
-        }*/
-
         List<Long> forbiddenDayTypeIds = (List<Long>) data.get("forbiddenDayTypeIds");
-
-        //boolean firstVisit = (boolean) data.get("firstVisit");
-        //boolean lastVisit = (boolean) data.get("lastVisit");
         boolean clientPresenceRequired = (boolean) data.get("clientPresenceRequired");
         boolean deliverOutsideUnitHours = (boolean) data.get("deliverOutsideUnitHours");
-        //TaskTypeEnum.CauseGroup causeGroup = TaskTypeEnum.CauseGroup.getByValue((String) data.get("causeGroup"));
-        //TaskTypeEnum.SequenceGroup sequenceGroup = TaskTypeEnum.SequenceGroup.getByValue((String) data.get("sequenceGroup"));
         taskType.saveTimeFrames(forbiddenDayTypeIds, clientPresenceRequired, deliverOutsideUnitHours);
         save(taskType);
     }
@@ -639,10 +583,6 @@ public class TaskTypeService extends MongoBaseService {
         Map<String, Object> map = new HashMap<>();
         map.put("dayTypeList", dayTypes);
         map.put("forbiddenDayTypeIds", taskType.getForbiddenDayTypeIds());
-        /*map.put("causeGroup", (taskType.getCauseGroup() == null) ? null : taskType.getCauseGroup().value);
-        map.put("sequenceGroup", (taskType.getSequenceGroup() == null) ? null : taskType.getSequenceGroup().value);
-        map.put("firstVisit", taskType.isFirstVisit());
-        map.put("lastVisit", taskType.isLastVisit());*/
         map.put("clientPresenceRequired", taskType.isClientPresenceRequired());
         map.put("deliverOutsideUnitHours", taskType.isDeliverOutsideUnitHours());
         return map;
@@ -653,10 +593,6 @@ public class TaskTypeService extends MongoBaseService {
         if (isNullOrDeleted(taskType)) {
             return null;
         }
-        /*List<String> taskTypeDays = new ArrayList<>();
-        for (TaskTypeEnum.TaskTypeDays taskTypeDay : taskType.getForbiddenDays()) {
-            taskTypeDays.add(taskTypeDay.value);
-        }*/
         List<DayType> dayTypes= userIntegrationService.getDayTypes(unitId);
         return getDayTypeMapList(dayTypes,taskType);
     }
@@ -666,14 +602,9 @@ public class TaskTypeService extends MongoBaseService {
         if (isNullOrDeleted(taskType)) {
             return null;
         }
-        /*List<String> taskTypeDays = new ArrayList<>();
-        for (TaskTypeEnum.TaskTypeDays taskTypeDay : taskType.getForbiddenDays()) {
-            taskTypeDays.add(taskTypeDay.value);
-        }*/
         List<DayType> dayTypes= userIntegrationService.getDayTypesByCountryId(countryId);
         return getDayTypeMapList(dayTypes,taskType);
     }
-
 
     public Map<String, Object> saveTimeRules(String taskTypeId, Map<String, Object> data) {
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
@@ -745,7 +676,6 @@ public class TaskTypeService extends MongoBaseService {
         if (!exist) {
             return null;
         }
-
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
 
         TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organizationId,new BigInteger(taskTypeId),subServiceId);
@@ -756,9 +686,7 @@ public class TaskTypeService extends MongoBaseService {
         save(copyObj);
         copySlaValues(taskType,Arrays.asList(copyObj),organizationId);
         return copyObj.getBasicTaskTypeInfo();
-
     }
-
 
     public TaskType copyProperties(TaskType source, TaskType target,long organizationId,long subServiceId){
         target.setOrganizationId(organizationId);
@@ -785,42 +713,12 @@ public class TaskTypeService extends MongoBaseService {
 
     }
 
-
-    public TaskType createTimeCareTaskType(Map<String, Object> data) {
-        if (data != null) {
-            String title = String.valueOf(data.get("title"));
-            String shortName = String.valueOf(data.get("shortName"));
-            String externalId = String.valueOf(data.get("externalId"));
-            Long orgnaizationId = Long.valueOf(String.valueOf(data.get("organizationId")));
-            Long subServiceId = Long.valueOf(String.valueOf(data.get("subServiceId")));
-            String taskTypeSchedule = String.valueOf(data.get("taskTypeSchedule"));
-            String taskTypeVisibility = String.valueOf(data.get("taskTypeVisibility"));
-            Boolean isBreak = Boolean.valueOf(String.valueOf(data.get("isBreak")));
-            Boolean isExportable = Boolean.valueOf(String.valueOf(data.get("isExportable")));
-            TaskType taskType;
-            taskType = taskTypeMongoRepository.findByExternalId(externalId);
-            if (taskType == null) taskType = new TaskType();
-            taskType.setTitle(title);
-            taskType.setShortName(shortName);
-            taskType.setOfTypeBreak(isBreak);
-            taskType.setExternalId(externalId);
-            taskType.setOrganizationId(orgnaizationId);
-            taskType.setExportedToVisitour(isExportable);
-            taskType.setTaskTypeSchedule(taskTypeSchedule);
-            taskType.setTaskTypeVisibility(taskTypeVisibility);
-            taskType.setSubServiceId(subServiceId);
-            return save(taskType);
-        }
-        return null;
-    }
-
     public List<TaskType> getAllTaskTypes() {
         return taskTypeMongoRepository.findAll();
     }
 
     public TaskType findByExternalId(String externalId) {
         return taskTypeMongoRepository.findByExternalId(externalId);
-
     }
 
     public boolean deleteTaskType(String taskTypeId,long organizationId,long subServiceId){
@@ -834,13 +732,10 @@ public class TaskTypeService extends MongoBaseService {
     }
 
     public List<TaskType> getByOrganization(Long org){
-
         return taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(org,true);
     }
 
-
     public Object linkWithOrganizationTypes(String taskTypeId,Set<Long> organizationSubTypeId, boolean isSelected){
-
         //anil maurya code commented due to wrong implementation
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
         if (isNullOrDeleted(taskType)) {
@@ -854,8 +749,6 @@ public class TaskTypeService extends MongoBaseService {
         if(organizationTypeId == null){
             exceptionService.internalError("error.organization.type");
         }
-
-
         List<OrganizationDTO> organizations = userIntegrationService.getOrganizationsByOrganizationType(organizationTypeId);
         if(isSelected){
             Set<Long> subTypes = taskType.getOrganizationSubTypes();
@@ -889,51 +782,18 @@ public class TaskTypeService extends MongoBaseService {
         return true;
     }
 
-    public String getWorkPlacesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId){
-        try{
-            logger.info(" Activities---> " + getAllActivitiesResponse.getGetAllActivitiesResult().size());
-            for(TimeCareActivity activity : getAllActivitiesResponse.getGetAllActivitiesResult() ){
-
-                Map<String, Object> activityMetaData = new HashMap<>();
-                activityMetaData.put("title",activity.getName());
-                activityMetaData.put("shortName",activity.getShortName());
-                activityMetaData.put("externalId",activity.getId());
-                activityMetaData.put("organizationId",unitId);
-                activityMetaData.put("subServiceId", 1196);
-                if(activity.getIsStaffing()) activityMetaData.put("taskTypeVisibility","Present");
-                else activityMetaData.put("taskTypeVisibility", "Absent");
-                if(activity.getWholeDay()) activityMetaData.put("taskTypeSchedule","Full day");
-                else activityMetaData.put("taskTypeSchedule","Partially");
-
-                activityMetaData.put("isBreak",activity.getIsBreak());
-                activityMetaData.put("isExportable",activity.getIsExportable());
-
-                TaskType taskType = createTimeCareTaskType(activityMetaData);
-                logger.info("task type----> "+taskType.getId());
-
-            }
-            return "Received";
-        }catch (Exception exception) {
-            logger.warn("Exception while hitting rest for saving workplaces", exception);
-        }
-        return null;
-    }
-
     public boolean saveTaskTypeSlaConfig(Long unitId, String taskTypeId, TaskTypeSlaConfigDTO taskTypeSlaConfigDTO){
-
         TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(unitId,new BigInteger(taskTypeId),
                 taskTypeSlaConfigDTO.getTimeSlotId());
         if(taskTypeSlaConfig == null){
             Map<String, Object> timeSlotMap = userIntegrationService.getTimeSlotByUnitIdAndTimeSlotId(taskTypeSlaConfigDTO.getTimeSlotId());
             taskTypeSlaConfig = new TaskTypeSlaConfig(new BigInteger(taskTypeId),unitId, taskTypeSlaConfigDTO.getTimeSlotId(), timeSlotMap.get("name").toString());
         }
-
         List<SlaPerDayInfo> slaPerDayInfoList = taskTypeSlaConfig.getSlaPerDayInfo() != null ? taskTypeSlaConfig.getSlaPerDayInfo() :  new ArrayList<>();
         return updateSlaValues(slaPerDayInfoList,taskTypeSlaConfig,taskTypeSlaConfigDTO);
     }
 
     public boolean saveTaskTypeSlaConfigForCountry(Long countryId, BigInteger taskTypeId, TaskTypeSlaConfigDTO taskTypeSlaConfigDTO){
-
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
             exceptionService.internalError("error.task.type");
@@ -954,9 +814,7 @@ public class TaskTypeService extends MongoBaseService {
     }
 
     private boolean updateSlaValues(List<SlaPerDayInfo> slaPerDayInfoList,TaskTypeSlaConfig taskTypeSlaConfig,TaskTypeSlaConfigDTO taskTypeSlaConfigDTO){
-
         boolean createNewEntry = true;
-
         for(SlaPerDayInfo slaPerDayInfo : slaPerDayInfoList){
             if(slaPerDayInfo.getTaskTypeSlaDay().equals(taskTypeSlaConfigDTO.getTaskTypeSlaDay())){
                 createNewEntry = false;
@@ -964,7 +822,6 @@ public class TaskTypeService extends MongoBaseService {
                 slaPerDayInfo.setSlaEndDuration(taskTypeSlaConfigDTO.getSlaEndDuration());
             }
         }
-
         if(createNewEntry){
             SlaPerDayInfo  addSlaPerDayInfo = new SlaPerDayInfo();
             addSlaPerDayInfo.setTaskTypeSlaDay(taskTypeSlaConfigDTO.getTaskTypeSlaDay());
@@ -978,13 +835,8 @@ public class TaskTypeService extends MongoBaseService {
     }
 
 
-
     public Map<String, Object> getTaskTypeSlaConfig(Long unitId, String taskTypeId){
-
         Map<String, Object> responseMap = new HashMap();
-        //anil maurya call this code via rest template
-        //List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
-
         List<TimeSlotWrapper> currentTimeSlots= userIntegrationService.getCurrentTimeSlot();
         List<TimeSlotWrapper> timeSlots = new ArrayList<>(currentTimeSlots.size());
         List<Long> timeSlotIds = new ArrayList<>(currentTimeSlots.size());
@@ -992,10 +844,8 @@ public class TaskTypeService extends MongoBaseService {
             timeSlots.add(standredTimeSlot);
             timeSlotIds.add(standredTimeSlot.getId());
         }
-
         List<Map<String,Object>> response = new ArrayList<>();
         List<TaskTypeSlaConfig> taskTypeSlaConfigList = taskTypeSlaConfigMongoRepository.findAllByUnitIdAndTaskTypeIdAndTimeSlotIdIn(unitId,new BigInteger(taskTypeId), timeSlotIds);
-
         for(TaskTypeSlaConfig taskTypeSlaConfig : taskTypeSlaConfigList){
             Map<String,Object> customResult = new HashMap<>();
             customResult.put("id", taskTypeSlaConfig.getTimeSlotId());
@@ -1006,28 +856,21 @@ public class TaskTypeService extends MongoBaseService {
             }
             response.add(customResult);
         }
-
         responseMap.put("taskTypeSlaConfig",response);
         responseMap.put("currentTimeSlots",timeSlots);
         responseMap.put("taskTypeSlaDays",TaskTypeEnum.TaskTypeSlaDay.values());
-
         return responseMap;
-
     }
 
     public Map<String, Object> getTaskTypeSlaConfigForCountry(BigInteger taskTypeId,Long countryId){
-
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
             exceptionService.internalError("task type not found");
         }
-
         List<TimeSlot> currentTimeSlots = userIntegrationService.getTimeSlotSetsOfCountry(countryId);
         List<Long> timeSlotIds = currentTimeSlots.stream().map(currentTimeSlot -> currentTimeSlot.getId()).collect(Collectors.toList());
-
         List<TaskTypeSlaConfig> taskTypeSlaConfigList = taskTypeSlaConfigMongoRepository.findAllByUnitIdAndTaskTypeIdAndTimeSlotIdIn(taskType.getOrganizationId(),
                 taskTypeId, timeSlotIds);
-
         List<Map<String,Object>> response = new ArrayList<>();
         for(TaskTypeSlaConfig taskTypeSlaConfig : taskTypeSlaConfigList){
             Map<String,Object> customResult = new HashMap<>();
@@ -1038,14 +881,11 @@ public class TaskTypeService extends MongoBaseService {
             }
             response.add(customResult);
         }
-
         Map<String,Object> responseMap = new HashMap<>();
         responseMap.put("taskTypeSlaConfig",response);
         responseMap.put("currentTimeSlots",currentTimeSlots);
         responseMap.put("taskTypeSlaDays",TaskTypeEnum.TaskTypeSlaDay.values());
-
         return responseMap;
-
     }
 
     private boolean isNullOrDeleted(TaskType taskType){
@@ -1054,7 +894,6 @@ public class TaskTypeService extends MongoBaseService {
         }
         return false;
     }
-
 
     public Map<String, Object> uploadPhoto(String taskTypeId, MultipartFile multipartFile) {
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
@@ -1075,19 +914,6 @@ public class TaskTypeService extends MongoBaseService {
 
     }
 
-
-
-    /**
-     *  @auther anil m2
-     *
-     * @param organizationId
-     * @return
-     */
-    public List<TaskType> getTaskTypesByOrganization(Long organizationId){
-        return taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId,true);
-    }
-
-
     /**
      *
      * @param id
@@ -1096,12 +922,10 @@ public class TaskTypeService extends MongoBaseService {
      * @return
      */
     public HashMap<String, Object> getTaskTypes(long id, long subServiceId,String type) {
-
         List<TaskTypeResponseDTO> visibleTaskTypes = new ArrayList<>();;
         List<TaskTypeResponseDTO> selectedTaskTypes = new ArrayList<>();
         if(ORGANIZATION.equalsIgnoreCase(type)){
             OrganizationDTO organization= userIntegrationService.getOrganization();
-            // OrganizationDTO organization = organizationGraphRepository.findOne(id);
             if (organization == null) {
                 return null;
             }
@@ -1144,7 +968,6 @@ public class TaskTypeService extends MongoBaseService {
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeByTeamIdAndSubServiceAndIsEnabled(id,subServiceId,true));
 
         }
-
         HashMap<String,Object> response = new HashMap<>();
         response.put("parentOrganizationTypes",visibleTaskTypes);
         response.put("unitTaskTypes",selectedTaskTypes);
@@ -1163,7 +986,6 @@ public class TaskTypeService extends MongoBaseService {
      * @return
      */
     public Map<String,Object> updateTaskType(long id, long subServiceId, String taskTypeId, boolean isSelected, String type) throws CloneNotSupportedException {
-
         if(ORGANIZATION.equalsIgnoreCase(type)){
             if(isSelected){
                 linkTaskTypesWithOrg(taskTypeId,id,subServiceId);
@@ -1194,9 +1016,7 @@ public class TaskTypeService extends MongoBaseService {
      * @return
      */
     public Map<String, Object> getTaskTypeList(List<Long> serviceIds,long orgId){
-
         Map<String, Object> response = new HashMap<>();
-        //  List<TaskType> taskTypes = taskTypeMongoRepository.findBySubServiceIdInAndOrganizationIdAndIsEnabled(serviceIds, orgId, true);
         List<TaskType> taskTypes = taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(orgId,true);
         List<Map<String, Object>> taskTypeList = new ArrayList<>(taskTypes.size());
         for (TaskType taskType : taskTypes) {
@@ -1238,15 +1058,11 @@ public class TaskTypeService extends MongoBaseService {
         });
         save(newTaskTypes);
         copySlaValues(taskType,newTaskTypes,taskType.getOrganizationId());
-
         return newTaskTypes.stream().map(newTaskType->new TaskTypeDTO(newTaskType.getTitle(),
                 newTaskType.getExpiresOn(),newTaskType.getDescription(),newTaskType.getId(),newTaskType.isEnabled())).collect(Collectors.toList());
     }
 
     private void copySlaValues(TaskType taskType,List<TaskType> clonedTaskTypes,Long unitId) throws CloneNotSupportedException {
-
-        System.out.println("Copying SLA values " + unitId + " task type id " + taskType.getId());
-
         List<TaskTypeSlaConfig> slaPerDayInfos = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeId(taskType.getOrganizationId(),taskType.getId());
         List<TaskTypeSlaConfig> clonedTaskTypeSlaDayConfigs = new ArrayList<>(slaPerDayInfos.size());
         for(TaskType clonedTaskType : clonedTaskTypes){
@@ -1260,25 +1076,15 @@ public class TaskTypeService extends MongoBaseService {
         if(!clonedTaskTypeSlaDayConfigs.isEmpty()){
             save(clonedTaskTypeSlaDayConfigs);
         }
-
     }
-
-    /*public TaskTypeSettingDTO createTaskTypeSetting(TaskTypeSettingDTO taskTypeSettingDTO){
-        TaskTypeSetting taskTypeSetting = new TaskTypeSetting(taskTypeSettingDTO.getStaffId(),taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());
-        save(taskTypeSetting);
-        taskTypeSettingDTO.setId(taskTypeSetting.getId());
-        return taskTypeSettingDTO;
-    }*/
 
     public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId, TaskTypeSettingDTO taskTypeSettingDTO){
         TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
             taskTypeSetting = new TaskTypeSetting(staffId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());
         }
-        //TaskType taskType = taskTypeMongoRepository.findOne(taskTypeSettingDTO.getTaskTypeId());
         taskTypeSetting.setEfficiency(taskTypeSettingDTO.getEfficiency());
         save(taskTypeSetting);
-        //taskTypeSettingDTO.setTaskTypeName(taskType.getTitle());
         taskTypeSettingDTO.setId(taskTypeSetting.getId());
         return taskTypeSettingDTO;
     }
@@ -1301,11 +1107,6 @@ public class TaskTypeService extends MongoBaseService {
         taskTypeSettingDTO.setId(taskTypeSetting.getId());
         return taskTypeSettingDTO;
     }
-
-    /*public List<TaskTypeSettingDTO> getTaskTypeSettingByStaff(Long staffId){
-        return taskTypeSettingMongoRepository.findByStaffId(staffId);
-    }*/
-
 
     public TaskTypeSettingWrapper getTaskTypeByOrganisationAndStaffSetting(Long organisationId, Long staffId){
         List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByStaffId(staffId);
@@ -1340,8 +1141,6 @@ public class TaskTypeService extends MongoBaseService {
         });
         return serviceIds;
     }
-
-
 
 }
 

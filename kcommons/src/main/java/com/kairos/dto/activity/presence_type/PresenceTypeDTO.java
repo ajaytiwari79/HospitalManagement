@@ -2,9 +2,8 @@ package com.kairos.dto.activity.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 /**
@@ -15,8 +14,7 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PresenceTypeDTO {//extends UserBaseEntity {
-    @NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty")
-    @NotNull(message = "error.PresenceTypeDTO.name.notnull")
+    @NotBlank(message = "error.PresenceTypeDTO.name.notEmpty")
     private String name;
     private BigInteger id;
     private String imageName;
@@ -33,7 +31,7 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
     public PresenceTypeDTO() {
     }
 
-    public PresenceTypeDTO(@NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty") @NotNull(message = "error.PresenceTypeDTO.name.notnull") String name, BigInteger id) {
+    public PresenceTypeDTO(@NotBlank(message = "error.PresenceTypeDTO.name.notEmpty") String name, BigInteger id) {
         this.name = name;
         this.id = id;
     }

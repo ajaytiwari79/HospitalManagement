@@ -41,7 +41,6 @@ import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
@@ -324,12 +323,6 @@ public class UserIntegrationService {
     //SkillRestClient
     public List<Map<String, Object>> getSkillsOfOrganization(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
-        });
-    }
-
-    //StaffRestClient
-    public Map<String, Object> getTeamStaffAndStaffSkill(List<Long> staffIds) {
-        return genericRestClient.publishRequest(staffIds, null, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_SKILL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
         });
     }
 

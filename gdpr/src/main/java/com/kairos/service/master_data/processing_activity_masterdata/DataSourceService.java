@@ -45,7 +45,7 @@ public class DataSourceService {
      */
     public List<DataSourceDTO> createDataSource(Long countryId, List<DataSourceDTO> dataSourceDTOS, boolean isSuggestion) {
         Set<String> existingDataSourceNames = dataSourceRepository.findNameByCountryIdAndDeleted(countryId);
-        Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS,existingDataSourceNames );
+        Set<String> dataSourceNames = ComparisonUtils.getNewMetaDataNames(dataSourceDTOS, existingDataSourceNames);
 
         List<DataSource> dataSources = new ArrayList<>();
         if (!dataSourceNames.isEmpty()) {
@@ -133,9 +133,8 @@ public class DataSourceService {
      * @return
      * @description method save Data Source suggested by unit
      */
-    public List<DataSourceDTO> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
-
-        return createDataSource(countryId, dataSourceDTOS, true);
+    public void saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
+        createDataSource(countryId, dataSourceDTOS, true);
     }
 
 

@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
@@ -18,8 +17,6 @@ import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -29,9 +26,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrganizationAssetTypeService {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationAssetTypeService.class);
 
 
     @Inject
@@ -70,9 +64,7 @@ public class OrganizationAssetTypeService {
             exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
         }
         checkForDuplicacyInNameOfAssetType(assetTypeDto);
-        AssetType assetType = new AssetType(assetTypeDto.getName());
-        assetType.setOrganizationId(unitId);
-        assetType.setSubAssetType(false);
+        AssetType assetType = new AssetType(assetTypeDto.getName(),  unitId, false);
         List<Risk> assetTypeRisks = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeDto.getSubAssetTypes())) {
             List<AssetType> subAssetTypeList = buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, assetTypeDto.getSubAssetTypes(), assetType);
@@ -97,9 +89,7 @@ public class OrganizationAssetTypeService {
         List<AssetType> subAssetTypes = new ArrayList<>();
         List<Risk> subAssetRisks = new ArrayList<>();
         for (AssetTypeOrganizationLevelDTO subAssetTypeDto : subAssetTypesDto) {
-            AssetType subAssetType = new AssetType(subAssetTypeDto.getName());
-            subAssetType.setSubAssetType(true);
-            subAssetType.setOrganizationId(unitId);
+            AssetType subAssetType = new AssetType(subAssetTypeDto.getName(),  unitId, true);
             subAssetType.setAssetType(assetType);
             subAssetType.setHasSubAssetType(false);
             for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
@@ -342,17 +332,14 @@ public class OrganizationAssetTypeService {
     @SuppressWarnings("unchecked")
     private Map<String, AssetTypeBasicDTO> createAssetTypeAndSubAssetTypeWithBasicDetail(Long unitId, AssetTypeBasicDTO assetTypeBasicDTO) {
 
-        AssetType assetType = new AssetType(assetTypeBasicDTO.getName());
-        assetType.setOrganizationId(unitId);
+        AssetType assetType = new AssetType(assetTypeBasicDTO.getName(),unitId,false);
         List<AssetType> subAssetTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(assetTypeBasicDTO.getSubAssetTypes())) {
             for (AssetTypeBasicDTO subAssetTypeDTO : assetTypeBasicDTO.getSubAssetTypes()) {
-                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
-                subAssetType.setOrganizationId(unitId);
+                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName(),unitId,true);
                 subAssetType.setAssetType(assetType);
                 subAssetType.setSuggestedDate(LocalDate.now());
                 assetType.setHasSubAssetType(true);
-                subAssetType.setSubAssetType(true);
                 subAssetTypes.add(subAssetType);
             }
         }

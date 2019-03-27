@@ -72,7 +72,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,7 +107,7 @@ public class ActivityService extends MongoBaseService {
     private ActivityCategoryRepository activityCategoryRepository;
     @Inject
     private ShiftService shiftService;
-    @Autowired
+    @Inject
     private PhaseService phaseService;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
@@ -126,7 +125,7 @@ public class ActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Autowired
+    @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -400,16 +399,17 @@ public class ActivityService extends MongoBaseService {
         }
         organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
         organizationActivityService.verifyTeamActivity(activityMatched,activity);
+        List<Activity> activityList=activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k->k.getActivity().getId()).collect(Collectors.toSet()));
 
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
-        updateCompositeActivity(activityMatched, activity, compositeActivities);
+        updateCompositeActivity(activityList, activity, compositeActivities);
         save(activity);
         return compositeShiftActivityDTOs;
     }
 
-    private void updateCompositeActivity(List<ActivityWrapper> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
-        Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v.getActivity()));
+    private void updateCompositeActivity(List<Activity> activityList, Activity activity, List<CompositeActivity> compositeActivities) {
+        Map<BigInteger, Activity> activityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
             Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
@@ -419,9 +419,8 @@ public class ActivityService extends MongoBaseService {
                 compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
             }
         }
-        if (!activityMatched.isEmpty()) {
-            List<Activity> activities=activityMatched.stream().map(k->k.getActivity()).collect(Collectors.toList());
-            save(activities);
+        if (isCollectionNotEmpty(activityList)) {
+            save(activityList);
         }
     }
 
@@ -948,6 +947,11 @@ public class ActivityService extends MongoBaseService {
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
+    }
+
+    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
+        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
+        return activityTypeList;
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {

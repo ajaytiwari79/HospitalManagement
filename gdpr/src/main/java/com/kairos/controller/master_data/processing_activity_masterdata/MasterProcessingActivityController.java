@@ -8,16 +8,12 @@ import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,8 +23,6 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 @Api(API_ORGANIZATION_COUNTRY_URL)
 class MasterProcessingActivityController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterProcessingActivityController.class);
 
     @Inject
     private MasterProcessingActivityService masterProcessingActivityService;
@@ -85,7 +79,7 @@ class MasterProcessingActivityController {
 
     @ApiOperation(value = "unlink risk from Processing Activity ")
     @DeleteMapping("/master_processing_activity/{processingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
+    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable Long processingActivityId, @PathVariable Long riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, processingActivityId, riskId));
     }
 

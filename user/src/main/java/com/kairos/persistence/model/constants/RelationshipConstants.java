@@ -21,7 +21,6 @@ public abstract class RelationshipConstants {
 
     // Organization
     public final static String COUNTRY = "BELONGS_TO";
-    public final static String HAS_GROUP = "HAS_GROUP";
     public final static String HAS_SETTING = "HAS_SETTING";
     public final static String TYPE_OF = "TYPE_OF";
     public final static String SUB_TYPE_OF = "SUB_TYPE_OF";
@@ -48,7 +47,7 @@ public abstract class RelationshipConstants {
     // Group
     public final static String GROUP_HAS_SKILLS = "GROUP_HAS_SKILLS";
     public final static String GROUP_HAS_SERVICES = "GROUP_HAS_SERVICES";
-    public final static String HAS_TEAM = "HAS_TEAM";
+    public final static String HAS_TEAMS = "HAS_TEAMS";
 
     // Team
     public final static String TEAM_HAS_SKILLS = "TEAM_HAS_SKILLS";

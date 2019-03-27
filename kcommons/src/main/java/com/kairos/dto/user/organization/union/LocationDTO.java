@@ -11,8 +11,7 @@ import java.util.List;
 public class LocationDTO {
 
     private Long id;
-    @NotEmpty(message="message.location.name.null")
-    @NotNull(message="message.location.name.null")
+    @NotEmpty(message="message.location.name.blank")
     private String name;
 
     private ContactAddressDTO address;

@@ -132,8 +132,8 @@ public class DataDisposalService {
      * @return
      * @description method save data disposal suggested by unit
      */
-    public List<DataDisposalDTO> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
-        return createDataDisposal(countryId, dataDisposalDTOS, true);
+    public void saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+        createDataDisposal(countryId, dataDisposalDTOS, true);
     }
 
 

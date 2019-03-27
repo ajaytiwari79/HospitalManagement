@@ -7,12 +7,10 @@ import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.risk_management.Risk;
-import com.kairos.response.dto.common.RiskResponseDTO;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

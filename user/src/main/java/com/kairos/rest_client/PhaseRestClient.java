@@ -1,12 +1,9 @@
 package com.kairos.rest_client;
 
-import com.kairos.dto.activity.phase.PhaseAndActivityTypeWrapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.util.List;
 
-import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
-
 /**
  * Created by vipul on 25/9/17.
  */
@@ -27,7 +22,7 @@ import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 public class PhaseRestClient {
     private static final Logger logger = LoggerFactory.getLogger(PhaseRestClient.class);
 
-    @Autowired
+    @Inject
     RestTemplate restTemplate;
 
 

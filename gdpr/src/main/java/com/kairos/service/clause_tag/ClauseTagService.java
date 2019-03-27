@@ -6,8 +6,6 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 

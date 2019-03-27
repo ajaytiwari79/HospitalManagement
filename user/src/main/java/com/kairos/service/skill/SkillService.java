@@ -83,7 +83,7 @@ public class SkillService {
     private CitizenStatusService citizenStatusService;
     @Inject
     private EnvConfig envConfig;
-    @Autowired
+    @Inject
     SkillServiceTemplateClient skillServiceTemplateClient;
     @Inject
     private TimeSlotService timeSlotService;
@@ -548,7 +548,6 @@ public class SkillService {
     }
 
     public List<Map<String, Object>> getSkillsOfOrganization(long organizationId) {
-        ;
         return organizationGraphRepository.getSkillsOfOrganization(organizationId);
     }
 

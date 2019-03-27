@@ -570,10 +570,15 @@ public class ShiftService extends MongoBaseService {
                 activity.setPlannedMinutes(activity.getScheduledMinutes() + activity.getTimeBankCtaBonusMinutes());
             }
         }
+        UserAccessRoleDTO userAccessRoleDTO;
         if (isNotNull(staffAdditionalInfoDTO)) {
             shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts, staffAdditionalInfoDTO.getUnitPosition().getStartDate(), endDate, staffAdditionalInfoDTO);
-            shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts,staffAdditionalInfoDTO.getUserAccessRoleDTO());
+            userAccessRoleDTO = staffAdditionalInfoDTO.getUserAccessRoleDTO();
+
+        }else {
+             userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         }
+        shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts,userAccessRoleDTO);
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }

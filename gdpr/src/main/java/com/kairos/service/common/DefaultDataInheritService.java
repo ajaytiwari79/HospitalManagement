@@ -1,7 +1,6 @@
 package com.kairos.service.common;
 
 
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.OrgTypeSubTypeServiceCategoryVO;
 import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
@@ -47,9 +46,6 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.data_subject_management.DataCategoryService;
@@ -64,10 +60,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -270,7 +264,6 @@ public class DefaultDataInheritService {
         callables.add(dataDisposalCreationlTask);
         callables.add(hostingProviderCreationTask);
         callables.add(hostingTypeCreationTask);
-        //callables.add(questionnaireTemplateTask);
         asynchronousService.executeAsynchronously(callables);
         return true;
     }
@@ -279,34 +272,31 @@ public class DefaultDataInheritService {
     private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> masterQuestionnaireTemplates, Map<Long, AssetType> masterAssetTypeMapWithUnitAssetTypeObject) {
         List<QuestionnaireTemplate> unitQuestionnaireTemplates = new ArrayList<>();
         masterQuestionnaireTemplates.forEach(masterQuestionnaireTemplate -> {
-            QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(masterQuestionnaireTemplate.getName(), masterQuestionnaireTemplate.getDescription(), QuestionnaireTemplateStatus.DRAFT);
-            questionnaireTemplate.setOrganizationId(unitId);
+            QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(masterQuestionnaireTemplate.getName(), masterQuestionnaireTemplate.getDescription(), masterQuestionnaireTemplate.getTemplateType(), QuestionnaireTemplateStatus.DRAFT, unitId);
             questionnaireTemplate.setDefaultAssetTemplate(masterQuestionnaireTemplate.isDefaultAssetTemplate());
-            switch (masterQuestionnaireTemplate.getTemplateType()) {
-                case ASSET_TYPE:
-                    if (!masterQuestionnaireTemplate.isDefaultAssetTemplate()) {
-                        questionnaireTemplate.setAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(masterQuestionnaireTemplate.getAssetType().getId()));
-                        Optional.ofNullable(masterQuestionnaireTemplate.getAssetSubType()).ifPresent(assetSubType -> questionnaireTemplate.setAssetSubType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
-                    } else {
-                        questionnaireTemplate.setDefaultAssetTemplate(true);
-                    }
-                    break;
-                case RISK:
-                    questionnaireTemplate.setRiskAssociatedEntity(masterQuestionnaireTemplate.getRiskAssociatedEntity());
-                    if (masterQuestionnaireTemplate.getRiskAssociatedEntity().equals(QuestionnaireTemplateType.ASSET_TYPE)) {
-                        questionnaireTemplate.setAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(masterQuestionnaireTemplate.getAssetType().getId()));
-                        Optional.ofNullable(masterQuestionnaireTemplate.getAssetSubType()).ifPresent(assetSubType -> questionnaireTemplate.setAssetSubType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
-                    }
-                    break;
+            if (masterQuestionnaireTemplate.getTemplateType().equals(QuestionnaireTemplateType.ASSET_TYPE)) {
+                if (!masterQuestionnaireTemplate.isDefaultAssetTemplate()) {
+                    questionnaireTemplate.setAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(masterQuestionnaireTemplate.getAssetType().getId()));
+                    Optional.ofNullable(masterQuestionnaireTemplate.getAssetSubType()).ifPresent(assetSubType -> questionnaireTemplate.setAssetSubType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
+                } else {
+                    questionnaireTemplate.setDefaultAssetTemplate(true);
+                }
             }
-            questionnaireTemplate.setTemplateType(masterQuestionnaireTemplate.getTemplateType());
+            if (masterQuestionnaireTemplate.getTemplateType().equals(QuestionnaireTemplateType.RISK)) {
+                if (masterQuestionnaireTemplate.getRiskAssociatedEntity().equals(QuestionnaireTemplateType.ASSET_TYPE)) {
+                    questionnaireTemplate.setAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(masterQuestionnaireTemplate.getAssetType().getId()));
+                    Optional.ofNullable(masterQuestionnaireTemplate.getAssetSubType()).ifPresent(assetSubType -> questionnaireTemplate.setAssetSubType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
+                }
+                questionnaireTemplate.setRiskAssociatedEntity(masterQuestionnaireTemplate.getRiskAssociatedEntity());
+
+            }
             if (CollectionUtils.isNotEmpty(masterQuestionnaireTemplate.getSections())) {
                 questionnaireTemplate.setSections(
                         masterQuestionnaireTemplate.getSections().stream().map(questionnaireSectionResponseDTO -> {
                             QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionResponseDTO.getTitle(), null, unitId);
-                            questionnaireSection.setQuestions(questionnaireSectionResponseDTO.getQuestions().stream().map(questionBasicResponseDTO -> {
-                                return new Question(questionBasicResponseDTO.getQuestion(), questionBasicResponseDTO.getDescription(), questionBasicResponseDTO.isRequired(), questionBasicResponseDTO.getQuestionType(), questionBasicResponseDTO.isNotSureAllowed(), null, unitId);
-                            }).collect(Collectors.toList()));
+                            questionnaireSection.setQuestions(questionnaireSectionResponseDTO.getQuestions().stream().map(questionBasicResponseDTO ->
+                                    new Question(questionBasicResponseDTO.getQuestion(), questionBasicResponseDTO.getDescription(), questionBasicResponseDTO.isRequired(), questionBasicResponseDTO.getQuestionType(), questionBasicResponseDTO.isNotSureAllowed(), null, unitId)
+                            ).collect(Collectors.toList()));
                             return questionnaireSection;
                         }).collect(Collectors.toList())
                 );
@@ -322,14 +312,11 @@ public class DefaultDataInheritService {
         List<AssetType> assetTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(masterAssetTypes)) {
             masterAssetTypes.forEach(masterAssetType -> {
-                AssetType assetType = new AssetType(masterAssetType.getName());
-                assetType.setOrganizationId(unitId);
+                AssetType assetType = new AssetType(masterAssetType.getName(),unitId,false);
                 if (CollectionUtils.isNotEmpty(masterAssetType.getSubAssetTypes())) {
                     List<AssetType> unitSubAssetTypes = new ArrayList<>();
                     masterAssetType.getSubAssetTypes().forEach(masterSubAssetType -> {
-                        AssetType assetSubType = new AssetType(masterSubAssetType.getName());
-                        assetSubType.setOrganizationId(unitId);
-                        assetSubType.setSubAssetType(true);
+                        AssetType assetSubType = new AssetType(masterSubAssetType.getName(),unitId,true);
                         assetSubType.setRisks(buildRiskForAssetType(unitId, masterSubAssetType.getRisks()));
                         assetType.setHasSubAssetType(true);
                         unitSubAssetTypes.add(assetSubType);
@@ -444,9 +431,7 @@ public class DefaultDataInheritService {
         Map<Long, DataCategory> longDataCategoryMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(dataCategories)) {
             List<DataCategory> unitDataCategories = dataCategories.stream().map(dataCategory -> {
-                DataCategory unitDataCategory = new DataCategory(dataCategory.getName(), dataCategory.getDataElements().stream().map(dataElement -> {
-                    return new DataElement(dataElement.getName(), unitId);
-                }).collect(Collectors.toList()), unitId);
+                DataCategory unitDataCategory = new DataCategory(dataCategory.getName(), dataCategory.getDataElements().stream().map(dataElement -> new DataElement(dataElement.getName(), unitId)).collect(Collectors.toList()), unitId);
                 longDataCategoryMap.put(dataCategory.getId(), unitDataCategory);
                 return unitDataCategory;
             }).collect(Collectors.toList());
@@ -454,9 +439,7 @@ public class DefaultDataInheritService {
         }
         if (CollectionUtils.isNotEmpty(dataSubjects)) {
             List<DataSubject> unitDataSubjects = dataSubjects.stream().map(dataSubject -> {
-                DataSubject subject = new DataSubject(dataSubject.getName(), dataSubject.getDescription(), dataSubject.getDataCategories().stream().map(dataCategory -> {
-                    return longDataCategoryMap.get(dataCategory.getId());
-                }).collect(Collectors.toList()));
+                DataSubject subject = new DataSubject(dataSubject.getName(), dataSubject.getDescription(), dataSubject.getDataCategories().stream().map(dataCategory -> longDataCategoryMap.get(dataCategory.getId())).collect(Collectors.toList()));
                 subject.setOrganizationId(unitId);
                 return subject;
             }).collect(Collectors.toList());

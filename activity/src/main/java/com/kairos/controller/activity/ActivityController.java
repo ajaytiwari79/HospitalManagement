@@ -391,17 +391,7 @@ public class ActivityController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithTimeTypes(countryId));
-
     }
-
-    @ApiOperation("Check rest client")
-    @GetMapping(value = "/check_rest_client")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTimeZone(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getStaff(countryId,14098L));
-
-    }
-
 
     @ApiOperation("Remove uploaded Attachments in Activity")
     @DeleteMapping(value = "/activity/{activityId}/remove_uploaded_attachments")

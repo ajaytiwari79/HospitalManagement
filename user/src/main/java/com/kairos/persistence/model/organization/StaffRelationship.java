@@ -21,34 +21,38 @@ public class StaffRelationship extends UserBaseEntity {
     private Team team;
 
     @EndNode
-    private Staff user;
+    private Staff staff;
 
 
     boolean isEnabled = true;
+
+    boolean teamLeader;
+
+    public StaffRelationship() {
+    }
+
+
+    public StaffRelationship(Team team, Staff staff) {
+        this.team = team;
+        this.staff = staff;
+    }
+
 
     public Team getTeam() {
         return team;
     }
 
+
     public void setTeam(Team team) {
         this.team = team;
     }
 
-    public Staff getUser() {
-        return user;
+    public Staff getStaff() {
+        return staff;
     }
 
-    public void setUser(Staff user) {
-        this.user = user;
-    }
-
-    public StaffRelationship(Team team, Staff user) {
-
-        this.team = team;
-        this.user = user;
-    }
-
-    public StaffRelationship() {
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 
     public void setEnabled(boolean enabled) {
@@ -69,6 +73,18 @@ public class StaffRelationship extends UserBaseEntity {
             }
             return null;
         }
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public boolean isTeamLeader() {
+        return teamLeader;
+    }
+
+    public void setTeamLeader(boolean teamLeader) {
+        this.teamLeader = teamLeader;
     }
 }
 

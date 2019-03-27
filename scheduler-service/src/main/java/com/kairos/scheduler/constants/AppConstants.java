@@ -11,6 +11,7 @@ import static com.kairos.enums.scheduler.JobSubType.*;
 public class AppConstants {
 
 
+
     public final static String SCHEDULER_PANEL_INTERVAL_STRING = ". Every {0} minutes during selected hours.";
     public final static String SCHEDULER_PANEL_RUN_ONCE_STRING = ". At {0}.";
     public final static String USER_TO_SCHEDULER_JOB_QUEUE_TOPIC = "UserToSchedulerJobQueue";
@@ -33,6 +34,7 @@ public class AppConstants {
     public static final String BODY = "Body";
     public static final String TO = "To";
     public static final String FROM = "From";
+    public static final String TIMEZONE_UTC = "UTC";
 
 
 }

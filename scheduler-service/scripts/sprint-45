@@ -1,0 +1,6 @@
+// delete job of SHIFT_REMINDER and Old Job
+
+db.schedulerPanel.updateMany({ "jobSubType" : "SHIFT_REMINDER"},{$set:{"deleted":true}})
+
+db.schedulerPanel.updateMany({"unitId":{"$nin":[ find unit id form neo4j db ]}},{$set:{"deleted":true}})
+
