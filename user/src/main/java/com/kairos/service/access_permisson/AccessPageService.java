@@ -79,8 +79,8 @@ public class AccessPageService {
         return accessPage;
     }
 
-    public List<AccessPageDTO> getMainTabs(Long countryId){
-        return accessPageRepository.getMainTabs(countryId);
+    public List<AccessPageDTO> getMainTabs(){
+        return accessPageRepository.getMainTabs();
     }
 
     public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
@@ -98,7 +98,7 @@ public class AccessPageService {
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
-    public Boolean updateAccessForOrganizationCategory(Long countryId, Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
+    public Boolean updateAccessForOrganizationCategory(Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
@@ -107,13 +107,13 @@ public class AccessPageService {
         Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
 
         if(orgCategoryTabAccessDTO.isAccessStatus()){
-            accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
-            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, countryId, isKairosHub, isUnion);
+            accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, isKairosHub, isUnion);
         } else {
-            accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
-            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId, isKairosHub, isUnion);
+            accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, isKairosHub, isUnion);
         }
-        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
+        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
 
     }
 
