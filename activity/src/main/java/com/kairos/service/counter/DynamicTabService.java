@@ -1,8 +1,9 @@
 package com.kairos.service.counter;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.counter.KPIDashboard;
@@ -10,19 +11,13 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.mockito.ArgumentMatchers.isNotNull;
 
 @Service
 public class DynamicTabService extends MongoBaseService {
@@ -79,7 +74,7 @@ public class DynamicTabService extends MongoBaseService {
         }
         List<StaffDTO> staffDTOS = userIntegrationService.getStaffListByUnit();
         if(ConfLevel.UNIT.equals(level)){
-            createTabsForStaff(kpiDashboards,staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
+            createTabsForStaff(unitId,kpiDashboards,staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
@@ -94,7 +89,7 @@ public class DynamicTabService extends MongoBaseService {
         refId = ConfLevel.UNIT.equals(level) ? unitId : (ConfLevel.STAFF.equals(level) ? staffId : countryId);
         List<String> formattedNames = new ArrayList<>();
         dashboardTabs.forEach(dashboardTab -> formattedNames.add(dashboardTab.trim().toLowerCase()));
-        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
+        List<KPIDashboardDTO> kpiDashboardDTOS =ConfLevel.STAFF.equals(level) ? counterRepository.getKPIDashboardsOfStaffs(unitId,ConfLevel.STAFF, Arrays.asList(staffId)): counterRepository.getKPIDashboard(null, level, refId);
         List<KPIDashboardDTO> duplicateEntries = new ArrayList<>();
         kpiDashboardDTOS.forEach(kpiDashboardDTO -> {
             if (formattedNames.contains(kpiDashboardDTO.getName().trim().toLowerCase())) {
@@ -129,8 +124,7 @@ public class DynamicTabService extends MongoBaseService {
         List<KPIDashboardDTO> existingDashboardTab = getExistingDashboardTab(dashboardTabs.getUpdateDashboardTab(), level, refId);
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
         List<String> deletableCategoryIds = deletableDashboardTab.stream().filter(k->!k.isDefaultTab()).map(kpiCategoryDTO -> kpiCategoryDTO.getModuleId()).collect(Collectors.toList());
-        // counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
-        counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class);
+        counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class,level);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
@@ -163,9 +157,9 @@ public class DynamicTabService extends MongoBaseService {
         return save(kpiDashboards);
     }
 
-    private void createTabsForStaff(List<KPIDashboard> kpiDashboards,List<Long> staffIds){
+    private void createTabsForStaff(Long unitId,List<KPIDashboard> kpiDashboards,List<Long> staffIds){
         List<KPIDashboard> dashboards=new ArrayList<>();
-        List<KPIDashboardDTO> dashboardDTOList=counterRepository.getKPIDashboardsOfStaffs(ConfLevel.STAFF,staffIds);
+        List<KPIDashboardDTO> dashboardDTOList=counterRepository.getKPIDashboardsOfStaffs(unitId,ConfLevel.STAFF,staffIds);
         Map<String,KPIDashboardDTO> nameAndKPIDashBoardMap=dashboardDTOList.stream().collect(Collectors.toMap(k->k.getName().trim().toLowerCase()+k.getStaffId(),v->v,(first,second)->second));
         kpiDashboards.forEach(kpiDashboard -> {
             List<KPIDashboard> kpiDashboardList=new ArrayList<>();

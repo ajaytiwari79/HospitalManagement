@@ -2,8 +2,6 @@ package com.kairos.commons.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.List;
-
 /**
  * Created by prabjot on 24/8/17.
  */

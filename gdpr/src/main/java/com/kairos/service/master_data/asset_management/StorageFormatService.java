@@ -137,8 +137,8 @@ public class StorageFormatService{
      * @param storageFormatDTOS
      * @return
      */
-    public List<StorageFormatDTO> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
-        return createStorageFormat(countryId, storageFormatDTOS,true);
+    public void saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
+        createStorageFormat(countryId, storageFormatDTOS,true);
     }
 
 

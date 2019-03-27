@@ -51,6 +51,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -143,6 +144,8 @@ public class StaffRetrievalService {
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private StaffAddressService staffAddressService;
+    @Inject
+    private TeamGraphRepository teamGraphRepository;
 
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId, String type) {
@@ -227,6 +230,7 @@ public class StaffRetrievalService {
         map.put("costHour", staff.getCostHour());
         map.put("costHourOvertime", staff.getCostHourOvertime());
         map.put("capacity", staff.getCapacity());
+        map.put("teamIdsOfStaff", teamGraphRepository.getTeamsOfStaff(staff.getId()));
         return map;
     }
 
@@ -290,18 +294,18 @@ public class StaffRetrievalService {
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         Long staffId = getStaffIdOfLoggedInUser(unitId);
         long loggedinUserId = UserContext.getUserDetails().getId();
-        Boolean isCountryAdmin = false;
+        Boolean isSuperAdmin = false;
         staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         if (!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()) {
             staffAccessGroupQueryResult = new StaffAccessGroupQueryResult();
-            isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+            isSuperAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.SUPER_ADMIN);
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
             staffAccessGroupQueryResult.setCountryId(organizationGraphRepository.getCountryId(parentOrganization.getId()));
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
-        staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
+        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }
@@ -317,34 +321,15 @@ public class StaffRetrievalService {
 
     public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, StaffFilterDTO staffFilterDTO, String moduleId) {
 
-        List<StaffPersonalDetailDTO> staff = null;
-        Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerTypeDTO> engineerTypes = null;
         Map<String, Object> map = new HashMap<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-//            staff = getStaffWithBasicInfo(id, allStaffRequired);
             map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId).getStaffList());
             roles = accessGroupService.getAccessGroups(unitId);
-            countryId = countryGraphRepository.getCountryIdByUnitId(id);
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
-        } else if (GROUP.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
-            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
-            roles = accessGroupService.getAccessGroups(organization.getId());
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
-            roles = accessGroupService.getAccessGroups(organization.getId());
-            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
-        }
-
-
-        if (Optional.ofNullable(staff).isPresent()) {
-            map.put("staffList", staff);
         }
         map.put("roles", roles);
+        List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
+        map.put("teamList", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
         return map;
     }
 
@@ -465,11 +450,6 @@ public class StaffRetrievalService {
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
-        } else if (GROUP.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
-            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
-            roles = accessGroupService.getAccessGroups(organization.getId());
         } else if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
@@ -489,7 +469,7 @@ public class StaffRetrievalService {
      * */
 
     // TODO NEED TO FIX map
-    public List<Map<String, Object>> getStaffWithBasicInfo(long unitId) {
+    public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);

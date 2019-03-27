@@ -2,7 +2,6 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.*;
@@ -17,12 +16,12 @@ import com.kairos.persistence.model.embeddables.SubServiceCategory;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
+import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 
 
@@ -44,7 +42,7 @@ public class MasterProcessingActivityService {
     private ExceptionService exceptionService;
 
     @Inject
-    private RiskService riskService;
+    private RiskRepository riskRepository;
 
     @Inject
     private GenericRestClient restClient;
@@ -181,7 +179,7 @@ public class MasterProcessingActivityService {
             subProcessingActivityList.addAll(createNewSubProcessingActivity(countryId, createNewSubProcessingActivities, parentProcessingActivity));
         }
         if (!updateSubProcessingActivities.isEmpty()) {
-            subProcessingActivityList.addAll(updateSubProcessingActivities(countryId, updateSubProcessingActivities, parentProcessingActivity));
+            subProcessingActivityList.addAll(updateSubProcessingActivities( updateSubProcessingActivities, parentProcessingActivity));
         }
         return subProcessingActivityList;
 
@@ -189,12 +187,11 @@ public class MasterProcessingActivityService {
 
 
     /**
-     * @param countryId
      * @param subProcessingActivities  list of existing Sub processing activities
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return map which contain list of ids and list of sub processing activities
      */
-    private List<MasterProcessingActivity> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
+    private List<MasterProcessingActivity> updateSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivity parentProcessingActivity) {
 
 
         Map<Long, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
@@ -316,9 +313,7 @@ public class MasterProcessingActivityService {
             masterProcessingActivity.setRisks(processingActivityRisks);
         }
         if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {
-            processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivity -> {
-                createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(countryId, subProcessingActivity.getId(), subProcessingActivity);
-            });
+            processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivity -> createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(countryId, subProcessingActivity.getId(), subProcessingActivity));
         }
         masterProcessingActivityRepository.save(masterProcessingActivity);
         return processingActivityRiskDTO;
@@ -330,16 +325,20 @@ public class MasterProcessingActivityService {
      * @param processingActivityId
      * @return
      */
-    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId, BigInteger processingActivityId, BigInteger riskId) {
-        //TODO
-       /* MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryId(countryId, processingActivityId);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId, Long processingActivityId, Long riskId) {
 
+        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
         }
-        processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.safeDeleteById(riskId);
-        masterProcessingActivityRepository.save(processingActivity);*/
+        Risk linkedRisk = processingActivity.getRisks().stream().filter(risk -> risk.getId().equals(riskId)).findFirst().orElse(null);
+        if (linkedRisk != null) {
+            processingActivity.getRisks().remove(linkedRisk);
+            riskRepository.delete(linkedRisk);
+        } else {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.risk", processingActivityId);
+        }
+        masterProcessingActivityRepository.save(processingActivity);
         return true;
 
     }
@@ -351,8 +350,7 @@ public class MasterProcessingActivityService {
      */
     public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityWithSubProcessingActivitiesAndRisks(Long countryId) {
         List<MasterProcessingActivity> masterProcessingActivities = masterProcessingActivityRepository.findAllByCountryId(countryId);
-        List<MasterProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = prepareMasterProcessingActivityRiskResponseDTOData(masterProcessingActivities, true);
-        return processingActivityRiskResponseDTOS;
+        return prepareMasterProcessingActivityRiskResponseDTOData(masterProcessingActivities, true);
     }
 
     private List<MasterProcessingActivityRiskResponseDTO> prepareMasterProcessingActivityRiskResponseDTOData(List<MasterProcessingActivity> processingActivities, boolean isParentProcessingActivity) {

@@ -17,8 +17,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -168,12 +166,6 @@ public class AssetTypeService{
         return assetTypesWithAllData;
     }
 
-    public void findAndSaveAllAssetTypeWithSubAssetTypeAndRiskNotAssociatedWithAssetForUnitLevel(Long countryId, Long unitId){
-        List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypesNotAssociatedWithAsset(countryId);
-        List unitLevelAssetTypes = prepareAssetTypeDataForUnitLevel(assetTypes, unitId, false, null);
-        assetTypeRepository.saveAll(unitLevelAssetTypes);
-    }
-
 
     public List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType,AssetType parentAssetType){
         List<AssetType> unitLevelAssetTypes = new ArrayList<>();
@@ -240,9 +232,7 @@ public class AssetTypeService{
      */
     private AssetTypeRiskResponseDTO buildAssetTypeOrSubTypeResponseData(AssetType assetType){
             List<AssetTypeRiskResponseDTO> subAssetTypeData = new ArrayList<>();
-            AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO();
-            assetTypeRiskResponseDTO.setId(assetType.getId());
-            assetTypeRiskResponseDTO.setName(assetType.getName());
+            AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO(assetType.getId(),assetType.getName());
             assetTypeRiskResponseDTO.setHasSubAsset(assetType.isHasSubAssetType());
             if(!assetType.getRisks().isEmpty()){
                 assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));

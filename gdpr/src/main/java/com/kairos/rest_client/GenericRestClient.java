@@ -31,31 +31,8 @@ public class GenericRestClient {
     @Autowired
     private
     RestTemplate restTemplate;
-    @Inject private ExceptionService exceptionService;
-
-    public <T, V> V publish(T t, Long id, boolean isOrganization, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isOrganization,id);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl +  getURI(t,uri,queryParams),
-                            getHttpMethod(integrationOperation),
-                            t==null?null:new HttpEntity<>(t), typeReference,pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
-    }
+    @Inject
+    private ExceptionService exceptionService;
 
     private static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
         switch (integrationOperation) {
@@ -67,21 +44,22 @@ public class GenericRestClient {
                 return HttpMethod.PUT;
             case GET:
                 return HttpMethod.GET;
-            default:return null;
+            default:
+                return null;
 
         }
     }
 
 
     public <T, V> V publishRequest(T t, Long id, boolean isOrganization, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isOrganization,id)+uri;
-        String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
+        final String baseUrl = getBaseUrl(isOrganization, id) + uri;
+        String url = baseUrl + getURIWithParam(queryParam).replace("%2C+", ",");
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
                             url,
                             getHttpMethod(integrationOperation),
-                            new HttpEntity<>(t), typeReference,pathParams);
+                            new HttpEntity<>(t), typeReference, pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalServerError(response.getMessage());
@@ -96,10 +74,10 @@ public class GenericRestClient {
     }
 
 
-    private String getURIWithParam(List<NameValuePair> queryParam){
+    private String getURIWithParam(List<NameValuePair> queryParam) {
         try {
-        URIBuilder builder = new URIBuilder();
-            if(queryParam!=null && !queryParam.isEmpty()) {
+            URIBuilder builder = new URIBuilder();
+            if (queryParam != null && !queryParam.isEmpty()) {
                 builder.setParameters(queryParam);
             }
             return builder.build().toString();
@@ -109,20 +87,4 @@ public class GenericRestClient {
         return null;
     }
 
-
-
-
-    private static <T> String getURI(T t, String uri, Map<String, Object> queryParams){
-        URIBuilder builder = new URIBuilder();
-
-        if(Optional.ofNullable(queryParams).isPresent()){
-            queryParams.forEach((key, value) -> builder.addParameter(key, value.toString()));
-        }
-        try {
-            uri= uri+builder.build().toString();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return uri;
-    }
 }

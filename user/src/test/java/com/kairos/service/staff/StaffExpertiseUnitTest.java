@@ -17,6 +17,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
@@ -65,6 +66,8 @@ public class StaffExpertiseUnitTest {
     OrganizationService organizationService;
     @Mock
     private StaffAddressService staffAddressService;
+    @Mock
+    private TeamGraphRepository teamGraphRepository;
 
     List<Long> expertiseIds = new ArrayList<>();
 

@@ -40,7 +40,7 @@ public class Question extends BaseEntity {
 
     public String getAttributeName() { return attributeName; }
 
-    public Question setAttributeName(String attributeName) { this.attributeName = attributeName;  return this;}
+    public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
     public Long getCountryId() {
         return countryId;

@@ -5,25 +5,19 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.dto.user.staff.permission.StaffPermissionDTO;
-import com.kairos.dto.user.staff.permission.StaffTabPermission;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.position.AccessPermissionAccessPageRelation;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.*;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageLanguageRelationShipRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
-import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by prabjot on 3/1/17.
@@ -50,21 +43,7 @@ public class AccessPageService {
     @Inject
     private EmploymentPageGraphRepository employmentPageGraphRepository;
     @Inject
-    private PositionGraphRepository positionGraphRepository;
-    @Inject
-    private StaffGraphRepository staffGraphRepository;
-    @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
-    @Inject
     private AccessGroupRepository accessGroupRepository;
-    @Inject
-    private TreeStructureService treeStructureService;
-    @Inject
-    private AccessPageCustomIdRepository accessPageCustomIdRepository;
-    @Inject
-    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Inject
-    private UserGraphRepository userGraphRepository;
     @Inject private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -100,26 +79,26 @@ public class AccessPageService {
         return accessPage;
     }
 
-    public List<AccessPageDTO> getMainTabs(Long countryId){
-        return accessPageRepository.getMainTabs(countryId);
+    public List<AccessPageDTO> getMainTabs(){
+        return accessPageRepository.getMainTabs();
     }
 
     public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
         return accessPageRepository.getMainTabsForUnit(unitId);
     }
 
-    public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
+    public List<AccessPageDTO> getChildTabs(Long tabId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();
         }
-        return accessPageRepository.getChildTabs(tabId, countryId);
+        return accessPageRepository.getChildTabs(tabId);
     }
 
     public Boolean updateStatus(boolean active,Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
-    public Boolean updateAccessForOrganizationCategory(Long countryId, Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
+    public Boolean updateAccessForOrganizationCategory(Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
@@ -128,13 +107,13 @@ public class AccessPageService {
         Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
 
         if(orgCategoryTabAccessDTO.isAccessStatus()){
-            accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
-            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, countryId, isKairosHub, isUnion);
+            accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, isKairosHub, isUnion);
         } else {
-            accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
-            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId, isKairosHub, isUnion);
+            accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, isKairosHub, isUnion);
         }
-        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
+        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
 
     }
 
@@ -200,23 +179,6 @@ public class AccessPageService {
         Integer lastTabIdNumber = accessPageRepository.getLastTabOrModuleIdOfAccessPage(isModule);
         return (isModule ? AppConstants.MODULE_ID_PRFIX : AppConstants.TAB_ID_PRFIX)+(Optional.ofNullable(lastTabIdNumber).isPresent() ? String.valueOf(lastTabIdNumber+1) : "1");
     }
-
-
-    private List<StaffTabPermission> getUnionOfTabPermission(List<Map<String,Object>> staffTabPermissions){
-        Map<String,StaffTabPermission> tabPermissionToProceed = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        for(Map<String,Object> tabPermission : staffTabPermissions){
-            StaffTabPermission staffTabPermission = objectMapper.convertValue(tabPermission,StaffTabPermission.class);
-            if(!tabPermissionToProceed.containsKey(staffTabPermission.getModuleId())){
-                tabPermissionToProceed.put(staffTabPermission.getModuleId(),staffTabPermission);
-            } else if(staffTabPermission.isWrite() || (staffTabPermission.isRead() && !tabPermissionToProceed.get(staffTabPermission.getId()).isRead())){
-                tabPermissionToProceed.put(staffTabPermission.getModuleId(),staffTabPermission);
-            }
-        }
-        return tabPermissionToProceed.values().stream().collect(Collectors.toList());
-    }
-
-
 
     public boolean isHubMember(Long userId){
         Boolean hubMember = accessPageRepository.isHubMember(userId);

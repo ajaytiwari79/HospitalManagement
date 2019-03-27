@@ -13,10 +13,8 @@ import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationGeneral;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
-import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -91,15 +89,11 @@ public class OrganizationController {
     @Inject
     private OpenningHourService openningHourService;
     @Inject
-    private GroupService groupService;
-    @Inject
     private TeamService teamService;
     @Inject
     private ResourceService resourceService;
     @Inject
     private OrganizationAddressService organizationAddressService;
-    @Inject
-    private DepartmentService departmentService;
     @Inject
     private OrganizationHierarchyService organizationHierarchyService;
     @Inject
@@ -210,82 +204,6 @@ public class OrganizationController {
                 unitService.getManageHierarchyData(unitId));
     }
 
-    /**
-     * assign staff to departments
-     *
-     * @param unitId
-     * @param departmentId
-     * @param staff
-     * @return
-     */
-    @ApiOperation(value = "add staff in department")
-    //@RequestMapping(value = "/{organizationId}/department/{departmentId}/staff", method = RequestMethod.POST)
-    @PostMapping(UNIT_URL+"/department/{departmentId}/staff")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createStaff(@PathVariable Long unitId, @PathVariable Long departmentId, @RequestBody Map<String, String> staff) {
-        if (unitId != null) {
-            long userId = Long.parseLong(staff.get("userId"));
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, departmentService.addStaff(unitId, departmentId, userId));
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-    }
-
-
-    /**
-     * to create department in organization
-     *
-     * @param unitId
-     * @param department
-     * @return
-     */
-
-    @ApiOperation(value = "add department in organization")
-    @PostMapping(UNIT_URL+"/department")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDepartment(@PathVariable Long unitId, @RequestBody Department department) {
-        if (unitId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, departmentService.createDepartment(unitId, department));
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-    }
-
-    @ApiOperation(value = "Get department in organization")
-    //@RequestMapping(value = "/{organizationId}/department", method = RequestMethod.GET)
-    @GetMapping(UNIT_URL+"/department")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDepartment(@PathVariable Long unitId) {
-        if (unitId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, departmentService.getDepartment(unitId));
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-    }
-
-    @ApiOperation(value = "Get Department Accessible in organization")
-    @GetMapping("/department/{departmentId}/accessible")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDepartmentAccessibleOrganization(@PathVariable Long departmentId) {
-        if (departmentId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, departmentService.getDepartmentAccessibleOrganizations(departmentId));
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-    }
-
-    /**
-     * group/
-     * this method will link departments with teams or other organization,
-     * super admin will give permission to department to manage further child organizations
-     *
-     * @param departmentId
-     * @param map          // this will contain ids of child organizations
-     */
-    @ApiOperation(value = "add staff in department")
-    @PostMapping("department/{departmentId}/manage")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public void manageOrganizationStructure(@PathVariable Long departmentId, @RequestBody Map<String, Object> map) {
-
-        List<Long> childIds = (List<Long>) map.get("childIds");
-        departmentService.manageStructure(departmentId, childIds);
-    }
 
     @ApiOperation(value = "Get skills of organization")
     @GetMapping(UNIT_URL+"/skill")
@@ -503,28 +421,12 @@ public class OrganizationController {
                 organizationService.updateOrganizationGeneralDetails(organizationGeneral, unitId));
     }
 
-    @PutMapping(UNIT_URL+"/group/general")
-    @ApiOperation("update general details of group")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateGroupGeneralDetails(@PathVariable long unitId, @Validated @RequestBody Group group) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                groupService.updateGroupGeneralDetails(unitId, group));
-    }
-
     @PutMapping(UNIT_URL+"/team/general")
     @ApiOperation("update general details of team")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 teamService.updateTeamGeneralDetails(unitId, teamDTO));
-    }
-
-    @GetMapping(UNIT_URL+"/teams")
-    @ApiOperation("Get Team of a Unit")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getUnitTeams(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                teamService.getTeamsInUnit(unitId));
     }
 
     @GetMapping(UNIT_URL+"/languages")

@@ -11,11 +11,10 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface AssetRepository extends CustomGenericRepository<Asset> {
+public interface AssetRepository extends CustomGenericRepository<Asset> ,CustomAssetRepository {
 
     @Query(value = "Select name from Asset where organizationId = ?1 and deleted = false and (assetType.id  = ?2 OR subAssetType.id = ?2)")
     List<String> findAllAssetLinkedWithAssetType(Long orgId, Long assetTypeId);
-
 
     @Query(value = "Select asset from #{#entityName} asset WHERE asset.organizationId = ?1 and asset.deleted = false and asset.active =  true order by asset.createdAt desc")
     List<Asset> findAllActiveAssetByOrganizationId(Long orgId);

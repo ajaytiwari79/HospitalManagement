@@ -4,7 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
-import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.*;
@@ -130,8 +129,8 @@ public class CounterConfService extends MongoBaseService {
         List<KPICategoryDTO> existingCategories = getExistingCategories(categories.getUpdatedCategories(), level, refId);
         List<KPICategory> kpiCategories=modifyCategories(categories.getUpdatedCategories(), existingCategories, level, refId);
         List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
-        counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
-        counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class);
+        counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class,level);
+        counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class,level);
        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiCategories, KPICategoryDTO.class);
     }
 

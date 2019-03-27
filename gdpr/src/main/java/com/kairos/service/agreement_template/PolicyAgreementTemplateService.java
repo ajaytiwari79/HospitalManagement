@@ -14,7 +14,6 @@ import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.clause.AgreementSectionClause;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepository;
@@ -23,23 +22,18 @@ import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,7 +41,6 @@ import java.util.stream.Collectors;
 @Service
 public class PolicyAgreementTemplateService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateService.class);
 
     @Inject
     private PolicyAgreementRepository policyAgreementRepository;
@@ -132,7 +125,7 @@ public class PolicyAgreementTemplateService {
         if (policyAgreementTemplate.isCoverPageAdded()) {
             policyAgreementTemplate.getCoverPageData().setCoverPageLogoUrl(coverPageLogoUrl);
         } else {
-            // policyAgreementTemplate.setCoverPageData(new CoverPageVO(coverPageLogoUrl));
+            policyAgreementTemplate.setCoverPageData(new CoverPage(coverPageLogoUrl));
             policyAgreementTemplate.setCoverPageAdded(true);
         }
 
@@ -166,15 +159,13 @@ public class PolicyAgreementTemplateService {
     public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByUnitId(Long unitId) {
 
         List<PolicyAgreementTemplate> templates = policyAgreementRepository.findAllByOrganizationId(unitId);
-        return templates.stream().map(policyAgreementTemplate -> {
-            return new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class));
-        }).collect(Collectors.toList());
+        return templates.stream().map(policyAgreementTemplate -> new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class))).collect(Collectors.toList());
     }
 
 
     /**
      * @param referenceId                - countryId or unitId
-     * @param isOrganization             isOrganization boolean to check whether referenceId id coutry id or unit id
+     * @param isOrganization             isOrganization boolean to check whether referenceId id country id or unit id
      * @param agreementTemplateId        - Agreement Template id
      * @param policyAgreementTemplateDto
      * @return
@@ -256,38 +247,6 @@ public class PolicyAgreementTemplateService {
         return agreementSectionResponseDTOS;
     }
 
-    private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
-        List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
-        Map<BigInteger, AgreementSectionClause> clauseCkEditorVOMap = new HashMap<>();
- /*       if (CollectionUtils.isNotEmpty(agreementSectionResponseDTO.getClauseCkEditorVOS())) {
-            clauseCkEditorVOMap = agreementSectionResponseDTO.getClauseCkEditorVOS().stream().collect(Collectors.toMap(ClauseCkEditorVO::getId, clauseCkEditorVO -> clauseCkEditorVO));
-        }
-        List<BigInteger> clauseIdOrderIndex = agreementSectionResponseDTO.getClauseIdOrderedIndex();
-        for (int i = 0; i < clauseIdOrderIndex.size(); i++) {
-            ClauseBasicResponseDTO clause = clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i));
-            if (clauseCkEditorVOMap.containsKey(clause.getId())) {
-                ClauseCkEditorVO clauseCkEditorVO = clauseCkEditorVOMap.get(clause.getId());
-                clause.setTitleHtml(clauseCkEditorVO.getTitleHtml());
-                clause.setDescriptionHtml(clauseCkEditorVO.getDescriptionHtml());
-            }
-            clauses.add(clause);
-        }
-        agreementSectionResponseDTO.setClauses(clauses);
-        agreementSectionResponseDTO.getClauseCkEditorVOS().clear();
-        agreementSectionResponseDTO.getClauseIdOrderedIndex().clear();*/
-    }
-
-
-    /**
-     * @param referenceId
-     * @param clauseId
-     * @description - return list of Agreement Template Conatining clause in Section and Sub Sections
-     */
-    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByReferenceIdAndClauseId(Long referenceId, boolean isOrganization, BigInteger clauseId) {
-        //TODO
-        // return policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isOrganization, clauseId);
-        return new ArrayList<>();
-    }
 
     /**
      * @param referenceId    - countryId or unitId

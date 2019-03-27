@@ -129,8 +129,8 @@ public class AccessorPartyService {
      * @return
      * @description method save Accessor Party suggested by unit
      */
-    public List<AccessorPartyDTO> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
-        return createAccessorParty(countryId, accessorPartyDTOS, true);
+    public void saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
+         createAccessorParty(countryId, accessorPartyDTOS, true);
     }
 
 

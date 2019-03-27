@@ -7,8 +7,6 @@ import com.kairos.service.data_inventory.asset.OrganizationAssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +22,6 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @Api(API_ORGANIZATION_UNIT_URL)
 class OrganizationAssetTypeController {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationAssetTypeController.class);
 
     @Inject
     private OrganizationAssetTypeService organizationAssetTypeService;
@@ -98,7 +94,6 @@ class OrganizationAssetTypeController {
     @ApiOperation("save and suggest AssetType to country admin ")
     @PostMapping(COUNTRY_URL+"/asset_type/suggest")
     public ResponseEntity<Object> saveAssetTypeAndSubAssetTypeAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId,@Valid @RequestBody AssetTypeBasicDTO assetTypeDTO) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.saveAndSuggestAssetTypeAndSubAssetTypeToCountryAdmin(unitId,countryId,assetTypeDTO));
 
     }

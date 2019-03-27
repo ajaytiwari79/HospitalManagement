@@ -11,6 +11,7 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
 import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
+import com.kairos.scheduler.constants.AppConstants;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -73,13 +74,12 @@ public class SchedulerPanelService extends MongoBaseService {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");
         if (!schedulerPanels.isEmpty()) {
-            List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
-                    collect(Collectors.toList());
             Map<Long, String> unitIdTimeZoneMap = userIntegrationService.getTimeZoneOfAllUnits();
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
                     logger.info("Inside initSchedulerPanels" + schedulerPanel.getUnitId() + " unitId = " + unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
-                    dynamicCronScheduler.setCronScheduling(schedulerPanel, unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+                    //if there is no timezone of unit/organization then we set "UTC" timezone of that unit
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel, unitIdTimeZoneMap.getOrDefault(schedulerPanel.getUnitId(), AppConstants.TIMEZONE_UTC));
                 }
             }
         }

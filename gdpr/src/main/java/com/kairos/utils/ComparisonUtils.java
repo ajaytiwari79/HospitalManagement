@@ -31,7 +31,7 @@ public class ComparisonUtils{
                     existingNamesMapData.put(name.toLowerCase(), name);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
                 throw new RuntimeException(e);
             }
             Set<String> newNamesList = new HashSet<>();
@@ -65,7 +65,7 @@ public class ComparisonUtils{
                 });
             }
         } catch (Exception ex) {
-            LOGGER.error("Error in getMetadataNameListInLowerCase::" + ex.getMessage());
+            LOGGER.info("Error in getMetadataNameListInLowerCase  {0} " , ex.getCause());
         }
         return lowerCaseNewNameList;
     }

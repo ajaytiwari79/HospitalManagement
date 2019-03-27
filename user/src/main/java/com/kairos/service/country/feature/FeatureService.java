@@ -30,18 +30,14 @@ import java.util.List;
 @Transactional
 public class FeatureService{
 
-    @Autowired
+    @Inject
     CountryGraphRepository countryGraphRepository;
-
-    @Autowired
+    @Inject
     FeatureGraphRepository featureGraphRepository;
-
-    @Autowired
+    @Inject
     VehicleGraphRepository vehicleGraphRepository;
-
-    @Autowired
+    @Inject
     ResourceGraphRepository resourceGraphRepository;
-
     @Inject
     private ExceptionService exceptionService;
 

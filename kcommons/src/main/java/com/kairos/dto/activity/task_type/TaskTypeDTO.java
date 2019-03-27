@@ -1,10 +1,8 @@
 package com.kairos.dto.activity.task_type;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskTypeDTO {
 
-    @NotNull(message = "error.Tasktype.title.notnull") @NotEmpty(message = "error.Tasktype.title.notnull")
+    @NotBlank(message = "error.Tasktype.title.notnull")
     private String title;
 
     private Date expiresOn;

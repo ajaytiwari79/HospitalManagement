@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-////@JaversSpringDataAuditable
 public interface DataCategoryRepository extends JpaRepository<DataCategory,Long> {
 
     @Query(value = "Select DC from DataCategory DC where DC.organizationId = ?1 and lower(DC.name) = lower(?2) and DC.deleted = false")

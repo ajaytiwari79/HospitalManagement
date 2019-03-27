@@ -1,13 +1,13 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -51,7 +51,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
+import static com.kairos.constants.AppConstants.SUPER_ADMIN;
 
 
 /**
@@ -213,7 +213,7 @@ public class AccessGroupService {
             // Remove AG_COUNTRY_ADMIN access group to be copied
             List<AccessGroup> accessGroups = new ArrayList<>(parent.getAccessGroups());
             for (AccessGroup accessGroup : accessGroups) {
-                if (accessGroup.getName().equals(AG_COUNTRY_ADMIN)) {
+                if (accessGroup.getName().equals(SUPER_ADMIN)) {
                     accessGroups.remove(accessGroup);
                 }
             }
@@ -467,14 +467,6 @@ public class AccessGroupService {
 
         AccessPageQueryResult readAndWritePermissionForAccessGroup = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, tabId);
 
-        // Check if new permissions are different then of Access Group
-        /*if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == read  && readAndWritePermissionForAccessGroup.isWrite() == write){
-            // CHECK if custom permission exist and then delete
-            accessGroupRepository.deleteCustomPermissionForTab(orgId, staffId, unitId, accessGroupId, tabId);
-        } else {
-            accessGroupRepository.setCustomPermissionForTab(orgId, staffId, unitId, accessGroupId, tabId, read, write);
-        }*/
-
         List<AccessPageQueryResult> accesPageList = accessPageRepository.getChildTabsAccessPermissionsByStaffAndOrg(orgId, unitId, staffId, tabId, accessGroupId);
 
         boolean parentTabRead = false, parentTabWrite = false;
@@ -693,11 +685,6 @@ public class AccessGroupService {
         return true;
     }
 
-
-    AccessGroup getCountryAccessGroupByName(Long countryId, OrganizationCategory category, String name) {
-        return accessGroupRepository.findCountryAccessGroupByNameAndCategory(countryId, name, category.toString());
-    }
-
     public Map<String, Object> getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId) {
         List<OrganizationCategoryDTO> organizationCategoryDTOS = OrganizationCategory.getListOfOrganizationCategory();
         AccessGroupCountQueryResult accessGroupCountData = accessGroupRepository.getListOfOrgCategoryWithCountryAccessGroupCount(countryId);
@@ -757,15 +744,6 @@ public class AccessGroupService {
     }
 
     /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/
-
-    // For Test Cases
-    List<Long> getAccessPageIdsByAccessGroup(Long accessGroupId) {
-        return accessGroupRepository.getAccessPageIdsByAccessGroup(accessGroupId);
-    }
-
-    Long getAccessPageIdByAccessGroup(Long accessGroupId) {
-        return accessGroupRepository.getAccessPageIdByAccessGroup(accessGroupId);
-    }
 
     public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
@@ -886,14 +864,6 @@ public class AccessGroupService {
         return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
 
-    public UserAccessRoleDTO getStaffAccessRoles(Long unitId, Long staffId) {
-        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(unitId,
-                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(), staffId),
-                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(), staffId), staffId
-        );
-        return userAccessRoleDTO;
-    }
 
     public List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId) {
         return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId, accessGroupId);

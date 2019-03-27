@@ -11,14 +11,14 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
  * Created by prabjot on 30/1/17.
  */
 @RelationshipEntity(type = HAS_ACCESS_PERMISSION)
-public class UnitEmpAccessRelationship extends UserBaseEntity {
+public class UnitPermissionAccessPermissionRelationship extends UserBaseEntity {
 
     @StartNode private UnitPermission unitPermission;
     @EndNode private AccessPermission accessPermission;
     @Property
     private boolean isEnabled  = true;
 
-    public UnitEmpAccessRelationship(UnitPermission unitPermission, AccessPermission accessPermission) {
+    public UnitPermissionAccessPermissionRelationship(UnitPermission unitPermission, AccessPermission accessPermission) {
         this.unitPermission = unitPermission;
         this.accessPermission = accessPermission;
     }

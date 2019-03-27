@@ -19,8 +19,6 @@ class AsyncConfiguration implements AsyncConfigurer {
         return  Executors.newWorkStealingPool(5);
 
     }
-
-    ExecutorService executor = Executors.newWorkStealingPool();
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

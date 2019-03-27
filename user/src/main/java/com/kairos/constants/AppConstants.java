@@ -79,7 +79,7 @@ public class AppConstants {
     public static final String PLANNER = "PLANNER";
     public static final String TASK_GIVERS = "TASK_GIVERS";
     public static final String COUNTRY_ADMIN = "COUNTRY_ADMIN";
-    public static final String AG_COUNTRY_ADMIN = "AG_COUNTRY_ADMIN";
+    public static final String SUPER_ADMIN="SUPER_ADMIN";
 
     public static final String IMAGES_PATH = "/opt/kairos/images";
     public static final String HAS_ACCESS_OF_TABS = "HAS_ACCESS_OF_TABS";
@@ -141,7 +141,7 @@ public class AppConstants {
     public static final String SKILL_CATEGORY_FOR_TIME_CARE = "Skills From TimeCare";
     public static final int DB_RECORD_LIMIT = 100;
     public static final String KAIROS_EMAIL = "@kairos.com";
-    public static final String DEFAULT_PASSWORD_ENDS_WITH = "@kairos";
+    public static final String DEFAULT_PASSPHRASE_ENDS_WITH = "@kairos";
 
 
     // Default data to import employments from time care

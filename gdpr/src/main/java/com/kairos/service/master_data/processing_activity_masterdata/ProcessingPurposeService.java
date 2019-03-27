@@ -136,8 +136,8 @@ public class ProcessingPurposeService {
      * @param processingPurposeDTOS - processing purpose suggested by unit
      * @return
      */
-    public List<ProcessingPurposeDTO> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
-        return createProcessingPurpose(countryId, processingPurposeDTOS, true);
+    public void saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+         createProcessingPurpose(countryId, processingPurposeDTOS, true);
 
     }
 
