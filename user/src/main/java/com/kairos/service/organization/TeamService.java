@@ -173,9 +173,8 @@ public class TeamService {
         return true;
     }
 
-    public Map<String, Object> getTeamDetails(Long teamId) {
-        Map<String, Object> teamDetails = teamGraphRepository.getTeamDetailsById(teamId);
-        return teamDetails;
+    public TeamDTO getTeamDetails(Long teamId) {
+        return teamGraphRepository.getTeamDetailsById(teamId);
     }
 
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
