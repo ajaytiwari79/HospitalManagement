@@ -544,7 +544,9 @@ public class ShiftValidatorService {
                 if (activityWrapper.getActivity().getRulesActivityTab().isEligibleForStaffingLevel()) {
                     int lowerLimit = 0;
                     int upperLimit = 0;
-                    List<StaffingLevelInterval> applicableIntervals =ShiftType.PRESENCE.equals(shift.getShiftType())?staffingLevel.getPresenceStaffingLevelInterval(): staffingLevel.getAbsenceStaffingLevelInterval();
+                    List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
+                    if (ShiftType.PRESENCE.equals(shift.getShiftType())) {
+                        applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
                         if (!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                             lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                             upperLimit = 95;
@@ -564,6 +566,7 @@ public class ShiftValidatorService {
                             upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
                             checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shiftActivities, checkOverStaffing, shiftActivity);
                         }
+                    }
                 }
             }
         }

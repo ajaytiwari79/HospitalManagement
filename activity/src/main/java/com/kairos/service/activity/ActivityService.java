@@ -463,7 +463,6 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
         validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
