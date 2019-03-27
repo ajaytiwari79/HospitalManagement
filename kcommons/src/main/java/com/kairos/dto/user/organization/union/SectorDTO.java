@@ -17,6 +17,14 @@ public class SectorDTO {
         this.id = id;
     }
 
+    public SectorDTO() {
+    }
+
+    public SectorDTO(Long id,@NotBlank String name) {
+        this.name = name;
+        this.id = id;
+    }
+
     public String getName() {
         return name.trim();
     }

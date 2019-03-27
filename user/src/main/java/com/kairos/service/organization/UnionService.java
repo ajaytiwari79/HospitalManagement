@@ -313,7 +313,7 @@ public class UnionService {
         }
         List<Long> sectorIds = new ArrayList<>();
         List<SectorDTO> sectorDTOS = new ArrayList<>();
-        findSectorsToBeCreateAndIdsOfExistingSectors(unionData, sectorIds, sectorDTOS);
+        filterSectorsWithIdsAndSectorWithOutId(unionData, sectorIds, sectorDTOS);
         List<Sector> sectors = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(sectorIds)) {
             sectors.addAll(sectorGraphRepository.findSectorsById(sectorIds));
@@ -325,6 +325,7 @@ public class UnionService {
         }
 
         organizationGraphRepository.save(union);
+        unionData.setSectors(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
         unionData.setId(union.getId());
         return unionData;
     }
@@ -353,13 +354,17 @@ public class UnionService {
         return sectors;
     }
 
-    private void findSectorsToBeCreateAndIdsOfExistingSectors(UnionDTO unionData, List<Long> sectorIds, List<SectorDTO> sectorDTOS) {
+    private void filterSectorsWithIdsAndSectorWithOutId(UnionDTO unionData, List<Long> sectorIds, List<SectorDTO> sectorDTOS) {
+        List<SectorDTO> sectorDTOSWithIds = new ArrayList<>();
         unionData.getSectors().forEach(sectorDTO -> {
-            if (Optional.ofNullable(sectorDTO.getId()).isPresent())
+            if (Optional.ofNullable(sectorDTO.getId()).isPresent()) {
                 sectorIds.add(sectorDTO.getId());
-            else
+                sectorDTOSWithIds.add(sectorDTO);
+            } else {
                 sectorDTOS.add(sectorDTO);
+            }
         });
+        unionData.setSectors(sectorDTOSWithIds);
     }
 
     public UnionDTO updateUnion(UnionDTO unionData, long countryId, Long unionId, boolean publish) {
@@ -382,7 +387,7 @@ public class UnionService {
         }
         List<Long> sectorIDsToBeCreated = new ArrayList<>();
         List<SectorDTO> sectorDTOS = new ArrayList<>();
-        findSectorsToBeCreateAndIdsOfExistingSectors(unionData, sectorIDsToBeCreated, sectorDTOS);
+        filterSectorsWithIdsAndSectorWithOutId(unionData, sectorIDsToBeCreated, sectorDTOS);
         Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
         List<Long> sectorIds = new ArrayList<>(sectorIDsToBeCreated);
         sectorIDsToBeCreated.removeAll(sectorIdsDb);
@@ -396,7 +401,10 @@ public class UnionService {
             organizationGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
         }
         if (!sectorDTOS.isEmpty()) {
-            union.getSectors().addAll(createSectors(countryId, sectorDTOS));
+            List<Sector> sectors = createSectors(countryId, sectorDTOS);
+            union.getSectors().addAll(sectors);
+            unionData.getSectors().addAll(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
+
         }
         ContactAddress address = null;
         boolean zipCodeUpdated = false;
