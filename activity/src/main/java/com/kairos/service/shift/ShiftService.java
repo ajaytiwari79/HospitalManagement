@@ -520,6 +520,7 @@ public class ShiftService extends MongoBaseService {
             }
             shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
         }
+        // TODO Pradeep remove when absence shift issue fix
         if(isNull(shiftWithViolatedInfoDTO)){
             shiftWithViolatedInfoDTO=new ShiftWithViolatedInfoDTO();
             shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
