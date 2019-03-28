@@ -80,8 +80,8 @@ public class TeamService {
         if (organizationContactAddress.getOrganization() == null) {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound.by.group");
         }
-        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
-        if (teamExistInOrganizationAndGroupByName) {
+        boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
+        if (teamExistInOrganizationByName) {
             exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
         }
 
@@ -139,7 +139,7 @@ public class TeamService {
         if (teamExistInOrganizationAndGroupByName) {
             exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
         }
-        Team team = teamGraphRepository.findOne(teamId);
+        Team team = teamGraphRepository.findOne(teamId,0);
         if (team != null) {
             team.setName(teamDTO.getName());
             team.setDescription(teamDTO.getDescription());

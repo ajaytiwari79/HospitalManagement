@@ -20,6 +20,7 @@ import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
@@ -542,8 +543,10 @@ public class OrganizationActivityService extends MongoBaseService {
         }
     }
 
-    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId,Long staffId){
-        List<BigInteger> activityList=userIntegrationService.getTeamActivitiesOfStaff(unitId,staffId);
-        return activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(activityList);
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId,Long staffId,List<StaffActivitySettingDTO> staffPersonalizedActivities){
+        Set<BigInteger> activityList=userIntegrationService.getTeamActivitiesOfStaff(unitId,staffId);
+        activityList.addAll(staffPersonalizedActivities.stream().map(k->k.getActivityId()).collect(Collectors.toSet()));
+         activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(new ArrayList<>(activityList));
+         return null;
     }
 }

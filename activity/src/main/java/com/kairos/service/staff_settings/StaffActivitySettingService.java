@@ -17,6 +17,8 @@ import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.service.organization.OrganizationActivityService;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -33,6 +35,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private LocaleService localeService;
     @Inject private ActivityService activityService;
+    @Inject private OrganizationActivityService organizationActivityService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
@@ -99,7 +102,10 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public List<StaffActivitySettingDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId){
-        return staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
+        List<StaffActivitySettingDTO> staffPersonalizedActivities= staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
+        List<ActivityWithCompositeDTO> activityList=organizationActivityService.getTeamActivitiesOfStaff(unitId,staffId,staffPersonalizedActivities);
+        return null;
+
     }
 
 
