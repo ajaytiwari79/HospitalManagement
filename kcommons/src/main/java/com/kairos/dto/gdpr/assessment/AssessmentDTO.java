@@ -35,7 +35,7 @@ public class AssessmentDTO {
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
-    private int relativeDeadlineDuration;
+    private Integer relativeDeadlineDuration;
     private DurationType relativeDeadlineType;
 
     public Long getId() { return id; }
@@ -82,13 +82,9 @@ public class AssessmentDTO {
 
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
-    public int getRelativeDeadlineDuration() {
-        return relativeDeadlineDuration;
-    }
+    public Integer getRelativeDeadlineDuration() { return relativeDeadlineDuration; }
 
-    public void setRelativeDeadlineDuration(int relativeDeadlineDuration) {
-        this.relativeDeadlineDuration = relativeDeadlineDuration;
-    }
+    public void setRelativeDeadlineDuration(Integer relativeDeadlineDuration) { this.relativeDeadlineDuration = relativeDeadlineDuration; }
 
     public DurationType getRelativeDeadlineType() {
         return relativeDeadlineType;

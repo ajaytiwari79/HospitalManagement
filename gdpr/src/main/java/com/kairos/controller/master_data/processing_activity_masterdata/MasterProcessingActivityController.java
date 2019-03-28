@@ -91,7 +91,7 @@ class MasterProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "Update Sugessted status of Processing Activity")
+    @ApiOperation(value = "Update Suggested status of Processing Activity")
     @PutMapping("/master_processing_activity/status")
     public ResponseEntity<Object> updateSuggestedStatusOfProcessingActivity(@PathVariable Long countryId, @PathVariable Set<Long> ids, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
@@ -100,7 +100,7 @@ class MasterProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfMasterProcessingActivities(countryId, ids, suggestedDataStatus));
     }
 
-    @ApiOperation(value = "Update Sugessted status of Processing Activity")
+    @ApiOperation(value = "Update Suggested status of sub Processing Activity")
     @PutMapping("/master_processing_activity/{processingActivityId}/subProcess/status")
     public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long processingActivityId, @RequestBody Set<Long> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(subProcessingActivityIds)) {

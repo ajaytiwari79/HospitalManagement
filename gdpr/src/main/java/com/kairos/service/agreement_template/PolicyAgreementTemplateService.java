@@ -28,8 +28,6 @@ import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +41,6 @@ import java.util.stream.Collectors;
 @Service
 public class PolicyAgreementTemplateService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateService.class);
 
     @Inject
     private PolicyAgreementRepository policyAgreementRepository;
@@ -168,7 +165,7 @@ public class PolicyAgreementTemplateService {
 
     /**
      * @param referenceId                - countryId or unitId
-     * @param isOrganization             isOrganization boolean to check whether referenceId id coutry id or unit id
+     * @param isOrganization             isOrganization boolean to check whether referenceId id country id or unit id
      * @param agreementTemplateId        - Agreement Template id
      * @param policyAgreementTemplateDto
      * @return

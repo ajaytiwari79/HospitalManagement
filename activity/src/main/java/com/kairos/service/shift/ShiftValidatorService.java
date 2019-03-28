@@ -28,6 +28,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
@@ -41,6 +42,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelActivityRankRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
@@ -123,6 +125,7 @@ public class ShiftValidatorService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private PhaseService phaseService;
     @Inject private ShiftService shiftService;
+    @Inject private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
 
 
     private static ExceptionService exceptionService;
@@ -720,7 +723,7 @@ public class ShiftValidatorService {
         String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
         ShiftState shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
         Map<BigInteger, ShiftActivity> activityMap = shiftState.getActivities().stream().filter(distinctByKey(a -> a.getId())).collect(Collectors.toMap(k -> k.getId(), v -> v));
-        boolean realtime = phaseService.shiftEdititableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
+        boolean realtime = phaseService.shiftEditableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
         if (realtime) {
             shiftDTO.getActivities().forEach(shiftActivity -> {
                 ShiftActivity shiftActivity1 = activityMap.get(shiftActivity.getId());
@@ -771,4 +774,24 @@ public class ShiftValidatorService {
         }
         return true;
     }
+
+    public boolean deleteDuplicateEntryOfShiftViolatedInfo(){
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAll();
+        Map<BigInteger,ShiftViolatedRules> longShiftViolatedRulesTreeMap = new HashMap<>();
+        List<ShiftViolatedRules> violatedRules = new ArrayList<>();
+        for (ShiftViolatedRules shiftViolatedRules1 : shiftViolatedRules) {
+            if(longShiftViolatedRulesTreeMap.containsKey(shiftViolatedRules1.getShiftId())){
+                //ShiftViolatedRules ShiftViolatedRules = longShiftViolatedRulesTreeMap.get(shiftViolatedRules1.getShiftId());
+                  //  if(ShiftViolatedRules.getUpdatedAt().after(shiftViolatedRules1.getUpdatedAt())){
+                        violatedRules.add(shiftViolatedRules1);
+                    //}
+            }else {
+                longShiftViolatedRulesTreeMap.put(shiftViolatedRules1.getShiftId(),shiftViolatedRules1);
+            }
+        }
+        logger.info("Duplicate remove entry count is "+violatedRules.size());
+        shiftViolatedRulesMongoRepository.deleteAll(violatedRules);
+        return true;
+    }
+
 }
