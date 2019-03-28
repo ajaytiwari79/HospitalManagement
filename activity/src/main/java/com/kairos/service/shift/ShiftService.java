@@ -83,6 +83,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
@@ -279,13 +280,15 @@ public class ShiftService extends MongoBaseService {
         }
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
-        shiftMongoRepository.save(shift);
         if (isNotNull(functionId) && activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
-            
+            Map<LocalDate,Long> dateAndFunctionIdMap=new HashMap<>();
+            dateAndFunctionIdMap.put(asLocalDate(shift.getStartDate()),functionId);
+            userIntegrationService.applyFunction(shift.getUnitId(),shift.getUnitPositionId(),dateAndFunctionIdMap);
         }
         else if(removeFunction){
-
+            userIntegrationService.removeFunctionFromUnitPositionByDate(shift.getUnitId(),shift.getUnitPositionId(),shift.getStartDate());
         }
+        shiftMongoRepository.save(shift);
         if (!updateShift) {
             updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
         }

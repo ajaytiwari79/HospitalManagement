@@ -199,6 +199,13 @@ public class UserIntegrationService {
         }, unitPositionId);
     }
 
+    public Boolean applyFunction(Long unitId, Long unitPositionId, Map<LocalDate, Long> dateAndFunctionIdMap) {
+
+        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLY_FUNCTION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        }, unitPositionId);
+
+    }
+
     //~ Added by mohit TODO remove comment after verification
 
     public OrganizationDTO getOrganizationDTO(Long unitId) {
