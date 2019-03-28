@@ -23,15 +23,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (org:Organization)-[:"+ HAS_TEAMS +"]->(team:Team {isEnabled:true}) WHERE id(org)={0} with team\n" +
-            "OPTIONAL MATCH (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:true}]->(teamLead:Staff) with team,teamLead\n" +
-            "RETURN COLLECT({id:id(team), name:team.name, description:team.description, teamLeaderStaffId:id(teamLead)}) as teams")
+            "RETURN COLLECT({id:id(team), name:team.name, description:team.description, teamLeaderStaffId:team.teamLeaderStaffId}) as teams")
     List<Map<String,Object>> getTeams(long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
-            "OPTIONAL MATCH (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:true}]->(teamLead:Staff) with team,teamLead\n" +
-            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) with team, teamLead,  COLLECT (id(teamMembers)) as teamMemberIds  \n"+
-            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, teamLead, teamMemberIds, COLLECT (id(skills)) as skillIds \n"+
-            "RETURN id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, teamMemberIds as teamMemberIds, skillIds as skillIds, id(teamLead) as teamLeaderStaffId")
+            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) with team,  COLLECT (id(teamMembers)) as teamMemberIds  \n"+
+            "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, teamMemberIds, COLLECT (id(skills)) as skillIds \n"+
+            "RETURN id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, teamMemberIds as teamMemberIds, skillIds as skillIds, team.teamLeaderStaffId as teamLeaderStaffId")
     TeamDTO getTeamDetailsById(long teamId);
 
     @Query("MATCH (t:Team)-[:"+TEAM_HAS_MEMBER+"]->(u:Staff) WHERE id(t)={0} RETURN u")
@@ -77,15 +75,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "]->(staff) SET r.lastModificationDate={2},r.isEnabled={3} RETURN COUNT(r) as r")
     int updateStaffTeamRelationship(long teamId, long staffId, long lastModificationDate, boolean isEnabled);
 
-
-    @Query("MATCH (team:Team),(staff:Staff) WHERE id(team)={0} AND id(staff)={1}\n" +
-           "CREATE UNIQUE (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{isEnabled:true, teamLeader:true}]->(staff)")
-    void assignTeamLeaderToTeam(long teamId, long staffId);
-
-    @Query("MATCH (team:Team),(staff:Staff) WHERE id(team)={0} AND id(staff)={1} \n" +
-            "OPTIONAL MATCH (team)-[existingStaffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:true}]->(teamStaffs:Staff) WHERE id(teamStaffs) <> {1} DETACH DELETE existingStaffTeamRel \n"+
-            "CREATE UNIQUE (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{isEnabled:true, teamLeader:true}]->(staff)")
-    void updateTeamLeaderOfTeam(long teamId, long staffId);
+    @Query("MATCH (team:Team) WHERE id(team)={0} SET team.teamLeaderStaffId={1}")
+    void updateTeamLeaderOfTeam(long teamId, long teamLeaderStaffId);
 
     @Query("MATCH (team:Team),(staff:Staff) WHERE id(team)={0} AND id(staff) IN {1}  " +
             "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
