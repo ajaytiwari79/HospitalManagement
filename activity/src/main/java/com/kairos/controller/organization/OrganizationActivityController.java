@@ -380,11 +380,4 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithCategories(unitId));
     }
 
-    @ApiOperation("Get all staff wise activities  ")
-    @GetMapping(value = "/staff/{staffId}/team_activities")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTeamActivitiesOfStaff(@PathVariable Long unitId,@PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getTeamActivitiesOfStaff(unitId,staffId));
-    }
-
 }

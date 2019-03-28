@@ -281,7 +281,7 @@ public class StaffRetrievalService {
     }
 
 
-    public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+    public List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffIds) {
         return unitPositionGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
     }
 
