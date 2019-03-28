@@ -129,7 +129,7 @@ public class TeamService {
         organizationGraphRepository.save(organization, 2);
 
         if(ObjectUtils.isNotNull(teamDTO.getTeamLeaderStaffId())){
-            teamGraphRepository.assignTeamLeaderToTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
+            teamGraphRepository.updateTeamLeaderOfTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
         }
         return teamDTO;
     }
