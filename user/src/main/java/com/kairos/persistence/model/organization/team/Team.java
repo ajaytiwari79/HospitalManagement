@@ -36,12 +36,9 @@ public class Team extends UserBaseEntity {
     @Relationship(type = TEAM_HAS_LOCATION)
     private ContactAddress contactAddress;
 
-    //@Relationship(type = PROVIDE_TASK_TYPE)
-    private List<String> taskTypeList;
-
     private boolean isEnabled = true;
-
     private Set<BigInteger> activityIds;
+    Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
     public Team() {
     }
@@ -70,14 +67,6 @@ public class Team extends UserBaseEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<String> getTaskTypeList() {
-        return taskTypeList;
-    }
-
-    public void setTaskTypeList(List<String> taskTypeList) {
-        this.taskTypeList = taskTypeList;
     }
 
     public void setContactAddress(ContactAddress contactAddress) {
@@ -111,5 +100,13 @@ public class Team extends UserBaseEntity {
 
     public void setActivityIds(Set<BigInteger> activityIds) {
         this.activityIds = activityIds;
+    }
+
+    public Long getTeamLeaderStaffId() {
+        return teamLeaderStaffId;
+    }
+
+    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
+        this.teamLeaderStaffId = teamLeaderStaffId;
     }
 }
