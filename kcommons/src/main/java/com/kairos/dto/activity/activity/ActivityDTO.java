@@ -50,6 +50,7 @@ public class ActivityDTO {
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
     private List<BigInteger> tags = new ArrayList<>();
+    private boolean allowChildActivities;
 
     public ActivityDTO() {
         //default constructor
@@ -272,6 +273,16 @@ public class ActivityDTO {
     public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
         this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
     }
+
+    public Boolean getActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public boolean isAllowChildActivities() {
+        return allowChildActivities;
+    }
+
+    public void setAllowChildActivities(boolean allowChildActivities) {
+        this.allowChildActivities = allowChildActivities;
+    }
 }
-
-
