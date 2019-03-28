@@ -168,19 +168,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds) {
 
-        String groupString = "{'$group':{'_id':{topId:'$_id','compositeActivities': { '$mergeObjects': [ { '$arrayElemAt': [ '$compositeActivitiesObject', 0 ] }, '$compositeActivities' ] },'name':'$name', generalActivityTab:'$generalActivityTab',  expertises:'$expertises', employmentTypes:'$employmentTypes', rulesActivityTab:'$rulesActivityTab', skillActivityTab:'$skillActivityTab', phaseSettingsActivityTab:'$phaseSettingsActivityTab', timeCalculationActivityTab:'$timeCalculationActivityTab',balanceSettingsActivityTab:'$balanceSettingsActivityTab'}}}";
-        String groupCompositeActivity = "{'$group':{'_id':{_id:'$_id.topId','name':'$_id.name', generalActivityTab:'$_id.generalActivityTab',  expertises:'$_id.expertises', employmentTypes:'$_id.employmentTypes', rulesActivityTab:'$_id.rulesActivityTab', skillActivityTab:'$_id.skillActivityTab' , phaseSettingsActivityTab:'$_id.phaseSettingsActivityTab', balanceSettingsActivityTab:'$_id.balanceSettingsActivityTab',timeCalculationActivityTab:'$_id.timeCalculationActivityTab'},compositeActivities:{$push:'$_id.compositeActivities'}}}";
+        String groupString = "{'$group':{'_id':{topId:'$_id','compositeActivities': { '$mergeObjects': [ { '$arrayElemAt': [ '$compositeActivitiesObject', 0 ] }, '$compositeActivities' ] },'name':'$name', generalActivityTab:'$generalActivityTab','timeTypeInfo':{ '$arrayElemAt': [ '$timeTypeInfo', 0 ] },  expertises:'$expertises', employmentTypes:'$employmentTypes', rulesActivityTab:'$rulesActivityTab', skillActivityTab:'$skillActivityTab', phaseSettingsActivityTab:'$phaseSettingsActivityTab', timeCalculationActivityTab:'$timeCalculationActivityTab',balanceSettingsActivityTab:'$balanceSettingsActivityTab'}}}";
+        String groupCompositeActivity = "{'$group':{'_id':{_id:'$_id.topId','name':'$_id.name', generalActivityTab:'$_id.generalActivityTab',  expertises:'$_id.expertises','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities', employmentTypes:'$_id.employmentTypes', rulesActivityTab:'$_id.rulesActivityTab', skillActivityTab:'$_id.skillActivityTab' , phaseSettingsActivityTab:'$_id.phaseSettingsActivityTab', balanceSettingsActivityTab:'$_id.balanceSettingsActivityTab',timeCalculationActivityTab:'$_id.timeCalculationActivityTab'},compositeActivities:{$push:'$_id.compositeActivities'}}}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("_id").in(activityIds).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "timeTypeInfo"),
                 unwind("compositeActivities", true),
                 graphLookup("activities").startWith("$compositeActivities.activityId")
                         .connectFrom("compositeActivities.activityId").connectTo("_id").maxDepth(0).as("compositeActivitiesObject"),
                 new CustomAggregationOperation(Document.parse(groupString)),
-                new CustomAggregationOperation(Document.parse(groupCompositeActivity)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
-                        "timeTypeInfo"),
-                project("generalActivityTab","timeCalculationActivityTab","compositeActivities","balanceSettingsActivityTab", "name","expertises","employmentTypes","rulesActivityTab","skillActivityTab","phaseSettingsActivityTab").and("timeTypeInfo.allowChildActivities").arrayElementAt(0).as("allowChildActivities"));
-
+                new CustomAggregationOperation(Document.parse(groupCompositeActivity)));
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
     }
