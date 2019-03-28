@@ -153,7 +153,7 @@ public class TeamService {
         return teamDTO;
     }
 
-    public boolean updateActivitiesOfTeam(Long teamId, List<BigInteger> activityIds) {
+    public boolean updateActivitiesOfTeam(Long teamId, Set<BigInteger> activityIds) {
         Team team = teamGraphRepository.findOne(teamId);
         if (team != null) {
             team.setActivityIds(activityIds);
@@ -274,7 +274,7 @@ public class TeamService {
 
     }
 
-    public boolean addTeamSelectedSkills(Long teamId, List<Long> skillIds) {
+    public boolean addTeamSelectedSkills(Long teamId, Set<Long> skillIds) {
         if(ObjectUtils.isCollectionNotEmpty(skillIds)){
             teamGraphRepository.saveSkill(teamId, skillIds);
         } else {

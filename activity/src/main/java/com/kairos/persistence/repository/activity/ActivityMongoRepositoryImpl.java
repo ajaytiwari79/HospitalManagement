@@ -44,11 +44,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private MongoTemplate mongoTemplate;
 
     public List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
-        AggregationOperation[] customAgregationForCompositeActivity = getCustomAgregationForCompositeActivityWithCategory();
-        AggregationOperation[] aggregationOperations = new AggregationOperation[customAgregationForCompositeActivity.length+1];
-        aggregationOperations[0] = match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true));
-        System.arraycopy(customAgregationForCompositeActivity,0,aggregationOperations,1,customAgregationForCompositeActivity.length);
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<AggregationOperation> customAgregationForCompositeActivity = getCustomAgregationForCompositeActivityWithCategory();
+        customAgregationForCompositeActivity.add(match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true)));
+         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
@@ -200,11 +198,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     public List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted) {
-        AggregationOperation[] customAgregationForCompositeActivity = getCustomAgregationForCompositeActivityWithCategory();
-        AggregationOperation[] aggregationOperations = new AggregationOperation[customAgregationForCompositeActivity.length+1];
-        aggregationOperations[0] = match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true));
-        System.arraycopy(customAgregationForCompositeActivity,0,aggregationOperations,1,customAgregationForCompositeActivity.length);
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
+        customAgregationForCompositeActivity.add(match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true)));
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory());
+        customAgregationForCompositeActivity.add(lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"));
+        customAgregationForCompositeActivity.add(project( "name","categoryId","categoryName").and("timeType").arrayElementAt(0).as("timeType"));
+        customAgregationForCompositeActivity.add(match(Criteria.where("timeType.partOfTeam").is(true)));
+        Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
@@ -562,7 +562,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.aggregate(aggregation, Activity.class, Activity.class).getMappedResults();
     }
 
-    private AggregationOperation[] getCustomAgregationForCompositeActivityWithCategory(){
+    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(){
         String group = "{  \n" +
                 "      \"$group\":{  \n" +
                 "         \"_id\":{  \n" +
@@ -590,17 +590,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "      }\n" +
                 "   }";
 
-        return new AggregationOperation[]{
-                lookup("activity_category", "generalActivityTab.categoryId", "_id",
-                "category"),
-                project("compositeActivities","timeCalculationActivityTab","balanceSettingsActivityTab","name").and("compositeActivities").as("compositeActivities").and("category").arrayElementAt(0).as("category"),
-                project("compositeActivities","timeCalculationActivityTab","balanceSettingsActivityTab","name").and("category._id").as("categoryId").and("category.name").as("categoryName"),
-                unwind("compositeActivities",true),
-                lookup("activities", "compositeActivities.activityId", "_id",
-                        "compositeActivities"),
-                project("compositeActivities","timeCalculationActivityTab","balanceSettingsActivityTab","name","categoryId","categoryName").and("compositeActivities").arrayElementAt(0),
-                new CustomAggregationOperation(Document.parse(group)),
-                new CustomAggregationOperation(Document.parse(projection))
-        };
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        aggregationOperations.add(lookup("activity_category", "generalActivityTab.categoryId", "_id",
+                "category"));
+        aggregationOperations.add(project("compositeActivities","timeCalculationActivityTab","balanceSettingsActivityTab","name").and("compositeActivities").as("compositeActivities").and("category").arrayElementAt(0).as("category"));
+        aggregationOperations.add(project("compositeActivities","timeCalculationActivityTab","balanceSettingsActivityTab","name").and("category._id").as("categoryId").and("category.name").as("categoryName"));
+        aggregationOperations.add(unwind("compositeActivities",true));
+        aggregationOperations.add(lookup("activities", "compositeActivities.activityId", "_id",
+                "compositeActivities"));
+        aggregationOperations.add(project("compositeActivities","timeCalculationActivityTab","balanceSettingsActivityTab","name","categoryId","categoryName").and("compositeActivities").arrayElementAt(0));
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(group)));
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(projection)));
+        return aggregationOperations;
     }
 }

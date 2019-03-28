@@ -70,7 +70,7 @@ import static com.kairos.constants.AppConstants.TEAM;
         @ApiOperation(value = "Update Activities in Team")
         @PutMapping(value = "/team/{teamId}/update_activities")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId,  @RequestBody List<BigInteger> activityIds) {
+        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId,  @RequestBody Set<BigInteger> activityIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.updateActivitiesOfTeam(teamId, activityIds));
         }
@@ -86,7 +86,7 @@ import static com.kairos.constants.AppConstants.TEAM;
         @ApiOperation(value = "Add Skill to Team")
         @PutMapping(value = "/team/{teamId}/update_skills")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> addTeamSkills(@PathVariable Long teamId, @RequestBody List<Long> skillIds) {
+        public ResponseEntity<Map<String, Object>> addTeamSkills(@PathVariable Long teamId, @RequestBody Set<Long> skillIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.addTeamSelectedSkills(teamId, skillIds));
         }
 
