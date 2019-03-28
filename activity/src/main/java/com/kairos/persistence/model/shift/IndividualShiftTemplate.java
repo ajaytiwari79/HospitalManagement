@@ -15,7 +15,7 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     private String remarks;
     private LocalTime startTime;
     private LocalTime endTime;
-    @NotNullOrEmpty
+    @NotNullOrEmpty(message = "message.activity.empty")
     private List<ShiftTemplateActivity> activities;
     private int durationMinutes;
 

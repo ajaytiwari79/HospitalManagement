@@ -281,7 +281,7 @@ public class StaffRetrievalService {
     }
 
 
-    public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+    public List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffIds) {
         return unitPositionGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
     }
 
@@ -321,27 +321,11 @@ public class StaffRetrievalService {
 
     public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, StaffFilterDTO staffFilterDTO, String moduleId) {
 
-        List<StaffPersonalDetailDTO> staff = null;
-        Long countryId = null;
         List<AccessGroup> roles = null;
-        List<EngineerTypeDTO> engineerTypes = null;
         Map<String, Object> map = new HashMap<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-//            staff = getStaffWithBasicInfo(id, allStaffRequired);
             map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId).getStaffList());
             roles = accessGroupService.getAccessGroups(unitId);
-            countryId = countryGraphRepository.getCountryIdByUnitId(id);
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
-            roles = accessGroupService.getAccessGroups(organization.getId());
-            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
-        }
-
-
-        if (Optional.ofNullable(staff).isPresent()) {
-            map.put("staffList", staff);
         }
         map.put("roles", roles);
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);

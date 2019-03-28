@@ -884,6 +884,7 @@ public class ClientExceptionService extends MongoBaseService {
         return tasksByNewDate;
     }
 
+
     private Task deleteExceptionFromTask(Task task, ClientException clientException) {
 
         Iterator<Task.ClientException> clientExceptionIterator = task.getClientExceptions().iterator();

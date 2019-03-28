@@ -609,8 +609,8 @@ public class StaffController {
     @PostMapping(value = "/details")
     @ApiOperation("get staff details  by ids")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffDetailByIds(@PathVariable Long unitId, @RequestBody Set<Long> staffIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByIds(unitId, staffIds));
+    public ResponseEntity<Map<String, Object>> getStaffDetailByIds(@RequestBody Set<Long> staffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByIds(staffIds));
     }
 
     @GetMapping(value = "/staff_employment_by_unit_position/{unitPositionId}")
