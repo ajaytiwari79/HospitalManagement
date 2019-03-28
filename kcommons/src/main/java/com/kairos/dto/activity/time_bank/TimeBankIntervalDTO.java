@@ -28,6 +28,7 @@ public class TimeBankIntervalDTO {
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private String headerName;
+    private long plannedMinutesOfTimebank;
 
 
     public TimeBankIntervalDTO(long totalScheduledMin, long totalTimeBankDiff, String title) {
@@ -225,5 +226,13 @@ public class TimeBankIntervalDTO {
 
     public void setTotalTimeBankDiff(long totalTimeBankDiff) {
         this.totalTimeBankDiff = totalTimeBankDiff;
+    }
+
+    public long getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
+    }
+
+    public void setPlannedMinutesOfTimebank(long plannedMinutesOfTimebank) {
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 }
