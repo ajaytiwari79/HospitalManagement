@@ -70,9 +70,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getFirstDayOfMonth;
-import static com.kairos.commons.utils.DateUtils.getLocalDate;
-import static com.kairos.commons.utils.DateUtils.getLocalDateTime;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -640,6 +638,9 @@ public class ExpertiseService {
         expertise.setStartDateMillis(new Date(publishedDateMillis));
         expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
+        if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDateMillis()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
+            exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
+        }
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
@@ -650,14 +651,14 @@ public class ExpertiseService {
             parentExp.setHistory(true);
             parentExp.setId(expertise.getId());
             expertiseGraphRepository.save(parentExp);
-            if(isNotNull(parentExp.getEndDateMillis()) && parentExp.getEndDateMillis().after(DateUtils.getDate())) {
-                schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(parentExp.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+            if(isNotNull(parentExp.getEndDateMillis()) && !getLocalDate(publishedDateMillis).isBefore(getLocalDate())) {
+                schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(getLocalDate(publishedDateMillis)), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
             }
             expertise.setId(parentExpertise.getId());
             expertiseGraphRepository.save(expertise);
         }
-        if(isNotNull(expertise.getEndDateMillis()) && expertise.getEndDateMillis().after(DateUtils.getDate())){
-            schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, DateUtils.getLocalDateTimeFromDate(expertise.getEndDateMillis()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+        if(isNotNull(expertise.getEndDateMillis()) && !getLocalDateFromDate(expertise.getEndDateMillis()).isBefore(getLocalDate())){
+            schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(asLocalDate(expertise.getEndDateMillis())), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
         registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
         return parentExpertise;
@@ -937,6 +938,7 @@ public class ExpertiseService {
     public boolean registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS)
     {   if(isCollectionNotEmpty(schedulerPanelDTOS)) {
         LOGGER.info("create job for add planning period");
+        // using -1 for unitId becounse this is not unit base job
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
         LOGGER.info("successfully job registered of add planning period");
