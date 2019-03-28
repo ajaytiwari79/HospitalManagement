@@ -75,24 +75,24 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "]->(staff) SET r.lastModificationDate={2},r.isEnabled={3} RETURN COUNT(r) as r")
     int updateStaffTeamRelationship(long teamId, long staffId, long lastModificationDate, boolean isEnabled);
 
-    @Query("MATCH (team:Team) WHERE id(team)={0} SET team.teamLeaderStaffId={1}")
+    @Query("MATCH (team:Team{isEnabled:true}) WHERE id(team)={0} SET team.teamLeaderStaffId={1}")
     void updateTeamLeaderOfTeam(long teamId, long teamLeaderStaffId);
 
-    @Query("MATCH (team:Team),(staff:Staff) WHERE id(team)={0} AND id(staff) IN {1}  " +
+    @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(team)={0} AND id(staff) IN {1}  " +
             "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
     void updateStaffsInTeam(long teamId, Set<Long> staffIds);
 
-    @Query("MATCH (team:Team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:false}]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:false}]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
-    @Query("MATCH (team:Team),(staff:Staff) WHERE id(staff)={0} AND id(team) IN {1}  " +
+    @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(staff)={0} AND id(team) IN {1}  " +
             "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
     void assignStaffInTeams(long staffId, Set<Long> teamIds);
 
-    @Query("MATCH (team:Team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
     void removeStaffFromAllTeams(long staffId);
 
-    @Query("MATCH (team:Team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} RETURN id(team)")
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} RETURN id(team)")
     List<Long> getTeamsOfStaff(long staffId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
