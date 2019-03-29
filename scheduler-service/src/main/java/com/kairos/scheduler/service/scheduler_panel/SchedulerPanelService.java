@@ -24,6 +24,7 @@ import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +69,8 @@ public class SchedulerPanelService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
+    private static final String scheduler = "scheduler";
+
 
     /**
      * @author yatharth
@@ -91,14 +94,12 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
 
-    public boolean updateSchedularPanelsByUnitIdAndTimeZone(Long unitId, String timeZone) {
+    public boolean updateSchedulerPanelsByUnitIdAndTimeZone(Long unitId, String timeZone) {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitIdAndDeletedFalse(unitId);
         if (isCollectionNotEmpty(schedulerPanels)) {
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
-                if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
-                    logger.info("Inside updateSchedularPanelsByUnitIdAndTimeZone : {0}" , schedulerPanel.getUnitId() );
-                    dynamicCronScheduler.setCronScheduling(schedulerPanel, timeZone);
-                }
+                dynamicCronScheduler.stopCronJob(scheduler + schedulerPanel.getId());
+                dynamicCronScheduler.startCronJob(schedulerPanel, timeZone);
             }
         }
         return true;
@@ -216,7 +217,7 @@ public class SchedulerPanelService extends MongoBaseService {
         save(panel);
         String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
-        dynamicCronScheduler.stopCronJob("scheduler" + panel.getId());
+        dynamicCronScheduler.stopCronJob(scheduler + panel.getId());
         dynamicCronScheduler.startCronJob(panel, timezone);
         return ObjectMapperUtils.copyPropertiesByMapper(panel, SchedulerPanelDTO.class);
     }
@@ -241,7 +242,7 @@ public class SchedulerPanelService extends MongoBaseService {
             schedulerPanel = schedulerPanelsById.get(localDateTimeIdDTO.getId());
             schedulerPanel.setOneTimeTriggerDate(localDateTimeIdDTO.getDateTime());
             schedulerPanelsUpdated.add(schedulerPanel);
-            dynamicCronScheduler.stopCronJob("scheduler" + localDateTimeIdDTO.getId());
+            dynamicCronScheduler.stopCronJob(scheduler + localDateTimeIdDTO.getId());
             dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
 
 
@@ -286,7 +287,7 @@ public class SchedulerPanelService extends MongoBaseService {
             save(schedulerPanelDB);
             String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
-            dynamicCronScheduler.stopCronJob("scheduler" + schedulerPanelDB.getId());
+            dynamicCronScheduler.stopCronJob(scheduler + schedulerPanelDB.getId());
             dynamicCronScheduler.startCronJob(schedulerPanelDB, timezone);
         }
         return true;
@@ -476,7 +477,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 schedulerPanel.setDeleted(true);
-                dynamicCronScheduler.stopCronJob("scheduler" + schedulerPanel.getId());
+                dynamicCronScheduler.stopCronJob(scheduler + schedulerPanel.getId());
                 schedulerPanel.setActive(false);
             }
             save(schedulerPanels);
@@ -497,7 +498,7 @@ public class SchedulerPanelService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
         }
 
-        dynamicCronScheduler.stopCronJob("scheduler" + schedulerPanelId);
+        dynamicCronScheduler.stopCronJob(scheduler + schedulerPanelId);
 
         return true;
     }

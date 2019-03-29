@@ -1,7 +1,6 @@
 package com.kairos.scheduler.controller;
 
 
-import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -17,12 +16,9 @@ import javax.inject.Inject;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 
@@ -130,7 +126,7 @@ public class SchedulerPanelController {
     @GetMapping("time_zone/{timeZone}")
     @ApiOperation("update time zones by unit id and time zone for Scheduler Panels ")
     public ResponseEntity<Map<String, Object>> updateSchedularPanelsDateByUnitIdAndTimeZone(@PathVariable Long unitId, @PathVariable String timeZone)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedularPanelsByUnitIdAndTimeZone(unitId, timeZone));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsByUnitIdAndTimeZone(unitId, timeZone));
         }
 
 
