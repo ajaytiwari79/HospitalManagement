@@ -11,7 +11,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_L
 @Repository
 public interface LevelGraphRepository extends Neo4jBaseRepository<Level,Long> {
 
-    @Query("MATCH(country:Country)<-[:" + HAS_LEVEL + "]-(level:Level {isEnabled:true}) WHERE id(country)={0} AND id(level)<>{2} AND level.name =~{1}  " +
+    @Query("MATCH(country:Country)-[:" + HAS_LEVEL + "]->(level:Level {isEnabled:true}) WHERE id(country)={0} AND id(level)<>{2} AND level.name =~{1}  " +
             " WITH count(level) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean levelExistInCountryByName(Long countryId, String name, Long currentLevelId);
