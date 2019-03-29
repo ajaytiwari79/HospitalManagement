@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -20,6 +22,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import static com.kairos.constants.CommonConstants.*;
 
@@ -36,13 +39,19 @@ public class MailService {
     final static Logger logger = LoggerFactory.getLogger(MailService.class);
 
     @Inject
-    JavaMailSender javaMailSender;
+    private JavaMailSender javaMailSender;
+    /*@Inject
+    private TemplateEngine templateEngine;*/
 
 
     public void sendPlainMailWithSendGrid(String receiver, String body, String subject) {
        Email from=new Email(NO_REPLY_EMAIL);
-       Email to=new Email(receiver);
-       Content content=new Content("text/plain",body);
+       Email to=new Email("pradeep.singh@oodlestechnologies.com");
+        /*final Context ctx = new Context(Locale.ENGLISH);
+        ctx.setVariable("name", "pradeep");*/
+       // String htmlContent = this.templateEngine.process("/media/pradeep/bak/kairos/kairos-user/scheduler-service/src/main/resources/kairos-email-template.html", ctx);
+        //text/plain
+        Content content=new Content("text/html",null);
        Mail mail=new Mail(from,subject,to,content);
        SendGrid sg = new SendGrid(SEND_GRID_API_KEY);
         Request request = new Request();
@@ -76,7 +85,6 @@ public class MailService {
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
             mail.setText(message);
-
             bodyPart.setFileName(source.getName());
             logger.info("File has dataType: "+source.getContentType());
             bodyPart.setDataHandler(new DataHandler(source));

@@ -46,6 +46,7 @@ public class ActivityDTO {
     private List<Long> skills;
     private SkillActivityDTO skillActivityTab;
     private Boolean activityCanBeCopied=false;
+    private ActivityPriorityDTO activityPriority;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -271,6 +272,14 @@ public class ActivityDTO {
 
     public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
         this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
+    }
+
+    public ActivityPriorityDTO getActivityPriority() {
+        return activityPriority;
+    }
+
+    public void setActivityPriority(ActivityPriorityDTO activityPriority) {
+        this.activityPriority = activityPriority;
     }
 }
 

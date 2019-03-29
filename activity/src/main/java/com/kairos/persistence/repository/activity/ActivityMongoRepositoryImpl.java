@@ -117,7 +117,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "tags")
+                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();

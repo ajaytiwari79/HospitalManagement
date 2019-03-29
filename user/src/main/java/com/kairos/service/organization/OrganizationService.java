@@ -93,6 +93,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.GROUP;
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -1101,5 +1102,18 @@ public class OrganizationService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organization", unitId);
         }
         return true;
+    }
+
+    public List<Long> getOrganizationIds(Long unitId){
+        List<Long> organizationIds = null;
+        if (isNull(unitId)) {
+            organizationIds = organizationGraphRepository.findAllOrganizationIds();
+        } else {
+            Optional<Organization> optionalOrganization = organizationGraphRepository.findById(unitId);
+            if(optionalOrganization.isPresent()){
+                organizationIds = optionalOrganization.get().getChildren().stream().map(unit->unit.getId()).collect(Collectors.toList());
+            }
+        }
+        return organizationIds;
     }
 }

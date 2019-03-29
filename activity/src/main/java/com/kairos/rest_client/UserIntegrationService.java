@@ -62,7 +62,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.*;
 
 
@@ -751,6 +751,11 @@ public class UserIntegrationService {
     public Long getUnitByUnitPositionId(Long unitPositionId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         },unitPositionId);
+    }
+
+    public List<Long> getAllOrganizationIds(Long unitId) {
+        List<NameValuePair> queryParamList = isNotNull(unitId) ?  newArrayList(new BasicNameValuePair("unitId", unitId.toString())) : null;
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, GET_ORGANIZATION_IDS, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
     }
 }
 
