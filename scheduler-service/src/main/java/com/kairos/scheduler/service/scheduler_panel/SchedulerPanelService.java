@@ -66,7 +66,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
-    private static final String scheduler = "scheduler";
+    private static final String SCHEDULER = "SCHEDULER";
 
 
     /**
@@ -95,7 +95,7 @@ public class SchedulerPanelService extends MongoBaseService {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
         if (isCollectionNotEmpty(schedulerPanels)) {
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
-                dynamicCronScheduler.stopCronJob(scheduler + schedulerPanel.getId());
+                dynamicCronScheduler.stopCronJob(SCHEDULER + schedulerPanel.getId());
                 dynamicCronScheduler.startCronJob(schedulerPanel, timeZone);
             }
         }
@@ -214,7 +214,7 @@ public class SchedulerPanelService extends MongoBaseService {
         save(panel);
         String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
-        dynamicCronScheduler.stopCronJob(scheduler + panel.getId());
+        dynamicCronScheduler.stopCronJob(SCHEDULER + panel.getId());
         dynamicCronScheduler.startCronJob(panel, timezone);
         return ObjectMapperUtils.copyPropertiesByMapper(panel, SchedulerPanelDTO.class);
     }
@@ -239,7 +239,7 @@ public class SchedulerPanelService extends MongoBaseService {
             schedulerPanel = schedulerPanelsById.get(localDateTimeIdDTO.getId());
             schedulerPanel.setOneTimeTriggerDate(localDateTimeIdDTO.getDateTime());
             schedulerPanelsUpdated.add(schedulerPanel);
-            dynamicCronScheduler.stopCronJob(scheduler + localDateTimeIdDTO.getId());
+            dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeIdDTO.getId());
             dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
 
 
@@ -284,7 +284,7 @@ public class SchedulerPanelService extends MongoBaseService {
             save(schedulerPanelDB);
             String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
-            dynamicCronScheduler.stopCronJob(scheduler + schedulerPanelDB.getId());
+            dynamicCronScheduler.stopCronJob(SCHEDULER + schedulerPanelDB.getId());
             dynamicCronScheduler.startCronJob(schedulerPanelDB, timezone);
         }
         return true;
@@ -474,7 +474,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 schedulerPanel.setDeleted(true);
-                dynamicCronScheduler.stopCronJob(scheduler + schedulerPanel.getId());
+                dynamicCronScheduler.stopCronJob(SCHEDULER + schedulerPanel.getId());
                 schedulerPanel.setActive(false);
             }
             save(schedulerPanels);
@@ -495,7 +495,7 @@ public class SchedulerPanelService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
         }
 
-        dynamicCronScheduler.stopCronJob(scheduler + schedulerPanelId);
+        dynamicCronScheduler.stopCronJob(SCHEDULER + schedulerPanelId);
 
         return true;
     }
