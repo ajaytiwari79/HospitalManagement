@@ -32,11 +32,14 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_INTERVAL_STRING;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ONCE_STRING;
@@ -88,6 +91,19 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
 
+    public boolean updateSchedularPanelsByUnitIdAndTimeZone(Long unitId, String timeZone) {
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitIdAndDeletedFalse(unitId);
+        if (isCollectionNotEmpty(schedulerPanels)) {
+            for (SchedulerPanel schedulerPanel : schedulerPanels) {
+                if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
+                    logger.info("Inside updateSchedularPanelsByUnitIdAndTimeZone : {0}" , schedulerPanel.getUnitId() );
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel, timeZone);
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * @author yatharth
      * @lastmodifiedby
@@ -101,7 +117,7 @@ public class SchedulerPanelService extends MongoBaseService {
         }
         List<SchedulerPanel> schedulerPanels = new ArrayList<>();
         for (SchedulerPanelDTO schedulerPanelDTO : schedulerPanelDTOs) {
-            SchedulerPanel schedulerPanel = ObjectMapperUtils.copyPropertiesByMapper(schedulerPanelDTO,SchedulerPanel.class);
+            SchedulerPanel schedulerPanel = ObjectMapperUtils.copyPropertiesByMapper(schedulerPanelDTO, SchedulerPanel.class);
             //ObjectMapperUtils.copyProperties(schedulerPanelDTO, schedulerPanel);
             if (Optional.ofNullable(schedulerPanelDTO.getIntegrationConfigurationId()).isPresent()) {
                 Optional<IntegrationSettings> integrationConfigurationOpt = integrationConfigurationRepository.findById(schedulerPanelDTO.getIntegrationConfigurationId());
@@ -142,8 +158,8 @@ public class SchedulerPanelService extends MongoBaseService {
         }
         save(schedulerPanels);
 
-        if(!Optional.ofNullable(timezone).isPresent())
-        timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
+        if (!Optional.ofNullable(timezone).isPresent())
+            timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
 //        String defaultTimezone=timezone;
 //        schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,defaultTimezone));
 
@@ -368,7 +384,6 @@ public class SchedulerPanelService extends MongoBaseService {
         logger.info("cronExpression runOnce--> " + cronExpression);
         return cronExpression;
     }
-
 
 
     private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {

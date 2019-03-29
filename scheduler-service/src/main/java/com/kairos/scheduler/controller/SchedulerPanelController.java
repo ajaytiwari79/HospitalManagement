@@ -46,7 +46,7 @@ public class SchedulerPanelController {
 
     @GetMapping("")
     @ApiOperation("Get Control Panel List ")
-    public ResponseEntity<Map<String, Object>> getSchedulerPanelList(@PathVariable  Long unitId) throws IOException {
+    public ResponseEntity<Map<String, Object>> getSchedulerPanelList(@PathVariable Long unitId) throws IOException {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getSchedulerPanelByUnitId(unitId));
 
@@ -55,21 +55,21 @@ public class SchedulerPanelController {
 
     @PostMapping
     @ApiOperation("Create Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable  Long unitId,
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable Long unitId,
                                                                  @RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTOs));
     }
 
     @PutMapping("/{schedulerPanelId}")
     @ApiOperation("Update Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO,@PathVariable BigInteger schedulerPanelId) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanelDTO,schedulerPanelId));
+    public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO, @PathVariable BigInteger schedulerPanelId) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanelDTO, schedulerPanelId));
     }
 
     @PutMapping("/update_date_only")
     @ApiOperation("Update Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> updateSchedulerPanelOneTimeTriggerDate(@RequestBody List<LocalDateTimeIdDTO> localDateTimeIdDTOs, @PathVariable Long unitId) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeIdDTOs,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeIdDTOs, unitId));
     }
 
     @GetMapping("/job_details/{schedulerPanelId}")
@@ -80,9 +80,10 @@ public class SchedulerPanelController {
 
     @GetMapping("/job_details")
     @ApiOperation("Get job details by unitId and offset")
-    public ResponseEntity<Map<String, Object>> getAllJobDetails(@PathVariable Long unitId,@RequestParam("offset") int offset) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getAllJobDetailsByUnitId(unitId,offset));
+    public ResponseEntity<Map<String, Object>> getAllJobDetails(@PathVariable Long unitId, @RequestParam("offset") int offset) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getAllJobDetailsByUnitId(unitId, offset));
     }
+
     /*@GetMapping("/authToken")
     @ApiOperation("Get job details ")
     public ResponseEntity<Map<String, Object>> getAuthToken() {
@@ -99,6 +100,7 @@ public class SchedulerPanelController {
     public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
     }
+
     @GetMapping("/default_data")
     @ApiOperation("Get default data")
     public ResponseEntity<Map<String, Object>> getDefaultData() {
@@ -125,7 +127,11 @@ public class SchedulerPanelController {
     }
 
 
-
+    @GetMapping("time_zone/{timeZone}")
+    @ApiOperation("update time zones by unit id and time zone for Scheduler Panels ")
+    public ResponseEntity<Map<String, Object>> updateSchedularPanelsDateByUnitIdAndTimeZone(@PathVariable Long unitId, @PathVariable String timeZone)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedularPanelsByUnitIdAndTimeZone(unitId, timeZone));
+        }
 
 
     /**
@@ -134,7 +140,7 @@ public class SchedulerPanelController {
      * @param schedulerPanelId
      * @return
      */
-  //Dont Remove
+    //Dont Remove
     /*@RequestMapping(value = "/{schedulerPanelId}/control_panel_details", method = RequestMethod.GET)
     @ApiOperation("Get scheduler panel details ")
     public ResponseEntity<Map<String, Object>> getRequiredControlPanelDataForTask(@PathVariable BigInteger schedulerPanelId) {
