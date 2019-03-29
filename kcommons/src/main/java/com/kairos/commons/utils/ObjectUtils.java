@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+
 /**
  * @author pradeep
  * @date - 8/6/18
@@ -68,13 +69,13 @@ public class ObjectUtils {
         return list;
     }
 
-    public static float getHoursByMinutes(int hour){
+    public static String getHoursByMinutes(int hour){
         if(hour==0){
             throw new RuntimeException("Hour should not be 0");
         }
         int hours = hour / 60; //since both are ints, you get an int
         int minutes = hour % 60;
-        return Float.valueOf(hours+"."+minutes);
+        return String.valueOf(hours+"."+minutes);
     }
 
     private void test(){

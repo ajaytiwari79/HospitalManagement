@@ -187,7 +187,7 @@ public class RuletemplateUtils {
                                                                   Integer counterCount, boolean isValid,
                                                                   WTABaseRuleTemplate wtaBaseRuleTemplate,
                                                                   Integer totalCounter, DurationType unitType,
-                                                                  Float unitValue) {
+                                                                  String unitValue) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
             if (counterCount != null) {

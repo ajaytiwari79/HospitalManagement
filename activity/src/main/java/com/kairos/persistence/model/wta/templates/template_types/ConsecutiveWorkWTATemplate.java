@@ -27,6 +27,7 @@ import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 
+
 /**
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE3
@@ -131,7 +132,8 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     int consecutiveDays = getConsecutiveDaysInDate(shiftDates);
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
-                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.DAYS,getHoursByMinutes(limitAndCounter[0]));
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
+                            limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
                 }
             }
         }
