@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
@@ -150,7 +151,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                         }
                     }
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin / (60 * (int) dateTimeInterval.getDays()));
-                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,limitAndCounter[0]/60);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]));
                 }
             }
         }

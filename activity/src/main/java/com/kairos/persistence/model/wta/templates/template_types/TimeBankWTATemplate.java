@@ -10,6 +10,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.util.Objects;
 
+import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -58,7 +59,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
-            brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,limitAndCounter[0]/60);
+            brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]));
         }
     }
 

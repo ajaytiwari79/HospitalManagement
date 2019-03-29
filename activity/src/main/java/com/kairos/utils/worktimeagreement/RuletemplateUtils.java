@@ -183,7 +183,11 @@ public class RuletemplateUtils {
         return updatedShifts;
     }
 
-    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper, Integer counterCount, boolean isValid, WTABaseRuleTemplate wtaBaseRuleTemplate, Integer totalCounter, DurationType unitType,Integer unitValue) {
+    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper,
+                                                                  Integer counterCount, boolean isValid,
+                                                                  WTABaseRuleTemplate wtaBaseRuleTemplate,
+                                                                  Integer totalCounter, DurationType unitType,
+                                                                  Float unitValue) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
             if (counterCount != null) {
@@ -193,9 +197,9 @@ public class RuletemplateUtils {
                     counterCount = 0;
                     canBeIgnore = false;
                 }
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, canBeIgnore,totalCounter,unitType,unitValue.floatValue());
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, canBeIgnore,totalCounter,unitType,unitValue);
             } else {
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), null, true, false,totalCounter,unitType,unitValue.floatValue());
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), null, true, false,totalCounter,unitType,unitValue);
             }
             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
         }
