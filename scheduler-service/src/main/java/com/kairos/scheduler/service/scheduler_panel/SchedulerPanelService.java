@@ -24,7 +24,6 @@ import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +32,12 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_INTERVAL_STRING;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ONCE_STRING;
@@ -95,7 +92,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
     public boolean updateSchedulerPanelsByUnitIdAndTimeZone(Long unitId, String timeZone) {
-        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitIdAndDeletedFalse(unitId);
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
         if (isCollectionNotEmpty(schedulerPanels)) {
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
                 dynamicCronScheduler.stopCronJob(scheduler + schedulerPanel.getId());
@@ -318,7 +315,7 @@ public class SchedulerPanelService extends MongoBaseService {
      */
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
-        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitIdAndDeletedFalse(unitId);
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
         List<SchedulerPanelDTO> schedulerPanelDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels, SchedulerPanelDTO.class);
         return schedulerPanelDTOS;
 
