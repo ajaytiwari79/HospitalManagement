@@ -13,7 +13,8 @@ import java.util.Set;
 @Repository
 public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerPanel, BigInteger> {
 
-    List<SchedulerPanel> findByUnitIdAndDeletedFalse(long unitId);
+    List<SchedulerPanel> findAllByUnitIdAndDeletedFalse(long unitId);
+
     List<SchedulerPanel> findByActive(boolean active);
 
     List<SchedulerPanel> findAllByDeletedFalse();
