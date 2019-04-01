@@ -3,6 +3,7 @@ package com.kairos.service.scheduler_service;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
 import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
@@ -29,7 +30,8 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     private TimeAndAttendanceService timeAndAttendanceService;
     @Inject
     private UnitPayrollSettingService unitPayrollSettingService;
-
+    @Inject
+    private ActivityService activityService;
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
 
@@ -57,6 +59,10 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case ADD_PLANNING_PERIOD:
                 logger.info("Job to add planning period ");
                 planningPeriodService.addPlanningPeriodViaJob();
+                break;
+            case UNASSIGN_EXPERTISE_FROM_ACTIVITY:
+                logger.info("Job to Unassign expertise from activity ");
+                activityService.unassighExpertiseFromActivities(job.getEntityId());
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");

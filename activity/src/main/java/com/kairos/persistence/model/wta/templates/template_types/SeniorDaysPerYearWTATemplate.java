@@ -32,7 +32,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
-    private boolean carryForwardLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
 
 
@@ -54,13 +53,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
 
     private float recommendedValue;
 
-    public boolean isCarryForwardLeave() {
-        return carryForwardLeave;
-    }
-
-    public void setCarryForwardLeave(boolean carryForwardLeave) {
-        this.carryForwardLeave = carryForwardLeave;
-    }
 
     public boolean isBorrowLeave() {
         return borrowLeave;
@@ -85,7 +77,9 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
                 List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
                 if (leaveCount < (shifts.size()+1)) {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null, DurationType.DAYS,leaveCount);
+                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                            new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+                                    DurationType.DAYS,String.valueOf(leaveCount));
                     infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                 }
             }
@@ -130,7 +124,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate;
         return (this != seniorDaysPerYearWTATemplate) && !(borrowLeave == seniorDaysPerYearWTATemplate.borrowLeave &&
-                carryForwardLeave == seniorDaysPerYearWTATemplate.carryForwardLeave &&
                 Float.compare(seniorDaysPerYearWTATemplate.recommendedValue, recommendedValue) == 0 &&
                 Objects.equals(ageRange, seniorDaysPerYearWTATemplate.ageRange) &&
                 Objects.equals(activityIds, seniorDaysPerYearWTATemplate.activityIds) &&

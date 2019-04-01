@@ -50,8 +50,8 @@ import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.SkillRestClient;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
@@ -63,7 +63,6 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
-import com.kairos.utils.external_plateform_shift.Transstatus;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -74,17 +73,11 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
-import java.io.StringReader;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,9 +91,9 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
+import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static com.kairos.service.activity.ActivityUtil.*;
-import static org.springframework.http.MediaType.APPLICATION_XML;
 
 
 /**
@@ -396,7 +389,7 @@ public class ActivityService extends MongoBaseService {
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
         Activity activity = activityMongoRepository.findById(activityId).orElse(null);
-        if (activity==null) {
+        if (activity == null) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
@@ -405,8 +398,8 @@ public class ActivityService extends MongoBaseService {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
         organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
-        organizationActivityService.verifyTeamActivity(activityMatched,activity);
-        List<Activity> activityList=activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k->k.getActivity().getId()).collect(Collectors.toSet()));
+        organizationActivityService.verifyTeamActivity(activityMatched, activity);
+        List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
 
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
@@ -721,7 +714,6 @@ public class ActivityService extends MongoBaseService {
         int year = date.getYear();
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeek = date.get(weekOfWeekBasedYear);
-        int currentDayOfWeek = date.getDayOfWeek().getValue();
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
 
         // Set access Role of staff
@@ -759,7 +751,7 @@ public class ActivityService extends MongoBaseService {
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
         PlanningPeriodDTO planningPeriodDTO = planningPeriodService.getStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
-        if(isNull(planningPeriodDTO)){
+        if (isNull(planningPeriodDTO)) {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         return new PhaseActivityDTO(activities,phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
@@ -792,40 +784,6 @@ public class ActivityService extends MongoBaseService {
         save(activity);
         return true;
     }
-
-    public String getActivitesFromTimeCare() {
-        String plainClientCredentials = "cluster:cluster";
-        String base64ClientCredentials = new String(org.apache.commons.codec.binary.Base64.encodeBase64(plainClientCredentials.getBytes()));
-        HttpHeaders headers = new HttpHeaders();
-        List<MediaType> mediaTypes = new ArrayList<>();
-        mediaTypes.add(APPLICATION_XML);
-        headers.setAccept(mediaTypes);
-        headers.add("Authorization", "Basic " + base64ClientCredentials);
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-
-        String importShiftURI = envConfig.getCarteServerHost() + KETTLE_EXECUTE_TRANS + "/home/prabjot/Desktop/Pentaho/data-integration/TimeCareIntegration/GetActivities.ktr";
-        logger.info("importShiftURI----> " + importShiftURI);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> importResult = restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-        System.out.println(importResult.getStatusCode());
-        if (importResult.getStatusCodeValue() == HttpStatus.OK.value()) {
-            System.out.println(importResult);
-            String importShiftStatusXMLURI = envConfig.getCarteServerHost() + "/kettle/transStatus/?name=GetActivities&xml=y";
-            ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
-            try {
-                JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
-                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                StringReader reader = new StringReader(resultStatusXml.getBody());
-                Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
-                logger.info("trans status---> " + transstatus.getId());
-            } catch (JAXBException exception) {
-                logger.info("trans status---exception > " + exception);
-            }
-
-        }
-        return importResult.toString();
-    }
-
 
     public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
@@ -871,15 +829,12 @@ public class ActivityService extends MongoBaseService {
 
 
     private void mapActivitiesInOrganization(List<Activity> countryActivities, Long unitId, List<String> externalIds) {
-
         List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(unitId, externalIds);
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
         List<Activity> organizationActivities = new ArrayList<>();
         for (Activity countryActivity : countryActivities) {
             Optional<Activity> result = unitActivities.stream().filter(unitActivity -> unitActivity.getExternalId().equals(countryActivity.getExternalId())).findFirst();
             if (!result.isPresent()) {
                 Activity activity = SerializationUtils.clone(countryActivity);
-                List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
                 activity.setCountryParentId(countryActivity.getId());
@@ -1090,6 +1045,14 @@ public class ActivityService extends MongoBaseService {
 
     public List<ActivityDTO> findAllActivityByDeletedFalseAndUnitId(List<Long> unitIds) {
         return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
+    }
+
+    //remove expertise from activity via schedular job
+    public boolean unassighExpertiseFromActivities(BigInteger expertiseId) {
+        logger.info("remove expertise from activities by job");
+        activityMongoRepository.unassignExpertiseFromActivitiesByExpertiesId(expertiseId.longValue());
+        logger.info("successfully remove expertise from activities by job");
+        return true;
     }
 
 }

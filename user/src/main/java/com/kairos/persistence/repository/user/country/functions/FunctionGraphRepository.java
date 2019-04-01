@@ -19,23 +19,23 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, Long> {
 
-    @Query("MATCH (country:Country)-[:"+ BELONGS_TO +"]-(function:Function{deleted:false}) where id(country)={0} " +
-            "OPTIONAL MATCH(function)-[:"+ HAS_ORGANIZATION_LEVEL +"]->(level:Level) " +
-            "OPTIONAL MATCH(function)-[:"+ HAS_UNION +"]->(union:Organization{union:true}) " +
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(function:Function{deleted:false}) where id(country)={0} " +
+            "OPTIONAL MATCH(function)-[:" + HAS_ORGANIZATION_LEVEL + "]->(level:Level) " +
+            "OPTIONAL MATCH(function)-[:" + HAS_UNION + "]->(union:Organization{union:true}) " +
             "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   " +
             "RETURN id(function) as id,function.name as name,function.description as description," +
             "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels,function.icon as icon ORDER BY function.creationDate  DESC")
     List<FunctionDTO> findFunctionsByCountry(long countryId);
 
-    @Query("MATCH (country:Country)-[:"+ BELONGS_TO +"]-(function:Function{deleted:false}) where id(country)={0} " +
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(function:Function{deleted:false}) where id(country)={0} " +
             "RETURN id(function) as id,function.name as name ORDER BY function.creationDate  DESC")
     List<FunctionDTO> findFunctionsIdAndNameByCountry(long countryId);
 
 
-    @Query("MATCH (c:Country)-[:"+ BELONGS_TO +"]-(fun:Function{deleted:false}) where id(c)={0} AND LOWER(fun.name)=LOWER({1}) RETURN fun")
+    @Query("MATCH (c:Country)-[:" + BELONGS_TO + "]-(fun:Function{deleted:false}) where id(c)={0} AND LOWER(fun.name)=LOWER({1}) RETURN fun")
     Function findByNameIgnoreCase(Long countryId, String name);
 
-    @Query("MATCH (country:Country)-[: "+ BELONGS_TO +"]-(function:Function{deleted:false}) where id(country)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) " +
+    @Query("MATCH (country:Country)-[: " + BELONGS_TO + "]-(function:Function{deleted:false}) where id(country)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) " +
             "RETURN function")
     Function findByNameExcludingCurrent(Long countryId, Long functionId, String name);
 
@@ -54,25 +54,25 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
     List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
 
     @Query("MATCH (unit:Organization) where id(unit)={3} \n" +
-            "MATCH(unit)-[:"+CONTACT_ADDRESS+"]-(:ContactAddress)-[:"+MUNICIPALITY+"]-(municipality:Municipality)<-[rel:"+HAS_MUNICIPALITY+"]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
-            "MATCH(expertise:Expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
-            "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) \n" +
+            "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
+            "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
+            "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
             "WHERE  date(functionalPayment.startDate)<=DATE({1}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({1}))\n" +
-            "MATCH(sl)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment) \n" +
-            "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
-            " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +
+            "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
+            " MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]-(payGroupArea) \n" +
+            "with slf,fpm  MATCH(slf)-[rel:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
             "RETURN distinct id(function) as id,function.name as name,rel.amount as amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
-    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,String selectedDate,Long seniorityLevelId,Long unitId);
+    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId, String selectedDate, Long seniorityLevelId, Long unitId);
 
 
     @Query("MATCH (unit:Organization) where id(unit)={0} \n" +
-            "MATCH(unit)-[:"+CONTACT_ADDRESS+"]-(:ContactAddress)-[:"+MUNICIPALITY+"]-(municipality:Municipality)<-[rel:"+HAS_MUNICIPALITY+"]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
-            "MATCH(expertise:Expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={1} \n" +
-            "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) \n" +
+            "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
+            "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={1} \n" +
+            "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
             "WHERE  DATE(functionalPayment.startDate)<=DATE({3}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({3}))\n" +
-            "MATCH(sl)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment) \n" +
-            "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) WHERE ID(function) IN {4} \n" +
-            " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +
+            "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
+            "with slf,fpm  MATCH(slf)-[rel:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) WHERE ID(function) IN {4} \n" +
+            " MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]-(payGroupArea) \n" +
             "RETURN distinct function as function,rel.amount as amount,rel.amountEditableAtUnit as amountEditableAtUnit")
     List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId, Long expertiseId, Long seniorityLevelId, String selectedDate, List<Long> functions);
 }
