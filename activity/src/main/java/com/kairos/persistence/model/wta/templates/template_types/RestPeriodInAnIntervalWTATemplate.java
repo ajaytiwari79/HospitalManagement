@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.constants.AppConstants.HOURS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -103,7 +104,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
             int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
             boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60);
-            brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,limitAndCounter[0]/60);
+            brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]));
         }
     }
 

@@ -3,6 +3,7 @@ package com.kairos.dto.activity.counter.configuration;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.CounterSize;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.FilterType;
 
 import java.math.BigInteger;
@@ -14,6 +15,7 @@ public class KPIDTO {
     private boolean counter;
     private CounterSize size;
     private ChartType chart;
+    private CounterType type;
     private List<FilterType> filterTypes;
     private String calculationFormula;
     //applicable filter of kpi
@@ -94,5 +96,13 @@ public class KPIDTO {
 
     public void setFilterTypes(List<FilterType> filterTypes) {
         this.filterTypes = filterTypes;
+    }
+
+    public CounterType getType() {
+        return type;
+    }
+
+    public void setType(CounterType type) {
+        this.type = type;
     }
 }

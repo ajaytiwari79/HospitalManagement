@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.Validation;
@@ -13,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
 
 /**
  * @author pradeep
@@ -73,6 +75,15 @@ public class ObjectUtils {
         List<E> list = new ArrayList<>(elements.length);
         Collections.addAll(list, elements);
         return list;
+    }
+
+    public static String getHoursByMinutes(int hour){
+        if(hour==0){
+            throw new RuntimeException("Hour should not be 0");
+        }
+        int hours = hour / 60; //since both are ints, you get an int
+        int minutes = hour % 60;
+        return String.valueOf(hours+"."+minutes);
     }
 
     private void test(){

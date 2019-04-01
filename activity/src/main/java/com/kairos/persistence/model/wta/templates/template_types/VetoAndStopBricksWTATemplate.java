@@ -113,7 +113,9 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
             }
             boolean isValid = validateVetoAndStopBrickRules(totalBlockingPoints, totalVeto, totalStopBricks);
             if (!isValid) {
-                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null, DurationType.DAYS,totalBlockingPoints);
+                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                        new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+                                DurationType.DAYS,String.valueOf(totalBlockingPoints));
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
 
