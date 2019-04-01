@@ -54,7 +54,14 @@ public class MailService {
     @Inject
     private TemplateEngine templateEngine;
 
-
+    /***
+     *
+     * @param templateName can be null if User want to send mail without any template
+     * @param templateParam can be null if User want to send mail without any template or in case of template doesn't have any Context param
+     * @param body can be null if mail send with template
+     * @param subject should not be null or blank
+     * @param receiver can't be null if null this method throw InvalidRequestException
+     */
     public void sendMailWithSendGrid(String templateName,Map<String,Object> templateParam,String body, String subject, String... receiver) {
         Mail mail = getMail(templateName, templateParam, body, subject, receiver);
         SendGrid sendGrid = new SendGrid(SEND_GRID_API_KEY);
@@ -110,6 +117,9 @@ public class MailService {
     }
 
     private Mail getMail(String templateName, Map<String,Object> templateParam, String body, String subject,String... receivers){
+        if(StringUtils.isBlank(subject)){
+            throw new InvalidRequestException("Subject should not be blank");
+        }
         Personalization personalization = new Personalization();
         for (String receiver : receivers) {
             if(StringUtils.isBlank(receiver) || StringUtils.containsWhitespace(receiver)){
