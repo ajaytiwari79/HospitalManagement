@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.UnitPositionType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -47,7 +48,7 @@ public class UnitPosition extends UserBaseEntity {
     private boolean published;
     @Relationship(type = HAS_POSITION_LINES)
     private List<UnitPositionLine> unitPositionLines;
-    private boolean mainUnitPosition;
+    private UnitPositionType unitPosition;
     private float taxDeductionPercentage;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
@@ -154,23 +155,13 @@ public class UnitPosition extends UserBaseEntity {
         this.published = published;
     }
 
-    public List<UnitPositionLine> getUnitPositionLines() {
-        return Optional.ofNullable(unitPositionLines).orElse(new ArrayList<>());
-    }
+    public List<UnitPositionLine> getUnitPositionLines() { return Optional.ofNullable(unitPositionLines).orElse(new ArrayList<>()); }
 
-    public void setUnitPositionLines(List<UnitPositionLine> unitPositionLines) {
-        this.unitPositionLines = unitPositionLines;
-    }
+    public void setUnitPositionLines(List<UnitPositionLine> unitPositionLines) { this.unitPositionLines = unitPositionLines; }
 
+    public UnitPositionType getUnitPosition() { return unitPosition; }
 
-
-    public boolean isMainUnitPosition() {
-        return mainUnitPosition;
-    }
-
-    public void setMainUnitPosition(boolean mainUnitPosition) {
-        this.mainUnitPosition = mainUnitPosition;
-    }
+    public void setUnitPosition(UnitPositionType unitPosition) { this.unitPosition = unitPosition; }
 
     public float getTaxDeductionPercentage() {
         return taxDeductionPercentage;

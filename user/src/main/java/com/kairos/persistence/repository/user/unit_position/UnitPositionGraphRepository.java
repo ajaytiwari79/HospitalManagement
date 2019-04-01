@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.unit_position;
 
 
+import com.kairos.enums.UnitPositionType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
@@ -332,13 +333,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)  where id(staff)={0}\n" +
             "MATCH(user)<-[:"+BELONGS_TO+"]-(staffList:Staff)\n" +
-            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{mainUnitPosition:TRUE}) WHERE id(up)<> {3} AND  " +
+            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition) WHERE id(up)<> {3} AND up.unitPostion ={5} AND  " +
             "(({2} IS NULL AND (up.endDate IS NULL OR DATE(up.endDate) >= DATE({1}))) \n" +
             "OR ({2} IS NOT NULL AND DATE(up.startDate) <= DATE({2}) AND (up.endDate IS NULL OR DATE(up.endDate)>DATE({1}))) ) \n" +
             "WITH up  \n" +
             "MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
             "RETURN id(up) as id,up.startDate as startDate,up.endDate as endDate,org.name as unitName \n ")
-    UnitPositionQueryResult findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate,long id);
+    UnitPositionQueryResult findAllByStaffIdAndBetweenDatesAndUnitPositionType(Long staffId, String startDate, String endDate, long id, UnitPositionType unitPositionType);
 
 
 }

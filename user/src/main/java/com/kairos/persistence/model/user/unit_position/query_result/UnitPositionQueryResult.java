@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.unit_position.query_result;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
+import com.kairos.enums.UnitPositionType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -36,7 +37,7 @@ public class UnitPositionQueryResult {
     private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private boolean mainUnitPosition;
+    private UnitPositionType unitPosition;
     private String unitName;
     private float taxDeductionPercentage;
     private long accumulatedTimebankMinutes;
@@ -61,7 +62,7 @@ public class UnitPositionQueryResult {
     }
 
     public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id,Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
-                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage,long accumulatedTimebankMinutes,LocalDate accumulatedTimebankDate) {
+                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,UnitPositionType unitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage,long accumulatedTimebankMinutes,LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -74,7 +75,7 @@ public class UnitPositionQueryResult {
         this.published=published;
         this.reasonCode=reasonCode;
         this.unitInfo=unitInfo;
-        this.mainUnitPosition=mainUnitPosition;
+        this.unitPosition=unitPosition;
         this.positionLines=positionLines;
         this.taxDeductionPercentage=taxDeductionPercentage;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
@@ -189,15 +190,9 @@ public class UnitPositionQueryResult {
         this.id = id;
     }
 
+    public List<UnitPositionLinesQueryResult> getPositionLines() { return Optional.ofNullable(positionLines).orElse(new ArrayList<>()); }
 
-
-    public List<UnitPositionLinesQueryResult> getPositionLines() {
-        return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
-    }
-
-    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
-        this.positionLines = positionLines;
-    }
+    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) { this.positionLines = positionLines; }
 
     public Map<String, Object> getReasonCode() {
         return reasonCode;
@@ -211,17 +206,13 @@ public class UnitPositionQueryResult {
         return appliedFunctions;
     }
 
-    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
-        this.appliedFunctions = appliedFunctions;
-    }
+    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) { this.appliedFunctions = appliedFunctions; }
 
     public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
-    }
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) { this.workingTimeAgreement = workingTimeAgreement; }
 
     public Long getStaffId() {
         return staffId;
@@ -231,13 +222,9 @@ public class UnitPositionQueryResult {
         this.staffId = staffId;
     }
 
-    public boolean isMainUnitPosition() {
-        return mainUnitPosition;
-    }
+    public UnitPositionType getUnitPosition() { return unitPosition; }
 
-    public void setMainUnitPosition(boolean mainUnitPosition) {
-        this.mainUnitPosition = mainUnitPosition;
-    }
+    public void setUnitPosition(UnitPositionType unitPosition) { this.unitPosition = unitPosition; }
 
     public String getUnitName() {
         return unitName;
