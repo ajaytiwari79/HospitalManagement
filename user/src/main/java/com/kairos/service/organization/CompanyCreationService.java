@@ -586,9 +586,9 @@ public class CompanyCreationService {
             unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
             unitIds.add(organizationId);
-            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
-                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
-            }
+//            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
+//                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
+//            }
             validateUserDetails(staffPersonalDetailDTOS, exceptionService);
             organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         } else {
