@@ -83,7 +83,7 @@ public class ActivityPrioritiesController {
     }
 
     @ApiOperation("update ActivityPriority In Activity")
-    @DeleteMapping(value = "/activity/{activityId}/activity_priority/{activityPriorityId}")
+    @PutMapping(value = "/activity/{activityId}/activity_priority/{activityPriorityId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateActivityPriorityInActvitiy(@PathVariable BigInteger activityId, @PathVariable BigInteger activityPriorityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateActivityPriorityInActvitiy(activityPriorityId,activityId));

@@ -127,7 +127,7 @@ public class ShiftReminderService extends MongoBaseService {
 
         String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
                 shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
-        mailService.sendPlainMailWithSendGrid(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
+        mailService.sendMailWithSendGrid(null,null, content, SHIFT_NOTIFICATION,staffDTO.getEmail());
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {

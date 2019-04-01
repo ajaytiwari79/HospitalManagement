@@ -104,7 +104,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "tags")
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
 
         );

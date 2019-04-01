@@ -183,6 +183,7 @@ public class ActivityPriorityService {
             exceptionService.dataNotFoundByIdException("message.activity.priority.id",activityPriorityId);
         }
         activity.setActivityPriorityId(activityPriorityId);
+        activityMongoRepository.save(activity);
         return true;
     }
 

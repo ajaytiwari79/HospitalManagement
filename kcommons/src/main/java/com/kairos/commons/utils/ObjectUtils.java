@@ -35,6 +35,14 @@ public class ObjectUtils {
     public static boolean isCollectionNotEmpty(@Nullable Collection<?> collection){
         return !(collection == null || collection.isEmpty());
     }
+
+    public static <K,V> boolean isMapNotEmpty(@Nullable Map<K,V> map){
+        return !(map == null || map.isEmpty());
+    }
+
+    public static <K,V> boolean isMapEmpty(@Nullable Map<K,V> map){
+        return (map == null || map.isEmpty());
+    }
     public static boolean isEmpty(@Nullable Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
