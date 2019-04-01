@@ -13,6 +13,7 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.service.counter.ActivityFilterCriteria;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -26,6 +27,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -551,6 +553,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("timeType.partOfTeam").is(true))
         );
         return mongoTemplate.aggregate(aggregation, Activity.class, Activity.class).getMappedResults().size() > 0;
+    }
+
+    public boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId) {
+        Update update=new Update().pull("expertises",expertiseId);
+        return mongoTemplate.updateMulti(new Query(),update,Activity.class).wasAcknowledged();
     }
 
     public List<Activity> findByActivityIdInCompositeActivities(BigInteger activityId, List<BigInteger> allowedActivityIds) {

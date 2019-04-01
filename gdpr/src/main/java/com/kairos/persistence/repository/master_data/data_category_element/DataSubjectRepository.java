@@ -11,7 +11,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-//@JaversSpringDataAuditable
 public interface DataSubjectRepository extends JpaRepository<DataSubject, Long>{
 
     @Query(value = "Select DS from DataSubject DS where DS.countryId = ?1 and lower(DS.name) = lower(?2) and DS.deleted = false")

@@ -127,7 +127,8 @@ public class CounterRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
-                project().and("title").as("title").and("kpi._id").as("_id")
+                project("title").and("kpi").arrayElementAt(0).as("kpi"),
+                project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
@@ -433,8 +434,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("staffId").is(refId).and("level").is(level).and("copy").is(copy)),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
-                Aggregation.group("kpi._id", "kpi.title", "kpi.counter"),
-                project().and("_id").as("_id")
+                project().and("kpi").arrayElementAt(0).as("kpi"),
+                Aggregation.group("kpi._id", "kpi.title", "kpi.counter","kpi.type"),
+                project().and("_id").as("_id").and("kpi.type").as("type")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
@@ -448,8 +450,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                 lookup("applicableKPI", "kpiId", "activeKpiId", "applicableKpi"),
                 match(Criteria.where("applicableKpi.staffId").is(staffId)),
                 lookup("counter", "applicableKpi.activeKpiId", "_id", "kpi"),
-                Aggregation.group("kpi._id", "kpi.title", "kpi.counter"),
-                project().and("_id").as("_id")
+                project().and("kpi").arrayElementAt(0).as("kpi"),
+                Aggregation.group("kpi._id", "kpi.title", "kpi.counter","kpi.type"),
+                project().and("_id").as("_id").and("kpi.type").as("type")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, AccessGroupKPIEntry.class, KPIDTO.class);
