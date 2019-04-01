@@ -521,10 +521,6 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(timeType.isPartOfTeam()) {
-                int partOfTeamTimeTypes = activities.stream().filter(a -> a.getTimeTypeInfo().isPartOfTeam()).collect(Collectors.toList()).size();
-                if (activities.size() != partOfTeamTimeTypes) {
-                    exceptionService.actionNotPermittedException("message.all_activity_same.time_type");
-                }
                 if (activityMongoRepository.existsByActivityIdInCompositeActivities(parentActivity.getId())) {
                     exceptionService.actionNotPermittedException("message.activity.being_used_as_child", parentActivity.getName());
                 }
