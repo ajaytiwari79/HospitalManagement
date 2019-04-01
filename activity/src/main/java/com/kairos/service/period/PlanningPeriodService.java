@@ -58,8 +58,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by prerna on 6/4/18.
@@ -752,8 +751,8 @@ public class PlanningPeriodService extends MongoBaseService {
     public boolean addPlanningPeriodViaJob() {
         List<PlanningPeriod> planningPeriodsViaJob = new ArrayList<>();
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findLastPlanningPeriodOfAllUnits();
-        LOGGER.info("add planning period via job");
-        if(isCollectionNotEmpty(planningPeriods)) {
+        if (isCollectionNotEmpty(planningPeriods)) {
+            LOGGER.info("add planning period via job");
             Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(planningPeriods.stream().map(planningPeriod -> planningPeriod.getUnitId()).collect(Collectors.toList()));
             for (PlanningPeriod planningPeriod : planningPeriods) {
                 try {
@@ -768,12 +767,16 @@ public class PlanningPeriodService extends MongoBaseService {
                         startDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()) : startDate.plusMonths(planningPeriod.getDuration());
                     }
                 } catch (Exception e) {
-                    LOGGER.info("error of added planning period via job in " + planningPeriod.getUnitId());
+                    LOGGER.info("error while adding planning period via job for Unit Id " + planningPeriod.getUnitId());
                     e.printStackTrace();
                 }
+            }
+            if (isCollectionEmpty(planningPeriodsViaJob)) {
                 planningPeriodMongoRepository.saveEntities(planningPeriodsViaJob);
                 createScheduleJobOfPanningPeriod(planningPeriodsViaJob);
                 LOGGER.info("successfully added planning period via job");
+            }else{
+                LOGGER.info("Planning Periods not created via job");
             }
         }
         return true;
