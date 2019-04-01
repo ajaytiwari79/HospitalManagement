@@ -298,6 +298,7 @@ public class UserIntegrationService {
     }
 
     public boolean isCountryExists(long countryId) {
+
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
