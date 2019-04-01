@@ -197,6 +197,9 @@ public class ShiftService extends MongoBaseService {
         boolean removeFunction=shiftDTO.isRemoveFunction();
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()));
+        if(isNull(planningPeriod)){
+            exceptionService.actionNotPermittedException("message.periodsetting.notFound");
+        }
         Shift mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate()));
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
