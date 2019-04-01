@@ -161,7 +161,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                project("name", "generalActivityTab", "compositeActivities"));
+                project("name", "generalActivityTab", "compositeActivities","balanceSettingsActivityTab"));
 
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();

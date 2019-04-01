@@ -684,8 +684,7 @@ public class UserIntegrationService {
     }
 
     public StaffDTO getStaff(Long unitId,Long staffId) {
-        return userRestClientForScheduler.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET,MicroService.USER, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<StaffDTO>>() {
-        }, staffId);
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {}, staffId);
     }
 
     public Expertise getExpertise(Long countryId, Long expertiseId) {

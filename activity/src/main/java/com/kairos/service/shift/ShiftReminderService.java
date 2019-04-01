@@ -2,6 +2,8 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.config.env.EnvConfig;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -22,6 +24,7 @@ import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserRestClientForScheduler;
 import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
 import com.kairos.service.MongoBaseService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,8 +37,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.SHIFT_EMAIL_BODY;
-import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
 
 /**
  * CreatedBy vipulpandey on 15/10/18
@@ -56,6 +59,7 @@ public class ShiftReminderService extends MongoBaseService {
     private UserRestClientForScheduler userRestClientForScheduler;
     @Inject
     private ActivityToSchedulerQueueService activityToSchedulerQueueService;
+    @Inject private EnvConfig envConfig;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
 
@@ -109,6 +113,7 @@ public class ShiftReminderService extends MongoBaseService {
         return triggerDateTime;
     }
 
+    //TODO this method need to refactor as per requirement
     public void sendReminderViaEmail(KairosSchedulerExecutorDTO jobDetails) {
         Shift shift = shiftMongoRepository.findShiftByShiftActivityId(jobDetails.getEntityId());
         if (!Optional.ofNullable(shift).isPresent()) {
@@ -125,9 +130,13 @@ public class ShiftReminderService extends MongoBaseService {
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
-        String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
+        String description = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
                 shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
-        mailService.sendMailWithSendGrid(null,null, content, SHIFT_NOTIFICATION,staffDTO.getEmail());
+        Map<String,Object> templateParam = new HashMap<>();
+        templateParam.put("receiverName",staffDTO.getFullName());
+        templateParam.put("description", description);
+        templateParam.put("imageResourceName",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getEmail());
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {

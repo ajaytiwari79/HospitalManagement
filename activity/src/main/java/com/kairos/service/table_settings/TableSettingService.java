@@ -112,7 +112,7 @@ public class TableSettingService extends MongoBaseService {
     }
 
     // TODO MIGHT refactor above query .....')
-    public TableConfiguration getTableConfigurationByTableId(long unitId, BigInteger tableId) {
+    public TableConfiguration getTableConfigurationByTabId(long unitId, BigInteger tableId) {
 
         TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, tableId.toString());
 

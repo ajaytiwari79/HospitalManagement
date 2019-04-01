@@ -47,9 +47,9 @@ public class TableSettingController {
     }
 
     @GetMapping("/table_settings/{tabId}")
-    ResponseEntity<Map<String, Object>> getTableConfigurationByTableId(@PathVariable long unitId, @PathVariable BigInteger tabId) {
+    ResponseEntity<Map<String, Object>> getTableConfigurationByTabId(@PathVariable long unitId, @PathVariable BigInteger tabId) {
 
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfigurationByTableId(unitId, tabId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfigurationByTabId(unitId, tabId));
     }
 }
