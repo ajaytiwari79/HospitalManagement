@@ -551,7 +551,7 @@ public class ShiftService extends MongoBaseService {
         if (staffId == null) {
             exceptionService.actionNotPermittedException("staff_id.null");
         }
-        Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap();
+        Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap<>();
         List<ReasonCodeDTO> reasonCodeDTOS;
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
         if (Optional.ofNullable(unitPositionId).isPresent()) {

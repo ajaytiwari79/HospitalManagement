@@ -619,6 +619,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 and("compositeActivities.timeCalculationActivityTab").as("compositeActivities.timeCalculationActivityTab")
                 .and("compositeActivities.balanceSettingsActivityTab").as("compositeActivities.balanceSettingsActivityTab")
                 .and("compositeActivities.name").as("compositeActivities.name")
+                .and("compositeActivities._id").as("compositeActivities._id")
                 .and("compositeActivities.categoryId").as("compositeActivities.categoryId")
                 .and("compositeActivities.categoryName").as("compositeActivities.categoryName"));
         aggregationOperations.add(new CustomAggregationOperation(Document.parse(group)));
