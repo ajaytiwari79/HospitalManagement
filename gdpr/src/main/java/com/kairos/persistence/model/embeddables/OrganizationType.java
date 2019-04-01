@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.embeddables;
 
+import com.kairos.annotations.PermissionMethod;
+
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,6 +20,7 @@ public class OrganizationType {
         return id;
     }
 
+    @PermissionMethod(value = "id")
     public void setId(Long id) {
         this.id = id;
     }
@@ -26,6 +29,7 @@ public class OrganizationType {
         return name.trim();
     }
 
+    @PermissionMethod(value = "name")
     public void setName(String name) {
         this.name = name;
     }

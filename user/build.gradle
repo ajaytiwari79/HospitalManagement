@@ -48,7 +48,7 @@ ext {
 
 dependencies {
     compile project(':kcommons')
-
+    compile project(':kpermissions')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.springframework.boot:spring-boot-starter-cache')

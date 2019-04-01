@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.clause;
 
 
+import com.kairos.annotations.PermissionMethod;
+import com.kairos.annotations.PermissionModel;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.template_type.TemplateType;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
+@PermissionModel
 @Entity
 public class Clause extends BaseEntity {
 
@@ -67,6 +69,7 @@ public class Clause extends BaseEntity {
         return templateTypes;
     }
 
+    @PermissionMethod(value = "templateType")
     public void setTemplateTypes(List<TemplateType> templateTypes) {
         this.templateTypes = templateTypes;
     }

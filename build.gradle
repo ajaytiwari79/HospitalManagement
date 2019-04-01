@@ -100,6 +100,7 @@ release {
 
 task verifyRelease {
     dependsOn ":kcommons:build"
+    dependsOn ":kpermissions:build"
     dependsOn ":user:build"
     dependsOn ":gdpr:build"
     dependsOn ":activity:build"
