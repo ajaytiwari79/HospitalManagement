@@ -6,6 +6,7 @@ import com.kairos.persistence.model.table_settings.TableSetting;
 import com.kairos.persistence.repository.table_settings.TableSettingMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CITIZEN_TABLE_ID;
 
 /**
@@ -28,10 +30,10 @@ public class TableSettingService extends MongoBaseService {
     @Inject
     private TableSettingMongoRepository tableSettingMongoRepository;
 
-    public TableConfiguration saveTableSettings(long userId, long organizationId, String tableId,
+    public TableConfiguration saveTableSettings(long userId, long organizationId, String tabId,
                                                 Map<String, Object> tableConf) {
 
-        TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), organizationId, tableId);
+        TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), organizationId, tabId);
 
         TableConfiguration tableConfiguration;
 
@@ -41,16 +43,16 @@ public class TableSettingService extends MongoBaseService {
             tableSetting.setOrganizationId(organizationId);
             tableConfiguration = new TableConfiguration();
             tableConfiguration.setSettings(tableConf);
-            tableConfiguration.setTableId(tableId);
+            tableConfiguration.setTabId(tabId);
             List<TableConfiguration> configurationList = tableSetting.getTableConfigurations();
             configurationList.add(tableConfiguration);
             tableSetting.setTableConfigurations(configurationList);
         } else {
-            tableConfiguration = getTableConfiguration(tableSetting, tableId);
+            tableConfiguration = getTableConfiguration(tableSetting, tabId);
             if (tableConfiguration == null) {
                 tableConfiguration = new TableConfiguration();
                 tableConfiguration.setSettings(tableConf);
-                tableConfiguration.setTableId(tableId);
+                tableConfiguration.setTabId(tabId);
                 List<TableConfiguration> configurationList = tableSetting.getTableConfigurations();
                 configurationList.add(tableConfiguration);
 
@@ -73,7 +75,7 @@ public class TableSettingService extends MongoBaseService {
         List<TableConfiguration> tableSettings = new ArrayList<>();
 
         for (TableConfiguration tableConfiguration : tableSetting.getTableConfigurations()) {
-            if (tableIds.contains(tableConfiguration.getTableId())) {
+            if (tableIds.contains(tableConfiguration.getTabId())) {
                 tableSettings.add(tableConfiguration);
             }
         }
@@ -81,13 +83,13 @@ public class TableSettingService extends MongoBaseService {
         return tableSettings;
     }
 
-    public static TableConfiguration getTableConfiguration(TableSetting tableSetting, String tableId) {
+    public static TableConfiguration getTableConfiguration(TableSetting tableSetting, String tabId) {
 
-        if (tableId == null || tableId.isEmpty() || tableSetting == null) {
+        if (StringUtils.isBlank(tabId) || isNull(tableSetting)) {
             return null;
         }
         for (TableConfiguration tableConfiguration : tableSetting.getTableConfigurations()) {
-            if (tableConfiguration.getTableId().equals(tableId)) {
+            if (tableConfiguration.getTabId().equals(tabId)) {
                 return tableConfiguration;
             }
         }

@@ -10,7 +10,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.util.Objects;
 
-import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
+
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 

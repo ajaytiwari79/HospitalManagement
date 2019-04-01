@@ -71,7 +71,7 @@ public class MailService {
             request.setEndpoint(MAIL_REQUEST_ENDPOINT);
             request.setBody(mail.build());
             Response response = sendGrid.api(request);
-            logger.info("Email sent to {}", receiver);
+            logger.info("Email sent to {}", receiver.toString());
             logger.info("Mail response {}", response.getBody());
         } catch (IOException ex) {
             logger.error("exception occured {}", ex);
