@@ -617,11 +617,10 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
 
-        //Commented this as we don't need to verify here
-//        boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
-//        if (!isSuccess) {
-//            exceptionService.dataNotFoundException("message.parameters.incorrect");
-//        }
+        boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
+        if (!isSuccess) {
+            exceptionService.dataNotFoundException("message.parameters.incorrect");
+        }
         activity.setRegions(organizationMappingActivityDTO.getRegions());
         activity.setExpertises(organizationMappingActivityDTO.getExpertises());
         activity.setOrganizationSubTypes(organizationMappingActivityDTO.getOrganizationSubTypes());
