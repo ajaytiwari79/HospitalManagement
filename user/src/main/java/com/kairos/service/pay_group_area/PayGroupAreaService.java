@@ -153,32 +153,40 @@ public class PayGroupAreaService {
 
     private void validateAllPayGroupAreaByLevelAndMunicipality(List<PayGroupAreaDTO> payGroupAreaDTOs, List<PayGroupAreaQueryResult> payGroupAreas) {
         for (PayGroupAreaDTO payGroupAreaDTO : payGroupAreaDTOs) {
-            for (PayGroupAreaQueryResult payGroupArea : payGroupAreas) {
+
+
+            for (int i = 0; i < payGroupAreas.size(); i++) {
                 if (payGroupAreaDTO.getEndDateMillis() != null) {
-                    if (payGroupArea.getEndDateMillis() != null) {
-                        if (new Date(payGroupArea.getStartDateMillis()).before(payGroupAreaDTO.getEndDateMillis())
-                                && new Date(payGroupArea.getEndDateMillis()).after(payGroupAreaDTO.getStartDateMillis())) {
-                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap1", asLocalDate(payGroupArea.getStartDateMillis()), asLocalDate(payGroupAreaDTO.getEndDateMillis()), asLocalDate(payGroupArea.getEndDateMillis()), asLocalDate(payGroupAreaDTO.getStartDateMillis()));
+                    if (payGroupAreas.get(i).getEndDateMillis() != null) {
+                        if (new DateTime(payGroupAreas.get(i).getStartDateMillis()).isBefore(new DateTime(payGroupAreaDTO.getEndDateMillis()))
+                                && new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
+                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap1", new DateTime(payGroupAreas.get(i).getStartDateMillis()), (new DateTime(payGroupAreaDTO.getEndDateMillis())), new DateTime(payGroupAreas.get(i).getEndDateMillis()), (new DateTime(payGroupAreaDTO.getStartDateMillis())));
+                            //throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDate())
+                            //        + " " + (new DateTime(payGroupAreaDTO.getEndDate())) + " " + new DateTime(payGroupAreas.get(i).getEndDate()) + " " + (new DateTime(payGroupAreaDTO.getStartDate())));
                         }
                     } else {
-                        if (payGroupAreaDTO.getEndDateMillis().after(new Date(payGroupArea.getStartDateMillis()))) {
-                            Long dateOneDayLessStartDate = DateUtils.minusDays(payGroupAreaDTO.getStartDateMillis(),1).getTime();
-                            payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupArea.getId(), payGroupArea.getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
+                        if (new DateTime(payGroupAreaDTO.getEndDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
+                            Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
+                            payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(), payGroupAreas.get(i).getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
                         } else {
-                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap", asLocalDate(payGroupAreaDTO.getEndDateMillis()), asLocalDate(payGroupArea.getStartDateMillis()));
+                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap", new DateTime(payGroupAreaDTO.getEndDateMillis()), (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+
                         }
                     }
                 } else {
-                    if (payGroupArea.getEndDateMillis() != null && new Date(payGroupArea.getEndDateMillis()).after(payGroupAreaDTO.getStartDateMillis())) {
-                        exceptionService.actionNotPermittedException("message.paygroup.daterange.overlapold", payGroupAreaDTO.getStartDateMillis(), (new Date(payGroupArea.getEndDateMillis())));
+                    if (payGroupAreas.get(i).getEndDateMillis() != null) {
+                        if (new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
+                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlapold", new DateTime(payGroupAreaDTO.getStartDateMillis()), (new DateTime(payGroupAreas.get(i).getEndDateMillis())));
+
+                        }
                     } else {
-                        LOGGER.info(payGroupAreaDTO.getStartDateMillis() + "to create CURRENT -->" + (new Date(payGroupArea.getStartDateMillis())));
-                        if (payGroupAreaDTO.getStartDateMillis().after(new Date(payGroupArea.getStartDateMillis()))) {
-                            Long dateOneDayLessStartDate = DateUtils.minusDays(payGroupAreaDTO.getStartDateMillis(),1).getTime();
-                            LOGGER.info(new Date(dateOneDayLessStartDate) + " new Date to update--------------");
-                            payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupArea.getId(), payGroupArea.getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
+                        LOGGER.info(new DateTime(payGroupAreaDTO.getStartDateMillis()) + "to create CURRENT -->" + (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+                        if (new DateTime(payGroupAreaDTO.getStartDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
+                            Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
+                            LOGGER.info(new DateTime(dateOneDayLessStartDate) + " new Date to update--------------");
+                            payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(), payGroupAreas.get(i).getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
                         } else {
-                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap",asLocalDate(payGroupAreaDTO.getStartDateMillis()), asLocalDate(payGroupArea.getStartDateMillis()));
+                            exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap", new DateTime(payGroupAreaDTO.getStartDateMillis()), (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
 
                         }
                     }
