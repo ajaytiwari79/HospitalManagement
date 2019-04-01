@@ -11,7 +11,7 @@ import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.UnitPositionType;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -175,10 +175,10 @@ public class UnitPositionService {
         UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage(), unitPositionDTO.getAccumulatedTimebankMinutes(), unitPositionDTO.getAccumulatedTimebankDate());
 
         preparePosition(unitPosition, unitPositionDTO);
-        if ((UnitPositionType.MAIN.equals(unitPositionDTO.getUnitPosition()) && positionService.eligibleForMainUnitPosition(unitPositionDTO, -1))) {
-            unitPosition.setUnitPosition(UnitPositionType.MAIN);
+        if ((EmploymentSubType.MAIN.equals(unitPositionDTO.getEmploymentSubType()) && positionService.eligibleForMainUnitPosition(unitPositionDTO, -1))) {
+            unitPosition.setEmploymentSubType(EmploymentSubType.MAIN);
         }
-        unitPosition.setUnitPosition(unitPositionDTO.getUnitPosition());
+        unitPosition.setEmploymentSubType(unitPositionDTO.getEmploymentSubType());
         unitPositionGraphRepository.save(unitPosition);
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToUnitPosition(unitPosition, unitPositionDTO);
         Long reasonCodeId = updateEmploymentEndDate(parentOrganization, unitPositionDTO, position);
@@ -414,10 +414,10 @@ public class UnitPositionService {
         }
 
         EmploymentType employmentType = employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(), 0).orElse(null);
-        if (UnitPositionType.MAIN.equals(unitPositionDTO.getUnitPosition()) && positionService.eligibleForMainUnitPosition(unitPositionDTO, unitPositionId)) {
-            oldUnitPosition.setUnitPosition(UnitPositionType.MAIN);
+        if (EmploymentSubType.MAIN.equals(unitPositionDTO.getEmploymentSubType()) && positionService.eligibleForMainUnitPosition(unitPositionDTO, unitPositionId)) {
+            oldUnitPosition.setEmploymentSubType(EmploymentSubType.MAIN);
         }
-        oldUnitPosition.setUnitPosition(unitPositionDTO.getUnitPosition());
+        oldUnitPosition.setEmploymentSubType(unitPositionDTO.getEmploymentSubType());
         UnitPositionLineEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentUnitPositionLine.getId());
         PositionQueryResult positionQueryResult;
         UnitPositionQueryResult unitPositionQueryResult;
@@ -746,7 +746,7 @@ public class UnitPositionService {
 
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
-                , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.getUnitPosition(),
+                , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.getEmploymentSubType(),
                 Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage(), unitPosition.getAccumulatedTimebankMinutes(), unitPosition.getAccumulatedTimebankDate());
 
     }

@@ -1,6 +1,6 @@
 package com.kairos.enums;
 
-public enum  UnitPositionType {
+public enum EmploymentSubType {
 
    MAIN,SECONDARY,NONE
 }

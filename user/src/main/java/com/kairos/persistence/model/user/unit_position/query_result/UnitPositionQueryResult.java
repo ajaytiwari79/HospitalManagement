@@ -3,7 +3,7 @@ package com.kairos.persistence.model.user.unit_position.query_result;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
-import com.kairos.enums.UnitPositionType;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -37,7 +37,7 @@ public class UnitPositionQueryResult {
     private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private UnitPositionType unitPosition;
+    private EmploymentSubType employmentSubType;
     private String unitName;
     private float taxDeductionPercentage;
     private long accumulatedTimebankMinutes;
@@ -61,8 +61,8 @@ public class UnitPositionQueryResult {
 
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id,Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
-                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,UnitPositionType unitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage,long accumulatedTimebankMinutes,LocalDate accumulatedTimebankDate) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
+                                   Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType unitPosition, List<UnitPositionLinesQueryResult> positionLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -75,7 +75,7 @@ public class UnitPositionQueryResult {
         this.published=published;
         this.reasonCode=reasonCode;
         this.unitInfo=unitInfo;
-        this.unitPosition=unitPosition;
+        this.employmentSubType =unitPosition;
         this.positionLines=positionLines;
         this.taxDeductionPercentage=taxDeductionPercentage;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
@@ -222,9 +222,9 @@ public class UnitPositionQueryResult {
         this.staffId = staffId;
     }
 
-    public UnitPositionType getUnitPosition() { return unitPosition; }
+    public EmploymentSubType getEmploymentSubType() { return employmentSubType; }
 
-    public void setUnitPosition(UnitPositionType unitPosition) { this.unitPosition = unitPosition; }
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) { this.employmentSubType = employmentSubType; }
 
     public String getUnitName() {
         return unitName;

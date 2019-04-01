@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.employment_type.EmploymentCategory;
-import com.kairos.enums.UnitPositionType;
+import com.kairos.enums.EmploymentSubType;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -71,7 +71,7 @@ public class UnitPositionDTO {
     private boolean published;
     private Long accessGroupId;
     @NotNull(message = "Unit Position Not selected")
-    private UnitPositionType unitPosition;
+    private EmploymentSubType employmentSubType;
     private float taxDeductionPercentage;
     private ExpertiseResponseDTO expertise;
     //This is the Intial value of accumulatedTimebank
@@ -334,9 +334,9 @@ public class UnitPositionDTO {
         this.positionLineId = positionLineId;
     }
 
-    public UnitPositionType getUnitPosition() { return unitPosition; }
+    public EmploymentSubType getEmploymentSubType() { return employmentSubType; }
 
-    public void setUnitPosition(UnitPositionType unitPosition) { this.unitPosition = unitPosition; }
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) { this.employmentSubType = employmentSubType; }
 
     public float getTaxDeductionPercentage() {
         return taxDeductionPercentage;
