@@ -551,7 +551,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("timeType").arrayElementAt(0).as("timeType"),
                 match(Criteria.where("timeType.partOfTeam").is(true))
         );
-        return mongoTemplate.aggregate(aggregation, Activity.class, Boolean.class).getMappedResults().size() > 0;
+        return mongoTemplate.aggregate(aggregation, Activity.class, Activity.class).getMappedResults().size() > 0;
     }
 
     public boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId) {

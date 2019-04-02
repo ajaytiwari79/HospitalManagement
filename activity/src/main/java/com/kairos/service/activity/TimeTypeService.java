@@ -103,11 +103,16 @@ public class TimeTypeService extends MongoBaseService {
             }
             List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
             boolean partOfTeamUpdated=false;
+            boolean allowedChildActivityUpdated=false;
             if (Optional.ofNullable(childTimeTypeList).isPresent()) {
                 for(TimeType childTimeType:childTimeTypeList){
                     if(childTimeType.isPartOfTeam()!=timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()){
                         childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
                         partOfTeamUpdated=true;
+                    }
+                    if(childTimeType.isAllowChildActivities()!=timeTypeDTO.isAllowChildActivities() && childTimeType.getChildTimeTypeIds().isEmpty()){
+                        childTimeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
+                        allowedChildActivityUpdated=true;
                     }
                     childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                     List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
@@ -116,6 +121,9 @@ public class TimeTypeService extends MongoBaseService {
                             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                             if(leafTimeType.isPartOfTeam()!=timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId()!=null){
                                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+                            }
+                            if(leafTimeType.isAllowChildActivities()!=timeTypeDTO.isAllowChildActivities() && !allowedChildActivityUpdated && timeType.getUpperLevelTimeTypeId()!=null){
+                                childTimeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
                             }
                         }
                         timeTypes.addAll(leafTimeTypeList);
