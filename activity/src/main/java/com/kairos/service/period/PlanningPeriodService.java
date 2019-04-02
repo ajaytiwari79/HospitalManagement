@@ -771,7 +771,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     e.printStackTrace();
                 }
             }
-            if (isCollectionEmpty(planningPeriodsViaJob)) {
+            if (isCollectionNotEmpty(planningPeriodsViaJob)) {
                 planningPeriodMongoRepository.saveEntities(planningPeriodsViaJob);
                 createScheduleJobOfPanningPeriod(planningPeriodsViaJob);
                 LOGGER.info("successfully added planning period via job");
