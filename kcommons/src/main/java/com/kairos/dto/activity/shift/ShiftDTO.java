@@ -73,7 +73,6 @@ public class ShiftDTO {
     private BigInteger phaseId;
     private int restingMinutes;
     private Set<ShiftEscalationReason> escalationReasons;
-    private boolean removeFunction;
     private Long functionId;
 
     public ShiftDTO() {
@@ -431,14 +430,6 @@ public class ShiftDTO {
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
         this.escalationReasons = isNullOrElse(escalationReasons,new HashSet<>());
-    }
-
-    public boolean isRemoveFunction() {
-        return removeFunction;
-    }
-
-    public void setRemoveFunction(boolean removeFunction) {
-        this.removeFunction = removeFunction;
     }
 
     public Long getFunctionId() {
