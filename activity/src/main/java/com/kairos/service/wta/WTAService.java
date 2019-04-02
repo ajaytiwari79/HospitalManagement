@@ -6,6 +6,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
@@ -33,6 +34,7 @@ import com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
@@ -115,6 +117,8 @@ public class WTAService extends MongoBaseService {
     private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
+    @Inject
+    private TagMongoRepository tagMongoRepository;
 
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
@@ -236,7 +240,8 @@ public class WTAService extends MongoBaseService {
         }
         wta.setDescription(wtaDTO.getDescription());
         wta.setName(wtaDTO.getName());
-        wta.setExpertise(new Expertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription(), wtaBasicDetailsDTO.getExpertiseResponse().getTags()));
+        wta.setTags(wtaDTO.getTags());
+        wta.setExpertise(new Expertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription()));
         wta.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
         wta.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
         return wta;
@@ -290,16 +295,22 @@ public class WTAService extends MongoBaseService {
             if (!Optional.ofNullable(wtaBasicDetailsDTO.getExpertiseResponse()).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.expertise.id", updateDTO.getExpertiseId());
             }
-            oldWta.setExpertise(new Expertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription(), wtaBasicDetailsDTO.getExpertiseResponse().getTags()));
+            oldWta.setExpertise(new Expertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription()));
         }
+        oldWta.setTags(updateDTO.getTags());
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
         oldWta.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
         oldWta.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
         save(oldWta);
+        List<TagDTO> tags = null;
+        if (isCollectionNotEmpty(oldWta.getTags())) {
+            tags = tagMongoRepository.findAllTagsByIdIn(oldWta.getTags());
+            oldWta.setTags(null);
+        }
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        wtaResponseDTO.setTags(tags);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
-
         return wtaResponseDTO;
     }
 

@@ -48,6 +48,6 @@ public interface TagMongoRepository extends MongoRepository<Tag,BigInteger>,Cust
 
     Tag findTagByOrganizationIdAndNameAndMasterDataTypeAndDeletedAndCountryTagFalse(Long orgId, String name, String masterDataTypeEnum,boolean deleted);
 
-    List<TagDTO> findAllTagsByIdIn(List<Long> tagIds);
+    List<TagDTO> findAllTagsByIdIn(List<BigInteger> tagIds);
 }
 

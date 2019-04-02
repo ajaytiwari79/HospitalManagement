@@ -133,7 +133,7 @@ public class CountryCTAService extends MongoBaseService {
             ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
         }
         if (creatingFromCountry) {
-            Expertise expertise = new Expertise(ctaBasicDetailsDTO.getExpertise().getId(), ctaBasicDetailsDTO.getExpertise().getName(), ctaBasicDetailsDTO.getExpertise().getDescription(), ctaBasicDetailsDTO.getExpertise().getTags());
+            Expertise expertise = new Expertise(ctaBasicDetailsDTO.getExpertise().getId(), ctaBasicDetailsDTO.getExpertise().getName(), ctaBasicDetailsDTO.getExpertise().getDescription());
             costTimeAgreement.setExpertise(expertise);
             if (!doUpdate) {
                 OrganizationType organizationType = new OrganizationType(ctaBasicDetailsDTO.getOrganizationType().getId(), ctaBasicDetailsDTO.getOrganizationType().getName(), ctaBasicDetailsDTO.getOrganizationType().getDescription());
