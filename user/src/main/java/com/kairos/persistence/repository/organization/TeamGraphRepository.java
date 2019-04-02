@@ -79,7 +79,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void updateTeamLeaderOfTeam(long teamId, long teamLeaderStaffId);
 
     @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(team)={0} AND id(staff) IN {1}  " +
-            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
+            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) WITH team "+
+            "MATCH (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE NOT id(staff) IN {1} DETACH DELETE staffTeamRel")
     void updateStaffsInTeam(long teamId, Set<Long> staffIds);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
