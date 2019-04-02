@@ -3,16 +3,10 @@ package com.kairos.configuration;
 import com.kairos.annotations.PermissionMethod;
 import com.kairos.annotations.PermissionModel;
 import com.kairos.annotations.PermissionSubModel;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.config.EnvConfigCommon;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.rest_client.UserRestClient;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -21,25 +15,11 @@ import java.util.*;
 
 import static com.kairos.constants.ApplicationConstants.*;
 
-@Component
-public class PermissionSchemaProcessor  {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionSchemaProcessor.class);
 
+public class PermissionSchemaScanner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionSchemaScanner.class);
 
-    private UserRestClient userRestClient;
-
-    private EnvConfigCommon envConfigCommon;
-
-    public PermissionSchemaProcessor(String domainPackagePath,UserRestClient userRestClient, String userServiceUrl, EnvConfigCommon envConfigCommon) {
-        this.userRestClient =userRestClient;
-        this.envConfigCommon= envConfigCommon;
-        createPermissionSchema(domainPackagePath, userServiceUrl);
-    }
-
-    public PermissionSchemaProcessor() {
-    }
-
-    private void createPermissionSchema(String domainPackagePath, String userServiceUrl){
+    public List<Map<String, Object>> createPermissionSchema(String domainPackagePath){
         List<Map<String, Object>> modelData = new ArrayList<>();
         try {
             Reflections reflections = new Reflections(ClasspathHelper.forPackage(domainPackagePath));
@@ -61,21 +41,16 @@ public class PermissionSchemaProcessor  {
                             modelMetaData.put(FIELDS, fields);
                             modelData.add(modelMetaData);
                         }
-
-
                     });
             LOGGER.info("model=="+modelData);
-            if("true".equalsIgnoreCase(envConfigCommon.getKpermissionDataPublish()) ) {
-                Boolean result = userRestClient.publishRequest(modelData, userServiceUrl, IntegrationOperation.CREATE, "create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-                });
-            }
 
         }catch (Exception ex){
             LOGGER.error("ERROR in identifying permission models======"+ex.getMessage());
         }
+        return modelData;
     }
 
-    public void findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
+    private void findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
         Arrays.stream(permissionClass.getDeclaredFields())
                 .filter(entityField -> entityField.isAnnotationPresent(PermissionSubModel.class))
                 .forEach(permissionField -> {

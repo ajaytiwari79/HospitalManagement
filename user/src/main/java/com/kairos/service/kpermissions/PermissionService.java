@@ -53,7 +53,6 @@ public class PermissionService {
 
     public List<Map<String, Object>> getPermissionSchema(){
         List<Map<String, Object>> modelData = permissionModelRepository.getPermissionModelDataWithFields();
-        LOGGER.info("DATA=="+modelData.toString());
         return modelData;
     }
 }
