@@ -657,7 +657,7 @@ public class ExpertiseService {
             registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
         }
         catch (Exception e){
-            LOGGER.info("Exception occured in scheduling job for register Job For unassign experties from activity");
+            LOGGER.info("Exception occured in scheduling job for unassign experties from activity");
         }
         return parentExpertise;
     }
