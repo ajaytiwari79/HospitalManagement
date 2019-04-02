@@ -34,8 +34,6 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
     @Override
     public boolean existsByNameAndCountryIdAndNotEqualToId(String name, BigInteger id,Long countryId){
-        Assert.notNull(name, "The given name must not be null!");
-        Assert.notNull(id, "The given id must not be null!");
         Criteria criteria = Criteria.where("countryId").is(countryId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false);
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
@@ -45,8 +43,6 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
     @Override
     public boolean existsByNameAndOrganizationIdAndNotEqualToId(String name, BigInteger id,Long organizationId){
-        Assert.notNull(name, "The given name must not be null!");
-        Assert.notNull(id, "The given id must not be null!");
         Criteria criteria = Criteria.where("organizationId").is(organizationId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false);
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
