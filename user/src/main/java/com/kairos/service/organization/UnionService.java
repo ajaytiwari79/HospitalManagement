@@ -311,18 +311,60 @@ public class UnionService {
             boardingCompleted = true;
             unionData.setState(UnionState.PUBLISHED);
         }
-        List<Sector> sectors = null;
-        if (!CollectionUtils.isEmpty(unionData.getSectorIds())) {
-            sectors = sectorGraphRepository.findSectorsById(unionData.getSectorIds());
+        List<Long> sectorIds = new ArrayList<>();
+        List<SectorDTO> sectorDTOS = new ArrayList<>();
+        filterSectorsWithIdsAndSectorWithOutId(unionData, sectorIds, sectorDTOS);
+        List<Sector> sectors = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(sectorIds)) {
+            sectors.addAll(sectorGraphRepository.findSectorsById(sectorIds));
         }
+        sectors.addAll(createSectors(countryId, sectorDTOS));
         Organization union = new Organization(unionData.getName(), sectors, address, boardingCompleted, country, true);
         if (isCollectionEmpty(union.getLocations()) && publish) {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
 
         organizationGraphRepository.save(union);
+        unionData.setSectors(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
         unionData.setId(union.getId());
         return unionData;
+    }
+
+
+    private List<Sector> createSectors(Long countryId, List<SectorDTO> sectorDTOS) {
+        List<Sector> sectors = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(sectorDTOS)) {
+            Country country = countryGraphRepository.findCountryById(countryId);
+            if (!Optional.ofNullable(country).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            }
+            List<String> sectorsNames = new ArrayList<>();
+            for (SectorDTO sectorDTO : sectorDTOS) {
+                Sector sector = new Sector(sectorDTO.getName());
+                sectorsNames.add(sectorDTO.getName().toLowerCase());
+                sector.setCountry(country);
+                sectors.add(sector);
+            }
+            sectorsNames = sectorGraphRepository.existsByNames(sectorsNames);
+            if (CollectionUtils.isNotEmpty(sectorsNames)) {
+                exceptionService.duplicateDataException("message.sector.alreadyexists", StringUtils.join(sectorsNames, ","));
+            }
+            sectorGraphRepository.saveAll(sectors);
+        }
+        return sectors;
+    }
+
+    private void filterSectorsWithIdsAndSectorWithOutId(UnionDTO unionData, List<Long> sectorIds, List<SectorDTO> sectorDTOS) {
+        List<SectorDTO> sectorDTOSWithIds = new ArrayList<>();
+        unionData.getSectors().forEach(sectorDTO -> {
+            if (Optional.ofNullable(sectorDTO.getId()).isPresent()) {
+                sectorIds.add(sectorDTO.getId());
+                sectorDTOSWithIds.add(sectorDTO);
+            } else {
+                sectorDTOS.add(sectorDTO);
+            }
+        });
+        unionData.setSectors(sectorDTOSWithIds);
     }
 
     public UnionDTO updateUnion(UnionDTO unionData, long countryId, Long unionId, boolean publish) {
@@ -343,21 +385,26 @@ public class UnionService {
         if (!publish && union.isBoardingCompleted()) {
             exceptionService.invalidRequestException("message.publish.union.unpublish");
         }
-
+        List<Long> sectorIDsToBeCreated = new ArrayList<>();
+        List<SectorDTO> sectorDTOS = new ArrayList<>();
+        filterSectorsWithIdsAndSectorWithOutId(unionData, sectorIDsToBeCreated, sectorDTOS);
         Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
-        List<Long> sectorIDsCreated = new ArrayList<>(unionData.getSectorIds());
-        List<Long> sectorIdsToBeDeleted = new ArrayList<Long>(sectorIdsDb);
-
-        sectorIDsCreated.removeAll(sectorIdsDb);
-        sectorIdsToBeDeleted.removeAll(unionData.getSectorIds());
-        if (!sectorIdsToBeDeleted.isEmpty() && !union.isBoardingCompleted()) {
-            organizationGraphRepository.deleteUnionSectorRelationShip(sectorIdsToBeDeleted, unionId);
-        } else if (!sectorIdsToBeDeleted.isEmpty() && union.isBoardingCompleted()) {
+        List<Long> sectorIds = new ArrayList<>(sectorIDsToBeCreated);
+        sectorIDsToBeCreated.removeAll(sectorIdsDb);
+        sectorIdsDb.removeAll(sectorIds);
+        if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
+            organizationGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
+        } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
             exceptionService.unsupportedOperationException("message.sector.unlinked");
         }
+        if (!sectorIDsToBeCreated.isEmpty()) {
+            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
+        }
+        if (!sectorDTOS.isEmpty()) {
+            List<Sector> sectors = createSectors(countryId, sectorDTOS);
+            union.getSectors().addAll(sectors);
+            unionData.getSectors().addAll(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
 
-        if (!sectorIDsCreated.isEmpty()) {
-            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsCreated, unionId);
         }
         ContactAddress address = null;
         boolean zipCodeUpdated = false;
@@ -377,7 +424,7 @@ public class UnionService {
             Long municipalityIdDB = Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent() ? unionDataQueryResult.getMunicipality().getId() : null;
             address = getAddress(unionData.getMainAddress(), zipCodeUpdated, municipalityUpdated, Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent() ?
                     unionDataQueryResult.getAddress().getId() : null, zipCodeIdDB, municipalityIdDB);
-            if(publish){
+            if (publish) {
                 union.setBoardingCompleted(true);
                 unionData.setState(UnionState.PUBLISHED);
             }
