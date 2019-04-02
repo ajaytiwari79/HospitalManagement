@@ -5,20 +5,20 @@ import java.util.Optional;
 
 public class TableConfiguration {
 
-    private String tableId;
+    private String tabId;
     private Map<String,Object> settings;
 
-    public void setTableId(String tableId) {
-        this.tableId = tableId;
+    public void setTabId(String tabId) {
+        this.tabId = tabId;
     }
 
     public void setSettings(Map<String, Object> settings) {
         this.settings = settings;
     }
 
-    public String getTableId() {
+    public String getTabId() {
 
-        return tableId;
+        return tabId;
     }
 
     public Map<String, Object> getSettings() {

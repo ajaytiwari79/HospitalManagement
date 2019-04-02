@@ -1378,4 +1378,13 @@ public class OrganizationController {
                 unitService.getEligibleUnitsForCtaAndWtaCreation(unitId));
 
     }
+
+    @ApiOperation(value = "get organization ids")
+    @GetMapping(value = "/get_organization_ids")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationIds(@RequestParam(required = false) Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationIds(unitId));
+
+    }
 }

@@ -475,7 +475,7 @@ public class WTAService extends MongoBaseService {
                 currentWTA.setVersions(versionWTAs);
             }
         });
-        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
+        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
         return new WTATableSettingWrapper(parentWTA, tableConfiguration);
     }
 

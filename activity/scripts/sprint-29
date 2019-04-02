@@ -55,7 +55,7 @@ db.wtaBaseRuleTemplate.updateMany({},{$push:{"phaseTemplateValues" :{$each:[ {
             "managementCanBeIgnore" : false
         }]}}});
 
-db.getCollection('tableSetting').remove({"tableConfigurations.tableId":{$in:["36","35"]}})
+db.getCollection('tableSetting').remove({"tableConfigurations.tabId":{$in:["36","35"]}})
 
 
 
