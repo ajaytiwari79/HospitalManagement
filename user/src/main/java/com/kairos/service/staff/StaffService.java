@@ -949,14 +949,17 @@ public class StaffService {
 
     public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
 
-        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
-                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-        Position position = new Position();
-        position.setStaff(staff);
-        staff.setUser(user);
-        position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
-        position.setStaff(staff);
-        position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(),user.getId());
+        if(isNull(position)) {
+            Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                    user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+            position.setStaff(staff);
+            staff.setUser(user);
+            position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+            position.setStaff(staff);
+            staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
+            position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+        }
         // if the organization is not parent organization then adding position in parent organization.
         if (!parentOrganization) {
             Organization
@@ -967,7 +970,6 @@ public class StaffService {
             organization.getPositions().add(position);
         }
         organizationGraphRepository.save(organization);
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {

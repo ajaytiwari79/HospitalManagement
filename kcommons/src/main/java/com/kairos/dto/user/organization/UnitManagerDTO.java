@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public class UnitManagerDTO {
     @NotNull(message = "error.Organization.unitmanager.accessgroupid.notnull")
     private Long accessGroupId;
-    @NotNull(message = "error.cprNumber.notnull")
+    @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
     private String firstName;
     private String lastName;

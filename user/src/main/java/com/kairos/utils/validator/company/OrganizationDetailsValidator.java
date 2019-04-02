@@ -1,5 +1,6 @@
 package com.kairos.utils.validator.company;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -44,23 +45,27 @@ public class OrganizationDetailsValidator {
     }
 
     public static void validateUserDetails(List<StaffPersonalDetailDTO> staffPersonalDetailDTOS, ExceptionService exceptionService) {
-        staffPersonalDetailDTOS.forEach(staffPersonalDetailDTO -> {
-            if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent()|| staffPersonalDetailDTO.getCprNumber().length()!=10) {
-                exceptionService.invalidRequestException("error.cprnumber.notnull", staffPersonalDetailDTO.getOrganizationId());
-            }
-            if (!Optional.ofNullable(staffPersonalDetailDTO.getFirstName()).isPresent()) {
-                exceptionService.invalidRequestException("error.firstname.notnull", staffPersonalDetailDTO.getOrganizationId());
-            }
-            if (!Optional.ofNullable(staffPersonalDetailDTO.getLastName()).isPresent()) {
-                exceptionService.invalidRequestException("error.lastname.notnull", staffPersonalDetailDTO.getOrganizationId());
-            }
-            if (!Optional.ofNullable(staffPersonalDetailDTO.getEmail()).isPresent()) {
-                exceptionService.invalidRequestException("error.email.notnull", staffPersonalDetailDTO.getOrganizationId());
-            }
-            if (!Optional.ofNullable(staffPersonalDetailDTO.getAccessGroupId()).isPresent()) {
-                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroup.notnull", staffPersonalDetailDTO.getOrganizationId());
-            }
-        });
+        if(ObjectUtils.isCollectionNotEmpty(staffPersonalDetailDTOS)) {
+            staffPersonalDetailDTOS.forEach(staffPersonalDetailDTO -> {
+                if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent() || staffPersonalDetailDTO.getCprNumber().length() != 10) {
+                    exceptionService.invalidRequestException("error.cprnumber.notnull", staffPersonalDetailDTO.getOrganizationId());
+                }
+                if (!Optional.ofNullable(staffPersonalDetailDTO.getFirstName()).isPresent()) {
+                    exceptionService.invalidRequestException("error.firstname.notnull", staffPersonalDetailDTO.getOrganizationId());
+                }
+                if (!Optional.ofNullable(staffPersonalDetailDTO.getLastName()).isPresent()) {
+                    exceptionService.invalidRequestException("error.lastname.notnull", staffPersonalDetailDTO.getOrganizationId());
+                }
+                if (!Optional.ofNullable(staffPersonalDetailDTO.getEmail()).isPresent()) {
+                    exceptionService.invalidRequestException("error.email.notnull", staffPersonalDetailDTO.getOrganizationId());
+                }
+                if (!Optional.ofNullable(staffPersonalDetailDTO.getAccessGroupId()).isPresent()) {
+                    exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroup.notnull", staffPersonalDetailDTO.getOrganizationId());
+                }
+            });
+        }else{
+            exceptionService.invalidRequestException("error.user.details.missing");
+        }
     }
 
     public static void validateAddressDetails(List<OrganizationContactAddress> organizationContactAddresses, ExceptionService exceptionService) {
