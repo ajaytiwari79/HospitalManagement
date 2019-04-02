@@ -55,6 +55,8 @@ import com.kairos.utils.FormatUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -79,7 +81,7 @@ import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
 @Transactional
 public class CompanyCreationService {
 
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyCreationService.class);
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -584,9 +586,9 @@ public class CompanyCreationService {
             unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
             unitIds.add(organizationId);
-            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
-                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
-            }
+//            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
+//                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
+//            }
             validateUserDetails(staffPersonalDetailDTOS, exceptionService);
             organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         } else {
@@ -599,10 +601,15 @@ public class CompanyCreationService {
 
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
-        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
-        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days, LocalTime.of(23,59),JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING,String.valueOf(organization.getTimeZone()));
-        // create job for auto clock out and create realtime/draft shiftstate
-        schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+       try {
+           List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+           SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(days, LocalTime.of(23, 59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING, String.valueOf(organization.getTimeZone()));
+           // create job for auto clock out and create realtime/draft shiftstate
+           schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+           });
+       }catch (Exception e){
+           LOGGER.info("schedular is not running , unable to create job");
+       }
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();

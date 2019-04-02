@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
+import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
 
 
 /**
@@ -481,7 +482,10 @@ public class UserService {
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
         }
         String token = tokenService.createForgotPasswordToken(currentUser);
-        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT);
+        Map<String,Object> templateParam = new HashMap<>();
+        templateParam.put("receiverName",currentUser.getFullName());
+        templateParam.put("description",AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token);
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,userEmail);
         return true;
     }
 

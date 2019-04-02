@@ -10,6 +10,7 @@ import com.mongodb.BulkWriteOperation;
 import com.mongodb.client.MongoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,6 +24,7 @@ import javax.validation.Valid;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 	private final MongoOperations mongoOperations;
@@ -59,6 +61,27 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	public <T extends MongoBaseEntity> void safeDelete(T object){
 		Assert.notNull(object.getId(), "The given id must not be null!");
 		mongoOperations.updateFirst(new Query(Criteria.where("_id").is(object.getId())),Update.update("deleted",true),entityInformation.getJavaType());
+	}
+
+	@Override
+	public boolean existsByName(String name){
+		Assert.notNull(name, "The given name must not be null!");
+		return mongoOperations.exists(new Query(Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false)),entityInformation.getJavaType());
+	}
+
+	@Override
+	public boolean existsByNameAndNotEqualToId(String name,BigInteger id){
+		Assert.notNull(name, "The given name must not be null!");
+		Assert.notNull(id, "The given id must not be null!");
+		return mongoOperations.exists(new Query(Criteria.where("_id").ne(id).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false)),entityInformation.getJavaType());
+	}
+
+	@Override
+	public <T extends MongoBaseEntity> T findLastOrFirstByField(Sort sort){
+		Assert.notNull(sort, "The given sort must not be null!");
+		Query query = new Query(Criteria.where("deleted").is(false));
+		query.with(sort);
+		return (T)mongoOperations.findOne(query,entityInformation.getJavaType());
 	}
 
 

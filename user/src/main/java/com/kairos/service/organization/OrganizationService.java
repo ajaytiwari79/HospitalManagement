@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
@@ -16,6 +17,7 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
@@ -60,6 +62,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.rest_client.PhaseRestClient;
 import com.kairos.rest_client.PlannedTimeTypeRestClient;
+import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.client.AddressVerificationService;
@@ -81,6 +84,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,9 +97,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.GROUP;
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+
 /**
  * Calls OrganizationGraphRepository to perform CRUD operation on  Organization.
  */
@@ -205,6 +211,8 @@ public class OrganizationService {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private SchedulerServiceRestClient schedulerServiceRestClient;
 
     private final Logger logger = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -469,7 +477,7 @@ public class OrganizationService {
                         && payload.containsKey("estimoteAppToken")
                         && payload.get("estimoteAppId") != null
                         && payload.get("estimoteAppToken") != null
-        ) {
+                ) {
             organizationObj.setEstimoteAppId(payload.get("estimoteAppId"));
             organizationObj.setEstimoteAppToken(payload.get("estimoteAppToken"));
             return payload;
@@ -633,16 +641,6 @@ public class OrganizationService {
     }
 
     public Boolean verifyOrganizationExpertise(OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
-        Long matchedExpertise = expertiseGraphRepository.findAllExpertiseCountMatchedByIds(organizationMappingActivityTypeDTO.getExpertises());
-        if (matchedExpertise != organizationMappingActivityTypeDTO.getExpertises().size()) {
-            exceptionService.dataNotMatchedException("message.organization.expertise.update.mismatched");
-
-        }
-        Long matchedRegion = regionGraphRepository.findAllRegionCountMatchedByIds(organizationMappingActivityTypeDTO.getRegions());
-        if (matchedRegion != organizationMappingActivityTypeDTO.getRegions().size()) {
-            exceptionService.dataNotMatchedException("message.organization.region.update.mismatched");
-
-        }
         List<Long> organizationTypeAndSubTypeIds = new ArrayList<Long>();
         organizationTypeAndSubTypeIds.addAll(organizationMappingActivityTypeDTO.getOrganizationTypes());
         organizationTypeAndSubTypeIds.addAll(organizationMappingActivityTypeDTO.getOrganizationSubTypes());
@@ -805,6 +803,7 @@ public class OrganizationService {
 
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
+        schedulerServiceRestClient.publishRequest(zoneId, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
         unit.setTimeZone(zoneId);
         organizationGraphRepository.save(unit);
         return true;
@@ -1081,15 +1080,15 @@ public class OrganizationService {
         return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
     }
 
-    public Map<Long,String> getTimeZoneStringsOfAllUnits() {
-        List<OrganizationBasicResponse> organizationBasicResponses=organizationGraphRepository.findTimezoneforAllorganizations();
-        return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId,OrganizationBasicResponse::getTimezone));
+    public Map<Long, String> getTimeZoneStringsOfAllUnits() {
+        List<OrganizationBasicResponse> organizationBasicResponses = organizationGraphRepository.findTimezoneforAllorganizations();
+        return organizationBasicResponses.stream().collect(HashMap::new, (m, v) -> m.put(v.getId(), v.getTimezone()), HashMap::putAll);
     }
 
 
-    public Map<Long,String> getTimeZoneStringsByUnitIds(Set<Long> unitIds) {
-        List<OrganizationBasicResponse> organizationBasicResponses=organizationGraphRepository.findTimezoneByUnitIds(unitIds);
-        return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId,OrganizationBasicResponse::getTimezone));
+    public Map<Long, String> getTimeZoneStringsByUnitIds(Set<Long> unitIds) {
+        List<OrganizationBasicResponse> organizationBasicResponses = organizationGraphRepository.findTimezoneByUnitIds(unitIds);
+        return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId, OrganizationBasicResponse::getTimezone));
     }
 
     public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
@@ -1101,5 +1100,18 @@ public class OrganizationService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organization", unitId);
         }
         return true;
+    }
+
+    public List<Long> getOrganizationIds(Long unitId){
+        List<Long> organizationIds = null;
+        if (isNull(unitId)) {
+            organizationIds = organizationGraphRepository.findAllOrganizationIds();
+        } else {
+            Optional<Organization> optionalOrganization = organizationGraphRepository.findById(unitId);
+            if(optionalOrganization.isPresent()){
+                organizationIds = optionalOrganization.get().getChildren().stream().map(unit->unit.getId()).collect(Collectors.toList());
+            }
+        }
+        return organizationIds;
     }
 }

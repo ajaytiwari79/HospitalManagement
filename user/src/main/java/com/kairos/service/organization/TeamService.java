@@ -80,8 +80,8 @@ public class TeamService {
         if (organizationContactAddress.getOrganization() == null) {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound.by.group");
         }
-        boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
-        if (teamExistInOrganizationAndGroupByName) {
+        boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
+        if (teamExistInOrganizationByName) {
             exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
         }
 
@@ -129,7 +129,7 @@ public class TeamService {
         organizationGraphRepository.save(organization, 2);
 
         if(ObjectUtils.isNotNull(teamDTO.getTeamLeaderStaffId())){
-            teamGraphRepository.assignTeamLeaderToTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
+            teamGraphRepository.updateTeamLeaderOfTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
         }
         return teamDTO;
     }
@@ -139,7 +139,7 @@ public class TeamService {
         if (teamExistInOrganizationAndGroupByName) {
             exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
         }
-        Team team = teamGraphRepository.findOne(teamId);
+        Team team = teamGraphRepository.findOne(teamId,0);
         if (team != null) {
             team.setName(teamDTO.getName());
             team.setDescription(teamDTO.getDescription());
@@ -153,7 +153,7 @@ public class TeamService {
         return teamDTO;
     }
 
-    public boolean updateActivitiesOfTeam(Long teamId, List<BigInteger> activityIds) {
+    public boolean updateActivitiesOfTeam(Long teamId, Set<BigInteger> activityIds) {
         Team team = teamGraphRepository.findOne(teamId);
         if (team != null) {
             team.setActivityIds(activityIds);
@@ -164,7 +164,7 @@ public class TeamService {
         return true;
     }
 
-    public boolean updateStaffsInTeam(Long teamId, List<Long> staffIds) {
+    public boolean updateStaffsInTeam(Long teamId, Set<Long> staffIds) {
         if(ObjectUtils.isCollectionEmpty(staffIds)){
             teamGraphRepository.removeAllStaffsFromTeam(teamId);
         }else{
@@ -274,7 +274,7 @@ public class TeamService {
 
     }
 
-    public boolean addTeamSelectedSkills(Long teamId, List<Long> skillIds) {
+    public boolean addTeamSelectedSkills(Long teamId, Set<Long> skillIds) {
         if(ObjectUtils.isCollectionNotEmpty(skillIds)){
             teamGraphRepository.saveSkill(teamId, skillIds);
         } else {
@@ -330,5 +330,9 @@ public class TeamService {
             response.add(o);
         }
         return response;
+    }
+
+    public List<BigInteger> getTeamActivitiesOfStaff(Long staffId) {
+       return teamGraphRepository.getTeamActivitiesOfStaff(staffId);
     }
 }
