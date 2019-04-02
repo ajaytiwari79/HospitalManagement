@@ -142,7 +142,7 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist", tagDTO.getName());
 
         }
-        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), true);
+        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false);
         if (CollectionUtils.isNotEmpty(organization.getTags())) {
             organization.getTags().add(tag);
         } else {
@@ -240,15 +240,11 @@ public class TagService {
         }
     }
 
+    //todo delete
     private List<Tag> getOrganizationTagsByIdsAndMasterDataType(Long orgId, List<Long> tagsId) {
         logger.info("tagsId : " + tagsId);
-        if (tagsId != null && tagsId.size() > 0) {
-            List<Tag> tags = tagGraphRepository.getOrganizationTagsById(orgId, tagsId, MasterDataTypeEnum.SKILL.toString(), false);
-            logger.info("tags : " + tags);
-            return tags;
-        } else {
-            return new ArrayList<>();
-        }
+        return CollectionUtils.isNotEmpty(tagsId) ? tagGraphRepository.getOrganizationTagsById(orgId, tagsId, MasterDataTypeEnum.SKILL.toString(), false) : new ArrayList<>();
+
     }
 
     public List<Tag> getCountryTagsOfSkill(long countryId, long skillId, String filterText) {
@@ -297,11 +293,9 @@ public class TagService {
     }
 
     public boolean updateOrganizationTagsOfSkill(Long skillId, Long orgId, List<Long> tagsId) {
-        Skill skill = skillGraphRepository.findOne(skillId);
         skillGraphRepository.removeAllOrganizationTags(orgId, skillId);
-        List<Tag> listOfTags = tagGraphRepository.getTagsOfSkillByDeleted(skillId, false);
-        listOfTags.addAll(getOrganizationTagsByIdsAndMasterDataType(orgId, tagsId));
-        skill.setTags(listOfTags);
+        Skill skill = skillGraphRepository.findOne(skillId);
+        skill.setTags(getOrganizationTagsByIdsAndMasterDataType(orgId, tagsId));
         skillGraphRepository.save(skill);
         return true;
 

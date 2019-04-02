@@ -89,6 +89,7 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     void removeAllOrganizationTags(long orgId, long skillId);
 
 
+
     List<Skill> findSkillByNameIn(List<String> skillNames);
 
     List<Skill> findByExternalIdInAndIsEnabledTrue(List<String> timecareIds);
