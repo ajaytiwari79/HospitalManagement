@@ -199,9 +199,9 @@ public class UserIntegrationService {
         }, unitPositionId);
     }
 
-    public Boolean applyFunction(Long unitId, Long unitPositionId, Map<LocalDate, Long> dateAndFunctionIdMap) {
+    public Boolean applyFunction(Long unitId, Long unitPositionId, Map<LocalDate, Long> dateAndFunctionIdMap,HttpMethod httpMethod) {
 
-        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLY_FUNCTION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, httpMethod, APPLY_FUNCTION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, unitPositionId);
 
     }

@@ -47,13 +47,14 @@ public class UnitPositionFunctionService {
         Long functionId = payload.get(dateAsString);
         //Long functionId = new Long((Integer) functionMap.get("id"));
 
-        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId,  dateAsString);
-
-        if (unitPositionFunctionRelationship == null) {
+//        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId,  dateAsString);
+//
+//        if (unitPositionFunctionRelationship == null) {
+            unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(dateAsString).toString());
             unitPositionFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId, Collections.singletonList(dateAsString));
-        } else if (unitPositionFunctionRelationship) {
-            exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
-        }
+//        } else if (unitPositionFunctionRelationship) {
+//            exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
+//        }
 
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION,Collections.emptySet());
         activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);

@@ -72,6 +72,7 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -286,7 +287,7 @@ public class ShiftService extends MongoBaseService {
         if (isNotNull(functionId) && activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
             Map<LocalDate,Long> dateAndFunctionIdMap=new HashMap<>();
             dateAndFunctionIdMap.put(asLocalDate(shift.getStartDate()),functionId);
-            userIntegrationService.applyFunction(shift.getUnitId(),shift.getUnitPositionId(),dateAndFunctionIdMap);
+            userIntegrationService.applyFunction(shift.getUnitId(),shift.getUnitPositionId(),dateAndFunctionIdMap,HttpMethod.POST);
         }
         else if(removeFunction){
             userIntegrationService.removeFunctionFromUnitPositionByDate(shift.getUnitId(),shift.getUnitPositionId(),shift.getStartDate());
