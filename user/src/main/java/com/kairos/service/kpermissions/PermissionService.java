@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.ApplicationConstants.*;
+
 @Service
 public class PermissionService {
 
@@ -21,17 +23,17 @@ public class PermissionService {
     private PermissionModelRepository permissionModelRepository;
 
     public Boolean createPermissionSchema(List<ModelDTO> modelDTOS){
-        List<Map<String, Object>> modelData = permissionModelRepository.getPermissionModelWithFields();
+        List<Map<String, Object>> modelData = permissionModelRepository.getPermissionModelWithModelAndFields();
         Set<ModelDTO> newModelDTO = new HashSet<>();
         Set<PermissionModel> permissionModels = new HashSet<>();
             modelDTOS.forEach(modelDTO -> {
                 Optional<Map<String, Object>>  modelMap = modelData.stream().filter(modelDataMap ->
-                    modelDTO.getModelName().equalsIgnoreCase((String)modelDataMap.get("modelName"))
+                    modelDTO.getModelName().equalsIgnoreCase((String)modelDataMap.get(MODEL_NAME))
                 ).findAny();
                 if(modelMap.isPresent()){
                     Map<String, Object> modelMapObj = modelMap.get();
-                    PermissionModel permissionModel = (PermissionModel)modelMapObj.get("model");
-                    List<String> fields = Arrays.asList((String[])modelMapObj.get("fields"));
+                    PermissionModel permissionModel = (PermissionModel)modelMapObj.get(MODEL);
+                    List<String> fields = Arrays.asList((String[])modelMapObj.get(FIELDS));
                     modelDTO.getFields().forEach(fieldDTO -> {
                         if(!fields.contains(fieldDTO.getFieldName())){
                             permissionModel.getFields().add(new PermissionField(fieldDTO.getFieldName()));
@@ -47,5 +49,11 @@ public class PermissionService {
         permissionModels.addAll(ObjectMapperUtils.copyPropertiesOfSetByMapper(newModelDTO, PermissionModel.class));
         permissionModelRepository.saveAll(permissionModels);
         return true;
+    }
+
+    public List<Map<String, Object>> getPermissionSchema(){
+        List<Map<String, Object>> modelData = permissionModelRepository.getPermissionModelDataWithFields();
+        LOGGER.info("DATA=="+modelData.toString());
+        return modelData;
     }
 }

@@ -29,4 +29,11 @@ public class PermissionController {
 
     }
 
+    @RequestMapping(value = "/get_permission_schema",method = RequestMethod.GET)
+    public ResponseEntity getFLPSchema()  {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema());
+
+    }
+
 }

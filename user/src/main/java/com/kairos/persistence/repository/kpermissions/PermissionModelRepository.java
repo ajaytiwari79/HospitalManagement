@@ -10,5 +10,8 @@ import java.util.Map;
 public interface PermissionModelRepository  extends Neo4jBaseRepository<PermissionModel,Long> {
 
     @Query(value = "MATCH (p:PermissionModel)-[:HAS_FIELD]-(t:PermissionField) return  p as model, collect(t.fieldName) as fields, p.modelName as modelName")
-    List<Map<String, Object>> getPermissionModelWithFields();
+    List<Map<String, Object>> getPermissionModelWithModelAndFields();
+
+    @Query(value = "MATCH (p:PermissionModel)-[:HAS_FIELD]-(t:PermissionField) return  collect(t.fieldName) as fields, p.modelName as modelName")
+    List<Map<String, Object>> getPermissionModelDataWithFields();
 }
