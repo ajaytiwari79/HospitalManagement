@@ -38,7 +38,9 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
-    List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(long unitId);
+    List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
+
+    List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId);
 
     List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted);
 

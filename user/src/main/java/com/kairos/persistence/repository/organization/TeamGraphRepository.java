@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -202,4 +203,10 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             " WITH COUNT(team) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);
+
+    @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team) WHERE id(staff)={0} \n" +
+            "WITH team.activityIds AS activityIds\n" +
+            "UNWIND activityIds AS activities\n" +
+            "RETURN DISTINCT activities")
+    List<BigInteger> getTeamActivitiesOfStaff(Long staffId);
 }
