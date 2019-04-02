@@ -11,9 +11,9 @@ import java.util.Arrays;
  */
 public class FirstTimePasswordUpdateDTO {
 
-    @Size(min = 6)
+    @Size(min = 6,max = 50)
     private char[] password;
-    @Size(min = 6)
+    @Size(min = 6,max = 50)
     private char[] repeatPassword;
     @Email
     String email;
