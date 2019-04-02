@@ -596,7 +596,7 @@ public class CompanyCreationService {
             unitIds.add(organizationId);
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         }
-     //   validateUserDetails(staffPersonalDetailDTOS, exceptionService);
+         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
 

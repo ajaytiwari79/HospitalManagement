@@ -953,6 +953,7 @@ public class StaffService {
         if(isNull(position)) {
             Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                     user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+            position=new Position();
             position.setStaff(staff);
             staff.setUser(user);
             position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
