@@ -82,11 +82,12 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
     void updateStaffsInTeam(long teamId, Set<Long> staffIds);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:false}]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(staff)={0} AND id(team) IN {1}  " +
-            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
+            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) WITH staff "+
+    "MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff) WHERE NOT id(team) IN {1} DETACH DELETE staffTeamRel")
     void assignStaffInTeams(long staffId, Set<Long> teamIds);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
