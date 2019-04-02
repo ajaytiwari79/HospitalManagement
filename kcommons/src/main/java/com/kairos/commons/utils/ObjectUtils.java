@@ -67,6 +67,12 @@ public class ObjectUtils {
         return list;
     }
 
+    public static String getHoursByMinutes(int minutes){
+        int hoursValue = minutes / 60; //since both are ints, you get an int
+        int minutesValue = minutes % 60;
+        return String.valueOf(hoursValue+"."+minutesValue);
+    }
+
     private void test(){
         /*ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
