@@ -544,9 +544,8 @@ public class ShiftValidatorService {
                 if (activityWrapper.getActivity().getRulesActivityTab().isEligibleForStaffingLevel()) {
                     int lowerLimit = 0;
                     int upperLimit = 0;
-                    List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
                     if (ShiftType.PRESENCE.equals(shift.getShiftType())) {
-                        applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
+                        List<StaffingLevelInterval>  applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
                         if (!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                             lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                             upperLimit = 95;
@@ -567,10 +566,14 @@ public class ShiftValidatorService {
                             checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shiftActivities, checkOverStaffing, shiftActivity);
                         }
                     }
+                    else {
+                        validateAbsenceTypeOfShift(staffingLevel,shiftActivity,checkOverStaffing);
+                    }
                 }
             }
         }
     }
+
 
     private boolean isVerificationRequired(boolean checkOverStaffing, boolean staff, boolean management, PhaseSettings phaseSettings) {
         boolean result = false;
@@ -793,5 +796,12 @@ public class ShiftValidatorService {
         shiftViolatedRulesMongoRepository.deleteAll(violatedRules);
         return true;
     }
+
+    private void validateAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity shiftActivity,boolean checkOverStaffing) {
+        if(isCollectionEmpty(staffingLevel.getAbsenceStaffingLevelInterval())){
+
+        }
+    }
+
 
 }
