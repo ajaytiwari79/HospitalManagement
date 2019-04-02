@@ -172,6 +172,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
+        activityDTO.setBalanceSettingsActivityTab(ObjectMapperUtils.copyPropertiesByMapper(activity.getBalanceSettingsActivityTab(),BalanceSettingActivityTabDTO.class));
         BeanUtils.copyProperties(activity, activityDTO);
         /*Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(timeType.isPresent()){

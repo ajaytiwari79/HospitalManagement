@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
+
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.HOURS;
 import static com.kairos.service.shift.ShiftValidatorService.*;

@@ -3,6 +3,7 @@ package com.kairos.commons.utils;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -37,6 +38,14 @@ public class ObjectUtils {
     public static boolean isCollectionNotEmpty(@Nullable Collection<?> collection){
         return !(collection == null || collection.isEmpty());
     }
+
+    public static <K,V> boolean isMapNotEmpty(@Nullable Map<K,V> map){
+        return !(map == null || map.isEmpty());
+    }
+
+    public static <K,V> boolean isMapEmpty(@Nullable Map<K,V> map){
+        return (map == null || map.isEmpty());
+    }
     public static boolean isEmpty(@Nullable Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
@@ -69,14 +78,6 @@ public class ObjectUtils {
         return list;
     }
 
-    public static String getHoursByMinutes(int hour){
-        if(hour==0){
-            throw new RuntimeException("Hour should not be 0");
-        }
-        int hours = hour / 60; //since both are ints, you get an int
-        int minutes = hour % 60;
-        return String.valueOf(hours+"."+minutes);
-    }
 
     private void test(){
         /*ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
