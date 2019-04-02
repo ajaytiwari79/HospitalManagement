@@ -1,5 +1,6 @@
 package com.kairos.commons.service.mail;
 
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.sendgrid.*;
@@ -53,6 +54,7 @@ public class MailService {
     private JavaMailSender javaMailSender;
     @Inject
     private TemplateEngine templateEngine;
+    @Inject private EnvConfigCommon envConfigCommon;
 
     /***
      *
@@ -154,6 +156,10 @@ public class MailService {
         Context context = new Context(Locale.ENGLISH);
         if(isMapNotEmpty(templateParam)){
             context.setVariables(templateParam);
+            context.setVariable("kairosLogo","http://dev.kairosplanning.com" + FORWARD_SLASH + envConfigCommon.getImagesPath()+KAIROS_LOGO);
+            if(!templateParam.containsKey("receiverImage")){
+                context.setVariable("receiverImage","http://dev.kairosplanning.com" + FORWARD_SLASH + envConfigCommon.getImagesPath()+USER_DEFAULT_IMAGE);
+            }
         }
         return context;
     }

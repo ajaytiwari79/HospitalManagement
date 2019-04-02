@@ -26,6 +26,12 @@ public class EnvConfigCommon {
     @Value("${user.loginapi.authPassword}")
     private String userServiceAuthPassword;
 
+    @Value("${server.host.http.url}")
+    private String serverHost;
+
+    @Value("${webservice.imagesPath}")
+    private String imagesPath;
+
 
 
 
@@ -68,5 +74,13 @@ public class EnvConfigCommon {
 
     public void setUserServiceAuthPassword(String userServiceAuthPassword) {
         this.userServiceAuthPassword = userServiceAuthPassword;
+    }
+
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    public String getImagesPath() {
+        return imagesPath;
     }
 }
