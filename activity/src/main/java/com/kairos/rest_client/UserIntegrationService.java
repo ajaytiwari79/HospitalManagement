@@ -62,7 +62,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.*;
 
 
@@ -684,8 +684,7 @@ public class UserIntegrationService {
     }
 
     public StaffDTO getStaff(Long unitId,Long staffId) {
-        return userRestClientForScheduler.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET,MicroService.USER, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<StaffDTO>>() {
-        }, staffId);
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {}, staffId);
     }
 
     public Expertise getExpertise(Long countryId, Long expertiseId) {
@@ -751,6 +750,16 @@ public class UserIntegrationService {
     public Long getUnitByUnitPositionId(Long unitPositionId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         },unitPositionId);
+    }
+
+
+    public Set<BigInteger> getTeamActivitiesOfStaff(Long unitId,Long staffId){
+        return genericRestClient.publishRequest(null,unitId, RestClientUrlType.UNIT, HttpMethod.GET,TEAM_ACTIVITIES,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {
+            },staffId);
+
+    public List<Long> getAllOrganizationIds(Long unitId) {
+        List<NameValuePair> queryParamList = isNotNull(unitId) ?  newArrayList(new BasicNameValuePair("unitId", unitId.toString())) : null;
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, GET_ORGANIZATION_IDS, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
     }
 }
 

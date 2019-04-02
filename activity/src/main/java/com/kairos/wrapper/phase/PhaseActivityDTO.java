@@ -31,9 +31,9 @@ public class PhaseActivityDTO {
         //Default Constructor
     }
 
-    public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
+    public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities,List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
                             UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes,LocalDate planningPeriodStartDate,LocalDate planningPeriodEndDate) {
-        this.activities = activities;
+        this.activities=activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
         this.staffAccessRole = staffAccessRole;

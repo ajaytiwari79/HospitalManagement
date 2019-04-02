@@ -76,18 +76,6 @@ public class WTARuleTemplateCalculationService {
         return shifts;
     }
 
-    private Map<LocalDate, BigInteger> getMapofDateAndMap(List<PlanningPeriod> planningPeriods,List<ShiftDTO> shifts){
-        Map<LocalDate, BigInteger> dateAndPhaseMap = new HashMap<>(shifts.size());
-        for (ShiftDTO shift : shifts) {
-            for (PlanningPeriod planningPeriod : planningPeriods) {
-                if(planningPeriod.contains(asLocalDate(shift.getStartDate()))){
-                    dateAndPhaseMap.put(asLocalDate(shift.getStartDate()),planningPeriod.getCurrentPhaseId());
-                }
-            }
-        }
-        return dateAndPhaseMap;
-    }
-
     private Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> getIntervalWTARuletemplateMap(List<WTAQueryResultDTO> workingTimeAgreements,LocalDate endDate){
         Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> dateTimeIntervalListMap = new HashMap<>(workingTimeAgreements.size());
         for (WTAQueryResultDTO workingTimeAgreement : workingTimeAgreements) {

@@ -8,7 +8,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
-import com.kairos.rule_validator.activity.StaffEmploymentTypeSpecification;
 import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
@@ -17,11 +16,14 @@ import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.service.organization.OrganizationActivityService;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +35,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private LocaleService localeService;
     @Inject private ActivityService activityService;
+    @Inject private OrganizationActivityService organizationActivityService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
@@ -98,8 +101,24 @@ public class StaffActivitySettingService extends MongoBaseService {
         return responseMap;
     }
 
-    public List<StaffActivitySettingDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId){
-        return staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
+    public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity){
+        List<ActivityWithCompositeDTO> staffPersonalizedActivities= staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
+        if(includeTeamActivity) {
+            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, staffPersonalizedActivities);
+            Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
+            staffPersonalizedActivities.forEach(activity -> {
+                if (activityMap.containsKey(activity.getActivityId())) {
+                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setEarliestStartTime(activity.getEarliestStartTime());
+                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setLatestStartTime(activity.getLatestStartTime());
+                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setShortestTime(activity.getShortestTime());
+                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setLongestTime(activity.getLongestTime());
+                }
+            });
+            return activityList;
+        }
+        else {
+            return staffPersonalizedActivities;
+        }
     }
 
 
@@ -121,9 +140,7 @@ public class StaffActivitySettingService extends MongoBaseService {
 
     private  String validateActivitySettingsForCurrentStaff(StaffDTO staffDTO,Activity activity){
         Specification<StaffDTO> staffDTOSpecification=new StaffExpertiseSpecification(activity);
-        Specification<StaffDTO> staffEmploymentTypeSpecification=new StaffEmploymentTypeSpecification(activity);
-        Specification<StaffDTO> expertiseWrapperSpecification=staffDTOSpecification.and(staffEmploymentTypeSpecification);
-        List<String> messages = expertiseWrapperSpecification.isSatisfiedString(staffDTO);
+        List<String> messages = staffDTOSpecification.isSatisfiedString(staffDTO);
         return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
     }
 

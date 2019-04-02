@@ -212,6 +212,7 @@ public class AppConstants {
     //for ContractualAndPlannedHoursCalculationService
     public static final String BAR_YAXIS = "barValue";
     public static final String LINE_FIELD = "lineValue";
+    public static final String KPI_DEFAULT_COLOR = "#b7b7b7";
     public static final String SEND_GRID_API_KEY = "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";
 
     public static final short MULTIPLE_ACTIVITY = 1;
@@ -225,5 +226,6 @@ public class AppConstants {
     public static final String ACTIVITY_IS_NOT_VALID = "Activity is not valid";
     public static final String PHASE_IS_NOT_VALID = "phase is not valid";
     public static final String EMPLOYMENT_IS_NOT_VALID = "Employment is not valid";
+    public static final String BLANK_STRING="";
 
 }

@@ -373,7 +373,7 @@ public class ShiftValidatorService {
 
     public void validateStatusOfShiftOnDelete(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK);
+            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
             if (notValid) {
                 exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
             }

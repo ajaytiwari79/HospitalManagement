@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_LOCATION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
@@ -25,9 +26,6 @@ public class Team extends UserBaseEntity {
 
     private String name;
     private String description;
-    /**
-     * Specifies if team's address is same as unit's address
-     */
 
     @Relationship(type = TEAM_HAS_SKILLS)
     private List<Skill> skillList;
@@ -35,12 +33,9 @@ public class Team extends UserBaseEntity {
     @Relationship(type = TEAM_HAS_LOCATION)
     private ContactAddress contactAddress;
 
-    //@Relationship(type = PROVIDE_TASK_TYPE)
-    private List<String> taskTypeList;
-
     private boolean isEnabled = true;
-
-    private List<BigInteger> activityIds;
+    private Set<BigInteger> activityIds;
+    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
     public Team() {
     }
@@ -71,14 +66,6 @@ public class Team extends UserBaseEntity {
         this.name = name;
     }
 
-    public List<String> getTaskTypeList() {
-        return taskTypeList;
-    }
-
-    public void setTaskTypeList(List<String> taskTypeList) {
-        this.taskTypeList = taskTypeList;
-    }
-
     public void setContactAddress(ContactAddress contactAddress) {
         this.contactAddress = contactAddress;
     }
@@ -104,11 +91,19 @@ public class Team extends UserBaseEntity {
     }
 
 
-    public List<BigInteger> getActivityIds() {
+    public Set<BigInteger> getActivityIds() {
         return activityIds;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
+    public void setActivityIds(Set<BigInteger> activityIds) {
         this.activityIds = activityIds;
+    }
+
+    public Long getTeamLeaderStaffId() {
+        return teamLeaderStaffId;
+    }
+
+    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
+        this.teamLeaderStaffId = teamLeaderStaffId;
     }
 }
