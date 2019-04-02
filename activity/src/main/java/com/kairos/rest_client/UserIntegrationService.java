@@ -753,9 +753,10 @@ public class UserIntegrationService {
     }
 
 
-    public Set<BigInteger> getTeamActivitiesOfStaff(Long unitId,Long staffId){
-        return genericRestClient.publishRequest(null,unitId, RestClientUrlType.UNIT, HttpMethod.GET,TEAM_ACTIVITIES,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {
-            },staffId);
+    public Set<BigInteger> getTeamActivitiesOfStaff(Long unitId,Long staffId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, TEAM_ACTIVITIES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {
+        }, staffId);
+    }
 
     public List<Long> getAllOrganizationIds(Long unitId) {
         List<NameValuePair> queryParamList = isNotNull(unitId) ?  newArrayList(new BasicNameValuePair("unitId", unitId.toString())) : null;
