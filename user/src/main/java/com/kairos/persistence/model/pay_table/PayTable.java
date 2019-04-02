@@ -27,7 +27,7 @@ public class PayTable extends UserBaseEntity {
     private LocalDate endDateMillis;
     private String paymentUnit;
     @Relationship(type = HAS_PAY_GRADE)
-    private List<PayGrade> payGrades;
+    private List<PayGrade> payGrades=new ArrayList<>();
     private String description;
     private boolean published;
     private boolean hasTempCopy;
@@ -84,11 +84,11 @@ public class PayTable extends UserBaseEntity {
     }
 
     public List<PayGrade> getPayGrades() {
-        return Optional.ofNullable(this.payGrades).orElse(new ArrayList<>());
+        return payGrades;
     }
 
     public void setPayGrades(List<PayGrade> payGrades) {
-        this.payGrades = Optional.ofNullable(payGrades).orElse(new ArrayList<>());
+        this.payGrades = payGrades;
     }
 
     public String getDescription() {
