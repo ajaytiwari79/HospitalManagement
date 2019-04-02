@@ -31,7 +31,7 @@ import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
-import com.kairos.dto.user.organization.PublicHolidayDayTypeReasonCodeWrapper;
+import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.ActivityStateEnum;
@@ -709,8 +709,8 @@ public class ActivityService extends MongoBaseService {
     }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
-        PublicHolidayDayTypeReasonCodeWrapper publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
-        if (Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
+        SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
+        if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
             exceptionService.internalServerError("message.publicHoliday.dayType.reasonCodeWrapper.null", unitId);
         }
         List<DayType> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();

@@ -6,16 +6,16 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import java.util.List;
 import java.util.Map;
 
-public class PublicHolidayDayTypeReasonCodeWrapper {
+public class SelfRosteringMetaData {
 
     private List<DayType> dayTypes;
     private ReasonCodeWrapper reasonCodeWrapper;
     private List<Map<String,Object>> publicHolidays;
 
-    public PublicHolidayDayTypeReasonCodeWrapper() {
+    public SelfRosteringMetaData() {
     }
 
-    public PublicHolidayDayTypeReasonCodeWrapper(List<DayType> dayTypes, ReasonCodeWrapper reasonCodeWrapper, List<Map<String, Object>> publicHolidays) {
+    public SelfRosteringMetaData(List<DayType> dayTypes, ReasonCodeWrapper reasonCodeWrapper, List<Map<String, Object>> publicHolidays) {
         this.dayTypes = dayTypes;
         this.reasonCodeWrapper = reasonCodeWrapper;
         this.publicHolidays = publicHolidays;

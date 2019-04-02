@@ -1398,7 +1398,7 @@ public class OrganizationController {
     @ApiOperation(value = "get organization ids")
     @GetMapping(value = UNIT_URL+"/holiday_day_type_reason_code")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<ResponseDTO<PublicHolidayDayTypeReasonCodeWrapper>> getDayTypeReasonCodeAndPublicHolidays(@RequestParam(required = false) Long unitId) {
+    public ResponseEntity<ResponseDTO<SelfRosteringMetaData>> getDayTypeReasonCodeAndPublicHolidays(@PathVariable long unitId ) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true,
                 organizationService.getPublicHolidaysReasonCodeAndDayTypeUnitId(unitId));
 

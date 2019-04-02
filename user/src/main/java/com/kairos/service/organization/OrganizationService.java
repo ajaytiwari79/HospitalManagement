@@ -101,7 +101,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.AppConstants.GROUP;
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
@@ -1119,7 +1118,7 @@ public class OrganizationService {
         return organizationIds;
     }
 
-    public PublicHolidayDayTypeReasonCodeWrapper getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
+    public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         Organization parentOrganization = fetchParentOrganization(unitId);
         Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
         if (countryId == null) {
@@ -1127,7 +1126,7 @@ public class OrganizationService {
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
-        return new PublicHolidayDayTypeReasonCodeWrapper(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
+        return new SelfRosteringMetaData(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
 
     }
 }
