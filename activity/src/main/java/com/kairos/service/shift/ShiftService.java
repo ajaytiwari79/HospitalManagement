@@ -795,12 +795,12 @@ public class ShiftService extends MongoBaseService {
 
     //TODO need to optimize this method
     public ShiftWithViolatedInfoDTO updateShiftByTandA(Long unitId, ShiftDTO shiftDTO,
-                                                       String type, Boolean validatedByStaff) {
+                                                       String type, Boolean updatedByStaff) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
-        if (!userAccessRoleDTO.getStaff() && validatedByStaff && !shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
+        if (!userAccessRoleDTO.getStaff() && updatedByStaff && !shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
             exceptionService.actionNotPermittedException("message.shift.save.access");
-        } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
+        } else if (!userAccessRoleDTO.getManagement() && !updatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.save.access");
         }
         Map<String, Phase> phaseMap = new HashMap<String, Phase>() {{
