@@ -711,7 +711,7 @@ public class ActivityService extends MongoBaseService {
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
         SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
         if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
-            exceptionService.internalServerError("message.publicHoliday.dayType.reasonCodeWrapper.null", unitId);
+            exceptionService.internalServerError("message.selfRostering.metaData.null");
         }
         List<DayType> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();
         LocalDate date = LocalDate.now();
