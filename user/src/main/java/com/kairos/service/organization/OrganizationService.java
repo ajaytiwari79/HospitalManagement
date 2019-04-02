@@ -11,12 +11,15 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
@@ -803,7 +806,8 @@ public class OrganizationService {
 
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
-        schedulerServiceRestClient.publishRequest(zoneId, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+        schedulerServiceRestClient.publishRequest(zoneId, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
         unit.setTimeZone(zoneId);
         organizationGraphRepository.save(unit);
         return true;
@@ -1102,16 +1106,28 @@ public class OrganizationService {
         return true;
     }
 
-    public List<Long> getOrganizationIds(Long unitId){
+    public List<Long> getOrganizationIds(Long unitId) {
         List<Long> organizationIds = null;
         if (isNull(unitId)) {
             organizationIds = organizationGraphRepository.findAllOrganizationIds();
         } else {
             Optional<Organization> optionalOrganization = organizationGraphRepository.findById(unitId);
-            if(optionalOrganization.isPresent()){
-                organizationIds = optionalOrganization.get().getChildren().stream().map(unit->unit.getId()).collect(Collectors.toList());
+            if (optionalOrganization.isPresent()) {
+                organizationIds = optionalOrganization.get().getChildren().stream().map(unit -> unit.getId()).collect(Collectors.toList());
             }
         }
         return organizationIds;
+    }
+
+    public PublicHolidayDayTypeReasonCodeWrapper getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
+        Organization parentOrganization = fetchParentOrganization(unitId);
+        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        if (countryId == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        }
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
+        return new PublicHolidayDayTypeReasonCodeWrapper(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
+
     }
 }
