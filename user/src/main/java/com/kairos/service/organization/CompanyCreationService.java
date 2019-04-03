@@ -349,6 +349,8 @@ public class CompanyCreationService {
                     if (userByCprNumberOrEmail != null) {
                         user = userByCprNumberOrEmail;
                         reinitializeUserManagerDto(unitManagerDTO, user);
+                        userGraphRepository.save(user);
+                        staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
@@ -563,7 +565,7 @@ public class CompanyCreationService {
         return unitType;
     }
 
-    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId) throws InterruptedException, ExecutionException {
+    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId){
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
@@ -611,19 +613,10 @@ public class CompanyCreationService {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
                 countryId, organization.isParentOrganization());
         if (parentOrgaziationId == null) {
-            CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
-            CompletableFuture.allOf(hasUpdated).join();
-
-            CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
-            CompletableFuture.allOf(createdInUnit).join();
-
-
+            companyDefaultDataService.createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
+            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
         } else {
-            CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentOrgaziationId, Arrays.asList(organization), countryId, timeSlots);
-            CompletableFuture.allOf(createdInUnit).join();
+            companyDefaultDataService.createDefaultDataInUnit(parentOrgaziationId, Arrays.asList(organization), countryId, timeSlots);
         }
 
         QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
