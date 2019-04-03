@@ -221,6 +221,6 @@ public abstract class RelationshipConstants {
     public static final String LOCATION_HAS_ADDRESS = "LOCATION_HAS_ADDRESS";
     public static final String HAS_SECTOR = "HAS_SECTOR";
     public static final String HAS_FIELD = "HAS_FIELD";
-
+    public static final String HAS_PERMISSION = "HAS_PERMISSION";
 
 }
