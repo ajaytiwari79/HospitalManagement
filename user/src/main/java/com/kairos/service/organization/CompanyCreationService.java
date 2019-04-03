@@ -5,8 +5,8 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
@@ -19,8 +19,8 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -166,14 +166,14 @@ public class CompanyCreationService {
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
-        Organization hubToBeLinked=organizationGraphRepository.findOne(orgDetails.getHubId(),0);
-        if (hubToBeLinked==null){
-            exceptionService.dataNotFoundByIdException("message.hub.notFound",orgDetails.getHubId());
+        Organization hubToBeLinked = organizationGraphRepository.findOne(orgDetails.getHubId(), 0);
+        if (hubToBeLinked == null) {
+            exceptionService.dataNotFoundByIdException("message.hub.notFound", orgDetails.getHubId());
         }
         organizationGraphRepository.save(organization);
 
         //Linking organization to the selected hub
-        organizationGraphRepository.linkOrganizationToHub(organization.getId(),hubToBeLinked.getId());
+        organizationGraphRepository.linkOrganizationToHub(organization.getId(), hubToBeLinked.getId());
         orgDetails.setId(organization.getId());
         orgDetails.setKairosCompanyId(kairosCompanyId);
         return orgDetails;
@@ -347,25 +347,27 @@ public class CompanyCreationService {
                 // No user is found its first time so we need to validate email and CPR number
                 //validate user email or name
                 if (unitManagerDTO.getCprNumber() != null || unitManagerDTO.getEmail() != null) {
-                    User userByCprNumberOrEmail = userGraphRepository.findUserByCprNumberOrEmail(unitManagerDTO.getCprNumber(), unitManagerDTO.getEmail()!=null?"(?)" + unitManagerDTO.getEmail():null);
+                    User userByCprNumberOrEmail = userGraphRepository.findUserByCprNumberOrEmail(unitManagerDTO.getCprNumber(), unitManagerDTO.getEmail() != null ? "(?)" + unitManagerDTO.getEmail() : null);
                     if (userByCprNumberOrEmail != null) {
-                        user=userByCprNumberOrEmail;
-                        reinitializeUserManagerDto(unitManagerDTO,user);
+                        user = userByCprNumberOrEmail;
+                        reinitializeUserManagerDto(unitManagerDTO, user);
                         userGraphRepository.save(user);
                         staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
-                        userGraphRepository.save(user);
-                        staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
                     }
+
+                    userGraphRepository.save(user);
+                    staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
+
                 }
             }
         }
         return unitManagerDTO;
     }
 
-    private void reinitializeUserManagerDto(UnitManagerDTO unitManagerDTO, User user){
+    private void reinitializeUserManagerDto(UnitManagerDTO unitManagerDTO, User user) {
         unitManagerDTO.setFirstName(user.getFirstName());
         unitManagerDTO.setLastName(user.getLastName());
         unitManagerDTO.setCprNumber(user.getCprNumber());
@@ -376,13 +378,13 @@ public class CompanyCreationService {
 
     private void setEncryptedPasswordAndAge(UnitManagerDTO unitManagerDTO, User user) {
         if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
-            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().replaceAll("\\s+","") + "@kairos"));
+            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().replaceAll("\\s+", "") + "@kairos"));
         }
         user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(unitManagerDTO.getCprNumber()));
         user.setGender(CPRUtil.getGenderFromCPRNumber(unitManagerDTO.getCprNumber()));
     }
 
-    
+
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
     }
@@ -405,8 +407,8 @@ public class CompanyCreationService {
             organization.setAccountType(parentOrganization.getAccountType());
         }
         if (organizationBasicDTO.getLevelId() != null) {
-                Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
-                organization.setLevel(level);
+            Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
+            organization.setLevel(level);
         }
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
         organization.setOrganizationSubTypes(organizationSubTypes);
@@ -565,7 +567,7 @@ public class CompanyCreationService {
         return unitType;
     }
 
-    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId) throws InterruptedException, ExecutionException {
+    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId){
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
@@ -589,13 +591,12 @@ public class CompanyCreationService {
 //            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
 //                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
 //            }
-            validateUserDetails(staffPersonalDetailDTOS, exceptionService);
             organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         } else {
             unitIds.add(organizationId);
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         }
-
+        validateUserDetails(staffPersonalDetailDTOS, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
 
@@ -616,21 +617,12 @@ public class CompanyCreationService {
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
-                countryId,organization.isParentOrganization());
+                countryId, organization.isParentOrganization());
         if (parentOrgaziationId == null) {
-            CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
-            CompletableFuture.allOf(hasUpdated).join();
-
-            CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
-            CompletableFuture.allOf(createdInUnit).join();
-
-
+            companyDefaultDataService.createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
+            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
         } else {
-            CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentOrgaziationId, Arrays.asList(organization), countryId, timeSlots);
-            CompletableFuture.allOf(createdInUnit).join();
+            companyDefaultDataService.createDefaultDataInUnit(parentOrgaziationId, Arrays.asList(organization), countryId, timeSlots);
         }
 
         QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
@@ -640,9 +632,9 @@ public class CompanyCreationService {
             childQueryResults.add(childUnit);
         }
         organizationQueryResult.setChildren(childQueryResults);
-        Map<Long, Long> unitAndStaffIdMap=staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v.getStaff().getId()));
-        unitIds.stream().forEach(unitId->{
-            if(unitAndStaffIdMap.containsKey(unitId)) {
+        Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k -> k.getOrganizationId(), v -> v.getStaff().getId()));
+        unitIds.stream().forEach(unitId -> {
+            if (unitAndStaffIdMap.containsKey(unitId)) {
                 activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
             }
         });
@@ -656,6 +648,5 @@ public class CompanyCreationService {
         });
         staffGraphRepository.saveAll(staffList);
     }
-
 
 }

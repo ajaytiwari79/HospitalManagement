@@ -949,26 +949,27 @@ public class StaffService {
     }
 
     public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
-
-        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
-                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-        Position position = new Position();
-        position.setStaff(staff);
-        staff.setUser(user);
-        position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
-        position.setStaff(staff);
-        position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+        Position position;
         // if the organization is not parent organization then adding position in parent organization.
         if (!parentOrganization) {
-            Organization
-                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            Organization mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            position = positionGraphRepository.findPositionByOrganizationIdAndUserId(mainOrganization.getId(),user.getId());
             mainOrganization.getPositions().add(position);
             organizationGraphRepository.save(mainOrganization);
         } else {
-            organization.getPositions().add(position);
+                Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                        user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+                position=new Position();
+                position.setStaff(staff);
+                staff.setUser(user);
+                position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+                position.setStaff(staff);
+                staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
+                position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+                  organization.getPositions().add(position);
+
         }
         organizationGraphRepository.save(organization);
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
@@ -1487,13 +1488,18 @@ public class StaffService {
     }
 
     public void addStaffInChatServer(Staff staff) {
-        Map<String, String> auth = new HashMap<>();
-        auth.put("type", "m.login.dummy");
-        auth.put("session", staff.getEmail());
-        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH);
-        StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
-        staff.setAccess_token(chatDetails.getAccess_token());
-        staff.setUser_id(chatDetails.getUser_id());
+        try {
+            Map<String, String> auth = new HashMap<>();
+            auth.put("type", "m.login.dummy");
+            auth.put("session", staff.getEmail());
+            StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH);
+            StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
+            staff.setAccess_token(chatDetails.getAccess_token());
+            staff.setUser_id(chatDetails.getUser_id());
+        }
+        catch (Exception ex){
+            LOGGER.error(ex.getMessage());
+        }
     }
 
     private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
