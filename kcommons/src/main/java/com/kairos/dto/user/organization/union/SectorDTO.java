@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.validation.constraints.NotBlank;
 
 public class SectorDTO {
-    @NotBlank
+    @NotBlank(message = "error.name.notnull")
     private String name;
     private Long id;
 
@@ -20,13 +20,13 @@ public class SectorDTO {
     public SectorDTO() {
     }
 
-    public SectorDTO(Long id,@NotBlank String name) {
+    public SectorDTO(Long id, @NotBlank String name) {
         this.name = name;
         this.id = id;
     }
 
     public String getName() {
-        return name.trim();
+        return name;
     }
 
     public void setName(String name) {

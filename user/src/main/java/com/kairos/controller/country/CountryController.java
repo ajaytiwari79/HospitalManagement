@@ -1012,14 +1012,14 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/level", method = RequestMethod.POST)
     @ApiOperation("Add level in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addLevel(@PathVariable long countryId, @RequestBody Level level) {
+    public ResponseEntity<Map<String, Object>> addLevel(@PathVariable long countryId, @RequestBody @Valid  Level level) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addLevel(countryId, level));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/level/{levelId}", method = RequestMethod.PUT)
     @ApiOperation("Update level in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateLevel(@PathVariable long countryId, @PathVariable long levelId, @RequestBody Level level) {
+    public ResponseEntity<Map<String, Object>> updateLevel(@PathVariable long countryId, @PathVariable long levelId, @RequestBody @Valid Level level) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateLevel(countryId, levelId, level));
     }
 

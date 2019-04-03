@@ -134,17 +134,18 @@ public class TimeBankCalculationService {
                                     totalPublishedDailyPlannedMinutes += ctaScheduledOrCompensationMinutes;
                                     someShiftPublish = true;
                                 }
+                                ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(),0)+ ctaScheduledOrCompensationMinutes);
+                                totalDailyPlannedMinutes += ctaScheduledOrCompensationMinutes;
                             }
                         }
                     }
                 }
                 if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {
                     int value = getFunctionalBonusCompensation(unitPosition,ruleTemplate,dateTimeInterval);
-                    ctaScheduledOrCompensationMinutes = value;
+                    ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(),0)+ value);
+                    totalDailyPlannedMinutes += ctaScheduledOrCompensationMinutes;
                     ctaBonusMinutes += value;
                 }
-                ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaScheduledOrCompensationMinutes);
-                totalDailyPlannedMinutes += ctaScheduledOrCompensationMinutes;
             }
             int totalTimeBankMinutes = totalDailyPlannedMinutes - contractualMinutes;
             int timeBankMinWithoutCta = scheduledMinutesOfTimeBank - contractualMinutes;
