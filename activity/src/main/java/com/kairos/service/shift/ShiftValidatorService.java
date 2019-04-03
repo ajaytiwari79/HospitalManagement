@@ -800,23 +800,22 @@ public class ShiftValidatorService {
         }
         int shiftsCount = 0;
         Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
-        if (staffingLevelActivity.isPresent()) {
-            for (ShiftActivity shiftActivityDB : shiftActivities) {
-                if (shiftActivityDB.getActivityId().equals(shiftActivity.getActivityId())) {
-                    shiftsCount++;
-                }
-            }
-            int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
-            if ((checkOverStaffing && totalCount >= 0)) {
-                exceptionService.actionNotPermittedException("message.shift.overStaffing");
-
-            }
-            if (!checkOverStaffing && totalCount <= 0) {
-                exceptionService.actionNotPermittedException("message.shift.underStaffing");
-
-            }
-        } else {
+        if (!staffingLevelActivity.isPresent()) {
             exceptionService.actionNotPermittedException("message.staffingLevel.activity",shiftActivity.getActivityName());
+        }
+        for (ShiftActivity currentShiftActivity : shiftActivities) {
+            if (currentShiftActivity.getActivityId().equals(shiftActivity.getActivityId())) {
+                shiftsCount++;
+            }
+        }
+        int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
+        if ((checkOverStaffing && totalCount >= 0)) {
+            exceptionService.actionNotPermittedException("message.shift.overStaffing");
+
+        }
+        if (!checkOverStaffing && totalCount <= 0) {
+            exceptionService.actionNotPermittedException("message.shift.underStaffing");
+
         }
     }
 
