@@ -633,16 +633,6 @@ public class OrganizationService {
     }
 
     public Boolean verifyOrganizationExpertise(OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
-        Long matchedExpertise = expertiseGraphRepository.findAllExpertiseCountMatchedByIds(organizationMappingActivityTypeDTO.getExpertises());
-        if (matchedExpertise != organizationMappingActivityTypeDTO.getExpertises().size()) {
-            exceptionService.dataNotMatchedException("message.organization.expertise.update.mismatched");
-
-        }
-        Long matchedRegion = regionGraphRepository.findAllRegionCountMatchedByIds(organizationMappingActivityTypeDTO.getRegions());
-        if (matchedRegion != organizationMappingActivityTypeDTO.getRegions().size()) {
-            exceptionService.dataNotMatchedException("message.organization.region.update.mismatched");
-
-        }
         List<Long> organizationTypeAndSubTypeIds = new ArrayList<Long>();
         organizationTypeAndSubTypeIds.addAll(organizationMappingActivityTypeDTO.getOrganizationTypes());
         organizationTypeAndSubTypeIds.addAll(organizationMappingActivityTypeDTO.getOrganizationSubTypes());

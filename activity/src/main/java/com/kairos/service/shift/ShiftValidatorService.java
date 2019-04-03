@@ -253,10 +253,10 @@ public class ShiftValidatorService {
             LocalTime earliestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getEarliestStartTime() : staffActivitySettingMap.get(activityId).getEarliestStartTime();
             LocalTime latestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getLatestStartTime() : staffActivitySettingMap.get(activityId).getLatestStartTime();
             if (shortestTime != null && shiftTimeDetails.getTotalTime() < shortestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time", shortestTime));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time", getHoursByMinutes(shortestTime)));
             }
             if (longestTime != null && shiftTimeDetails.getTotalTime() > longestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time", longestTime));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time", getHoursByMinutes(longestTime)));
             }
             if (earliestStartTime != null && earliestStartTime.isAfter(shiftTimeDetails.getActivityStartTime())) {
                 errorMessages.add(exceptionService.convertMessage("error.start_time.greater_than.earliest_time", earliestStartTime));
