@@ -354,7 +354,7 @@ public class ShiftValidatorService {
     public void validateStatusOfShiftOnUpdate(Shift shift, ShiftDTO shiftDTO) {
         int i = 0;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK);
+            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
             if (notValid) {
                 try {
                     ShiftActivityDTO updateShiftActivity = shiftDTO.getActivities().get(i);
