@@ -5,6 +5,7 @@ import com.kairos.enums.UnionState;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,8 @@ public class UnionDTO {
     private String name;
     @Valid
     private ContactAddressDTO mainAddress;
-    private List<Long> sectorIds = new ArrayList<>();
+    @Valid
+    private List<SectorDTO> sectors=new ArrayList<>();
     private List<Long> locationIds = new ArrayList<>();
     private Long id;
     private UnionState state;
@@ -36,13 +38,9 @@ public class UnionDTO {
         this.mainAddress = mainAddress;
     }
 
-    public List<Long> getSectorIds() {
-        return sectorIds;
-    }
+    public List<SectorDTO> getSectors() { return sectors; }
 
-    public void setSectorIds(List<Long> sectorIds) {
-        this.sectorIds = sectorIds;
-    }
+    public void setSectors(List<SectorDTO> sectors) { this.sectors = sectors; }
 
     public List<Long> getLocationIds() {
         return locationIds;

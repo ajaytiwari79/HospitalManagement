@@ -1,5 +1,6 @@
 package com.kairos.utils.worktimeagreement;
 
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
@@ -36,8 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.AppConstants.YEARS;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
@@ -501,6 +501,15 @@ public class RuletemplateUtils {
             }
         }
         return limitAndCounter;
+    }
+
+    public static String getHoursByMinutes(Integer hour){
+        if(isNull(hour) || hour==0){
+            throwException("message.ruleTemplate.hours.notzero");
+        }
+        int hours = hour / 60; //since both are ints, you get an int
+        int minutes = hour % 60;
+        return String.valueOf(hours+"."+minutes);
     }
 
 

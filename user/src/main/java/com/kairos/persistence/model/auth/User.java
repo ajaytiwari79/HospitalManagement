@@ -517,4 +517,8 @@ public class User extends UserBaseEntity {
     public void setUserType(UserType userType) {
         this.userType = userType;
     }
+
+    public String getFullName(){
+        return this.firstName+" "+this.lastName;
+    }
 }

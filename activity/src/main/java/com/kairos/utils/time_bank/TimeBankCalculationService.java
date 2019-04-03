@@ -126,6 +126,7 @@ public class TimeBankCalculationService {
                                         }
                                     } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                         ctaTimeBankMin = calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval);
+                                        ctaTimeBankMinMap.put(ruleTemplate.getId(),ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaTimeBankMin);
                                     }
                                     if (!ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                                         shiftActivity.getTimeBankCTADistributions().add(new TimeBankCTADistributionDTO(ruleTemplate.getName(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0), ruleTemplate.getId(), DateUtils.asLocalDate(shiftInterval.getStartMillis())));
@@ -148,10 +149,8 @@ public class TimeBankCalculationService {
                         if (ruleTemplate.getStaffFunctions().contains(isNotNull(unitPosition.getFunctionId()) ? unitPosition.getFunctionId() : functionId)) {
                             float value = !getHourlyCostByDate(unitPosition.getPositionLines(), asLocalDate(interval.getStart())).equals(new BigDecimal(0)) ? new BigDecimal(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(unitPosition.getHourlyCost() ,6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
                             ctaTimeBankMin += value;
+                            ctaTimeBankMinMap.put(ruleTemplate.getId(),ctaTimeBankMin);
                         }
-                    }
-                    if (!ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
-                        ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMin);
                     }
                     totalDailyPlannedMinutes += ctaTimeBankMin;
                 }

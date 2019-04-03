@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,14 +80,16 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void updateTeamLeaderOfTeam(long teamId, long teamLeaderStaffId);
 
     @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(team)={0} AND id(staff) IN {1}  " +
-            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
+            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) WITH team "+
+            "MATCH (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE NOT id(staff) IN {1} DETACH DELETE staffTeamRel")
     void updateStaffsInTeam(long teamId, Set<Long> staffIds);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"{teamLeader:false}]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(staff)={0} AND id(team) IN {1}  " +
-            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff)")
+            "CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) WITH staff "+
+    "MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff) WHERE NOT id(team) IN {1} DETACH DELETE staffTeamRel")
     void assignStaffInTeams(long staffId, Set<Long> teamIds);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
@@ -202,4 +205,10 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             " WITH COUNT(team) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);
+
+    @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team) WHERE id(staff)={0} \n" +
+            "WITH team.activityIds AS activityIds\n" +
+            "UNWIND activityIds AS activities\n" +
+            "RETURN DISTINCT activities")
+    List<BigInteger> getTeamActivitiesOfStaff(Long staffId);
 }

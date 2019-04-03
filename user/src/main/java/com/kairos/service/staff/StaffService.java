@@ -108,6 +108,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
 
@@ -1173,8 +1174,14 @@ public class StaffService {
 
     private void sendEmailToUnitManager(UnitManagerDTO unitManagerDTO, String password) {
         String body = "Hi,\n\n" + "You are assigned as an unit manager and to get access in KairosPlanning.\n" + "Your username " + unitManagerDTO.getEmail() + " and password is " + password + "\n\n Thanks";
+        //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
         String subject = "You are a unit manager at KairosPlanning";
-        mailService.sendPlainMailWithSendGrid(unitManagerDTO.getEmail(), body, subject);
+        Map<String,Object> templateParam = new HashMap<>();
+        templateParam.put("receiverName",unitManagerDTO.getFullName());
+        templateParam.put("description", body);
+        //TODO This API doesn't have staff image
+        //templateParam.put("imageResourceName",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, subject,unitManagerDTO.getEmail());
     }
 
     public List<Staff> getUploadedStaffByOrganizationId(Long organizationId) {

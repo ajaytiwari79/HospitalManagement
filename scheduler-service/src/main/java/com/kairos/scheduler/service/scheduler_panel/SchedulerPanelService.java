@@ -66,7 +66,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
-    private static final String SCHEDULER = "SCHEDULER";
+    private static final String SCHEDULER = "scheduler";
 
 
     /**
