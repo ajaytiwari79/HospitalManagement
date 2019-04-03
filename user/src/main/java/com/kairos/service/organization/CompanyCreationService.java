@@ -1,14 +1,12 @@
 package com.kairos.service.organization;
 
 
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.auth.User;
@@ -19,8 +17,8 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -55,7 +53,6 @@ import com.kairos.utils.FormatUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -349,13 +346,9 @@ public class CompanyCreationService {
                     if (userByCprNumberOrEmail != null) {
                         user=userByCprNumberOrEmail;
                         reinitializeUserManagerDto(unitManagerDTO,user);
-//                        userGraphRepository.save(user);
-//                        staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
-//                        userGraphRepository.save(user);
-//                        staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
                     }
 
                     userGraphRepository.save(user);
@@ -596,7 +589,7 @@ public class CompanyCreationService {
             unitIds.add(organizationId);
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         }
-         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
+        validateUserDetails(staffPersonalDetailDTOS, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
 
@@ -652,6 +645,5 @@ public class CompanyCreationService {
         });
         staffGraphRepository.saveAll(staffList);
     }
-
 
 }

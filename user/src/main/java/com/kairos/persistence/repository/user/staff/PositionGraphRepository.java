@@ -63,7 +63,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
     @Query("MATCH (organization:Organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
             "Match (organization)<-[:" + HAS_SUB_ORGANIZATION+"*]-(org:Organization{isParentOrganization:true,isKairosHub:false})" +
             "MATCH (user)-[:"+ BELONGS_TO +"]-(staff:Staff)" +
-            "MATCH (org)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[BELONGS_TO]->(staff) RETURN position")
+            "MATCH (org)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[" + BELONGS_TO + "]->(staff) RETURN position")
     Position findPositionByOrganizationIdAndUserId(long organizationId, long userId);
 
 }
