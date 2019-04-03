@@ -1480,13 +1480,18 @@ public class StaffService {
     }
 
     public void addStaffInChatServer(Staff staff) {
-        Map<String, String> auth = new HashMap<>();
-        auth.put("type", "m.login.dummy");
-        auth.put("session", staff.getEmail());
-        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+","") + DEFAULT_PASSPHRASE_ENDS_WITH);
-        StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
-        staff.setAccess_token(chatDetails.getAccess_token());
-        staff.setUser_id(chatDetails.getUser_id());
+        try {
+            Map<String, String> auth = new HashMap<>();
+            auth.put("type", "m.login.dummy");
+            auth.put("session", staff.getEmail());
+            StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH);
+            StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
+            staff.setAccess_token(chatDetails.getAccess_token());
+            staff.setUser_id(chatDetails.getUser_id());
+        }
+        catch (Exception ex){
+            LOGGER.error(ex.getMessage());
+        }
     }
 
     private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
