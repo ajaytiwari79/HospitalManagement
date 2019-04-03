@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.asset;
 
 
-import com.kairos.controller.master_data.asset_management.HostingTypeController;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.service.data_inventory.asset.OrganizationHostingTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -9,8 +8,6 @@ import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +24,6 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @Api(API_ORGANIZATION_UNIT_URL)
 class OrganizationHostingTypeController {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HostingTypeController.class);
 
     @Inject
     private OrganizationHostingTypeService hostingTypeService;

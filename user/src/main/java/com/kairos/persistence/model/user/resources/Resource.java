@@ -29,7 +29,6 @@ public class Resource extends UserBaseEntity {
     private float costPerKM;
     private FuelType fuelType;
     private boolean enabled ;
-    private boolean deleted ;
     private Long decommissionDate;
 
     @Relationship(type = RESOURCE_HAS_FEATURE)
@@ -80,15 +79,6 @@ public class Resource extends UserBaseEntity {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
 
     public String getRegistrationNumber() {
         return registrationNumber;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
-import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +23,6 @@ public class AgreementTemplateSectionResponseDTO {
     private CoverPageVO coverPageData;
 
     private List<ClauseBasicResponseDTO> clauseListForTemplate = new ArrayList<>();
-
-    private List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
 
     private List<AgreementSectionResponseDTO> agreementSections = new ArrayList<>();
 
@@ -71,13 +68,5 @@ public class AgreementTemplateSectionResponseDTO {
 
     public void setIncludeContentPage(boolean includeContentPage) {
         this.includeContentPage = includeContentPage;
-    }
-
-    public List<UnitLevelClauseResponseDTO> getClauseListForUnitLevelTemplate() {
-        return clauseListForUnitLevelTemplate;
-    }
-
-    public void setClauseListForUnitLevelTemplate(List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate) {
-        this.clauseListForUnitLevelTemplate = clauseListForUnitLevelTemplate;
     }
 }

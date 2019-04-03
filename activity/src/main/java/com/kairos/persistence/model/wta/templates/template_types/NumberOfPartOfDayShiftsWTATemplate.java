@@ -2,6 +2,9 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.AppConstants;
+import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
@@ -10,15 +13,16 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -120,17 +124,48 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
-            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
-            if(timeInterval!=null) {
-                DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+        if(!isDisabled() && isValidShift(infoWrapper.getPhaseId(),infoWrapper.getShift(),this.phaseTemplateValues,timeTypeIds,plannedTimeIds)){
+            TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
+            if(timeIntervals.length>0) {
+                DateTimeInterval[] dateTimeIntervals = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
                 List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
-                shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
-                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+                    Set<BigInteger> shiftIds = getShiftIdsByInterval(dateTimeInterval, shifts, timeIntervals);
+                    Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shiftIds.size()+1);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.DAYS,limitAndCounter[0]);
+                    if(!isValid){
+                        break;
+                    }
+                }
             }
         }
+    }
+
+    public static DateTimeInterval[] getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
+        DateTimeInterval[] interval = new DateTimeInterval[2];
+        if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
+            throwException("message.ruleTemplate.interval.notNull");
+        }
+        switch (intervalUnit) {
+            case DAYS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusDays(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case WEEKS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusWeeks(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case MONTHS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusMonths(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case YEARS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusYears(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+        }
+        return interval;
     }
 
 

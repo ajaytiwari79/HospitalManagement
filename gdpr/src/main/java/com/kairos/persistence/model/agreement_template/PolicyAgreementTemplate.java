@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Entity
 public class PolicyAgreementTemplate extends BaseEntity {
 
-    @NotBlank(message = "Name cannot be empty")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
     private String name;
 
     @Column(columnDefinition = "text")
@@ -54,8 +54,6 @@ public class PolicyAgreementTemplate extends BaseEntity {
     @Embedded
     private CoverPage coverPageData = new CoverPage();
     private Long organizationId;
-    /*@Transient
-    private ClauseTag defaultClauseTag;*/
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -96,13 +94,9 @@ public class PolicyAgreementTemplate extends BaseEntity {
         return name;
     }
 
-    public PolicyAgreementTemplate setName(String name) { this.name = name;return this; }
-
     public String getDescription() {
         return description;
     }
-
-    public PolicyAgreementTemplate setDescription(String description) { this.description = description;return this; }
 
     public Long getCountryId() {
         return countryId;
@@ -112,23 +106,15 @@ public class PolicyAgreementTemplate extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public PolicyAgreementTemplate setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; return this;}
-
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
-
-    public PolicyAgreementTemplate setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; return this;}
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public PolicyAgreementTemplate setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
-
     public List<AccountType> getAccountTypes() { return accountTypes; }
-
-    public PolicyAgreementTemplate setAccountTypes(List<AccountType> accountTypes) { this.accountTypes = accountTypes;return this; }
 
     public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
 
@@ -146,10 +132,6 @@ public class PolicyAgreementTemplate extends BaseEntity {
 
     public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
 
-   /* public ClauseTag getDefaultClauseTag() { return defaultClauseTag; }
-
-    public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
-*/
     public List<AgreementSection> getAgreementSections() {
         return agreementSections.stream().filter(agreementSection -> !agreementSection.isDeleted()).collect(Collectors.toList());
     }
@@ -185,6 +167,18 @@ public class PolicyAgreementTemplate extends BaseEntity {
     public void setCoverPageData(CoverPage coverPageData) {
         this.coverPageData = coverPageData;
     }
+
+    public void setName(String name) { this.name = name; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public void setAccountTypes(List<AccountType> accountTypes) { this.accountTypes = accountTypes; }
+
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
+
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     @Override
     public void delete() {

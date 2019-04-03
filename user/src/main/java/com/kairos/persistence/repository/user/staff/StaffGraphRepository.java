@@ -40,13 +40,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (team:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff:Staff) WHERE id(team)={0} " +
             " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) " +
-            "RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName AS lastName,staff.familyName AS familyName,user.cprNumber AS cprNumber,staff.visitourId AS visitourId,{1} + staff.profilePic AS profilePic order by data.firstName")
+            "RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName AS lastName,staff.familyName AS familyName,user.cprNumber AS cprNumber,{1} + staff.profilePic AS profilePic order by data.firstName")
     List<StaffPersonalDetailDTO> getStaffByTeamId(long teamId, String imageUrl);
-
-    @Query("MATCH (group:Group)-[:" + HAS_TEAM + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(staff:Staff) WHERE id(group)={0} " +
-            " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) " +
-            "RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName AS lastName,staff.familyName AS familyName,user.cprNumber AS cprNumber,staff.visitourId AS visitourId,{1} + staff.profilePic AS profilePic order by data.firstName")
-    List<StaffPersonalDetailDTO> getStaffByGroupId(long groupId, String imageUrl);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(organization:Organization) WHERE id(organization)={0} WITH unitPermission\n" +
             "MATCH (staffs:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission) WITH staffs " +
@@ -128,11 +123,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN partialLeave")
     List<PartialLeave> getPartialLeaves(long childOrganizationId, long staffId);
 
-    @Query("MATCH (u:User)-[:"+BELONGS_TO+"]-(s:Staff) WHERE id(u)={0} WITH s " +
-            "MATCH (t:Team)-[:"+TEAM_HAS_MEMBER+"] -(s) WITH t " +
-            "MATCH (g:Group)-[:"+HAS_TEAM+"]-(t) WITH g " +
-            "MATCH (o:Organization)-[:"+HAS_GROUP+"]-(g) RETURN o")
-    Organization getStaffOrganization(Long id);
+    @Query("MATCH (u:User)-[:"+BELONGS_TO+"]-(s:Staff) WHERE id(u)={0} with s " +
+            "MATCH (t:Team)-[:"+TEAM_HAS_MEMBER+"] -(s) with t " +
+            "MATCH (o:Organization)-[:"+HAS_TEAMS+"]-(t) RETURN o")
+     Organization getStaffOrganization(Long id);
 
     @Query("MATCH(u:User)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+HAS_CONTACT_DETAIL+"]->(c:ContactDetail) WHERE c.privatePhone={0} OR c.mobilePhone={0} RETURN u")
     List<User> getStaffByMobileNumber(String number);
@@ -163,20 +157,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (s:Staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) WHERE id(s)={0} RETURN contactDetail")
     ContactDetail getContactDetail(long staffId);
-
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
-            "MATCH (organization)-[:"+HAS_GROUP+"]->(g:Group)-[:"+HAS_TEAM+"]->(team:Team) \n" +
-            "MATCH (team)-[:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff) IN {1} \n" +
-            " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) " +
-            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill) WITH COLLECT({id:id(skill),name:skill.name}) AS skills,staff,team\n" +
-            "RETURN {id:id(team),name:team.name,staffList:COLLECT({id:id(staff), name:staff.firstName+\" \" +staff.lastName,cprNumber:user.cprNumber, profilePic: staff.profilePic, skills:case WHEN skills[0].id is null then [] else skills end})} AS data")
-    List<Map<String, Object>> getTeamStaffList(Long organizationId, List staffIds);
-
-    @Query("MATCH (staff:Staff) WHERE id(staff) IN {0} WITH staff\n" +
-            " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) WITH staff,user" +
-            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill) WITH COLLECT({id:id(skill),name:skill.name}) AS skills,staff,user\n" +
-            "RETURN {skills:case WHEN skills[0].id is null then [] else skills end,id:id(staff),name:staff.firstName+\" \" +staff.lastName,cprNumber:user.cprNumber, profilePic: staff.profilePic} AS data")
-    List<Map<String, Object>> getSkillsOfStaffs(List<Long> staffIds);
 
     @Query("MATCH (c:Client) , (s:Staff) WHERE id(c)={0}  AND id(s) IN {1}  " +
             "OPTIONAL MATCH (c)-[r1:"+SERVED_BY_STAFF+"]->(s) delete r1  " +
@@ -257,12 +237,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     List<StaffPersonalDetailDTO> getAllStaffHavingUnitPositionByUnitId(long unitId, String imageUrl);
 
 
-    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPos:UnitPosition{deleted:false})-[:"+IN_UNIT+"]-(organization:Organization) WHERE id(organization)={0}\n" +
-            "MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) WITH user, staff\n" +
-            "OPTIONAL MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
-            "OPTIONAL MATCH (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) WITH engineerType, staff, user,count(unitPos) AS unitPosition ORDER BY staff.firstName ASC\n" +
-            "RETURN distinct {id:id(staff),name:staff.firstName+\" \"+staff.lastName,city:contactAddress.city, case  when unitPosition > 0 then TRUE else false end AS unitPosition ,province:contactAddress.province  ,firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:user.cprNumber,visitourId:staff.visitourId, age:duration.between(date(u.dateOfBirth),date()).years, gender:user.gender, profilePic:{1} + staff.profilePic, engineerType:id(engineerType)} AS data order by data.firstName")
-    List<Map<String, Object>> getAllStaffHavingUnitPositionByUnitIdMap(long unitId, String imageUrl);
+    @Query("MATCH(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) WHERE id(organization)={0}\n" +
+            "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff,unitPos\n" +
+            "RETURN  distinct id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName, staff.userName AS userName,user.cprNumber AS cprNumber, staff.familyName AS familyName, user.gender AS gender, {1} + staff.profilePic AS profilePic")
+    List<StaffPersonalDetailDTO> getAllStaffHavingUnitPositionByUnitIdMap(long unitId, String imageUrl);
 
     @Query("MATCH (organization:Organization)-[:"+HAS_POSITIONS+"]-(position:Position)-[:BELONGS_TO]-(staff:Staff) WHERE id(organization)={0} \n" +
             "MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) WITH user, staff\n" +
@@ -271,6 +249,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  WITH engineerType, staff,contactAddress, user ,count(unitPos) AS unitPosition ORDER BY staff.firstName ASC\n" +
             "RETURN  distinct id(staff) AS id,case  WHEN unitPosition > 0 then TRUE else false end AS unitPosition , contactAddress.city AS city,contactAddress.province AS province ,staff.firstName AS firstName,staff.lastName AS lastName,staff.employedSince AS employedSince,staff.badgeNumber AS badgeNumber, staff.userName AS userName,staff.externalId AS externalId,user.cprNumber AS cprNumber,staff.visitourTeamId AS visitourTeamId,staff.familyName AS familyName, user.gender AS gender, {1} + staff.profilePic AS profilePic, id(engineerType) AS engineerType")
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, String imageUrl);
+
+    @Query("MATCH (org:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE id(org)={0}  \n" +
+        "MATCH(accessGroup)-[:"+HAS_ACCESS_GROUP+"]-(unitPermission:UnitPermission)  \n" +
+        "MATCH(unitPermission)-[:"+HAS_UNIT_PERMISSIONS +"]-(position:Position)  \n" +
+        "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff) \n" +
+        "RETURN  distinct collect(distinct accessGroup.role) AS roles, id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName, staff.userName AS userName, {1} + staff.profilePic AS profilePic")
+    List<StaffPersonalDetailDTO> getAllStaffPersonalDetailsByUnit(long unitId, String imageUrl);
 
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) WHERE id(staff)={0} RETURN id(engineerType)")
     Long getEngineerTypeId(Long staffId);

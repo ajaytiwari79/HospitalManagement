@@ -2,7 +2,6 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProcessingActivityResponseDTO {
 
     private Long id;
@@ -37,7 +35,14 @@ public class ProcessingActivityResponseDTO {
     private Boolean suggested;
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
     private List<RelatedDataSubjectDTO> dataSubjects = new ArrayList<>();
+    private List<AssetBasicResponseDTO> assets=new ArrayList<>();
 
+    public ProcessingActivityResponseDTO() {
+    }
+
+    public List<AssetBasicResponseDTO> getAssets() { return assets; }
+
+    public void setAssets(List<AssetBasicResponseDTO> assets) { this.assets = assets; }
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
 

@@ -48,7 +48,7 @@ public class HostingProviderService {
         List<HostingProvider> hostingProviders = new ArrayList<>();
         if (!hostingProviderNames.isEmpty()) {
             for (String name : hostingProviderNames) {
-                HostingProvider hostingProvider = new HostingProvider(name, countryId);
+                HostingProvider hostingProvider = new HostingProvider(countryId, name);
                 if (isSuggestion) {
                     hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     hostingProvider.setSuggestedDate(LocalDate.now());
@@ -126,7 +126,7 @@ public class HostingProviderService {
         }
         Integer resultCount = hostingProviderRepository.updateMasterMetadataName(hostingProviderDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvider", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }
@@ -143,8 +143,8 @@ public class HostingProviderService {
      * @return
      * @description method save Hosting provider suggested by unit
      */
-    public List<HostingProviderDTO> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
-        return createHostingProviders(countryId, hostingProviderDTOS, true);
+    public void saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+         createHostingProviders(countryId, hostingProviderDTOS, true);
     }
 
 
@@ -160,7 +160,7 @@ public class HostingProviderService {
         if (updateCount > 0) {
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingProviderIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingProviderIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvider", hostingProviderIds);
         }
         return hostingProviderRepository.findAllByIds(hostingProviderIds);
     }

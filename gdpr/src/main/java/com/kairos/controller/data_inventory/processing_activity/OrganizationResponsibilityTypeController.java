@@ -8,8 +8,6 @@ import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +22,6 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
 class OrganizationResponsibilityTypeController {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationResponsibilityTypeController.class);
 
     @Inject
     private OrganizationResponsibilityTypeService responsibilityTypeService;
@@ -46,9 +41,6 @@ class OrganizationResponsibilityTypeController {
     @ApiOperation("get ResponsibilityType  by id")
     @GetMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> getResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(unitId, responsibilityTypeId));
     }
 
@@ -56,9 +48,7 @@ class OrganizationResponsibilityTypeController {
     @ApiOperation("get all ResponsibilityType ")
     @GetMapping("/responsibility_type")
     public ResponseEntity<Object> getAllResponsibilityType(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllResponsibilityType(unitId));
 
     }
@@ -66,9 +56,6 @@ class OrganizationResponsibilityTypeController {
     @ApiOperation("delete ResponsibilityType  by id")
     @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(unitId, responsibilityTypeId));
 
     }
@@ -76,9 +63,6 @@ class OrganizationResponsibilityTypeController {
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(unitId, responsibilityTypeId, responsibilityType));
 
     }
@@ -87,9 +71,6 @@ class OrganizationResponsibilityTypeController {
     @ApiOperation("save responsibility Type And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/responsibility_type/suggest")
     public ResponseEntity<Object> saveResponsibilityTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypeDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id does not exist");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.saveAndSuggestResponsibilityTypes(countryId, unitId, responsibilityTypeDTOs.getRequestBody()));
 
     }

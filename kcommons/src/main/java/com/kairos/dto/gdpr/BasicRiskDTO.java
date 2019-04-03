@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BasicRiskDTO {
@@ -26,6 +27,21 @@ public class BasicRiskDTO {
 
     @NotNull(message = "error.message.risk.level")
     protected RiskSeverity riskLevel;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BasicRiskDTO that = (BasicRiskDTO) o;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(name);
+    }
 
     public String getName() { return name.trim(); }
 

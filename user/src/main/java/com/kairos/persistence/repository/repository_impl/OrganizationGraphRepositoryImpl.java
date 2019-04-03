@@ -56,9 +56,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             matchRelationshipQueryForStaff += "MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
-                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp \n" +
                     "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
+                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp,employmentType,positionLine \n" +
                     "OPTIONAL MATCH(positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
                     "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,positionLine,exp,employmentType\n" +
                     "WITH staff,organization,unitPos,user, COLLECT(distinct {id:id(positionLine),startDate:positionLine.startDate,endDate:positionLine.endDate,functions:functions}) as positionLines,exp,employmentType\n" +
@@ -86,15 +86,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
 
         matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, " +
-                "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList";
-
-        if (Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,employments, user, employmentList,expertiseList  Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds}  ";
-
-        } else {
-            matchRelationshipQueryForStaff += " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) ";
-        }
-        matchRelationshipQueryForStaff += " with engineerType,employments, staff, user, employmentList, expertiseList";
+                "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
+        " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
+        " with engineerType,employments, staff, user, employmentList, expertiseList";
         return matchRelationshipQueryForStaff;
     }
 
@@ -120,10 +114,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             queryParameters.put("employmentTypeIds",
                     convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
-        }
-        if (Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()) {
-            queryParameters.put("engineerTypeIds",
-                    convertListOfStringIntoLong(filters.get(FilterType.ENGINEER_TYPE)));
         }
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
             queryParameters.put("expertiseIds",
@@ -272,13 +262,13 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             }
         }
 
-        String query = "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team)" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
+        String query = "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})-[:HAS_TEAMS]->(team:Team)" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
                 "UNION\n" +
-                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})-[:HAS_GROUP]->(group:Group)" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
+                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
                 "UNION\n" +
                 "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data \n" +
                 "UNION\n" +
-                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data";
+                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_TEAMS]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data";
 
         Iterator<Map> mapIterator = session.query(Map.class, query, queryParameters).iterator();
         List<Map<String, Object>> mapList = new ArrayList<>();

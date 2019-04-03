@@ -54,6 +54,7 @@ public class StaffPersonalDetail {
     private List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise;
     private AddressDTO primaryAddress;
     private AddressDTO secondaryAddress;
+    private Set<Long> teamIdsOfStaff;
 
     public StaffPersonalDetail() {
         //Default Constructor
@@ -290,6 +291,14 @@ public class StaffPersonalDetail {
 
     public void setSecondaryAddress(AddressDTO secondaryAddress) {
         this.secondaryAddress = secondaryAddress;
+    }
+
+    public Set<Long> getTeamIdsOfStaff() {
+        return teamIdsOfStaff;
+    }
+
+    public void setTeamIdsOfStaff(Set<Long> teamIdsOfStaff) {
+        this.teamIdsOfStaff = teamIdsOfStaff;
     }
 
     @Override

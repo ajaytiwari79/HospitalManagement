@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class DataDisposalService{
+public class DataDisposalService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalService.class);
 
@@ -44,11 +44,11 @@ public class DataDisposalService{
      */
     public List<DataDisposalDTO> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
         Set<String> existingDataDisposalNames = dataDisposalRepository.findNameByCountryIdAndDeleted(countryId);
-        Set<String> dataDisposalsNames = ComparisonUtils.getNewMetaDataNames(dataDisposalDTOS,existingDataDisposalNames );
+        Set<String> dataDisposalsNames = ComparisonUtils.getNewMetaDataNames(dataDisposalDTOS, existingDataDisposalNames);
         List<DataDisposal> dataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposal dataDisposal = new DataDisposal(name, countryId);
+                DataDisposal dataDisposal = new DataDisposal(countryId, name);
                 if (isSuggestion) {
                     dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     dataDisposal.setSuggestedDate(LocalDate.now());
@@ -59,7 +59,7 @@ public class DataDisposalService{
             }
             dataDisposalRepository.saveAll(dataDisposals);
         }
-       return ObjectMapperUtils.copyPropertiesOfListByMapper(dataDisposals,DataDisposalDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(dataDisposals, DataDisposalDTO.class);
 
     }
 
@@ -82,20 +82,19 @@ public class DataDisposalService{
     public DataDisposal getDataDisposalById(Long countryId, Long id) {
         DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("No data found");
-        } else {
-            return exist;
-
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", id);
         }
+        return exist;
+
     }
 
     public Boolean deleteDataDisposalById(Long countryId, Long id) {
         Integer resultCount = dataDisposalRepository.deleteByIdAndCountryId(id, countryId);
-       if (resultCount > 0) {
-           LOGGER.info("Data Disposal deleted successfully for id :: {}", id);
-       }else{
-           throw new DataNotFoundByIdException("No data found");
-       }
+        if (resultCount > 0) {
+            LOGGER.info("Data Disposal deleted successfully for id :: {}", id);
+        } else {
+            throw new DataNotFoundByIdException("No data found");
+        }
         return true;
     }
 
@@ -111,17 +110,17 @@ public class DataDisposalService{
     public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
 
-        DataDisposal dataDisposal = dataDisposalRepository.findByCountryIdAndName(countryId,  dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalRepository.findByCountryIdAndName(countryId, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
         }
-        Integer resultCount =  dataDisposalRepository.updateMasterMetadataName(dataDisposalDTO.getName(), id, countryId);
-        if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
-        }else{
+        Integer resultCount = dataDisposalRepository.updateMasterMetadataName(dataDisposalDTO.getName(), id, countryId);
+        if (resultCount <= 0) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", id);
+        } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataDisposalDTO.getName());
         }
         return dataDisposalDTO;
@@ -133,8 +132,8 @@ public class DataDisposalService{
      * @return
      * @description method save data disposal suggested by unit
      */
-    public List<DataDisposalDTO> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
-        return createDataDisposal(countryId, dataDisposalDTOS, true);
+    public void saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+        createDataDisposal(countryId, dataDisposalDTOS, true);
     }
 
 
@@ -146,10 +145,10 @@ public class DataDisposalService{
     public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, Set<Long> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = dataDisposalRepository.updateMetadataStatus(countryId, dataDisposalIds, suggestedDataStatus);
-        if(updateCount > 0){
+        if (updateCount > 0) {
             LOGGER.info("Data Disposals are updated successfully with ids :: {}", dataDisposalIds);
-        }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", dataDisposalIds);
+        } else {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", dataDisposalIds);
         }
         return dataDisposalRepository.findAllByIds(dataDisposalIds);
     }

@@ -44,22 +44,22 @@ public class OrganizationHostingProviderService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param hostingProviderDTOS
      * @return return map which contain list of new HostingProvider and list of existing HostingProvider if HostingProvider already exist
      * @description this method create new HostingProvider if HostingProvider not exist with same name ,
      * and if exist then simply add  HostingProvider to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
-    public List<HostingProviderDTO> createHostingProviders(Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
-        Set<String> existingHostingProviderNames = hostingProviderRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<HostingProviderDTO> createHostingProviders(Long unitId, List<HostingProviderDTO> hostingProviderDTOS) {
+        Set<String> existingHostingProviderNames = hostingProviderRepository.findNameByOrganizationIdAndDeleted(unitId);
         Set<String> hostingProviderNames = ComparisonUtils.getNewMetaDataNames(hostingProviderDTOS,existingHostingProviderNames );
         List<HostingProvider> hostingProviderList = new ArrayList<>();
         if (!hostingProviderNames.isEmpty()) {
             for (String name : hostingProviderNames) {
 
                 HostingProvider hostingProvider = new HostingProvider(name);
-                hostingProvider.setOrganizationId(organizationId);
+                hostingProvider.setOrganizationId(unitId);
                 hostingProviderList.add(hostingProvider);
             }
            hostingProviderRepository.saveAll(hostingProviderList);
@@ -71,24 +71,24 @@ public class OrganizationHostingProviderService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @return list of HostingProvider
      */
-    public List<HostingProviderResponseDTO> getAllHostingProvider(Long organizationId) {
-        return hostingProviderRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<HostingProviderResponseDTO> getAllHostingProvider(Long unitId) {
+        return hostingProviderRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param id
      * @return HostingProvider object fetch by id
      * @throws DataNotFoundByIdException if HostingProvider not exist for given id
      */
-    public HostingProvider getHostingProviderById(Long organizationId, Long id) {
+    public HostingProvider getHostingProviderById(Long unitId, Long id) {
 
-        HostingProvider exist = hostingProviderRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId);
+        HostingProvider exist = hostingProviderRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -101,7 +101,7 @@ public class OrganizationHostingProviderService {
     public Boolean deleteHostingProvider(Long unitId, Long hostingProviderId) {
         List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, hostingProviderId);
         if (CollectionUtils.isNotEmpty(assetNames)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.hostingProvide", StringUtils.join(assetNames, ','));
         }
         Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, unitId);
         if (resultCount > 0) {
@@ -115,24 +115,24 @@ public class OrganizationHostingProviderService {
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id                 id of HostingProvider
      * @param hostingProviderDTO
      * @return return hostingProviderDTO HostingProvider object
      * @throws DuplicateDataException if HostingProvider exist with same name
      */
-    public HostingProviderDTO updateHostingProvider(Long organizationId, Long id, HostingProviderDTO hostingProviderDTO) {
+    public HostingProviderDTO updateHostingProvider(Long unitId, Long id, HostingProviderDTO hostingProviderDTO) {
 
-        HostingProvider hostingProvider = hostingProviderRepository.findByOrganizationIdAndDeletedAndName(organizationId, hostingProviderDTO.getName());
+        HostingProvider hostingProvider = hostingProviderRepository.findByOrganizationIdAndDeletedAndName(unitId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Hosting Provider", hostingProvider.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.hostingProvide", hostingProvider.getName());
         }
-        Integer resultCount = hostingProviderRepository.updateMetadataName(hostingProviderDTO.getName(), id, organizationId);
+        Integer resultCount = hostingProviderRepository.updateMetadataName(hostingProviderDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting provider", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvide", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }
@@ -142,8 +142,8 @@ public class OrganizationHostingProviderService {
     }
 
 
-    public List<HostingProviderDTO> saveAndSuggestHostingProviders(Long countryId, Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
-        List<HostingProviderDTO> hostingProviders = createHostingProviders(organizationId, hostingProviderDTOS);
+    public List<HostingProviderDTO> saveAndSuggestHostingProviders(Long countryId, Long unitId, List<HostingProviderDTO> hostingProviderDTOS) {
+        List<HostingProviderDTO> hostingProviders = createHostingProviders(unitId, hostingProviderDTOS);
         hostingProviderService.saveSuggestedHostingProvidersFromUnit(countryId, hostingProviderDTOS);
         return hostingProviders;
     }

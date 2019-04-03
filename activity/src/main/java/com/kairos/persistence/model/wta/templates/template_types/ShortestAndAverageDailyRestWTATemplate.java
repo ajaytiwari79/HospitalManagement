@@ -2,6 +2,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -105,13 +107,13 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
             List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds);
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getIntervals(interval);
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
+            Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
             for (DateTimeInterval dateTimeInterval : intervals) {
                 int totalMin = (int)dateTimeInterval.getMinutes();
                 for (ShiftWithActivityDTO shift : shifts) {
@@ -120,7 +122,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
                     }
                 }
                 boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
-                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,limitAndCounter[0]/60);
             }
         }
     }

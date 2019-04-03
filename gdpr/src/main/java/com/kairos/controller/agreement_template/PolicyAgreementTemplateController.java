@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.ApiConstant.*;
@@ -85,24 +84,6 @@ class PolicyAgreementTemplateController {
 
     }
 
-    //TODO
-    @ApiOperation("get All Master agreement Template linked with Clause , country level ")
-    @GetMapping(COUNTRY_URL+"/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getAllMasterAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(countryId, false,clauseId));
-
-    }
-
-    //TODO
-    /*@ApiOperation("Replace Old Clause With New Version of Clause, country level ")
-    @PutMapping(COUNTRY_URL+"/agreement_template/clause/version")
-    public ResponseEntity<Object> updateMasterAgreementTemplateClauseWithNewVersion(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(countryId, false,agreementTemplateClauseUpdateDTO));
-
-    }*/
-
-    // Agreement template unit url
-
     @ApiOperation("save agreement template with basic detail , unit level ")
     @PostMapping(UNIT_URL+"/agreement_template")
     public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createPolicyAgreementTemplate(@PathVariable Long unitId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
@@ -110,7 +91,6 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(unitId,true, agreementTemplateDto));
     }
 
-    //TODO
     @ApiOperation("upload cover image of agreement template , unit level")
     @PostMapping(UNIT_URL+"/agreement_template/{agreementTemplateId}/upload")
     public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByUnitId(@PathVariable Long unitId, @PathVariable Long agreementTemplateId, @RequestParam("file") MultipartFile file) {
@@ -149,13 +129,6 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId,true, agreementTemplateId));
     }
 
-    //TODO
-    @ApiOperation("get all agreement Template linked with clause , org level ")
-    @GetMapping(UNIT_URL+"/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(unitId,true, clauseId));
-
-    }
 
     //TODO
    /* @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
@@ -165,7 +138,6 @@ class PolicyAgreementTemplateController {
 
     }*/
 
-    //TODO
     @ApiOperation(value = "All Template Type type ")
     @GetMapping(UNIT_URL+"/template/all")
     public ResponseEntity<Object> getAllTemplateType(@PathVariable Long unitId) {

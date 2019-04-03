@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.phase;
 
 
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
@@ -51,6 +52,13 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
         return mongoTemplate.find(query, PhaseDTO.class, "phases");
     }
 
+    @Override
+    public List<PhaseDTO> getApplicablePlanningPhasesByUnitIds(List<Long> unitIds, Sort.Direction direction) {
+        Query query = Query.query(Criteria.where("organizationId").in(unitIds).and("duration").gt(0).and("phaseType").is(PhaseType.PLANNING));
+        query.with(new Sort(direction, "sequence"));
+        return mongoTemplate.find(query, PhaseDTO.class, "phases");
+    }
+
     public List<PhaseDTO> getActualPhasesByUnit(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("organizationId").is(unitId).and("phaseType").is(PhaseType.ACTUAL)));
         AggregationResults<PhaseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseDTO.class);
@@ -73,8 +81,8 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     }
 
-    public Boolean checkPhaseByName(BigInteger phaseId, String name) {
-        Query query = Query.query(Criteria.where("name").is(name).and("id").is(phaseId));
+    public Boolean checkPhaseByPhaseIdAndPhaseEnum(BigInteger phaseId, PhaseDefaultName phaseEnum) {
+        Query query = Query.query(Criteria.where("phaseEnum").is(phaseEnum).and("id").is(phaseId));
         return mongoTemplate.exists(query, Phase.class);
     }
 

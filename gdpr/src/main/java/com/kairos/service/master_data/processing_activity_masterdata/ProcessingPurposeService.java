@@ -50,7 +50,7 @@ public class ProcessingPurposeService {
         List<ProcessingPurpose> processingPurposes = new ArrayList<>();
         if (!processingPurposesNames.isEmpty()) {
             for (String name : processingPurposesNames) {
-                ProcessingPurpose processingPurpose = new ProcessingPurpose(name, countryId);
+                ProcessingPurpose processingPurpose = new ProcessingPurpose(countryId, name);
                 if (isSuggestion) {
                     processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     processingPurpose.setSuggestedDate(LocalDate.now());
@@ -122,7 +122,7 @@ public class ProcessingPurposeService {
         } else {
             Integer resultCount = processingPurposeRepository.updateMasterMetadataName(processingPurposeDTO.getName(), id, countryId);
             if (resultCount <= 0) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
+                exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingPurpose", id);
             } else {
                 LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingPurposeDTO.getName());
             }
@@ -136,8 +136,8 @@ public class ProcessingPurposeService {
      * @param processingPurposeDTOS - processing purpose suggested by unit
      * @return
      */
-    public List<ProcessingPurposeDTO> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
-        return createProcessingPurpose(countryId, processingPurposeDTOS, true);
+    public void saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+         createProcessingPurpose(countryId, processingPurposeDTOS, true);
 
     }
 
@@ -154,7 +154,7 @@ public class ProcessingPurposeService {
         if (updateCount > 0) {
             LOGGER.info("Processing Purposes are updated successfully with ids :: {}", processingPurposeIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", processingPurposeIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingPurpose", processingPurposeIds);
         }
         return processingPurposeRepository.findAllByIds(processingPurposeIds);
     }

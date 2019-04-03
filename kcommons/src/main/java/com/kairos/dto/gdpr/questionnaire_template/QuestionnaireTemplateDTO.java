@@ -31,13 +31,17 @@ public class QuestionnaireTemplateDTO {
     @Valid
     private List<QuestionnaireSectionDTO> sections=new ArrayList<>();
 
-    public Long getAssetSubType() { return subAssetType; }
+    public Long getSubAssetType() {
+        return subAssetType;
+    }
+
+    public void setSubAssetType(Long subAssetType) {
+        this.subAssetType = subAssetType;
+    }
 
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 
     public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
-
-    public void setAssetSubType(Long subAssetType) { this.subAssetType = subAssetType; }
 
     public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
 

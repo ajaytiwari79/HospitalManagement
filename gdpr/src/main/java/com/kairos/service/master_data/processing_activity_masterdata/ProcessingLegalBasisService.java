@@ -51,7 +51,7 @@ public class ProcessingLegalBasisService {
         List<ProcessingLegalBasis> processingLegalBases = new ArrayList<>();
         if (!legalBasisNames.isEmpty()) {
             for (String name : legalBasisNames) {
-                ProcessingLegalBasis legalBasis = new ProcessingLegalBasis(name, countryId);
+                ProcessingLegalBasis legalBasis = new ProcessingLegalBasis(countryId, name);
                 if (isSuggestion) {
                     legalBasis.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     legalBasis.setSuggestedDate(LocalDate.now());
@@ -125,7 +125,7 @@ public class ProcessingLegalBasisService {
         }
         Integer resultCount = processingLegalBasisRepository.updateMasterMetadataName(processingLegalBasisDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.legalBasis", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingLegalBasisDTO.getName());
         }
@@ -140,8 +140,8 @@ public class ProcessingLegalBasisService {
      * @param processingLegalBasisDTOS - processing legal basis suggested by Unit
      * @return
      */
-    public List<ProcessingLegalBasisDTO> saveSuggestedProcessingLegalBasisFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
-        return createProcessingLegalBasis(countryId, processingLegalBasisDTOS, true);
+    public void saveSuggestedProcessingLegalBasisFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
+         createProcessingLegalBasis(countryId, processingLegalBasisDTOS, true);
     }
 
 
@@ -157,7 +157,7 @@ public class ProcessingLegalBasisService {
         if (updateCount > 0) {
             LOGGER.info("Legal Basis are updated successfully with ids :: {}", processingLegalBasisIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", processingLegalBasisIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.legalBasis", processingLegalBasisIds);
         }
         return processingLegalBasisRepository.findAllByIds(processingLegalBasisIds);
     }

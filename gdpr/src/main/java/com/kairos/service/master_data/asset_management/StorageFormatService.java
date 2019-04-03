@@ -49,7 +49,7 @@ public class StorageFormatService{
             List<StorageFormat> storageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-                    StorageFormat storageFormat = new StorageFormat(name,countryId);
+                    StorageFormat storageFormat = new StorageFormat(countryId, name);
                     if(isSuggestion){
                         storageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         storageFormat.setSuggestedDate(LocalDate.now());
@@ -122,7 +122,7 @@ public class StorageFormatService{
         }
         Integer resultCount =  storageFormatRepository.updateMasterMetadataName(storageFormatDTO.getName(), id, countryId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.storageFormat", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, storageFormatDTO.getName());
         }
@@ -137,8 +137,8 @@ public class StorageFormatService{
      * @param storageFormatDTOS
      * @return
      */
-    public List<StorageFormatDTO> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
-        return createStorageFormat(countryId, storageFormatDTOS,true);
+    public void saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
+        createStorageFormat(countryId, storageFormatDTOS,true);
     }
 
 
@@ -155,7 +155,7 @@ public class StorageFormatService{
         if(updateCount > 0){
             LOGGER.info("Storage Formats are updated successfully with ids :: {}", storageFormatIds);
         }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", storageFormatIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.storageFormat", storageFormatIds);
         }
         return storageFormatRepository.findAllByIds(storageFormatIds);
     }

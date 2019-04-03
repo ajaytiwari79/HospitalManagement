@@ -8,7 +8,6 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
 
@@ -18,7 +17,6 @@ import java.util.List;
 public class OrganizationBuilder {
     private String name;
     private Long id;
-    private List<Group> groupList;
     private List<Organization> children;
     private boolean parentOrganization;
     private Country country;
@@ -48,11 +46,6 @@ public class OrganizationBuilder {
 
     public OrganizationBuilder setName(String name) {
         this.name = name;
-        return this;
-    }
-
-    public OrganizationBuilder setGroupList(List<Group> groupList) {
-        this.groupList = groupList;
         return this;
     }
 
@@ -198,10 +191,6 @@ public class OrganizationBuilder {
         this.id = id;
     }
 
-    public List<Group> getGroupList() {
-        return groupList;
-    }
-
     public List<Organization> getChildren() {
         return children;
     }
@@ -314,7 +303,7 @@ public class OrganizationBuilder {
     public Organization createOrganization() {
         return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
-                parentOrganization, country,accountType,boardingCompleted,groupList,children,unitType, workcentre);
+                parentOrganization, country,accountType,boardingCompleted,children,unitType, workcentre);
     }
 
 }

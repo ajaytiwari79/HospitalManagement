@@ -10,20 +10,20 @@ public final class ApiConstants {
     public static final String ORGANIZATION_UNIT_URL =   UNIT_URL;
     public static final String COUNTRY_URL = "/country/{countryId}";
     public static final String API_V1 = "/api/v1";
-    public static final String API_ORGANIZATION_UNIT_URL = API_V1 + UNIT_URL;
+    public static final String API_UNIT_URL = API_V1 + UNIT_URL;
     public static final String API_ABSENCE_PLANNING_URL = API_V1 + UNIT_URL + "/absence_planning";
     public static final String API_NOTIFICATION_URL = API_V1 + "/notification";
     public static final String API_REQUEST_COMPONENT_URL = API_V1  + "/resourceComponent";
     public static final String API_ORGANIZATION_COUNTRY_URL = API_V1  + COUNTRY_URL;
-    public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL + "/timeBank";
-    public static final String PAYOUT_URL = API_ORGANIZATION_UNIT_URL + "/payOut";
+    public static final String TIMEBANK_URL = API_UNIT_URL + "/timeBank";
+    public static final String PAYOUT_URL = API_UNIT_URL + "/payOut";
     public static final String COUNTER_DIST_URL = "/counter/dist";
     public static final String KPI_URL = "/kpi/{kpiId}";
     public static final String COUNTER_COUNTRY_DIST_URL = COUNTRY_URL + COUNTER_DIST_URL;
     public static final String COUNTER_UNIT_DIST_URL = UNIT_URL + COUNTER_DIST_URL;
     public static final String COUNTER_STAFF_UNIT_DIST_URL = UNIT_URL + STAFF_URL + COUNTER_DIST_URL;
     public static final String COUNTER_CONF_URL = "/counter/conf";
-    public static final String COUNTER_DATA_URL = API_ORGANIZATION_UNIT_URL + "/counters/data";
+    public static final String COUNTER_DATA_URL = API_UNIT_URL + "/counters/data";
     public static final String ORDER_URL = API_V1 + UNIT_URL + "/orders";
     public static final String COUNTRY_ACTIVITY_CONFIGURATION = COUNTRY_URL + "/activity_configuration";
     public static final String UNIT_ACTIVITY_CONFIGURATION = UNIT_URL + "/activity_configuration";
@@ -75,8 +75,7 @@ public final class ApiConstants {
     public static final String COUNTRY_COUNTRY_ID=COUNTRY_ID+"/{countryId}";
     public static final String SERVICE_DATA="/service/data";
     public static final String SKILLS ="/skills";
-    public static final String STAFF_AND_SKILL="/staff/getsfAndsfSkill";
-   public static final String STAFF_WITH_STAFF_ID="/staff/{staffId}";
+    public static final String STAFF_WITH_STAFF_ID="/staff/{staffId}";
     public static final String STAFF_UNIT_WISE="/staff/unitwise";
     public static final String UNIT_POSITION_EXPERTISE="/unit_position/expertise";
     public static final String STAFF_GET_STAFF_INFO="/staff/getStaffInfo";
@@ -140,10 +139,12 @@ public final class ApiConstants {
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION="/updateFunctionOnPhaseRestoration";
     public static final String GET_FUNCTIONS_OF_UNIT_POSITION=STAFF_WITH_STAFF_ID+"/unit_position/{unitPositionId}/functions";
     public static final String UNIT_TIMEZONE="/time_zone";
+    public static final String UNITS_TIMEZONE="units_time_zone";
 
     public static final String STAFF_EMPLOYMENT_BY_UNIT_POSITION_ID=STAFF_URL+"/staff_employment_by_unit_position/{unitPositionId}";
 
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
+    public static final String GET_UNIT_BY_UNIT_POSITION= GET_UNIT_POSITION+"/get_unit";
 
     // /staff_by_employment_type
     public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";

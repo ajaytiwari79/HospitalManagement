@@ -1,5 +1,6 @@
 package com.kairos.controller.auth;
 
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
@@ -156,7 +157,7 @@ public class AuthController {
      */
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @ApiOperation(value = "logout User from System")
-    ResponseEntity<Map<String, Object>> logoutUser(@RequestHeader(value = "authtoken") String accessToken) {
+    ResponseEntity<Map<String, Object>> logoutUser(@RequestHeader(value = CommonConstants.AUTH_TOKEN) String accessToken) {
         logger.info("Removing token  " + accessToken + "\n");
         if (userService.removeToken(accessToken)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);

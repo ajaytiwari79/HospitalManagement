@@ -3,19 +3,18 @@ package com.kairos.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class ComparisonUtils {
+public class ComparisonUtils{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonUtils.class);
 
     public static <T> Set<String> getNewNameListOfMetadata(List<T> existingObject, Set<String> namesList) {
 
-        if (existingObject.size() == 0) {
+        if (existingObject.isEmpty()) {
             return namesList;
         } else {
             Map<String, String> existingNamesMapData = new HashMap<>();
@@ -32,7 +31,7 @@ public class ComparisonUtils {
                     existingNamesMapData.put(name.toLowerCase(), name);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
                 throw new RuntimeException(e);
             }
             Set<String> newNamesList = new HashSet<>();
@@ -65,13 +64,10 @@ public class ComparisonUtils {
                     }
                 });
             }
-        }catch (Exception ex){
-            LOGGER.error("Error in getMetadataNameListInLowerCase::"+ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.info("Error in getMetadataNameListInLowerCase  {0} " , ex.getCause());
         }
         return lowerCaseNewNameList;
     }
-
-
-
 
 }

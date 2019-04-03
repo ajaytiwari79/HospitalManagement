@@ -13,7 +13,7 @@ import java.util.Set;
 
 ////@JaversSpringDataAuditable
 @Repository
-public interface MasterProcessingActivityRepository extends JpaRepository<MasterProcessingActivity,Long>{
+public interface MasterProcessingActivityRepository extends JpaRepository<MasterProcessingActivity, Long> {
 
 
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?2 and lower(MPA.name) = lower(?1) and MPA.deleted = false")
@@ -22,8 +22,11 @@ public interface MasterProcessingActivityRepository extends JpaRepository<Master
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.deleted = false and MPA.subProcessActivity = false")
     List<MasterProcessingActivity> findAllByCountryId(Long countryId);
 
+    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id in (?2) and MPA.deleted = false")
+    List<MasterProcessingActivity> findAllByCountryIdAndIds(Long countryId, Set<Long> ids);
+
     @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id = ?2 and MPA.deleted = false")
-    MasterProcessingActivity getMasterAssetByCountryIdAndId(Long countryId, Long id);
+    MasterProcessingActivity findByCountryIdAndId(Long countryId, Long id);
 
     @Transactional
     @Modifying

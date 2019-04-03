@@ -4,21 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.enums.UnitPosition;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
-import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
-import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -29,6 +28,7 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.user_context.UserContext;
+import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by prerna on 1/5/18.
@@ -83,12 +83,12 @@ public class StaffFilterService {
     @Inject
     private AccessPageRepository accessPageRepository;
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId,  Long unitId) {
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         Organization organization;
-        if(accessPageRepository.isHubMember(userId)){
+        if (accessPageRepository.isHubMember(userId)) {
             organization = accessPageRepository.fetchParentHub(userId);
-        }else {
+        } else {
             //TODO please Optimise these DB calls
             organization = organizationGraphRepository.findOne(unitId);
             if (!Optional.ofNullable(organization).isPresent()) {
@@ -126,13 +126,10 @@ public class StaffFilterService {
             case STAFF_STATUS: {
                 return dtoToQueryesultConverter(StaffStatusEnum.getListOfStaffStatusForFilters(), objectMapper);
             }
-            case ENGINEER_TYPE: {
-                return engineerTypeGraphRepository.getEngineerTypeByCountryIdForFilters(countryId);
-            }
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
-            case UNIT_POSITION:{
+            case UNIT_POSITION: {
                 return dtoToQueryesultConverter(UnitPosition.getListOfUnitPositionForFilters(), objectMapper);
             }
 
@@ -175,8 +172,8 @@ public class StaffFilterService {
 
     public StaffFilterDTO addFavouriteFilter(Long unitId, StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, unitId);
-
+        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
 
         if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.name.empty");
@@ -204,8 +201,9 @@ public class StaffFilterService {
 
     public StaffFilterDTO updateFavouriteFilter(Long filterId, Long organizationId, StaffFilterDTO favouriteFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
+        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(organizationId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
-                userId, organizationId, filterId);
+                userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 
@@ -235,8 +233,9 @@ public class StaffFilterService {
 
     public Boolean deleteFavouriteFilter(Long filterId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
+        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
-                userId, unitId, filterId);
+                userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 
@@ -279,19 +278,19 @@ public class StaffFilterService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
-        staffEmploymentTypeWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),moduleId,
+        staffEmploymentTypeWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(), moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
-        List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(),unitId);
-        staffs = staffs.stream().filter(distinctByKey(a->a.get("id"))).collect(Collectors.toList());
+        List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId);
+        staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
         return staffEmploymentTypeWrapper;
 
     }
 
     private List<Map> filterStaffByRoles(List<Map> staffList, Long unitId) {
-        Long userId=UserContext.getUserDetails().getId();
+        Long userId = UserContext.getUserDetails().getId();
         List<Map> staffListByRole = new ArrayList<>();
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
         if (staffAtHub != null) {
@@ -300,12 +299,14 @@ public class StaffFilterService {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
             String STAFF_CURRENT_ROLE;
             if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE=staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
-                if(AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)){
-                    staffListByRole=staffList;
-                }else if(AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)){
-                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staff);
+                STAFF_CURRENT_ROLE = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+                if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
+                    staffListByRole = staffList;
+                } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
+                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().orElse(new HashMap());
+                    if (isNotEmpty(staff)) {
+                        staffListByRole.add(staff);
+                    }
                 }
             }
         }

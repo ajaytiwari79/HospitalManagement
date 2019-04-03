@@ -7,17 +7,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface AssetRepository extends CustomGenericRepository<Asset> {
+public interface AssetRepository extends CustomGenericRepository<Asset> ,CustomAssetRepository {
 
     @Query(value = "Select name from Asset where organizationId = ?1 and deleted = false and (assetType.id  = ?2 OR subAssetType.id = ?2)")
     List<String> findAllAssetLinkedWithAssetType(Long orgId, Long assetTypeId);
 
-
-    @Query(value = "Select asset from #{#entityName} asset WHERE asset.organizationId = ?1 and asset.deleted = false and asset.active =  true")
+    @Query(value = "Select asset from #{#entityName} asset WHERE asset.organizationId = ?1 and asset.deleted = false and asset.active =  true order by asset.createdAt desc")
     List<Asset> findAllActiveAssetByOrganizationId(Long orgId);
+
+    @Query(value = "Select asset from #{#entityName} asset where asset.organizationId = ?1 and asset.id in (?2) and asset.deleted = false")
+    List<Asset> findAllByUnitIdAndIds(Long unitId, Set<Long> ids);
 
     @Query(value = "Select name from Asset where organizationId = ?1 and dataDisposal.id = ?2 and deleted = false")
     List<String> findAllAssetLinkedWithDataDisposal(Long orgId, Long disposalId);

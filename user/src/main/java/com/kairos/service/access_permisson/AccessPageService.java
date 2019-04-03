@@ -5,11 +5,9 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.dto.user.staff.permission.StaffPermissionDTO;
 import com.kairos.dto.user.staff.permission.StaffTabPermission;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.position.AccessPermissionAccessPageRelation;
@@ -21,7 +19,6 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.user_context.UserContext;
@@ -61,8 +58,6 @@ public class AccessPageService {
     private TreeStructureService treeStructureService;
     @Inject
     private AccessPageCustomIdRepository accessPageCustomIdRepository;
-    @Inject
-    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject private SystemLanguageGraphRepository systemLanguageGraphRepository;
@@ -124,8 +119,8 @@ public class AccessPageService {
             return false;
         }
 
-        Boolean isKairosHub = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.HUB) ? true : false;
-        Boolean isUnion = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.UNION) ? true : false;
+        Boolean isKairosHub = OrganizationCategory.HUB.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
+        Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
 
         if(orgCategoryTabAccessDTO.isAccessStatus()){
             accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );

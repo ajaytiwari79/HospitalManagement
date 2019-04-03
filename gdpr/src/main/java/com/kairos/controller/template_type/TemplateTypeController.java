@@ -1,5 +1,6 @@
 package com.kairos.controller.template_type;
 
+import com.kairos.dto.gdpr.master_data.TemplateTypeDTO;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -7,8 +8,6 @@ import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +21,6 @@ import static com.kairos.constants.ApiConstant.*;
 @Api(API_V1)
 @RequestMapping(API_V1)
 class TemplateTypeController {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateTypeController.class);
 
 
     @Inject
@@ -41,7 +37,7 @@ class TemplateTypeController {
 
     @ApiOperation(value = "create new Template type")
     @PostMapping(COUNTRY_URL+"/template")
-    public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TemplateType> templateData) {
+    public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TemplateTypeDTO> templateData) {
         if (CollectionUtils.isEmpty(templateData.getRequestBody())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -59,7 +55,7 @@ class TemplateTypeController {
      */
     @ApiOperation(value = "update template")
     @PutMapping(value = COUNTRY_URL+"/template/{id}")
-    public ResponseEntity<Object> updateTemplate(@PathVariable Long id, @PathVariable Long countryId, @Valid @RequestBody TemplateType templateType) {
+    public ResponseEntity<Object> updateTemplate(@PathVariable Long id, @PathVariable Long countryId, @Valid @RequestBody TemplateTypeDTO templateType) {
 
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id parameter is null or empty");

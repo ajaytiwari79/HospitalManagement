@@ -29,16 +29,16 @@ public interface DataSubjectRepository extends JpaRepository<DataSubject, Long>{
     List<DataSubject> getAllDataSubjectByCountryId(Long countryId);
 
     @Query(value = "Select DS from DataSubject DS where DS.organizationId = ?1 and lower(DS.name) = lower(?2) and DS.deleted = false")
-    DataSubject findByNameAndUnitId(Long unitId, String name);
+    DataSubject findByNameAndUnitId(Long organizationId, String name);
 
     @Query(value = "Select DS from DataSubject DS where DS.organizationId = ?1 and DS.id = ?2 and DS.deleted =  false")
     DataSubject getDataSubjectByUnitIdAndId(Long unit, Long id);
 
     @Query(value = "Select DS from DataSubject DS where DS.organizationId = ?1 and DS.deleted = false Order By DS.createdAt desc")
-    List<DataSubject> getAllDataSubjectByUnitId(Long unitId);
+    List<DataSubject> getAllDataSubjectByUnitId(Long organizationId);
 
     @Query(value = "select ds.name from data_subject ds Inner Join data_subject_categories dc  ON ds.id = dc.data_subject_id where ds.organization_id = ?1 and dc.data_category_id = ?2", nativeQuery = true)
-    List<String> findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(Long unitId, Long id);
+    List<String> findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(Long organizationId, Long id);
 
     @Query(value = "select ds.name from data_subject ds Inner Join data_subject_categories dc  ON ds.id = dc.data_subject_id where ds.country_id = ?1 and dc.data_category_id = ?2", nativeQuery = true)
     List<String> findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(Long countryId, Long id);

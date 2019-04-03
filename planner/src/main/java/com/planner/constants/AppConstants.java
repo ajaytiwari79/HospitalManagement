@@ -18,7 +18,7 @@ public class AppConstants {
      */
     public static final String NEO4J_URI = "spring.data.neo4j.uri";
     public static final String NEO4J_USER_NAME = "spring.data.neo4j.username";
-    public static final String NEO4J_PASSWORD = "spring.data.neo4j.password";
+    public static final String NEO4J_PASSPHRASE = "spring.data.neo4j.password";
     public static final String CONNECTION_POOL_SIZE = "spring.data.neo4j.connection.pool.size";
 
     /**
@@ -27,7 +27,7 @@ public class AppConstants {
      * @date 31-8-17
      */
     public static final String STAFFING_LEVEL="staffing_level";
-    public static final String ACTIVITYIES="activities";
+    public static final String ACTIVITIES ="activities";
     public static final String COST_TIME_AGGREMENET="costTimeAgreement";
     public static final String CTA_RULE_TEMPLATE="cTARuleTemplate";
     public static final String Working_Time_AGREEMENT="workingTimeAgreement";

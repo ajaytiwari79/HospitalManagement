@@ -6,7 +6,6 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.mongodb.client.result.UpdateResult;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -33,4 +32,5 @@ public interface CustomPlanningPeriodMongoRepository {
     PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId);
     List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
     List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate);
+    List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
 }

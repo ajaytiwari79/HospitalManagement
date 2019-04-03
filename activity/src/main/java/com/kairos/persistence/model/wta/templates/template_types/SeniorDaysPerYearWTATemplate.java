@@ -5,11 +5,14 @@ import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.user.expertise.CareDaysDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
+
+
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static com.kairos.constants.CommonConstants.DAYS;
 
 
 /**
@@ -81,7 +85,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
                 List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
                 if (leaveCount < (shifts.size()+1)) {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
+                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null, DurationType.DAYS,leaveCount);
                     infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                 }
             }

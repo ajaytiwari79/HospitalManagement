@@ -58,9 +58,9 @@ public class StaffingLevelUtil {
 
         staffingLevel.setStaffingLevelSetting(presenceStaffingLevelDTO.getStaffingLevelSetting());
         staffingLevel.setPhaseId(presenceStaffingLevelDTO.getPhaseId());
-        int i = 0;
-        for(StaffingLevelInterval staffingLevelInterval:staffingLevel.getPresenceStaffingLevelInterval()) {
-            StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO = presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(i);
+        Map<Duration,StaffingLevelInterval> durationAndStaffingLevelIntervalMap=staffingLevel.getPresenceStaffingLevelInterval().stream().collect(Collectors.toMap(k->k.getStaffingLevelDuration(),v->v));
+        for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
+            StaffingLevelInterval staffingLevelInterval=durationAndStaffingLevelIntervalMap.get(staffingLevelTimeSlotDTO.getStaffingLevelDuration());
             staffingLevelInterval.setMinNoOfStaff(staffingLevelTimeSlotDTO.getMinNoOfStaff());
             staffingLevelInterval.setMaxNoOfStaff(staffingLevelTimeSlotDTO.getMaxNoOfStaff());
             staffingLevelInterval.setSequence(staffingLevelTimeSlotDTO.getSequence());
@@ -72,10 +72,9 @@ public class StaffingLevelUtil {
                 if(staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
                     staffingLevelActivityNew.setAvailableNoOfStaff(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()).getAvailableNoOfStaff());
                 }
-              staffingLevelActivities.add(staffingLevelActivityNew);
+                staffingLevelActivities.add(staffingLevelActivityNew);
             }
             staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
-            i++;
         }
         staffingLevel.setUnitId(unitId);
         staffingLevel.setId(staffingLevelId);

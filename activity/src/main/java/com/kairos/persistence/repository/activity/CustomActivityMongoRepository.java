@@ -20,11 +20,9 @@ import java.util.Set;
 
 public interface CustomActivityMongoRepository {
 
-    List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted);
+    List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted);
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
-
-    List<Activity> findAllActivitiesByOrganizationTypeOrSubType(Long orgTypeIds, List<Long> orgSubTypeIds);
 
     List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId);
 
@@ -42,7 +40,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(long unitId);
 
-    List<ActivityDTO> findAllActivityByUnitId(Long unitId);
+    List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted);
 
     Activity getActivityByNameAndUnitId(Long unitId,String name);
 
@@ -68,8 +66,7 @@ public interface CustomActivityMongoRepository {
 
     StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId,BigInteger activityId);
 
-    List<BreakActivitiesDTO> getAllActivitiesGroupedByTimeType(Long unitId);
-     List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) ;
+    List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) ;
 
     List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds);
     List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId);
@@ -78,6 +75,9 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
-    ActivityDTO eligibleForCopy(BigInteger activityId);
+    List<ActivityWrapper> findActivityAndTimeTypeByActivityIds(Set<BigInteger> activityIds);
 
+    boolean existsByActivityIdInCompositeActivities(BigInteger activityId);
+
+    List<Activity> findByActivityIdInCompositeActivities(BigInteger activityId,List<BigInteger> allowedActivityIds);
 }

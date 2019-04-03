@@ -16,7 +16,7 @@ public class OrganizationTypeSubTypeAndServicesQueryResult {
     private Long id;
     private String name;
     private Long countryId;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
 
@@ -28,9 +28,9 @@ public class OrganizationTypeSubTypeAndServicesQueryResult {
 
     public void setName(String name) { this.name = name; }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() { return organizationSubTypeDTOS; }
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
 

@@ -5,13 +5,10 @@ import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,8 +30,6 @@ import static com.kairos.constants.ApiConstant.*;
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
 class ClauseController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClauseController.class);
 
     @Inject
     private ClauseService clauseService;
@@ -90,7 +85,7 @@ class ClauseController {
 
     @ApiOperation("get all clause of unit")
     @GetMapping(UNIT_URL + "/clause")
-    public ResponseEntity<ResponseDTO<List<UnitLevelClauseResponseDTO>>> getAllClause(@PathVariable Long unitId) {
+    public ResponseEntity<ResponseDTO<List<ClauseResponseDTO>>> getAllClause(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.getAllClauseByUnitId(unitId));
     }
 

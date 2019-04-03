@@ -43,22 +43,22 @@ public class OrganizationProcessingPurposeService{
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param processingPurposeDTOS
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public List<ProcessingPurposeDTO>  createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
-            Set<String> existingProcessingPurposeNames = processingPurposeRepository.findNameByOrganizationIdAndDeleted(organizationId);
+    public List<ProcessingPurposeDTO>  createProcessingPurpose(Long unitId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+            Set<String> existingProcessingPurposeNames = processingPurposeRepository.findNameByOrganizationIdAndDeleted(unitId);
             Set<String> processingPurposesNames = ComparisonUtils.getNewMetaDataNames(processingPurposeDTOS,existingProcessingPurposeNames );
             List<ProcessingPurpose> processingPurposes = new ArrayList<>();
             if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
 
                     ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
-                    processingPurpose.setOrganizationId(organizationId);
+                    processingPurpose.setOrganizationId(unitId);
                     processingPurposes.add(processingPurpose);
 
                 }
@@ -69,22 +69,22 @@ public class OrganizationProcessingPurposeService{
 
 
     /**
-     * @param organizationId
+     * @param unitId
      * @return list of ProcessingPurpose
      */
-    public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+    public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long unitId) {
+        return processingPurposeRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId);
     }
 
     /**
-     * @param organizationId
+     * @param unitId
      * @param id             id of ProcessingPurpose
      * @return ProcessingPurpose object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
-    public ProcessingPurpose getProcessingPurpose(Long organizationId, Long id) {
+    public ProcessingPurpose getProcessingPurpose(Long unitId, Long id) {
 
-        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeletedFalse( id, organizationId);
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeletedFalse( id, unitId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -98,7 +98,7 @@ public class OrganizationProcessingPurposeService{
 
         List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", StringUtils.join(processingActivities,','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.processingPurpose", StringUtils.join(processingActivities,','));
         }
         processingPurposeRepository.deleteByIdAndOrganizationId(processingPurposeId, unitId);
         return true;
@@ -106,23 +106,23 @@ public class OrganizationProcessingPurposeService{
 
     /***
      * @throws DuplicateDataException throw exception if ProcessingPurpose data not exist for given id
-     * @param organizationId
+     * @param unitId
      * @param id id of ProcessingPurpose
      * @param processingPurposeDTO
      * @return ProcessingPurpose updated object
      */
-    public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
+    public ProcessingPurposeDTO updateProcessingPurpose(Long unitId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
 
-        ProcessingPurpose processingPurpose = processingPurposeRepository.findByOrganizationIdAndDeletedAndName(organizationId, processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeRepository.findByOrganizationIdAndDeletedAndName(unitId, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Processing Purpose", processingPurpose.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.processingPurpose", processingPurpose.getName());
         }
-        Integer resultCount =  processingPurposeRepository.updateMetadataName(processingPurposeDTO.getName(), id, organizationId);
+        Integer resultCount =  processingPurposeRepository.updateMetadataName(processingPurposeDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingPurpose", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingPurposeDTO.getName());
         }
@@ -130,9 +130,9 @@ public class OrganizationProcessingPurposeService{
 
     }
 
-    public List<ProcessingPurposeDTO> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public List<ProcessingPurposeDTO> saveAndSuggestProcessingPurposes(Long countryId, Long unitId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
-        List<ProcessingPurposeDTO> result = createProcessingPurpose(organizationId, processingPurposeDTOS);
+        List<ProcessingPurposeDTO> result = createProcessingPurpose(unitId, processingPurposeDTOS);
         processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, processingPurposeDTOS);
         return result;
     }

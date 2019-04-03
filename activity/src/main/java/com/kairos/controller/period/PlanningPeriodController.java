@@ -14,17 +14,16 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
  * Created by prerna on 6/4/18.
  */
 @RestController()
-@Api(API_ORGANIZATION_UNIT_URL)
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_UNIT_URL)
+@RequestMapping(API_UNIT_URL)
 public class PlanningPeriodController {
 
     @Inject
@@ -104,5 +103,13 @@ public class PlanningPeriodController {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.migratePlanningPeriods(unitId, planningPeriodDTO));
     }
+
+    @ApiOperation(value = "create job of Planning Period ")
+    @PutMapping(value="/planning_period_job")
+    public ResponseEntity<Map<String, Object>> createJobForPlanningPeriod() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobOfPlanningPeriod());
+
+    }
+    
 
 }

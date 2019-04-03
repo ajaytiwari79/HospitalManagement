@@ -7,7 +7,9 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static org.neo4j.ogm.annotation.Relationship.INCOMING;
@@ -25,7 +27,7 @@ public class PayTable extends UserBaseEntity {
     private LocalDate endDateMillis;
     private String paymentUnit;
     @Relationship(type = HAS_PAY_GRADE)
-    private List<PayGrade> payGrades;
+    private List<PayGrade> payGrades=new ArrayList<>();
     private String description;
     private boolean published;
     private boolean hasTempCopy;

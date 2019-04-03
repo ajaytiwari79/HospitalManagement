@@ -3,6 +3,7 @@ package com.kairos.service.integration;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
@@ -61,6 +62,10 @@ public class ActivityIntegrationService {
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId) {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/activities_with_time_types", null), ActivityWithTimeTypeDTO.class);
+    }
+
+    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId, Long countryId) {

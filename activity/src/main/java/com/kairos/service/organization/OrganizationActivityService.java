@@ -23,6 +23,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -134,8 +135,8 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
-            Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a->a.getActivityShiftStatusSettings().stream().flatMap(b->b.getAccessGroupIds().stream())).collect(Collectors.toSet());
-            Map<Long,Long> accessGroupIdsMap= userIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
+            Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a -> a.getActivityShiftStatusSettings().stream().flatMap(b -> b.getAccessGroupIds().stream())).collect(Collectors.toSet());
+            Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
                 List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
@@ -198,8 +199,8 @@ public class OrganizationActivityService extends MongoBaseService {
             boolean activityCanBeCopied = false;
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             if ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
-                        (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
-                    activityCanBeCopied = true;
+                    (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
+                activityCanBeCopied = true;
             }
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
@@ -494,7 +495,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<Activity> activities) {
+    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<ActivityWrapper> activities) {
         List<String> invalidActivities = ActivityUtil.verifyCompositeActivities(breakAllowed, activities);
         if (invalidActivities.size() != 0) {
             List<String> errorMessages = new ArrayList<>(invalidActivities);
@@ -505,6 +506,34 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.actionNotPermittedException("activities.support.break", errorMessages);
             }
 
+        }
+    }
+
+    /**
+     *
+     * @param activities
+     * @param parentActivity
+     * @Desc this method is being used to validate the cases of allowed activities
+     */
+    public void verifyTeamActivity(List<ActivityWrapper> activities, Activity parentActivity) {
+        if(parentActivity.getRulesActivityTab().isEligibleForStaffingLevel() && activities.stream().anyMatch(k->!k.getActivity().getRulesActivityTab().isEligibleForStaffingLevel())){
+            exceptionService.actionNotPermittedException("message.child_activities.not_support.staffing_level");
+        }
+        TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType.isPartOfTeam()) {
+                if (activityMongoRepository.existsByActivityIdInCompositeActivities(parentActivity.getId())) {
+                    exceptionService.actionNotPermittedException("message.activity.being_used_as_child", parentActivity.getName());
+                }
+                List<Activity> activityList = activityMongoRepository.findByActivityIdInCompositeActivities(parentActivity.getId(), activities.stream().map(k -> k.getActivity().getId()).collect(Collectors.toList()));
+                if (isCollectionNotEmpty(activityList)) {
+                    List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
+                    exceptionService.actionNotPermittedException("message.activity.being_used_as_child", activityNames);
+                }
+                activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getActivity().getCompositeActivities())).collect(Collectors.toList());
+                if (isCollectionNotEmpty(activities)) {
+                    List<String> activityNames = activities.stream().map(k -> k.getActivity().getName()).collect(Collectors.toList());
+                    exceptionService.actionNotPermittedException("message.activity.being_used_as_parent", activityNames);
+                }
         }
     }
 

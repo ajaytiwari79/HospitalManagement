@@ -108,48 +108,43 @@ public class UserServiceApplication implements WebMvcConfigurer {
 	@Primary
 	@Bean
 	public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-		RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
 				.interceptors(new UserContextInterceptor())
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
-		return template;
 	}
 	@Profile({"development","qa","production"})
 	@LoadBalanced
 	@Bean(name ="restTemplateWithoutAuth")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-		RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
-		return template;
 	}
     @Profile({"local", "test"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
     @Profile({"local", "test"})
     @Bean(name ="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 	@Profile({"local", "test"})
 	@Bean(name="schedulerServiceRestTemplate")
 	public RestTemplate getRestTemplateWithoutUserContextLocal(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
-		RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
 				.interceptors(new SchedulerUserContextInterceptor(authorization))
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
-		return template;
 	}
 
 	@Profile({"development","qa","production"})
@@ -157,11 +152,10 @@ public class UserServiceApplication implements WebMvcConfigurer {
 	@Bean(name="schedulerServiceRestTemplate")
 	public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
-		RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
 				.interceptors(new SchedulerUserContextInterceptor(authorization))
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
-		return template;
 	}
 
 

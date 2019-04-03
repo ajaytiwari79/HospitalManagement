@@ -3,6 +3,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static com.kairos.constants.AppConstants.HOURS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -98,15 +101,15 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues)) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
             if (timeInterval != null) {
                 boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()));
                 if (isValidShift && isValidForDay(dayTypeIds, infoWrapper)) {
                     ShiftWithActivityDTO shift = infoWrapper.getShift();
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                    Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
-                    brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2],DurationType.HOURS,limitAndCounter[0]/60);
 
                 }
             }

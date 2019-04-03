@@ -8,7 +8,9 @@ import com.kairos.persistence.model.user.skill.Skill;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_LOCATION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
@@ -23,11 +25,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 public class Team extends UserBaseEntity {
 
     private String name;
-
+    private String description;
     /**
      * Specifies if team's address is same as unit's address
      */
-    private boolean hasAddressOfUnit;
 
     @Relationship(type = TEAM_HAS_SKILLS)
     private List<Skill> skillList;
@@ -35,11 +36,18 @@ public class Team extends UserBaseEntity {
     @Relationship(type = TEAM_HAS_LOCATION)
     private ContactAddress contactAddress;
 
-    //@Relationship(type = PROVIDE_TASK_TYPE)
-    private List<String> taskTypeList;
-
     private boolean isEnabled = true;
+    private Set<BigInteger> activityIds;
+    Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
+    public Team() {
+    }
+
+    public Team(String name, String description,  ContactAddress contactAddress) {
+        this.name = name;
+        this.description = description;
+        this.contactAddress = contactAddress;
+    }
 
     public List<Skill> getSkillList() {
         return skillList;
@@ -61,28 +69,12 @@ public class Team extends UserBaseEntity {
         this.name = name;
     }
 
-    public List<String> getTaskTypeList() {
-        return taskTypeList;
-    }
-
-    public void setTaskTypeList(List<String> taskTypeList) {
-        this.taskTypeList = taskTypeList;
-    }
-
     public void setContactAddress(ContactAddress contactAddress) {
         this.contactAddress = contactAddress;
     }
 
     public ContactAddress getContactAddress() {
         return contactAddress;
-    }
-
-    public boolean isHasAddressOfUnit() {
-        return hasAddressOfUnit;
-    }
-
-    public void setHasAddressOfUnit(boolean hasAddressOfUnit) {
-        this.hasAddressOfUnit = hasAddressOfUnit;
     }
 
     public boolean isEnabled() {
@@ -93,13 +85,28 @@ public class Team extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public Team() {
+    public String getDescription() {
+        return description;
     }
 
-    public Team(String name, boolean hasAddressOfUnit, ContactAddress contactAddress) {
-        this.name = name;
-        this.hasAddressOfUnit = hasAddressOfUnit;
-        this.contactAddress = contactAddress;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
+
+    public Set<BigInteger> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(Set<BigInteger> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public Long getTeamLeaderStaffId() {
+        return teamLeaderStaffId;
+    }
+
+    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
+        this.teamLeaderStaffId = teamLeaderStaffId;
+    }
 }

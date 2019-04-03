@@ -19,7 +19,6 @@ public class SchedulerBootstrapListener implements ApplicationListener<Applicati
     private static final Logger logger =LoggerFactory.getLogger(SchedulerBootstrapListener.class);
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-
-      //  schedulerPanelService.initSchedulerPanels();
+      schedulerPanelService.initSchedulerPanels();
     }
 }

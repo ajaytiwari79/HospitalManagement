@@ -25,7 +25,7 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
     List<QuestionnaireTemplate> getAllMasterQuestionnaireTemplateByCountryId(Long countryId);
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and QT.templateStatus = ?3 and QT.isDefaultAssetTemplate = true and QT.deleted = false")
-    QuestionnaireTemplate findDefaultTemplateByUnitIdAndTemplateTypeAndStatus(Long unitId, QuestionnaireTemplateType templateType,QuestionnaireTemplateStatus templateStatus);
+    QuestionnaireTemplate findDefaultTemplateByUnitIdAndTemplateTypeAndStatus(Long organizationId, QuestionnaireTemplateType templateType,QuestionnaireTemplateStatus templateStatus);
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where  QT.countryId = ?1 and QT.templateType = ?2 and QT.riskAssociatedEntity = ?2 and  QT.deleted = false")
     QuestionnaireTemplate findTemplateByCountryIdAndTemplateTypeAndRiskAssociatedEntity( Long countryId,QuestionnaireTemplateType templateType, QuestionnaireTemplateType riskAssociatedEntity);
@@ -37,7 +37,7 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.countryId=?1 and QT.deleted = false and QT.isDefaultAssetTemplate= true")
     QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByCountryId(long countryId);
 
-    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1  and QT.assetType.id = ?2 and QT.templateType = ?3 and QT.templateStatus = ?4 and QT.subAssetType IS NULL and QT.deleted = false ")
+    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1  and QT.assetType.id = ?2 and QT.templateType = ?3 and QT.templateStatus = ?4 and QT.deleted = false ")
     QuestionnaireTemplate findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(Long orgId, Long assetTypeId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus );
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and QT.templateStatus = ?3")
@@ -59,11 +59,6 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.id = ?2 and QT.deleted = false")
     QuestionnaireTemplate getQuestionnaireTemplateWithSectionsByOrganizationId(Long orgId, Long questionnaireTemplateId);
-
-   /* @Modifying
-    @Transactional
-    @Query(value = "delete from questionnaire_templatemd_sections where questionnaire_templatemd_id = ?1 and sections_id = ?2", nativeQuery = true)
-    Integer removeSectionFromQuestionnaireTemplate(Long templateId, Long sectionId);*/
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and  QT.templateStatus = ?3  and QT.deleted = false")
     QuestionnaireTemplate findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(Long orgId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus status);

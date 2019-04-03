@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.enums.DurationType;
+
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -11,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.DateUtils.asDate;
 
 /**
  * Created by prerna on 6/4/18.
@@ -27,6 +32,8 @@ public class PlanningPeriod extends MongoBaseEntity {
     private BigInteger nextPhaseId;
     private List<PeriodPhaseFlippingDate> phaseFlippingDate = new ArrayList<>();
     private Type type;
+    private int duration;
+    private DurationType durationType;
     private boolean active=true;
 
 
@@ -39,6 +46,16 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
+
+    }
+
+    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId,DurationType durationType,int duration) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.unitId = unitId;
+        this.durationType=durationType;
+        this.duration=duration;
     }
 
     public LocalDate getStartDate() {
@@ -113,6 +130,31 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.active = active;
     }
 
+
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(asDate(startDate),asDate(endDate));
+    }
+
+    public boolean contains(LocalDate localDate){
+        return getInterval().contains(asDate(localDate)) || endDate.equals(localDate);
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public DurationType getDurationType() {
+        return durationType;
+    }
+
+    public void setDurationType(DurationType durationType) {
+        this.durationType = durationType;
+    }
+
     public enum Type {
 
         WEEKLY, MONTHLY;
@@ -129,7 +171,7 @@ public class PlanningPeriod extends MongoBaseEntity {
         }
 
         public static List<Type> getListByValue(List<String> values) {
-            if(Optional.ofNullable(values).isPresent()){
+            if (Optional.ofNullable(values).isPresent()) {
                 return values.stream().map(Type::valueOf)
                         .collect(Collectors.toList());
             }
@@ -137,4 +179,5 @@ public class PlanningPeriod extends MongoBaseEntity {
 
         }
     }
+    
 }

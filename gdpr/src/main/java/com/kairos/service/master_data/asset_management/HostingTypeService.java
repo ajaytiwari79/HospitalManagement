@@ -49,7 +49,7 @@ public class HostingTypeService {
         List<HostingType> hostingTypes = new ArrayList<>();
         if (!hostingTypeNames.isEmpty()) {
             for (String name : hostingTypeNames) {
-                HostingType hostingType = new HostingType(name, countryId);
+                HostingType hostingType = new HostingType(countryId, name);
                 if (isSuggestion) {
                     hostingType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     hostingType.setSuggestedDate(LocalDate.now());
@@ -127,7 +127,7 @@ public class HostingTypeService {
         }
         Integer resultCount = hostingTypeRepository.updateMasterMetadataName(hostingTypeDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingType", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingTypeDTO.getName());
         }
@@ -143,8 +143,8 @@ public class HostingTypeService {
      * @return
      * @description method save Hosting type suggested by unit
      */
-    public List<HostingTypeDTO> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
-        return createHostingType(countryId, hostingTypeDTOS, true);
+    public void saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
+        createHostingType(countryId, hostingTypeDTOS, true);
     }
 
 
@@ -160,7 +160,7 @@ public class HostingTypeService {
         if (updateCount > 0) {
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingTypeIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingTypeIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingType", hostingTypeIds);
         }
         return hostingTypeRepository.findAllByIds(hostingTypeIds);
     }
