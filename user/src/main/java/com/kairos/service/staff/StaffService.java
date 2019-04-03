@@ -1092,7 +1092,6 @@ public class StaffService {
 
 
     public Map createUnitManager(long unitId, UnitManagerDTO unitManagerDTO) {
-
         User user = userGraphRepository.findByEmail(unitManagerDTO.getEmail());
         Organization unit = organizationGraphRepository.findOne(unitId);
         Organization parent;

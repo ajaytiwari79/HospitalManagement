@@ -2,9 +2,17 @@ package com.kairos.service.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.activity.task.*;
+import com.kairos.dto.activity.task.BulkUpdateTaskDTO;
+import com.kairos.dto.activity.task.TaskDTO;
+import com.kairos.dto.activity.task.TaskRestrictionDto;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.country.basic_details.CountryHolidayCalender;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
+import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.CitizenHealthStatus;
 import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
@@ -31,7 +39,9 @@ import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.rule_validator.TaskSpecification;
+import com.kairos.rule_validator.task.TaskDaySpecification;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
@@ -41,24 +51,12 @@ import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.task_type.TaskDemandService;
 import com.kairos.service.task_type.TaskDynamicReportService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.rule_validator.task.TaskDaySpecification;
-import com.kairos.rule_validator.TaskSpecification;
-import com.kairos.dto.user.client.Client;
-import com.kairos.dto.user.country.basic_details.CountryHolidayCalender;
-import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.organization.skill.Skill;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.TaskCountWithAssignedUnit;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import com.kairos.wrapper.task.TaskUpdateDTO;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
-import de.tourenserver.ArrayOfFixedCall;
-import de.tourenserver.CallInfoRec;
-import de.tourenserver.FixScheduleResponse;
-import de.tourenserver.FixedCall;
 import org.apache.commons.collections.map.HashedMap;
 import org.bson.Document;
 import org.json.JSONObject;
@@ -72,7 +70,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -86,17 +83,14 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MERGED_TASK_NAME;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 import static com.kairos.persistence.model.task.TaskStatus.CANCELLED;
-import static com.kairos.commons.utils.DateUtils.*;
 import static java.time.ZoneId.systemDefault;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -1194,204 +1188,6 @@ public class PlannerService extends MongoBaseService {
         return randomDateList;
     }
 
-    /*
-    This method receives initial set of random dates. Adds Number of weeks to each date for generating repetition till demand's end date.
-     */
-    private List<LocalDate> addRepetitionsToRandomDates(List<LocalDate> randomDates, int numberOfWeeks, LocalDate taskDemandEndDate) {
-        List<LocalDate> repetitions = new ArrayList<>();
-        for (LocalDate randomDate : randomDates) {
-            LocalDate nextDate = randomDate.plusWeeks(numberOfWeeks);
-            if (nextDate.isBefore(taskDemandEndDate) || nextDate.isEqual(taskDemandEndDate)) {
-                repetitions.add(nextDate);
-            }
-        }
-        return repetitions;
-    }
-
-    /*
-    Add StartBoundaryDate and EndBoundaryDate  to a RandomDate.
-     */
-    private List<Map<String, LocalDate>> addBoundaryDates(List<LocalDate> initialRandomDates, LocalDate boundaryStartDate, LocalDate boundaryEndDate) {
-        List<Map<String, LocalDate>> randomDatesList = new ArrayList<>();
-        for (LocalDate randomDate : initialRandomDates) {
-            Map<String, LocalDate> map = new HashMap<>();
-            map.put("randomDate", randomDate);
-            map.put("taskStartBoundary", boundaryStartDate);
-            map.put("taskEndBoundary", boundaryEndDate);
-            randomDatesList.add(map);
-        }
-        return randomDatesList;
-    }
-
-
-    public Map synchronizeTaskInVisitour(long unitId, Map<String, Object> synchronizeTaskPayload, long citizenId, boolean isActualPlanningScreen, String startDate) throws ParseException {
-
-        logger.info("synchronizeTaskPayload " + synchronizeTaskPayload.toString());
-        LocalDate upcomingMonday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-        LocalDate fourWeekLater = upcomingMonday.plusDays(28);
-        Date dateFrom = Date.from(upcomingMonday.atStartOfDay().atZone(systemDefault()).toInstant());
-        Date dateTo = Date.from(fourWeekLater.atStartOfDay().atZone(systemDefault()).toInstant());
-        List<String> taskIds = (List<String>) synchronizeTaskPayload.get("tasks");
-        logger.info(" Task data " + synchronizeTaskPayload);
-        List<Task> taskList = Collections.EMPTY_LIST;
-        if (taskIds.size() > 0) {
-            taskList = taskMongoRepository.getAllTasksByIdsInAndDateRange(taskIds, dateFrom, dateTo);
-            logger.info("taskList >>>>>>>  " + taskList);
-        }
-        String action = synchronizeTaskPayload.get("action").toString();
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-        if (action.equals("sync")) {
-            if (taskList.size() > 0) {
-                taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
-            } else {
-                logger.info("NO Tasks Available");
-            }
-        } else if (action.equals("optimize")) {
-
-            Map<String, Object> datePayload = new HashMap<>();
-            datePayload.put("startDate", dateFrom);
-            datePayload.put("endDate", dateTo);
-            Map<String, Object> openCall = new HashMap<>();
-            openCall.put("openCallsMode", "2");
-            scheduler.optmizeSchedule(openCall, datePayload, flsCredentials);
-
-        } else if (action.equals("fixed")) {
-            logger.debug("Fixed preference called :::::::::::::::::::::::::");
-
-            if (taskIds.size() > 0) {
-                for (String taskId : taskIds) {
-
-                    Map<String, Object> datePayload = new HashMap<>();
-                    //datePayload.put("startDate", dateFrom);
-                    //datePayload.put("endDate", dateTo);
-                    Map<String, Object> openCall = new HashMap<>();
-                    openCall.put("extID", taskId);
-                    openCall.put("confirmCalls", "true");
-                    //openCall.put("fixCalls", "true");
-                    FixScheduleResponse fixScheduleResponse = scheduler.getSchedule(openCall, datePayload, flsCredentials);
-                    ArrayOfFixedCall arrayOfFixedCall = fixScheduleResponse.getFixScheduleResult();
-                    List<FixedCall> fixedCallList = arrayOfFixedCall.getFixedCall();
-                    logger.debug("fixedCallList size " + fixedCallList.size());
-                    for (FixedCall fixedCall : fixedCallList) {
-                        logger.debug("fixedCall ExtId " + fixedCall.getExtID());
-                        logger.debug("fixedCall FMExtID " + fixedCall.getFMExtID());
-                        logger.debug("fixedCall date " + fixedCall.getDate());
-                        logger.debug("fixedCall state " + fixedCall.getState());
-                        logger.debug("fixedCall Arrival " + fixedCall.getArrival());
-                        logger.debug("fixedCall Distance " + fixedCall.getDistance());
-                        Task task = taskMongoRepository.findOne(new BigInteger(fixedCall.getExtID() + ""));
-                        logger.info(" Task found " + task);
-                        if (task != null) {
-                            if (fixedCall.getState() == 3) {
-                                task.setExecutionDate(fixedCall.getArrival().toGregorianCalendar().getTime());
-                                task.setTaskStatus(TaskStatus.PLANNED);
-                            } else if (fixedCall.getState() == 2) {
-                                task.setTaskStatus(TaskStatus.CONFIRMED);
-                                task.setStaffId(Long.parseLong(fixedCall.getFMExtID()));
-                            } else {
-                                task.setTaskStatus(TaskStatus.GENERATED);
-                            }
-                            if (fixedCall.getFMExtID() != null && fixedCall.getFMExtID() != "") {
-                                List<Long> assingedStaffIds = Stream.of(fixedCall.getFMExtID().split(",")).map(Long::parseLong).collect(Collectors.toList());
-                                task.setAssignedStaffIds(assingedStaffIds);
-                            } else {
-                                task.setAssignedStaffIds(Collections.EMPTY_LIST);
-                            }
-                            taskService.save(task);
-                        }
-                    }
-                }
-            }
-        }
-        if (isActualPlanningScreen) {
-            DateFormat dateISOFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date fromDate = dateISOFormat.parse(startDate);
-            LocalDate fromDateInLocalFormat = fromDate.toInstant().atZone(systemDefault()).toLocalDate();
-            LocalDate toDateInLocalFormat = fromDateInLocalFormat.plusDays(28);
-            Date toDate = Date.from(toDateInLocalFormat.atStartOfDay().atZone(systemDefault()).toInstant());
-            taskList = taskMongoRepository.getActualPlanningTask(citizenId, fromDate, toDate);
-        } else {
-            taskList = taskMongoRepository.findAllBetweenDates(citizenId, dateFrom, dateTo);
-        }
-
-        if (action.equals("optimize")) {
-            if (taskList.size() > 0) {
-                for (Task task : taskList) {
-                    if (task.getVisitourId() != null && task.getVisitourId() > 0) { // Get CallInfo of only those tasks, where visitour id is available.
-                        Map<String, Object> callInfoMetaData = new HashMap<>();
-                        callInfoMetaData.put("extID", task.getId());
-                        callInfoMetaData.put("vtid", task.getVisitourId());
-                        CallInfoRec callInfoRec = scheduler.getCallInfo(callInfoMetaData, flsCredentials);
-                        logger.debug(" Data received >>>>>>> " + callInfoRec.getState());
-                        if (callInfoRec.getState() == 3) {
-                            task.setExecutionDate(callInfoRec.getArrival().toGregorianCalendar().getTime());
-                            task.setTaskStatus(TaskStatus.PLANNED);
-                        } else if (callInfoRec.getState() == 2) {
-                            task.setTaskStatus(TaskStatus.CONFIRMED);
-                            task.setStaffId(Long.parseLong(callInfoRec.getFMExtID()));
-                        } else {
-                            task.setTaskStatus(TaskStatus.GENERATED);
-                        }
-                        if (callInfoRec.getExtID() != null && callInfoRec.getExtID() != "") {
-                            List<Long> assingedStaffIds = Stream.of(callInfoRec.getFMExtID().split(",")).map(Long::parseLong).collect(Collectors.toList());
-                            task.setAssignedStaffIds(assingedStaffIds);
-                        } else {
-                            task.setAssignedStaffIds(Collections.EMPTY_LIST);
-                        }
-                    }
-                }
-                taskService.save(taskList);
-            }
-        }
-
-        List<TaskGanttDTO> responseList = customizeTaskData(taskList);
-        logger.info("responseList " + responseList);
-
-        Map returnData = new HashMap();
-        returnData.put("taskList", responseList);
-        returnData.put("taskDemandList", getCitizenPlanning(unitId, citizenId, false, null));
-        return returnData;
-
-    }
-
-    public boolean deleteTasksFromDBAndVisitour(List<Task> taskList, long unitId)  {
-        if (!taskList.isEmpty()) {
-            // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-            //Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
-            for (Task task : taskList) {
-                /*Map<String, Object> callMetaData = new HashMap<>();
-                callMetaData.put("functionCode", 4);
-                callMetaData.put("extID", task.getId());
-                callMetaData.put("vtid", task.getVisitourId());
-
-
-                boolean deleteTask = true;
-                if (task.getVisitourId() != null && task.getVisitourId() > 0) { //If VisitourId found then Delete task from Visitour, else delete from kairos only.
-                    int returnedValue = scheduler.deleteCall(callMetaData, flsCredentials);
-                    if (returnedValue == 0) {
-                        deleteTask = false;
-                    }
-                } else {
-                    logger.debug("No Visitour Id: task.getId " + task.getId() + " vtid " + task.getVisitourId());
-                }
-                if (deleteTask) {
-                    task.setTaskStatus(CANCELLED);
-                    task.setDeleted(true);
-                }*/
-                task.setTaskStatus(CANCELLED);
-                task.setDeleted(true);
-            }
-            taskService.save(taskList);
-            return true;
-        } else {
-            logger.info("No Tasks to Delete " + taskList);
-            return false;
-        }
-    }
-
-
-
 
     public List<Task> mergeRepetitions(List<String> jointEventsIds, Date dateFrom,Long citizenId, long unitId, String mainTaskName, boolean isActualPlanningScreen) throws CloneNotSupportedException {
 
@@ -1447,44 +1243,6 @@ public class PlannerService extends MongoBaseService {
         return taskList;
     }
 
-
-
-
-
-    public List<TaskGanttDTO> mergeMultipleTasks(String authToken, long unitId, long citizenId, Map<String, Object> tasksData, boolean isActualPlanningScreen) throws CloneNotSupportedException {
-        long startTime = System.currentTimeMillis();
-
-
-        List<String> jointEventsIds = new ArrayList<>();
-
-        logger.debug("tasksData payload <><><><><><><><>" + tasksData);
-
-        List<String> taskIds = new ArrayList<>();
-        SimpleDateFormat executionDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = null;
-        for (Map<String, Object> taskData : (List<Map<String, Object>>) tasksData.get("events")) {
-            taskIds.add(taskData.get("id").toString());
-            jointEventsIds.add(taskData.get("jointEvents").toString());
-            try {
-                startDate = executionDateFormat.parse(taskData.get("resource").toString());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        logger.debug("taskIds <><><><><><><><>" + taskIds);
-
-        List<Task> taskList = new ArrayList<>();
-
-        if (isActualPlanningScreen == false) {
-            taskList.addAll(mergeRepetitions(jointEventsIds, startDate, citizenId, unitId, tasksData.get("mainTaskName").toString(), isActualPlanningScreen));
-        }
-
-        List<TaskGanttDTO> responseList = customizeTaskData(taskList);
-
-        logger.debug("Execution Time :(PlannerService:mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
-        logger.debug("responseList " + responseList);
-        return responseList;
-    }
 
     private Task mergeTasksWithIds(List<String> taskIds, long unitId,Long citizenId, String mainTaskName, boolean isActualPlanningScreen, String uniqueID, TaskAddress taskAddress,
                                    Long loggedInUser, List<Long> preferredStaffIds, List<Long> forbiddenStaffIds, Map<String, String> flsCredentials) throws CloneNotSupportedException {
