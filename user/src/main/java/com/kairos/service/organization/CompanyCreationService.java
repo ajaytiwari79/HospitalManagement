@@ -11,6 +11,7 @@ import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
@@ -23,6 +24,7 @@ import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
@@ -31,6 +33,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
@@ -43,11 +46,13 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.CPRUtil;
@@ -130,6 +135,11 @@ public class CompanyCreationService {
     private SchedulerServiceRestClient schedulerRestClient;
     @Inject
     private TreeStructureService treeStructureService;
+    @Inject
+    private UnitPermissionGraphRepository unitPermissionGraphRepository;
+    @Inject
+    private AccessGroupRepository accessGroupRepository;
+    @Inject private StaffCreationService staffCreationService;
 
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
@@ -316,7 +326,7 @@ public class CompanyCreationService {
                     StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(),
                             unitManagerDTO.getCprNumber(),
                             null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
-                    staffService.createUnitManagerForNewOrganization(organization, unitManagerData);
+                    staffCreationService.createUnitManagerForNewOrganization(organization, unitManagerData);
                 }
 
             }
@@ -341,7 +351,7 @@ public class CompanyCreationService {
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
-                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
+                    setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                 }
             } else {
                 // No user is found its first time so we need to validate email and CPR number
@@ -352,7 +362,7 @@ public class CompanyCreationService {
                         user=userByCprNumberOrEmail;
                         reinitializeUserManagerDto(unitManagerDTO,user);
                         userGraphRepository.save(user);
-                        staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
+                        setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
@@ -657,5 +667,15 @@ public class CompanyCreationService {
         staffGraphRepository.saveAll(staffList);
     }
 
+    public void setAccessGroupInUserAccount(User user, Long organizationId, Long accessGroupId, boolean union) {
+        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
+        unitPermission = unitPermission == null ? new UnitPermission() : unitPermission;
+        AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
+        if(Optional.ofNullable(accessGroup).isPresent()) {
+            unitPermission.setAccessGroup(accessGroup);
+            staffService.linkAccessOfModules(accessGroup, unitPermission);
+        }
+        unitPermissionGraphRepository.save(unitPermission);
+    }
 
 }

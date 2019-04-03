@@ -322,13 +322,6 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
     }
 
-    @ApiOperation(value = "Init optplanner integration")
-    @RequestMapping(value = "/planner_integration", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(unitId));
-    }
-
     @ApiOperation("Get all activity based on unitId")
     @GetMapping(value = "/orders_and_activities")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
