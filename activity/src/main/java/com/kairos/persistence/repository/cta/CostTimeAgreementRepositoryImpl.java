@@ -211,7 +211,4 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(ctaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
     }
-
-
-
 }

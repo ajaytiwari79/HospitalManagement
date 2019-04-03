@@ -49,7 +49,6 @@ public class CompanyDefaultDataService {
 
     public void createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
-        orgTypeAndSubTypeDTO.setUnitIds(units.stream().map(Organization::getId).collect(Collectors.toList()));
         units.forEach(unit -> {
             orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
