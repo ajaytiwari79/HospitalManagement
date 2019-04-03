@@ -367,7 +367,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Get All Activities and Phases by unitId")
-    @RequestMapping(value = "/activityWithPhase", method = RequestMethod.GET)
+    @RequestMapping(value = "/activity_with_phase", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
