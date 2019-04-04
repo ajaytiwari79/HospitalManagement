@@ -1,18 +1,24 @@
 package com.kairos.service.time_bank;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.*;
+import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.employment.UnitPositionLinesDTO;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +26,7 @@ import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -28,29 +35,31 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
 import static org.junit.Assert.*;
-
+@RunWith(MockitoJUnitRunner.class)
 public class TimeBankCalculationServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeBankCalculationServiceTest.class);
 
-    @Inject
-    TimeBankCalculationService timeBankCalculationService;
+    @InjectMocks
+    private TimeBankCalculationService timeBankCalculationService;
 
-    StaffUnitPositionDetails unitPosition;
-    Interval interval;
-    List<ShiftWithActivityDTO> shifts;
-    Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap;
-    Set<DateTimeInterval> planningPeriodIntervals;
-    List<DayTypeDTO> dayTypeDTOS;
+
+    private StaffUnitPositionDetails unitPosition;
+    private Interval interval;
+    private List<ShiftWithActivityDTO> shifts;
+    private Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap;
+    private Set<DateTimeInterval> planningPeriodIntervals;
+    private List<DayTypeDTO> dayTypeDTOS;
 
     @Before
-    void init(){
+    public void init(){
         List<UnitPositionLinesDTO> unitPositionLinesDTOS = new ArrayList<>();
         unitPositionLinesDTOS.add(new UnitPositionLinesDTO(LocalDate.of(2019,4,9),null,5,35,2100,new BigDecimal(0.002)));
         interval = new Interval(asDate(LocalDate.of(2019,4,10)).getTime(),asDate(LocalDate.of(2019,4,11)).getTime());
         CTAResponseDTO ctaResponseDTO = new CTAResponseDTO();
-        ctaResponseDTO.setRuleTemplates(getRuleTemplate());
         unitPosition = new StaffUnitPositionDetails(15l,487l,unitPositionLinesDTOS,ctaResponseDTO);
+        unitPosition.setCtaRuleTemplates(getRuleTemplate());
+        unitPosition.setEmploymentType(new EmploymentType(54l));
         shifts= getShifts();
         dailyTimeBankEntryMap = new HashMap<>();
         planningPeriodIntervals = newHashSet(new DateTimeInterval(asDate(LocalDate.of(2019,4,8)),asDate(LocalDate.of(2019,4,21))));
@@ -60,6 +69,7 @@ public class TimeBankCalculationServiceTest {
     @Test
     public void getTimeBankByInterval() {
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition,interval,shifts,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS);
+        LOGGER.info("daily timebank : {}",dailyTimeBankEntry);
     }
 
     private List<CTARuleTemplateDTO> getRuleTemplate(){
@@ -94,7 +104,15 @@ public class TimeBankCalculationServiceTest {
 
     private List<ShiftWithActivityDTO> getShifts(){
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
-        List<ShiftActivityDTO> shiftActivityDTOS = newArrayList();
+        List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
+
+        shiftActivityDTOS.add(new ShiftActivityDTO("test1",asDate(LocalDateTime.of(2019,4,10,3,00)),asDate(LocalDateTime.of(2019,4,10,9,00)),new BigInteger("4"),360,newHashSet(ShiftStatus.PUBLISH),new ActivityDTO(new BigInteger("10"))));
+        shiftActivityDTOS.add(new ShiftActivityDTO("test2",asDate(LocalDateTime.of(2019,4,10,9,00)),asDate(LocalDateTime.of(2019,4,10,15,00)),new BigInteger("5"),360,newHashSet(),new ActivityDTO(new BigInteger("10"))));
+        shifts.add(new ShiftWithActivityDTO(new BigInteger("6"),shiftActivityDTOS));
+        shiftActivityDTOS = new ArrayList<>();
+        shiftActivityDTOS.add(new ShiftActivityDTO("test2",asDate(LocalDateTime.of(2019,4,10,17,00)),asDate(LocalDateTime.of(2019,4,11,3,00)),new BigInteger("5"),360,newHashSet(ShiftStatus.PUBLISH),new ActivityDTO(new BigInteger("10"))));
+        shiftActivityDTOS.add(new ShiftActivityDTO("test1",asDate(LocalDateTime.of(2019,4,11,3,00)),asDate(LocalDateTime.of(2019,4,11,9,00)),new BigInteger("4"),360,newHashSet(ShiftStatus.PUBLISH),new ActivityDTO(new BigInteger("10"))));
+        shifts.add(new ShiftWithActivityDTO(new BigInteger("7"),shiftActivityDTOS));
         return shifts;
     }
 
