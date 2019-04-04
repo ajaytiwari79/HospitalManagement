@@ -85,12 +85,9 @@ public class ShiftWithActivityDTO {
         this.unitId = unitId;
     }
 
-    public ShiftWithActivityDTO(Date startDate, Date endDate, Activity activity) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.activities = activities;
+    public ShiftWithActivityDTO(BigInteger phaseId) {
+        this.phaseId= phaseId;
     }
-
 
     public List<BigInteger> getActivitiesTimeTypeIds(){
         if(activitiesTimeTypeIds.isEmpty()) {

@@ -21,7 +21,7 @@ import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.utils.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;

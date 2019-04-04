@@ -1,4 +1,4 @@
-package com.kairos.utils.time_bank;
+package com.kairos.service.time_bank;
 
 import com.google.common.collect.Lists;
 import com.kairos.commons.utils.DateTimeInterval;
