@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.util.Assert;
 
 import javax.inject.Inject;
@@ -33,8 +34,8 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
 
     @Override
-    public boolean existsByNameAndCountryIdAndNotEqualToId(String name, BigInteger id,Long countryId){
-        Criteria criteria = Criteria.where("countryId").is(countryId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false);
+    public boolean existsByNameAndCountryIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long countryId){
+        Criteria criteria = Criteria.where("countryId").is(countryId).and("deleted").is(false).orOperator(Criteria.where("colorCode").is(colorCode),Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
         }
@@ -42,11 +43,25 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
     }
 
     @Override
-    public boolean existsByNameAndOrganizationIdAndNotEqualToId(String name, BigInteger id,Long organizationId){
-        Criteria criteria = Criteria.where("organizationId").is(organizationId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false);
+    public boolean existsByNameAndOrganizationIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long organizationId){
+        Criteria criteria = Criteria.where("organizationId").is(organizationId).and("deleted").is(false).orOperator(Criteria.where("colorCode").is(colorCode),Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
         }
         return mongoTemplate.exists(new Query(criteria),ActivityPriority.class);
+    }
+
+    @Override
+    public void updateSequenceOfActivityPriorityOnCountry(int oldSequence,int newSequence,Long countryId){
+        Update update = new Update();
+        update.set("sequence",newSequence);
+        mongoTemplate.updateFirst(new Query(Criteria.where("sequence").is(oldSequence).and("countryId").is(countryId)),update,ActivityPriority.class);
+    }
+
+    @Override
+    public void updateSequenceOfActivityPriorityOnOrganization(int oldSequence,int newSequence,Long unitId){
+        Update update = new Update();
+        update.set("sequence",newSequence);
+        mongoTemplate.updateFirst(new Query(Criteria.where("sequence").is(oldSequence).and("organizationId").is(unitId)),update,ActivityPriority.class);
     }
 }
