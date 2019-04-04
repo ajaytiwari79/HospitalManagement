@@ -1,7 +1,6 @@
 package com.kairos.controller.activity;
 
 
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.service.activity.ActivityPriorityService;
 import com.kairos.utils.response.ResponseHandler;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;

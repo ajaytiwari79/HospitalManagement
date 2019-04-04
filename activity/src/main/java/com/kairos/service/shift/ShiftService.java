@@ -14,7 +14,6 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
@@ -550,7 +549,7 @@ public class ShiftService extends MongoBaseService {
         if (staffId == null) {
             exceptionService.actionNotPermittedException("staff_id.null");
         }
-        Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap<>();
+        Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
         List<ReasonCodeDTO> reasonCodeDTOS;
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
         if (Optional.ofNullable(unitPositionId).isPresent()) {
@@ -562,22 +561,14 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.actionNotPermittedException("message.unit.position", startDate.toString());
             }
             reasonCodeDTOS = staffAdditionalInfoDTO.getReasonCodes();
-            List<AppliedFunctionDTO> appliedFunctionDTOs = null;
+            List<FunctionDTO> appliedFunctionDTOs = null;
             if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
                 appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
             }
 
-            if (CollectionUtils.isNotEmpty(appliedFunctionDTOs)) {
-                for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
-                    if (CollectionUtils.isNotEmpty(appliedFunctionDTO.getAppliedDates())) {
-                        FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
-                        for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
-                            functionDTOMap.put(date, functionDTO);
-                        }
-                    }
-                }
-            }
+            addFunction(functionDTOMap, staffAdditionalInfoDTO, appliedFunctionDTOs);
         } else {
+            functionDTOMap= userIntegrationService.getFunctionsByUnitPosition(unitId,startDate,endDate);
             List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.TIME_TYPE.toString()));
             reasonCodeDTOS = userIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         }
@@ -610,6 +601,20 @@ public class ShiftService extends MongoBaseService {
         shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts, userAccessRoleDTO);
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
+    }
+
+    private void addFunction(Map<LocalDate, List<FunctionDTO>> functionDTOMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<FunctionDTO> appliedFunctionDTOs) {
+        if (CollectionUtils.isNotEmpty(appliedFunctionDTOs)) {
+            for (FunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
+                if (CollectionUtils.isNotEmpty(appliedFunctionDTO.getAppliedDates())) {
+                    FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
+                    functionDTO.setUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId());
+                    for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
+                        functionDTOMap.put(date, Arrays.asList(functionDTO));
+                    }
+                }
+            }
+        }
     }
 
 
@@ -728,7 +733,9 @@ public class ShiftService extends MongoBaseService {
             roles.add(AccessGroupRole.STAFF);
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), roles);
-        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO, buttonConfig);
+        Map<LocalDate,List<FunctionDTO>>  appliedFunctionDTOs= userIntegrationService.getFunctionsByUnitPosition(unitId,startLocalDate,endLocalDate);
+
+        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO, buttonConfig,appliedFunctionDTOs);
     }
 
     public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, boolean management) {
