@@ -3,6 +3,7 @@ package com.kairos.controller.country;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.service.country.ReasonCodeService;
+import com.kairos.service.region.RegionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,9 +29,8 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 public class ReasonCodeController {
     @Inject
     private ReasonCodeService reasonCodeService;
-
-
-    //Reason Code
+    @Inject
+    private RegionService regionService;
 
     @ApiOperation(value = "Add ReasonCode by countryId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code", method = RequestMethod.POST)
@@ -42,25 +42,26 @@ public class ReasonCodeController {
     @ApiOperation(value = "Get ReasonCodes by countryId")
     @RequestMapping(value = COUNTRY_URL + "/reason_codes", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getReasonCodesForCountry(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType ,@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesForCountry(countryId,reasonCodeType));
+    public ResponseEntity<Map<String, Object>> getReasonCodesForCountry(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType, @PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesForCountry(countryId, reasonCodeType));
 
     }
 
     @ApiOperation(value = "Update ReasonCode")
     @RequestMapping(value = COUNTRY_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateReasonCodeForCountry(@PathVariable long countryId,@Validated @RequestBody ReasonCodeDTO reasonCodeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateReasonCodeForCountry(countryId,reasonCodeDTO));
+    public ResponseEntity<Map<String, Object>> updateReasonCodeForCountry(@PathVariable long countryId, @Validated @RequestBody ReasonCodeDTO reasonCodeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateReasonCodeForCountry(countryId, reasonCodeDTO));
     }
 
     @ApiOperation(value = "Delete ReasonCode by reasonCodeId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteReasonCodeForCountry(@PathVariable long countryId, @PathVariable long reasonCodeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCodeForCountry(countryId,reasonCodeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCodeForCountry(countryId, reasonCodeId));
     }
-//
+
+    //
     @ApiOperation(value = "Add ReasonCode by unitId")
     @RequestMapping(value = UNIT_URL + "/reason_code", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -68,28 +69,28 @@ public class ReasonCodeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.createReasonCodeForUnit(unitId, reasonCodeDTO));
     }
 
-
     @ApiOperation(value = "Update ReasonCode ")
     @RequestMapping(value = UNIT_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateReasonCodeForUnit(@PathVariable long unitId,@Validated @RequestBody ReasonCodeDTO reasonCodeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateReasonCodeForUnit(unitId,reasonCodeDTO));
+    public ResponseEntity<Map<String, Object>> updateReasonCodeForUnit(@PathVariable long unitId, @Validated @RequestBody ReasonCodeDTO reasonCodeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateReasonCodeForUnit(unitId, reasonCodeDTO));
     }
 
     @ApiOperation(value = "Delete ReasonCode by unitId")
     @RequestMapping(value = UNIT_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteReasonCodeForUnit(@PathVariable long unitId, @PathVariable long reasonCodeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCodeForUnit(unitId,reasonCodeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCodeForUnit(unitId, reasonCodeId));
     }
 
     @ApiOperation(value = "Get ReasonCodes by UnitId")
     @GetMapping(value = UNIT_URL + "/reason_codes")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getReasonCodesByUnitId(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType ,@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesByUnitId(unitId,reasonCodeType));
+    public ResponseEntity<Map<String, Object>> getReasonCodesByUnitId(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesByUnitId(unitId, reasonCodeType));
 
     }
+
     @ApiOperation(value = "Check if any reason code exists with the provided time type Id")
     @GetMapping(value = COUNTRY_URL + "/reason_codes/link_with_time_type/{timeTypeId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -98,6 +99,11 @@ public class ReasonCodeController {
 
     }
 
-
+    @GetMapping(UNIT_URL + "/zipcode/{zipCodeId}/address")
+    @ApiOperation("get location of organization")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAddressByZipCode(@PathVariable long zipCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
+    }
 
 }

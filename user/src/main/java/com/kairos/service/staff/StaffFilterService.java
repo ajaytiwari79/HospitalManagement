@@ -9,6 +9,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.UnitPosition;
+import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
@@ -313,4 +314,19 @@ public class StaffFilterService {
         return staffListByRole;
     }
 
+    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
+        StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
+        Long userId = UserContext.getUserDetails().getId();
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
+        AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilter.setName(staffFilterDTO.getName());
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
+        staff.addFavouriteFilters(staffFavouriteFilter);
+        staffGraphRepository.save(staff);
+        staffFilterDTO.setModuleId(accessPage.getModuleId());
+        staffFilterDTO.setName(staffFavouriteFilter.getName());
+        staffFilterDTO.setId(staffFavouriteFilter.getId());
+        return staffFilterDTO;
+    }
 }
