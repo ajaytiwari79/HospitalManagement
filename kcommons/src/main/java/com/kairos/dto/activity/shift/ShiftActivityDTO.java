@@ -80,6 +80,16 @@ public class ShiftActivityDTO {
         this.activityName = activityName;
         this.status=status;
     }
+
+    public ShiftActivityDTO(String activityName, Date startDate,Date endDate,BigInteger activityId,int scheduledMinutes,Set<ShiftStatus> status,ActivityDTO activity) {
+        this.activityId = activityId;
+        this.scheduledMinutes = scheduledMinutes;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+        this.status=status;
+        this.activity = activity;
+    }
     public ShiftActivityDTO() {
     }
 

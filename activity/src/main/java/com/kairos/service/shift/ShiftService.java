@@ -67,7 +67,7 @@ import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.event.ShiftNotificationEvent;
-import com.kairos.utils.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;

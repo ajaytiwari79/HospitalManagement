@@ -18,6 +18,14 @@ public class BalanceSettingActivityTabDTO {
     private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent;
     private Boolean negativeDayBalancePresent;
+
+    public BalanceSettingActivityTabDTO() {
+    }
+
+    public BalanceSettingActivityTabDTO(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
     public Long getActivityId() {
         return activityId;
     }

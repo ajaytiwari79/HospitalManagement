@@ -27,7 +27,7 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.utils.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
