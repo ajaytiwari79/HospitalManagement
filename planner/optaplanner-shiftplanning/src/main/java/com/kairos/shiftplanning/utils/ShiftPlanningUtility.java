@@ -79,23 +79,11 @@ public class ShiftPlanningUtility {
     }
 
     public static void checker(Object... objs) throws Exception {
-        boolean same = objs[0] == objs[1];
         int i = 0;
         i++;
-        /*
-        Interval interval =(Interval) objs[2];
-		Employee employee= (Employee)objs[1];*/
-        // DefaultKnowledgeHelper helper = (DefaultKnowledgeHelper) objs[0];
         List<AvailabilityRequest> requests = new ArrayList<>();
-        /*for (Object object : helper.getWorkingMemory().getObjects()) {
-			if ( object instanceof AvailabilityRequest && ((AvailabilityRequest)object).getEmployee().getId().equals(employee.getId())
-					&& ((AvailabilityRequest) object).containsInterval(interval)) {
-				requests.add((AvailabilityRequest)object);
-			}
-		}*/
         if (requests.size() > 0) {
             log.info("size:{}", requests.size());
-            //throw  new Exception();
         }
 
     }
@@ -154,16 +142,6 @@ public class ShiftPlanningUtility {
         return canBeAttempted;
     }
 
-    /*public static AvailabilityRequest getEmployeeAvailabilityForDay(Employee employee,ScoreDirector<ShiftPlanningSolution> director){
-    	AvailabilityRequest req=null;
-    	for (AvailabilityRequest availabilityRequest : director.getWorkingSolution().getAvailabilityList()) {
-			if(availabilityRequest.getEmployee().getId().equals(employee.getId())){
-				req=availabilityRequest;
-				break;
-			}
-		}
-    	return req;
-    }*/
     public static void updateInsertedAvialabilities(ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
@@ -359,21 +337,6 @@ public class ShiftPlanningUtility {
         return shiftStartComparator;
     }
 
-    /*private static List<Shift> getSortedShiftsInDesc(List<Shift> shifts) {
-        Collections.sort(shifts, new Comparator<Shift>() {
-            @Override
-            public int compare(Shift shift1, Shift shift2) {
-                if (shift1.getStart() != null && shift2.getStart() != null && shift1.getEmployee().getId().equals(shift2.getEmployee().getId())) {
-                    return shift1.getStart().compareTo(shift2.getStart());
-                } else {
-                    return 1;
-                }
-            }
-        });
-        Collections.sort(shifts, Collections.reverseOrder());
-        return shifts;
-    }*/
-
     public static int getTimeFromPrevShift(List<Shift> shifts, Shift shift) {
         //shifts = getSortedShiftsInDesc(shifts);
         int timeFromPrevShift = 0;
@@ -386,16 +349,6 @@ public class ShiftPlanningUtility {
 
     public static int getRestingTimeBetweenTwoWorkingDays(List<Shift> shifts, Shift shift) {
         int restingTime = 0;
-        //TODO Sachin commented it because it sucks.
-        /*if (shift.getStart() != null) {
-            shifts = getSortedShiftsInAsc(shifts);
-            LocalDate currentShiftlocalDate = shift.getStart().toLocalDate();
-            for (Shift shift1 : shifts) {
-                if (shift1.getStart() != null && currentShiftlocalDate.minusDays(1).equals(shift1.getStart().toLocalDate()) && shift1.getStart().toLocalDate().isAfter(shift.getStartingDayOfThisWeek()) && shift.getEmployee().getId().equals(shift1.getEmployee().getId())) {
-                    restingTime = new Period(shift.getEnd(), shift.getStart()).getMinutes();
-                }
-            }
-        }*/
         return restingTime;
     }
 
@@ -403,71 +356,15 @@ public class ShiftPlanningUtility {
     public static List<ShiftBreak> generateBreaksForShift(Shift shift) {
         List<ShiftBreak> breaks = new ArrayList<>();
         if (shift.getInterval() != null) {
-            //>5 h 30 mins
-            //>9h 15 min
-            //>12h 15 min
-            /*Integer minutes = shift.getInterval().toDuration().toStandardMinutes().getMinutes();
-            if (minutes > 12 * 60) {
-                ShiftBreak shiftBreak = new ShiftBreak(UUID.randomUUID(), shift.getStart().plusMinutes(11 * 60), "", 15);
-                breaks.add(shiftBreak);
-            }
-            if (minutes > 9 * 60) {
-                ShiftBreak shiftBreak = new ShiftBreak(UUID.randomUUID(), shift.getStart().plusMinutes(7 * 60), "", 15);
-                breaks.add(shiftBreak);
-            }
-            if (minutes > 5 * 60) {
-                ShiftBreak shiftBreak = new ShiftBreak(UUID.randomUUID(), shift.getStart().plusMinutes(3 * 60), "", 30);
-                breaks.add(shiftBreak);
-            }*/
         }
         return breaks.isEmpty() ? null : breaks;
     }
-
-    /*public static BigDecimal calculateCostOfEmployee(Shift shift) {
-        BigDecimal totalCost = new BigDecimal(0);
-        DateTime startTime = shift.getStart();
-        DateTime endTime = shift.getEnd();
-        if(startTime==null || endTime==null || startTime.isAfter(endTime)) return totalCost;
-        double baseCost = 10;
-        int i = 0;
-        double[][] costTimeAgreement = shift.getEmployee().getCollectiveTimeAgreement();
-        while (startTime.getHourOfDay() != endTime.getHourOfDay() && startTime.isBefore(endTime)) {
-            totalCost.add(new BigDecimal((baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()])));
-            //totalCost = totalCost + (baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()]);
-            startTime = startTime.plusHours(1);
-        }
-        double minuteCost;
-        if(startTime.getMinuteOfHour()>0) {
-            minuteCost = (60d - startTime.getMinuteOfHour()) / 60d;
-            totalCost.subtract(new BigDecimal(baseCost * costTimeAgreement[startTime.minusHours(endTime.getHourOfDay()).getDayOfWeek() - 1][startTime.minusHours(endTime.getHourOfDay()).getHourOfDay()]));
-            totalCost.add(new BigDecimal(baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()] * minuteCost));
-        }
-        if(endTime.getMinuteOfHour()>0) {
-            minuteCost = endTime.getMinuteOfHour() / 60d;
-            totalCost.add(new BigDecimal(baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()] * minuteCost));
-        }
-        return  totalCost;
-    }*/
-
-   /* public static BigDecimal calculateCostOfEmployee(ShiftRequestPhase shift){
-        BigDecimal totalCostOfShift = new BigDecimal(0);
-        for (ActivityLineInterval ali:shift.getActivityLineIntervalsList()) {
-            totalCostOfShift.add(new BigDecimal(ali.getActivity().getActivityCost() * shift.getCostForThisInterval(ali.getInterval())));
-        }
-        return totalCostOfShift;
-    }*/
 
     public static String getIntervalAsString(Interval interval) {
         return interval.getStart().toString("dd[HH:mm") + "-" + interval.getEnd().toString("HH:mm]");
     }
 
     public static Comparator<ActivityLineInterval> getActivityIntervalStartTimeComparator() {
-        /*Comparator shiftStartComparator = new Comparator<ActivityLineInterval>() {
-            @Override
-            public int compare(ActivityLineInterval a1, ActivityLineInterval a2) {
-                    return a1.getStart().compareTo(a2.getStart());
-            }
-        };*/
         return Comparator.comparing(ActivityLineInterval::getStart);
     }
 

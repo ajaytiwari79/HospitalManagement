@@ -338,7 +338,7 @@ public class CountryService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
-        if(levelGraphRepository.levelExistInCountryByName(countryId,level.getName(),-1L)){
+        if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),-1L)){
             exceptionService.duplicateDataException("message.country.level.name.exist");
         }
         country.addLevel(level);
@@ -353,7 +353,7 @@ public class CountryService {
             exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", levelId);
 
         }
-        if(levelGraphRepository.levelExistInCountryByName(countryId,level.getName(),levelToUpdate.getId())){
+        if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),levelToUpdate.getId())){
             exceptionService.duplicateDataException("message.country.level.name.exist");
         }
         levelToUpdate.setName(level.getName());

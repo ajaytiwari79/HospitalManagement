@@ -11,6 +11,7 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 19/9/17.
@@ -26,13 +27,14 @@ public class PhaseActivityDTO {
     private List<ReasonCodeDTO> reasonCodes;
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
+    private List<Map<String, Object>> publicHolidays;
 
     public PhaseActivityDTO() {
         //Default Constructor
     }
 
     public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities,List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
-                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes,LocalDate planningPeriodStartDate,LocalDate planningPeriodEndDate) {
+                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes,LocalDate planningPeriodStartDate,LocalDate planningPeriodEndDate,List<Map<String,Object>> publicHolidays) {
         this.activities=activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
@@ -43,8 +45,15 @@ public class PhaseActivityDTO {
         this.reasonCodes = reasonCodes;
         this.planningPeriodStartDate=planningPeriodStartDate;
         this.planningPeriodEndDate=planningPeriodEndDate;
+        this.publicHolidays=publicHolidays;
     }
-    
+
+    public List<Map<String, Object>> getPublicHolidays() { return publicHolidays; }
+
+    public void setPublicHolidays(List<Map<String, Object>> publicHolidays) {
+        this.publicHolidays = publicHolidays;
+    }
+
     public List<ActivityWithCompositeDTO> getActivities() {
         return activities;
     }

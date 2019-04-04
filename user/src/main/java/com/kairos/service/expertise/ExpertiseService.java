@@ -629,7 +629,8 @@ public class ExpertiseService {
         expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDateMillis()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
-            exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
+            //exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
+            exceptionService.actionNotPermittedException("message.expertise.alreadyPublishedWithExistingDate");
         }
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
@@ -650,7 +651,14 @@ public class ExpertiseService {
         if(isNotNull(expertise.getEndDateMillis()) && !getLocalDateFromDate(expertise.getEndDateMillis()).isBefore(getLocalDate())){
             schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(asLocalDate(expertise.getEndDateMillis())), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
-        registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
+
+        // create job for unassign experties from activity
+        try {
+            registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
+        }
+        catch (Exception e){
+            LOGGER.info("Exception occured in scheduling job for unassign experties from activity");
+        }
         return parentExpertise;
     }
 

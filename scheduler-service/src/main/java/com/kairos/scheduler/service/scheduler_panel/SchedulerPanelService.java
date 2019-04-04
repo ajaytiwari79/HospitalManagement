@@ -5,7 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.scheduler.JobDetailsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
 import com.kairos.enums.scheduler.JobFrequencyType;
@@ -66,7 +66,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
-    private static final String SCHEDULER = "SCHEDULER";
+    private static final String SCHEDULER = "scheduler";
 
 
     /**
@@ -224,9 +224,9 @@ public class SchedulerPanelService extends MongoBaseService {
      * @author yatharth
      * @lastmodifiedby
      */
-    public List<LocalDateTimeIdDTO> updateSchedulerPanelsOneTimeTriggerDate(List<LocalDateTimeIdDTO> localDateTimeIdDTOS, Long unitId) {
+    public List<LocalDateTimeScheduledPanelIdDTO> updateSchedulerPanelsOneTimeTriggerDate(List<LocalDateTimeScheduledPanelIdDTO> localDateTimeScheduledPanelIdDTOS, Long unitId) {
 
-        Set<BigInteger> schedulerPanelIDs = localDateTimeIdDTOS.stream().map(localDateTimeIdDTO -> localDateTimeIdDTO.getId()).collect(Collectors.toSet());
+        Set<BigInteger> schedulerPanelIDs = localDateTimeScheduledPanelIdDTOS.stream().map(localDateTimeScheduledPanelIdDTO -> localDateTimeScheduledPanelIdDTO.getId()).collect(Collectors.toSet());
 
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIDs);
         Map<BigInteger, SchedulerPanel> schedulerPanelsById = schedulerPanels.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
@@ -235,18 +235,18 @@ public class SchedulerPanelService extends MongoBaseService {
         SchedulerPanel schedulerPanel;
 
         List<SchedulerPanel> schedulerPanelsUpdated = new ArrayList<>();
-        for (LocalDateTimeIdDTO localDateTimeIdDTO : localDateTimeIdDTOS) {
-            schedulerPanel = schedulerPanelsById.get(localDateTimeIdDTO.getId());
-            schedulerPanel.setOneTimeTriggerDate(localDateTimeIdDTO.getDateTime());
+        for (LocalDateTimeScheduledPanelIdDTO localDateTimeScheduledPanelIdDTO : localDateTimeScheduledPanelIdDTOS) {
+            schedulerPanel = schedulerPanelsById.get(localDateTimeScheduledPanelIdDTO.getId());
+            schedulerPanel.setOneTimeTriggerDate(localDateTimeScheduledPanelIdDTO.getDateTime());
             schedulerPanelsUpdated.add(schedulerPanel);
-            dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeIdDTO.getId());
+            dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeScheduledPanelIdDTO.getId());
             dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
 
 
         }
         save(schedulerPanelsUpdated);
 
-        return localDateTimeIdDTOS;
+        return localDateTimeScheduledPanelIdDTOS;
     }
 
     /**

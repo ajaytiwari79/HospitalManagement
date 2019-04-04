@@ -322,13 +322,6 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
     }
 
-    @ApiOperation(value = "Init optplanner integration")
-    @RequestMapping(value = "/planner_integration", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(unitId));
-    }
-
     @ApiOperation("Get all activity based on unitId")
     @GetMapping(value = "/orders_and_activities")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -367,7 +360,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Get All Activities and Phases by unitId")
-    @RequestMapping(value = "/activityWithPhase", method = RequestMethod.GET)
+    @RequestMapping(value = "/activity_with_phase", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));

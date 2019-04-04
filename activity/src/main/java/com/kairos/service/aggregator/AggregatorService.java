@@ -18,7 +18,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.SchedulerRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.planner.RandomDateGeneratorService;
 import com.kairos.service.task_type.TaskDynamicReportService;
 import com.kairos.dto.user.client.Client;
@@ -28,7 +27,6 @@ import com.kairos.dto.user.staff.client.ClientAggregatorDTO;
 import com.kairos.utils.ApplicationUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.functional_interface.PerformCalculation;
-import de.tourenserver.CallInfoRec;
 import org.bson.Document;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -66,8 +64,6 @@ public class AggregatorService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(AggregatorService.class);
 
-    @Inject
-    private Scheduler scheduler;
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
@@ -354,7 +350,7 @@ public class AggregatorService extends MongoBaseService {
         List<BigInteger> plannedStatusTasks = new ArrayList<>();
         List<BigInteger> totalPlannedProblemsTasks = new ArrayList<>();
         for (Map<String, Object> taskMap : taskIds) {
-            CallInfoRec callInfoRec = getCallInfo(taskMap, flsCredentials);
+            /*CallInfoRec callInfoRec = getCallInfo(taskMap, flsCredentials);
             if (callInfoRec.getFMExtID().equals("")) {
                 escalationCount += 1;
                 escalationTasks.add(BigInteger.valueOf(Long.valueOf(taskMap.get("taskId").toString())));
@@ -389,7 +385,7 @@ public class AggregatorService extends MongoBaseService {
                         totalPlannedProblemsTasks.addAll(waitingTasks);
                     }
                 }
-            }
+            }*/
 
         }
 
@@ -420,39 +416,6 @@ public class AggregatorService extends MongoBaseService {
         return finalResult.getMappedResults();
     }
 
-    private CallInfoRec getCallInfo(Map<String, Object> taskMap, Map<String, String> flsCredentials) {
-        Map<String, Object> callInfoMetaData = new HashMap<>();
-        callInfoMetaData.put("extID", taskMap.get("taskId").toString());
-        callInfoMetaData.put("vtid", Integer.valueOf(taskMap.get("visitourId").toString()));
-
-        return scheduler.getCallInfo(callInfoMetaData, flsCredentials);
-    }
-
-    private Map getPreviousCallByStaffId(CallInfoRec callInfoRec, Integer fromDays) {
-        List<Long> staffIds = new ArrayList<>();
-        LocalDate upcomingMonday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-        LocalDate fromDaysLater = upcomingMonday.plusDays(fromDays);
-        Date fromDate = Date.from(fromDaysLater.atStartOfDay(systemDefault()).toInstant());
-        DateTime dateTime = new DateTime(fromDate);
-        fromDate = dateTime.plusHours(5).plusMinutes(30).toDate();
-        List<String> staffs = Arrays.asList(callInfoRec.getFMExtID().split("\\s*,\\s*"));
-        for (String staff : staffs) {
-            staffIds.add(Long.valueOf(staff));
-        }
-        Criteria criteria = Criteria.where("timeFrom").gte(fromDate).and("timeTo").lte(callInfoRec.getArrival().toGregorianCalendar().getTime()).and("isDeleted").is(false)
-                .and("taskStatus").ne("CANCELLED").and("relatedTaskId").exists(false).and("assignedStaffIds").in(staffIds).and("visitourId").ne(null);
-        Aggregation aggregation = newAggregation(
-                match(criteria),
-                sort(Sort.Direction.DESC, "timeTo")
-
-        );
-        logger.debug("Task Aggregator Query: " + aggregation.toString());
-
-        // Result
-        AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
-        if (finalResult.getMappedResults().isEmpty()) return null;
-        return finalResult.getMappedResults().get(0);
-    }
 
     private List<ClientAggregator> getCitizenDynamicData(Long organizationId) {
 

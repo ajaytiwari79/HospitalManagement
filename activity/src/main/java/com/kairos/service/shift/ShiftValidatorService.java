@@ -253,10 +253,10 @@ public class ShiftValidatorService {
             LocalTime earliestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getEarliestStartTime() : staffActivitySettingMap.get(activityId).getEarliestStartTime();
             LocalTime latestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getLatestStartTime() : staffActivitySettingMap.get(activityId).getLatestStartTime();
             if (shortestTime != null && shiftTimeDetails.getTotalTime() < shortestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time", shortestTime));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time", getHoursByMinutes(shortestTime)));
             }
             if (longestTime != null && shiftTimeDetails.getTotalTime() > longestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time", longestTime));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time", getHoursByMinutes(longestTime)));
             }
             if (earliestStartTime != null && earliestStartTime.isAfter(shiftTimeDetails.getActivityStartTime())) {
                 errorMessages.add(exceptionService.convertMessage("error.start_time.greater_than.earliest_time", earliestStartTime));
@@ -354,7 +354,7 @@ public class ShiftValidatorService {
     public void validateStatusOfShiftOnUpdate(Shift shift, ShiftDTO shiftDTO) {
         int i = 0;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK);
+            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
             if (notValid) {
                 try {
                     ShiftActivityDTO updateShiftActivity = shiftDTO.getActivities().get(i);
@@ -544,9 +544,8 @@ public class ShiftValidatorService {
                 if (activityWrapper.getActivity().getRulesActivityTab().isEligibleForStaffingLevel()) {
                     int lowerLimit = 0;
                     int upperLimit = 0;
-                    List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
                     if (ShiftType.PRESENCE.equals(shift.getShiftType())) {
-                        applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
+                        List<StaffingLevelInterval>  applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
                         if (!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                             lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                             upperLimit = 95;
@@ -567,10 +566,14 @@ public class ShiftValidatorService {
                             checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shiftActivities, checkOverStaffing, shiftActivity);
                         }
                     }
+                    else {
+                        validateStaffingLevelForAbsenceTypeOfShift(staffingLevel,shiftActivity,checkOverStaffing,shiftActivities);
+                    }
                 }
             }
         }
     }
+
 
     private boolean isVerificationRequired(boolean checkOverStaffing, boolean staff, boolean management, PhaseSettings phaseSettings) {
         boolean result = false;
@@ -781,10 +784,7 @@ public class ShiftValidatorService {
         List<ShiftViolatedRules> violatedRules = new ArrayList<>();
         for (ShiftViolatedRules shiftViolatedRules1 : shiftViolatedRules) {
             if(longShiftViolatedRulesTreeMap.containsKey(shiftViolatedRules1.getShiftId())){
-                //ShiftViolatedRules ShiftViolatedRules = longShiftViolatedRulesTreeMap.get(shiftViolatedRules1.getShiftId());
-                  //  if(ShiftViolatedRules.getUpdatedAt().after(shiftViolatedRules1.getUpdatedAt())){
                         violatedRules.add(shiftViolatedRules1);
-                    //}
             }else {
                 longShiftViolatedRulesTreeMap.put(shiftViolatedRules1.getShiftId(),shiftViolatedRules1);
             }
@@ -793,5 +793,31 @@ public class ShiftValidatorService {
         shiftViolatedRulesMongoRepository.deleteAll(violatedRules);
         return true;
     }
+
+    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities) {
+        if (CollectionUtils.isEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
+            exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+        }
+        int shiftsCount = 0;
+        Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
+        if (!staffingLevelActivity.isPresent()) {
+            exceptionService.actionNotPermittedException("message.staffingLevel.activity",shiftActivity.getActivityName());
+        }
+        for (ShiftActivity currentShiftActivity : shiftActivities) {
+            if (currentShiftActivity.getActivityId().equals(shiftActivity.getActivityId())) {
+                shiftsCount++;
+            }
+        }
+        int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
+        if ((checkOverStaffing && totalCount >= 0)) {
+            exceptionService.actionNotPermittedException("message.shift.overStaffing");
+
+        }
+        if (!checkOverStaffing && totalCount <= 0) {
+            exceptionService.actionNotPermittedException("message.shift.underStaffing");
+
+        }
+    }
+
 
 }

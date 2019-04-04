@@ -22,10 +22,11 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
-public class AssetTypeService{
+public class AssetTypeService {
 
     @Inject
     private ExceptionService exceptionService;
@@ -51,14 +52,14 @@ public class AssetTypeService{
     public AssetTypeDTO createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDTO assetTypeDto) {
 
 
-        AssetType assetTypeExist = assetTypeRepository.findByNameAndCountryIdAndSubAssetType(assetTypeDto.getName(),countryId,  false);
+        AssetType assetTypeExist = assetTypeRepository.findByNameAndCountryIdAndSubAssetType(assetTypeDto.getName(), countryId, false);
         if (Optional.ofNullable(assetTypeExist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
         }
         AssetType assetType = new AssetType(assetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
-        List<Risk> assetTypeRisks ;
+        List<Risk> assetTypeRisks;
         if (!assetTypeDto.getSubAssetTypes().isEmpty()) {
-            List<AssetType> subAssetTypeList = buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, assetTypeDto.getSubAssetTypes(),assetType);
+            List<AssetType> subAssetTypeList = buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, assetTypeDto.getSubAssetTypes(), assetType);
             assetType.setHasSubAssetType(true);
             assetType.setSubAssetTypes(subAssetTypeList);
         }
@@ -95,59 +96,31 @@ public class AssetTypeService{
 
     /**
      * @param countryId
-     * @param subAssetTypesDto contain list of Existing Sub Asset type which need to we update
+     * @param subAssetTypesDtos contain list of Existing Sub Asset type which need to we update
      * @return map of Sub asset Types List and Ids (List for rollback)
      * @description this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      */
-    private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDto, AssetType assetType) {
-        List<BasicRiskDTO> newRiskOfSubAssetType = new ArrayList<>();
-        Map<Long, AssetTypeDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
-        Map<Long, BasicRiskDTO> subAssetTypeExistingRiskDtoCorrespondingToIds = new HashMap<>();
-        Map<Long, List<BasicRiskDTO>> subAssetTypeNewRiskDto = new HashMap<>();
+    private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDtos, AssetType assetType) {
+        checkForDuplicacyInNameOfAssetType(subAssetTypesDtos);
+        Map<Long, AssetType> subAssetTypesMap = assetType.getSubAssetTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         List<AssetType> subAssetTypes = new ArrayList<>();
-        subAssetTypesDto.forEach(subAssetTypeDto -> {
-            if (Optional.ofNullable(subAssetTypeDto.getId()).isPresent()) {
-                subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
-                subAssetTypeDto.getRisks().forEach( subAssetTypeRiskDto -> {
-                    if (Optional.ofNullable(subAssetTypeRiskDto.getId()).isPresent()) {
-                        subAssetTypeExistingRiskDtoCorrespondingToIds.put(subAssetTypeRiskDto.getId(), subAssetTypeRiskDto);
-                    }else{
-                        newRiskOfSubAssetType.add(subAssetTypeRiskDto);
+        subAssetTypesDtos.forEach(subAssetTypeDTO ->
+                {
+                    List<Risk> subAssetRisks;
+                    AssetType subAssetType;
+                    if (subAssetTypeDTO.getId() != null) {
+                        subAssetType = subAssetTypesMap.get(subAssetTypeDTO.getId());
+                    } else {
+                        subAssetType = new AssetType(subAssetTypeDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
+                        subAssetType.setSubAssetType(true);
+                        subAssetType.setAssetType(assetType);
                     }
-                });
-                subAssetTypeNewRiskDto.put(subAssetTypeDto.getId(), newRiskOfSubAssetType);
-            } else {
-                AssetType subAssetType = new AssetType(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
-                subAssetType.setSubAssetType(true);
-                subAssetType.setAssetType(assetType);
-                List<Risk>  subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), Risk.class);
-                subAssetType.setRisks(subAssetRisks);
-                subAssetTypes.add(subAssetType);
-            }
-
-        });
-
-        assetType.getSubAssetTypes().forEach(subAssetType -> {
-            AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            subAssetType.setName(subAssetTypeDto.getName());
-            if(!subAssetType.getRisks().isEmpty() && !subAssetTypeExistingRiskDtoCorrespondingToIds.isEmpty()){
-            subAssetType.getRisks().forEach(subAssetTypeRisk -> {
-                BasicRiskDTO basicRiskDTO = subAssetTypeExistingRiskDtoCorrespondingToIds.get(subAssetTypeRisk.getId());
-                subAssetTypeRisk.setName(basicRiskDTO.getName());
-                subAssetTypeRisk.setDescription(basicRiskDTO.getDescription());
-                subAssetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
-                subAssetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-            });
-            }
-            subAssetTypeNewRiskDto.get(subAssetType.getId()).forEach( newRisk -> {
-                Risk risk = new Risk(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel() );
-                risk.setCountryId(countryId);
-                subAssetType.getRisks().add(risk);
-            });
-            subAssetTypes.add(subAssetType);
-        });
-
-
+                    subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDTO.getRisks(), Risk.class);
+                    subAssetRisks.forEach(risk -> risk.setCountryId(countryId));
+                    subAssetType.setRisks(subAssetRisks);
+                    subAssetTypes.add(subAssetType);
+                }
+        );
         return subAssetTypes;
     }
 
@@ -160,14 +133,14 @@ public class AssetTypeService{
     public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRisk(Long countryId) {
         List<AssetType> assetTypes = assetTypeRepository.getAllAssetTypeByCountryId(countryId);
         List<AssetTypeRiskResponseDTO> assetTypesWithAllData = new ArrayList<>();
-        for(AssetType assetType : assetTypes) {
+        for (AssetType assetType : assetTypes) {
             assetTypesWithAllData.add(buildAssetTypeOrSubTypeResponseData(assetType));
         }
         return assetTypesWithAllData;
     }
 
 
-    public List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType,AssetType parentAssetType){
+    public List<AssetType> prepareAssetTypeDataForUnitLevel(List<AssetType> assetTypes, Long unitId, boolean isSubAssetType, AssetType parentAssetType) {
         List<AssetType> unitLevelAssetTypes = new ArrayList<>();
         assetTypes.forEach(assetType -> {
             AssetType unitLevelAssetType = new AssetType();
@@ -183,74 +156,75 @@ public class AssetTypeService{
                 unitLevelAssetTypeRiskList.add(unitLevelAssetTypeRisk);
             });
             unitLevelAssetType.setRisks(unitLevelAssetTypeRiskList);
-            if(!isSubAssetType) {
+            if (!isSubAssetType) {
                 unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true, assetType));
-                if(!unitLevelAssetType.getSubAssetTypes().isEmpty()) {
+                if (!unitLevelAssetType.getSubAssetTypes().isEmpty()) {
                     unitLevelAssetType.setHasSubAssetType(true);
                 }
             }
-            if(isSubAssetType){
+            if (isSubAssetType) {
                 unitLevelAssetType.setAssetType(parentAssetType);
             }
             unitLevelAssetTypes.add(unitLevelAssetType);
         });
-            return unitLevelAssetTypes;
+        return unitLevelAssetTypes;
     }
 
-    public AssetType prepareAssetTypeDataForUnitLevel(AssetType assetType, Long unitId, boolean isSubAssetType, AssetType parentAssetType){
-            AssetType unitLevelAssetType = new AssetType();
-            unitLevelAssetType.setName(assetType.getName());
-            unitLevelAssetType.setSubAssetType(assetType.isSubAssetType());
-            unitLevelAssetType.setOrganizationId(unitId);
-            unitLevelAssetType.setCountryId(null);
-            List<Risk> unitLevelAssetTypeRiskList = new ArrayList<>();
-            assetType.getRisks().forEach(risk -> {
-                Risk unitLevelAssetTypeRisk = new Risk(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
-                unitLevelAssetTypeRisk.setOrganizationId(unitId);
-                unitLevelAssetTypeRiskList.add(unitLevelAssetTypeRisk);
-            });
-            unitLevelAssetType.setRisks(unitLevelAssetTypeRiskList);
-            if(!isSubAssetType) {
-                unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true, unitLevelAssetType));
-                if(!unitLevelAssetType.getSubAssetTypes().isEmpty()) {
-                    unitLevelAssetType.setHasSubAssetType(true);
-                }
+    public AssetType prepareAssetTypeDataForUnitLevel(AssetType assetType, Long unitId, boolean isSubAssetType, AssetType parentAssetType) {
+        AssetType unitLevelAssetType = new AssetType();
+        unitLevelAssetType.setName(assetType.getName());
+        unitLevelAssetType.setSubAssetType(assetType.isSubAssetType());
+        unitLevelAssetType.setOrganizationId(unitId);
+        unitLevelAssetType.setCountryId(null);
+        List<Risk> unitLevelAssetTypeRiskList = new ArrayList<>();
+        assetType.getRisks().forEach(risk -> {
+            Risk unitLevelAssetTypeRisk = new Risk(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
+            unitLevelAssetTypeRisk.setOrganizationId(unitId);
+            unitLevelAssetTypeRiskList.add(unitLevelAssetTypeRisk);
+        });
+        unitLevelAssetType.setRisks(unitLevelAssetTypeRiskList);
+        if (!isSubAssetType) {
+            unitLevelAssetType.setSubAssetTypes(prepareAssetTypeDataForUnitLevel(assetType.getSubAssetTypes(), unitId, true, unitLevelAssetType));
+            if (!unitLevelAssetType.getSubAssetTypes().isEmpty()) {
+                unitLevelAssetType.setHasSubAssetType(true);
             }
-            if(isSubAssetType){
-                unitLevelAssetType.setAssetType(parentAssetType);
-            }
+        }
+        if (isSubAssetType) {
+            unitLevelAssetType.setAssetType(parentAssetType);
+        }
 
         return unitLevelAssetType;
     }
 
     /**
-     *  THis method is used to build response of asset type and asset sub type. This method used recursion
-     *  to prepare the data of asset sub type.
+     * THis method is used to build response of asset type and asset sub type. This method used recursion
+     * to prepare the data of asset sub type.
      *
      * @param assetType - It may be asset type or asset sub type.
      * @return List<AssetTypeRiskResponseDTO> - List of asset-type or Sub asset-type response DTO.
      */
-    private AssetTypeRiskResponseDTO buildAssetTypeOrSubTypeResponseData(AssetType assetType){
-            List<AssetTypeRiskResponseDTO> subAssetTypeData = new ArrayList<>();
-            AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO(assetType.getId(),assetType.getName());
-            assetTypeRiskResponseDTO.setHasSubAsset(assetType.isHasSubAssetType());
-            if(!assetType.getRisks().isEmpty()){
-                assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
-            }
-            if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes())){
-                assetType.getSubAssetTypes().forEach( subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
-                assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
-            }
+    private AssetTypeRiskResponseDTO buildAssetTypeOrSubTypeResponseData(AssetType assetType) {
+        List<AssetTypeRiskResponseDTO> subAssetTypeData = new ArrayList<>();
+        AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO(assetType.getId(), assetType.getName());
+        assetTypeRiskResponseDTO.setHasSubAsset(assetType.isHasSubAssetType());
+        if (!assetType.getRisks().isEmpty()) {
+            assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
+        }
+        if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes())) {
+            assetType.getSubAssetTypes().forEach(subAssetType -> subAssetTypeData.add(buildAssetTypeOrSubTypeResponseData(subAssetType)));
+            assetTypeRiskResponseDTO.setSubAssetTypes(subAssetTypeData);
+        }
         return assetTypeRiskResponseDTO;
     }
 
     /**
      * Description : This method is used to convert Risks of asset-type or Sub asset-type to Risk Response DTO
-     *  Convert Risk into RiskBasicResponseDTO
+     * Convert Risk into RiskBasicResponseDTO
+     *
      * @param risks - Risks of asset-type or Sub asset-type
      * @return List<RiskBasicResponseDTO> - List of RiskResponse DTO.
      */
-    private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<Risk> risks){
+    private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<Risk> risks) {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(risks, RiskBasicResponseDTO.class);
     }
 
@@ -273,9 +247,9 @@ public class AssetTypeService{
 
         List<String> masterAssetsLinkedWithAssetType = masterAssetRepository.findMasterAssetsLinkedWithAssetType(countryId, assetTypeId);
         if (CollectionUtils.isNotEmpty(masterAssetsLinkedWithAssetType)) {
-            exceptionService.invalidRequestException("message.metaData.linked.with.asset", "message.assetType",  StringUtils.join(masterAssetsLinkedWithAssetType, ','));
+            exceptionService.invalidRequestException("message.metaData.linked.with.asset", "message.assetType", StringUtils.join(masterAssetsLinkedWithAssetType, ','));
         }
-        AssetType assetType = assetTypeRepository.findByCountryIdAndId(countryId, assetTypeId,false);
+        AssetType assetType = assetTypeRepository.findByCountryIdAndId(countryId, assetTypeId, false);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetTypeId);
         }
@@ -306,30 +280,30 @@ public class AssetTypeService{
         }
         assetType.setName(assetTypeDto.getName());
         List<AssetType> subAssetTypeList = updateSubAssetTypes(countryId, assetTypeDto.getSubAssetTypes(), assetType);
-        if(!subAssetTypeList.isEmpty()) {
+        if (!subAssetTypeList.isEmpty()) {
             assetType.setSubAssetTypes(subAssetTypeList);
             assetType.setHasSubAssetType(true);
         }
-        updateOrAddAssetTypeRisk(assetType,assetTypeDto);
+        updateOrAddAssetTypeRisk(assetType, assetTypeDto);
         assetType.getRisks().forEach(risk -> risk.setCountryId(countryId));
         assetTypeRepository.save(assetType);
         return assetTypeDto;
 
     }
 
-    private AssetType updateOrAddAssetTypeRisk(AssetType assetType, AssetTypeDTO assetTypeDto){
+    private AssetType updateOrAddAssetTypeRisk(AssetType assetType, AssetTypeDTO assetTypeDto) {
         List<BasicRiskDTO> newRisks = new ArrayList<>();
         List<Risk> assetTypeRisks = assetType.getRisks();
         Map<Long, BasicRiskDTO> existingRiskDtoCorrespondingToIds = new HashMap<>();
-        assetTypeDto.getRisks().forEach( assetTypeRiskDto -> {
+        assetTypeDto.getRisks().forEach(assetTypeRiskDto -> {
             if (Optional.ofNullable(assetTypeRiskDto.getId()).isPresent()) {
                 existingRiskDtoCorrespondingToIds.put(assetTypeRiskDto.getId(), assetTypeRiskDto);
-            }else{
+            } else {
                 newRisks.add(assetTypeRiskDto);
             }
         });
         List<Risk> existingRisk = assetType.getRisks();
-        if(!existingRisk.isEmpty() && ! existingRiskDtoCorrespondingToIds.isEmpty()) {
+        if (!existingRisk.isEmpty() && !existingRiskDtoCorrespondingToIds.isEmpty()) {
             existingRisk.forEach(assetTypeRisk -> {
                 BasicRiskDTO basicRiskDTO = existingRiskDtoCorrespondingToIds.get(assetTypeRisk.getId());
                 assetTypeRisk.setName(basicRiskDTO.getName());
@@ -343,7 +317,7 @@ public class AssetTypeService{
             assetTypeRisks.add(risk);
         });
         assetType.setRisks(assetTypeRisks);
-        return  assetType;
+        return assetType;
     }
 
     /**

@@ -353,7 +353,6 @@ public class VisitatorService{
                 } else {
                     logger.info("Task Demand EndDate updated, so delete tasks from kairos and visitour after this date");
                     List<Task> tasksToDelete = taskMongoRepository.getTasksByDemandIdAndDateTo(existingTaskDemand.getId().toString(), updatedTaskDemand.getEndDate());
-                    plannerService.deleteTasksFromDBAndVisitour(tasksToDelete, unitId);
 
                     updatedTaskDemand.setStatus(TaskDemand.Status.UPDATED);
                     updatedTaskDemand.setWeekendVisits(Collections.EMPTY_LIST);

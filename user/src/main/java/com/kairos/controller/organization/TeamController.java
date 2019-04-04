@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
     import java.math.BigInteger;
+    import java.text.ParseException;
     import java.util.List;
     import java.util.Map;
     import java.util.Set;
 
     import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.AppConstants.TEAM;
+    import static com.kairos.constants.ApiConstants.UNIT_URL;
+    import static com.kairos.constants.AppConstants.TEAM;
 
     /**
      * Created by oodles on 18/10/16.
@@ -171,5 +173,12 @@ import static com.kairos.constants.AppConstants.TEAM;
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> getTeamActivitiesOfStaff(@PathVariable Long staffId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getTeamActivitiesOfStaff(staffId));
+        }
+
+        @PutMapping("/team/general")
+        @ApiOperation("update general details of team")
+        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO) throws ParseException {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeamGeneralDetails(unitId, teamDTO));
         }
     }
