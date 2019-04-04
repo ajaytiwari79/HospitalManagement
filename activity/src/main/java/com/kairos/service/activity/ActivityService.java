@@ -87,6 +87,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -199,9 +200,20 @@ public class ActivityService extends MongoBaseService {
             activityTagDTO.setActivityCanBeCopied(true);
         });
         List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
+        checkActivityAllowChildActivities(activityTagDTOS);
         response.put("activities", activityTagDTOS);
         response.put("activityCategories", acivitityCategories);
         return response;
+    }
+
+    public List<ActivityTagDTO> checkActivityAllowChildActivities(List<ActivityTagDTO> activities){
+        Set<BigInteger> childActivitiesIds=(Set)activities.stream().map(activityTagDTO -> activityTagDTO.getChildActivityIds()).collect(Collectors.toSet());
+        for (ActivityTagDTO activity : activities) {
+            if(childActivitiesIds.contains(activity.getId())){
+                activity.setAllowChildActivities(false);
+            }
+        }
+        return activities;
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
@@ -410,6 +422,30 @@ public class ActivityService extends MongoBaseService {
             save(activityList);
         }
     }
+
+    public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
+        Activity activity = activityMongoRepository.findById(activityId).orElse(null);
+        if (activity == null) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+        }
+        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(childActivitiesIds);
+        if (activityMatched.size() != childActivitiesIds.size()) {
+            exceptionService.illegalArgumentException("message.mismatched-ids", childActivitiesIds);
+        }
+        activity.setChildActivityIds(childActivitiesIds);
+        //updateCompositeActivity(activityList, activity, compositeActivities);
+        save(activity);
+        return childActivitiesIds;
+    }
+
+    public Set<BigInteger> getChildActivitiesIdsOfActivity(BigInteger activityId) {
+        Optional<Activity> activity = activityMongoRepository.findById(activityId);
+        if (!activity.isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+        }
+        return activity.get().getChildActivityIds();
+    }
+
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);

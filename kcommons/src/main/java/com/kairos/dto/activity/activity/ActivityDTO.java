@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -52,6 +53,7 @@ public class ActivityDTO {
 //    private List<BigInteger> tags = new ArrayList<>();
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
+    private Set<BigInteger> childActivityIds;
 
     public ActivityDTO() {
         //default constructor
@@ -293,5 +295,13 @@ public class ActivityDTO {
 
     public void setAllowChildActivities(boolean allowChildActivities) {
         this.allowChildActivities = allowChildActivities;
+    }
+
+    public Set<BigInteger> getChildActivityIds() {
+        return childActivityIds;
+    }
+
+    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
+        this.childActivityIds = childActivityIds;
     }
 }

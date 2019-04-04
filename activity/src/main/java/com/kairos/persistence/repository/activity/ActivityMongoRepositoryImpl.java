@@ -106,7 +106,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup("tag", "tags", "_id", "tags"),
                 project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
-
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
@@ -118,6 +118,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
                 project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();

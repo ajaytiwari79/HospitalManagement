@@ -44,6 +44,8 @@ public class ActivityTagDTO {
     private ActivityStateEnum state;
     private List<CompositeShiftActivityDTO> compositeActivities;
     private BigInteger activityPriorityId;
+    private boolean allowChildActivities;
+    private Set<BigInteger> childActivityIds;
 
     public ActivityTagDTO() {
         //default constructor
@@ -227,6 +229,22 @@ public class ActivityTagDTO {
 
     public void setActivityPriorityId(BigInteger activityPriorityId) {
         this.activityPriorityId = activityPriorityId;
+    }
+
+    public boolean isAllowChildActivities() {
+        return allowChildActivities;
+    }
+
+    public void setAllowChildActivities(boolean allowChildActivities) {
+        this.allowChildActivities = allowChildActivities;
+    }
+
+    public Set<BigInteger> getChildActivityIds() {
+        return childActivityIds;
+    }
+
+    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
+        this.childActivityIds = childActivityIds;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

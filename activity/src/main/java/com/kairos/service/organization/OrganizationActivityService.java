@@ -208,6 +208,7 @@ public class OrganizationActivityService extends MongoBaseService {
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
+        activityService.checkActivityAllowChildActivities(activities);
         response.put("activities", activities);
         response.put("activityCategories", activityCategories);
         return response;
