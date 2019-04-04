@@ -948,25 +948,26 @@ public class StaffService {
     }
 
     public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
-        Position position;
+        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(),user.getId());
+        if(isNull(position)) {
+            Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                    user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+            position=new Position();
+            position.setStaff(staff);
+            staff.setUser(user);
+            position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+            position.setStaff(staff);
+            staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
+            position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+        }
         // if the organization is not parent organization then adding position in parent organization.
         if (!parentOrganization) {
-            Organization mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
-            position = positionGraphRepository.findPositionByOrganizationIdAndUserId(mainOrganization.getId(),user.getId());
+            Organization
+                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
             mainOrganization.getPositions().add(position);
             organizationGraphRepository.save(mainOrganization);
         } else {
-                Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
-                        user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-                position=new Position();
-                position.setStaff(staff);
-                staff.setUser(user);
-                position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
-                position.setStaff(staff);
-                staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
-                position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
-                  organization.getPositions().add(position);
-
+            organization.getPositions().add(position);
         }
         organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
