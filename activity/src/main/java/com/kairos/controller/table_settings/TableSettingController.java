@@ -24,13 +24,13 @@ public class TableSettingController {
     @Inject
     private TableSettingService tableSettingService;
 
-    @RequestMapping(value = "/table/{tableId}/settings", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> saveTableSettings(@PathVariable long unitId, @PathVariable String tableId, @RequestBody Map<String, Object> tableSettings) {
+    @RequestMapping(value = "/table/{tabId}/settings", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> saveTableSettings(@PathVariable long unitId, @PathVariable String tabId, @RequestBody Map<String, Object> tableSettings) {
 
         //User loggedInUser = UserAuthentication.getCurrentUser();
         Long loggedInUserId = UserContext.getUserDetails().getId();
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.saveTableSettings(loggedInUserId, unitId, tableId, tableSettings));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.saveTableSettings(loggedInUserId, unitId, tabId, tableSettings));
     }
 
     /**
@@ -46,10 +46,10 @@ public class TableSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfiguration(staffId, unitId));
     }
 
-    @GetMapping("/table_settings/{tableId}")
-    ResponseEntity<Map<String, Object>> getTableConfigurationByTableId(@PathVariable long unitId, @PathVariable BigInteger tableId) {
+    @GetMapping("/table_settings/{tabId}")
+    ResponseEntity<Map<String, Object>> getTableConfigurationByTabId(@PathVariable long unitId, @PathVariable BigInteger tabId) {
 
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfigurationByTableId(unitId, tableId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfigurationByTabId(unitId, tabId));
     }
 }

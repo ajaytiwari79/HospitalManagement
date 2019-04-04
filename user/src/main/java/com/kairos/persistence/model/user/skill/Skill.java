@@ -34,9 +34,9 @@ public class Skill extends UserBaseEntity {
     @Relationship(type = HAS_CATEGORY)
     private SkillCategory skillCategory;
     @Relationship(type = REQUESTED_BY)
-    User requestedBy;
+    private User requestedBy;
     @Relationship(type = APPROVED_BY)
-    User approvedBy;
+    private User approvedBy;
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
     //time care id

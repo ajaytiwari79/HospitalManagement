@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.constants.AppConstants.BLANK_STRING;
 
 @Service
 public class ShiftAndActivityDurationKpiService implements CounterService {
@@ -55,7 +57,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                         shift.getActivities().forEach(activity -> {
                             int activityDuration = activityNameAndTotalDurationMinutesMap.getOrDefault(activity.getActivityName(), 0);
                             activityNameAndTotalDurationMinutesMap.put(activity.getActivityName(), activityDuration + activity.getDurationMinutes());
-                            activityNameAndColorCodeMap.putIfAbsent(activity.getActivityName(), activity.getBackgroundColor());
+                            activityNameAndColorCodeMap.putIfAbsent(activity.getActivityName(), (isNotNull(activity.getBackgroundColor()) && !BLANK_STRING.equals(activity.getBackgroundColor())) ? activity.getBackgroundColor() : AppConstants.KPI_DEFAULT_COLOR);
                         });
                         shiftDurationMinutes += shift.getDurationMinutes();
                     }

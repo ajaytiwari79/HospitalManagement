@@ -379,13 +379,6 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
     }
 
-    @ApiOperation(value = "Init optplanner integration")
-    @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync( unitId));
-    }
-
     @ApiOperation("Get all activity based on country")
     @GetMapping(value = "/activities_with_time_types")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -398,4 +391,5 @@ public class ActivityController {
     ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
     }
+
 }

@@ -8,8 +8,6 @@ import com.kairos.persistence.model.task.TaskStatus;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
@@ -52,10 +50,6 @@ public class TasksMergingService extends MongoBaseService {
     TaskService taskService;
     @Inject
     MongoTemplate mongoTemplate;
-    @Inject
-    Scheduler scheduler;
-    @Inject
-    TaskConverterService taskConverterService;
     @Autowired
     UserIntegrationService userIntegrationService;
 
@@ -151,7 +145,7 @@ public class TasksMergingService extends MongoBaseService {
             Task mergedTask = mergeTasksWithIds(taskIds, unitId, citizenId, mainTaskName, isActualPlanningScreen, uniqueID, taskAddress, loggedInUser, preferredStaffIds, forbiddenStaffIds, flsCredentials);
             taskList.add(mergedTask);
         }
-        taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
+        //taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
         return taskList;
     }
 
@@ -388,12 +382,12 @@ public class TasksMergingService extends MongoBaseService {
         }
 
         Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-        if (tasksToCreate.size() > 0) {
+       /* if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {
             logger.info("NO Tasks Available");
         }
-
+*/
         /*for (Task task : tasksToDelete) {
             Map<String, Object> callMetaData = new HashMap<>();
             callMetaData.put("functionCode", 4);

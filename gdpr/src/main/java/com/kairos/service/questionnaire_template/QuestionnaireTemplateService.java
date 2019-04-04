@@ -4,19 +4,18 @@ package com.kairos.service.questionnaire_template;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
-import com.kairos.enums.gdpr.AssetAttributeName;
-import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
+import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
+import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ public class QuestionnaireTemplateService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(QuestionnaireTemplateService.class);
 
+
     @Inject
     private ExceptionService exceptionService;
 
@@ -43,6 +43,9 @@ public class QuestionnaireTemplateService {
 
     @Inject
     private QuestionnaireTemplateRepository questionnaireTemplateRepository;
+
+    @Inject
+    private AssessmentRepository assessmentRepository;
 
 
     /**
@@ -260,7 +263,7 @@ public class QuestionnaireTemplateService {
     public List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long id, boolean isOrganization) {
         List<QuestionnaireTemplateResponseDTO> questionnaireTemplateResponseDTOS = new ArrayList<>();
         List<QuestionnaireTemplate> questionnaireTemplates = isOrganization ? questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(id) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(id);
-        questionnaireTemplates.forEach(questionnaireTemplate ->  questionnaireTemplateResponseDTOS.add(prepareQuestionnaireTemplateResponseData(questionnaireTemplate)));
+        questionnaireTemplates.forEach(questionnaireTemplate -> questionnaireTemplateResponseDTOS.add(prepareQuestionnaireTemplateResponseData(questionnaireTemplate)));
         return questionnaireTemplateResponseDTOS;
     }
 
@@ -328,6 +331,10 @@ public class QuestionnaireTemplateService {
 
 
     public boolean deleteQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId) {
+        List<String> assessmentNames = assessmentRepository.findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(unitId, questionnaireTemplateId, AssessmentStatus.IN_PROGRESS);
+        if (CollectionUtils.isNotEmpty(assessmentNames)) {
+            exceptionService.invalidRequestException("message.cannot.update.questionnaireTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
+        }
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(questionnaireTemplateId, unitId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.questionnaireTemplate", questionnaireTemplateId);

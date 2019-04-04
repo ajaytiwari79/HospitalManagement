@@ -18,7 +18,6 @@ public class DayTypeDTO {
     private boolean allowTimeSettings = false;
     private String description;
     private String country;
-    @NotNull
     private int code;
     private String colorCode;
 

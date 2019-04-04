@@ -23,8 +23,7 @@ public class StaffRelationship extends UserBaseEntity {
     @EndNode
     private Staff staff;
 
-
-    boolean isEnabled = true;
+    private boolean isEnabled = true;
 
     public StaffRelationship() {
     }
