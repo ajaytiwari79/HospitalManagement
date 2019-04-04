@@ -102,6 +102,7 @@ public class DynamicCronScheduler implements DisposableBean {
             if (future != null) {
                 future.cancel(true);
                 BeanFactoryUtil.getDefaultListableBeanFactory().destroySingleton(scheduler);
+                threadPoolTaskScheduler.getScheduledThreadPoolExecutor().purge();
             }
         } catch (NoSuchBeanDefinitionException exception) {
             logger.error("No bean registered for cron job, May be this is your first time to scheduling cron job!!");
@@ -141,33 +142,27 @@ public class DynamicCronScheduler implements DisposableBean {
      * @return
      */
     private Runnable getTask(SchedulerPanel schedulerPanel, CronTrigger trigger, TimeZone timeZone) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                logger.info("control pannel exist--> " + schedulerPanel.getId());
-                schedulerPanel.setLastRunTime(DateUtils.getCurrentDate());
-                if (!schedulerPanel.isOneTimeTrigger()) {
-                    schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
-                } else {
-                    schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
-                }
-                schedulerPanelService.setScheduleLastRunTime(schedulerPanel);
-                IntegrationSettingsDTO integrationSettingsDTO = null;
-                if (Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
-                    integrationSettingsDTO = new IntegrationSettingsDTO();
-                    Optional<IntegrationSettings> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
-                    ObjectMapperUtils.copyProperties(integrationConfiguration.get(), integrationSettingsDTO);
-                }
-
-                KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(), schedulerPanel.getUnitId(), schedulerPanel.getJobType(), schedulerPanel.getJobSubType(), schedulerPanel.getEntityId(),
-                        integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
-
-                kafkaProducer.pushToQueue(jobToExecute);
+        return () -> {
+            logger.info("control pannel exist--> " + schedulerPanel.getId());
+            schedulerPanel.setLastRunTime(DateUtils.getCurrentDate());
+            if (!schedulerPanel.isOneTimeTrigger()) {
+                schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
+            } else {
+                schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
             }
+            schedulerPanelService.setScheduleLastRunTime(schedulerPanel);
+            IntegrationSettingsDTO integrationSettingsDTO = null;
+            if (Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
+                integrationSettingsDTO = new IntegrationSettingsDTO();
+                Optional<IntegrationSettings> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
+                ObjectMapperUtils.copyProperties(integrationConfiguration.get(), integrationSettingsDTO);
+            }
+
+            KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(), schedulerPanel.getUnitId(), schedulerPanel.getJobType(), schedulerPanel.getJobSubType(), schedulerPanel.getEntityId(),
+                    integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
+
+            kafkaProducer.pushToQueue(jobToExecute);
         };
-
-        return runnable;
-
     }
 
     public void destroy() {

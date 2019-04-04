@@ -9,7 +9,7 @@ import com.kairos.dto.activity.period.PeriodPhaseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -431,9 +431,9 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public void updateSchedularFlippingDateById(BigInteger schedulerPanelId, Long unitId, LocalDate localDate, LocalTime localTime) {
-        LocalDateTimeIdDTO localDateTimeIdDTO = new LocalDateTimeIdDTO(schedulerPanelId, LocalDateTime.of(localDate, localTime));
+        LocalDateTimeScheduledPanelIdDTO localDateTimeScheduledPanelIdDTO = new LocalDateTimeScheduledPanelIdDTO(schedulerPanelId, LocalDateTime.of(localDate, localTime));
         if (Optional.ofNullable(schedulerPanelId).isPresent())
-            schedulerRestClient.publishRequest(Arrays.asList(localDateTimeIdDTO), unitId, true, IntegrationOperation.UPDATE, "/scheduler_panel/update_date_only", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<LocalDateTimeIdDTO>>>() {
+            schedulerRestClient.publishRequest(Arrays.asList(localDateTimeScheduledPanelIdDTO), unitId, true, IntegrationOperation.UPDATE, "/scheduler_panel/update_date_only", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<LocalDateTimeScheduledPanelIdDTO>>>() {
             }, null, null);
     }
 

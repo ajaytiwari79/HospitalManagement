@@ -16,7 +16,6 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
     private boolean borrowLeave;
-    private boolean carryForwardLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
     public float getRecommendedValue() {
         return recommendedValue;
@@ -37,14 +36,6 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public void setBorrowLeave(boolean borrowLeave) {
         this.borrowLeave = borrowLeave;
-    }
-
-    public boolean isCarryForwardLeave() {
-        return carryForwardLeave;
-    }
-
-    public void setCarryForwardLeave(boolean carryForwardLeave) {
-        this.carryForwardLeave = carryForwardLeave;
     }
 
     public CutOffIntervalUnit getCutOffIntervalUnit() {

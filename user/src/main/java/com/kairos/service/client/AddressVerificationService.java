@@ -11,7 +11,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
 import org.slf4j.Logger;
@@ -32,8 +31,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class AddressVerificationService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Inject
-    private Scheduler scheduler;
 
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
@@ -122,12 +119,12 @@ public class AddressVerificationService {
         addressToVerify.put("city", municipalityName);
         addressToVerify.put("street", contactAddress.getStreet());
         addressToVerify.put("hnr", contactAddress.getHouseNumber());
-        Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
+        /*Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
 
         if ((boolean) geoCodeResponse.get("isAddressVerified")) {
             logger.debug("GeoCode Response from TOM TOM : " + geoCodeResponse);
             return geoCodeResponse;
-        }
+        }*/
         logger.debug("Address not verified with TOMTOM");
         return null;
     }

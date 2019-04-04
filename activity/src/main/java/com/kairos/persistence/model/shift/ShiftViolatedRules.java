@@ -2,12 +2,14 @@ package com.kairos.persistence.model.shift;
 
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -20,6 +22,7 @@ public class ShiftViolatedRules extends MongoBaseEntity{
     private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
+    private Set<ShiftEscalationReason> escalationReasons;
 
     public ShiftViolatedRules() {
     }
@@ -50,5 +53,13 @@ public class ShiftViolatedRules extends MongoBaseEntity{
 
     public void setActivities(List<ActivityRuleViolation> activities) {
         this.activities = activities;
+    }
+
+    public Set<ShiftEscalationReason> getEscalationReasons() {
+        return escalationReasons;
+    }
+
+    public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
+        this.escalationReasons = escalationReasons;
     }
 }

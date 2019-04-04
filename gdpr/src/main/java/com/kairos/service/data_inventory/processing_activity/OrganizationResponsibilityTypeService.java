@@ -98,7 +98,7 @@ public class OrganizationResponsibilityTypeService{
 
         List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
-                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.resposibilityType", StringUtils.join(processingActivities, ','));
+                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.responsibilityType", StringUtils.join(processingActivities, ','));
         }
         responsibilityTypeRepository.deleteByIdAndOrganizationId(responsibilityTypeId, unitId);
         return true;
@@ -119,11 +119,11 @@ public class OrganizationResponsibilityTypeService{
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.resposibilityType", responsibilityType.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.responsibilityType", responsibilityType.getName());
         }
         Integer resultCount =  responsibilityTypeRepository.updateMetadataName(responsibilityTypeDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.resposibilityType", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.responsibilityType", id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, responsibilityTypeDTO.getName());
         }
