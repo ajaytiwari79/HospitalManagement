@@ -42,8 +42,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.serializers.MongoDateMapper;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.planner.TasksMergingService;
@@ -115,15 +113,11 @@ public class TaskService extends MongoBaseService {
     @Inject
     private TaskMongoRepository taskMongoRepository;
     @Inject
-    private TaskConverterService taskConverterService;
-    @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
     private TaskDemandMongoRepository taskDemandMongoRepository;
     @Inject
     private MongoTemplate mongoTemplate;
-    @Inject
-    private Scheduler scheduler;
     @Inject
     private TaskTypeService taskTypeService;
     @Inject
@@ -537,14 +531,14 @@ public class TaskService extends MongoBaseService {
                     }
                     logger.debug("tasksToSync: size " + tasksToSync.size());
                     if (tasksToSync.size() > 0) {
-                        taskConverterService.createFlsCallFromTasks(tasksToSync, flsCredentials);
+                        //taskConverterService.createFlsCallFromTasks(tasksToSync, flsCredentials);
 
                         Map<String, Object> datePayload = new HashMap<>();
                         datePayload.put("startDate", fromDate);
                         datePayload.put("endDate", toDate);
                         Map<String, Object> openCall = new HashMap<>();
                         openCall.put("openCallsMode", "2");
-                        scheduler.optmizeSchedule(openCall, datePayload, flsCredentials);
+                        //scheduler.optmizeSchedule(openCall, datePayload, flsCredentials);
                     }
                 } else {
                     logger.info("FLS Credentials Missing for Unit Id " + map.get("_id"));

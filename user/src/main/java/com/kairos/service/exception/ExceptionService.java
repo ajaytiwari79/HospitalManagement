@@ -2,9 +2,10 @@ package com.kairos.service.exception;
 
 import com.kairos.commons.custom_exception.DataNotMatchedException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.custom_exception.*;
-
-import com.kairos.service.fls_visitour.exceptions.scheduler.FlsCallException;
+import com.kairos.custom_exception.FlsCredentialException;
+import com.kairos.custom_exception.InvalidSize;
+import com.kairos.custom_exception.UnitNotFoundException;
+import com.kairos.custom_exception.ZipCodeNotFound;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +38,7 @@ public class ExceptionService extends CommonsExceptionUtil {
     public void exceptionWithoutConvertInRestClient(String message) {
         throw new com.kairos.commons.custom_exception.ActionNotPermittedException(message);
     }
-    public void flsCallException(String message,Object... params) {
-        throw new FlsCallException(convertMessage(message, params));
-    }
+
     public void nullPointerException(String message,Object... params) {
         throw new NullPointerException(convertMessage(message, params));
     }

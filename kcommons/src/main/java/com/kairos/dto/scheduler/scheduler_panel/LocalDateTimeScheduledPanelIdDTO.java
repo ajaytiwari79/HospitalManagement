@@ -3,14 +3,14 @@ package com.kairos.dto.scheduler.scheduler_panel;
 
 import java.time.LocalDateTime;
 import java.math.BigInteger;
-public class LocalDateTimeIdDTO {
+public class LocalDateTimeScheduledPanelIdDTO {
     private LocalDateTime dateTime;
     private BigInteger id;
 
-    public LocalDateTimeIdDTO() {
+    public LocalDateTimeScheduledPanelIdDTO() {
     }
 
-    public LocalDateTimeIdDTO(BigInteger id, LocalDateTime dateTime) {
+    public LocalDateTimeScheduledPanelIdDTO(BigInteger id, LocalDateTime dateTime) {
         this.dateTime = dateTime;
         this.id = id;
     }
