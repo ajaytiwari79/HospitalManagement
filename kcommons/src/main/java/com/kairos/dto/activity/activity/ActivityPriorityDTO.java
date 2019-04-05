@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.activity;
 
+import org.hibernate.validator.constraints.Range;
+
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
@@ -11,6 +13,7 @@ public class ActivityPriorityDTO {
     @NotBlank(message = "error.name.notnull")
     private String name;
     private String description;
+    @Range(min = 1,message = "message.activity.priority.sequence")
     private int sequence;
     private String colorCode;
 

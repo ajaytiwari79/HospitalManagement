@@ -60,6 +60,13 @@ public class StaffUnitPositionDetails {
 
     }
 
+    public StaffUnitPositionDetails(Long id, Long staffId, List<UnitPositionLinesDTO> positionLines, CTAResponseDTO costTimeAgreement) {
+        this.id = id;
+        this.staffId = staffId;
+        this.positionLines = positionLines;
+        this.costTimeAgreement = costTimeAgreement;
+    }
+
     public StaffUnitPositionDetails(Long unitId) {
         this.unitId = unitId;
     }

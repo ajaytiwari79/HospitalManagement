@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
@@ -298,7 +299,11 @@ public class ShiftDTO {
     }
 
     public Date getStartDate() {
-        return startDate;
+         if(isNull(startDate) && isCollectionNotEmpty(activities)){
+            activities.sort(Comparator.comparing(ShiftActivityDTO::getStartDate));
+            this.startDate = activities.get(0).getStartDate();
+         }
+         return this.startDate;
     }
 
 
@@ -307,7 +312,11 @@ public class ShiftDTO {
     }
 
     public Date getEndDate() {
-        return endDate;
+        if(isNull(endDate) && isCollectionNotEmpty(activities)){
+            activities.sort(Comparator.comparing(ShiftActivityDTO::getStartDate));
+            this.endDate = activities.get(activities.size()-1).getEndDate();
+        }
+        return this.endDate;
     }
 
 

@@ -17,17 +17,13 @@ public abstract class MongoBaseEntity {
 
     @Id
     protected BigInteger id;
-    @JsonIgnore
     @CreatedDate
     protected Date createdAt;
-    @JsonIgnore
+
     @LastModifiedDate
     protected Date updatedAt;
-    @JsonIgnore
     protected boolean deleted;
-    @JsonIgnore
     protected UserInfo createdBy;
-    @JsonIgnore
     protected UserInfo lastModifiedBy;
 
 
@@ -57,10 +53,12 @@ public abstract class MongoBaseEntity {
         this.id = id;
     }
 
+
     public Date getCreatedAt() {
         return createdAt;
     }
 
+    @JsonIgnore
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -69,6 +67,7 @@ public abstract class MongoBaseEntity {
         return updatedAt;
     }
 
+    @JsonIgnore
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }

@@ -111,10 +111,11 @@ public class AssetTypeService {
                     if (subAssetTypeDTO.getId() != null) {
                         subAssetType = subAssetTypesMap.get(subAssetTypeDTO.getId());
                     } else {
-                        subAssetType = new AssetType(subAssetTypeDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
-                        subAssetType.setSubAssetType(true);
+                        subAssetType = new AssetType(countryId, SuggestedDataStatus.APPROVED);
                         subAssetType.setAssetType(assetType);
                     }
+                    subAssetType.setSubAssetType(true);
+                    subAssetType.setName(subAssetTypeDTO.getName());
                     subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDTO.getRisks(), Risk.class);
                     subAssetRisks.forEach(risk -> risk.setCountryId(countryId));
                     subAssetType.setRisks(subAssetRisks);

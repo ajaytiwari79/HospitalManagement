@@ -1,5 +1,5 @@
 MATCH(ag:AccessGroup) where ag.name="AG_COUNTRY_ADMIN"
-SET ag.name='SUPER_ADMIN'
+SET ag.name='SUPER_ADMIN';
 
 
 

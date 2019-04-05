@@ -52,8 +52,6 @@ public class TimeAndAttendanceService extends MongoBaseService {
     @Inject
     private ShiftService shiftService;
     @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private SickSettingsRepository sickSettingsRepository;
