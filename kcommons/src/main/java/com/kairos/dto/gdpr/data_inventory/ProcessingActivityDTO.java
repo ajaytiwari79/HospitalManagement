@@ -38,7 +38,8 @@ public class ProcessingActivityDTO {
     private Set<Long> processingLegalBasis;
     @Valid
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
-    private List<RelatedDataSubjectDTO> dataSubjectSet=new ArrayList<>();
+    @Valid
+    private List<RelatedDataSubjectDTO> dataSubjectList =new ArrayList<>();
     private Long responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -133,12 +134,12 @@ public class ProcessingActivityDTO {
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
-    public List<RelatedDataSubjectDTO> getDataSubjectSet() {
-        return dataSubjectSet;
+    public List<RelatedDataSubjectDTO> getDataSubjectList() {
+        return dataSubjectList;
     }
 
-    public void setDataSubjectSet(List<RelatedDataSubjectDTO> dataSubjectSet) {
-        this.dataSubjectSet = dataSubjectSet;
+    public void setDataSubjectList(List<RelatedDataSubjectDTO> dataSubjectList) {
+        this.dataSubjectList = dataSubjectList;
     }
 
     public List<OrganizationLevelRiskDTO> getRisks() {

@@ -3,7 +3,9 @@ package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ public class RelatedDataSubjectDTO {
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
+    @Valid
+    @NotEmpty
     private List<RelatedDataCategoryDTO> dataCategories = new ArrayList<>();
 
     public Long getId() {

@@ -3,11 +3,8 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
-import com.kairos.dto.gdpr.data_inventory.RelatedDataElementsDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
-import com.kairos.enums.gdpr.RetentionDuration;
 import com.kairos.persistence.model.data_inventory.processing_activity.*;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
@@ -102,8 +99,8 @@ public class ProcessingActivityService {
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
         }
-        if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
-            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectSet()));
+        if (!processingActivityDTO.getDataSubjectList().isEmpty()) {
+            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectList()));
         }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
