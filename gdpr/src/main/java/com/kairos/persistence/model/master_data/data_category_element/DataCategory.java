@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 import com.kairos.persistence.model.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -9,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class DataCategory extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -22,58 +28,13 @@ public class DataCategory extends BaseEntity {
     private Long countryId;
     private Long organizationId;
 
-    public DataCategory(@NotBlank(message = "Name cannot be empty")
-                        @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
-                                String name, List<DataElement> dataElements) {
-        this.name = name;
-        this.dataElements = dataElements;
-    }
-
     public DataCategory(@NotBlank(message = "Name cannot be empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
         this.name = name;
         this.dataElements = dataElements;
         this.organizationId = organizationId;
     }
 
-    public DataCategory() {
-    }
-
-    public DataCategory(String name) {
+    public DataCategory(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.name = name;
     }
-
-
-    public List<DataElement> getDataElements() {
-        return dataElements;
-    }
-
-    public void setDataElements(List<DataElement> dataElements) {
-        this.dataElements = dataElements;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
-    }
-
-
 }

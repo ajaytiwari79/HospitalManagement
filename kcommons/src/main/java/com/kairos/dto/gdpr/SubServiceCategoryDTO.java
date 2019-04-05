@@ -2,12 +2,20 @@ package com.kairos.dto.gdpr;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SubServiceCategoryDTO {
 
 
@@ -16,30 +24,6 @@ public class SubServiceCategoryDTO {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name.trim();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public SubServiceCategoryDTO() {
-    }
-
-    public SubServiceCategoryDTO(@NotNull(message = "id can't be null") Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 
     @Override
     public boolean equals(Object o) {

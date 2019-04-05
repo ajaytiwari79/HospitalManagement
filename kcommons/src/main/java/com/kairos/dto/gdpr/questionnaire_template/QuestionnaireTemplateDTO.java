@@ -4,6 +4,9 @@ package com.kairos.dto.gdpr.questionnaire_template;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class QuestionnaireTemplateDTO {
 
     private Long id;
@@ -31,58 +37,9 @@ public class QuestionnaireTemplateDTO {
     @Valid
     private List<QuestionnaireSectionDTO> sections=new ArrayList<>();
 
-    public Long getSubAssetType() {
-        return subAssetType;
-    }
-
-    public void setSubAssetType(Long subAssetType) {
-        this.subAssetType = subAssetType;
-    }
-
-    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
-
-    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
-
-    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
-
-    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
-
-    public QuestionnaireTemplateStatus getTemplateStatus() { return templateStatus; }
-
-    public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
-
     public String getName() {
         return name.trim();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public QuestionnaireTemplateType getTemplateType() { return templateType;}
-
-    public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
-
-    public Long getAssetType() { return assetType; }
-
-    public void setAssetType(Long assetType) { this.assetType = assetType; }
-
-    public Long getId() { return id; }
-
     public QuestionnaireTemplateDTO setId(Long id) { this.id = id;return this;}
-
-    public List getSections() { return sections; }
-
-    public void setSections(List sections) { this.sections = sections; }
-
-    public QuestionnaireTemplateDTO() {
-    }
 }

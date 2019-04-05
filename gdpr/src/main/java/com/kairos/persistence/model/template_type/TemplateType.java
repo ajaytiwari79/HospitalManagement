@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.template_type;
 
 import com.kairos.persistence.model.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
@@ -11,6 +14,9 @@ import javax.validation.constraints.Pattern;
  */
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class TemplateType extends BaseEntity {
 
 
@@ -20,23 +26,8 @@ public class TemplateType extends BaseEntity {
     private Long countryId;
     private Long organizationId;
 
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
     public String getName() {
         return name.trim();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 }

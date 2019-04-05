@@ -1,9 +1,15 @@
 package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationTypeAndSubTypeIdDTO {
 
@@ -13,9 +19,6 @@ public class OrganizationTypeAndSubTypeIdDTO {
     private List<Long> serviceCategoryIds;
     private List<Long> subServiceCategoryIds;
 
-    public OrganizationTypeAndSubTypeIdDTO() {
-    }
-
     public OrganizationTypeAndSubTypeIdDTO(List<Long> organizationTypeId, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds) {
         this.organizationTypeId = organizationTypeId;
         this.organizationSubTypeIds = organizationSubTypeIds;
@@ -23,23 +26,4 @@ public class OrganizationTypeAndSubTypeIdDTO {
         this.subServiceCategoryIds = subServiceCategoryIds;
     }
 
-    public List<Long> getOrganizationTypeId() { return organizationTypeId; }
-
-    public void setOrganizationTypeId(List<Long> organizationTypeId) { this.organizationTypeId = organizationTypeId; }
-
-    public List<Long> getOrganizationSubTypeIds() { return organizationSubTypeIds; }
-
-    public void setOrganizationSubTypeIds(List<Long> organizationSubTypeIds) { this.organizationSubTypeIds = organizationSubTypeIds; }
-
-    public List<Long> getServiceCategoryIds() { return serviceCategoryIds; }
-
-    public void setServiceCategoryIds(List<Long> serviceCategoryIds) { this.serviceCategoryIds = serviceCategoryIds; }
-
-    public List<Long> getSubServiceCategoryIds() { return subServiceCategoryIds; }
-
-    public void setSubServiceCategoryIds(List<Long> subServiceCategoryIds) { this.subServiceCategoryIds = subServiceCategoryIds; }
-
-    public Long getCountryId() { return countryId; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
 }

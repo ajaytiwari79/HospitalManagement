@@ -2,6 +2,9 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
@@ -9,6 +12,9 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class TechnicalSecurityMeasure extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -18,36 +24,8 @@ public class TechnicalSecurityMeasure extends BaseEntity {
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
     private Long organizationId;
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public LocalDate getSuggestedDate() { return suggestedDate; }
-
-    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
-
-    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
     public String getName() {
         return name.trim();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public TechnicalSecurityMeasure(String name) {
-        this.name = name;
     }
 
     public TechnicalSecurityMeasure(@NotBlank(message = "error.message.name.notNull.orEmpty")String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
@@ -66,6 +44,7 @@ public class TechnicalSecurityMeasure extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public TechnicalSecurityMeasure() {
+    public TechnicalSecurityMeasure(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
+        this.name = name;
     }
 }

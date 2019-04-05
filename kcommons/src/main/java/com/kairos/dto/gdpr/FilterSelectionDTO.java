@@ -1,11 +1,17 @@
 package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class FilterSelectionDTO {
 
 
@@ -13,20 +19,4 @@ public class FilterSelectionDTO {
     private List<FilterSelection> filtersData;
 
     private String moduleId;
-
-    public List<FilterSelection> getFiltersData() {
-        return filtersData;
-    }
-
-    public void setFiltersData(List<FilterSelection> filtersData) {
-        this.filtersData = filtersData;
-    }
-
-    public String getModuleId() {
-        return moduleId;
-    }
-
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
-    }
 }

@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.clause_tag;
 
 import com.kairos.persistence.model.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
@@ -8,6 +11,9 @@ import java.util.Objects;
 
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class ClauseTag extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -20,37 +26,10 @@ public class ClauseTag extends BaseEntity {
         this.name = name;
     }
 
-    public ClauseTag() {
-    }
-
     public ClauseTag(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, boolean defaultTag) {
         this.name = name;
         this.defaultTag = defaultTag;
     }
-
-    public boolean isDefaultTag() { return defaultTag; }
-
-    public void setDefaultTag(boolean defaultTag) { this.defaultTag = defaultTag; }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     @Override
     public boolean equals(Object o) {

@@ -3,6 +3,9 @@ package com.kairos.persistence.model.agreement_template;
 
 import com.kairos.persistence.model.clause.AgreementSectionClause;
 import com.kairos.persistence.model.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class AgreementSection extends BaseEntity {
 
 
@@ -38,40 +44,9 @@ public class AgreementSection extends BaseEntity {
         return agreementSubSections.stream().filter(subSection -> !subSection.isDeleted()).collect(Collectors.toList());
     }
 
-    public void setAgreementSubSections(List<AgreementSubSection> agreementSubSections) {
-        this.agreementSubSections = agreementSubSections;
-    }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public Long getCountryId() { return countryId; }
-
-    public String getTitle() { return title; }
-
-    public void setTitle(String title) { this.title = title; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
-
-    public Integer getOrderedIndex() { return orderedIndex; }
-
-    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
-
-    public String getTitleHtml() { return titleHtml; }
-
-    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
-
     public List<AgreementSectionClause> getClauses() {
         return clauses.stream().filter(clause -> !clause.isDeleted()).collect(Collectors.toList());
     }
-
-    public void setClauses(List<AgreementSectionClause> clauses) {
-        this.clauses = clauses;
-    }
-
-    public AgreementSection(){ }
-
 
     public AgreementSection(@NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex, String titleHtml)
     {

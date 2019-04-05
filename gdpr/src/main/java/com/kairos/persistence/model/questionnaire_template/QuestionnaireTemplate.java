@@ -5,6 +5,9 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -14,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class QuestionnaireTemplate extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -51,67 +57,8 @@ public class QuestionnaireTemplate extends BaseEntity {
         this.templateType=templateType;
         this.organizationId=organizationId;
     }
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
-
-    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public String getName() { return name; }
 
     public void setName(String name) { this.name = name.trim(); }
-    public QuestionnaireTemplateStatus getTemplateStatus() { return templateStatus; }
-
-    public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
-
-    public AssetType getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(AssetType assetType) {
-        this.assetType = assetType;
-    }
-
-    public AssetType getAssetSubType() {
-        return subAssetType;
-    }
-
-    public void setAssetSubType(AssetType subAssetType) {
-        this.subAssetType = subAssetType;
-    }
-
-    public List<QuestionnaireSection> getSections() {
-        return sections;
-    }
-
-    public void setSections(List<QuestionnaireSection> sections) {
-        this.sections = sections;
-    }
-
-    public QuestionnaireTemplateType getTemplateType() { return templateType; }
-
-    public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public boolean isDefaultAssetTemplate() { return isDefaultAssetTemplate; }
-
-    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.isDefaultAssetTemplate = defaultAssetTemplate; }
-
-    public QuestionnaireTemplate() {
-    }
 
     @Override
     public void delete() {

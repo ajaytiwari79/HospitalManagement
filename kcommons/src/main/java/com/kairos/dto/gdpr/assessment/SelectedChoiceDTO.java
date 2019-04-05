@@ -1,9 +1,11 @@
 package com.kairos.dto.gdpr.assessment;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kairos.enums.gdpr.QuestionType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,6 +18,9 @@ import javax.validation.constraints.NotNull;
         @JsonSubTypes.Type(value = TextChoiceDTO.class, name = "TEXTBOX"),
         @JsonSubTypes.Type(value = SingleSelectChoiceDTO.class, name = "SELECT_BOX"),
 })
+@Getter
+@Setter
+@NoArgsConstructor
 public class SelectedChoiceDTO {
 
     private Long id;
@@ -23,17 +28,4 @@ public class SelectedChoiceDTO {
     @NotNull(message = "error.message.questionType.name.null")
     private QuestionType questionType;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    public SelectedChoiceDTO() {
-
-
-    }
 }

@@ -4,6 +4,9 @@ package com.kairos.persistence.model.master_data.data_category_element;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.OrganizationSubType;
 import com.kairos.persistence.model.embeddables.OrganizationType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class DataSubject extends BaseEntity {
 
 
@@ -36,10 +42,6 @@ public class DataSubject extends BaseEntity {
     private Long organizationId;
 
 
-
-    public DataSubject() {
-    }
-
     public DataSubject(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
                        List<DataCategory> dataCategories) {
         this.name = name;
@@ -61,58 +63,5 @@ public class DataSubject extends BaseEntity {
         this.name = name;
         this.description=description;
     }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public List<DataCategory> getDataCategories() {
-        return dataCategories;
-    }
-
-    public void setDataCategories(List<DataCategory> dataCategories) {
-        this.dataCategories = dataCategories;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
 
 }

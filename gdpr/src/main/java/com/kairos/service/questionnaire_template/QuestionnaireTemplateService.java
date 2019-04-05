@@ -127,7 +127,7 @@ public class QuestionnaireTemplateService {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
                     }
                     AssetType subAssetType = isOrganization ? assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId);
-                    questionnaireTemplate.setAssetSubType(subAssetType);
+                    questionnaireTemplate.setSubAssetType(subAssetType);
                 }
             }
         }
@@ -159,7 +159,7 @@ public class QuestionnaireTemplateService {
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
                 }
-                questionnaireTemplate.setAssetSubType(selectedAssetSubType);
+                questionnaireTemplate.setSubAssetType(selectedAssetSubType);
             }
             questionnaireTemplate.setAssetType(assetType);
 
@@ -245,8 +245,8 @@ public class QuestionnaireTemplateService {
         if (Optional.ofNullable(questionnaireTemplate.getAssetType()).isPresent()) {
             questionnaireTemplateResponseDTO.setAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetType().getName(), questionnaireTemplate.getAssetType().isSubAssetType()));
         }
-        if (Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
-            questionnaireTemplateResponseDTO.setAssetSubType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetSubType().getId(), questionnaireTemplate.getAssetSubType().getName(), questionnaireTemplate.getAssetSubType().isSubAssetType()));
+        if (Optional.ofNullable(questionnaireTemplate.getSubAssetType()).isPresent()) {
+            questionnaireTemplateResponseDTO.setSubAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getSubAssetType().getId(), questionnaireTemplate.getSubAssetType().getName(), questionnaireTemplate.getSubAssetType().isSubAssetType()));
         }
         questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
 
