@@ -20,7 +20,7 @@ public class UnitPositionLineFunctionRelationShip extends UserBaseEntity {
 
 
     @StartNode
-    private UnitPositionLine unitPositionLine;
+    private EmploymentLine employmentLine;
     @EndNode
     private Function function;
     @Property
@@ -30,17 +30,17 @@ public class UnitPositionLineFunctionRelationShip extends UserBaseEntity {
 
     }
 
-    public UnitPositionLineFunctionRelationShip(UnitPositionLine unitPositionLine, Function function,BigDecimal amount) {
-        this.unitPositionLine = unitPositionLine;
+    public UnitPositionLineFunctionRelationShip(EmploymentLine employmentLine, Function function, BigDecimal amount) {
+        this.employmentLine = employmentLine;
         this.function = function;
         this.amount=amount;
     }
-    public UnitPositionLine getUnitPositionLine() {
-        return unitPositionLine;
+    public EmploymentLine getEmploymentLine() {
+        return employmentLine;
     }
 
-    public void setUnitPositionLine(UnitPositionLine unitPositionLine) {
-        this.unitPositionLine = unitPositionLine;
+    public void setEmploymentLine(EmploymentLine employmentLine) {
+        this.employmentLine = employmentLine;
     }
 
     public Function getFunction() {

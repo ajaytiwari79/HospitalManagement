@@ -13,8 +13,8 @@ import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -813,7 +813,7 @@ public class WTAService extends MongoBaseService {
         return isCalculatedValueChanged;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getUnitpositionCtaWtaAndAccumulatedTimebank(Long unitId,Map<Long, List<UnitPositionLinesDTO>> positionLinesMap){
+    public CTAWTAAndAccumulatedTimebankWrapper getUnitpositionCtaWtaAndAccumulatedTimebank(Long unitId,Map<Long, List<EmploymentLinesDTO>> positionLinesMap){
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = getWTACTAByUpIds(positionLinesMap.keySet());
        /* Map<Long,Map<Long,Long>> accumulatedTimebankMap = timeBankService.getAccumulatedTimebankByUnitPositions(positionLinesMap);
         ctawtaAndAccumulatedTimebankWrapper.setUnitPositionLineAndTimebankMinuteMap(accumulatedTimebankMap);

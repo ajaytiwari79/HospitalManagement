@@ -2,7 +2,7 @@ package com.kairos.dto.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 
 
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ public class UnitPositionWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
     private int fullTimeWeeklyMinutes;
     private float hourlyCost;
-    private List<UnitPositionLinesDTO> positionLines;
+    private List<EmploymentLinesDTO> positionLines;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
@@ -49,7 +49,7 @@ public class UnitPositionWithCtaDetailsDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public UnitPositionWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<UnitPositionLinesDTO> positionLines,long accumulatedTimebankMinutes,LocalDate accumulatedTimebankDate) {
+    public UnitPositionWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> positionLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.id = id;
         this.totalWeeklyHours = totalWeeklyHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -62,11 +62,11 @@ public class UnitPositionWithCtaDetailsDTO {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 
-    public List<UnitPositionLinesDTO> getPositionLines() {
+    public List<EmploymentLinesDTO> getPositionLines() {
         return positionLines;
     }
 
-    public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
+    public void setPositionLines(List<EmploymentLinesDTO> positionLines) {
         this.positionLines = Optional.ofNullable(positionLines).isPresent() ? positionLines : new ArrayList<>();
     }
 

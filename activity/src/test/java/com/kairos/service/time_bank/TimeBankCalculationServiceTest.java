@@ -9,20 +9,18 @@ import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.Interval;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -34,7 +32,7 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
-import static org.junit.Assert.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class TimeBankCalculationServiceTest {
 
@@ -53,11 +51,11 @@ public class TimeBankCalculationServiceTest {
 
     @Before
     public void init(){
-        List<UnitPositionLinesDTO> unitPositionLinesDTOS = new ArrayList<>();
-        unitPositionLinesDTOS.add(new UnitPositionLinesDTO(LocalDate.of(2019,4,9),null,5,35,2100,new BigDecimal(0.002)));
+        List<EmploymentLinesDTO> employmentLinesDTOS = new ArrayList<>();
+        employmentLinesDTOS.add(new EmploymentLinesDTO(LocalDate.of(2019,4,9),null,5,35,2100,new BigDecimal(0.002)));
         interval = new Interval(asDate(LocalDate.of(2019,4,10)).getTime(),asDate(LocalDate.of(2019,4,11)).getTime());
         CTAResponseDTO ctaResponseDTO = new CTAResponseDTO();
-        unitPosition = new StaffUnitPositionDetails(15l,487l,unitPositionLinesDTOS,ctaResponseDTO);
+        unitPosition = new StaffUnitPositionDetails(15l,487l, employmentLinesDTOS,ctaResponseDTO);
         unitPosition.setCtaRuleTemplates(getRuleTemplate());
         unitPosition.setEmploymentType(new EmploymentType(54l));
         shifts= getShifts();

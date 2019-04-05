@@ -18,6 +18,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
@@ -90,7 +91,7 @@ public class TimeBankCalculationService {
             int totalDailyPlannedMinutes = 0;
             int dailyScheduledMin = 0;
             int totalPublishedDailyPlannedMinutes = 0;
-            int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, DateUtils.asLocalDate(shifts.get(0).getStartDate()), unitPosition.getPositionLines());
+            int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, DateUtils.asLocalDate(shifts.get(0).getStartDate()), unitPosition.getEmploymentLines());
             Map<BigInteger, Integer> ctaTimeBankMinMap = new HashMap<>();
             Map<Long, DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
             boolean ruleTemplateValid = false;
@@ -134,7 +135,7 @@ public class TimeBankCalculationService {
                             functionId = appliedFunctionDTO.isPresent() ? appliedFunctionDTO.get().getId() : null;
                         }
                         if (ruleTemplate.getStaffFunctions().contains(isNotNull(unitPosition.getFunctionId()) ? unitPosition.getFunctionId() : functionId)) {
-                            float value = !getHourlyCostByDate(unitPosition.getPositionLines(), asLocalDate(interval.getStart())).equals(new BigDecimal(0)) ? new BigDecimal(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(unitPosition.getHourlyCost() ,6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
+                            float value = !getHourlyCostByDate(unitPosition.getEmploymentLines(), asLocalDate(interval.getStart())).equals(new BigDecimal(0)) ? new BigDecimal(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(unitPosition.getHourlyCost() ,6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
                             ctaTimeBankMin += value;
                             ctaTimeBankMinMap.put(ruleTemplate.getId(),ctaTimeBankMin);
                         }
@@ -183,7 +184,7 @@ public class TimeBankCalculationService {
         return ctaTimeBankMin;
     }
 
-    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<com.kairos.dto.user.employment.UnitPositionLinesDTO> positionLines) {
+    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<EmploymentLinesDTO> positionLines) {
         Date date = asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
         if(CollectionUtils.isNotEmpty(positionLines)) {
@@ -195,7 +196,7 @@ public class TimeBankCalculationService {
                 }
             }
             if (valid) {
-                for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
+                for (EmploymentLinesDTO positionLine : positionLines) {
                     DateTimeInterval positionInterval = positionLine.getInterval();
                     if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate)))) {
                         contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
@@ -982,9 +983,9 @@ public class TimeBankCalculationService {
         return localDateTimeBankByDateDTOMap;
     }
 
-    private BigDecimal getHourlyCostByDate(List<com.kairos.dto.user.employment.UnitPositionLinesDTO> positionLines, java.time.LocalDate localDate){
+    private BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> positionLines, java.time.LocalDate localDate){
         BigDecimal hourlyCost = new BigDecimal(0);
-        for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
+        for (EmploymentLinesDTO positionLine : positionLines) {
             DateTimeInterval positionInterval = positionLine.getInterval();
             if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(asDate(localDate)) || positionLine.getEndDate().equals(localDate)))) {
                 hourlyCost = positionLine.getHourlyCost();

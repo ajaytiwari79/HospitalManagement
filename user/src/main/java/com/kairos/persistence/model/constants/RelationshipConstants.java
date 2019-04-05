@@ -211,7 +211,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_ACCESS_Of_MODULE = "HAS_ACCESS_Of_MODULE";
     public final static String HAS_UNIT_TYPE = "HAS_UNIT_TYPE";
 
-    public final static String HAS_POSITION_LINES = "HAS_POSITION_LINES";
+    public final static String HAS_EMPLOYMENT_LINES = "HAS_EMPLOYMENT_LINES";
 
     public static final String DAY_TYPES = "DAY_TYPES";
     public static final String HAS_PARENT_ACCESS_GROUP = "HAS_PARENT_ACCESS_GROUP";

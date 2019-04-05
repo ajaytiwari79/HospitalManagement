@@ -31,7 +31,7 @@ public class UnitPositionQueryResult {
     private Long staffId;
     private Map<String, Object> reasonCode;
     private Map<String, Object> unitInfo;
-    private List<UnitPositionLinesQueryResult> positionLines;
+    private List<EmploymentLinesQueryResult> employmentLines;
     private Boolean history;
     private Boolean editable=true;
     private Boolean published;
@@ -60,8 +60,8 @@ public class UnitPositionQueryResult {
 
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id,Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
-                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage,long accumulatedTimebankMinutes,LocalDate accumulatedTimebankDate) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
+                                   Map<String, Object> reasonCode, Map<String, Object> unitInfo, boolean mainUnitPosition, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -75,7 +75,7 @@ public class UnitPositionQueryResult {
         this.reasonCode=reasonCode;
         this.unitInfo=unitInfo;
         this.mainUnitPosition=mainUnitPosition;
-        this.positionLines=positionLines;
+        this.employmentLines = employmentLines;
         this.taxDeductionPercentage=taxDeductionPercentage;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
         this.accumulatedTimebankDate = accumulatedTimebankDate;
@@ -191,12 +191,12 @@ public class UnitPositionQueryResult {
 
 
 
-    public List<UnitPositionLinesQueryResult> getPositionLines() {
-        return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
+    public List<EmploymentLinesQueryResult> getEmploymentLines() {
+        return Optional.ofNullable(employmentLines).orElse(new ArrayList<>());
     }
 
-    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
-        this.positionLines = positionLines;
+    public void setEmploymentLines(List<EmploymentLinesQueryResult> employmentLines) {
+        this.employmentLines = employmentLines;
     }
 
     public Map<String, Object> getReasonCode() {

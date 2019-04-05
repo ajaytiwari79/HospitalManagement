@@ -1,10 +1,10 @@
 package com.kairos.service.unit_position;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 
 import java.util.List;
@@ -17,19 +17,19 @@ public class UnitPositionUtility {
     public static com.kairos.dto.activity.shift.StaffUnitPositionDetails convertUnitPositionObject(UnitPositionQueryResult unitPosition) {
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
-        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
+        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
+        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
         unitPositionDetails.setStartDate(unitPosition.getStartDate());
         unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
-        unitPositionDetails.setPositionLines(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getPositionLines(), UnitPositionLinesDTO.class));
-        unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
-        unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
-        unitPositionDetails.setTotalWeeklyHours(currentPositionLine.getTotalWeeklyHours());
-        unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
-        unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
-        unitPositionDetails.setHourlyCost(currentPositionLine.getHourlyCost());
+        unitPositionDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getEmploymentLines(), EmploymentLinesDTO.class));
+        unitPositionDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
+        unitPositionDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyMinutes());
+        unitPositionDetails.setTotalWeeklyHours(currentEmploymentLine.getTotalWeeklyHours());
+        unitPositionDetails.setWorkingDaysInWeek(currentEmploymentLine.getWorkingDaysInWeek());
+        unitPositionDetails.setAvgDailyWorkingHours(currentEmploymentLine.getAvgDailyWorkingHours());
+        unitPositionDetails.setHourlyCost(currentEmploymentLine.getHourlyCost());
         unitPositionDetails.setPublished(unitPosition.getPublished());
         unitPositionDetails.setEditable(unitPosition.getEditable());
         unitPositionDetails.setAccumulatedTimebankMinutes(unitPosition.getAccumulatedTimebankMinutes());
@@ -40,7 +40,7 @@ public class UnitPositionUtility {
     public static void convertStaffUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails,List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes ) {
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
         unitPositionDetails.setStaff(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
-        UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
+        EmploymentLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
         com.kairos.dto.activity.shift.EmploymentType employmentType =ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class);
         Optional<ExpertisePlannedTimeQueryResult> plannedTimeQueryResult=expertisePlannedTimes.stream().filter(
                 current -> current.getEmploymentTypes().stream()

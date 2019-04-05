@@ -86,7 +86,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
             queryParameters.put("staffIds",staffIds);
         }
-        stringBuilder.append(" MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
+        stringBuilder.append(" MATCH (up)-[:"+ HAS_EMPLOYMENT_LINES +"]-(positionLine:EmploymentLine)"+
                 "WHERE  date(positionLine.startDate) <= date({endDate}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({startDate}))"+
                 "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
                 "WITH  COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek,\n" +

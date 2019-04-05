@@ -109,7 +109,7 @@ public class UnitPositionCTAWTAService {
         updateDTO.setId(wtaId);
         updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
-        return unitPositionService.getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
+        return unitPositionService.getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getEmploymentLines().get(0));
     }
     //  TODO Pradeep INCORRECT function NAME and working
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {

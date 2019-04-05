@@ -41,7 +41,7 @@ public class StaffUnitPositionDetails {
     private ZoneId unitTimeZone;
     private Staff staff;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private List<UnitPositionLinesQueryResult> positionLines;
+    private List<EmploymentLinesQueryResult> employmentLines;
 
     public StaffUnitPositionDetails() {
     }
@@ -168,12 +168,12 @@ public class StaffUnitPositionDetails {
         this.appliedFunctions = appliedFunctions;
     }
 
-    public List<UnitPositionLinesQueryResult> getPositionLines() {
-        return positionLines;
+    public List<EmploymentLinesQueryResult> getEmploymentLines() {
+        return employmentLines;
     }
 
-    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
-        this.positionLines = positionLines;
+    public void setEmploymentLines(List<EmploymentLinesQueryResult> employmentLines) {
+        this.employmentLines = employmentLines;
     }
 
     public Long getUserId() {

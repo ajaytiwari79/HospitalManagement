@@ -12,8 +12,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.position.PositionQueryResult;
 import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.user.unit_position.EmploymentLine;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -69,14 +69,14 @@ public class UnitPositionJobService {
                 Set<Long> unitPositionIds = unitPositionSeniorityLevelQueryResultMap.keySet();
                 Iterable<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(unitPositionIds, 2);
 
-                Map<UnitPositionIdDTO, UnitPositionLine> newPositionLineWithParentId = new HashMap<>();
+                Map<UnitPositionIdDTO, EmploymentLine> newPositionLineWithParentId = new HashMap<>();
 
                 for (UnitPosition currentUnitPosition : unitPositions) {
-                    Optional<UnitPositionLine> positionLine = currentUnitPosition.getUnitPositionLines().stream()
+                    Optional<EmploymentLine> positionLine = currentUnitPosition.getEmploymentLines().stream()
                             .filter(pl -> (todaysDate.isAfter(pl.getStartDate()) || todaysDate.isEqual(pl.getStartDate()) && (pl.getEndDate() == null || pl.getEndDate().isBefore(todaysDate) || pl.getEndDate().isEqual(todaysDate))))
                             .findAny();
                     if (positionLine.isPresent()) {
-                        UnitPositionLine newUnitPositionLine = new UnitPositionLine.UnitPositionLineBuilder()
+                        EmploymentLine newEmploymentLine = new EmploymentLine.UnitPositionLineBuilder()
                                 .setAvgDailyWorkingHours(positionLine.get().getAvgDailyWorkingHours())
                                 .setTotalWeeklyMinutes(positionLine.get().getTotalWeeklyMinutes())
                                 .setHourlyCost(positionLine.get().getHourlyCost())
@@ -88,14 +88,14 @@ public class UnitPositionJobService {
                                 .setSeniorityLevel(unitPositionSeniorityLevelQueryResultMap.get(currentUnitPosition.getId()).getSeniorityLevel())
                                 .build();
                         positionLine.get().setEndDate(todaysDate);
-                        currentUnitPosition.getUnitPositionLines().add(newUnitPositionLine);
-                        newPositionLineWithParentId.put(new UnitPositionIdDTO(currentUnitPosition.getId(), null, positionLine.get().getId()), newUnitPositionLine);
+                        currentUnitPosition.getEmploymentLines().add(newEmploymentLine);
+                        newPositionLineWithParentId.put(new UnitPositionIdDTO(currentUnitPosition.getId(), null, positionLine.get().getId()), newEmploymentLine);
                     }
 
                 }
                 List<UnitPositionLineEmploymentTypeRelationShip> unitPositionLineEmploymentTypeRelationShips = new ArrayList<>();
 
-                for (Map.Entry<UnitPositionIdDTO, UnitPositionLine> currentMap : newPositionLineWithParentId.entrySet()) {
+                for (Map.Entry<UnitPositionIdDTO, EmploymentLine> currentMap : newPositionLineWithParentId.entrySet()) {
                     UnitPositionSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldUnitPositionID());
                     if (currentObject != null) {
                         UnitPositionLineEmploymentTypeRelationShip unitPositionLineEmploymentTypeRelationShip =

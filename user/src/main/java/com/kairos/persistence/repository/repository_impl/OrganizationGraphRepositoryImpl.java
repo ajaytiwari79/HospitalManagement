@@ -55,7 +55,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += "MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
+            matchRelationshipQueryForStaff += "MATCH(unitPos)-[:" + HAS_EMPLOYMENT_LINES + "]-(positionLine:EmploymentLine)  " +
                     "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
                     "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp,employmentType,positionLine \n" +
@@ -65,7 +65,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "with staff,user,employmentType, \n" +
                     "COLLECT(distinct {id:id(unitPos),startDate:unitPos.startDate,endDate:unitPos.endDate,expertise:{id:id(exp),name:exp.name},positionLines:positionLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         } else {
-            matchRelationshipQueryForStaff += "OPTIONAL MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
+            matchRelationshipQueryForStaff += "OPTIONAL MATCH(unitPos)-[:" + HAS_EMPLOYMENT_LINES + "]-(positionLine:EmploymentLine)  " +
                     "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
                     "OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
                     "OPTIONAL MATCH(positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +

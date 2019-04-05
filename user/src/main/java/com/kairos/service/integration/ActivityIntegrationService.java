@@ -15,8 +15,7 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
-import com.kairos.persistence.model.user.unit_position.query_result.PositionCtaWtaQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.EmploymentLinesQueryResult;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -144,7 +143,7 @@ public class ActivityIntegrationService {
         });
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap, Long unitId){
+    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<EmploymentLinesQueryResult>> positionLinesMap, Long unitId){
         return genericRestClient.publishRequest(positionLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
     }
 

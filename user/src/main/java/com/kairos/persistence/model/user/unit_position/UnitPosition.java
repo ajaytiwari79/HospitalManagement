@@ -45,8 +45,8 @@ public class UnitPosition extends UserBaseEntity {
     private LocalDate lastWorkingDate;
     private Long timeCareExternalId;
     private boolean published;
-    @Relationship(type = HAS_POSITION_LINES)
-    private List<UnitPositionLine> unitPositionLines;
+    @Relationship(type = HAS_EMPLOYMENT_LINES)
+    private List<EmploymentLine> employmentLines;
     private boolean mainUnitPosition;
     private float taxDeductionPercentage;
     //This is the Intial value of accumulatedTimebank
@@ -154,12 +154,12 @@ public class UnitPosition extends UserBaseEntity {
         this.published = published;
     }
 
-    public List<UnitPositionLine> getUnitPositionLines() {
-        return Optional.ofNullable(unitPositionLines).orElse(new ArrayList<>());
+    public List<EmploymentLine> getEmploymentLines() {
+        return Optional.ofNullable(employmentLines).orElse(new ArrayList<>());
     }
 
-    public void setUnitPositionLines(List<UnitPositionLine> unitPositionLines) {
-        this.unitPositionLines = unitPositionLines;
+    public void setEmploymentLines(List<EmploymentLine> employmentLines) {
+        this.employmentLines = employmentLines;
     }
 
 

@@ -6,7 +6,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.staff.Staff;
 
 import java.math.BigDecimal;
@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +48,7 @@ public class StaffUnitPositionDetails {
     private Long unitId;
     private BigDecimal hourlyCost;
     private Long functionId;
-    private List<UnitPositionLinesDTO> positionLines;
+    private List<EmploymentLinesDTO> employmentLines;
     private Boolean history;
     private Boolean editable;
     private boolean published;
@@ -62,10 +61,10 @@ public class StaffUnitPositionDetails {
 
     }
 
-    public StaffUnitPositionDetails(Long id, Long staffId, List<UnitPositionLinesDTO> positionLines, CTAResponseDTO costTimeAgreement) {
+    public StaffUnitPositionDetails(Long id, Long staffId, List<EmploymentLinesDTO> employmentLines, CTAResponseDTO costTimeAgreement) {
         this.id = id;
         this.staffId = staffId;
-        this.positionLines = positionLines;
+        this.employmentLines = employmentLines;
         this.costTimeAgreement = costTimeAgreement;
     }
 
@@ -277,12 +276,12 @@ public class StaffUnitPositionDetails {
         this.userId = userId;
     }
 
-    public List<UnitPositionLinesDTO> getPositionLines() {
-        return positionLines;
+    public List<EmploymentLinesDTO> getEmploymentLines() {
+        return employmentLines;
     }
 
-    public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
-        this.positionLines = positionLines;
+    public void setEmploymentLines(List<EmploymentLinesDTO> employmentLines) {
+        this.employmentLines = employmentLines;
     }
 
     public CTAResponseDTO getCostTimeAgreement() {
