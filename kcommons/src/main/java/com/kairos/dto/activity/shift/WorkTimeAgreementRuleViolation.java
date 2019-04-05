@@ -18,13 +18,13 @@ public class WorkTimeAgreementRuleViolation {
     private boolean broken;
     private boolean canBeIgnore;
     private DurationType unitType;
-    private float unitValue;
+    private String unitValue;
 
 
     public WorkTimeAgreementRuleViolation() {
     }
 
-    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, Integer counter, boolean broken, boolean canBeIgnore,Integer totalCounter,DurationType unitType,float unitValue) {
+    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, Integer counter, boolean broken, boolean canBeIgnore,Integer totalCounter,DurationType unitType,String unitValue) {
         this.ruleTemplateId = ruleTemplateId;
         this.name = name;
         this.counter = counter;
@@ -91,11 +91,11 @@ public class WorkTimeAgreementRuleViolation {
         this.unitType = unitType;
     }
 
-    public float getUnitValue() {
+    public String getUnitValue() {
         return unitValue;
     }
 
-    public void setUnitValue(float unitValue) {
+    public void setUnitValue(String unitValue) {
         this.unitValue = unitValue;
     }
 }

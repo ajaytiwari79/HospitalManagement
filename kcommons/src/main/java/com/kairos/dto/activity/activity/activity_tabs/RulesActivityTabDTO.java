@@ -31,7 +31,7 @@ public class RulesActivityTabDTO {
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals = new ArrayList<>();
-
+    private CutOffIntervalUnit.CutOffBalances cutOffBalances;
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
@@ -266,5 +266,13 @@ public class RulesActivityTabDTO {
 
     public void setReasonCodeRequired(boolean reasonCodeRequired) {
         this.reasonCodeRequired = reasonCodeRequired;
+    }
+
+    public CutOffIntervalUnit.CutOffBalances getCutOffBalances() {
+        return cutOffBalances;
+    }
+
+    public void setCutOffBalances(CutOffIntervalUnit.CutOffBalances cutOffBalances) {
+        this.cutOffBalances = cutOffBalances;
     }
 }

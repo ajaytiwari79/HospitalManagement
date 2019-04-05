@@ -3,6 +3,7 @@ package com.kairos.controller.client;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.user.client.ClientExceptionDTO;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
@@ -15,6 +16,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.utils.response.ResponseHandler;
+import com.kairos.utils.user_context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -36,7 +38,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Client Controller
@@ -733,7 +735,61 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getPrerequisiteForPersonalCalender(unitId,clientId));
     }
 
+    @PostMapping("/upload")
+    @ApiOperation("Upload XLSX file ")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> batchCreateClient(@PathVariable long unitId, @RequestParam("file") MultipartFile multipartFile) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientBatchService.batchAddClientsToDatabase(multipartFile, unitId));
+    }
 
+    @ApiOperation(value = "Get Organization Clients with min details")
+    @GetMapping
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getClientsOrganization(@PathVariable Long unitId) throws InterruptedException, ExecutionException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClients(unitId));
+    }
 
+    @ApiOperation(value = "Get Organization Clients with min details")
+    @GetMapping("/planner")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithPlanning(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClientsWithPlanning(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Clients with max details")
+    @GetMapping("/all")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationAllClients(@PathVariable long unitId) {
+        long userId = UserContext.getUserDetails().getId();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationAllClients(unitId, userId));
+    }
+
+    @ApiOperation("Assign staff to citizen")
+    @PostMapping("/assign/staff")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> assignStaffToCitizen(@RequestBody ClientStaffDTO clientStaffDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.assignStaffToCitizen(clientStaffDTO.getCitizenId(), clientStaffDTO.getStaffId(), clientStaffDTO.getType()));
+    }
+
+    @ApiOperation("Assign staff to citizen")
+    @PostMapping("/assign/bulk/staff")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> assignMultipleStaffToClient(@PathVariable long unitId, @RequestBody ClientStaffDTO clientStaffDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.assignMultipleStaffToClient(unitId, clientStaffDTO.getType()));
+    }
+
+    @ApiOperation("get assigned staff to citizen")
+    @GetMapping("/assign/staff")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAssignedStaffOfCitizen(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getAssignedStaffOfCitizen(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Clients with filters")
+    @PostMapping("/filters")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("start") String start, @RequestParam("moduleId") String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start, moduleId));
+    }
 
 }

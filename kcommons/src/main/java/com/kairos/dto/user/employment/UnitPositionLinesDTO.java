@@ -28,6 +28,17 @@ public class UnitPositionLinesDTO {
     private long accumulatedTimebankMinutes;
     private BigDecimal hourlyCost;
 
+    public UnitPositionLinesDTO() {}
+
+    public UnitPositionLinesDTO(LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Integer totalWeeklyMinutes, BigDecimal hourlyCost) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.hourlyCost = hourlyCost;
+    }
+
     public Long getId() {
         return id;
     }

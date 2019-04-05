@@ -104,7 +104,7 @@ public class JaversCommonService {
                     fieldValues.add(findAllByIds((ArrayList<InstanceId>) historyMap.getState().getPropertyValue(field), clazz));
                 }
             } else {
-                fieldValues.add((Object) historyMap.getState().getPropertyValue(field));
+                fieldValues.add(historyMap.getState().getPropertyValue(field));
             }
         }
         return fieldValues;

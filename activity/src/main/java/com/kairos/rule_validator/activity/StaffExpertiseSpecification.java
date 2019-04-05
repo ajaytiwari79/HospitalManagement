@@ -8,6 +8,8 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
 
@@ -29,7 +31,7 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO>
     @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         List<String> errorMessages = new ArrayList<>();
-        if (!CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
+        if (isNotNull(staffDTO) && !CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
             errorMessages.add("expertise.absent.activity");
         }
         return errorMessages;

@@ -1,12 +1,11 @@
 package com.kairos.dto.user.organization.union;
 
-import com.kairos.commons.utils.NotNullOrEmpty;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 public class SectorDTO {
-    @NotEmpty
+    @NotBlank(message = "error.name.notnull")
     private String name;
     private Long id;
 
@@ -15,6 +14,14 @@ public class SectorDTO {
     }
 
     public void setId(Long id) {
+        this.id = id;
+    }
+
+    public SectorDTO() {
+    }
+
+    public SectorDTO(Long id, @NotBlank String name) {
+        this.name = name;
         this.id = id;
     }
 

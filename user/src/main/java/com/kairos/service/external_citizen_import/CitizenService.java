@@ -25,6 +25,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.TimeSlotService;
+import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.dto.user.organization.ImportTimeSlotListDTO;
@@ -112,7 +113,7 @@ public class CitizenService {
     TaskDemandRestClient taskDemandRestClient;
     @Inject
     private TimeSlotService timeSlotService;
-
+    @Inject private StaffCreationService staffCreationService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -537,7 +538,7 @@ public class CitizenService {
             if (alreadyExistStaff != null)
                 exceptionService.dataNotFoundByIdException("message.citizen.staff.alreadyexist");
 
-            staff = staffService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
+            staff = staffCreationService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
         }
 
         Organization parent = null;
