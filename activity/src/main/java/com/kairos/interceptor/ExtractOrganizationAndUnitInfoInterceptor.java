@@ -13,11 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 /**
  * Created by anil on 10/8/17.
  */
 public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapter {
-    private static final Logger log = LoggerFactory.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
 
     @Override
     public boolean preHandle(
@@ -33,7 +35,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         }        String orgIdString=pathVariables.get("organizationId");
 
         String unitIdString=pathVariables.get("unitId");
-        log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdString+" ,"+unitIdString+" ]");
 
         if(orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)){
@@ -52,6 +54,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(Optional.ofNullable(tabId).isPresent()){
             UserContext.setTabId(tabId);
         }
-        return true;
+        return isNotNull(httpServletRequest);
     }
 }

@@ -15,12 +15,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 /**
  * Created by anil on 10/8/17.
  */
 
 class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapter {
-    private static final Logger log = LoggerFactory.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -40,7 +42,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         String orgIdString = pathVariables.get("organizationId");
         String unitIdString = pathVariables.get("unitId");
         String countryIdString = pathVariables.get("countryId");
-        log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
 
         if (orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)) {
@@ -64,10 +66,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         if (Optional.ofNullable(tabId).isPresent()) {
             UserContext.setTabId(tabId);
         }
-
-
-
-        return true;
+        return isNotNull(httpServletRequest);
     }
 
 
