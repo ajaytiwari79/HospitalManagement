@@ -16,7 +16,6 @@ import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionTypeMongoRepository;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
@@ -26,8 +25,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.rule_validator.task.TaskLocationSpecification;
-import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.functional_interface.PerformCalculation;
 import com.kairos.wrapper.task.TaskGanttDTO;
@@ -42,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -79,8 +75,6 @@ public class ClientExceptionService extends MongoBaseService {
     private ClientExceptionMongoRepository clientExceptionMongoRepository;
     @Inject
     private TaskService taskService;
-    @Inject
-    MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
     private PlannerService plannerService;
@@ -474,7 +468,7 @@ public class ClientExceptionService extends MongoBaseService {
         ClientException clientException = clientExceptionOptional.get();
         List<Task> tasksToHandle = taskMongoRepository.getTaskByException(clientException.getClientId(), unitId, exceptionId);
         if (!tasksToHandle.isEmpty()) {
-            deleteExceptionFromTask(tasksToHandle, clientException.getId());
+            deleteExceptionByIdFromTask(tasksToHandle, clientException.getId());
             save(tasksToHandle);
         }
         ClientAggregator clientAggregator = taskExceptionService.updateTaskCountInAggregator(tasksToHandle, unitId, clientException.getClientId(), true);
@@ -506,7 +500,7 @@ public class ClientExceptionService extends MongoBaseService {
                 exceptionIdsToDelete.addAll(exceptionIds);
                 List<Task> tasksToHandle = taskMongoRepository.getTasksByException(clientExceptions.get(0).getClientId(), unitId, exceptionIds);
                 exceptionIds.forEach(exceptionId -> {
-                    deleteExceptionFromTask(tasksToHandle, exceptionId);
+                    deleteExceptionByIdFromTask(tasksToHandle, exceptionId);
                 });
                 allTask.addAll(tasksToHandle);
             }
@@ -827,7 +821,7 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     //TODO refactor this method, need to refactor name
-    private void deleteExceptionFromTask(List<Task> tasksToHandle, BigInteger clientExceptionId) {
+    private void deleteExceptionByIdFromTask(List<Task> tasksToHandle, BigInteger clientExceptionId) {
         tasksToHandle.forEach(task -> {
             Iterator<Task.ClientException> clientExceptionIterator = task.getClientExceptions().iterator();
             while (clientExceptionIterator.hasNext()) {

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.task_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.organization.skill.Skill;
 
 
@@ -7,7 +8,7 @@ import com.kairos.dto.user.organization.skill.Skill;
  * Created by prabjot on 24/10/16.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TaskTypeSkill implements Cloneable{
+public class TaskTypeSkill{
     private long skillId;
     private Skill.SkillLevel skillLevel;
     private long visitourId;
@@ -46,9 +47,8 @@ public class TaskTypeSkill implements Cloneable{
         this.name = name;
     }
 
-    @Override
-    protected TaskTypeSkill clone() throws CloneNotSupportedException {
-        return (TaskTypeSkill) super.clone();
+    protected TaskTypeSkill cloneObject() {
+        return ObjectMapperUtils.copyPropertiesByMapper(this,TaskTypeSkill.class);
     }
 
 }

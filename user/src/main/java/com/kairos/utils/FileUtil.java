@@ -11,13 +11,12 @@ import java.io.*;
  */
 public class FileUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
     private FileUtil() {
     }
 
     public static void writeFile(String path, MultipartFile multipartFile) {
-
         try (InputStream inputStream = multipartFile.getInputStream();
              FileOutputStream fileOutputStream = new FileOutputStream(new File(path))) {
             byte[] buf = new byte[1024];
@@ -25,27 +24,26 @@ public class FileUtil {
             while ((numRead = inputStream.read(buf)) >= 0) {
                 fileOutputStream.write(buf, 0, numRead);
             }
-
         } catch (FileNotFoundException e) {
-            logger.error("Exception orrured while uploading exception " + e);
+            LOGGER.error("Exception orrured while uploading exception " + e);
         } catch (IOException e) {
-            logger.error("Exception orrured while uploading exception " + e);
+            LOGGER.error("Exception orrured while uploading exception " + e);
         }
     }
 
     public static void createDirectory(String dirPath) {
         File theDir = new File(dirPath);
         if (!theDir.exists()) {
-            logger.info("creating directory: " + dirPath);
+            LOGGER.info("creating directory: " + dirPath);
             boolean result = false;
             try {
                 theDir.mkdir();
                 result = true;
             } catch (SecurityException se) {
-                logger.info(se.toString());
+                LOGGER.info(se.toString());
             }
             if (result) {
-                logger.info("DIR created");
+                LOGGER.info("DIR created");
             }
         }
     }

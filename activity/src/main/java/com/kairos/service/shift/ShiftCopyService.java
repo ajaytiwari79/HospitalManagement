@@ -86,8 +86,6 @@ public class ShiftCopyService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private TimeBankService timeBankService;
