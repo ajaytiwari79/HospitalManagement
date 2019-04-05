@@ -66,10 +66,10 @@ public class TimeBankCalculationServiceTest {
         dayTypeDTOS = new ArrayList<>();
     }
 
-    //@Test
+    @Test
     public void getTimeBankByInterval() {
-        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition,interval,shifts,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS);
-        LOGGER.info("daily timebank : {}",dailyTimeBankEntry);
+        //DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition,interval,shifts,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS);
+        //LOGGER.info("daily timebank : {}",dailyTimeBankEntry);
     }
 
     private List<CTARuleTemplateDTO> getRuleTemplate(){
