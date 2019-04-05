@@ -207,10 +207,10 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<ActivityTagDTO> checkActivityAllowChildActivities(List<ActivityTagDTO> activities){
-        Set<BigInteger> childActivitiesIds=(Set)activities.stream().map(activityTagDTO -> activityTagDTO.getChildActivityIds()).collect(Collectors.toSet());
+        Set<BigInteger> childActivitiesIds=activities.stream().flatMap(activityTagDTO -> activityTagDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
         for (ActivityTagDTO activity : activities) {
             if(childActivitiesIds.contains(activity.getId())){
-                activity.setAllowChildActivities(false);
+                activity.setApplicableForChildActivities(false);
             }
         }
         return activities;
@@ -455,7 +455,7 @@ public class ActivityService extends MongoBaseService {
         return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
     }
 
-    public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
+    public ActivityWithCompositeDTO getCompositeShiftTabOfActivity(BigInteger activityId) {
         Optional<Activity> activity = activityMongoRepository.findById(activityId);
         if (!activity.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
@@ -464,7 +464,7 @@ public class ActivityService extends MongoBaseService {
         if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()) {
             compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
         }
-        return compositeActivities;
+        return new ActivityWithCompositeDTO(compositeActivities,activity.get().getChildActivityIds());
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {

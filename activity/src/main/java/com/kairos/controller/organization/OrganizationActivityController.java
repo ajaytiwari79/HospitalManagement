@@ -338,7 +338,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Create default data for  Organization")
-    @RequestMapping(value = "/organization_default_data", method = RequestMethod.POST)
+    @PostMapping(value = "/organization_default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -352,7 +352,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Get All Activities by unitId")
-    @RequestMapping(value = "/activity", method = RequestMethod.GET)
+    @GetMapping(value = "/activity")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -360,7 +360,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Get All Activities and Phases by unitId")
-    @RequestMapping(value = "/activity_with_phase", method = RequestMethod.GET)
+    @GetMapping(value = "/activity_with_phase")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));

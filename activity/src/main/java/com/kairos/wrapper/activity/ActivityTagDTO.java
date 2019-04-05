@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +46,8 @@ public class ActivityTagDTO {
     private List<CompositeShiftActivityDTO> compositeActivities;
     private BigInteger activityPriorityId;
     private boolean allowChildActivities;
-    private Set<BigInteger> childActivityIds;
+    private boolean applicableForChildActivities;
+    private Set<BigInteger> childActivityIds=new HashSet<>();
 
     public ActivityTagDTO() {
         //default constructor
@@ -245,6 +247,14 @@ public class ActivityTagDTO {
 
     public void setChildActivityIds(Set<BigInteger> childActivityIds) {
         this.childActivityIds = childActivityIds;
+    }
+
+    public boolean isApplicableForChildActivities() {
+        return applicableForChildActivities;
+    }
+
+    public void setApplicableForChildActivities(boolean applicableForChildActivities) {
+        this.applicableForChildActivities = applicableForChildActivities;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
