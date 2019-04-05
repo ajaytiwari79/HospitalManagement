@@ -349,7 +349,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     }
 
     public Set<BigInteger> getChildActivityIds() {
-        return childActivityIds;
+        return childActivityIds =Optional.ofNullable(childActivityIds).orElse(new HashSet<>());
     }
 
     public void setChildActivityIds(Set<BigInteger> childActivityIds) {

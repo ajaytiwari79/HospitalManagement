@@ -494,6 +494,12 @@ public class OrganizationActivityService extends MongoBaseService {
                     compositeActivityIterator.remove();
                 }
             }
+            for (BigInteger childActivityId : activity.getChildActivityIds()) {
+                if (activityIdMap.containsKey(childActivityId)) {
+                    activity.getChildActivityIds().add(activityIdMap.get(childActivityId));
+                }
+                activity.getChildActivityIds().remove(childActivityId);
+            }
         }
         save(activities);
     }
