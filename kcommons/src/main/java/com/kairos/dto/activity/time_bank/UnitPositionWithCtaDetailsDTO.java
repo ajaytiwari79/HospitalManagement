@@ -27,7 +27,7 @@ public class UnitPositionWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
     private int fullTimeWeeklyMinutes;
     private float hourlyCost;
-    private List<EmploymentLinesDTO> positionLines;
+    private List<EmploymentLinesDTO> employmentLines;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
@@ -49,7 +49,7 @@ public class UnitPositionWithCtaDetailsDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public UnitPositionWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> positionLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+    public UnitPositionWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> employmentLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.id = id;
         this.totalWeeklyHours = totalWeeklyHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -57,17 +57,17 @@ public class UnitPositionWithCtaDetailsDTO {
         this.staffId = staffId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.positionLines = positionLines;
+        this.employmentLines = employmentLines;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
         this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 
-    public List<EmploymentLinesDTO> getPositionLines() {
-        return positionLines;
+    public List<EmploymentLinesDTO> getEmploymentLines() {
+        return employmentLines;
     }
 
-    public void setPositionLines(List<EmploymentLinesDTO> positionLines) {
-        this.positionLines = Optional.ofNullable(positionLines).isPresent() ? positionLines : new ArrayList<>();
+    public void setEmploymentLines(List<EmploymentLinesDTO> employmentLines) {
+        this.employmentLines = Optional.ofNullable(employmentLines).isPresent() ? employmentLines : new ArrayList<>();
     }
 
     public Integer getTotalWeeklyHours() {

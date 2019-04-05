@@ -14,7 +14,7 @@ import com.kairos.persistence.model.staff.position.PositionQueryResult;
 import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.user.unit_position.EmploymentLine;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.EmploymentLineEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -69,44 +69,44 @@ public class UnitPositionJobService {
                 Set<Long> unitPositionIds = unitPositionSeniorityLevelQueryResultMap.keySet();
                 Iterable<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(unitPositionIds, 2);
 
-                Map<UnitPositionIdDTO, EmploymentLine> newPositionLineWithParentId = new HashMap<>();
+                Map<UnitPositionIdDTO, EmploymentLine> newEmploymentLineWithParentId = new HashMap<>();
 
                 for (UnitPosition currentUnitPosition : unitPositions) {
-                    Optional<EmploymentLine> positionLine = currentUnitPosition.getEmploymentLines().stream()
+                    Optional<EmploymentLine> employmentLine = currentUnitPosition.getEmploymentLines().stream()
                             .filter(pl -> (todaysDate.isAfter(pl.getStartDate()) || todaysDate.isEqual(pl.getStartDate()) && (pl.getEndDate() == null || pl.getEndDate().isBefore(todaysDate) || pl.getEndDate().isEqual(todaysDate))))
                             .findAny();
-                    if (positionLine.isPresent()) {
-                        EmploymentLine newEmploymentLine = new EmploymentLine.UnitPositionLineBuilder()
-                                .setAvgDailyWorkingHours(positionLine.get().getAvgDailyWorkingHours())
-                                .setTotalWeeklyMinutes(positionLine.get().getTotalWeeklyMinutes())
-                                .setHourlyCost(positionLine.get().getHourlyCost())
+                    if (employmentLine.isPresent()) {
+                        EmploymentLine newEmploymentLine = new EmploymentLine.EmploymentLineBuilder()
+                                .setAvgDailyWorkingHours(employmentLine.get().getAvgDailyWorkingHours())
+                                .setTotalWeeklyMinutes(employmentLine.get().getTotalWeeklyMinutes())
+                                .setHourlyCost(employmentLine.get().getHourlyCost())
                                 .setStartDate(todaysDate.plusDays(1))
-                                .setFunctions(positionLine.get().getFunctions())
-                                .setFullTimeWeeklyMinutes(positionLine.get().getFullTimeWeeklyMinutes())
-                                .setWorkingDaysInWeek(positionLine.get().getWorkingDaysInWeek())
-                                .setEndDate(positionLine.get().getEndDate())
+                                .setFunctions(employmentLine.get().getFunctions())
+                                .setFullTimeWeeklyMinutes(employmentLine.get().getFullTimeWeeklyMinutes())
+                                .setWorkingDaysInWeek(employmentLine.get().getWorkingDaysInWeek())
+                                .setEndDate(employmentLine.get().getEndDate())
                                 .setSeniorityLevel(unitPositionSeniorityLevelQueryResultMap.get(currentUnitPosition.getId()).getSeniorityLevel())
                                 .build();
-                        positionLine.get().setEndDate(todaysDate);
+                        employmentLine.get().setEndDate(todaysDate);
                         currentUnitPosition.getEmploymentLines().add(newEmploymentLine);
-                        newPositionLineWithParentId.put(new UnitPositionIdDTO(currentUnitPosition.getId(), null, positionLine.get().getId()), newEmploymentLine);
+                        newEmploymentLineWithParentId.put(new UnitPositionIdDTO(currentUnitPosition.getId(), null, employmentLine.get().getId()), newEmploymentLine);
                     }
 
                 }
-                List<UnitPositionLineEmploymentTypeRelationShip> unitPositionLineEmploymentTypeRelationShips = new ArrayList<>();
+                List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
 
-                for (Map.Entry<UnitPositionIdDTO, EmploymentLine> currentMap : newPositionLineWithParentId.entrySet()) {
+                for (Map.Entry<UnitPositionIdDTO, EmploymentLine> currentMap : newEmploymentLineWithParentId.entrySet()) {
                     UnitPositionSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldUnitPositionID());
                     if (currentObject != null) {
-                        UnitPositionLineEmploymentTypeRelationShip unitPositionLineEmploymentTypeRelationShip =
-                                new UnitPositionLineEmploymentTypeRelationShip(currentMap.getValue(), currentObject.getEmploymentType(),
-                                        currentObject.getUnitPositionLineEmploymentTypeRelationShip().getEmploymentTypeCategory());
-                        unitPositionLineEmploymentTypeRelationShips.add(unitPositionLineEmploymentTypeRelationShip);
+                        EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip =
+                                new EmploymentLineEmploymentTypeRelationShip(currentMap.getValue(), currentObject.getEmploymentType(),
+                                        currentObject.getEmploymentLineEmploymentTypeRelationShip().getEmploymentTypeCategory());
+                        employmentLineEmploymentTypeRelationShips.add(employmentLineEmploymentTypeRelationShip);
                     }
                 }
 
                 unitPositionGraphRepository.saveAll(unitPositions);
-                unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionLineEmploymentTypeRelationShips);
+                unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(employmentLineEmploymentTypeRelationShips);
 
             }
 

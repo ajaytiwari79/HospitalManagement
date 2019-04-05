@@ -35,16 +35,16 @@ public class EmploymentLine extends UserBaseEntity {
     public EmploymentLine() {
         // DC
     }
-    private EmploymentLine(UnitPositionLineBuilder unitPositionLineBuilder){
-        this.seniorityLevel = unitPositionLineBuilder.seniorityLevel;
-        this.functions = unitPositionLineBuilder.functions;
-        this.startDate = unitPositionLineBuilder.startDate;
-        this.endDate = unitPositionLineBuilder.endDate;
-        this.totalWeeklyMinutes = unitPositionLineBuilder.totalWeeklyMinutes;
-        this.fullTimeWeeklyMinutes = unitPositionLineBuilder.fullTimeWeeklyMinutes;
-        this.avgDailyWorkingHours = unitPositionLineBuilder.avgDailyWorkingHours;
-        this.workingDaysInWeek = unitPositionLineBuilder.workingDaysInWeek;
-        this.hourlyCost = unitPositionLineBuilder.hourlyCost;
+    private EmploymentLine(EmploymentLineBuilder employmentLineBuilder){
+        this.seniorityLevel = employmentLineBuilder.seniorityLevel;
+        this.functions = employmentLineBuilder.functions;
+        this.startDate = employmentLineBuilder.startDate;
+        this.endDate = employmentLineBuilder.endDate;
+        this.totalWeeklyMinutes = employmentLineBuilder.totalWeeklyMinutes;
+        this.fullTimeWeeklyMinutes = employmentLineBuilder.fullTimeWeeklyMinutes;
+        this.avgDailyWorkingHours = employmentLineBuilder.avgDailyWorkingHours;
+        this.workingDaysInWeek = employmentLineBuilder.workingDaysInWeek;
+        this.hourlyCost = employmentLineBuilder.hourlyCost;
 
     }
 
@@ -122,7 +122,7 @@ public class EmploymentLine extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public static class UnitPositionLineBuilder {
+    public static class EmploymentLineBuilder {
          private SeniorityLevel seniorityLevel;
          private List<Function> functions;
          private LocalDate startDate;
@@ -133,47 +133,47 @@ public class EmploymentLine extends UserBaseEntity {
          private int workingDaysInWeek;
          private BigDecimal hourlyCost;
 
-         public UnitPositionLineBuilder setSeniorityLevel(SeniorityLevel seniorityLevel) {
+         public EmploymentLineBuilder setSeniorityLevel(SeniorityLevel seniorityLevel) {
              this.seniorityLevel = seniorityLevel;
              return this;
          }
 
-         public UnitPositionLineBuilder setFunctions(List<Function> functions) {
+         public EmploymentLineBuilder setFunctions(List<Function> functions) {
              this.functions = functions;
              return this;
          }
 
-         public UnitPositionLineBuilder setStartDate(LocalDate startDate) {
+         public EmploymentLineBuilder setStartDate(LocalDate startDate) {
              this.startDate = startDate;
              return this;
          }
 
-         public UnitPositionLineBuilder setEndDate(LocalDate endDate) {
+         public EmploymentLineBuilder setEndDate(LocalDate endDate) {
              this.endDate = endDate;
              return this;
          }
 
-         public UnitPositionLineBuilder setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+         public EmploymentLineBuilder setTotalWeeklyMinutes(int totalWeeklyMinutes) {
              this.totalWeeklyMinutes = totalWeeklyMinutes;
              return this;
          }
 
-         public UnitPositionLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+         public EmploymentLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
              this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
              return this;
          }
 
-         public UnitPositionLineBuilder setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+         public EmploymentLineBuilder setAvgDailyWorkingHours(float avgDailyWorkingHours) {
              this.avgDailyWorkingHours = avgDailyWorkingHours;
              return this;
          }
 
-         public UnitPositionLineBuilder setWorkingDaysInWeek(int workingDaysInWeek) {
+         public EmploymentLineBuilder setWorkingDaysInWeek(int workingDaysInWeek) {
              this.workingDaysInWeek = workingDaysInWeek;
              return this;
          }
 
-         public UnitPositionLineBuilder setHourlyCost(BigDecimal hourlyCost) {
+         public EmploymentLineBuilder setHourlyCost(BigDecimal hourlyCost) {
              this.hourlyCost = hourlyCost;
              return this;
          }

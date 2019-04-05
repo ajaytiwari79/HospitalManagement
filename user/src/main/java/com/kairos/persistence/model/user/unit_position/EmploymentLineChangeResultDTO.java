@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * CreatedBy vipulpandey on 3/10/18
  **/
-public class PositionLineChangeResultDTO {
+public class EmploymentLineChangeResultDTO {
     private boolean calculativeChanged;
     private boolean employmentTypeChanged;
     private BigInteger ctaId;
@@ -19,7 +19,7 @@ public class PositionLineChangeResultDTO {
     private BigInteger oldwtaId;
     private boolean functionsChanged;
     private List<FunctionWithAmountQueryResult> functions;
-    public PositionLineChangeResultDTO(boolean calculativeChanged) {
+    public EmploymentLineChangeResultDTO(boolean calculativeChanged) {
         this.calculativeChanged=calculativeChanged;
     }
 

@@ -3,7 +3,7 @@ package com.kairos.persistence.model.user.unit_position.query_result;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.unit_position.EmploymentLine;
-import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.EmploymentLineEmploymentTypeRelationShip;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult
@@ -11,7 +11,7 @@ public class UnitPositionSeniorityLevelQueryResult {
 
     private Long unitPositionId;
     private SeniorityLevel seniorityLevel;
-    private UnitPositionLineEmploymentTypeRelationShip unitPositionLineEmploymentTypeRelationShip;
+    private EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip;
     private EmploymentType employmentType;
     private EmploymentLine employmentLine;
 
@@ -30,12 +30,12 @@ public class UnitPositionSeniorityLevelQueryResult {
     public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
     }
-    public UnitPositionLineEmploymentTypeRelationShip getUnitPositionLineEmploymentTypeRelationShip() {
-        return unitPositionLineEmploymentTypeRelationShip;
+    public EmploymentLineEmploymentTypeRelationShip getEmploymentLineEmploymentTypeRelationShip() {
+        return employmentLineEmploymentTypeRelationShip;
     }
 
-    public void setUnitPositionLineEmploymentTypeRelationShip(UnitPositionLineEmploymentTypeRelationShip unitPositionLineEmploymentTypeRelationShip) {
-        this.unitPositionLineEmploymentTypeRelationShip = unitPositionLineEmploymentTypeRelationShip;
+    public void setEmploymentLineEmploymentTypeRelationShip(EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip) {
+        this.employmentLineEmploymentTypeRelationShip = employmentLineEmploymentTypeRelationShip;
     }
 
     public EmploymentType getEmploymentType() {

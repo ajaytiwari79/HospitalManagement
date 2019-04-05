@@ -7,7 +7,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
 import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationshipQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLineFunctionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.EmploymentLineFunctionQueryResult;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -118,7 +118,7 @@ public class UnitPositionFunctionService {
      * @param unitPositionId
      * @return
      */
-    public List<UnitPositionLineFunctionQueryResult> getPositionLinesWithHourlyCost(Long unitId, Long staffId, Long unitPositionId) {
+    public List<EmploymentLineFunctionQueryResult> getEmploymentLinesWithHourlyCost(Long unitId, Long staffId, Long unitPositionId) {
         String inValidField = unitPositionGraphRepository.validateOrganizationStaffUnitPosition(unitId, staffId, unitPositionId);
         if (ORGANIZATION.equals(inValidField)) {
             exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
@@ -131,21 +131,21 @@ public class UnitPositionFunctionService {
         } else if (UNIT_POSITION_STAFF_RELATIONSHIP.equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionStaffRel");
         }
-        List<UnitPositionLineFunctionQueryResult> hourlyCostByUnitPositionLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, unitPositionId);
+        List<EmploymentLineFunctionQueryResult> hourlyCostByEmploymentLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, unitPositionId);
         BigDecimal leapYearConst=PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(LEAP_YEAR));
         BigDecimal nonLeapYearConst=PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(NON_LEAP_YEAR));
-        hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines, UnitPositionLineFunctionQueryResult.class);
-        for (UnitPositionLineFunctionQueryResult unitPositionLineFunctionQueryResult : hourlyCostByUnitPositionLines) {
-            BigDecimal hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYearConst : nonLeapYearConst;
-            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount().divide(hourlyCostCalculationFactor,2,RoundingMode.CEILING));
-            unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost().divide(hourlyCostCalculationFactor,2,RoundingMode.CEILING));
-            List<FunctionDTO> functionList = unitPositionLineFunctionQueryResult.getFunctions();
+        hourlyCostByEmploymentLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByEmploymentLines, EmploymentLineFunctionQueryResult.class);
+        for (EmploymentLineFunctionQueryResult employmentLineFunctionQueryResult : hourlyCostByEmploymentLines) {
+            BigDecimal hourlyCostCalculationFactor = employmentLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYearConst : nonLeapYearConst;
+            employmentLineFunctionQueryResult.setBasePayGradeAmount(employmentLineFunctionQueryResult.getBasePayGradeAmount().divide(hourlyCostCalculationFactor,2,RoundingMode.CEILING));
+            employmentLineFunctionQueryResult.setHourlyCost(employmentLineFunctionQueryResult.getHourlyCost().divide(hourlyCostCalculationFactor,2,RoundingMode.CEILING));
+            List<FunctionDTO> functionList = employmentLineFunctionQueryResult.getFunctions();
             functionList = functionList.stream().filter(functionDTO -> functionDTO.getAmount()!=null).collect(Collectors.toList());
             for (FunctionDTO functionDTO : functionList) {
                 functionDTO.setAmount(functionDTO.getAmount().divide(hourlyCostCalculationFactor,2, RoundingMode.CEILING));
             }
-            unitPositionLineFunctionQueryResult.setFunctions(functionList);
+            employmentLineFunctionQueryResult.setFunctions(functionList);
         }
-        return hourlyCostByUnitPositionLines;
+        return hourlyCostByEmploymentLines;
     }
 }

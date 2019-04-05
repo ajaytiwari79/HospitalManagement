@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CompanyDefaultDataService {
-    private static final Logger logger = LoggerFactory.getLogger(CompanyDefaultDataService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyDefaultDataService.class);
     @Inject
     private TimeSlotService timeSlotService;
     @Inject

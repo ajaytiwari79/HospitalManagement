@@ -4,7 +4,7 @@ public class UnitPositionIdDTO {
 
     private Long oldUnitPositionID;
     private Long newUnitPositionID;
-    private Long positionLineId;
+    private Long employmentLineId;
     public UnitPositionIdDTO() {
 
     }
@@ -14,10 +14,10 @@ public class UnitPositionIdDTO {
         this.newUnitPositionID = newUnitPositionID;
     }
 
-    public UnitPositionIdDTO(Long oldUnitPositionID, Long newUnitPositionID, Long positionLineId) {
+    public UnitPositionIdDTO(Long oldUnitPositionID, Long newUnitPositionID, Long employmentLineId) {
         this.oldUnitPositionID = oldUnitPositionID;
         this.newUnitPositionID = newUnitPositionID;
-        this.positionLineId = positionLineId;
+        this.employmentLineId = employmentLineId;
     }
 
     public Long getOldUnitPositionID() {
@@ -36,11 +36,11 @@ public class UnitPositionIdDTO {
         this.newUnitPositionID = newUnitPositionID;
     }
 
-    public Long getPositionLineId() {
-        return positionLineId;
+    public Long getEmploymentLineId() {
+        return employmentLineId;
     }
 
-    public void setPositionLineId(Long positionLineId) {
-        this.positionLineId = positionLineId;
+    public void setEmploymentLineId(Long employmentLineId) {
+        this.employmentLineId = employmentLineId;
     }
 }

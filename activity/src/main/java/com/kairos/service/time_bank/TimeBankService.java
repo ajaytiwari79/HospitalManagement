@@ -378,7 +378,7 @@ public class TimeBankService extends MongoBaseService {
 
     /**
      * This function is used to update TimeBank when Staff Personalized CTA
-     * or individual unitPositionLine is changed at a time
+     * or individual employmentLine is changed at a time
      * @param unitPositionId
      * @param startDate
      * @param staffAdditionalInfoDTO
@@ -657,11 +657,5 @@ public class TimeBankService extends MongoBaseService {
         return timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals,dailyTimeBankEntries,unitPositionWithCtaDetailsDTO,startDate,endDate);
     }
 
-    /*public Map<Long,Map<Long,Long>> getAccumulatedTimebankByUnitPositions(Map<Long, List<EmploymentLinesDTO>> positionLinesMap){
-        List<EmploymentLinesDTO> unitPositionLinesDTOS = positionLinesMap.values().stream().flatMap(unitPositionLines -> unitPositionLines.stream()).collect(toList());
-        unitPositionLinesDTOS.sort(Comparator.comparing(EmploymentLinesDTO::getEndDateForAccumulatedTimebank));
-        unitPositionLinesDTOS.
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeAndEqualsDate(unitPositionId, asDate(endDate));
-    }*/
 
 }

@@ -126,9 +126,9 @@ public class ActivityIntegrationService {
         });
     }
 
-    public void updateTimeBankOnUnitPositionUpdation(BigInteger collectiveTimeAgreementId,Long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        BasicNameValuePair startDate = new BasicNameValuePair("unitPositionLineStartDate", unitPositionLineStartDate.toString());
-        BasicNameValuePair endDate = new BasicNameValuePair("unitPositionLineEndDate", unitPositionLineEndDate!=null?unitPositionLineEndDate.toString():null);
+    public void updateTimeBankOnUnitPositionUpdation(BigInteger collectiveTimeAgreementId,Long unitPositionId, LocalDate employmentLineStartDate, LocalDate employmentLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        BasicNameValuePair startDate = new BasicNameValuePair("employmentLineStartDate", employmentLineStartDate.toString());
+        BasicNameValuePair endDate = new BasicNameValuePair("employmentLineEndDate", employmentLineEndDate!=null?employmentLineEndDate.toString():null);
         BasicNameValuePair ctaId = new BasicNameValuePair("ctaId", collectiveTimeAgreementId.toString());
         List<NameValuePair> param = new ArrayList<>();
         param.add(startDate);
@@ -143,8 +143,8 @@ public class ActivityIntegrationService {
         });
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<EmploymentLinesQueryResult>> positionLinesMap, Long unitId){
-        return genericRestClient.publishRequest(positionLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
+    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<EmploymentLinesQueryResult>> employmentLinesMap, Long unitId){
+        return genericRestClient.publishRequest(employmentLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
     }
 
     public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAByExpertiseAndDate(Long expertiseId, Long unitId,LocalDate selectedDate){

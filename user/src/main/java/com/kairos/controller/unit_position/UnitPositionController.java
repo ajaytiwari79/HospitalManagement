@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -177,10 +176,10 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(unitId, staffId));
     }
 
-    @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
+    @ApiOperation(value = "get HourlyCost By employmentLine Wise")
     @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
-    public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
+    public ResponseEntity<Map<String, Object>> getEmploymentLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.getEmploymentLinesWithHourlyCost(unitId, staffId,unitPositionId));
     }
 
     @RequestMapping(value = "/unit_position/default_data", method = RequestMethod.GET)

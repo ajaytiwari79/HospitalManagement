@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.unit_position;
 
 import com.kairos.enums.employment_type.EmploymentCategory;
-import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.EmploymentLineEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -12,12 +12,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_E
  * Created by vipul on 6/4/18.
  */
 @Repository
-public interface UnitPositionEmploymentTypeRelationShipGraphRepository extends Neo4jBaseRepository<UnitPositionLineEmploymentTypeRelationShip, Long> {
+public interface UnitPositionEmploymentTypeRelationShipGraphRepository extends Neo4jBaseRepository<EmploymentLineEmploymentTypeRelationShip, Long> {
 
-    @Query("MATCH(positionLine:EmploymentLine),(newEmployment:EmploymentType) WHERE id(newEmployment)={2} AND id(positionLine)={0} "+
-    "MATCH(positionLine)-[oldRelation:"+HAS_EMPLOYMENT_TYPE+"]-(emp:EmploymentType) "+
+    @Query("MATCH(employmentLine:EmploymentLine),(newEmployment:EmploymentType) WHERE id(newEmployment)={2} AND id(employmentLine)={0} "+
+    "MATCH(employmentLine)-[oldRelation:"+HAS_EMPLOYMENT_TYPE+"]-(emp:EmploymentType) "+
     "DETACH DELETE oldRelation "+
-    "MERGE(positionLine)-[newRelation:"+HAS_EMPLOYMENT_TYPE+"]->(newEmployment) "+
+    "MERGE(employmentLine)-[newRelation:"+HAS_EMPLOYMENT_TYPE+"]->(newEmployment) "+
     "set newRelation.employmentTypeCategory={2} ")
-    void updateEmploymentTypeInCurrentUnitPositionLine(Long positionLineId,Long newEmploymentType,EmploymentCategory newCategory);
+    void updateEmploymentTypeInCurrentEmploymentLine(Long employmentLineId, Long newEmploymentType, EmploymentCategory newCategory);
 }

@@ -813,11 +813,8 @@ public class WTAService extends MongoBaseService {
         return isCalculatedValueChanged;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getUnitpositionCtaWtaAndAccumulatedTimebank(Long unitId,Map<Long, List<EmploymentLinesDTO>> positionLinesMap){
-        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = getWTACTAByUpIds(positionLinesMap.keySet());
-       /* Map<Long,Map<Long,Long>> accumulatedTimebankMap = timeBankService.getAccumulatedTimebankByUnitPositions(positionLinesMap);
-        ctawtaAndAccumulatedTimebankWrapper.setUnitPositionLineAndTimebankMinuteMap(accumulatedTimebankMap);
-        */return ctawtaAndAccumulatedTimebankWrapper;
+    public CTAWTAAndAccumulatedTimebankWrapper getUnitpositionCtaWtaAndAccumulatedTimebank(Long unitId,Map<Long, List<EmploymentLinesDTO>> employmentLinesMap){
+        return getWTACTAByUpIds(employmentLinesMap.keySet());
     }
 
     public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long unitPositionId,LocalDate startDate,LocalDate endDate){

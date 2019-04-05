@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
  * Created by vipul on 6/4/18.
  */
 @RelationshipEntity(type = APPLICABLE_FUNCTION)
-public class UnitPositionLineFunctionRelationShip extends UserBaseEntity {
+public class EmploymentLineFunctionRelationShip extends UserBaseEntity {
 
 
     @StartNode
@@ -26,11 +26,11 @@ public class UnitPositionLineFunctionRelationShip extends UserBaseEntity {
     @Property
     private BigDecimal amount;
 
-    public UnitPositionLineFunctionRelationShip() {
+    public EmploymentLineFunctionRelationShip() {
 
     }
 
-    public UnitPositionLineFunctionRelationShip(EmploymentLine employmentLine, Function function, BigDecimal amount) {
+    public EmploymentLineFunctionRelationShip(EmploymentLine employmentLine, Function function, BigDecimal amount) {
         this.employmentLine = employmentLine;
         this.function = function;
         this.amount=amount;

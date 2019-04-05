@@ -18,8 +18,8 @@ public class CTAWTAAndAccumulatedTimebankWrapper {
 
     private List<CTAResponseDTO> cta = new ArrayList<>();
     private List<WTAResponseDTO> wta = new ArrayList<>();
-    //This is a Map of UnitPositionId and UnitpositionLineId and AccumulatedTimebank in Minutes
-    private Map<Long, Map<Long,Long>> unitPositionLineAndTimebankMinuteMap;
+    //This is a Map of UnitPositionId and employmentLine and AccumulatedTimebank in Minutes
+    private Map<Long, Map<Long,Long>> employmentLineAndTimebankMinuteMap;
 
     public CTAWTAAndAccumulatedTimebankWrapper(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta) {
         this.cta = cta;
@@ -45,11 +45,11 @@ public class CTAWTAAndAccumulatedTimebankWrapper {
         this.wta = wta;
     }
 
-    public Map<Long, Map<Long, Long>> getUnitPositionLineAndTimebankMinuteMap() {
-        return unitPositionLineAndTimebankMinuteMap;
+    public Map<Long, Map<Long, Long>> getEmploymentLineAndTimebankMinuteMap() {
+        return employmentLineAndTimebankMinuteMap;
     }
 
-    public void setUnitPositionLineAndTimebankMinuteMap(Map<Long, Map<Long, Long>> unitPositionLineAndTimebankMinuteMap) {
-        this.unitPositionLineAndTimebankMinuteMap = isNull(unitPositionLineAndTimebankMinuteMap) ? new HashMap<>() : unitPositionLineAndTimebankMinuteMap;
+    public void setEmploymentLineAndTimebankMinuteMap(Map<Long, Map<Long, Long>> employmentLineAndTimebankMinuteMap) {
+        this.employmentLineAndTimebankMinuteMap = isNull(employmentLineAndTimebankMinuteMap) ? new HashMap<>() : employmentLineAndTimebankMinuteMap;
     }
 }

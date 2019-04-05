@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class UnitPositionLineFunctionQueryResult {
+public class EmploymentLineFunctionQueryResult {
 
     private LocalDate startDate;
     private BigDecimal hourlyCost;

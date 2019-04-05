@@ -184,10 +184,10 @@ public class TimeBankCalculationService {
         return ctaTimeBankMin;
     }
 
-    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<EmploymentLinesDTO> positionLines) {
+    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<EmploymentLinesDTO> employmentLines) {
         Date date = asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
-        if(CollectionUtils.isNotEmpty(positionLines)) {
+        if(CollectionUtils.isNotEmpty(employmentLines)) {
             boolean valid = false;
             for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
                 if (planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)) {
@@ -196,10 +196,10 @@ public class TimeBankCalculationService {
                 }
             }
             if (valid) {
-                for (EmploymentLinesDTO positionLine : positionLines) {
-                    DateTimeInterval positionInterval = positionLine.getInterval();
-                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate)))) {
-                        contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
+                for (EmploymentLinesDTO employmentLine : employmentLines) {
+                    DateTimeInterval positionInterval = employmentLine.getInterval();
+                    if ((positionInterval == null && (employmentLine.getStartDate().equals(localDate) || employmentLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || employmentLine.getEndDate().equals(localDate)))) {
+                        contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= employmentLine.getWorkingDaysInWeek() ? employmentLine.getTotalWeeklyMinutes() / employmentLine.getWorkingDaysInWeek() : 0;
                         break;
                     }
                 }
@@ -485,7 +485,7 @@ public class TimeBankCalculationService {
                 if (calculateContractual || !dailyTimeBanksDates.contains(startDate.toLocalDate())) {
                     boolean vaild = (unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) || (startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY);
                     if(vaild) {
-                        contractualMinutes+= getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(startDate),unitPositionWithCtaDetailsDTO.getPositionLines());
+                        contractualMinutes+= getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(startDate),unitPositionWithCtaDetailsDTO.getEmploymentLines());
                     }
                 }
                 startDate = startDate.plusDays(1);
@@ -968,7 +968,7 @@ public class TimeBankCalculationService {
                 totalTimeBankMinutes = dailyTimeBankEntry.getTotalTimeBankMin();
                 accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
             } else {
-                totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, unitPositionStartDate, unitPositionWithCtaDetailsDTO.getPositionLines()));
+                totalTimeBankMinutes = (-getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, unitPositionStartDate, unitPositionWithCtaDetailsDTO.getEmploymentLines()));
             }
             if(unitPositionStartDate.equals(unitPositionWithCtaDetailsDTO.getAccumulatedTimebankDate())){
                 accumulatedTimebank = unitPositionWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
@@ -983,12 +983,12 @@ public class TimeBankCalculationService {
         return localDateTimeBankByDateDTOMap;
     }
 
-    private BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> positionLines, java.time.LocalDate localDate){
+    private BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate){
         BigDecimal hourlyCost = new BigDecimal(0);
-        for (EmploymentLinesDTO positionLine : positionLines) {
-            DateTimeInterval positionInterval = positionLine.getInterval();
-            if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(asDate(localDate)) || positionLine.getEndDate().equals(localDate)))) {
-                hourlyCost = positionLine.getHourlyCost();
+        for (EmploymentLinesDTO employmentLine : employmentLines) {
+            DateTimeInterval positionInterval = employmentLine.getInterval();
+            if ((positionInterval == null && (employmentLine.getStartDate().equals(localDate) || employmentLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(asDate(localDate)) || employmentLine.getEndDate().equals(localDate)))) {
+                hourlyCost = employmentLine.getHourlyCost();
                 break;
             }
         }

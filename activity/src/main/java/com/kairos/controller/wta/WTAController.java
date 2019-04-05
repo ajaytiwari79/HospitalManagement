@@ -277,8 +277,8 @@ public class WTAController {
 
     @ApiOperation(value = "Get unitposition cta wta and accumulated timebank")
     @PostMapping(value =  UNIT_URL+ "/unitposition_cta_wta_and_accumulated_timebank")
-    public ResponseEntity<Map<String, Object>> getUnitpositionCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<EmploymentLinesDTO>> positionLinesMap) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getUnitpositionCtaWtaAndAccumulatedTimebank(unitId, positionLinesMap));
+    public ResponseEntity<Map<String, Object>> getUnitpositionCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<EmploymentLinesDTO>> employmentLinesMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getUnitpositionCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
     }
 
 

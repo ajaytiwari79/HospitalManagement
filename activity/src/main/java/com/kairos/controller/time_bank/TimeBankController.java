@@ -70,25 +70,12 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnFunctionChange(shiftStartDate,staffAdditionalInfoDTO));
     }
 
-    @ApiOperation("Update time bank after modification of unitPositionLine")
+    @ApiOperation("Update time bank after modification of employmentLine")
     @PutMapping("unit_position/{unitPositionId}/update_time_bank")
-    public ResponseEntity<Map<String,Object>> updateTimeBankOnUnitPositionModification(@RequestParam BigInteger ctaId,@PathVariable Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date unitPositionLineStartDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date unitPositionLineEndDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnUnitPositionModification(ctaId,unitPositionId,unitPositionLineStartDate,unitPositionLineEndDate,staffAdditionalInfoDTO));
+    public ResponseEntity<Map<String,Object>> updateTimeBankOnUnitPositionModification(@RequestParam BigInteger ctaId,@PathVariable Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date employmentLineStartDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date employmentLineEndDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnUnitPositionModification(ctaId,unitPositionId,employmentLineStartDate,employmentLineEndDate,staffAdditionalInfoDTO));
     }
-    /*@RequestMapping(value = "/saveTimeBank", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getTimeBankIncludedTimeTypes() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.saveTimeBank());
-    }*/
 
-   /* @PostMapping(value = "/createBlankTimebank")
-    public ResponseEntity<Map<String,Object>> createBlankTimeBank(@RequestBody UnitPositionWithCtaDetailsDTO timebankWrapper){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.createBlankTimeBank(timebankWrapper));
-    }*/
-
-    /*@PutMapping(value = "/updateBlankTimebank")
-    public ResponseEntity<Map<String,Object>> updateBlankTimebank(@RequestBody UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.updateBlankTimebank(unitPositionWithCtaDetailsDTO));
-    }*/
 
     @ApiOperation("Renew Timebank of Shifts")
     @PutMapping("/renew_timebank_shifts")
