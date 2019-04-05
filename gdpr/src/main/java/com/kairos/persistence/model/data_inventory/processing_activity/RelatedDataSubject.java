@@ -50,8 +50,9 @@ public class RelatedDataSubject  {
         this.name = name;
     }
 
-    public RelatedDataSubject(Long id, @NotNull String name) {
+    public RelatedDataSubject(Long id, @NotNull String name,List<RelatedDataCategory> relatedDataCategories) {
         this.id = id;
         this.name = name;
+        this.dataCategories=relatedDataCategories;
     }
 }

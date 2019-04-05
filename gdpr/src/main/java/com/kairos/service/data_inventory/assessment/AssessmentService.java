@@ -155,7 +155,7 @@ public class AssessmentService {
             }
         }
         if (!result) {
-            exceptionService.illegalArgumentException("message.assessment.relativeDeadLine.value.invalid");
+            exceptionService.illegalArgumentException("message.relativeDeadLine.value.invalid");
         }
         return result;
     }

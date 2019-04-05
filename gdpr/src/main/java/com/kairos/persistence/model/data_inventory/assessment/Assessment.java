@@ -10,6 +10,7 @@ import com.kairos.persistence.model.data_inventory.processing_activity.Processin
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
+import org.javers.core.metamodel.annotation.Entity;
 
 import javax.persistence.*;
 import javax.validation.Valid;
