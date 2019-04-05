@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.shift;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftEscalationReason;
@@ -17,13 +18,13 @@ import java.util.Set;
  * @date - 30/8/18
  */
 @Document
-public class ShiftViolatedRules extends MongoBaseEntity{
+public class ShiftViolatedRules extends MongoBaseEntity {
 
     //TODO We need proper discussion it should be per phase
     private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
-    private Set<ShiftEscalationReason> escalationReasons=new HashSet<>();
+    private Set<ShiftEscalationReason> escalationReasons ;
 
     public ShiftViolatedRules() {
     }
@@ -61,6 +62,10 @@ public class ShiftViolatedRules extends MongoBaseEntity{
     }
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
-        this.escalationReasons = escalationReasons;
+        if (ObjectUtils.isCollectionEmpty(escalationReasons)) {
+            this.escalationReasons = new HashSet<>();
+        } else
+
+            this.escalationReasons = escalationReasons;
     }
 }
