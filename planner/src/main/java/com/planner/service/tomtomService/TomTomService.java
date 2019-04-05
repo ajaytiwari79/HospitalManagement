@@ -72,8 +72,12 @@ public class TomTomService {
         //int i = 0;
         for (List<Task> origin : subTaskList) {
             String request = getRequestMap(origin, tasks);
-
-            TomTomResponse response = submitToTomtomForMatrix(request);
+            TomTomResponse response = null;
+            try {
+                response = submitToTomtomForMatrix(request);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             //i++;
            // tomTomRepository.save(response);
             List<LocationDistance> locationDistances = processLocationDistance(response,origin,tasks);
@@ -147,7 +151,7 @@ public class TomTomService {
         return subTaskList;
     }
 
-    public TomTomResponse submitToTomtomForMatrix(String requestBody) {
+    public TomTomResponse submitToTomtomForMatrix(String requestBody) throws IOException {
         HttpClient httpclient = HttpClients.createDefault();
         URIBuilder builder = null;
         try {
@@ -178,6 +182,8 @@ public class TomTomService {
             return tomTomResponse;
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
+        }finally {
+            ((CloseableHttpClient) httpclient).close();
         }
         return null;
     }
@@ -210,11 +216,13 @@ public class TomTomService {
                 e1.printStackTrace();
             }
             e.printStackTrace();
+        }finally {
+            ((CloseableHttpClient) httpclient).close();
         }
         return null;
     }
 
-    private TomTomResponse getfromTomtom(String headersUrl) {
+    private TomTomResponse getfromTomtom(String headersUrl) throws IOException {
         HttpClient httpclient = HttpClients.createDefault();
         URIBuilder builder = null;
         try {
@@ -227,6 +235,8 @@ public class TomTomService {
             return tomTomResponse;
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
+        }finally {
+            ((CloseableHttpClient) httpclient).close();
         }
         return null;
     }
@@ -267,7 +277,7 @@ public class TomTomService {
         return atoBRoutes;
     }
 
-    private Route getTomtomRoute(String headersUrl) {
+    private Route getTomtomRoute(String headersUrl) throws IOException {
         HttpClient httpclient = HttpClients.createDefault();
         URIBuilder builder = null;
         try {
@@ -280,6 +290,8 @@ public class TomTomService {
             return route;
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
+        }finally {
+            ((CloseableHttpClient) httpclient).close();
         }
         return null;
     }

@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstants.*;
 @RestController
 @RequestMapping(API_V1)
 @Api(API_V1)
-public class ActivityPrioritiesController {
+public class ActivityPriorityController {
 
     @Inject private ActivityPriorityService activityPriorityService;
 
@@ -86,7 +86,7 @@ public class ActivityPrioritiesController {
     @PutMapping(value = "/activity/{activityId}/activity_priority/{activityPriorityId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateActivityPriorityInActvitiy(@PathVariable BigInteger activityId, @PathVariable BigInteger activityPriorityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateActivityPriorityInActvitiy(activityPriorityId,activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateActivityPriorityInActivity(activityPriorityId,activityId));
     }
 
 }

@@ -39,10 +39,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.ActivityUtil;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.activity.*;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
@@ -123,8 +120,10 @@ public class OrganizationActivityService extends MongoBaseService {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private ActivityPriorityService activityPriorityService;
     @Inject
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -263,6 +262,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
+        activityCopied.setActivityPriorityId(activity.getActivityPriorityId());
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
@@ -468,6 +468,7 @@ public class OrganizationActivityService extends MongoBaseService {
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
             timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         }
+        activityPriorityService.createActivityPriorityForNewOrganization(unitId,orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId,orgTypeAndSubTypeDTO);

@@ -3,9 +3,6 @@ package com.kairos.controller.exception_handler;
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
@@ -46,7 +43,6 @@ import java.util.Set;
 @ControllerAdvice
 @Order(1)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler  {
-	private final Logger LOGGER = LoggerFactory.getLogger(CustomResponseEntityExceptionHandler.class);
 
 
 
@@ -93,7 +89,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        LOGGER.error("exception in activity service",ex);
+        logger.error("exception in activity service",ex);
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
         List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
@@ -118,7 +114,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Override
 	public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		String unsupported = "Unsupported content type: " + ex.getContentType();
 		String supported = "Supported content types: " + MediaType.toString(ex.getSupportedMediaTypes());
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
@@ -130,7 +126,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Override
 	public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -139,7 +135,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(ex.getRequestURL());
@@ -161,7 +157,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		pageNotFoundLogger.warn(ex.getMessage());
 
 		Set<HttpMethod> supportedMethods = ex.getSupportedHttpMethods();
@@ -186,7 +182,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -206,7 +202,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -225,7 +221,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -244,7 +240,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -260,11 +256,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	 * @param request the current request
 	 * @return a {@code ResponseEntity} instance
 	 */
-	
+
 	@Override
 	protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -284,7 +280,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -302,7 +298,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -321,12 +317,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
 		return handleExceptionInternal(ex, errorMessage, headers, status, request);
-	}	
+	}
 
 
 	// API
@@ -335,7 +331,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({DataIntegrityViolationException.class})
 	public ResponseEntity<Object> handleBadRequest(final Exception ex, final WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -345,7 +341,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	// 403
 	@ExceptionHandler({ AccessDeniedException.class,InvalidRequestException.class })
 	public ResponseEntity<Object> handleAccessDeniedException(final Exception ex, final WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -357,7 +353,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({DuplicateDataException.class, DataAccessException.class,InvalidDataAccessApiUsageException.class })
 	protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		final String bodyOfResponse = "This should be application specific";
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -369,7 +365,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({TimeTypeLinkedException.class})
 	protected ResponseEntity<Object> handleTimeTypeHasLink(final RuntimeException ex, final WebRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		final String bodyOfResponse = "This should be application specific";
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -381,7 +377,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({ NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class,Exception.class,MessagingException.class })
 	public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request,HttpServletRequest httprequest) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -396,7 +392,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 			ZipCodeNotFound.class,CitizenNotFoundException.class})
 	@ResponseBody
 	public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex, HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -409,7 +405,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value=ActionNotPermittedException.class)
 	@ResponseBody
 	public ResponseEnvelope actionNotPermittedExceptionHandler(ActionNotPermittedException ex,HttpServletRequest request) {
-		LOGGER.error("error in user service ",ex);
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -423,7 +419,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({DataNotFoundByIdException.class, TaskDemandException.class})
 	@ResponseBody
 	public ResponseEnvelope taskDemandExceptionHandler(RuntimeException ex,HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -437,7 +433,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value = InvalidClientException.class)
 	@ResponseBody
 	public ResponseEnvelope clientExceptionHandler(InvalidClientException ex,HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -451,7 +447,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value = FlsCredentialException.class)
 	@ResponseBody
 	public ResponseEnvelope flsCredentialExceptionHandler(FlsCredentialException ex,HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		 ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -465,7 +461,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({DataNotFoundException.class})
 	@ResponseBody
 	public ResponseEnvelope dataNotFound(DataNotFoundException ex, HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -478,7 +474,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({DataNotModifiedException.class})
 	@ResponseBody
 	public ResponseEnvelope dataNotModified(DataNotModifiedException ex, HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -491,7 +487,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({HttpClientErrorException.class})
 	@ResponseBody
 	public ResponseEnvelope clientException(HttpClientErrorException ex,HttpServletRequest request) {
-		LOGGER.error("exception in activity service",ex);
+		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());

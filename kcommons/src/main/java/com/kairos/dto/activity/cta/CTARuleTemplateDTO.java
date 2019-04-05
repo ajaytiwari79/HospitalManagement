@@ -67,6 +67,15 @@ public class CTARuleTemplateDTO {
     public CTARuleTemplateDTO() {
     }
 
+    public CTARuleTemplateDTO(String name,BigInteger id,List<CTARuleTemplatePhaseInfo> phaseInfo, List<Long> employmentTypes, List<BigInteger> activityIds, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
+        this.name = name;
+        this.id = id;
+        this.phaseInfo = phaseInfo;
+        this.employmentTypes = employmentTypes;
+        this.activityIds = activityIds;
+        this.timeTypeIds = timeTypeIds;
+        this.plannedTimeIds = plannedTimeIds;
+    }
 
     public String getRuleTemplateCategoryName() {
         return ruleTemplateCategoryName;
