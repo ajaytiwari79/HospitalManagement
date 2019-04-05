@@ -130,8 +130,6 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
     private ShiftStateMongoRepository shiftStateMongoRepository;
     @Inject
     private ShiftBreakService shiftBreakService;
