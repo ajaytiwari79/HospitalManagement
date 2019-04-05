@@ -132,17 +132,16 @@ public class CostTimeAgreementService extends MongoBaseService {
     /**
      *
      * @param countryId
-     * @param organizationSubTypeId
+     * @param organizationSubTypeIdList
      * @param organizationId
      */
     public void assignCountryCTAtoOrganisation(Long countryId, List<Long> organizationSubTypeIdList,Long organizationId){
-        List<CostTimeAgreement> allCTAs=new ArrayList<>();
+        List<CostTimeAgreement> costTimeAgreements = new ArrayList<>();
         for(Long organizationSubTypeId:organizationSubTypeIdList) {
             List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
             List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp -> Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
             List<Long> unitIds = Arrays.asList(organizationId);
             Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
-            List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(ctaResponseDTOS.size());
             for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
                 CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
                 // Set activity Ids according to unit activity Ids
@@ -161,11 +160,11 @@ public class CostTimeAgreementService extends MongoBaseService {
                     ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
                 }
                 organisationCTA.setRuleTemplateIds(ruleTemplateIds);
-                allCTAs.add(organisationCTA);
+                costTimeAgreements.add(organisationCTA);
             }
         }
-        if(!allCTAs.isEmpty()){
-            save(allCTAs);
+        if(!costTimeAgreements.isEmpty()){
+            save(costTimeAgreements);
         }
 
     }
