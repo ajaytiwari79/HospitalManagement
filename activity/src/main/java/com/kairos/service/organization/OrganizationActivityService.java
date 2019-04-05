@@ -42,6 +42,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.*;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
@@ -120,6 +121,9 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private ActivityPriorityService activityPriorityService;
+    @Inject
+    private OpenShiftRuleTemplateService openShiftRuleTemplateService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -457,7 +461,7 @@ public class OrganizationActivityService extends MongoBaseService {
                     activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
                 }
                 save(activityCopiedList);
-                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
+                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
                 wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
                 updateCompositeActivitiesIds(activityCopiedList);
             }
@@ -467,6 +471,8 @@ public class OrganizationActivityService extends MongoBaseService {
         activityPriorityService.createActivityPriorityForNewOrganization(unitId,orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId,orgTypeAndSubTypeDTO);
+
         return true;
     }
 
