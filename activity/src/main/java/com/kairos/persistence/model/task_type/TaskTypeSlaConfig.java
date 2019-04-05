@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.task_type;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * Created by oodles on 15/6/17.
  */
 @Document
-public class TaskTypeSlaConfig extends MongoBaseEntity implements Cloneable {
+public class TaskTypeSlaConfig extends MongoBaseEntity {
 
     private long timeSlotId;
     private String timeSlotName;
@@ -82,17 +83,12 @@ public class TaskTypeSlaConfig extends MongoBaseEntity implements Cloneable {
         return map;
     }
 
-    @Override
-    public TaskTypeSlaConfig clone() throws CloneNotSupportedException {
-        TaskTypeSlaConfig taskTypeSlaConfig = (TaskTypeSlaConfig) super.clone();
+    public TaskTypeSlaConfig copyObject() throws CloneNotSupportedException {
+        TaskTypeSlaConfig taskTypeSlaConfig = ObjectMapperUtils.copyPropertiesByMapper(this,TaskTypeSlaConfig.class);
         taskTypeSlaConfig.setId(null);
         List<SlaPerDayInfo> slaPerDayInfos = new ArrayList<>(taskTypeSlaConfig.getSlaPerDayInfo().size());
         this.slaPerDayInfo.forEach(slaPerDayInfo -> {
-            try{
-                slaPerDayInfos.add(slaPerDayInfo.clone());
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException("Clone not supported for task type");
-            }
+                slaPerDayInfos.add(slaPerDayInfo.copyObject());
         });
         taskTypeSlaConfig.slaPerDayInfo = slaPerDayInfos;
         return taskTypeSlaConfig;

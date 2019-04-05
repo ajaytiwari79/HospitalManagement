@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.*;
@@ -680,7 +681,7 @@ public class TaskTypeService extends MongoBaseService {
 
         TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organizationId,new BigInteger(taskTypeId),subServiceId);
         if(copyObj == null){
-            copyObj = taskType.clone();
+            copyObj = taskType.cloneObject();
         }
         copyProperties(taskType,copyObj,organizationId,subServiceId);
         save(copyObj);
@@ -760,7 +761,7 @@ public class TaskTypeService extends MongoBaseService {
                 TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organization.getId(),new BigInteger(taskTypeId),taskType.getSubServiceId());
                 if(copyObj == null){
                     try{
-                        copyObj = taskType.clone();
+                        copyObj = taskType.cloneObject();
                     } catch (CloneNotSupportedException e){
                         throw new RuntimeException(e);
                     }
@@ -904,7 +905,11 @@ public class TaskTypeService extends MongoBaseService {
         createDirectory(IMAGES_PATH);
         String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
-        FileUtil.writeFile(path, multipartFile);
+        try {
+            FileUtil.writeFile(path, multipartFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         taskType.setIcon(fileName);
         save(taskType);
         Map<String, Object> map = new HashMap<>();
@@ -1049,7 +1054,7 @@ public class TaskTypeService extends MongoBaseService {
         taskTypeNames.forEach(taskTypeName->{
             TaskType clonedObject;
             try {
-                clonedObject = taskType.clone();
+                clonedObject = taskType.cloneObject();
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException("Clone not supported on task type");
             }
@@ -1067,7 +1072,7 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskTypeSlaConfig> clonedTaskTypeSlaDayConfigs = new ArrayList<>(slaPerDayInfos.size());
         for(TaskType clonedTaskType : clonedTaskTypes){
             for(TaskTypeSlaConfig taskTypeSlaConfig : slaPerDayInfos){
-                TaskTypeSlaConfig clonedTaskTypeSlaConfig = taskTypeSlaConfig.clone();
+                TaskTypeSlaConfig clonedTaskTypeSlaConfig = taskTypeSlaConfig.copyObject();
                 clonedTaskTypeSlaConfig.setTaskTypeId(clonedTaskType.getId());
                 clonedTaskTypeSlaConfig.setUnitId(unitId);
                 clonedTaskTypeSlaDayConfigs.add(clonedTaskTypeSlaConfig);

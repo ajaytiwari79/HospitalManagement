@@ -22,7 +22,7 @@ import static com.kairos.constants.ApiConstants.*;
 @RestController
 @RequestMapping(API_V1)
 @Api(API_V1)
-public class ActivityPrioritiesController {
+public class ActivityPriorityController {
 
     @Inject private ActivityPriorityService activityPriorityService;
 
