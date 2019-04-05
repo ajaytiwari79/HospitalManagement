@@ -72,6 +72,10 @@ public class ActivityDTO {
         this.isParentActivity = isParentActivity;
     }
 
+    public ActivityDTO(BigInteger timeTypeId){
+        this.balanceSettingsActivityTab = new BalanceSettingActivityTabDTO(timeTypeId);
+    }
+
     public List<Long> getEmploymentTypes() {
         return employmentTypes;
     }

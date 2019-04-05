@@ -3,6 +3,7 @@ package com.kairos.persistence.model.task_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -21,7 +22,7 @@ import java.util.*;
 // Task and task demand
 @Document(collection = "task_types")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TaskType extends MongoBaseEntity implements Cloneable {
+public class TaskType extends MongoBaseEntity {
 
     private  String title;
     private  String shortName;
@@ -1541,20 +1542,15 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         this.expiresOn = expiresOn;
     }
 
-    @Override
-    public TaskType clone() throws CloneNotSupportedException {
-        TaskType taskType = (TaskType) super.clone();
+    public TaskType cloneObject() {
+        TaskType taskType = ObjectMapperUtils.copyPropertiesByMapper(this,TaskType.class);
         taskType.id = null;
         List<TaskTypeSkill> skills = new ArrayList<>(this.taskTypeSkills.size());
         this.taskTypeSkills.forEach(taskTypeSkill -> {
-            try {
-                skills.add(taskTypeSkill.clone());
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException("Clone not supported for task type");
-            }
+                skills.add(taskTypeSkill.cloneObject());
         });
         taskType.taskTypeSkills = skills;
-        taskType.definations = (this.definations == null)?null:this.definations.clone();
+        taskType.definations = (this.definations == null)?null:this.definations.cloneObject();
         return taskType;
     }
 
