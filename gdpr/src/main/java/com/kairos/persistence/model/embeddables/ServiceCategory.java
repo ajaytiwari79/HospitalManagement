@@ -17,10 +17,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ServiceCategory {
 
-    @NotNull(message = "id can't be null")
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
-    @NotBlank(message = "name can't be null or empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
 }

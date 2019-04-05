@@ -30,18 +30,6 @@ public class ResponsibilityType extends BaseEntity {
         return name.trim();
     }
 
-
-    public ResponsibilityType(@NotBlank(message = "error.message.name.cannot.be.null.or.empty")  String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public ResponsibilityType(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
     public ResponsibilityType(Long countryId, @NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.name = name;
         this.countryId = countryId;
@@ -51,7 +39,4 @@ public class ResponsibilityType extends BaseEntity {
         this.name = name;
     }
 
-    public ResponsibilityType(Long id) {
-        this.id = id;
-    }
 }

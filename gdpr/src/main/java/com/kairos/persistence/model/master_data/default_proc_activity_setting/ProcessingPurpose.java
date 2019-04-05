@@ -30,18 +30,6 @@ public class ProcessingPurpose extends BaseEntity {
     public String getName() {
         return name.trim();
     }
-
-    public ProcessingPurpose(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public ProcessingPurpose(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
     public ProcessingPurpose(Long countryId, @NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.name = name;
         this.countryId = countryId;
@@ -49,8 +37,5 @@ public class ProcessingPurpose extends BaseEntity {
 
     public ProcessingPurpose(String name) {
         this.name = name;
-    }
-    public ProcessingPurpose(Long id){
-        this.id = id;
     }
 }

@@ -59,7 +59,7 @@ public class DataSubject extends BaseEntity {
         this.dataCategories = dataCategories;
     }
 
-    public DataSubject(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
+    public DataSubject(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
         this.name = name;
         this.description=description;
     }

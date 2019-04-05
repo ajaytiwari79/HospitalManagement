@@ -27,7 +27,7 @@ public class QuestionnaireTemplateDTO {
     private String name;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-    @NotNull(message = "Template type cannot be empty ")
+    @NotNull(message = "error.message.template.type.notNull")
     private QuestionnaireTemplateType templateType;
     private Long assetType;
     private Long subAssetType;
@@ -40,6 +40,4 @@ public class QuestionnaireTemplateDTO {
     public String getName() {
         return name.trim();
     }
-
-    public QuestionnaireTemplateDTO setId(Long id) { this.id = id;return this;}
 }

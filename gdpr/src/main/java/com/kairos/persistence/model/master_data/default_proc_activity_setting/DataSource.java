@@ -30,17 +30,6 @@ public class DataSource extends BaseEntity {
         return name.trim();
     }
 
-    public DataSource(@NotBlank(message = "error.message.name.notNull.orEmpty")  String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public DataSource(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
 
     public DataSource(Long countryId,@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.name = name;
@@ -51,7 +40,4 @@ public class DataSource extends BaseEntity {
         this.name = name;
     }
 
-    public DataSource(Long id) {
-        this.id = id;
-    }
 }

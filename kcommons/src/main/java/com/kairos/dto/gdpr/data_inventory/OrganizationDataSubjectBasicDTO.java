@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.Set;
@@ -26,8 +24,7 @@ public class OrganizationDataSubjectBasicDTO {
     @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotEmpty(message = "Data Category  can't be  empty")
-    @NotNull(message = "Data category  can't be  null")
+    @NotBlank(message = "error.message.datacategory.notNull")
     private Set<BigInteger> dataCategories;
 
 

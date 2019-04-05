@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class OrganizationSubType {
 
-    @NotNull(message = "id can't be null")
+    @NotNull(message = "error.message.id.notnull")
     private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")

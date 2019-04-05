@@ -59,8 +59,8 @@ public class Risk extends BaseEntity {
     private Long organizationId;
 
 
-    public Risk(Long countryId, @NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                                             @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
+    public Risk(Long countryId, @NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description,
+                                             @NotBlank(message = "error.message.question.notnull") String riskRecommendation, @NotNull(message = "error.message.risk.level.notnull") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -69,8 +69,8 @@ public class Risk extends BaseEntity {
     }
 
 
-    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
+    public Risk(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description,
+                @NotBlank(message = "error.message.question.notnull") String riskRecommendation, @NotNull(message = "error.message.risk.level.notnull") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;

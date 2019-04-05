@@ -9,7 +9,6 @@ import lombok.Setter;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -24,8 +23,7 @@ public class DataCategoryDTO {
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNull(message = "error.message.dataelement.notNull")
-    @NotEmpty(message = "error.message.dataelement.notNull")
+    @NotBlank(message = "error.message.dataelement.notNull")
     @Valid
     List<DataElementDTO> dataElements;
 

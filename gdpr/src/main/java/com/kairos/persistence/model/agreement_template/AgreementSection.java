@@ -48,7 +48,7 @@ public class AgreementSection extends BaseEntity {
         return clauses.stream().filter(clause -> !clause.isDeleted()).collect(Collectors.toList());
     }
 
-    public AgreementSection(@NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex, String titleHtml)
+    public AgreementSection(@NotBlank(message = "error.message.section.title.notNull") String title, @NotNull(message = "error.message.clause.order.notdefined") Integer orderedIndex, String titleHtml)
     {
         this.title=title;
         this.orderedIndex=orderedIndex;

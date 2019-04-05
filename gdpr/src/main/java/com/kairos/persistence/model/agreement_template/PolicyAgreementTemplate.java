@@ -71,7 +71,7 @@ public class PolicyAgreementTemplate extends BaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, TemplateType templateType) {
+    public PolicyAgreementTemplate(@NotBlank(message = "error.message.name.notnull") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, TemplateType templateType) {
         this.name = name;
         this.description = description;
         this.templateType = templateType;

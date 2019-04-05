@@ -28,17 +28,6 @@ public class TechnicalSecurityMeasure extends BaseEntity {
         return name.trim();
     }
 
-    public TechnicalSecurityMeasure(@NotBlank(message = "error.message.name.notNull.orEmpty")String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public TechnicalSecurityMeasure(@NotBlank(message = "error.message.name.notNull.orEmpty")String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
     public TechnicalSecurityMeasure(Long countryId, @NotBlank(message = "error.message.name.notNull.orEmpty")String name) {
         this.name = name;
         this.countryId = countryId;

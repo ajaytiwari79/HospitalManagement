@@ -29,17 +29,6 @@ public class OrganizationalSecurityMeasure extends BaseEntity {
         return name.trim();
     }
 
-    public OrganizationalSecurityMeasure(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public OrganizationalSecurityMeasure(@NotBlank(message = "error.message.name.notNull.orEmpty") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
     public OrganizationalSecurityMeasure( Long countryId, @NotBlank(message = "error.message.name.notNull.orEmpty") String name) {
         this.name = name;
         this.countryId = countryId;

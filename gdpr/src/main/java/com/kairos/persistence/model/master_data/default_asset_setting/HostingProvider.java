@@ -28,18 +28,6 @@ public class HostingProvider extends BaseEntity {
 
     public String getName() { return name.trim(); }
 
-
-    public HostingProvider(@NotBlank(message = "error.message.name.notNull.orEmpty ") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public HostingProvider(@NotBlank(message = "error.message.name.notNull.orEmpty ") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
     public HostingProvider(Long countryId, @NotBlank(message = "error.message.name.notNull.orEmpty ") String name) {
         this.name = name;
         this.countryId = countryId;

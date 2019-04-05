@@ -18,15 +18,15 @@ public class QuestionDTO {
 
     private Long id;
 
-    @NotBlank(message = "Question title  can't be  empty")
+    @NotBlank(message = "error.message.question.title.notNull")
     private String question;
 
-    @NotBlank(message = "Description  can't be  Empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     private boolean required;
 
-    @NotNull(message = "Question type Must be Text ,Yes no May")
+    @NotNull(message = "error.message.questionType.name.notnull")
     private QuestionType questionType;
 
     private String attributeName;

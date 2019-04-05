@@ -65,9 +65,6 @@ public class Assessment extends BaseEntity {
     @NotNull
     private Long organizationId;
 
-
-
-
     public Assessment(@NotBlank String name, @NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate,@NotNull LocalDate endDate, String comment, @NotNull List<Staff> assigneeList, @NotNull Staff approver,@NotNull Long organizationId) {
         this.name = name;
         this.endDate = endDate;

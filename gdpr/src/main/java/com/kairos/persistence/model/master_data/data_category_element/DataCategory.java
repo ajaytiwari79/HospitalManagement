@@ -28,7 +28,7 @@ public class DataCategory extends BaseEntity {
     private Long countryId;
     private Long organizationId;
 
-    public DataCategory(@NotBlank(message = "Name cannot be empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
+    public DataCategory(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
         this.name = name;
         this.dataElements = dataElements;
         this.organizationId = organizationId;

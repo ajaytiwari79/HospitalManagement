@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class Question extends BaseEntity {
 
-    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @NotBlank(message = "error.message.question.notnull")
     private String question;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
@@ -30,7 +30,7 @@ public class Question extends BaseEntity {
     private Long organizationId;
 
 
-    public Question(@NotBlank(message = "Question cant'be empty") String question, @NotBlank(message = "Description can't be empty") String description, boolean required, @NotNull QuestionType questionType, boolean notSureAllowed, Long countryId, Long organizationId) {
+    public Question(@NotBlank(message = "error.message.question.notnull") String question, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, boolean required, @NotNull QuestionType questionType, boolean notSureAllowed, Long countryId, Long organizationId) {
         this.question = question;
         this.description = description;
         this.required = required;

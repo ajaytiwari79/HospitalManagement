@@ -23,7 +23,7 @@ public class ManagingOrganization {
     @NotNull
     private Long managingOrgId;
 
-    @NotBlank(message = "ManagingOrganization name can't be empty")
+    @NotBlank(message = "error.message.managingDepartment.name.notNull")
     private String managingOrgName;
 
     @Override

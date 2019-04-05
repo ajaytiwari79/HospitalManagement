@@ -15,7 +15,7 @@ import java.util.List;
 public class FilterSelectionDTO {
 
 
-    @NotEmpty(message = "Selection List cannot Empty")
+    @NotEmpty(message = "error.message.selection.list.notNull")
     private List<FilterSelection> filtersData;
 
     private String moduleId;

@@ -31,17 +31,6 @@ public class ProcessingLegalBasis extends BaseEntity {
         return name.trim();
     }
 
-    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty")String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
-    }
-
     public ProcessingLegalBasis(Long countryId, @NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
         this.name = name;
         this.countryId = countryId;
@@ -51,7 +40,4 @@ public class ProcessingLegalBasis extends BaseEntity {
         this.name = name;
     }
 
-    public ProcessingLegalBasis(Long id ) {
-        this.id = id;
-    }
 }

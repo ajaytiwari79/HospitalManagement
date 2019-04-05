@@ -28,9 +28,4 @@ public class QuestionnaireAssetTypeDTO {
     public String getName() {
         return name.trim();
     }
-
-    public QuestionnaireAssetTypeDTO(Long id, @NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

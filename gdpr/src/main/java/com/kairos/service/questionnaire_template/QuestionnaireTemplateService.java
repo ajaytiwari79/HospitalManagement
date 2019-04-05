@@ -297,8 +297,8 @@ public class QuestionnaireTemplateService {
         QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), questionnaireTemplateDTO.getTemplateType(), QuestionnaireTemplateStatus.DRAFT, unitId);
         validateQuestionnaireTemplateAndAddTemplateType(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
         questionnaireTemplateRepository.save(questionnaireTemplate);
-        return questionnaireTemplateDTO.setId(questionnaireTemplate.getId());
-
+        questionnaireTemplateDTO.setId(questionnaireTemplate.getId());
+        return questionnaireTemplateDTO;
     }
 
 

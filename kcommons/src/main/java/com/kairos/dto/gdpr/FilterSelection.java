@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,11 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 public class FilterSelection {
 
-    @NotBlank(message = "Filter Category name cannot be empty")
+    @NotBlank(message = "error.message.filter.category.notNull")
     private FilterType name;
 
-    @NotEmpty(message = "Value can't be Empty")
-    @NotNull(message = "Value can't be  Null")
+    @NotBlank(message = "error.message.value.notNull")
     private List<Long> value;
 
 }

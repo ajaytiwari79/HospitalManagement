@@ -78,7 +78,7 @@ public class Asset extends BaseEntity {
     @OneToOne
     private AssetType subAssetType;
     private Integer dataRetentionPeriod;
-    @NotNull(message = "Status can't be empty")
+    @NotNull(message = "error.message.status.notnull")
     private boolean active=true;
     private boolean suggested;
     private AssetAssessor assetAssessor;
