@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 /**
- * @Auther vikash patwal
+ * @Auther
  */
 
 @Entity
