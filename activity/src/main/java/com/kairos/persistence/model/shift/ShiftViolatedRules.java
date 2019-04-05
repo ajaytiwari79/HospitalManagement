@@ -8,6 +8,7 @@ import com.kairos.persistence.model.shift.Shift;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public class ShiftViolatedRules extends MongoBaseEntity{
     private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
-    private Set<ShiftEscalationReason> escalationReasons;
+    private Set<ShiftEscalationReason> escalationReasons=new HashSet<>();
 
     public ShiftViolatedRules() {
     }

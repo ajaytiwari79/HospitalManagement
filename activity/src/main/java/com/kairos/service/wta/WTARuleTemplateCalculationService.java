@@ -74,12 +74,7 @@ public class WTARuleTemplateCalculationService {
                     }
                 }
                 shift.setRestingMinutes(restingMinutes);
-                if (shiftViolatedRulesMap.containsKey(shift.getId())) {
-                    ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMap.get(shift.getId());
-                    shift.setEscalationReasons(isCollectionNotEmpty(shiftViolatedRules.getWorkTimeAgreements()) ? newHashSet(ShiftEscalationReason.WORK_TIME_AGREEMENT) : shiftViolatedRules.getEscalationReasons());
-
-                } else
-                    shift.setEscalationReasons(new HashSet<>());
+                shift.setEscalationReasons(shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons());
             }
         }
         return shifts;
