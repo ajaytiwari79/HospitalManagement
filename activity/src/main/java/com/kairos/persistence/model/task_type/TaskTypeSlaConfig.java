@@ -83,7 +83,7 @@ public class TaskTypeSlaConfig extends MongoBaseEntity {
         return map;
     }
 
-    public TaskTypeSlaConfig copyObject() throws CloneNotSupportedException {
+    public TaskTypeSlaConfig copyObject()  {
         TaskTypeSlaConfig taskTypeSlaConfig = ObjectMapperUtils.copyPropertiesByMapper(this,TaskTypeSlaConfig.class);
         taskTypeSlaConfig.setId(null);
         List<SlaPerDayInfo> slaPerDayInfos = new ArrayList<>(taskTypeSlaConfig.getSlaPerDayInfo().size());

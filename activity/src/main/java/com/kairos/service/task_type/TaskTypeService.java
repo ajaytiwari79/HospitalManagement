@@ -671,7 +671,7 @@ public class TaskTypeService extends MongoBaseService {
      * @return
      */
     public TaskTypeDTO linkTaskTypesWithOrg(String taskTypeId, long organizationId,
-                                            long subServiceId) throws CloneNotSupportedException {
+                                            long subServiceId) {
 
         boolean exist= userIntegrationService.isExistOrganization(organizationId);
         if (!exist) {
@@ -759,12 +759,8 @@ public class TaskTypeService extends MongoBaseService {
             List<TaskType> taskTypes = new ArrayList<>();
             organizations.forEach(organization -> {
                 TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organization.getId(),new BigInteger(taskTypeId),taskType.getSubServiceId());
-                if(copyObj == null){
-                    try{
-                        copyObj = taskType.cloneObject();
-                    } catch (CloneNotSupportedException e){
-                        throw new RuntimeException(e);
-                    }
+                if(copyObj == null) {
+                    copyObj = taskType.cloneObject();
                 }
                 copyProperties(taskType,copyObj,organization.getId(),taskType.getSubServiceId());
                 taskTypes.add(copyObj);
@@ -1044,7 +1040,7 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeIds;
     }
 
-    public List<TaskTypeDTO> createCopiesForTaskType(BigInteger taskTypeId, List<String> taskTypeNames) throws CloneNotSupportedException {
+    public List<TaskTypeDTO> createCopiesForTaskType(BigInteger taskTypeId, List<String> taskTypeNames) {
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
             logger.error("Incorrect task type id " + taskType);
@@ -1053,11 +1049,7 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskType> newTaskTypes = new ArrayList<>(taskTypeNames.size());
         taskTypeNames.forEach(taskTypeName->{
             TaskType clonedObject;
-            try {
-                clonedObject = taskType.cloneObject();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException("Clone not supported on task type");
-            }
+            clonedObject = taskType.cloneObject();
             clonedObject.setTitle(taskTypeName);
             newTaskTypes.add(clonedObject);
         });
@@ -1067,7 +1059,7 @@ public class TaskTypeService extends MongoBaseService {
                 newTaskType.getExpiresOn(),newTaskType.getDescription(),newTaskType.getId(),newTaskType.isEnabled())).collect(Collectors.toList());
     }
 
-    private void copySlaValues(TaskType taskType,List<TaskType> clonedTaskTypes,Long unitId) throws CloneNotSupportedException {
+    private void copySlaValues(TaskType taskType,List<TaskType> clonedTaskTypes,Long unitId) {
         List<TaskTypeSlaConfig> slaPerDayInfos = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeId(taskType.getOrganizationId(),taskType.getId());
         List<TaskTypeSlaConfig> clonedTaskTypeSlaDayConfigs = new ArrayList<>(slaPerDayInfos.size());
         for(TaskType clonedTaskType : clonedTaskTypes){
