@@ -431,7 +431,7 @@ public class TaskDemandService extends MongoBaseService {
 
 
 
-   public TaskDemand createGrants(Map<String, Object> grantObject,Long subServiceId) throws CloneNotSupportedException {
+   public TaskDemand createGrants(Map<String, Object> grantObject,Long subServiceId) {
        JSONObject grantJson = new JSONObject(grantObject);
        TaskType taskType = null;
         Integer weekDayCount=0;
