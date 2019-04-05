@@ -62,11 +62,6 @@ class DataSubjectController {
 
 
 
-
-
-    // todo working on it
-
-
     @ApiOperation("organization, save  data Subject ")
     @PostMapping(UNIT_URL+"/data_subject")
     public ResponseEntity<Object> saveOrganizationDataSubject(@PathVariable Long unitId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {

@@ -31,6 +31,8 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -56,7 +58,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
 @Transactional
 @Service
 public class CostTimeAgreementService extends MongoBaseService {
-    private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
     @Inject
@@ -138,8 +140,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp->Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
         List<Long> unitIds = Arrays.asList(organizationId);
         Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
-         List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(countryId);
-        Map<Long,Map<PhaseDefaultName,BigInteger>> unitsPhasesMap = getMapOfPhaseIdsAndUnitByParentIds(unitIds);
         List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(ctaResponseDTOS.size());
         for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
             CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
@@ -153,7 +153,6 @@ public class CostTimeAgreementService extends MongoBaseService {
             List<BigInteger> ruleTemplateIds = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(ruleTemplates)){
                 ruleTemplates.forEach(ctaRuleTemplate -> { ctaRuleTemplate.setId(null);});
-                //updateExistingPhaseIdOfCTA(ruleTemplates,organizationId,countryId);
                 save(ruleTemplates);
                 ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
             }
@@ -328,11 +327,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         return responseCTA;
     }
 
-    private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
-        Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,ctaStartDate, ORGANIZATION,unitPositionId,Collections.emptySet());
-        timeBankService.updateTimeBankOnUnitPositionModification(null,unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
-    }
 
     /**
      * @param countryId
@@ -534,7 +528,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
-        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
+        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
         Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getUnitPositionId(), Collectors.toList()));
         ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getUnitPositionId())));

@@ -56,6 +56,8 @@ public class ShiftActivityDTO {
     private String description;// this is from activity description and used in shift detail popup
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
     private int plannedMinutes;
+    private String startLocation; // this is for the location from where activity will gets starts
+    private String endLocation;   // this is for the location from where activity will gets ends
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
         this.activityId = activityId;
@@ -77,6 +79,16 @@ public class ShiftActivityDTO {
         this.id = id;
         this.activityName = activityName;
         this.status=status;
+    }
+
+    public ShiftActivityDTO(String activityName, Date startDate,Date endDate,BigInteger activityId,int scheduledMinutes,Set<ShiftStatus> status,ActivityDTO activity) {
+        this.activityId = activityId;
+        this.scheduledMinutes = scheduledMinutes;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+        this.status=status;
+        this.activity = activity;
     }
     public ShiftActivityDTO() {
     }
@@ -333,5 +345,21 @@ public class ShiftActivityDTO {
     @JsonIgnore
     public LocalDate getEndLocalDate(){
         return asLocalDate(this.endDate);
+    }
+
+    public String getStartLocation() {
+        return startLocation;
+    }
+
+    public void setStartLocation(String startLocation) {
+        this.startLocation = startLocation;
+    }
+
+    public String getEndLocation() {
+        return endLocation;
+    }
+
+    public void setEndLocation(String endLocation) {
+        this.endLocation = endLocation;
     }
 }

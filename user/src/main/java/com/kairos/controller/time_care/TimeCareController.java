@@ -4,6 +4,7 @@ import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.TimeCareStaffDTO;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
@@ -29,7 +30,7 @@ public class TimeCareController {
     @Inject
     private SkillService skillService;
     @Inject
-    private StaffService staffService;
+    private StaffCreationService staffCreationService;
     @Inject
     private UnitPositionService unitPositionService;
 
@@ -42,7 +43,7 @@ public class TimeCareController {
     @RequestMapping(value = "/organization/{organizationExternalId}/staff",method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> importStaffFromTimeCare(@RequestBody List<TimeCareStaffDTO> timeCareStaffDTOS,@PathVariable String organizationExternalId){
 
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,staffService.importStaffFromTimeCare(timeCareStaffDTOS,organizationExternalId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,staffCreationService.importStaffFromTimeCare(timeCareStaffDTOS,organizationExternalId));
     }
 
     @RequestMapping(value = "/organization/{organizationId}/unit/{unitId}/staff/employments",method = RequestMethod.POST)

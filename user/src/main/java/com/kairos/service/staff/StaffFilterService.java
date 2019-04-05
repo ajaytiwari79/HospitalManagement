@@ -9,6 +9,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.UnitPosition;
+import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
@@ -38,7 +39,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by prerna on 1/5/18.
@@ -303,12 +304,29 @@ public class StaffFilterService {
                 if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
                     staffListByRole = staffList;
                 } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staff);
+                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().orElse(new HashMap());
+                    if (isNotEmpty(staff)) {
+                        staffListByRole.add(staff);
+                    }
                 }
             }
         }
         return staffListByRole;
     }
 
+    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
+        StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
+        Long userId = UserContext.getUserDetails().getId();
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
+        AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilter.setName(staffFilterDTO.getName());
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
+        staff.addFavouriteFilters(staffFavouriteFilter);
+        staffGraphRepository.save(staff);
+        staffFilterDTO.setModuleId(accessPage.getModuleId());
+        staffFilterDTO.setName(staffFavouriteFilter.getName());
+        staffFilterDTO.setId(staffFavouriteFilter.getId());
+        return staffFilterDTO;
+    }
 }

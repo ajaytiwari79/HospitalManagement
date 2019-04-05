@@ -51,7 +51,7 @@ public class WTARuleTemplateCalculationService {
             Date startDate = getStartOfDay(shifts.get(0).getStartDate());
             Date endDate = getStartOfDay(plusDays(shifts.get(shifts.size()-1).getEndDate(),1));
             List<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toList());
-            Map<BigInteger,ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds).stream().filter(shiftViolatedRules -> isCollectionNotEmpty(shiftViolatedRules.getWorkTimeAgreements())).collect(Collectors.toMap(k->k.getShiftId(),v->v));
+            Map<BigInteger,ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds).stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
             List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDatesWithRuleTemplateType(shifts.get(0).getUnitPositionId(),startDate,endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
             Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap = getIntervalWTARuletemplateMap(workingTimeAgreements,asLocalDate(endDate).plusDays(1));
             Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
@@ -62,29 +62,19 @@ public class WTARuleTemplateCalculationService {
                 if(isNotNull(dateTimeIntervalListEntry)) {
                     List<DurationBetweenShiftsWTATemplate> durationBetweenShiftsWTATemplates = dateTimeIntervalListEntry.getValue();
                     for (DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate : durationBetweenShiftsWTATemplates) {
-                        Integer currentRuletemplateRestingMinutes = getValueByPhase(userAccessRole, durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
-                        if(isNotNull(currentRuletemplateRestingMinutes) && restingMinutes<currentRuletemplateRestingMinutes){
-                            restingMinutes = currentRuletemplateRestingMinutes;
+                        if(phaseMapByDate.containsKey(shift.getStartDate())) {
+                            Integer currentRuletemplateRestingMinutes = getValueByPhase(userAccessRole, durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
+                            if (isNotNull(currentRuletemplateRestingMinutes) && restingMinutes < currentRuletemplateRestingMinutes) {
+                                restingMinutes = currentRuletemplateRestingMinutes;
+                            }
                         }
                     }
                 }
                 shift.setRestingMinutes(restingMinutes);
-                shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? newHashSet(ShiftEscalationReason.WORK_TIME_AGREEMENT) : new HashSet<>());
+                shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons() : new HashSet<>());
             }
         }
         return shifts;
-    }
-
-    private Map<LocalDate, BigInteger> getMapofDateAndMap(List<PlanningPeriod> planningPeriods,List<ShiftDTO> shifts){
-        Map<LocalDate, BigInteger> dateAndPhaseMap = new HashMap<>(shifts.size());
-        for (ShiftDTO shift : shifts) {
-            for (PlanningPeriod planningPeriod : planningPeriods) {
-                if(planningPeriod.contains(asLocalDate(shift.getStartDate()))){
-                    dateAndPhaseMap.put(asLocalDate(shift.getStartDate()),planningPeriod.getCurrentPhaseId());
-                }
-            }
-        }
-        return dateAndPhaseMap;
     }
 
     private Map<DateTimeInterval,List<DurationBetweenShiftsWTATemplate>> getIntervalWTARuletemplateMap(List<WTAQueryResultDTO> workingTimeAgreements,LocalDate endDate){

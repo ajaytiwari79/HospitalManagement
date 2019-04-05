@@ -59,6 +59,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
+    private BigInteger activityPriorityId;
 
     //time care id
     private String externalId;
@@ -335,6 +336,15 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     public void setCountryParentId(BigInteger countryParentId) {
         this.countryParentId = countryParentId;
+    }
+
+
+    public BigInteger getActivityPriorityId() {
+        return activityPriorityId;
+    }
+
+    public void setActivityPriorityId(BigInteger activityPriorityId) {
+        this.activityPriorityId = activityPriorityId;
     }
 
     @Override

@@ -15,6 +15,15 @@ public class CompensationTableInterval {
     private float value;
     private CompensationMeasurementType compensationMeasurementType;
 
+    public CompensationTableInterval() {
+    }
+
+    public CompensationTableInterval(LocalTime from, LocalTime to, float value, CompensationMeasurementType compensationMeasurementType) {
+        this.from = from;
+        this.to = to;
+        this.value = value;
+        this.compensationMeasurementType = compensationMeasurementType;
+    }
 
     public LocalTime getFrom() {
         return from;

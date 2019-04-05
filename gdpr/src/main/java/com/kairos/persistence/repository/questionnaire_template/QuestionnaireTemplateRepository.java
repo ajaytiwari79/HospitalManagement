@@ -40,7 +40,7 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1  and QT.assetType.id = ?2 and QT.templateType = ?3 and QT.templateStatus = ?4 and QT.deleted = false ")
     QuestionnaireTemplate findTemplateByUnitIdAssetTypeIdAndTemplateTypeAndTemplateStatus(Long orgId, Long assetTypeId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus );
 
-    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and QT.templateStatus = ?3")
+    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and QT.templateStatus = ?3 and QT.deleted = false")
     QuestionnaireTemplate findQuestionnaireTemplateByUnitIdAndTemplateTypeAndTemplateStatus(Long orgId, QuestionnaireTemplateType templateType , QuestionnaireTemplateStatus templateStatus );
 
 

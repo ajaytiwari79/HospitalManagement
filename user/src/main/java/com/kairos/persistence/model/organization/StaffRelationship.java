@@ -23,10 +23,7 @@ public class StaffRelationship extends UserBaseEntity {
     @EndNode
     private Staff staff;
 
-
-    boolean isEnabled = true;
-
-    boolean teamLeader;
+    private boolean isEnabled = true;
 
     public StaffRelationship() {
     }
@@ -79,13 +76,6 @@ public class StaffRelationship extends UserBaseEntity {
         return isEnabled;
     }
 
-    public boolean isTeamLeader() {
-        return teamLeader;
-    }
-
-    public void setTeamLeader(boolean teamLeader) {
-        this.teamLeader = teamLeader;
-    }
 }
 
 

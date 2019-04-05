@@ -1,12 +1,12 @@
 package com.kairos.service.absencePlanning;
 
-import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
-import com.kairos.rest_client.*;
+import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskReport;
@@ -18,15 +18,12 @@ import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity_stream.NotificationService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.tpa.TaskReportService;
-import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
-import de.tourenserver.CallInfoRec;
-import de.tourenserver.FixScheduleResponse;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -64,8 +61,6 @@ public class AbsencePlanningService {
     private TaskMongoRepository taskMongoRepository;
     @Inject
     private NotificationService notificationService;
-    @Inject
-    private Scheduler scheduler;
     @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
@@ -644,7 +639,7 @@ public class AbsencePlanningService {
                     Map<String, Object> callMetaData = new HashMap<>();
                     callMetaData.put("vtid", task.getVisitourId());
                     callMetaData.put("extID", task.getId());
-                    CallInfoRec callInfoRec = scheduler.getCallInfo(callMetaData, flsCredentials);
+                    /*CallInfoRec callInfoRec = scheduler.getCallInfo(callMetaData, flsCredentials);
 
                     Date startDate = DateUtils.getSingleCompleteDate(callInfoRec.getDateFrom().toGregorianCalendar().getTime(), callInfoRec.getTimeFrom().toGregorianCalendar().getTime());
 
@@ -657,7 +652,7 @@ public class AbsencePlanningService {
                         task.setEndDate(endDate);
                     }
                     if (callInfoRec.getFMExtID() != null) task.setStaffId(Long.valueOf(callInfoRec.getFMExtID()));
-                    taskService.save(task);
+                    taskService.save(task);*/
                 }
 
             } catch (Exception exception) {
@@ -744,7 +739,7 @@ public class AbsencePlanningService {
         dateTimeInfo.put("endTime", endDateTime.hourOfDay().get()); //till day after tomorrow
         dateTimeInfo.put("startTimeMinute", startDateTime.minuteOfHour().get()); //Assigning Absence starting from tomorrow
         dateTimeInfo.put("endTimeMinute", endDateTime.minuteOfHour().get()); //till day after tomorrow
-        workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo, flsCredentials);
+        /*workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo, flsCredentials);
         if (workScheduleResult > 0) {
             logger.info("Working time of Engineer " + staff.getFirstName() + " updated Successfully " + workScheduleResult);
             Task task1 = taskMongoRepository.findOne(new BigInteger(task.getId()));
@@ -753,7 +748,7 @@ public class AbsencePlanningService {
 
         } else {
             exceptionService.internalError("error.visitour.worktime.engineer.update");
-        }
+        }*/
     }
 
     /**
@@ -829,21 +824,21 @@ public class AbsencePlanningService {
             timeFrameInfo.put("timeTo", endDateTime);
             timeFrameInfo.put("fixedDate", startDateTime);
 
-            vtID = scheduler.fixedAppointment(callMetaData, timeFrameInfo, flsCredentials);
+            /*vtID = scheduler.fixedAppointment(callMetaData, timeFrameInfo, flsCredentials);
             if (vtID > 0) {
                 logger.info("Call Created Successfully " + vtID);
                 fixedCallMetaData.put("vtid", vtID);
                 fixedCallMetaData.put("fixCalls", true);
                 fixedCallMetaData.put("fmextID", staff.getId());
-                FixScheduleResponse fixScheduleResponse = scheduler.getSchedule(fixedCallMetaData, null, flsCredentials);
-                logger.info("fixScheduleResponse----of call id--> " + vtID + " is--> " + fixScheduleResponse.getFixScheduleResult().getFixedCall());
+                //FixScheduleResponse fixScheduleResponse = scheduler.getSchedule(fixedCallMetaData, null, flsCredentials);
+                //logger.info("fixScheduleResponse----of call id--> " + vtID + " is--> " + fixScheduleResponse.getFixScheduleResult().getFixedCall());
                 task1.setVisitourId(vtID);
                 task1.setAbsencePlanningStatus(AbsencePlanningStatus.SYNCHRONISED);
                 taskService.save(task1);
 
             } else {
                 exceptionService.internalError("error.visitour.task.create");
-            }
+            }*/
         }
     }
 
@@ -878,9 +873,9 @@ public class AbsencePlanningService {
             dateTimeInfo.put("endTime", endDateTime.hourOfDay().get()); //till day after tomorrow
             dateTimeInfo.put("startTimeMinute", startDateTime.minuteOfHour().get()); //Assigning Absence starting from tomorrow
             dateTimeInfo.put("endTimeMinute", endDateTime.minuteOfHour().get()); //till day after tomorrow
-            workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo, flsCredentials);
+            //workScheduleResult = scheduler.assignAbsencesToFLS(workScheduleMetaData, dateTimeInfo, flsCredentials);
 
-            return workScheduleResult;
+            //return workScheduleResult;
         }
         return -1;
     }

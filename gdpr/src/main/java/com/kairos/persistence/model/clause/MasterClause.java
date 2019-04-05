@@ -20,7 +20,6 @@ public class MasterClause extends Clause {
 
     private Long countryId;
 
-    //TODO @Valid
     @ElementCollection
     private List<OrganizationType> organizationTypes = new ArrayList<>();
 

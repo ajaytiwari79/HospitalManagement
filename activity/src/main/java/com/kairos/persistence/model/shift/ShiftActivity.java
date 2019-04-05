@@ -38,6 +38,9 @@ public class ShiftActivity {
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private Long allowedBreakDurationInMinute;
     private int timeBankCtaBonusMinutes;
+    private String startLocation; // this is for the location from where activity will gets starts
+    private String endLocation;   // this is for the location from where activity will gets ends
+
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }
@@ -267,5 +270,21 @@ public class ShiftActivity {
 
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+    }
+
+    public String getStartLocation() {
+        return startLocation;
+    }
+
+    public void setStartLocation(String startLocation) {
+        this.startLocation = startLocation;
+    }
+
+    public String getEndLocation() {
+        return endLocation;
+    }
+
+    public void setEndLocation(String endLocation) {
+        this.endLocation = endLocation;
     }
 }

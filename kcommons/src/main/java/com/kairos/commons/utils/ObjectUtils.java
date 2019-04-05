@@ -3,7 +3,9 @@ package com.kairos.commons.utils;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.Validation;
@@ -13,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
 
 /**
  * @author pradeep
@@ -34,6 +37,14 @@ public class ObjectUtils {
 
     public static boolean isCollectionNotEmpty(@Nullable Collection<?> collection){
         return !(collection == null || collection.isEmpty());
+    }
+
+    public static <K,V> boolean isMapNotEmpty(@Nullable Map<K,V> map){
+        return !(map == null || map.isEmpty());
+    }
+
+    public static <K,V> boolean isMapEmpty(@Nullable Map<K,V> map){
+        return (map == null || map.isEmpty());
     }
     public static boolean isEmpty(@Nullable Map<?, ?> map) {
         return (map == null || map.isEmpty());
@@ -67,12 +78,9 @@ public class ObjectUtils {
         return list;
     }
 
-    private void test(){
-        /*ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        Validator validator = validatorFactory.getValidator();
-        Set<ConstraintViolation<List<Searching>> violations = validator.validate(searchingList);*/
+    public static String getHoursByMinutes(int minutes){
+        int hoursValue = minutes / 60; //since both are ints, you get an int
+        int minutesValue = minutes % 60;
+        return hoursValue+"."+minutesValue;
     }
-
-
-
 }

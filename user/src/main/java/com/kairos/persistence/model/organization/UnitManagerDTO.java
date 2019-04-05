@@ -73,4 +73,8 @@ public class UnitManagerDTO {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
+
+    public String getFullName(){
+        return this.firstName+" "+this.getLastName();
+    }
 }

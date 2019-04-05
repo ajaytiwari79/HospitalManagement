@@ -23,7 +23,6 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private LocalDate validationStartDate;
     private int numberOfWeeks;
     private boolean borrowLeave;
-    private boolean carryForwardLeave;
     private float recommendedValue;
 
     public float getRecommendedValue() {
@@ -48,14 +47,6 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public boolean isCarryForwardLeave() {
-        return carryForwardLeave;
-    }
-
-    public void setCarryForwardLeave(boolean carryForwardLeave) {
-        this.carryForwardLeave = carryForwardLeave;
     }
 
     public boolean isBorrowLeave() {

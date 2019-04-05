@@ -309,7 +309,7 @@ public class PhaseService extends MongoBaseService {
             List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
             LocalDateTime previousMonday=DateUtils.getDateForPreviousDay(LocalDate.now(),DayOfWeek.MONDAY).atStartOfDay();
             Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), Function.identity()));
-            phase= getActualPhaseApplicableForDate(startDateTime,endDateTime,previousMonday,phaseMap,untilTentativeDate,timeZone);
+            phase= getActualPhaseApplicableForDate(startDateTime,endDateTime,phaseMap,untilTentativeDate,timeZone);
         }
         if (isNull(phase)) {
             exceptionService.dataNotFoundException("message.phaseSettings.absent");
@@ -345,7 +345,7 @@ public class PhaseService extends MongoBaseService {
                phase=phaseAndIdMap.get(planningPeriod.getCurrentPhaseId());
             }
             else {
-               phase= getActualPhaseApplicableForDate(requestedDate,null,previousMonday,phaseMap,untilTentative,timeZone);
+               phase= getActualPhaseApplicableForDate(requestedDate,null,phaseMap,untilTentative,timeZone);
             }
             localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate),phase);
         }
@@ -356,12 +356,11 @@ public class PhaseService extends MongoBaseService {
     /**
      *
      * @param startDateTime
-     * @param previousMondayLocalDateTime
      * @param phaseMap
      * @param untilTentativeDate
      * @return phase
      */
-    private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime,LocalDateTime endDateTime, LocalDateTime previousMondayLocalDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,String timeZone){
+    private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime,LocalDateTime endDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,String timeZone){
         Phase phase=null;
         int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
         LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
@@ -380,7 +379,7 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
-    public boolean shiftEdititableInRealtime(String timeZone, Map<String,Phase> phaseMap, Date startDate, Date endDate){
+    public boolean shiftEditableInRealtime(String timeZone, Map<String,Phase> phaseMap, Date startDate, Date endDate){
         int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
         LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
         LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);

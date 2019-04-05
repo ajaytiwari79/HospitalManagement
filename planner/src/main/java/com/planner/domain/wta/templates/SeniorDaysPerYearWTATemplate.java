@@ -16,7 +16,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private LocalDate validationStartDate;
     private Long numberOfWeeks;
     private boolean borrowLeave;
-    private boolean carryForwardLeave;
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -27,14 +26,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     }
 
     private float recommendedValue;
-
-    public boolean isCarryForwardLeave() {
-        return carryForwardLeave;
-    }
-
-    public void setCarryForwardLeave(boolean carryForwardLeave) {
-        this.carryForwardLeave = carryForwardLeave;
-    }
 
     public boolean isBorrowLeave() {
         return borrowLeave;

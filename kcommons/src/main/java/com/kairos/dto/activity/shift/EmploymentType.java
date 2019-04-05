@@ -19,6 +19,10 @@ public class EmploymentType {
     public EmploymentType() {
     }
 
+    public EmploymentType(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }

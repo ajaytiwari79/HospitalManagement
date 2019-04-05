@@ -200,6 +200,7 @@ public class OrganizationAssetTypeService {
 
     private void updateAssetTypeAndSubAssetTypeRisk(Long unitId, AssetType assetType, AssetTypeOrganizationLevelDTO assetTypeDto) {
         updateRiskOfAssetType(unitId, assetType, assetTypeDto);
+        checkForDuplicacyInNameOfAssetType(assetTypeDto);
         if (CollectionUtils.isNotEmpty(assetTypeDto.getSubAssetTypes())) {
             Map<Long, AssetType> longAssetTypeMap = new HashMap<>();
             assetType.getSubAssetTypes().forEach(assetSubType -> longAssetTypeMap.put(assetSubType.getId(), assetSubType));
@@ -363,7 +364,7 @@ public class OrganizationAssetTypeService {
             if (names.contains(assetSubType.getName().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetSubType.getName());
             }
-            names.add(assetTypeDTO.getName().toLowerCase());
+            names.add(assetSubType.getName().toLowerCase());
         }
     }
 

@@ -29,7 +29,6 @@ public class Clause extends BaseEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<ClauseTag> tags  = new ArrayList<>();
 
-    // Mandatory or not to be discussed with Ulrik
     @NotNull
     @Column(columnDefinition = "text")
     private String description;
