@@ -931,9 +931,6 @@ public class StaffingLevelService extends MongoBaseService {
         else if(minutes>=15) {
             minuteOffset = 1;
         }
-        else if(minutes>=0){
-            minuteOffset = 0;
-        }
         return lowerLimit+minuteOffset;
     }
 
