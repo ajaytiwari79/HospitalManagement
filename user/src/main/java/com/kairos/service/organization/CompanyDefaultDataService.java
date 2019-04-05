@@ -54,6 +54,7 @@ public class CompanyDefaultDataService {
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
             orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
+            orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
             activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
             activityIntegrationService.createDefaultKPISetting(
@@ -71,6 +72,7 @@ public class CompanyDefaultDataService {
     public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
 
                                                                          List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+            orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
             activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO);
             vrpClientService.createDefaultPreferredTimeWindow(organization);
             organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());

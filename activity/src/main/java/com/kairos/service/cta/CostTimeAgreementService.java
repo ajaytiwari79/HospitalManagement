@@ -135,32 +135,37 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @param organizationSubTypeId
      * @param organizationId
      */
-    public void assignCountryCTAtoOrganisation(Long countryId, Long organizationSubTypeId,Long organizationId){
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
-        List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp->Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
-        List<Long> unitIds = Arrays.asList(organizationId);
-        Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
-        List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(ctaResponseDTOS.size());
-        for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
-            CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
-            // Set activity Ids according to unit activity Ids
-            organisationCTA.setId(null);
-            assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(),unitActivities.get(organisationCTA.getId()));
-            organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
-            organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
-            updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(),organizationId,countryId);
-            List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class);
-            List<BigInteger> ruleTemplateIds = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(ruleTemplates)){
-                ruleTemplates.forEach(ctaRuleTemplate -> { ctaRuleTemplate.setId(null);});
-                save(ruleTemplates);
-                ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
+    public void assignCountryCTAtoOrganisation(Long countryId, List<Long> organizationSubTypeIdList,Long organizationId){
+        List<CostTimeAgreement> allCTAs=new ArrayList<>();
+        for(Long organizationSubTypeId:organizationSubTypeIdList) {
+            List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
+            List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp -> Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
+            List<Long> unitIds = Arrays.asList(organizationId);
+            Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
+            List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(ctaResponseDTOS.size());
+            for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
+                CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
+                // Set activity Ids according to unit activity Ids
+                organisationCTA.setId(null);
+                assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(), unitActivities.get(organisationCTA.getId()));
+                organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
+                organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
+                updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(), organizationId, countryId);
+                List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
+                List<BigInteger> ruleTemplateIds = new ArrayList<>();
+                if (CollectionUtils.isNotEmpty(ruleTemplates)) {
+                    ruleTemplates.forEach(ctaRuleTemplate -> {
+                        ctaRuleTemplate.setId(null);
+                    });
+                    save(ruleTemplates);
+                    ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
+                }
+                organisationCTA.setRuleTemplateIds(ruleTemplateIds);
+                allCTAs.add(organisationCTA);
             }
-            organisationCTA.setRuleTemplateIds(ruleTemplateIds);
-            costTimeAgreements.add(organisationCTA);
         }
-        if(!costTimeAgreements.isEmpty()){
-            save(costTimeAgreements);
+        if(!allCTAs.isEmpty()){
+            save(allCTAs);
         }
 
     }

@@ -458,7 +458,7 @@ public class OrganizationActivityService extends MongoBaseService {
                     activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
                 }
                 save(activityCopiedList);
-                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
+                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
                 wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
                 updateCompositeActivitiesIds(activityCopiedList);
             }
