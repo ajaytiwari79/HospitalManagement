@@ -2,9 +2,9 @@ package com.kairos.shiftplanning.domain.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.shiftplanning.domain.Shift;
-import com.kairos.shiftplanning.domain.ShiftRequestPhase;
-import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
+import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 
 
 import java.util.List;
@@ -92,6 +92,6 @@ public class MinimumShiftLengthWTATemplate implements ConstraintHandler {
     }
 
     public int checkConstraints(Shift shift){
-        return !((ShiftRequestPhase)shift).isAbsenceActivityApplied() && shift.getMinutes()<timeLimit?((int) timeLimit-shift.getMinutes()):0;
+        return !((ShiftImp)shift).isAbsenceActivityApplied() && shift.getMinutes()<timeLimit?((int) timeLimit-shift.getMinutes()):0;
     }
 }

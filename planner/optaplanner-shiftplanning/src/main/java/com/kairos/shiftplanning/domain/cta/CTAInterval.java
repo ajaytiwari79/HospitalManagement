@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain.cta;
 
-import com.kairos.shiftplanning.domain.TimeInterval;
+import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
 import com.kairos.shiftplanning.utils.StaticFields;
 import org.joda.time.Interval;
 

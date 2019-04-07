@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.domain.cta;
 
-import com.kairos.shiftplanning.domain.ActivityLineInterval;
-import com.kairos.shiftplanning.domain.ShiftRequestPhase;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.dto.ActivityIntervalDTO;
 import com.kairos.shiftplanning.utils.StaticFields;
 
@@ -13,7 +13,6 @@ public class CollectiveTimeAgreement {
 
     private String id;
     private List<CTARuleTemplate> ctaRuleTemplates;
-    private WorkingExtraTimeCtaRuleTemplate workingExtraTime;
 
     public String getId() {
         return id;
@@ -31,15 +30,8 @@ public class CollectiveTimeAgreement {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
 
-    public WorkingExtraTimeCtaRuleTemplate getWorkingExtraTime() {
-        return workingExtraTime;
-    }
 
-    public void setWorkingExtraTime(WorkingExtraTimeCtaRuleTemplate workingExtraTime) {
-        this.workingExtraTime = workingExtraTime;
-    }
-
-    public BigDecimal getTotalCostOfShift(ShiftRequestPhase shift){
+    public BigDecimal getTotalCostOfShift(ShiftImp shift){
         List<ActivityIntervalDTO> activityIntervalDTOS = getActivityIntervalDTO(shift.getActivityLineIntervals());
         BigDecimal shiftCost = shift.getEmployee().getBaseCost().divide(new BigDecimal(60), StaticFields.DECIMAL_PLACES,BigDecimal.ROUND_CEILING).multiply(new BigDecimal(shift.getInterval().toDuration().getStandardMinutes()));
         for (CTARuleTemplate cta:ctaRuleTemplates){
