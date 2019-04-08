@@ -4,14 +4,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Getter
+@Setter
+@NoArgsConstructor
 public class AssetTypeBasicResponseDTO {
 
     private Long id;
@@ -19,8 +23,7 @@ public class AssetTypeBasicResponseDTO {
     private Long organizationId;
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
-    private Set<BigInteger> risks;
-    private List<OrganizationLevelRiskDTO> riskList;
+    private List<OrganizationLevelRiskDTO> risks;
 
     public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType) {
         this.id = id;
@@ -28,41 +31,11 @@ public class AssetTypeBasicResponseDTO {
         this.subAssetType = subAssetType;
     }
 
-    public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType, List<OrganizationLevelRiskDTO> riskList) {
+    public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType, List<OrganizationLevelRiskDTO> risks) {
         this.id = id;
         this.name = name;
         this.subAssetType = subAssetType;
-        this.riskList = riskList;
+        this.risks = risks;
     }
 
-    public AssetTypeBasicResponseDTO() {
-    }
-
-    public Set<BigInteger> getRisks() { return risks; }
-
-    public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
-
-    public Boolean getSubAssetType() { return subAssetType; }
-
-    public void setSubAssetType(Boolean subAssetType) { this.subAssetType = subAssetType; }
-
-    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-
-    public void setName(String name) { this.name = name; }
-
-    public List<OrganizationLevelRiskDTO> getRiskList() { return riskList; }
-
-    public void setRiskList(List<OrganizationLevelRiskDTO> riskList) { this.riskList = riskList; }
-}
+   }

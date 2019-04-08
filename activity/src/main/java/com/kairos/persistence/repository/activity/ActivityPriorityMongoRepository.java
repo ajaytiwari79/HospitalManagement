@@ -22,6 +22,13 @@ public interface ActivityPriorityMongoRepository extends MongoBaseRepository<Act
     @Query("{deleted:false,organizationId:?0}")
     List<ActivityPriorityDTO> findAllOrganizationId(Long organizationId);
 
+    @Query(value = "{deleted:false,organizationId:?0}",count = true)
+    int getActivityPriorityCountAtOrganization(Long organizationId);
+
+    @Query(value = "{deleted:false,countryId:?0}",count = true)
+    int getActivityPriorityCountAtCountry(Long organizationId);
+
+
     @Query("{sequence:{$gte:?0}, deleted:false,countryId:?1}")
     List<ActivityPriority> findAllGreaterThenAndEqualSequenceAndCountryId(int sequence,Long countryId,Sort sort);
 
@@ -29,7 +36,7 @@ public interface ActivityPriorityMongoRepository extends MongoBaseRepository<Act
     List<ActivityPriorityDTO> findAllCountryId(Long countryId);
 
 
-    @Query("{deleted:false,countryId:?0,sequence:?1}")
+    @Query("{deleted:false,countryId:?1,sequence:?0}")
     ActivityPriority findBySequenceAndCountryId(int sequence,Long countryId);
 
     @Query("{deleted:false,organizationId:?1,sequence:?0}")

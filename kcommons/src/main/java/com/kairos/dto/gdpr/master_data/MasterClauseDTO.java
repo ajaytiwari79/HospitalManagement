@@ -5,6 +5,9 @@ import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -15,6 +18,9 @@ import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class MasterClauseDTO extends ClauseDTO{
 
     @Valid
@@ -37,28 +43,4 @@ public class MasterClauseDTO extends ClauseDTO{
     @NotEmpty(message = "error.message.accountType.not.Selected")
     private List<AccountTypeVO> accountTypes=new ArrayList<>();
 
-    public List<Long> getOrganizationList() { return organizationList; }
-
-    public void setOrganizationList(List<Long> organizationList) { this.organizationList = organizationList; }
-
-    private List<Long> organizationList;
-
-    public Set<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypes; }
-
-    public void setOrganizationTypes(Set<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
-
-    public Set<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
-
-    public void setOrganizationSubTypes(Set<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
-
-    public Set<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
-
-    public void setOrganizationServices(Set<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
-
-    public Set<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
-
-    public void setOrganizationSubServices(Set<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
-
-    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
-    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 }

@@ -23,10 +23,10 @@ public class TableSettingMongoRepositoryImpl implements CustomTableSettingMongoR
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public TableSetting findByUserIdAndOrganizationId(long userId, long organizationId, String tableId) {
+    public TableSetting findByUserIdAndOrganizationId(long userId, long organizationId, String tabId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("userId").is(userId).and("organizationId").is(organizationId).and("tableConfigurations.tableId").is(tableId)));
+                match(Criteria.where("deleted").is(false).and("userId").is(userId).and("organizationId").is(organizationId).and("tableConfigurations.tabId").is(tabId)));
         AggregationResults<TableSetting> results = mongoTemplate.aggregate(aggregation, TableSetting.class, TableSetting.class);
 
         return !results.getMappedResults().isEmpty() ? results.getMappedResults().get(0) : null;

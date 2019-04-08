@@ -59,7 +59,7 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -67,9 +67,12 @@ public class ShiftActivity {
         this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,String remarks) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
+                          Long allowedBreakDurationInMinute,String remarks,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -78,8 +81,11 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.remarks = remarks;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,boolean breakReplaced) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
+                          Long allowedBreakDurationInMinute,boolean breakReplaced,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -88,6 +94,8 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.breakReplaced=breakReplaced;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;

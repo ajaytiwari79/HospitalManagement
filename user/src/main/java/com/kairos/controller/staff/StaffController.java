@@ -65,6 +65,7 @@ public class StaffController {
     private StaffRetrievalService staffRetrievalService;
     @Inject
     private UnitPositionJobService unitPositionJobService;
+    @Inject private StaffCreationService staffCreationService;
 
 
     @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
@@ -403,7 +404,7 @@ public class StaffController {
     @RequestMapping(value = "/country_admin", method = RequestMethod.POST)
     @ApiOperation("create country admin")
     public ResponseEntity<Map<String, Object>> createCountryAdmin(@RequestBody User user) {
-        User admin = staffService.createCountryAdmin(user);
+        User admin = staffCreationService.createCountryAdmin(user);
         if (admin == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false,
                     null);
@@ -436,7 +437,7 @@ public class StaffController {
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.createStaffFromWeb(unitId, staffCreationDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaffFromWeb(unitId, staffCreationDTO));
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")
@@ -464,7 +465,7 @@ public class StaffController {
     @ApiOperation("createStaff")
     public ResponseEntity<Map<String, Object>> createStaff(@PathVariable long unitId, @RequestBody StaffDTO staffDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.createStaffFromPlanningWorkflow(staffDTO, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaffFromPlanningWorkflow(staffDTO, unitId));
     }
 
      /**

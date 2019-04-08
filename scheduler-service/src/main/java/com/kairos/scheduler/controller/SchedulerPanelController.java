@@ -3,7 +3,7 @@ package com.kairos.scheduler.controller;
 
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.scheduler.service.UserIntegrationService;
-import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
@@ -65,8 +65,8 @@ public class SchedulerPanelController {
 
     @PutMapping("/update_date_only")
     @ApiOperation("Update Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> updateSchedulerPanelOneTimeTriggerDate(@RequestBody List<LocalDateTimeIdDTO> localDateTimeIdDTOs, @PathVariable Long unitId) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeIdDTOs, unitId));
+    public ResponseEntity<Map<String, Object>> updateSchedulerPanelOneTimeTriggerDate(@RequestBody List<LocalDateTimeScheduledPanelIdDTO> localDateTimeScheduledPanelIdDTOS, @PathVariable Long unitId) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeScheduledPanelIdDTOS, unitId));
     }
 
     @GetMapping("/job_details/{schedulerPanelId}")

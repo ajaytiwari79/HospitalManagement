@@ -8,6 +8,8 @@ import java.util.List;
 public interface CustomActivityPriorityMongoRepository {
 
     List<ActivityPriority> findLastSeqenceByOrganizationIds(List<Long> organizationIds);
-    boolean existsByNameAndOrganizationIdAndNotEqualToId(String name, BigInteger id, Long organizationId);
-    boolean existsByNameAndCountryIdAndNotEqualToId(String name, BigInteger id,Long countryId);
+    boolean existsByNameAndOrganizationIdAndNotEqualToId(String name,String colorCode, BigInteger id, Long organizationId);
+    boolean existsByNameAndCountryIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long countryId);
+    void updateSequenceOfActivityPriorityOnCountry(int oldSequence,int newSequence,Long countryId);
+    void updateSequenceOfActivityPriorityOnOrganization(int oldSequence,int newSequence,Long countryId);
 }

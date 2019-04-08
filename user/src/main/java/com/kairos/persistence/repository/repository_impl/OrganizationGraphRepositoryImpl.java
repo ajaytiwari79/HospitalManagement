@@ -60,7 +60,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
                     "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp,employmentType,positionLine \n" +
                     "OPTIONAL MATCH(positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
-                    "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,positionLine,exp,employmentType\n" +
+                    "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon}) END as functions,positionLine,exp,employmentType\n" +
                     "WITH staff,organization,unitPos,user, COLLECT(distinct {id:id(positionLine),startDate:positionLine.startDate,endDate:positionLine.endDate,functions:functions}) as positionLines,exp,employmentType\n" +
                     "with staff,user,employmentType, \n" +
                     "COLLECT(distinct {id:id(unitPos),startDate:unitPos.startDate,endDate:unitPos.endDate,expertise:{id:id(exp),name:exp.name},positionLines:positionLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
@@ -69,7 +69,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
                     "OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
                     "OPTIONAL MATCH(positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
-                    "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,positionLine,exp,employmentType\n" +
+                    "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon}) END as functions,positionLine,exp,employmentType\n" +
                     "WITH staff,organization,unitPos,user, COLLECT(distinct {id:id(positionLine),startDate:positionLine.startDate,endDate:positionLine.endDate,functions:functions}) as positionLines,exp,employmentType\n" +
                     "with staff,user,employmentType, \n" +
                     "COLLECT(distinct {id:id(unitPos),startDate:unitPos.startDate,endDate:unitPos.endDate,expertise:{id:id(exp),name:exp.name},positionLines:positionLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";

@@ -345,15 +345,6 @@ public class WTAService extends MongoBaseService {
         return true;
     }
 
-    public List<WTAResponseDTO> getAllWTAByOrganizationId(long organizationId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationTypeId(organizationId);
-        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta -> {
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
-        });
-        return wtaResponseDTOS;
-    }
-
     public List<WTAResponseDTO> getAllWTAByCountryId(long countryId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
@@ -382,11 +373,6 @@ public class WTAService extends MongoBaseService {
     }
 
     public List<WTAResponseDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId) {
-        /*List<Map<String, Object>> map =
-        List<Object> objectList = new ArrayList<>();
-        for (Map<String, Object> result : map) {
-            objectList.add(result.get("result"));
-        }*/
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithWTAId(countryId, wtaId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
@@ -556,8 +542,6 @@ public class WTAService extends MongoBaseService {
             workingTimeAgreement.setCountryId(null);
             workingTimeAgreement.setParentId(wtaResponseDTO.getId());
             workingTimeAgreements.add(workingTimeAgreement);
-            //wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement,WTAResponseDTO.class);
-            //wtaResponseDTO.setRuleTemplate(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
 
         });
         if (!workingTimeAgreements.isEmpty()) {
@@ -565,10 +549,6 @@ public class WTAService extends MongoBaseService {
             solverConfigService.createDefaultConfig(organisationId);
         }
         return true;
-    }
-
-    public List<WorkingTimeAgreement> findAllByIdAndDeletedFalse(Set<BigInteger> wtaIds) {
-        return wtaRepository.findAllByIdsInAndDeletedFalse(wtaIds);
     }
 
     public WTAResponseDTO updateWtaOfUnitPosition(Long unitId, WTADTO wtadto, Boolean oldUnitPositionPublished) {

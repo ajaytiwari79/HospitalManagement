@@ -2,17 +2,20 @@ package com.kairos.dto.gdpr.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class AssetTypeOrganizationLevelDTO {
 
     private Long id;
@@ -26,19 +29,5 @@ public class AssetTypeOrganizationLevelDTO {
     private List<AssetTypeOrganizationLevelDTO> subAssetTypes = new ArrayList<>();
 
 
-    public Long getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name.trim(); }
-
-    public void setName(String name) { this.name = name; }
-
-    public Set<OrganizationLevelRiskDTO> getRisks() { return risks; }
-
-    public void setRisks(Set<OrganizationLevelRiskDTO> risks) { this.risks = risks; }
-
-    public List<AssetTypeOrganizationLevelDTO> getSubAssetTypes() { return subAssetTypes; }
-
-    public void setSubAssetTypes(List<AssetTypeOrganizationLevelDTO> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
 }

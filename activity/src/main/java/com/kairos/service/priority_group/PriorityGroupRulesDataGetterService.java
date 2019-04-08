@@ -20,7 +20,7 @@ import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.utils.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;

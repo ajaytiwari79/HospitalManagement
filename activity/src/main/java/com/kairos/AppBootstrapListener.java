@@ -1,6 +1,5 @@
 package com.kairos;
 
-import com.kairos.service.fls_visitour.dynamic_change.FLSVisitourChangeService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -18,8 +17,6 @@ import javax.inject.Inject;
 public class AppBootstrapListener implements ApplicationListener<ApplicationReadyEvent> {
 
 
-    @Inject
-    FLSVisitourChangeService flsVisitourChangeService;
 
     /**
      * Executes on application ready event
@@ -29,7 +26,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
-        flsVisitourChangeService.registerReceiver("visitourChange");
+        //flsVisitourChangeService.registerReceiver("visitourChange");
        // payRollSystemService.createDefaultPayRollSystemList();
 
     }

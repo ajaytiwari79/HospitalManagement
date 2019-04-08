@@ -731,7 +731,7 @@ public class TaskTypeController {
     @RequestMapping(value = "/task_type/{taskTypeId}/clone", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createCopyForTaskType(@PathVariable BigInteger taskTypeId,
-                                                                     @RequestBody TaskTypeCopyDTO taskTypeCopyDTO) throws CloneNotSupportedException {
+                                                                     @RequestBody TaskTypeCopyDTO taskTypeCopyDTO)  {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 taskTypeService.createCopiesForTaskType(taskTypeId, taskTypeCopyDTO.getTaskTypeNames()));
     }

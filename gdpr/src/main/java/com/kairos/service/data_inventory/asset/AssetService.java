@@ -101,7 +101,7 @@ public class AssetService {
                 }
         );
         Asset asset = buildAsset(unitId, assetDTO);
-        saveAssetTypeSubTypeAndRisk(unitId, asset, assetDTO);
+        addAssetTypeAndSubAssetType(unitId, asset, assetDTO);
         assetRepository.save(asset);
         assetDTO.setId(asset.getId());
         return assetDTO;
@@ -150,45 +150,44 @@ public class AssetService {
     }
 
 
-    private void saveAssetTypeSubTypeAndRisk(Long unitId, Asset asset, AssetDTO assetDTO) {
+    private void addAssetTypeAndSubAssetType(Long unitId, Asset asset, AssetDTO assetDTO) {
         AssetType assetType;
         AssetType subAssetType = null;
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
-            assetType = assetTypeRepository.findById(assetDTO.getAssetType().getId()).orElse(null);
-            if (assetType!=null) {
-                linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
-                if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
-                    if (assetDTO.getAssetSubType().getId() != null) {
-                        Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(assetDTO.getAssetSubType().getId())).findAny();
-                        if (subAssetTypeObj.isPresent()) {
-                            subAssetType = subAssetTypeObj.get();
-                        } else {
-                            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetSubType().getId());
-                        }
-                    } else {
-                        subAssetType = new AssetType(assetDTO.getAssetSubType().getName(),  unitId, true);
-                        subAssetType.setAssetType(assetType);
-                        assetType.getSubAssetTypes().add(subAssetType);
-                    }
-                    linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getAssetSubType().getRisks());
-                }
-            } else
+            assetType = assetTypeRepository.findByIdAndDeletedFalse(assetDTO.getAssetType().getId());
+            if (assetType == null) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetType().getId());
+            }
+            if (assetDTO.getSubAssetType() != null) {
+                if (assetDTO.getSubAssetType().getId() == null) {
+                    subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
+                    linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
+                    subAssetType.setAssetType(assetType);
+                    assetTypeRepository.save(subAssetType);
+                    assetType.getSubAssetTypes().add(subAssetType);
+                } else {
+                    for (AssetType assetSubType : assetType.getSubAssetTypes()) {
+                        if (assetDTO.getSubAssetType().getId().equals(assetSubType.getId())) {
+                            subAssetType = assetSubType;
+                            linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
+                            break;
+                        }
+                    }
+                }
+            }
         } else {
             AssetType previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetDTO.getAssetType().getName(), unitId, false);
             if (Optional.ofNullable(previousAssetType).isPresent()) {
                 exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetDTO.getAssetType().getName());
             }
-            assetType = new AssetType(assetDTO.getAssetType().getName(),  unitId, false);
-            linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
-            if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
-                subAssetType = new AssetType(assetDTO.getAssetSubType().getName(),  unitId, true);
+            assetType = new AssetType(assetDTO.getAssetType().getName(), unitId, false);
+            if (assetDTO.getSubAssetType() != null) {
+                subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
                 subAssetType.setAssetType(assetType);
-                assetType.getSubAssetTypes().add(subAssetType);
-                linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getAssetSubType().getRisks());
+                assetType.setSubAssetTypes(Arrays.asList(subAssetType));
             }
-
         }
+        linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
         assetTypeRepository.save(assetType);
         asset.setAssetType(assetType);
         asset.setSubAssetType(subAssetType);

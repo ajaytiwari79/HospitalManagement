@@ -100,6 +100,7 @@ release {
 
 task verifyRelease {
     dependsOn ":kcommons:build"
+    dependsOn ":kpermissions:build"
     dependsOn ":user:build"
     dependsOn ":gdpr:build"
     dependsOn ":activity:build"
@@ -107,7 +108,6 @@ task verifyRelease {
     dependsOn ":planner:optaplanner-shiftplanning:build"
     dependsOn ":planner:optaplanner-taskplanning:build"
     dependsOn ":planner:optaplanner-vrp-taskplanning:build"
-    dependsOn ":planner:responseWrapper:build"
 }
 
 beforeReleaseBuild.dependsOn verifyRelease

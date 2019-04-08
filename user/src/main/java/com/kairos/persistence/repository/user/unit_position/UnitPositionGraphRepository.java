@@ -38,12 +38,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "RETURN  DISTINCT expertise as expertise,unitPosition.startDate as startDate,unitPosition.accumulatedTimebankDate as accumulatedTimebankDate,unitPosition.accumulatedTimebankMinutes as accumulatedTimebankMinutes,unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,unitPosition.published as published, appliedFunctions as appliedFunctions,collect(positionLines[0]) as positionLines")
     UnitPositionQueryResult getUnitPositionById(Long unitPositionId);
 
-    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
-            "OPTIONAL MATCH (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
-            "WITH unitPosition,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions "+
-            " RETURN  id(unitPosition) as id , appliedFunctions as appliedFunctions")
-    UnitPositionQueryResult findAppliedFunctionsAtUnitPosition(Long unitPositionId,String shiftDate);
-
     @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(user:User) WHERE id(staff) IN {2}\n" +
             "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
             "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
