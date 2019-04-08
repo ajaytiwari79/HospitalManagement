@@ -2,10 +2,18 @@ package com.kairos.dto.gdpr.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ModuleIdDTO {
 
     @NotBlank
@@ -17,43 +25,4 @@ public class ModuleIdDTO {
     private Boolean isModuleId ;
 
     private Boolean active;
-
-
-    public String getModuleId() {
-        return moduleId;
-    }
-
-    public void setModuleId(Boolean moduleId) {
-        isModuleId = moduleId;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public ModuleIdDTO(String name, String moduleId, Boolean isModuleId, Boolean active) {
-        this.name = name;
-        this.moduleId = moduleId;
-        this.isModuleId = isModuleId;
-        this.active = active;
-    }
-
-    public ModuleIdDTO() {
-    }
 }

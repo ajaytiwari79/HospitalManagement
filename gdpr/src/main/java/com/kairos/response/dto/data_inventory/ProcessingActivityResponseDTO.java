@@ -6,10 +6,16 @@ import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
 import com.kairos.response.dto.common.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessingActivityResponseDTO {
 
@@ -37,154 +43,4 @@ public class ProcessingActivityResponseDTO {
     private List<RelatedDataSubjectDTO> dataSubjects = new ArrayList<>();
     private List<AssetBasicResponseDTO> assets=new ArrayList<>();
 
-    public ProcessingActivityResponseDTO() {
-    }
-
-    public List<AssetBasicResponseDTO> getAssets() { return assets; }
-
-    public void setAssets(List<AssetBasicResponseDTO> assets) { this.assets = assets; }
-
-    public List<RiskBasicResponseDTO> getRisks() { return risks; }
-
-    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
-
-    public List<ProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
-
-    public void setSubProcessingActivities(List<ProcessingActivityResponseDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
-
-    public Boolean getActive() { return active; }
-
-    public void setActive(Boolean active) { this.active = active; }
-
-    public Boolean getSuggested() { return suggested; }
-
-    public void setSuggested(Boolean suggested) { this.suggested = suggested; }
-
-    public ResponsibilityTypeResponseDTO getResponsibilityType() { return responsibilityType; }
-
-    public void setResponsibilityType(ResponsibilityTypeResponseDTO responsibilityType) { this.responsibilityType = responsibilityType; }
-
-    public List<ProcessingLegalBasisResponseDTO> getProcessingLegalBasis() { return processingLegalBasis; }
-
-    public void setProcessingLegalBasis(List<ProcessingLegalBasisResponseDTO> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ManagingOrganization getManagingDepartment() {
-        return managingDepartment;
-    }
-
-    public void setManagingDepartment(ManagingOrganization managingDepartment) {
-        this.managingDepartment = managingDepartment;
-    }
-
-    public Staff getProcessOwner() {
-        return processOwner;
-    }
-
-    public void setProcessOwner(Staff processOwner) {
-        this.processOwner = processOwner;
-    }
-
-    public List<ProcessingPurposeResponseDTO> getProcessingPurposes() {
-        return processingPurposes;
-    }
-
-    public void setProcessingPurposes(List<ProcessingPurposeResponseDTO> processingPurposes) {
-        this.processingPurposes = processingPurposes;
-    }
-
-    public List<DataSourceResponseDTO> getDataSources() {
-        return dataSources;
-    }
-
-    public void setDataSources(List<DataSourceResponseDTO> dataSources) {
-        this.dataSources = dataSources;
-    }
-
-    public List<AccessorPartyResponseDTO> getAccessorParties() {
-        return accessorParties;
-    }
-
-    public void setAccessorParties(List<AccessorPartyResponseDTO> accessorParties) { this.accessorParties = accessorParties; }
-
-    public List<TransferMethodResponseDTO> getTransferMethods() { return transferMethods; }
-
-    public void setTransferMethods(List<TransferMethodResponseDTO> transferMethods) { this.transferMethods = transferMethods; }
-
-    public Integer getControllerContactInfo() {
-        return controllerContactInfo;
-    }
-
-    public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
-
-    public Integer getDpoContactInfo() {
-        return dpoContactInfo;
-    }
-
-    public void setDpoContactInfo(Integer dpoContactInfo) {
-        this.dpoContactInfo = dpoContactInfo;
-    }
-
-    public Integer getJointControllerContactInfo() {
-        return jointControllerContactInfo;
-    }
-
-    public void setJointControllerContactInfo(Integer jointControllerContactInfo) {
-        this.jointControllerContactInfo = jointControllerContactInfo;
-    }
-
-    public Long getMinDataSubjectVolume() {
-        return minDataSubjectVolume;
-    }
-
-    public void setMinDataSubjectVolume(Long minDataSubjectVolume) {
-        this.minDataSubjectVolume = minDataSubjectVolume;
-    }
-
-    public Long getMaxDataSubjectVolume() {
-        return maxDataSubjectVolume;
-    }
-
-    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) {
-        this.maxDataSubjectVolume = maxDataSubjectVolume;
-    }
-
-    public Integer getDataRetentionPeriod() {
-        return dataRetentionPeriod;
-    }
-
-    public void setDataRetentionPeriod(Integer dataRetentionPeriod) {
-        this.dataRetentionPeriod = dataRetentionPeriod;
-    }
-
-    public List<RelatedDataSubjectDTO> getDataSubjects() {
-        return dataSubjects;
-    }
-
-    public void setDataSubjects(List<RelatedDataSubjectDTO> dataSubjects) {
-        this.dataSubjects = dataSubjects;
-    }
 }

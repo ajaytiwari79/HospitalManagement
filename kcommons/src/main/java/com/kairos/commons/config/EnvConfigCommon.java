@@ -26,9 +26,11 @@ public class EnvConfigCommon {
     @Value("${user.loginapi.authPassword}")
     private String userServiceAuthPassword;
 
+    @Value("${kpermissions.data.publish}")
+    private String kpermissionDataPublish;
 
-
-
+    @Value("${kpermissions.model.package.path}")
+    private String modelPackagePath;
 
     public String getUserServiceUrl() {
         return userServiceUrl;
@@ -68,5 +70,21 @@ public class EnvConfigCommon {
 
     public void setUserServiceAuthPassword(String userServiceAuthPassword) {
         this.userServiceAuthPassword = userServiceAuthPassword;
+    }
+
+    public String getKpermissionDataPublish() {
+        return kpermissionDataPublish;
+    }
+
+    public void setKpermissionDataPublish(String kpermissionDataPublish) {
+        this.kpermissionDataPublish = kpermissionDataPublish;
+    }
+
+    public String getModelPackagePath() {
+        return modelPackagePath;
+    }
+
+    public void setModelPackagePath(String modelPackagePath) {
+        this.modelPackagePath = modelPackagePath;
     }
 }
