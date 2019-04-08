@@ -159,7 +159,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                lookup("activities", "_id", "childActivityIds", "parentActivity"),
                 project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab","activityPriorityId","childActivityIds","compositeActivities").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("parentActivity._id").as("parentActivityId")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
         );

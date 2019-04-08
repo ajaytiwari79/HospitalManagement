@@ -53,6 +53,7 @@ public class ActivityWithCompositeDTO {
     private List<Long> dayTypeIds= new ArrayList<>();
     private Set<BigInteger> childActivityIds=new HashSet<>();
     private Set<BigInteger> availableChildActivityIds =new HashSet<>();
+    private BigInteger parentActivityId;
 
 
     public ActivityWithCompositeDTO() {
@@ -288,5 +289,13 @@ public class ActivityWithCompositeDTO {
 
     public void setApplicableForChildActivities(boolean applicableForChildActivities) {
         this.applicableForChildActivities = applicableForChildActivities;
+    }
+
+    public BigInteger getParentActivityId() {
+        return parentActivityId;
+    }
+
+    public void setParentActivityId(BigInteger parentActivityId) {
+        this.parentActivityId = parentActivityId;
     }
 }
