@@ -175,7 +175,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation("Update compositeShifts Tab of Activity")
-    @PutMapping(value = "/activity/{activityId}/childActivies")
+    @PutMapping(value = "/activity/{activityId}/childActivities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));

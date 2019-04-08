@@ -427,7 +427,7 @@ public class ActivityService extends MongoBaseService {
         if (activityMatched.size() != childActivitiesIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", childActivitiesIds);
         }
-       // organizationActivityService.verifyTeamActivity(activityMatched, activity);
+        //organizationActivityService.verifyTeamActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
         //updateCompositeActivity(activityList, activity, compositeActivities);
         save(activity);
