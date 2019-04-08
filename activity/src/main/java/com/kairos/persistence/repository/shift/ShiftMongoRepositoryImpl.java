@@ -578,7 +578,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Override
     public boolean existShiftsBetweenDurationByUnitPositionIdAndTimeType(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, TimeTypes timeType) {
 
-        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lt(endDate).and("endDate").gt(startDate);
+        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lte(endDate).and("endDate").gt(startDate);
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
         }

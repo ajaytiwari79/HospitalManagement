@@ -74,7 +74,8 @@ public class WTARuleTemplateCalculationService {
                     }
                 }
                 shift.setRestingMinutes(restingMinutes);
-                shift.setEscalationReasons(shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons());
+                shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons():newHashSet());
+
             }
         }
         return shifts;
