@@ -26,12 +26,12 @@ import java.util.Set;
 public class MongoBaseService {
 
     @Inject
-    MongoSequenceRepository mongoSequenceRepository;
+    protected MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
-    MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
     @Inject
-    DB database;
+    protected DB database;
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 

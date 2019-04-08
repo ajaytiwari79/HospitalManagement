@@ -136,8 +136,6 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private CounterRepository counterRepository;
     @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
     private GlideTimeSettingsService glideTimeSettingsService;
     @Inject
     private PlanningPeriodService planningPeriodService;

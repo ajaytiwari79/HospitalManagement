@@ -981,6 +981,8 @@ public class StaffService {
         staffToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
         staffToUpdate.setSignature(staffPersonalDetail.getSignature());
         staffToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
+        staffToUpdate.getUser().setFirstName(staffPersonalDetail.getFirstName());
+        staffToUpdate.getUser().setLastName(staffPersonalDetail.getLastName());
         staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         if(staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
             staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
