@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -99,6 +100,20 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     }
 
+    public List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "activityPriorityId","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities"),
+                match(Criteria.where("applicableForChildActivities").is(true))
+        );
+        AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
+        return result.getMappedResults();
+    }
+
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
@@ -113,6 +128,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
+
     public List<ActivityTagDTO> findAllActivityByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
@@ -124,6 +140,31 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
+    }
+
+    public List<ActivityTagDTO> findAllowChildActivityByCountryId(long countryId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                project("name", "countryId", "isParentActivity", "generalActivityTab","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities"),
+                    match(Criteria.where("applicableForChildActivities").is(true))
+        );
+        AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
+        return result.getMappedResults();
+    }
+
+    public ActivityWithCompositeDTO findActivityByActivityId(BigInteger activityId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab","activityPriorityId","childActivityIds","compositeActivities").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
+        );
+        AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
+        return isCollectionNotEmpty(result.getMappedResults()) ?result.getMappedResults().get(0) : null;
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {

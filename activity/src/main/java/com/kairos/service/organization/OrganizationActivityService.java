@@ -210,7 +210,6 @@ public class OrganizationActivityService extends MongoBaseService {
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
-        activityService.checkActivityAllowChildActivities(activities);
         response.put("activities", activities);
         response.put("activityCategories", activityCategories);
         return response;
@@ -532,9 +531,6 @@ public class OrganizationActivityService extends MongoBaseService {
      * @Desc this method is being used to validate the cases of allowed activities
      */
     public void verifyTeamActivity(List<ActivityWrapper> activities, Activity parentActivity) {
-        if(parentActivity.getRulesActivityTab().isEligibleForStaffingLevel() && activities.stream().anyMatch(k->!k.getActivity().getRulesActivityTab().isEligibleForStaffingLevel())){
-            exceptionService.actionNotPermittedException("message.child_activities.not_support.staffing_level");
-        }
         TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(timeType.isPartOfTeam()) {
                 if (activityMongoRepository.existsByActivityIdInCompositeActivities(parentActivity.getId())) {

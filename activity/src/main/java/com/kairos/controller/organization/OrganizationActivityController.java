@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
@@ -173,11 +174,18 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId, compositeShiftActivityDTO));
     }
 
+    @ApiOperation("Update compositeShifts Tab of Activity")
+    @PutMapping(value = "/activity/{activityId}/childActivies")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));
+    }
+
     @ApiOperation("get compositeShifts Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/compositeShifts")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeShiftTabOfActivity(activityId));
+    ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeAndChildActivityOfUnitActivity(activityId,unitId));
     }
 
 

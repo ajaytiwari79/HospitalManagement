@@ -37,6 +37,7 @@ public class ActivityWithCompositeDTO {
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
     private boolean allowChildActivities;
+    private boolean applicableForChildActivities;
     private Long staffId;
     private BigInteger activityId;
     private Long unitPositionId;
@@ -51,6 +52,7 @@ public class ActivityWithCompositeDTO {
     private LocalTime maximumEndTime;
     private List<Long> dayTypeIds= new ArrayList<>();
     private Set<BigInteger> childActivityIds=new HashSet<>();
+    private Set<BigInteger> availableChildActivityIds =new HashSet<>();
 
 
     public ActivityWithCompositeDTO() {
@@ -270,5 +272,21 @@ public class ActivityWithCompositeDTO {
 
     public void setChildActivityIds(Set<BigInteger> childActivityIds) {
         this.childActivityIds = childActivityIds;
+    }
+
+    public Set<BigInteger> getAvailableChildActivityIds() {
+        return availableChildActivityIds;
+    }
+
+    public void setAvailableChildActivityIds(Set<BigInteger> availableChildActivityIds) {
+        this.availableChildActivityIds = availableChildActivityIds;
+    }
+
+    public boolean isApplicableForChildActivities() {
+        return applicableForChildActivities;
+    }
+
+    public void setApplicableForChildActivities(boolean applicableForChildActivities) {
+        this.applicableForChildActivities = applicableForChildActivities;
     }
 }

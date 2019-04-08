@@ -207,8 +207,8 @@ public class ActivityController {
     @ApiOperation("get compositeShifts Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/compositeShifts")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeShiftTabOfActivity(activityId));
+    ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeAndChildActivityOfCountryActivity(activityId,countryId));
     }
 
 

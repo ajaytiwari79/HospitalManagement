@@ -28,6 +28,10 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);
 
+    List<ActivityTagDTO> findAllowChildActivityByCountryId(long countryId);
+
+    ActivityWithCompositeDTO findActivityByActivityId(BigInteger activityId);
+
     List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId);
 
     List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId);
@@ -37,6 +41,8 @@ public interface CustomActivityMongoRepository {
     List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId);
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
+
+    List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
 
