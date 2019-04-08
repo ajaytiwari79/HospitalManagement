@@ -4,12 +4,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Getter
+@Setter
+@NoArgsConstructor
 public class AssetTypeBasicResponseDTO {
 
     private Long id;
@@ -32,31 +38,4 @@ public class AssetTypeBasicResponseDTO {
         this.risks = risks;
     }
 
-    public AssetTypeBasicResponseDTO() {
-    }
-
-
-    public Boolean getSubAssetType() { return subAssetType; }
-
-    public void setSubAssetType(Boolean subAssetType) { this.subAssetType = subAssetType; }
-
-    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-
-    public void setName(String name) { this.name = name; }
-
-    public List<OrganizationLevelRiskDTO> getRisks() { return risks; }
-
-    public void setRisks(List<OrganizationLevelRiskDTO> risks) { this.risks = risks; }
-}
+   }

@@ -158,18 +158,18 @@ public class AssetService {
             if (assetType == null) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetDTO.getAssetType().getId());
             }
-            if (assetDTO.getAssetSubType() != null) {
-                if (assetDTO.getAssetSubType().getId() == null) {
-                    subAssetType = new AssetType(assetDTO.getAssetSubType().getName(), unitId, true);
-                    linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getAssetSubType().getRisks());
+            if (assetDTO.getSubAssetType() != null) {
+                if (assetDTO.getSubAssetType().getId() == null) {
+                    subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
+                    linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
                     subAssetType.setAssetType(assetType);
                     assetTypeRepository.save(subAssetType);
                     assetType.getSubAssetTypes().add(subAssetType);
                 } else {
                     for (AssetType assetSubType : assetType.getSubAssetTypes()) {
-                        if (assetDTO.getAssetSubType().getId().equals(assetSubType.getId())) {
+                        if (assetDTO.getSubAssetType().getId().equals(assetSubType.getId())) {
                             subAssetType = assetSubType;
-                            linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getAssetSubType().getRisks());
+                            linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
                             break;
                         }
                     }
@@ -181,8 +181,8 @@ public class AssetService {
                 exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetDTO.getAssetType().getName());
             }
             assetType = new AssetType(assetDTO.getAssetType().getName(), unitId, false);
-            if (assetDTO.getAssetSubType() != null) {
-                subAssetType = new AssetType(assetDTO.getAssetSubType().getName(), unitId, true);
+            if (assetDTO.getSubAssetType() != null) {
+                subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
                 subAssetType.setAssetType(assetType);
                 assetType.setSubAssetTypes(Arrays.asList(subAssetType));
             }

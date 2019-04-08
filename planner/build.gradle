@@ -52,6 +52,7 @@ dependencies {
 	compile project('optaplanner-taskplanning')
 	compile project('optaplanner-vrp-taskplanning')
 	compile project (':kcommons')
+	compile project (':kpermissions')
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
 	compile group: 'com.google.guava', name: 'guava', version: '19.0'
 	compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.2'

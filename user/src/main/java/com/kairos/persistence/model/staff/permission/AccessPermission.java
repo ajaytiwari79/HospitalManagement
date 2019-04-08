@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.staff.permission;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
