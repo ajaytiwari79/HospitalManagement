@@ -222,7 +222,7 @@ public class ShiftBreakService {
         } else {
             //endDateMillis = mainShift.getEndDate().getTime();
             for (ShiftActivity shiftActivity : shift.getActivities()) {
-                shiftActivities.add(getShiftObject(shiftActivity.getActivityName(), shiftActivity.getActivityId(), shiftActivity.getStartDate(), shiftActivity.getEndDate(), false, shiftActivity.getAbsenceReasonCodeId(), null));
+                shiftActivities.add(getShiftObject(shiftActivity.getActivityName(), shiftActivity.getActivityId(), shiftActivity.getStartDate(), shiftActivity.getEndDate(), false, shiftActivity.getAbsenceReasonCodeId(), null,shiftActivity.getStartLocation(),shiftActivity.getEndLocation()));
             }
             shiftDurationInMinute = 0L;
         }
@@ -318,7 +318,7 @@ public class ShiftBreakService {
                             shiftEndDate = previousShiftEndDate;
                             shiftStartDate = new Date(shiftEndDate.getTime() - breakSetting.getBreakDurationInMinute() * ONE_MINUTE);
                             shiftActivities.add(i, getShiftObject(breakActivity.getName(), breakActivity.getId(), shiftStartDate,
-                                    shiftEndDate, true, null, breakSetting.getBreakDurationInMinute()));
+                                    shiftEndDate, true, null, breakSetting.getBreakDurationInMinute(),shiftActivities.get(i).getStartLocation(),shiftActivities.get(i).getEndLocation()));
 
                             shiftEndDate = shiftStartDate;
                             shiftStartDate = new Date(shiftEndDate.getTime() - gapBetweenBreaks * ONE_MINUTE);
@@ -340,8 +340,8 @@ public class ShiftBreakService {
         }
     }
 
-    private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute) {
-        ShiftActivity childShift = new ShiftActivity(name, startDate, endDate, activityId, breakShift, absenceReasonCodeId, allowedBreakDurationInMinute);
+    private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute,String startLocation,String endLocation) {
+        ShiftActivity childShift = new ShiftActivity(name, startDate, endDate, activityId, breakShift, absenceReasonCodeId, allowedBreakDurationInMinute,startLocation,endLocation);
         childShift.setStatus(Collections.singleton(ShiftStatus.REQUEST));
         return childShift;
     }
@@ -349,7 +349,7 @@ public class ShiftBreakService {
     private ShiftActivity getShiftByStartDuration(Shift shift, Date startDate, Date endDate) {
         Optional<ShiftActivity> currentShiftActivity = shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime() <= startDate.getTime() && shiftActivity.getEndDate().getTime() > startDate.getTime())).findFirst();
         ShiftActivity childShift = currentShiftActivity.isPresent() ? currentShiftActivity.get() : shift.getActivities().get(0);
-        return new ShiftActivity(childShift.getActivityName(), startDate, endDate, childShift.getActivityId(), false, childShift.getAbsenceReasonCodeId(), null,childShift.getRemarks());
+        return new ShiftActivity(childShift.getActivityName(), startDate, endDate, childShift.getActivityId(), false, childShift.getAbsenceReasonCodeId(), null,childShift.getRemarks(),childShift.getStartLocation(),childShift.getEndLocation());
 
     }
 
@@ -357,11 +357,10 @@ public class ShiftBreakService {
         ShiftActivity childShift;
         Optional<ShiftActivity> currentShiftActivity = shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime() <= startDate.getTime() && shiftActivity.getEndDate().getTime() > startDate.getTime())).findFirst();
         if (currentShiftActivity.isPresent() && currentShiftActivity.get().isBreakShift()) {
-            childShift = new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), true, currentShiftActivity.get().getAbsenceReasonCodeId(), allowedBreakDurationInMinute, currentShiftActivity.get().isBreakReplaced());
+            childShift = new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), true, currentShiftActivity.get().getAbsenceReasonCodeId(), allowedBreakDurationInMinute, currentShiftActivity.get().isBreakReplaced(),currentShiftActivity.get().getStartLocation(),currentShiftActivity.get().getEndLocation());
 
         } else {
-            childShift = new ShiftActivity(breakActivity.getName(), startDate, endDate, breakActivity.getId(), true, shift.getActivities().get(0).getAbsenceReasonCodeId(), allowedBreakDurationInMinute);
-
+            childShift = new ShiftActivity(breakActivity.getName(), startDate, endDate, breakActivity.getId(), true, shift.getActivities().get(0).getAbsenceReasonCodeId(), allowedBreakDurationInMinute,shift.getActivities().get(0).getStartLocation(),shift.getActivities().get(0).getEndLocation());
         }
         return childShift;
     }

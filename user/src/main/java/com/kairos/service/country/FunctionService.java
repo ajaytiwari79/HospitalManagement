@@ -1,6 +1,6 @@
 package com.kairos.service.country;
 
-import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
@@ -9,6 +9,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
 import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationshipQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
@@ -159,6 +160,7 @@ public class FunctionService {
 
     /**
      * Assuming one function per Date per unitPosition
+     *
      * @param unitPositionIdWithShiftDateFunctionIdMap
      * @return
      */
@@ -177,7 +179,7 @@ public class FunctionService {
                 Set<LocalDate> existingAppliedDates = unitPositionFunctionRelationshipQueryResult.getAppliedDates();
                 Map<LocalDate, Long> localDateFunctionIdMap = unitPositionIdWithShiftDateFunctionIdMap.get(existingUnitPosition.getId());
                 Set<LocalDate> datesToBeAdded = localDateFunctionIdMap.keySet().stream().filter(date -> existingFunction.getId().equals(localDateFunctionIdMap.get(date))).collect(Collectors.toSet());
-                Set<LocalDate> datesToBeRemoved = localDateFunctionIdMap.keySet().stream().filter(date -> ((localDateFunctionIdMap.get(date)==null) && existingAppliedDates.contains(date))).collect(Collectors.toSet());
+                Set<LocalDate> datesToBeRemoved = localDateFunctionIdMap.keySet().stream().filter(date -> ((localDateFunctionIdMap.get(date) == null) && existingAppliedDates.contains(date))).collect(Collectors.toSet());
                 if (!datesToBeAdded.isEmpty() || !datesToBeRemoved.isEmpty()) {
                     existingAppliedDates.addAll(datesToBeAdded);
                     existingAppliedDates.removeAll(datesToBeRemoved);
@@ -190,13 +192,31 @@ public class FunctionService {
         }
         return result;
     }
+
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
-        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
 
         return functionGraphRepository.findFunctionsByCountry(countryId);
+    }
+
+    public Map<LocalDate, List<FunctionDTO>> findAppliedFunctionsAtUnitPosition(Long unitId, String startDate, String endDate) {
+        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(functionGraphRepository.findAppliedFunctionsAtUnitPosition(unitId, startDate, endDate), UnitPositionQueryResult.class);
+        Map<LocalDate, List<FunctionDTO>> dateWiseFunctionMap = new HashMap<>();
+        for (UnitPositionQueryResult unitPositionQueryResult : unitPositionQueryResults) {
+            for (com.kairos.persistence.model.country.functions.FunctionDTO appliedFunctionDTO : unitPositionQueryResult.getAppliedFunctions()) {
+                for (LocalDate localDate : appliedFunctionDTO.getAppliedDates()) {
+                    FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
+                    functionDTO.setUnitPositionId(unitPositionQueryResult.getId());
+                    List<FunctionDTO> functionDTOS = dateWiseFunctionMap.getOrDefault(localDate, new ArrayList<>());
+                    functionDTOS.add(functionDTO);
+                    dateWiseFunctionMap.put(localDate, functionDTOS);
+                }
+            }
+        }
+        return dateWiseFunctionMap;
     }
 }

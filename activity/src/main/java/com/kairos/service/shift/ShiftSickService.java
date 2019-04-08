@@ -179,7 +179,7 @@ public class ShiftSickService extends MongoBaseService {
                 if (!breakActivities.isEmpty()) {
                     shift.setActivities(breakActivities);
                 }
-                shiftService.saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO,false);
+                shiftService.saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO,false,null);
             }
 
             shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
