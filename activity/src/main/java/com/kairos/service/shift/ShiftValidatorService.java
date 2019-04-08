@@ -359,27 +359,8 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateStatusOfShiftOnUpdate(Shift shift, ShiftDTO shiftDTO) {
-        int i = 0;
-        for (ShiftActivity shiftActivity : shift.getActivities()) {
-            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
-            if (notValid) {
-                try {
-                    ShiftActivityDTO updateShiftActivity = shiftDTO.getActivities().get(i);
-                    if (updateShiftActivity == null || updateShiftActivity.getStartDate().equals(shift.getStartDate()) || updateShiftActivity.getEndDate().equals(shift.getEndDate())) {
-                        exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
-                }
 
-            }
-            i++;
-        }
-
-    }
-
-    public void validateStatusOfShiftOnDelete(Shift shift) {
+    public void validateStatusOfShiftActivity(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
             if (notValid) {
