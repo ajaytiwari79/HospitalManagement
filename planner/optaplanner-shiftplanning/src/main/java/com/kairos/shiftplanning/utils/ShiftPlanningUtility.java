@@ -4,14 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.enums.Day;
 import com.kairos.enums.wta.IntervalUnit;
-import com.kairos.shiftplanning.domain.*;
-import com.kairos.shiftplanning.domain.activityConstraint.CountryHolidayCalender;
-import com.kairos.shiftplanning.domain.activityConstraint.DayType;
+import com.kairos.shiftplanning.constraints.activityConstraint.CountryHolidayCalender;
+import com.kairos.shiftplanning.constraints.activityConstraint.DayType;
+import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staff.AvailabilityRequest;
+import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.staff.IndirectActivity;
+import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
+import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelInterval;
+import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelPlannerEntity;
 import com.kairos.shiftplanning.dto.ShiftDTO;
+import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import org.apache.commons.collections4.CollectionUtils;
@@ -45,7 +53,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.time.DayOfWeek;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -158,25 +165,6 @@ public class ShiftPlanningUtility {
         });
         updatedList = generatedAvailabilityRequests;
         //log.info(Thread.currentThread().getName()+"added new availabilities size:"+insertedFacts.size());
-    }
-
-    @Deprecated
-    public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, List<ShiftConstrutionPhase> shifts) {
-        int[] shiftsOutsideLimit = new int[1];
-        staffingLevel.getIntervals().forEach(slInterval -> {
-            int shiftsInThisInterval = getShiftsForInterval(slInterval, shifts);
-            if (shiftsInThisInterval < slInterval.getMinimumStaffRequired()) {
-                shiftsOutsideLimit[0] += slInterval.getMinimumStaffRequired() - shiftsInThisInterval;
-            } else if (shiftsInThisInterval > slInterval.getMaximumStaffRequired()) {
-                shiftsOutsideLimit[0] += shiftsInThisInterval - slInterval.getMaximumStaffRequired();
-            }
-        });
-        return shiftsOutsideLimit[0];
-    }
-
-    @Deprecated
-    public static Integer getShiftsForInterval(StaffingLevelInterval interval, List<ShiftConstrutionPhase> shifts) {
-        return (int) shifts.stream().filter(shift -> shift.getInterval() != null && shift.getInterval().contains(interval.getInterval())).count();
     }
 
     public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, List<Shift> shifts, List<IndirectActivity> indirectActivityList) {
@@ -440,7 +428,7 @@ public class ShiftPlanningUtility {
         return overlappingAlis;
     }
 
-    public static void unassignShiftIntervalsOverlappingBreaks(ScoreDirector scoreDirector, ShiftRequestPhase shift, List<ShiftBreak> breaks) {
+    public static void unassignShiftIntervalsOverlappingBreaks(ScoreDirector scoreDirector, ShiftImp shift, List<ShiftBreak> breaks) {
         List<ActivityLineInterval> overlappingAlis = getOverlappingActivityLineIntervalsWithBreaks(shift, breaks);
         //removeALIFromVariableListenerNotificationQueue(scoreDirector,overlappingAlis);
         for (ActivityLineInterval ali : overlappingAlis) {
@@ -471,7 +459,7 @@ public class ShiftPlanningUtility {
         }
     }
 
-    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithBreaks(ShiftRequestPhase shift, List<ShiftBreak> breaks) {
+    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithBreaks(ShiftImp shift, List<ShiftBreak> breaks) {
         List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
         List<ActivityLineInterval> overlappingAlis = new ArrayList<>();
         for (ActivityLineInterval ali : alis) {
@@ -484,7 +472,7 @@ public class ShiftPlanningUtility {
         return overlappingAlis;
     }
 
-    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithInterval(ShiftRequestPhase shift, Interval interval) {
+    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithInterval(ShiftImp shift, Interval interval) {
         List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
         List<ActivityLineInterval> overlappingAlis = new ArrayList<>();
         for (ActivityLineInterval ali : alis) {
@@ -495,7 +483,7 @@ public class ShiftPlanningUtility {
         return overlappingAlis;
     }
 
-    public static boolean intervalOverlapsBreak(ShiftRequestPhase shift, DateTime start) {
+    public static boolean intervalOverlapsBreak(ShiftImp shift, DateTime start) {
         boolean overlaps = false;
         if (shift == null || CollectionUtils.isEmpty(shift.getBreaks())) {
             return overlaps;
@@ -530,13 +518,13 @@ public class ShiftPlanningUtility {
         return aliw;
     }
 
-    public static List<ActivityLineIntervalWrapper> toActivityWrapper(List<ActivityLineInterval> alis, ShiftRequestPhase shiftRequestPhase) {
+    public static List<ActivityLineIntervalWrapper> toActivityWrapper(List<ActivityLineInterval> alis, ShiftImp shiftImp) {
         List<ActivityLineIntervalWrapper> aliw = new ArrayList<>();
         if (CollectionUtils.isEmpty(alis)) return aliw;
         for (ActivityLineInterval ali : alis) {
-            if (Objects.equals(ali.getShift(), shiftRequestPhase))
+            if (Objects.equals(ali.getShift(), shiftImp))
                 continue;
-            aliw.add(new ActivityLineIntervalWrapper(ali, shiftRequestPhase));
+            aliw.add(new ActivityLineIntervalWrapper(ali, shiftImp));
         }
         return aliw;
     }
@@ -631,8 +619,8 @@ public class ShiftPlanningUtility {
     //TODO n2 complex need to improve
     public static List<ActivityLineIntervalWrapper> buildNullAssignWrappersForExIntervals(List<ActivityLineIntervalWrapper> activityLineIntervalWrappers) {
         List<ActivityLineIntervalWrapper> overlappingAlisWrappers = new ArrayList<>();
-        if (activityLineIntervalWrappers.get(0).getShiftRequestPhase() == null) return overlappingAlisWrappers;
-        List<ActivityLineInterval> exAlisThisShift = activityLineIntervalWrappers.get(0).getShiftRequestPhase().getActivityLineIntervals();
+        if (activityLineIntervalWrappers.get(0).getShiftImp() == null) return overlappingAlisWrappers;
+        List<ActivityLineInterval> exAlisThisShift = activityLineIntervalWrappers.get(0).getShiftImp().getActivityLineIntervals();
         if (exAlisThisShift != null) {
             for (ActivityLineInterval ex : exAlisThisShift) {
                 for (ActivityLineIntervalWrapper newAli : activityLineIntervalWrappers) {
@@ -709,7 +697,7 @@ public class ShiftPlanningUtility {
 
     }
 
-    public static Interval getPossibleBreakStartInterval(ShiftBreak shiftBreak, ShiftRequestPhase shift) {
+    public static Interval getPossibleBreakStartInterval(ShiftBreak shiftBreak, ShiftImp shift) {
         switch (shiftBreak.getOrder()) {
             case 1:
                 return new Interval(shift.getStart().plusMinutes(FIRST_BREAK_START_MINUTES), shift.getStart().plusMinutes(FIRST_BREAK_END_MINUTES));
@@ -760,7 +748,7 @@ public class ShiftPlanningUtility {
         });
     }
 
-    public static Map<LocalDate, Object[]> reduceStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrixOriginal, List<ShiftRequestPhase> shifts,
+    public static Map<LocalDate, Object[]> reduceStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrixOriginal, List<ShiftImp> shifts,
                                                                      List<ShiftBreak> shiftBreaks, List<IndirectActivity> indirectActivities, int granularity) {
         long start = System.currentTimeMillis();
         Map<LocalDate, Object[]> slMatrix = deepCopyMatrix(slMatrixOriginal);
@@ -777,7 +765,7 @@ public class ShiftPlanningUtility {
                 breaksPerShift.get(sb.getShift().getId()).add(sb);
             });
         }
-        for (ShiftRequestPhase shift : shifts) {
+        for (ShiftImp shift : shifts) {
             if (shift.getInterval() == null) {
                 continue;
             }
@@ -895,7 +883,7 @@ public class ShiftPlanningUtility {
     THis is not required as we can just reduce shifts from SL matrix. instead createStaffingLevelMatrix()
      */
     @Deprecated
-    public static Map<LocalDate, Object[]> createShiftsMatrix(List<ShiftRequestPhase> shifts, int granularity, int activitiesCount) {
+    public static Map<LocalDate, Object[]> createShiftsMatrix(List<ShiftImp> shifts, int granularity, int activitiesCount) {
         Map<LocalDate, Object[]> slMatrix = new HashMap<>();
         for (LocalDate localDate : shifts.stream().map(s -> s.getDate()).collect(Collectors.toSet())) {
             slMatrix.put(localDate, new int[1440 / granularity][activitiesCount]);
@@ -921,7 +909,7 @@ public class ShiftPlanningUtility {
         return activityLineInterval.getActivity().getOrder() * 2 - 1;
     }
 
-    public static void breakConstraints(RuleContext kContext, HardMediumSoftLongScoreHolder scoreHolder, List<ShiftRequestPhase> shifts) {
+    public static void breakConstraints(RuleContext kContext, HardMediumSoftLongScoreHolder scoreHolder, List<ShiftImp> shifts) {
         kContext = kContext;
     }
 
@@ -930,7 +918,7 @@ public class ShiftPlanningUtility {
         return;
     }
 
-    public static boolean checkEmployeesAvailability(List<ShiftRequestPhase> shifts, List<Employee> employeeList, DateTime startTime) {
+    public static boolean checkEmployeesAvailability(List<ShiftImp> shifts, List<Employee> employeeList, DateTime startTime) {
         for (Employee emp : employeeList) {
             boolean employeeAvailable = false;
             //for()
