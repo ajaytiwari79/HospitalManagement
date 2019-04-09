@@ -99,6 +99,7 @@ public class StaffExpertiseUnitTest {
         contactDetail.setPrivatePhone("9876767767");
         contactDetail.setPrivateEmail("abc@kairosplanning.com");
         staff.setContactDetail(contactDetail);
+        staff.setUser(user);
         List<Long> expertiseIds = new ArrayList<>();
         expertiseIds.add(23234L);
         expertiseIds.add(23238L);
