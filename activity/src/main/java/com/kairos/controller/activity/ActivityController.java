@@ -219,13 +219,6 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));
     }
 
-    @ApiOperation("get child activity Tab of Activity")
-    @GetMapping(value = "/activity/{activityId}/childActivies")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getChildShiftTabOfActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getChildActivitiesIdsOfActivity(activityId));
-    }
-
    /* @ApiOperation("Update notes Tab of Activity")
     @PutMapping(value = "/activity/notes")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
