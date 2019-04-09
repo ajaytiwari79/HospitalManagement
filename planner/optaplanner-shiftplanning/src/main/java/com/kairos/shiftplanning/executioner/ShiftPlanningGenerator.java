@@ -3,10 +3,19 @@ package com.kairos.shiftplanning.executioner;
 
 import com.kairos.enums.Day;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.shiftplanning.domain.*;
-import com.kairos.shiftplanning.domain.activityConstraint.*;
-import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
+import com.kairos.shiftplanning.constraints.activityConstraint.*;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.cta.*;
+import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.skill.Skill;
+import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.staff.IndirectActivity;
+import com.kairos.shiftplanning.domain.staff.PrevShiftsInfo;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.wta.*;
 import com.kairos.shiftplanning.enums.SkillType;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
@@ -127,8 +136,8 @@ public class ShiftPlanningGenerator {
         }
         return unresolvedSolution;
     }
-    private List<ShiftBreak> generateBreaksForShifts(List<ShiftRequestPhase> shifts) {
-        for(ShiftRequestPhase shift:shifts){
+    private List<ShiftBreak> generateBreaksForShifts(List<ShiftImp> shifts) {
+        for(ShiftImp shift:shifts){
             if(shift.isAbsenceActivityApplied() || shift.getMinutes()<FIRST_BREAK_THRESHOLD_MINUTES){
                 continue;
             }
@@ -175,19 +184,6 @@ public class ShiftPlanningGenerator {
         return unresolvedSolution;
     }
 
-    private List<Absence> generateAbsenceList(List<Employee> employees) {
-        List<Absence> absences= new ArrayList<>();
-        employees.forEach(employee -> {
-            /*Absence absenceVeto1= new Absence(UUID.randomUUID(),employee,new DateTime(getPlanningWeekStart().plusDays(3)),new DateTime(getPlanningWeekStart().plusDays(4)),"VETO");
-            Absence absenceStopBrick1= new Absence(UUID.randomUUID(),employee,new DateTime(getPlanningWeekStart().plusDays(5)),new DateTime(getPlanningWeekStart().plusDays(5)).plusHours(8),"SB");
-            Absence absenceStopBrick2= new Absence(UUID.randomUUID(),employee,new DateTime(getPlanningWeekStart().plusDays(5)).plusHours(20),new DateTime(getPlanningWeekStart().plusDays(6)),"SB");
-            absences.add(absenceVeto1);
-            absences.add(absenceStopBrick1);
-            absences.add(absenceStopBrick2);*/
-        });
-        return absences;
-    }
-
     private List<IndirectActivity> generateIndirectActivities(List<Employee> employees) {
         return Arrays.asList(new IndirectActivity(UUID.randomUUID(),20,false,new ArrayList<>(employees.subList(2,5)),"XYZ",false));
     }
@@ -222,13 +218,13 @@ public class ShiftPlanningGenerator {
             e.printStackTrace();
         }
     }
-    private List<ShiftRequestPhase> generateShifts(List<Employee> employees){
+    private List<ShiftImp> generateShifts(List<Employee> employees){
         LocalDate shiftStart=getPlanningWeekStart();
-        List<ShiftRequestPhase> shifts= new ArrayList<>();
+        List<ShiftImp> shifts= new ArrayList<>();
         //for (Employee employee : employees) {
         int start = 5;
         for(int i=0;i<6;i++){
-            ShiftRequestPhase shift = new ShiftRequestPhase();
+            ShiftImp shift = new ShiftImp();
             shift.setStartTime(new DateTime(shiftStart.toDateTimeAtStartOfDay()).minusHours(start+5).toLocalTime());
             shift.setEndTime(new DateTime(shiftStart.toDateTimeAtStartOfDay()).minusHours(start).toLocalTime());
             start+=5;
@@ -241,15 +237,15 @@ public class ShiftPlanningGenerator {
         return shifts;
     }
 
-    public List<ShiftRequestPhase> generateShiftForAssignments(List<Employee> employees,List<ActivityLineInterval> activityLineIntervals) {
-        List<ShiftRequestPhase> shiftList = new ArrayList<>();
+    public List<ShiftImp> generateShiftForAssignments(List<Employee> employees, List<ActivityLineInterval> activityLineIntervals) {
+        List<ShiftImp> shiftList = new ArrayList<>();
         int i = 0;
         for(Employee emp:employees){
             for(LocalDate date:getPlanningDays()) {
                 /*List<ActivityLineInterval> activityLineIntervalList = activityLineIntervals.subList(i,i=i+5);
                 activityLineIntervalList.sort(Comparator.comparing(ActivityLineInterval::getStart));
                 ActivityLineInterval ali = null;*/
-                ShiftRequestPhase sa = new ShiftRequestPhase();
+                ShiftImp sa = new ShiftImp();
                 sa.setEmployee(emp);
                 sa.setId(UUID.randomUUID());
                 sa.setDate(date);

@@ -2,10 +2,9 @@ package com.planner.domain.shift_planning;
 
 
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.shiftplanning.domain.Employee;
+import com.kairos.shiftplanning.domain.staff.Employee;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

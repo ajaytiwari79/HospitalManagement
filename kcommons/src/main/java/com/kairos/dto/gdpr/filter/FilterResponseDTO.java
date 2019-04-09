@@ -26,6 +26,4 @@ public class FilterResponseDTO {
 
     private String displayName;
 
-
-
 }
