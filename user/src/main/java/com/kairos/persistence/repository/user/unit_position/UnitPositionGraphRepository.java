@@ -324,7 +324,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)  where id(staff)={0}\n" +
             "MATCH(user)<-[:"+BELONGS_TO+"]-(staffList:Staff)\n" +
-            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition) WHERE id(up)<> {3} AND up.unitPostion ={5} AND  " +
+            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition) WHERE id(up)<> {3} AND up.employmentSubType ={4} AND  " +
             "(({2} IS NULL AND (up.endDate IS NULL OR DATE(up.endDate) >= DATE({1}))) \n" +
             "OR ({2} IS NOT NULL AND DATE(up.startDate) <= DATE({2}) AND (up.endDate IS NULL OR DATE(up.endDate)>DATE({1}))) ) \n" +
             "WITH up  \n" +
