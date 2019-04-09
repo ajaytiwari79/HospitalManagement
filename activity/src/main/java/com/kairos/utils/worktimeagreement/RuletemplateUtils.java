@@ -232,7 +232,7 @@ public class RuletemplateUtils {
         return false;
     }
 
-    public static boolean isValidShift(BigInteger phaseId,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
+    public static boolean isValidShift(BigInteger phaseId,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
         boolean valid = false;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
