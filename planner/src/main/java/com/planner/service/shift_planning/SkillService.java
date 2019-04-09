@@ -1,6 +1,6 @@
 package com.planner.service.shift_planning;
 
-import com.kairos.shiftplanning.domain.Skill;
+import com.kairos.shiftplanning.domain.skill.Skill;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

@@ -1,6 +1,9 @@
 package com.kairos.shiftplanning.rules;
     dialect "java"
-import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
@@ -8,7 +11,7 @@ global HardMediumSoftLongScoreHolder scoreHolder;
 rule "Empty activity line"
 salience 20
     when
-        $shifts:ArrayList() from collect (ShiftRequestPhase(getInterval()!=null));
+        $shifts:ArrayList() from collect (ShiftImp(getInterval()!=null));
         $matrix:StaffingLevelMatrix();
     then
         //ShiftPlanningUtility.breakConstraints(kcontext,scoreHolder,$shifts);
@@ -92,7 +95,7 @@ end
 /**/rule "Missing Shift intervals"
 salience 20
     when
-        $shift:ShiftRequestPhase(!locked)
+        $shift:ShiftImp(!locked)
         $total: Integer(intValue>0) from ($shift.missingIntervals())
     then
         scoreHolder.addHardConstraintMatch(kcontext,  -$total);
@@ -110,7 +113,7 @@ end
 rule "Shift must have empty slots as Break"
 salience 20
     when
-        ShiftRequestPhase(!isAbsenceActivityApplied() && getInterval()!=null && $missingBreakTime:getMissingBreakTimes() && $missingBreakTime>0)
+        ShiftImp(!isAbsenceActivityApplied() && getInterval()!=null && $missingBreakTime:getMissingBreakTimes() && $missingBreakTime>0)
     then
         scoreHolder.addMediumConstraintMatch(kcontext,  -$missingBreakTime);
 end

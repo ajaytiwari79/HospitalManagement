@@ -2,10 +2,10 @@
 <solver>
   <!--<environmentMode>FULL_ASSERT</environmentMode>-->
   <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
-  <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
-  <entityClass>com.kairos.shiftplanning.domain.SkillLineInterval</entityClass>
-  <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
-    <!--<entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>-->
+  <entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImp</entityClass>
+    <!--<entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>-->
 
     <!--Intervals on assigned back to null will not reduce shift length if they are in mid of shift and hence causing score corruption, which is fine
     <environmentMode>FULL_ASSERT</environmentMode>-->
@@ -20,7 +20,7 @@
     <constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="activityLineIntervalSelector">
-                <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="activityLineIntervalSelector"/>
@@ -33,7 +33,7 @@
     <constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="skillLineIntervalSelector">
-                <entityClass>com.kairos.shiftplanning.domain.SkillLineInterval</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="skillLineIntervalSelector"/>
@@ -46,13 +46,13 @@
     <localSearch>
     <unionMoveSelector>
         <moveIteratorFactory>
-            <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
+            <moveIteratorFactoryClass>com.kairos.shiftplanning.move.ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
         </moveIteratorFactory>
         <moveIteratorFactory>
-            <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalPillarMoveIteratorFactory</moveIteratorFactoryClass>
+            <moveIteratorFactoryClass>com.kairos.shiftplanning.move.ActivityLineIntervalPillarMoveIteratorFactory</moveIteratorFactoryClass>
         </moveIteratorFactory>
         <moveIteratorFactory>
-            <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
+            <moveIteratorFactoryClass>com.kairos.shiftplanning.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
         </moveIteratorFactory>
     </unionMoveSelector>
         <acceptor>
@@ -68,10 +68,10 @@
    <!-- <localSearch>
         <unionMoveSelector>
             <moveIteratorFactory>
-                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
+                <moveIteratorFactoryClass>ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
             </moveIteratorFactory>
             <moveIteratorFactory>
-                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
+                <moveIteratorFactoryClass>ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
             </moveIteratorFactory>
         </unionMoveSelector>
         <acceptor>
