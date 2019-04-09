@@ -26,7 +26,7 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
     private Set<BigInteger> plannedTimeIds = new HashSet<>();
     private Set<BigInteger> timeTypeIds = new HashSet<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting;
 
 
     public MinMaxSetting getMinMaxSetting() {
