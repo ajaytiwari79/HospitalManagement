@@ -143,19 +143,19 @@ public class QuestionnaireSectionService {
                     aClass = ProcessingActivity.class.getDeclaredField(ProcessingActivityAttributeName.valueOf(attributeName).value).getType();
                     break;
             }
-            boolean inValidQuestionType=false;
-            if (List.class.equals(aClass) && !question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-                inValidQuestionType=true;
-            } else if ((String.class.equals(aClass) || Integer.class.equals(aClass)) && !question.getQuestionType().equals(QuestionType.TEXTBOX)) {
-                inValidQuestionType=true;
-            } else if (Boolean.class.equals(aClass) && !question.getQuestionType().equals(QuestionType.YES_NO_MAYBE)) {
-                inValidQuestionType=true;
-            } else if (!question.getQuestionType().equals(QuestionType.SELECT_BOX)) {
-                inValidQuestionType=true;
+            boolean isQuestionTypeValid=false;
+            if (List.class.equals(aClass) && question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+                isQuestionTypeValid=true;
+            } else if ((String.class.equals(aClass) || Integer.class.equals(aClass)) && question.getQuestionType().equals(QuestionType.TEXTBOX)) {
+                isQuestionTypeValid=true;
+            } else if (Boolean.class.equals(aClass) && question.getQuestionType().equals(QuestionType.YES_NO_MAYBE)) {
+                isQuestionTypeValid=true;
+            } else if (QuestionType.SELECT_BOX.equals(question.getQuestionType())){
+                isQuestionTypeValid=true;
             }
-            if (inValidQuestionType)
+            if (!isQuestionTypeValid)
             {
-                exceptionService.illegalArgumentException("message.invalid.question.type.selected",question.getAttributeName());
+                exceptionService.illegalArgumentException("message.invalid.question.type.selected",attributeName);
             }
         } catch (NoSuchFieldException e) {
             LOGGER.debug("No such field Exception error in method addAttributeNameToQuestion");
