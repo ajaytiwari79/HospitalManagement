@@ -390,7 +390,7 @@ public class ActivityService extends MongoBaseService {
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(compositeShiftIds);
         if (activityMatched.size() != compositeShiftIds.size()) {
-            exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
+            exceptionService.illegalArgumentException("message.mismatched-ids");
         }
         organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
@@ -424,7 +424,7 @@ public class ActivityService extends MongoBaseService {
         }
         List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
         if (activityMatched.size() != childActivitiesIds.size()) {
-            exceptionService.illegalArgumentException("message.mismatched-ids", childActivitiesIds);
+            exceptionService.illegalArgumentException("message.mismatched-ids");
         }
         organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
@@ -935,8 +935,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
-        return activityTypeList;
+        return activityMongoRepository.findAllActivityByUnitId(unitId, false);
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {

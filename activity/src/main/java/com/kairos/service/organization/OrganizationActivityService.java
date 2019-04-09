@@ -532,7 +532,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public void verifyChildActivity(List<ActivityDTO> activities, Activity parentActivity) {
         TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(!timeType.isAllowChildActivities()) {
-            exceptionService.actionNotPermittedException("message.activity.being_used_as_child", parentActivity.getName());
+            exceptionService.actionNotPermittedException("message.activity.setting.enable", parentActivity.getName());
 
         }
                 if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
