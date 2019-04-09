@@ -13,6 +13,8 @@ import lombok.Setter;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FilterResponseDTO {
@@ -23,6 +25,5 @@ public class FilterResponseDTO {
     private List<FilterAttributes> filterData;
 
     private String displayName;
-
 
 }
