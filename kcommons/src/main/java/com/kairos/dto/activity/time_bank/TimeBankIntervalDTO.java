@@ -14,6 +14,7 @@ public class TimeBankIntervalDTO {
     //In minutes
     private long totalTimeBankAfterCtaMin;
     private long totalTimeBankBeforeCtaMin;
+    //Its is the sum of scheduled minutes of payout and timebank
     private long totalScheduledMin;
     private long totalTimeBankMin;
     private long totalContractedMin;
@@ -28,7 +29,8 @@ public class TimeBankIntervalDTO {
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private String headerName;
-    private long plannedMinutesOfTimebank;
+    //Its is the sum of Planned minutes of payout and timebank
+    private long totalPlannedMinutes;
 
 
     public TimeBankIntervalDTO(long totalScheduledMin, long totalTimeBankDiff, String title) {
@@ -228,11 +230,11 @@ public class TimeBankIntervalDTO {
         this.totalTimeBankDiff = totalTimeBankDiff;
     }
 
-    public long getPlannedMinutesOfTimebank() {
-        return plannedMinutesOfTimebank;
+    public long getTotalPlannedMinutes() {
+        return totalPlannedMinutes;
     }
 
-    public void setPlannedMinutesOfTimebank(long plannedMinutesOfTimebank) {
-        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    public void setTotalPlannedMinutes(long totalPlannedMinutes) {
+        this.totalPlannedMinutes = totalPlannedMinutes;
     }
 }

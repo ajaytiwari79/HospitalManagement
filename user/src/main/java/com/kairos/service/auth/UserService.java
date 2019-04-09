@@ -488,7 +488,7 @@ public class UserService {
         templateParam.put("description",AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
         templateParam.put("hyperLink",config.getForgotPasswordApiLink()+token);
         templateParam.put("hyperLinkName",RESET_PASSWORD);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,"pradeep.singh@oodlestechnologies.com");
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,currentUser.getEmail());
         return true;
     }
 

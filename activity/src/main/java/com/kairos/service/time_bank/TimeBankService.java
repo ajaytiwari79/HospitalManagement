@@ -8,7 +8,6 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
@@ -180,6 +179,9 @@ public class TimeBankService extends MongoBaseService {
         if (!dailyTimeBanks.isEmpty()) {
             timeBankRepository.saveEntities(dailyTimeBanks);
         }
+        if (CollectionUtils.isNotEmpty(dailyTimeBanks)) {
+            updateBonusHoursOfTimeBankInShift(shiftsList, shifts);
+        }
     }
 
 
@@ -277,21 +279,14 @@ public class TimeBankService extends MongoBaseService {
             Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, interval.getStart().toDate(), interval.getEnd().toDate());
             int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBanksBeforeStartDate, false);
             totalTimeBankBeforeStartDate = isCollectionNotEmpty(dailyTimeBanksBeforeStartDate)
-                    ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getTotalTimeBankMinutes()).sum() : 0;
+                    ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getDeltaTimeBankMinutes()).sum() : 0;
             totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;
         }
         totalTimeBankBeforeStartDate+=unitPositionWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
         List<PayOutTransaction> payOutTransactions = payOutTransactionMongoRepository.findAllByUnitPositionIdAndDate(unitPositionId, startDate, endDate);
-        List<PayOutPerShift> payOutPerShifts = payOutRepository.findAllByUnitPositionAndDate(unitPositionId, startDate, endDate);
         List<Interval> intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, payOutTransactions);
-        TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankAdvanceView(intervals,unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, unitPositionWithCtaDetailsDTO, timeTypeDTOS, payoutTransactionIntervalMap);
-        List<PayOutPerShift> payOutPerShiftBeforestartDate = payOutRepository.findAllByUnitPositionAndBeforeDate(unitPositionId,startDate);
-        long payoutMinutesBefore = isCollectionNotEmpty(payOutPerShiftBeforestartDate)
-                ? payOutPerShiftBeforestartDate.stream().mapToLong(payout -> payout.getTotalPayOutMinutes()).sum() : 0;
-        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOutPerShifts,payoutMinutesBefore, payoutTransactionIntervalMap, unitPositionWithCtaDetailsDTO, query);
-        //timeBankDTO1.setCostTimeAgreement(getCostTimeAgreement(145l));
-        return new TimeBankAndPayoutDTO(timeBankDTO,payOut);
+        return timeBankCalculationService.getTimeBankAdvanceView(intervals,unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, unitPositionWithCtaDetailsDTO, timeTypeDTOS, payoutTransactionIntervalMap);
     }
 
     /**
@@ -436,6 +431,7 @@ public class TimeBankService extends MongoBaseService {
                         shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
                         timeBankCtaBonusMinutes += shiftActivityDTO.getTimeBankCtaBonusMinutes();
                         shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+                        shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getPlannedMinutesOfTimebank());
                     }
                 }
                 shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
@@ -494,28 +490,28 @@ public class TimeBankService extends MongoBaseService {
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(unitPositionWithCtaDetailsDTO.getId(),asDate(startDate),asDate(endDate.plusDays(1)));
         Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k->k.getDate(),v->v));
         int accumulatedTimebank = 0;
-        //TODO This code calculate the Accumulated timebank till shiftStartDate
+        /*//TODO This code calculate the Accumulated timebank till shiftStartDate
         while (startDate.isBefore(endDate)){
             if(dateDailyTimeBankEntryMap.containsKey(startDate)){
-                accumulatedTimebank+= dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMinutes();
+                accumulatedTimebank+= dateDailyTimeBankEntryMap.get(startDate).getDeltaTimeBankMinutes();
             }else {
                 accumulatedTimebank+= (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
             }
             startDate = startDate.plusDays(1);
-        }
+        }*/
         int totalTimeBankMinutes;
+        int plannedMinutesOfTimebank = 0;
         //TODO This code calculate the Delta timebank till shiftStartDate
         if(dateDailyTimeBankEntryMap.containsKey(startDate)){
-            totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMinutes();
-        }else {
+            DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(startDate);
+            //totalTimeBankMinutes = dailyTimeBankEntry.getDeltaTimeBankMinutes();
+            plannedMinutesOfTimebank = dailyTimeBankEntry.getPlannedMinutesOfTimebank();
+        }/*else {
             totalTimeBankMinutes = (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
-        }
-        shiftDTO.setDeltaTimeBankMinutes(totalTimeBankMinutes);
-        for (ShiftActivityDTO shiftActivityDTO : shiftDTO.getActivities()) {
-            shiftActivityDTO.setPlannedMinutes(shiftActivityDTO.getScheduledMinutes() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
-        }
-        shiftDTO.setPlannedMinutes(shiftDTO.getScheduledMinutes() + shiftDTO.getTimeBankCtaBonusMinutes());
-        shiftDTO.setAccumulatedTimeBankMinutes(accumulatedTimebank+totalTimeBankMinutes);
+        }*/
+        //shiftDTO.setDeltaTimeBankMinutes(totalTimeBankMinutes);
+        shiftDTO.setPlannedMinutesOfTimebank(plannedMinutesOfTimebank);
+        //shiftDTO.setAccumulatedTimeBankMinutes(accumulatedTimebank+totalTimeBankMinutes);
         return shiftDTO;
     }
 
@@ -533,7 +529,7 @@ public class TimeBankService extends MongoBaseService {
                 if(startDate.isAfter(unitPositionWithCtaDetailsDTO.getStartDate()) || startDate.equals(unitPositionWithCtaDetailsDTO.getStartDate())){
                     int totalTimeBankMinutes;
                     if(dateDailyTimeBankEntryMap.containsKey(startDate)){
-                        totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getTotalTimeBankMinutes();
+                        totalTimeBankMinutes = dateDailyTimeBankEntryMap.get(startDate).getDeltaTimeBankMinutes();
                     }else {
                         totalTimeBankMinutes = (- timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,startDate,staffAdditionalInfoDTO.getUnitPosition().getPositionLines()));
                     }
@@ -542,7 +538,7 @@ public class TimeBankService extends MongoBaseService {
                         for (ShiftDTO shiftDTO : dateWiseShiftMap.get(startDate)) {
                             shiftDTO.setDeltaTimeBankMinutes(totalTimeBankMinutes);
                             shiftDTO.setAccumulatedTimeBankMinutes(accumulatedTimebank);
-                            shiftDTO.setPlannedMinutes(shiftDTO.getScheduledMinutes() + shiftDTO.getTimeBankCtaBonusMinutes());
+                            shiftDTO.setPlannedMinutesOfTimebank(shiftDTO.getScheduledMinutes() + shiftDTO.getTimeBankCtaBonusMinutes());
                         }
                     }
                 }

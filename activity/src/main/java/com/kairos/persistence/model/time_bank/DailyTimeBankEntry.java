@@ -17,7 +17,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private Long unitPositionId;
     private Long staffId;
     //It is Delta timebank
-    private int totalTimeBankMinutes;
+    private int deltaTimeBankMinutes;
     private int contractualMinutes;
     //It is the scheduled minutes of Ruletemplate which accountType is equal to TIMEBANK_ACCOUNT
     private int scheduledMinutesOfTimeBank;
@@ -25,7 +25,6 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int timeBankMinutesWithoutCta;
     //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to TIMEBANK_ACCOUNT
     private int ctaBonusMinutesOfTimeBank;
-    private long accumultedTimeBankMinutes;
     private LocalDate date;
     //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to TIMEBANK_ACCOUNT
     private List<TimeBankCTADistribution> timeBankCTADistributionList;
@@ -50,15 +49,6 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
 
 
     public DailyTimeBankEntry() {
-    }
-
-
-    public long getAccumultedTimeBankMinutes() {
-        return accumultedTimeBankMinutes;
-    }
-
-    public void setAccumultedTimeBankMinutes(long accumultedTimeBankMinutes) {
-        this.accumultedTimeBankMinutes = accumultedTimeBankMinutes;
     }
 
     public LocalDate getDate() {
@@ -109,12 +99,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
-    public int getTotalTimeBankMinutes() {
-        return totalTimeBankMinutes;
+    public int getDeltaTimeBankMinutes() {
+        return deltaTimeBankMinutes;
     }
 
-    public void setTotalTimeBankMinutes(int totalTimeBankMinutes) {
-        this.totalTimeBankMinutes = totalTimeBankMinutes;
+    public void setDeltaTimeBankMinutes(int deltaTimeBankMinutes) {
+        this.deltaTimeBankMinutes = deltaTimeBankMinutes;
     }
 
     public int getContractualMinutes() {

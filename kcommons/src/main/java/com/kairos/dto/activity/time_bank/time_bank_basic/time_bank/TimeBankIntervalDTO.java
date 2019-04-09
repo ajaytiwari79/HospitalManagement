@@ -21,7 +21,7 @@ public class TimeBankIntervalDTO {
     private int totalContractualMin;
     private int totalTimeBankDiff;
     private String title;
-    private List<TimeBankCTADistributionDTO> timeBankDistributions = new ArrayList<>();
+    private List<CTADistributionDTO> timeBankDistributions = new ArrayList<>();
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private int minutesFromCta;
@@ -40,7 +40,7 @@ public class TimeBankIntervalDTO {
         this.totalTimeBankDiff = totalTimeBankDiff;
     }
 
-    public List<TimeBankCTADistributionDTO> getTimeBankDistributions() {
+    public List<CTADistributionDTO> getTimeBankDistributions() {
         return timeBankDistributions;
     }
 
@@ -77,7 +77,7 @@ public class TimeBankIntervalDTO {
         this.nonWorkingTimeType = nonWorkingTimeType;
     }
 
-    public void setTimeBankDistributions(List<TimeBankCTADistributionDTO> timeBankDistributions) {
+    public void setTimeBankDistributions(List<CTADistributionDTO> timeBankDistributions) {
         this.timeBankDistributions = timeBankDistributions;
     }
 

@@ -51,7 +51,7 @@ public class TimeBankDTO {
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
     private float hourlyCost;
-    private long plannedMinutesOfTimebank;
+    private long totalPlannedMinutes;
 
     public TimeBankDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
@@ -324,11 +324,11 @@ public class TimeBankDTO {
     }
 
 
-    public long getPlannedMinutesOfTimebank() {
-        return plannedMinutesOfTimebank;
+    public long getTotalPlannedMinutes() {
+        return totalPlannedMinutes;
     }
 
-    public void setPlannedMinutesOfTimebank(long plannedMinutesOfTimebank) {
-        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    public void setTotalPlannedMinutes(long totalPlannedMinutes) {
+        this.totalPlannedMinutes = totalPlannedMinutes;
     }
 }

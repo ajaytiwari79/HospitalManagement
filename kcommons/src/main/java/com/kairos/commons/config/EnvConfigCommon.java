@@ -39,6 +39,9 @@ public class EnvConfigCommon {
     @Value("${kpermissions.model.package.path}")
     private String modelPackagePath;
 
+    @Value("${spring.profiles.active}")
+    private  String currentProfile;
+
 
     public String getUserServiceUrl() {
         return userServiceUrl;
@@ -102,5 +105,9 @@ public class EnvConfigCommon {
 
     public void setModelPackagePath(String modelPackagePath) {
         this.modelPackagePath = modelPackagePath;
+    }
+
+    public String getCurrentProfile() {
+        return currentProfile;
     }
 }

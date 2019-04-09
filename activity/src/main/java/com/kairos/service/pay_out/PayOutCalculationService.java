@@ -6,6 +6,8 @@ import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.time_bank.CTARuletemplateBonus;
+import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.constants.AppConstants;
@@ -35,8 +37,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.dto.user.country.agreement.cta.CalculationFor.BONUS_HOURS;
-import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
@@ -150,15 +152,42 @@ public class PayOutCalculationService {
     public PayOutDTO getAdvanceViewPayout(List<Interval> intervals, List<PayOutPerShift> payOutPerShifts, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, String query) {
         Map<Interval, List<PayOutPerShift>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOutPerShifts);
         List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutMinutesBefore, payoutTransactionAndIntervalMap, unitPositionWithCtaDetailsDTO, query);
+        List<CTADistributionDTO> scheduledCTADistributions = payoutIntervalDTOS.stream().flatMap(ti -> ti.getPayOutDistribution().getScheduledCTADistributions().stream()).collect(Collectors.toList());
+        Map<String, Integer> ctaDistributionMap = scheduledCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getName(), Collectors.summingInt(tb -> tb.getMinutes())));
+        scheduledCTADistributions = getScheduledCTADistributions(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
+        List<CTADistributionDTO> ctaBonusDistributions = payoutIntervalDTOS.stream().flatMap(ti -> ti.getPayOutDistribution().getCtaRuletemplateBonus().getCtaDistributions().stream()).collect(Collectors.toList());
+        Map<String, Integer> ctaBonusDistributionMap = ctaBonusDistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getName(), Collectors.summingInt(tb -> tb.getMinutes())));
         long[] payoutCalculatedValue = calculatePayoutForInterval(payoutIntervalDTOS);
-        Map<BigInteger, Long> ctaDistributionMap = payoutIntervalDTOS.stream().flatMap(p -> p.getPayOutDistribution().getChildren().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb -> ptb.getId(), Collectors.summingLong(p -> p.getMinutes())));
-        List<CTADistributionDTO> ctaDistributionDTOS = getDistributionOfPayout(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
         long payoutChange = payoutCalculatedValue[0];
         long payoutBefore = payoutCalculatedValue[1];
         long payoutAfter = payoutCalculatedValue[2];
         long payoutFromCTA = payoutCalculatedValue[3];
-        PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(payoutFromCTA, ctaDistributionDTOS);
+        PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(scheduledCTADistributions, getCTABonusDistributions(ctaBonusDistributionMap, unitPositionWithCtaDetailsDTO),payoutFromCTA);
         return new PayOutDTO(intervals.get(0).getStart().toDate(), intervals.get(intervals.size() - 1).getEnd().toDate(), payoutAfter, payoutBefore, payoutChange, payoutIntervalDTOS, payOutCTADistributionDTO);
+    }
+
+    private CTARuletemplateBonus getCTABonusDistributions(Map<String, Integer> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+        List<CTADistributionDTO> ctaBonusDistributions = new ArrayList<>();
+        long ctaBonusMinutes = 0;
+        for (CTARuleTemplateDTO ctaRuleTemplate : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
+            if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT) && (ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS))) {
+                CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
+                ctaBonusDistributions.add(ctaDistributionDTO);
+                ctaBonusMinutes += ctaDistributionDTO.getMinutes();
+            }
+        }
+        return new CTARuletemplateBonus(ctaBonusDistributions, ctaBonusMinutes);
+    }
+
+    private List<CTADistributionDTO> getScheduledCTADistributions(Map<String, Integer> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+        List<CTADistributionDTO> scheduledCTADistributions = new ArrayList<>();
+        unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
+            if(cta.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT) && cta.getCalculationFor().equals(SCHEDULED_HOURS)) {
+                scheduledCTADistributions.add(new CTADistributionDTO(cta.getId(), cta.getName(), ctaDistributionMap.getOrDefault(cta.getName(), 0)));
+
+            }
+        });
+        return scheduledCTADistributions;
     }
 
     /**
@@ -205,10 +234,10 @@ public class PayOutCalculationService {
             Long approvePayOut = payOutTransactionList.stream().filter(p -> p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.APPROVED)).mapToLong(p -> (long) p.getMinutes()).sum();
             payoutChange += approvePayOut;
             Long payoutAfter = payoutMinutesBefore + payoutChange;
-            Map<BigInteger, Long> ctaDistributionMap = payOutPerShifts.stream().flatMap(p -> p.getPayOutPerShiftCTADistributions().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb -> ptb.getCtaRuleTemplateId(), Collectors.summingLong(p -> p.getMinutes())));
-            List<CTADistributionDTO> payOutCTADistributionDTOS = getDistributionOfPayout(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
-            Long payoutFromCTA = payOutCTADistributionDTOS.stream().mapToLong(pd -> pd.getMinutes()).sum();
-            PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(payoutFromCTA, payOutCTADistributionDTOS);
+            List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions = payOutPerShifts.stream().flatMap(payOutPerShift -> payOutPerShift.getPayOutPerShiftCTADistributions().stream()).collect(Collectors.toList());
+            Map<String, Integer> ctaDistributionMap = payOutPerShiftCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaName(), Collectors.summingInt(tb -> tb.getMinutes())));
+            Long payoutFromCTA = payOutPerShifts.stream().mapToLong(payOutPerShift->payOutPerShift.getScheduledMinutes()+payOutPerShift.getCtaBonusMinutesOfPayOut()).sum();
+            PayOutCTADistributionDTO payOutCTADistributionDTO = getDistributionOfPayout(ctaDistributionMap, unitPositionWithCtaDetailsDTO,payoutFromCTA);
             String title = getTitle(query, interval);
             PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate(), payoutAfter, payoutMinutesBefore, payoutChange, payOutCTADistributionDTO, DayOfWeek.of(interval.getStart().getDayOfWeek()), title);
             payoutMinutesBefore+=payoutChange;
@@ -216,6 +245,24 @@ public class PayOutCalculationService {
         }
         Collections.reverse(payOutIntervalDTOS);
         return payOutIntervalDTOS;
+    }
+
+    public PayOutCTADistributionDTO getDistributionOfPayout(Map<String, Integer> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, long plannedMinutesOfTimebank) {
+        List<CTADistributionDTO> timeBankCTADistributionDTOS = new ArrayList<>();
+        List<CTADistributionDTO> scheduledCTADistributions = new ArrayList<>();
+        long ctaBonusMinutes = 0;
+        for (CTARuleTemplateDTO ctaRuleTemplate : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
+            if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
+                if(ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS)) {
+                    CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
+                    timeBankCTADistributionDTOS.add(ctaDistributionDTO);
+                    ctaBonusMinutes += ctaDistributionDTO.getMinutes();
+                } else if(ctaRuleTemplate.getCalculationFor().equals(SCHEDULED_HOURS)) {
+                    scheduledCTADistributions.add(new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0)));
+                }
+            }
+        }
+        return new PayOutCTADistributionDTO(scheduledCTADistributions, new CTARuletemplateBonus(timeBankCTADistributionDTOS, ctaBonusMinutes),plannedMinutesOfTimebank);
     }
 
     private String getTitle(String query, Interval interval) {
@@ -260,7 +307,7 @@ public class PayOutCalculationService {
         long payoutFromCTA = 0l;
         for (PayOutIntervalDTO payOutIntervalDTO : timeBankIntervalDTOS) {
             payoutChange += payOutIntervalDTO.getPayoutChange();
-            payoutFromCTA += payOutIntervalDTO.getPayOutDistribution().getMinutes();
+            payoutFromCTA += payOutIntervalDTO.getPayOutDistribution().getPlannedMinutesOfPayout();
         }
         long payoutAfter = payoutBefore + payoutChange;
         return new long[]{payoutChange, payoutBefore, payoutAfter, payoutFromCTA};

@@ -40,6 +40,7 @@ public class ShiftActivity {
     private int timeBankCtaBonusMinutes;
     private String startLocation; // this is for the location from where activity will gets starts
     private String endLocation;   // this is for the location from where activity will gets ends
+    private int plannedMinutesOfTimebank;
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
@@ -294,5 +295,13 @@ public class ShiftActivity {
 
     public void setEndLocation(String endLocation) {
         this.endLocation = endLocation;
+    }
+
+    public int getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
+    }
+
+    public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 }
