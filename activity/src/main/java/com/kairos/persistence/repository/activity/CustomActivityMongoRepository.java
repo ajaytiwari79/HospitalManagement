@@ -28,6 +28,10 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);
 
+    List<ActivityTagDTO> findAllowChildActivityByCountryId(long countryId);
+
+    ActivityWithCompositeDTO findActivityByActivityId(BigInteger activityId);
+
     List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId);
 
     List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId);
@@ -37,6 +41,8 @@ public interface CustomActivityMongoRepository {
     List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId);
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
+
+    List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
 
@@ -79,9 +85,11 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWrapper> findActivityAndTimeTypeByActivityIds(Set<BigInteger> activityIds);
 
-    boolean existsByActivityIdInCompositeActivities(BigInteger activityId);
+    List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds);
+
+    boolean existsByActivityIdInChildActivities(BigInteger activityId);
 
     boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId);
 
-    List<Activity> findByActivityIdInCompositeActivities(BigInteger activityId,List<BigInteger> allowedActivityIds);
+    List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
 }

@@ -1,6 +1,5 @@
 package com.kairos.service.activity;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
@@ -20,9 +19,7 @@ import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
-import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -41,10 +38,8 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
@@ -200,6 +195,20 @@ public class ActivityService extends MongoBaseService {
         response.put("activities", activityTagDTOS);
         response.put("activityCategories", acivitityCategories);
         return response;
+    }
+
+    public Set<BigInteger> checkActivityAllowForChildActivities(List<ActivityTagDTO> activities, ActivityWithCompositeDTO activityWithCompositeDTO){
+        Set<BigInteger> allowChildActivityIds=new HashSet<>();
+        Set<BigInteger> childActivitiesIds=activities.stream().flatMap(activityTagDTO -> activityTagDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
+        for (ActivityTagDTO activity : activities) {
+            if(!childActivitiesIds.contains(activity.getId()) && !activity.getId().equals(activityWithCompositeDTO.getId())){
+                allowChildActivityIds.add(activity.getId());
+            }
+        }
+        if(childActivitiesIds.contains(activityWithCompositeDTO.getId())){
+            activityWithCompositeDTO.setApplicableForChildActivities(false);
+        }
+        return allowChildActivityIds;
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
@@ -381,10 +390,9 @@ public class ActivityService extends MongoBaseService {
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(compositeShiftIds);
         if (activityMatched.size() != compositeShiftIds.size()) {
-            exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
+            exceptionService.illegalArgumentException("message.mismatched-ids");
         }
         organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
-        organizationActivityService.verifyTeamActivity(activityMatched, activity);
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
@@ -409,6 +417,23 @@ public class ActivityService extends MongoBaseService {
         }
     }
 
+    public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
+        Activity activity = activityMongoRepository.findById(activityId).orElse(null);
+        if (activity == null) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+        }
+        List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
+        if (activityMatched.size() != childActivitiesIds.size()) {
+            exceptionService.illegalArgumentException("message.mismatched-ids");
+        }
+        organizationActivityService.verifyChildActivity(activityMatched, activity);
+        activity.setChildActivityIds(childActivitiesIds);
+        //updateCompositeActivity(activityList, activity, compositeActivities);
+        save(activity);
+        return childActivitiesIds;
+    }
+
+
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -417,16 +442,34 @@ public class ActivityService extends MongoBaseService {
         return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
     }
 
-    public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
-        Optional<Activity> activity = activityMongoRepository.findById(activityId);
-        if (!activity.isPresent()) {
+
+    public ActivityWithCompositeDTO getCompositeAndChildActivityOfCountryActivity(BigInteger activityId,Long countryId){
+        ActivityWithCompositeDTO  activity=getCompositeShiftTabOfActivity(activityId);
+        List<ActivityTagDTO> activityTagDTO=activityMongoRepository.findAllowChildActivityByCountryId(countryId);
+        activity.setAvailableChildActivityIds(checkActivityAllowForChildActivities(activityTagDTO,activity));
+        return activity;
+    }
+
+
+    public ActivityWithCompositeDTO getCompositeAndChildActivityOfUnitActivity(BigInteger activityId,Long unitId){
+        ActivityWithCompositeDTO  activity=getCompositeShiftTabOfActivity(activityId);
+        List<ActivityTagDTO> activityTagDTO = activityMongoRepository.findAllowChildActivityByUnitIdAndDeleted(unitId, false);
+        activity.setAvailableChildActivityIds(checkActivityAllowForChildActivities(activityTagDTO,activity));
+        return activity;
+    }
+
+
+    public ActivityWithCompositeDTO getCompositeShiftTabOfActivity(BigInteger activityId) {
+        ActivityWithCompositeDTO  activity=activityMongoRepository.findActivityByActivityId(activityId);
+        if (isNull(activity)) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        List<CompositeActivityDTO> compositeActivities = new ArrayList<>();
-        if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()) {
+        List<CompositeActivityDTO> compositeActivities;
+        if (Optional.ofNullable(activity.getCompositeActivities()).isPresent() && !activity.getCompositeActivities().isEmpty()) {
             compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
+            activity.setCompositeActivities(compositeActivities);
         }
-        return compositeActivities;
+        return activity;
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
@@ -892,8 +935,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
-        return activityTypeList;
+        return activityMongoRepository.findAllActivityByUnitId(unitId, false);
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {
