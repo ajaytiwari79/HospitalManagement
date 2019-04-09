@@ -122,35 +122,47 @@ public class QuestionnaireSectionService {
     }
 
 
-    private void addAttributeNameToQuestion(Question question, String attributeName, QuestionnaireTemplateType templateType)  {
+    private void addAttributeNameToQuestion(Question question, String attributeName, QuestionnaireTemplateType templateType) {
 
         if (!Optional.ofNullable(templateType).isPresent()) {
             exceptionService.invalidRequestException("message.invalid.request", " Attribute name is incorrect");
         }
-        Class aClass = null;
         try {
+            Class aClass = null;
             switch (templateType) {
                 case ASSET_TYPE:
                     if (!Optional.ofNullable(AssetAttributeName.valueOf(attributeName).value).isPresent()) {
                         exceptionService.invalidRequestException("Attribute not found for Asset ");
                     }
-                    aClass = Asset.class.getDeclaredField(AssetAttributeName.valueOf(attributeName).value).getDeclaringClass();
+                    aClass = Asset.class.getDeclaredField(AssetAttributeName.valueOf(attributeName).value).getType();
                     break;
                 case PROCESSING_ACTIVITY:
                     if (!Optional.ofNullable(ProcessingActivityAttributeName.valueOf(attributeName).value).isPresent()) {
                         exceptionService.invalidRequestException("Attribute not found for Asset ");
                     }
-                    aClass = ProcessingActivity.class.getDeclaredField(ProcessingActivityAttributeName.valueOf(attributeName).value).getDeclaringClass();
+                    aClass = ProcessingActivity.class.getDeclaredField(ProcessingActivityAttributeName.valueOf(attributeName).value).getType();
                     break;
             }
-        }
-        catch (NoSuchFieldException e)
-        {
+            boolean inValidQuestionType=false;
+            if (List.class.equals(aClass) && !question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+                inValidQuestionType=true;
+            } else if ((String.class.equals(aClass) || Integer.class.equals(aClass)) && !question.getQuestionType().equals(QuestionType.TEXTBOX)) {
+                inValidQuestionType=true;
+            } else if (Boolean.class.equals(aClass) && !question.getQuestionType().equals(QuestionType.YES_NO_MAYBE)) {
+                inValidQuestionType=true;
+            } else if (!question.getQuestionType().equals(QuestionType.SELECT_BOX)) {
+                inValidQuestionType=true;
+            }
+            if (inValidQuestionType)
+            {
+                exceptionService.illegalArgumentException("message.invalid.question.type.selected",question.getAttributeName());
+            }
+        } catch (NoSuchFieldException e) {
+            LOGGER.debug("No such field Exception error in method addAttributeNameToQuestion");
             exceptionService.unsupportedOperationException("message.invalid.request");
         }
         question.setAttributeName(attributeName);
     }
-
 
 
     public boolean deleteQuestionnaireSectionFromTemplate(boolean isOrganizationId, Long referenceId, Long templateId, Long questionnaireSectionId) {
