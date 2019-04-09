@@ -34,6 +34,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -588,26 +590,28 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public boolean existsByActivityIdInCompositeActivities(BigInteger activityId) {
+    @Override
+    public List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("compositeActivities.activityId").is(activityId).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED)),
+                match(Criteria.where("id").in(activityIds).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("$id", "name")
-                        .and("timeType").arrayElementAt(0).as("timeType"),
-                match(Criteria.where("timeType.partOfTeam").is(true))
+                project("name","id","childActivityIds")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
+                        .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities"),
+                match(Criteria.where("applicableForChildActivities").is(true))
         );
-        return mongoTemplate.aggregate(aggregation, Activity.class, Boolean.class).getMappedResults().size() > 0;
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
     }
 
-    public List<Activity> findByActivityIdInCompositeActivities(BigInteger activityId, List<BigInteger> allowedActivityIds) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("_id").ne(activityId).and("compositeActivities.activityId").in(allowedActivityIds).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("$id", "name")
-                        .and("timeType").arrayElementAt(0).as("timeType"),
-                match(Criteria.where("timeType.partOfTeam").is(true))
-        );
-        return mongoTemplate.aggregate(aggregation, Activity.class, Activity.class).getMappedResults();
+    public boolean existsByActivityIdInChildActivities(BigInteger activityId) {
+        Query query=new Query(Criteria.where("childActivityIds").is(activityId).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED));
+        return isNotNull(mongoTemplate.findOne(query,Activity.class));
+    }
+
+    public List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds) {
+        Query query=new Query(Criteria.where("_id").ne(activityId).and("childActivityIds").in(allowedActivityIds).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED));
+        return mongoTemplate.find(query,Activity.class);
     }
 
     private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory() {

@@ -393,7 +393,6 @@ public class ActivityService extends MongoBaseService {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
         organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
-        //organizationActivityService.verifyTeamActivity(activityMatched, activity);
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
@@ -423,23 +422,15 @@ public class ActivityService extends MongoBaseService {
         if (activity == null) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
-        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(childActivitiesIds);
+        List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
         if (activityMatched.size() != childActivitiesIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", childActivitiesIds);
         }
-        //organizationActivityService.verifyTeamActivity(activityMatched, activity);
+        organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
         //updateCompositeActivity(activityList, activity, compositeActivities);
         save(activity);
         return childActivitiesIds;
-    }
-
-    public Set<BigInteger> getChildActivitiesIdsOfActivity(BigInteger activityId) {
-        Optional<Activity> activity = activityMongoRepository.findById(activityId);
-        if (!activity.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
-        }
-        return activity.get().getChildActivityIds();
     }
 
 
