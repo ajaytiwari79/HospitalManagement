@@ -630,7 +630,7 @@ public class ExpertiseService {
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDateMillis()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
             //exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
-            exceptionService.actionNotPermittedException("message.expertise.alreadyPublishedWithExistingDate");
+            exceptionService.actionNotPermittedException("message.expertise.publish.with.future.startDate");
         }
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());

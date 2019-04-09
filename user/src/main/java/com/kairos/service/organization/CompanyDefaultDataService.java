@@ -34,10 +34,6 @@ import java.util.stream.Collectors;
 public class CompanyDefaultDataService {
     private static final Logger logger = LoggerFactory.getLogger(CompanyDefaultDataService.class);
     @Inject
-    private AsynchronousService asynchronousService;
-    @Inject
-    private AccessGroupService accessGroupService;
-    @Inject
     private TimeSlotService timeSlotService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
@@ -51,55 +47,41 @@ public class CompanyDefaultDataService {
     private GdprIntegrationService gdprIntegrationService;
 
 
-    public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) throws InterruptedException, ExecutionException {
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
+    public void createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) {
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
         units.forEach(unit -> {
-                orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
-                orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
-                orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
-                orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
-                orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
-                activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
-                activityIntegrationService.createDefaultKPISetting(
+            orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
+            orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
+            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
+            orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
+            orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
+            orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
+            activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
+            activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
                             null, parentId, null), unit.getId());
-                asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
-                //asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
-                asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
-                asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
-                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefaultDataForSubUnit(unit,parentId));
-                asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,unit.getId()));
+            timeSlotService.createDefaultTimeSlots(unit, timeSlots);
+            vrpClientService.createDefaultPreferredTimeWindow(unit);
+            activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
+            reasonCodeService.createDefaultDataForSubUnit(unit, parentId);
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
         });
-        return CompletableFuture.completedFuture(true);
     }
 
-    public CompletableFuture<Boolean> createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
-                                                                             List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO,Long countryId) throws InterruptedException, ExecutionException {
-        List<Future<Object>> futureList = new ArrayList<>();
-        asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO));
-        asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(organization));
-        asynchronousService.executeInBackGround(() -> organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId()));
-        futureList.add(asynchronousService.executeAsynchronously(() -> {
-                    activityIntegrationService.createDefaultKPISetting(
-                            new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(),
-                                    organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
-            return true;
-        }));
-        asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(organization, timeSlots));
-        asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
-        asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
-        orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
-        asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
-        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefaultDataForUnit(organization,countryId));
-        asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,organization.getId()));
-        futureList.forEach(data -> {
-            try {
-                data.get();
-            } catch (InterruptedException | ExecutionException ex){
-                logger.info("failed...............");
-            }
-        });
-        return CompletableFuture.completedFuture(true);
+    public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
+
+                                                                         List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+            orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
+            activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO);
+            vrpClientService.createDefaultPreferredTimeWindow(organization);
+            organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+            activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
+            timeSlotService.createDefaultTimeSlots(organization, timeSlots);
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+            organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
+            reasonCodeService.createDefaultDataForUnit(organization, countryId);
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }
 }

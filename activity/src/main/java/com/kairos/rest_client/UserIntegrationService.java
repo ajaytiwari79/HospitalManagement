@@ -14,6 +14,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.Expertise;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
@@ -196,6 +197,11 @@ public class UserIntegrationService {
 
     public Map<LocalDate, Long> removeFunctionFromUnitPositionByDates(Long unitId, Long unitPositionId, Set<LocalDate> dates) {
         return genericRestClient.publishRequest(dates, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
+        }, unitPositionId);
+    }
+
+    public Boolean applyFunction(Long unitId, Long unitPositionId, Map<LocalDate, Long> requestBody,HttpMethod httpMethod,List<NameValuePair>  queryParams) {
+        return genericRestClient.publishRequest(requestBody, unitId, RestClientUrlType.UNIT, httpMethod, APPLY_FUNCTION, queryParams, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, unitPositionId);
     }
 
@@ -393,6 +399,15 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitPositionId);
     }
+
+    public Map<LocalDate,List<FunctionDTO>> getFunctionsByUnitPosition(Long unitPositionId,LocalDate startDate,LocalDate endDate) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
+        queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_OF_UNIT_POSITION, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,List<FunctionDTO>>>>() {
+        }, unitPositionId);
+    }
+
     public StaffDTO getStaffByUser(Long userId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, userId);

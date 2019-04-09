@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -89,7 +90,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Object> payload) throws ParseException {
+    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Long> payload) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.applyFunction(unitPositionId, payload,unitId));
     }
 
@@ -195,5 +196,12 @@ public class UnitPositionController {
     @GetMapping(value = "/unit_position/{unitPositionId}/get_unit")
     public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitByUnitPositionId(unitPositionId));
+    }
+
+    @GetMapping("/unit_position/expertise")
+    @ApiOperation("fetch Map of unit position id and expertise id")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getExpertiseOfUnitPosition(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionExpertiseMap(unitId));
     }
 }

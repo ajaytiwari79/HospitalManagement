@@ -54,7 +54,7 @@ public class AbsenceShiftService {
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
 
-    public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean shiftOverlappedWithNonWorkingType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
         if (activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
@@ -65,7 +65,7 @@ public class AbsenceShiftService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), null);
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
-            shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase);
+            shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase,shiftOverlappedWithNonWorkingType);
         } else {
             shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId);
         }

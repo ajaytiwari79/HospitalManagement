@@ -2,8 +2,8 @@ package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.enums.EmploymentSubType;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -36,8 +36,8 @@ public class UnitPositionQueryResult {
     private Boolean history;
     private Boolean editable=true;
     private Boolean published;
-    private List<AppliedFunctionDTO> appliedFunctions;
     private EmploymentSubType employmentSubType;
+    private List<FunctionDTO> appliedFunctions;
     private String unitName;
     private float taxDeductionPercentage;
     private long accumulatedTimebankMinutes;
@@ -202,11 +202,13 @@ public class UnitPositionQueryResult {
         this.reasonCode = reasonCode;
     }
 
-    public List<AppliedFunctionDTO> getAppliedFunctions() {
+    public List<FunctionDTO> getAppliedFunctions() {
         return appliedFunctions;
     }
 
-    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) { this.appliedFunctions = appliedFunctions; }
+    public void setAppliedFunctions(List<FunctionDTO> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
+    }
 
     public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;

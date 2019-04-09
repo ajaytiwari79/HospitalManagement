@@ -277,7 +277,7 @@ public class DefaultDataInheritService {
             if (masterQuestionnaireTemplate.getTemplateType().equals(QuestionnaireTemplateType.ASSET_TYPE)) {
                 if (!masterQuestionnaireTemplate.isDefaultAssetTemplate()) {
                     questionnaireTemplate.setAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(masterQuestionnaireTemplate.getAssetType().getId()));
-                    Optional.ofNullable(masterQuestionnaireTemplate.getAssetSubType()).ifPresent(assetSubType -> questionnaireTemplate.setAssetSubType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
+                    Optional.ofNullable(masterQuestionnaireTemplate.getSubAssetType()).ifPresent(assetSubType -> questionnaireTemplate.setSubAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
                 } else {
                     questionnaireTemplate.setDefaultAssetTemplate(true);
                 }
@@ -285,7 +285,7 @@ public class DefaultDataInheritService {
             if (masterQuestionnaireTemplate.getTemplateType().equals(QuestionnaireTemplateType.RISK)) {
                 if (masterQuestionnaireTemplate.getRiskAssociatedEntity().equals(QuestionnaireTemplateType.ASSET_TYPE)) {
                     questionnaireTemplate.setAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(masterQuestionnaireTemplate.getAssetType().getId()));
-                    Optional.ofNullable(masterQuestionnaireTemplate.getAssetSubType()).ifPresent(assetSubType -> questionnaireTemplate.setAssetSubType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
+                    Optional.ofNullable(masterQuestionnaireTemplate.getSubAssetType()).ifPresent(assetSubType -> questionnaireTemplate.setSubAssetType(masterAssetTypeMapWithUnitAssetTypeObject.get(assetSubType.getId())));
                 }
                 questionnaireTemplate.setRiskAssociatedEntity(masterQuestionnaireTemplate.getRiskAssociatedEntity());
 

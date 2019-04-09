@@ -31,6 +31,8 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -56,7 +58,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
 @Transactional
 @Service
 public class CostTimeAgreementService extends MongoBaseService {
-    private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
     @Inject
@@ -130,35 +132,36 @@ public class CostTimeAgreementService extends MongoBaseService {
     /**
      *
      * @param countryId
-     * @param organizationSubTypeId
+     * @param organizationSubTypeIdList
      * @param organizationId
      */
-    public void assignCountryCTAtoOrganisation(Long countryId, Long organizationSubTypeId,Long organizationId){
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
-        List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp->Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
-        List<Long> unitIds = Arrays.asList(organizationId);
-        Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
-         List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(countryId);
-        Map<Long,Map<PhaseDefaultName,BigInteger>> unitsPhasesMap = getMapOfPhaseIdsAndUnitByParentIds(unitIds);
-        List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(ctaResponseDTOS.size());
-        for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
-            CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
-            // Set activity Ids according to unit activity Ids
-            organisationCTA.setId(null);
-            assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(),unitActivities.get(organisationCTA.getId()));
-            organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
-            organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
-            updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(),organizationId,countryId);
-            List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class);
-            List<BigInteger> ruleTemplateIds = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(ruleTemplates)){
-                ruleTemplates.forEach(ctaRuleTemplate -> { ctaRuleTemplate.setId(null);});
-                //updateExistingPhaseIdOfCTA(ruleTemplates,organizationId,countryId);
-                save(ruleTemplates);
-                ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
+    public void assignCountryCTAtoOrganisation(Long countryId, List<Long> organizationSubTypeIdList,Long organizationId){
+        List<CostTimeAgreement> costTimeAgreements = new ArrayList<>();
+        for(Long organizationSubTypeId:organizationSubTypeIdList) {
+            List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
+            List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp -> Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
+            List<Long> unitIds = Arrays.asList(organizationId);
+            Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
+            for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
+                CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
+                // Set activity Ids according to unit activity Ids
+                organisationCTA.setId(null);
+                assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(), unitActivities.get(organisationCTA.getId()));
+                organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
+                organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
+                updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(), organizationId, countryId);
+                List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
+                List<BigInteger> ruleTemplateIds = new ArrayList<>();
+                if (CollectionUtils.isNotEmpty(ruleTemplates)) {
+                    ruleTemplates.forEach(ctaRuleTemplate -> {
+                        ctaRuleTemplate.setId(null);
+                    });
+                    save(ruleTemplates);
+                    ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
+                }
+                organisationCTA.setRuleTemplateIds(ruleTemplateIds);
+                costTimeAgreements.add(organisationCTA);
             }
-            organisationCTA.setRuleTemplateIds(ruleTemplateIds);
-            costTimeAgreements.add(organisationCTA);
         }
         if(!costTimeAgreements.isEmpty()){
             save(costTimeAgreements);
@@ -328,11 +331,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         return responseCTA;
     }
 
-    private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
-        Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,ctaStartDate, ORGANIZATION,unitPositionId,Collections.emptySet());
-        timeBankService.updateTimeBankOnUnitPositionModification(null,unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
-    }
 
     /**
      * @param countryId

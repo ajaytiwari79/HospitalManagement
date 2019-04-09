@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.task_type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.task_type.TaskTypeEnum;
 
 import java.io.Serializable;
@@ -8,7 +9,7 @@ import java.io.Serializable;
 /**
  * Created by prabjot on 7/10/16.
  */
-public class TaskTypeDefination implements Serializable,Cloneable {
+public class TaskTypeDefination implements Serializable {
 
     private TaskTypeEnum.TaskTypeStatus taskTypeStatus;
 
@@ -558,8 +559,8 @@ public class TaskTypeDefination implements Serializable,Cloneable {
         this.hasPrimaryAddress = hasPrimaryAddress;
     }
 
-    protected TaskTypeDefination clone() throws CloneNotSupportedException {
-        return (TaskTypeDefination) super.clone();
+    protected TaskTypeDefination cloneObject(){
+        return ObjectMapperUtils.copyPropertiesByMapper(this,TaskTypeDefination.class);
     }
 
 }

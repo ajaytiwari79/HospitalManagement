@@ -102,6 +102,7 @@ public class DynamicCronScheduler implements DisposableBean {
             if (future != null) {
                 future.cancel(true);
                 BeanFactoryUtil.getDefaultListableBeanFactory().destroySingleton(scheduler);
+                threadPoolTaskScheduler.getScheduledThreadPoolExecutor().purge();
             }
         } catch (NoSuchBeanDefinitionException exception) {
             logger.error("No bean registered for cron job, May be this is your first time to scheduling cron job!!");
