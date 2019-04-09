@@ -1,6 +1,13 @@
 package com.kairos.shiftplanning.solution;
 
-import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.staff.IndirectActivity;
+import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
+import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelMatrix;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.DateTime;
@@ -29,7 +36,7 @@ public class BreaksIndirectAndActivityPlanningSolution {
     private List<IndirectActivity> indirectActivities;
     @ProblemFactCollectionProperty
     //@ValueRangeProvider(id = "shifts")
-    private List<ShiftRequestPhase> shifts;
+    private List<ShiftImp> shifts;
     @ProblemFactCollectionProperty
     private List<Activity> activities;
     @ProblemFactCollectionProperty
@@ -58,11 +65,11 @@ public class BreaksIndirectAndActivityPlanningSolution {
         this.unitId = unitId;
     }
 
-    public List<ShiftRequestPhase> getShifts() {
+    public List<ShiftImp> getShifts() {
         return shifts;
     }
 
-    public void setShifts(List<ShiftRequestPhase> shifts) {
+    public void setShifts(List<ShiftImp> shifts) {
         this.shifts = shifts;
     }
 

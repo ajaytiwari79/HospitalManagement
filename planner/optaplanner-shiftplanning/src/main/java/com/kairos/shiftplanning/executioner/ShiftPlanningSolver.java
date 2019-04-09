@@ -2,7 +2,13 @@ package com.kairos.shiftplanning.executioner;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
@@ -20,7 +26,6 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.config.solver.EnvironmentMode;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
@@ -202,10 +207,10 @@ public class ShiftPlanningSolver {
         log.info("*************Indictment**************");
         MutableInt unassignedIntervals=new MutableInt(0);
         indictmentMap.forEach((entity,indictment)->{
-            if(entity instanceof ShiftRequestPhase && !((ShiftRequestPhase) entity).isLocked() && ((ShiftRequestPhase) entity).getInterval()!=null) {
+            if(entity instanceof ShiftImp && !((ShiftImp) entity).isLocked() && ((ShiftImp) entity).getInterval()!=null) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n------------------------\n");
-                sb.append(getShiftPlanInfo((ShiftRequestPhase) entity)+"\n");
+                sb.append(getShiftPlanInfo((ShiftImp) entity)+"\n");
                 MutableBoolean any=new MutableBoolean(false);
                 indictment.getConstraintMatchSet().forEach(constraintMatch -> {
                     if(((HardMediumSoftLongScore)constraintMatch.getScore()).getHardScore()==0 &&((HardMediumSoftLongScore)constraintMatch.getScore()).getMediumScore()==0){
@@ -281,7 +286,7 @@ public class ShiftPlanningSolver {
 		log.info("-------Printing solution:-------");
         log.info("total intervals:"+solution.getActivityLineIntervals().stream().count());
         log.info("total assigned intervals:"+solution.getActivityLineIntervals().stream().filter(i->i.getShift()!=null).count());
-		/*Map<ShiftRequestPhase,List<ActivityLineInterval>> shiftsAssignedToActivityIntervals= new HashMap<>();
+		/*Map<ShiftImp,List<ActivityLineInterval>> shiftsAssignedToActivityIntervals= new HashMap<>();
         solution.getActivityLineIntervalsList().stream().forEach(activityLineInterval -> {
             if(activityLineInterval.getShift()==null) return;
             if(shiftsAssignedToActivityIntervals.containsKey(activityLineInterval.getShift())){
@@ -304,7 +309,7 @@ public class ShiftPlanningSolver {
         });
 
         //printStaffingLines(solution.getActivityLineIntervalsList());
-        Map<ShiftRequestPhase,List<SkillLineInterval>> shiftsAssignedToSkillIntervals= new HashMap<>();
+        Map<ShiftImp,List<SkillLineInterval>> shiftsAssignedToSkillIntervals= new HashMap<>();
         solution.getSkillLineIntervals().stream().forEach(skillLineInterval -> {
             if(skillLineInterval.getShift()==null) return;
             if(shiftsAssignedToSkillIntervals.containsKey(skillLineInterval.getShift())){
@@ -355,9 +360,9 @@ public class ShiftPlanningSolver {
         ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS,solvedSolution.getUnitId());
     }
 
-    private List<ShiftDTO> getShift(List<ShiftRequestPhase> shiftRequestPhase){
-        List<ShiftDTO> shiftDTOS = new ArrayList<>(shiftRequestPhase.size());
-        shiftRequestPhase.forEach(s->{
+    private List<ShiftDTO> getShift(List<ShiftImp> shiftImp){
+        List<ShiftDTO> shiftDTOS = new ArrayList<>(shiftImp.size());
+        shiftImp.forEach(s->{
             //s.getActivityLineIntervals().get(0).getActivity().getId()
             ShiftDTO shiftDTO = new ShiftDTO(s.getStart().toDate(),s.getEnd().toDate(),new BigInteger("320"),95l,1005l);//Long.valueOf(s.getEmployee().getId()));
             shiftDTO.setUnitEmploymentPositionId(12431l);
@@ -369,7 +374,7 @@ public class ShiftPlanningSolver {
         return shiftDTOS;
     }
 
-    private List<ShiftDTO> getSubShift(ShiftRequestPhase shift,Long unitId){
+    private List<ShiftDTO> getSubShift(ShiftImp shift, Long unitId){
         List<ShiftDTO> shiftDTOS = new ArrayList<>();
         shift.getActivityLineIntervals().sort(Comparator.comparing(ActivityLineInterval::getStart));
        // int activityCount = getActivityCount(shift.getActivityLineIntervals());
