@@ -1,8 +1,8 @@
 package com.kairos.shiftplanning.dto;
 
-import com.kairos.shiftplanning.domain.Activity;
-import com.kairos.shiftplanning.domain.ActivityLineInterval;
-import com.kairos.shiftplanning.domain.ShiftRequestPhase;
+import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
@@ -14,7 +14,7 @@ public class ActivityIntervalDTO {
     private DateTime start;
     private boolean required;
     private Activity activity;
-    private ShiftRequestPhase shift;
+    private ShiftImp shift;
     private boolean processedForDay;
     //Duration in minutes
     private int duration;
@@ -109,11 +109,11 @@ public class ActivityIntervalDTO {
         this.activity = activity;
     }
 
-    public ShiftRequestPhase getShift() {
+    public ShiftImp getShift() {
         return shift;
     }
 
-    public void setShift(ShiftRequestPhase shift) {
+    public void setShift(ShiftImp shift) {
         this.shift = shift;
     }
 }

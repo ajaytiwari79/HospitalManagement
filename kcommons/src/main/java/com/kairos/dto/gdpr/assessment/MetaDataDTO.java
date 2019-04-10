@@ -1,11 +1,15 @@
 package com.kairos.dto.gdpr.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties
+@Getter @Setter @NoArgsConstructor
 public class MetaDataDTO {
 
     @NotNull(message = "error.message.id.null")
@@ -14,22 +18,4 @@ public class MetaDataDTO {
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
-    public Long getMetadataId() {
-        return metadataId;
-    }
-
-    public void setMetadataId(Long metadataId) {
-        this.metadataId = metadataId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public MetaDataDTO() {
-    }
 }

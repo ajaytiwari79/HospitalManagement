@@ -801,18 +801,6 @@ public class UnitPositionService {
         return unitPositionDetails;
     }
 
-    public com.kairos.dto.activity.shift.StaffUnitPositionDetails findAppliedFunctionsAtUnitPosition(Long unitPositionId, LocalDate shiftDate) {
-        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.findAppliedFunctionsAtUnitPosition(unitPositionId, shiftDate.toString());
-        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
-        if (unitPosition != null) {
-            unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-            unitPositionDetails.setId(unitPosition.getId());
-            unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
-        }
-        return unitPositionDetails;
-    }
-
-
     private UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
         LocalDate startDate = DateUtils.getLocalDateFromString(timeCareEmploymentDTO.getStartDate());
         LocalDate endDate = null;

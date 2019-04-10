@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
@@ -40,8 +40,13 @@ public class StaffUnitPositionDetails {
     private List<DayOfWeek> activityDayTypes;
     private ZoneId unitTimeZone;
     private Staff staff;
+<<<<<<< HEAD
     private List<AppliedFunctionDTO> appliedFunctions;
     private List<EmploymentLinesQueryResult> employmentLines;
+=======
+    private List<FunctionDTO> appliedFunctions;
+    private List<UnitPositionLinesQueryResult> positionLines;
+>>>>>>> 0b3bccac4b0782833ed2bac52a3320715be143a5
 
     public StaffUnitPositionDetails() {
     }
@@ -160,11 +165,11 @@ public class StaffUnitPositionDetails {
     }
 
 
-    public List<AppliedFunctionDTO> getAppliedFunctions() {
+    public List<FunctionDTO> getAppliedFunctions() {
         return appliedFunctions;
     }
 
-    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
+    public void setAppliedFunctions(List<FunctionDTO> appliedFunctions) {
         this.appliedFunctions = appliedFunctions;
     }
 

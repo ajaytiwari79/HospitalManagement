@@ -38,7 +38,7 @@ public class TemplateTypeService {
      * @return list
      * @throws InvalidRequestException
      * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
-     * @author vikash patwal
+     * @author
      */
     public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateTypeDTO> templateTypeList) {
         Map<String, List<TemplateType>> result = new HashMap<>();
@@ -75,7 +75,7 @@ public class TemplateTypeService {
      * @return TemplateType
      * @throws DuplicateDataException
      * @description this method is used for update template by id
-     * @author vikash patwal
+     * @author
      */
     public TemplateType updateTemplateName(Long templateId, Long countryId, TemplateTypeDTO templateType) {
 
@@ -98,7 +98,7 @@ public class TemplateTypeService {
      * @return TemplateType
      * @throws DataNotFoundByIdException
      * @description this method is used for delete template type by id.
-     * @author vikash patwal
+     * @author
      */
     public Boolean deleteTemplateType(Long templateId, Long countryId) {
         TemplateType templateType = templateTypeRepository.findByIdAndCountryIdAndDeletedFalse(templateId, countryId);
@@ -115,7 +115,7 @@ public class TemplateTypeService {
      * @param countryId
      * @return List<TemplateType>
      * @description this method is used for get all template type.
-     * @author vikash patwal
+     * @author
      */
     public List<TemplateType> getAllTemplateType(Long countryId) {
         return templateTypeRepository.getAllTemplateType(countryId);

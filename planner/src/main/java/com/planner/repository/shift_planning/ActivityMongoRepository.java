@@ -6,7 +6,7 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
-import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

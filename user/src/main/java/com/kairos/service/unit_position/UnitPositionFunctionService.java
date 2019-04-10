@@ -40,20 +40,21 @@ public class UnitPositionFunctionService {
     @Inject private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject private ActivityIntegrationService activityIntegrationService;
 
-    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload, Long unitId) {
+    public Boolean applyFunction(Long unitPositionId, Map<String, Long> payload, Long unitId) {
 
         String dateAsString = new ArrayList<>(payload.keySet()).get(0);
 
-        Map<String, Object> functionMap = (Map<String, Object>) payload.get(dateAsString);
-        Long functionId = new Long((Integer) functionMap.get("id"));
+        Long functionId = payload.get(dateAsString);
+        //Long functionId = new Long((Integer) functionMap.get("id"));
 
-        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId,  dateAsString);
-
-        if (unitPositionFunctionRelationship == null) {
+//        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId,  dateAsString);
+//
+//        if (unitPositionFunctionRelationship == null) {
+            unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(dateAsString).toString());
             unitPositionFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId, Collections.singletonList(dateAsString));
-        } else if (unitPositionFunctionRelationship) {
-            exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
-        }
+//        } else if (unitPositionFunctionRelationship) {
+//            exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
+//        }
 
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION,Collections.emptySet());
         activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);

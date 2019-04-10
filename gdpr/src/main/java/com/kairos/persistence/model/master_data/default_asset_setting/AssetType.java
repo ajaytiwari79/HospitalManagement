@@ -3,6 +3,9 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +16,9 @@ import java.util.List;
 
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class AssetType extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty or null")
@@ -50,69 +56,6 @@ public class AssetType extends BaseEntity {
     public AssetType( Long countryId,  SuggestedDataStatus suggestedDataStatus) {
         this.countryId = countryId;
         this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public List<Risk> getRisks() {
-        return risks;
-    }
-
-    public void setRisks(List<Risk> risks) {
-        this.risks = risks;
-    }
-
-    public LocalDate getSuggestedDate() { return suggestedDate; }
-
-    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
-
-    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
-
-    public boolean isHasSubAssetType() { return hasSubAssetType; }
-
-    public void setHasSubAssetType(boolean hasSubAssetType) { this.hasSubAssetType = hasSubAssetType; }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public String getName() { return name; }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public AssetType getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(AssetType assetType) {
-        this.assetType = assetType;
-    }
-
-    public List<AssetType> getSubAssetTypes() { return subAssetTypes; }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public void setSubAssetTypes(List<AssetType> subAssetTypes) {
-        this.subAssetTypes = subAssetTypes;
-    }
-
-    public boolean isSubAssetType() {
-        return isSubAssetType;
-    }
-
-    public void setSubAssetType(boolean subAssetType) {
-        isSubAssetType = subAssetType;
-    }
-
-    public AssetType() {
     }
 
     @Override

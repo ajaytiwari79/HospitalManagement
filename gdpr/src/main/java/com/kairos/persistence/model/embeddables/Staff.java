@@ -2,6 +2,10 @@ package com.kairos.persistence.model.embeddables;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
@@ -11,6 +15,10 @@ import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Staff{
 
     @NotNull
@@ -20,28 +28,6 @@ public class Staff{
 
     @NotBlank(message = "error.message.staffName.notnull ")
     private String firstName;
-
-    public Long getStaffId() { return staffId; }
-
-    public void setStaffId(Long staffId) { this.staffId = staffId; }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFirstName() { return firstName; }
-
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public Staff(Long staffId,String lastName, String firstName) {
-        this.staffId = staffId;
-        this.lastName = lastName;
-        this.firstName = firstName;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -57,8 +43,5 @@ public class Staff{
     public int hashCode() {
 
         return Objects.hash(staffId, lastName, firstName);
-    }
-
-    public Staff() {
     }
 }

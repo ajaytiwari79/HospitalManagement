@@ -20,13 +20,6 @@ public class WTABuilderService {
             case CONSECUTIVE_WORKING_PARTOFDAY:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ConsecutiveWorkWTATemplate.class);
                 break;
-
-          /*  case CONSECUTIVE_NIGHTS_AND_DAYS:
-                ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate = new ConsecutiveRestPartOfDayWTATemplate();
-                copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate);
-                consecutiveRestPartOfDayWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
-                wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
-                break;*/
             case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ConsecutiveRestPartOfDayWTATemplate.class);
                 break;

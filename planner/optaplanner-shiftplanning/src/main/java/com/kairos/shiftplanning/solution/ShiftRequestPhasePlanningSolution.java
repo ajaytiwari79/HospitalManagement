@@ -1,6 +1,11 @@
 package com.kairos.shiftplanning.solution;
 
-import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
+import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelMatrix;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.LocalDate;
@@ -27,7 +32,7 @@ public class ShiftRequestPhasePlanningSolution {
     private List<LocalDate> weekDates;
     @PlanningEntityCollectionProperty
     @ValueRangeProvider(id = "shifts")
-    private List<ShiftRequestPhase> shifts;
+    private List<ShiftImp> shifts;
     //TODO it should have all activities per day
     @ProblemFactCollectionProperty
     private List<Activity> activities;
@@ -56,11 +61,11 @@ public class ShiftRequestPhasePlanningSolution {
         this.unitId = unitId;
     }
 
-    public List<ShiftRequestPhase> getShifts() {
+    public List<ShiftImp> getShifts() {
         return shifts;
     }
 
-    public void setShifts(List<ShiftRequestPhase> shifts) {
+    public void setShifts(List<ShiftImp> shifts) {
         this.shifts = shifts;
     }
 

@@ -12,15 +12,15 @@ import java.util.Map;
 public class ShiftFunctionWrapper {
 
 
-    Map<LocalDate,List<ShiftDTO>> shifts;
-    Map<LocalDate,FunctionDTO> assignedFunctionsObj;
+    private Map<LocalDate,List<ShiftDTO>> shifts;
+    private Map<LocalDate,List<FunctionDTO>> assignedFunctionsObj;
 
 
     //default constructor
     public ShiftFunctionWrapper() {
     }
 
-    public ShiftFunctionWrapper(Map<LocalDate,List<ShiftDTO>> shifts, Map<LocalDate, FunctionDTO> assignedFunctionsObj) {
+    public ShiftFunctionWrapper(Map<LocalDate,List<ShiftDTO>> shifts, Map<LocalDate,List<FunctionDTO>> assignedFunctionsObj) {
         this.shifts = shifts;
         this.assignedFunctionsObj = assignedFunctionsObj;
     }
@@ -33,11 +33,11 @@ public class ShiftFunctionWrapper {
         this.shifts = shifts;
     }
 
-    public Map<LocalDate, FunctionDTO> getAssignedFunctionsObj() {
+    public Map<LocalDate,List<FunctionDTO>> getAssignedFunctionsObj() {
         return assignedFunctionsObj;
     }
 
-    public void setAssignedFunctionsObj(Map<LocalDate, FunctionDTO> assignedFunctionsObj) {
+    public void setAssignedFunctionsObj(Map<LocalDate,List<FunctionDTO>> assignedFunctionsObj) {
         this.assignedFunctionsObj = assignedFunctionsObj;
     }
 }

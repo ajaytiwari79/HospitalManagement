@@ -139,23 +139,6 @@ public class OpenShiftService extends MongoBaseService {
     }
 
 
-    public List<OpenShiftResponseDTO> getOpenshiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
-
-        List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(unitId, orderId);
-        List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
-        openShifts.forEach(openShift -> {
-            OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
-            BeanUtils.copyProperties(openShift, openShiftResponseDTO, openShift.getStartDate().toString(), openShift.getEndDate().toString());
-            openShiftResponseDTO.setFromTime(DateUtils.asLocalTime(openShift.getStartDate()));
-            openShiftResponseDTO.setToTime(DateUtils.asLocalTime(openShift.getEndDate()));
-            openShiftResponseDTO.setStartDate(DateUtils.asLocalDate(openShift.getStartDate()));
-            openShiftResponseDTO.setEndDate(DateUtils.asLocalDate(openShift.getEndDate()));
-            openShiftResponseDTOS.add(openShiftResponseDTO);
-        });
-
-        return openShiftResponseDTOS;
-    }
-
     public OpenShiftAction pickOpenShiftByStaff(long unitId, BigInteger openShiftId, long staffId, String action) {
         OpenShiftAction openShiftAction = null;
         OpenShift openShift = openShiftMongoRepository.findByIdAndUnitIdAndDeletedFalse(openShiftId, unitId);
@@ -187,7 +170,7 @@ public class OpenShiftService extends MongoBaseService {
         return openShiftAction;
     }
 
-    List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
+    public List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
         List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndOrderId(unitId, orderId);
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {

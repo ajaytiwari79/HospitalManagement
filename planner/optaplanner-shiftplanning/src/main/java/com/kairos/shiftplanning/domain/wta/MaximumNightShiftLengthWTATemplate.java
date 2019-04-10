@@ -2,10 +2,10 @@ package com.kairos.shiftplanning.domain.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.shiftplanning.domain.Shift;
-import com.kairos.shiftplanning.domain.ShiftRequestPhase;
-import com.kairos.shiftplanning.domain.TimeInterval;
-import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
+import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 
 
 import java.util.List;
@@ -108,7 +108,7 @@ public class MaximumNightShiftLengthWTATemplate implements ConstraintHandler,Nig
 
     public int checkConstraints(Shift shift){
         if(isNightShift(shift)){
-            return !((ShiftRequestPhase)shift).isAbsenceActivityApplied() && shift.getMinutes() > timeLimit?(shift.getMinutes()-timeLimit):0;
+            return !((ShiftImp)shift).isAbsenceActivityApplied() && shift.getMinutes() > timeLimit?(shift.getMinutes()-timeLimit):0;
         }
         return 0;
     }

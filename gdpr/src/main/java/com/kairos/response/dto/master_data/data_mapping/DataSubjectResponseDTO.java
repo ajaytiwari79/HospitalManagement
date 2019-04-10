@@ -5,11 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@NoArgsConstructor
 public class DataSubjectResponseDTO {
 
     private Long id;
@@ -25,62 +31,5 @@ public class DataSubjectResponseDTO {
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     private List<DataCategoryResponseDTO> dataCategories;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<DataCategoryResponseDTO> getDataCategories() {
-        return dataCategories;
-    }
-
-    public void setDataCategories(List<DataCategoryResponseDTO> dataCategories) {
-        this.dataCategories = dataCategories;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
 
 }

@@ -7,6 +7,9 @@ import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class MasterProcessingActivityResponseDTO {
 
     @NotNull(message = "error.message.id.notnull")
@@ -38,73 +44,6 @@ public class MasterProcessingActivityResponseDTO {
         this.description = description;
         this.suggestedDate = suggestedDate;
         this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public Boolean getHasSubProcessingActivity() { return hasSubProcessingActivity; }
-
-    public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) { this.hasSubProcessingActivity = hasSubProcessingActivity; }
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-
-    public void setName(String name) { this.name = name; }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-
-    public List<MasterProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
-
-    public void setSubProcessingActivities(List<MasterProcessingActivityResponseDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
-
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<ServiceCategoryDTO> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
-
-    public LocalDate getSuggestedDate() { return suggestedDate; }
-
-    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
-
-    public SuggestedDataStatus getSuggestedDataStatus() {
-        return suggestedDataStatus;
-    }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public MasterProcessingActivityResponseDTO() {
     }
 
 }

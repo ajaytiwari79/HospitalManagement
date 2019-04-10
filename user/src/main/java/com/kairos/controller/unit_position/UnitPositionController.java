@@ -89,7 +89,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Object> payload) throws ParseException {
+    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Long> payload) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.applyFunction(unitPositionId, payload,unitId));
     }
 

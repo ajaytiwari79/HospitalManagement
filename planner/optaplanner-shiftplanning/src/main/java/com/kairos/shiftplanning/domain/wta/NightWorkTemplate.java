@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.domain.wta;
 
-import com.kairos.shiftplanning.domain.Shift;
-import com.kairos.shiftplanning.domain.TimeInterval;
+import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
 
 public interface NightWorkTemplate {
     default boolean isNightShift(Shift shift) {

@@ -56,7 +56,7 @@ public class OpenShiftController {
     @ApiOperation(value = "Get All openshifts by order and unitId")
     @RequestMapping(value = "/order/{orderId}/openshifts", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllOpenShiftsByUnitId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.getOpenshiftsByUnitIdAndOrderId(unitId,orderId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.getOpenShiftsByUnitIdAndOrderId(unitId,orderId));
     }
 
     @ApiOperation(value = "Pick open Shift by staff")
