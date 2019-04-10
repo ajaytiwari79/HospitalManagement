@@ -16,6 +16,9 @@ buildscript {
     }
 }
 
+plugins {
+    id 'jacoco'
+}
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
@@ -92,13 +95,28 @@ dependencies {
 
 }
 
+jacoco {
+    toolVersion = "0.8.3"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
 sonarqube {
     properties {
         property "sonar.projectName", "activity"
         property "sonar.projectKey", "kairos:activity"
         property "sonar.sources", "src/main"
-        property "sonar.skip.tests", "true"
-        property "sonar.exclusions", "**/*test*/**"
+        property "sonar.junit.reportPaths", "build/test-results/test"
+        property "sonar.jacoco.reportPaths" , "build/jacoco/test.exe"
     }
 }
 
