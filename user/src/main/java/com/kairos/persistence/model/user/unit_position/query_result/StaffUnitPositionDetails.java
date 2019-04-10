@@ -40,13 +40,8 @@ public class StaffUnitPositionDetails {
     private List<DayOfWeek> activityDayTypes;
     private ZoneId unitTimeZone;
     private Staff staff;
-<<<<<<< HEAD
-    private List<AppliedFunctionDTO> appliedFunctions;
     private List<EmploymentLinesQueryResult> employmentLines;
-=======
     private List<FunctionDTO> appliedFunctions;
-    private List<UnitPositionLinesQueryResult> positionLines;
->>>>>>> 0b3bccac4b0782833ed2bac52a3320715be143a5
 
     public StaffUnitPositionDetails() {
     }
