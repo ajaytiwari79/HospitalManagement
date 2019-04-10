@@ -121,10 +121,10 @@ public class WorkTimeAgreementBalancesCalculationService {
         if (staffAdditionalInfoDTO == null) {
             exceptionService.invalidRequestException("message.staff.notfound");
         }
-        if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.actionNotPermittedException("message.unit.position");
         }
-        if (!staffAdditionalInfoDTO.getUnitPosition().isPublished()) {
+        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
             exceptionService.invalidRequestException("message.shift.not.published");
         }
         if (staffAdditionalInfoDTO.getUnitId() == null) {

@@ -8,7 +8,7 @@ import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.enums.UnitPosition;
+import com.kairos.enums.Employment;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
@@ -131,7 +131,7 @@ public class StaffFilterService {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
             case UNIT_POSITION: {
-                return dtoToQueryesultConverter(UnitPosition.getListOfUnitPositionForFilters(), objectMapper);
+                return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             }
 
             default:

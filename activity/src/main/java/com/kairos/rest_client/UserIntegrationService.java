@@ -7,7 +7,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
-import com.kairos.dto.activity.cta.UnitPositionDTO;
+import com.kairos.dto.activity.cta.EmploymentDTO;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -15,8 +15,8 @@ import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.shift.FunctionDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -39,8 +39,8 @@ import com.kairos.dto.user.staff.OrganizationStaffWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
@@ -96,8 +96,8 @@ public class UserIntegrationService {
         });
     }
 
-    public StaffUnitPositionUnitDataWrapper getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionUnitDataWrapper>>() {
+    public StaffEmploymentUnitDataWrapper getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
         }, expertiseId);
     }
 
@@ -106,9 +106,9 @@ public class UserIntegrationService {
         });
     }
 
-    public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, List<Long> staffIds, Long expertiseId) {
+    public List<StaffEmploymentDetails> getStaffIdAndUnitPositionId(Long unitId, List<Long> staffIds, Long expertiseId) {
 
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentDetails>>>() {
         }, expertiseId);
 
     }
@@ -212,8 +212,8 @@ public class UserIntegrationService {
         });
     }
 
-    public UnitPositionDTO getUnitPositionDTO(Long unitId, Long unitEmploymentPositionId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionDTO>>() {
+    public EmploymentDTO getUnitPositionDTO(Long unitId, Long unitEmploymentPositionId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentDTO>>() {
         }, unitEmploymentPositionId);
     }
 
@@ -260,8 +260,8 @@ public class UserIntegrationService {
     }
 
     // PriortyGroupRestClient
-    public List<StaffUnitPositionQueryResult> getStaffIdsByPriorityGroupIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
-        return genericRestClient.publishRequest(staffIncludeFilterDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_PRIORTY_GROUP, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionQueryResult>>>() {
+    public List<StaffEmploymentQueryResult> getStaffIdsByPriorityGroupIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
+        return genericRestClient.publishRequest(staffIncludeFilterDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_PRIORTY_GROUP, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentQueryResult>>>() {
         });
     }
 
@@ -370,9 +370,9 @@ public class UserIntegrationService {
     }
 
     //On user micro-service query Param is not applicable
-    public StaffUnitPositionDetails verifyUnitEmploymentOfStaff(Long staffId, Long unitId, String type) {
+    public StaffEmploymentDetails verifyUnitEmploymentOfStaff(Long staffId, Long unitId, String type) {
         BasicNameValuePair basicNameValuePair = new BasicNameValuePair("type", type);
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>>() {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
         }, staffId);
     }
 
@@ -453,8 +453,8 @@ public class UserIntegrationService {
     }
 
     //TimeBankRestClient
-    public UnitPositionWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>>() {
+    public EmploymentWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentWithCtaDetailsDTO>>() {
         }, unitPositionId);
     }
 

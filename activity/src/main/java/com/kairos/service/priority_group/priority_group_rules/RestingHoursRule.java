@@ -1,9 +1,9 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 
@@ -22,7 +22,7 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         this.shifts = shifts;
     }
     @Override
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
         int restingHoursBeforeStart = priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeBeforeShiftStart();
         int restingHoursAfterEnd = priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeAfterShiftEnd();
 
@@ -41,8 +41,8 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         }
         DateTimeInterval dateTimeIntervalBeforeStart = null;
         DateTimeInterval dateTimeIntervalAfterEnd = null;
-        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+        for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
+            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
 
             if(restingBeforeStart) {
                 LocalTime openShiftStartTime = DateUtils.asLocalTime(openShiftMap.get(entry.getKey()).getStartDate());
@@ -67,7 +67,7 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
     }
 
 
-    private void removeStaffFromListByRestingHours(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator, DateTimeInterval dateTimeIntervalBeforeStart,
+    private void removeStaffFromListByRestingHours(Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator, DateTimeInterval dateTimeIntervalBeforeStart,
                                                    DateTimeInterval dateTimeIntervalAfterEnd, boolean both, boolean restingBeforeStart, boolean restingAfterEnd) {
 
         Set<Long> unitPositionIds = new HashSet<Long>();
@@ -81,8 +81,8 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
             }
         }
         while(staffUnitPositionIterator.hasNext()) {
-            StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-            if(unitPositionIds.contains(staffUnitPositionQueryResult.getUnitPositionId())) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
+            if(unitPositionIds.contains(staffEmploymentQueryResult.getUnitPositionId())) {
                 staffUnitPositionIterator.remove();
             }
         }

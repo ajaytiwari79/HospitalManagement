@@ -14,7 +14,7 @@ public class Shift {
     private Employee employee;
     private Date startDate;
     private Date endDate;
-    private Long unitPositionId;
+    private Long employmentId;
     private List<ShiftActivityDTO> activities;
 
     public BigInteger getId() {
@@ -49,12 +49,12 @@ public class Shift {
         this.endDate = endDate;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public List<ShiftActivityDTO> getActivities() {

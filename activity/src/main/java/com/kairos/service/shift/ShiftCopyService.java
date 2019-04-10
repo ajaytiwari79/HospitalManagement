@@ -9,7 +9,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentUnitDataWrapper;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -20,7 +20,6 @@ import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -102,9 +101,9 @@ public class ShiftCopyService extends MongoBaseService {
         Set<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getShifts().stream().flatMap(ss -> ss.getActivities().stream().map(a -> a.getActivityId()))).collect(Collectors.toSet());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
         Map<BigInteger, ActivityWrapper> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        StaffUnitPositionUnitDataWrapper dataWrapper = userIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
-        List<StaffUnitPositionDetails> staffDataList = dataWrapper.getStaffUnitPositionDetails();
-        List<Long> unitPositionIds = staffDataList.stream().map(StaffUnitPositionDetails::getId).collect(Collectors.toList());
+        StaffEmploymentUnitDataWrapper dataWrapper = userIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
+        List<StaffEmploymentDetails> staffDataList = dataWrapper.getStaffEmploymentDetails();
+        List<Long> unitPositionIds = staffDataList.stream().map(StaffEmploymentDetails::getId).collect(Collectors.toList());
         findAndAddCTAInUnitPositions(staffDataList, copyShiftDTO, dataWrapper, unitPositionIds);
         Map<Long, List<WTAQueryResultDTO>> WTAMapByUnitPositionId = findAllWTAGroupByUnitPositionId(unitPositionIds, copyShiftDTO);
         List<Long> expertiseIds = staffDataList.stream().map(staffUnitPositionDetails -> staffUnitPositionDetails.getExpertise().getId()).collect(Collectors.toList());
@@ -128,7 +127,7 @@ public class ShiftCopyService extends MongoBaseService {
         List<ShiftResponseDTO> previousShiftBetweenDatesByUnitPosition = shiftMongoRepository.findShiftsBetweenDurationByUnitPositions(unitPositionIds, asDate(copyShiftDTO.getStartDate().atTime(LocalTime.MIN)), asDate(copyShiftDTO.getEndDate().atTime(LocalTime.MAX)));
         Map<Long, List<Shift>> unitPositionWiseShifts = previousShiftBetweenDatesByUnitPosition.stream().collect(Collectors.toMap(key -> key.getUnitPositionId(), value -> value.getShifts()));
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
-            StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
+            StaffEmploymentDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
 
             List<WTAQueryResultDTO> wtaQueryResultDTOS = WTAMapByUnitPositionId.get(staffUnitPosition.getId());
             List<Shift> currentStaffPreviousShifts = unitPositionWiseShifts.get(staffUnitPosition.getId());
@@ -144,7 +143,7 @@ public class ShiftCopyService extends MongoBaseService {
         return copyShiftResponse;
     }
 
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffUnitPositionDetails staffUnitPosition, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO, Map<BigInteger, ActivityWrapper> breakActivitiesMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffEmploymentDetails staffUnitPosition, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO, Map<BigInteger, ActivityWrapper> breakActivitiesMap, StaffEmploymentUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts) {
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
         List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs = new ArrayList<>();
@@ -211,7 +210,7 @@ public class ShiftCopyService extends MongoBaseService {
         return statusMap;
     }
 
-    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
+    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffEmploymentDetails staffUnitPosition, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffEmploymentUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
             List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyPropertiesOfListByMapper(sourceShift.getActivities(),ShiftActivity.class);
             for (ShiftActivity shiftActivity : shiftActivities) {
@@ -248,13 +247,13 @@ public class ShiftCopyService extends MongoBaseService {
 
     private Map<Long, List<WTAQueryResultDTO>> findAllWTAGroupByUnitPositionId(List<Long> unitPositionIds, CopyShiftDTO copyShiftDTO) {
         List<WTAQueryResultDTO> wtaQueryResults = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdsAndDates(unitPositionIds, asDate(copyShiftDTO.getStartDate()), asDate(copyShiftDTO.getEndDate()));
-        return wtaQueryResults.stream().collect(groupingBy(WTAQueryResultDTO::getUnitPositionId));
+        return wtaQueryResults.stream().collect(groupingBy(WTAQueryResultDTO::getEmploymentId));
 
     }
 
-    private void findAndAddCTAInUnitPositions(List<StaffUnitPositionDetails> staffDataList, CopyShiftDTO copyShiftDTO, StaffUnitPositionUnitDataWrapper dataWrapper, List<Long> unitPositionIds) {
+    private void findAndAddCTAInUnitPositions(List<StaffEmploymentDetails> staffDataList, CopyShiftDTO copyShiftDTO, StaffEmploymentUnitDataWrapper dataWrapper, List<Long> unitPositionIds) {
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, asDate(copyShiftDTO.getStartDate()), asDate(copyShiftDTO.getEndDate()));
-        Map<Long, List<CTAResponseDTO>> CTAResponseMapByUnitPositionIds = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
+        Map<Long, List<CTAResponseDTO>> CTAResponseMapByUnitPositionIds = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
         staffDataList.stream().forEach(staffAdditionalInfoDTO -> {
             if (CTAResponseMapByUnitPositionIds.get(staffAdditionalInfoDTO.getId()) != null) {
                 List<CTAResponseDTO> ctaResponseDTOSList = CTAResponseMapByUnitPositionIds.get(staffAdditionalInfoDTO.getId());
@@ -265,7 +264,7 @@ public class ShiftCopyService extends MongoBaseService {
         });
     }
 
-    private void setScheduleMinuteAndHours(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffUnitPositionUnitDataWrapper dataWrapper, StaffUnitPositionDetails staffUnitPosition,
+    private void setScheduleMinuteAndHours(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffEmploymentUnitDataWrapper dataWrapper, StaffEmploymentDetails staffUnitPosition,
                                            PlanningPeriodDTO planningPeriod, List<ActivityConfiguration> activityConfigurations) {
         int scheduledMinutes = 0, durationMinutes = 0;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -291,7 +290,7 @@ public class ShiftCopyService extends MongoBaseService {
         shift.setDurationMinutes(durationMinutes);
     }
 
-    private BigInteger addPlannedTimeInShift(BigInteger phaseId, Activity activity, StaffUnitPositionDetails staffAdditionalInfoDTO, StaffUnitPositionUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations) {
+    private BigInteger addPlannedTimeInShift(BigInteger phaseId, Activity activity, StaffEmploymentDetails staffAdditionalInfoDTO, StaffEmploymentUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations) {
         /**
          * This is used for checking the activity is for presence type
          **/
@@ -303,7 +302,7 @@ public class ShiftCopyService extends MongoBaseService {
                 : getPresencePlannedTime(phaseId, managementPerson, staffAdditionalInfoDTO, activityConfigurations);
     }
 
-    private BigInteger getAbsencePlannedTime(BigInteger phaseId, StaffUnitPositionDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
+    private BigInteger getAbsencePlannedTime(BigInteger phaseId, StaffEmploymentDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
         BigInteger plannedTimeId = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
             if (activityConfiguration.getAbsencePlannedTime() != null && activityConfiguration.getAbsencePlannedTime().getPhaseId().equals(phaseId)) {
@@ -320,7 +319,7 @@ public class ShiftCopyService extends MongoBaseService {
         return plannedTimeId;
     }
 
-    private BigInteger getPresencePlannedTime(BigInteger phaseId, Boolean managementPerson, StaffUnitPositionDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
+    private BigInteger getPresencePlannedTime(BigInteger phaseId, Boolean managementPerson, StaffEmploymentDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
         ActivityConfiguration appliedActivityConfiguration = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
             if (activityConfiguration.getPresencePlannedTime() != null && activityConfiguration.getPresencePlannedTime().getPhaseId().equals(phaseId)) {
@@ -332,9 +331,9 @@ public class ShiftCopyService extends MongoBaseService {
                 : getApplicablePlannedType(staffAdditionalInfoDTO, appliedActivityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
     }
 
-    private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
-        if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
-            plannedTypeId = plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+    private BigInteger getApplicablePlannedType(StaffEmploymentDetails staffEmploymentDetails, BigInteger plannedTypeId) {
+        if (Optional.ofNullable(staffEmploymentDetails.getIncludedPlannedTime()).isPresent()) {
+            plannedTypeId = plannedTypeId.equals(staffEmploymentDetails.getExcludedPlannedTime()) ? staffEmploymentDetails.getIncludedPlannedTime() : plannedTypeId;
         }
         return plannedTypeId;
 

@@ -9,8 +9,8 @@ import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
-import com.kairos.service.unit_position.UnitPositionCTAWTAService;
-import com.kairos.service.unit_position.UnitPositionService;
+import com.kairos.service.unit_position.EmploymentCTAWTAService;
+import com.kairos.service.unit_position.EmploymentService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +24,6 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -39,14 +38,14 @@ public class ExpertiseController {
     @Inject
     private ExpertiseService expertiseService;
     @Inject
-    private UnitPositionService unitPositionService;
+    private EmploymentService employmentService;
     @Inject
     private LocaleService localeService;
     @Inject
     private FunctionalPaymentService functionalPaymentService;
     @Inject
     ExpertiseUnitService expertiseUnitService;
-    @Inject private  UnitPositionCTAWTAService unitPositionCTAWTAService;
+    @Inject private EmploymentCTAWTAService employmentCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
@@ -82,7 +81,7 @@ public class ExpertiseController {
     @RequestMapping(value =  UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
                                                                   @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,unitPositionCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
     }
 
     @ApiOperation(value = "Get Available expertise")

@@ -8,7 +8,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
+import com.kairos.dto.user.staff.unit_position.EmploymentDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.employment_type.EmploymentStatus;
@@ -28,14 +28,14 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.EmploymentGraphRepository;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -98,7 +98,7 @@ public class PositionService {
     @Inject
     private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
     @Inject
-    private UnitPositionGraphRepository unitPositionGraphRepository;
+    private EmploymentGraphRepository employmentGraphRepository;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
@@ -590,7 +590,7 @@ public class PositionService {
         Long employmentEndDate = null;
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        List<String> unitPositionsEndDate = unitPositionGraphRepository.getAllUnitPositionsByStaffId(staffId);
+        List<String> unitPositionsEndDate = employmentGraphRepository.getAllUnitPositionsByStaffId(staffId);
         if (!unitPositionsEndDate.isEmpty()) {
             //java.lang.ClassCastException: java.lang.String cannot be cast to java.time.LocalDate
             LocalDate maxEndDate = LocalDate.parse(unitPositionsEndDate.get(0));
@@ -670,13 +670,13 @@ public class PositionService {
     }
 
 
-    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO, long unitPositionId) {
-        UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(), unitPositionId);
-        if (unitPositionQueryResult != null) {
-            if (unitPositionQueryResult.getEndDate() == null) {
-                exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate());
+    public boolean eligibleForMainUnitPosition(EmploymentDTO employmentDTO, long unitPositionId) {
+        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), unitPositionId);
+        if (employmentQueryResult != null) {
+            if (employmentQueryResult.getEndDate() == null) {
+                exceptionService.actionNotPermittedException("message.main_unit_position.exists", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());
             } else {
-                exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate());
+                exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate(), employmentQueryResult.getEndDate());
             }
         }
         return true;

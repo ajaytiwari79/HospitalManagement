@@ -50,16 +50,4 @@ public class ShiftPlanningInitializationController {
 
         return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.FOUND);
     }
-
-    /*@RequestMapping("/getWTA")
-    ResponseEntity<Map<String, Object>> getWTA() {
-        Long[] unitPositionIds = {35682L,35681L};
-        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds));
-    }
-
-    @RequestMapping("/getShifts")
-    ResponseEntity<Map<String, Object>> getShifts() {
-        Long[] unitPositionIds = {35682L,35681L};
-        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getAllShiftsByUnitPositionIds(unitPositionIds, new Date(1530383400000l), new Date(1532975400000l)));
-    }*/
 }

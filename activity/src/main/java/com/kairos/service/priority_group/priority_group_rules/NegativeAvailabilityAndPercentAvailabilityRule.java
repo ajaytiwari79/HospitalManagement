@@ -1,9 +1,9 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 
@@ -26,10 +26,10 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
         this.openShiftMap = openShiftMap;
     }
     @Override
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
-        for (Map.Entry<BigInteger, List<StaffUnitPositionQueryResult>> entry : openShiftStaffMap.entrySet()) {
-            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+        for (Map.Entry<BigInteger, List<StaffEmploymentQueryResult>> entry : openShiftStaffMap.entrySet()) {
+            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
             Date filterEndDate = DateUtils.getEndOfDay(openShiftMap.get(entry.getKey()).getStartDate());
             Date filterStartDate = DateUtils.getStartOfDay(openShiftMap.get(entry.getKey()).getStartDate());
             Date flterStartDatePerAvailability = openShiftMap.get(entry.getKey()).getStartDate();
@@ -38,7 +38,7 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
             DateTimeInterval dateTimeIntervalPerAvailability = new DateTimeInterval(flterStartDatePerAvailability.getTime(), filterEndDatePerAvailability.getTime());
 
             /* Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
-                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getUnitPositionId));*/
+                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getEmploymentId));*/
 
             Set<Long> unitPositionIds = new HashSet<Long>();
             for (Shift shift : shifts) {
@@ -58,11 +58,11 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
 
         }
     }
-    private void removeStaffFromList(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator,Set<Long> unitPositionIds) {
+    private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator, Set<Long> unitPositionIds) {
 
         while(staffUnitPositionIterator.hasNext()) {
-            StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-            if(unitPositionIds.contains(staffUnitPositionQueryResult.getUnitPositionId())) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
+            if(unitPositionIds.contains(staffEmploymentQueryResult.getUnitPositionId())) {
                 staffUnitPositionIterator.remove();
             }
         }

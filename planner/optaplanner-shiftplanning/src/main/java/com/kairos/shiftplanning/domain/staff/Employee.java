@@ -41,7 +41,7 @@ public class Employee {
     private int workingDaysInWeek;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private Long employmentTypeId;
-    private Long unitPositionId;
+    private Long employmentId;
 
 
     public Employee(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
@@ -193,12 +193,12 @@ public class Employee {
     public Employee() {
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     @Override

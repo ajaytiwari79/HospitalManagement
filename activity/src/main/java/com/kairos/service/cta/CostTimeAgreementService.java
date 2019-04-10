@@ -1,11 +1,10 @@
 package com.kairos.service.cta;
 
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.*;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
@@ -31,8 +30,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -227,7 +224,7 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
     public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitPositionId) {
-        UnitPositionDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
+        EmploymentDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
 
@@ -235,20 +232,20 @@ public class CostTimeAgreementService extends MongoBaseService {
         return costTimeAgreementRepository.getOneCtaById(unitPosition.getCostTimeAgreementId());
     }
 
-    public StaffUnitPositionDetails updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
+    public StaffEmploymentDetails updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,null,ORGANIZATION,unitPositionId,new HashSet<>());
-        if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
         }
-        if (staffAdditionalInfoDTO.getUnitPosition().getEndDate()!=null && ctaDTO.getEndDate()!=null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getUnitPosition().getEndDate())){
-            exceptionService.actionNotPermittedException("end_date.from.end_date",ctaDTO.getEndDate(),staffAdditionalInfoDTO.getUnitPosition().getEndDate());
+        if (staffAdditionalInfoDTO.getEmployment().getEndDate()!=null && ctaDTO.getEndDate()!=null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())){
+            exceptionService.actionNotPermittedException("end_date.from.end_date",ctaDTO.getEndDate(),staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
-        if (staffAdditionalInfoDTO.getUnitPosition().getEndDate()!=null && ctaDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getUnitPosition().getEndDate())){
-            exceptionService.actionNotPermittedException("start_date.from.end_date",ctaDTO.getStartDate(),staffAdditionalInfoDTO.getUnitPosition().getEndDate());
+        if (staffAdditionalInfoDTO.getEmployment().getEndDate()!=null && ctaDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())){
+            exceptionService.actionNotPermittedException("start_date.from.end_date",ctaDTO.getStartDate(),staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
-        boolean updateSameCTA = !staffAdditionalInfoDTO.getUnitPosition().isPublished() || ctaDTO.getStartDate().isBefore(oldCTA.getStartDate()) || ctaDTO.getStartDate().equals(oldCTA.getStartDate());
+        boolean updateSameCTA = !staffAdditionalInfoDTO.getEmployment().isPublished() || ctaDTO.getStartDate().isBefore(oldCTA.getStartDate()) || ctaDTO.getStartDate().equals(oldCTA.getStartDate());
         if(!updateSameCTA){
             updateSameCTA = !isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
         }
@@ -257,9 +254,9 @@ public class CostTimeAgreementService extends MongoBaseService {
         }else {
             responseCTA = updateUnitPositionCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
-        staffAdditionalInfoDTO.getUnitPosition().setCostTimeAgreement(responseCTA);
+        staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
         timeBankService.updateDailyTimeBankOnCTAChangeOfUnitPosition(staffAdditionalInfoDTO,responseCTA);
-        return staffAdditionalInfoDTO.getUnitPosition();
+        return staffAdditionalInfoDTO.getEmployment();
     }
 
     private CTAResponseDTO updateUnitPositionCTA(CostTimeAgreement costTimeAgreement,CollectiveTimeAgreementDTO ctaDTO){
@@ -534,8 +531,8 @@ public class CostTimeAgreementService extends MongoBaseService {
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
-        Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getUnitPositionId(), Collectors.toList()));
-        ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getUnitPositionId())));
+        Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
+        ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getEmploymentId())));
         return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
     }
 

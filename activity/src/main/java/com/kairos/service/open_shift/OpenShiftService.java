@@ -5,8 +5,8 @@ import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.enums.open_shift.OpenShiftAction;
@@ -194,8 +194,8 @@ public class OpenShiftService extends MongoBaseService {
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
             Long unitPositionId = userIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
-            UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId,startDate,endDate);
-            data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
+            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId,startDate,endDate);
+            data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), employmentWithCtaDetailsDTO);
         }
 
         List<OpenShift> similarShifts = openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate, endDate);
@@ -240,7 +240,7 @@ public class OpenShiftService extends MongoBaseService {
     }
 
     private boolean assignShiftToStaff(OpenShift openShift, Long unitId, List<Long> staffIds, Order order) {
-        List<StaffUnitPositionDetails> unitPositionDetails = userIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
+        List<StaffEmploymentDetails> unitPositionDetails = userIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
         unitPositionDetails.forEach(unitPositionDetail -> {
             if (!Optional.ofNullable(unitPositionDetail.getId()).isPresent() || openShift.getNoOfPersonRequired()<1 ||
                     openShift.getAssignedStaff().contains(unitPositionDetail.getStaffId()) ) {

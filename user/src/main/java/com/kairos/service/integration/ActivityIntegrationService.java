@@ -10,7 +10,7 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
-import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -107,10 +107,10 @@ public class ActivityIntegrationService {
         genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/" + staffId, queryParams);
     }
 
-    public List<CTAWTAResponseDTO> copyWTACTA(List<UnitPositionIdDTO> unitPositionIdDTOS) {
+    public List<CTAWTAResponseDTO> copyWTACTA(List<EmploymentIdDTO> employmentIdDTOS) {
 
 
-        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(unitPositionIdDTOS, null, false, IntegrationOperation.CREATE, "copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTAWTAResponseDTO>>>() {
+        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(employmentIdDTOS, null, false, IntegrationOperation.CREATE, "copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTAWTAResponseDTO>>>() {
         });
 
         return ctawtaResponseDTOS;

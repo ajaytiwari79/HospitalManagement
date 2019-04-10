@@ -20,7 +20,6 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
@@ -34,7 +33,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.enums.phase.PhaseType.ACTUAL;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -203,12 +201,12 @@ public class ShiftStateService {
         startDate = startDate.before(shiftStartDate) ? startDate : shiftStartDate;
         endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate, endDate);
-        Map<Long, List<CTAResponseDTO>> unitPositionAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
+        Map<Long, List<CTAResponseDTO>> unitPositionAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
-            if (unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getUnitPosition().getId()) != null) {
-                List<CTAResponseDTO> ctaResponseDTOSList = unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getUnitPosition().getId());
+            if (unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId()) != null) {
+                List<CTAResponseDTO> ctaResponseDTOSList = unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId());
                 List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-                staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaRuleTemplateDTOS);
+                staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaRuleTemplateDTOS);
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             }
         });

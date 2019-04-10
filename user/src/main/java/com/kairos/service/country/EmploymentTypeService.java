@@ -31,7 +31,7 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.EmploymentGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
@@ -66,7 +66,7 @@ public class EmploymentTypeService {
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    private UnitPositionGraphRepository unitPositionGraphRepository;
+    private EmploymentGraphRepository employmentGraphRepository;
     @Inject
     private RegionService regionService;
     @Inject
@@ -100,7 +100,7 @@ public class EmploymentTypeService {
 
         }
         EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
-                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition());
+                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtEmployment());
         employmentTypeToCreate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
@@ -129,7 +129,7 @@ public class EmploymentTypeService {
         }
         EmploymentType employmentType=new EmploymentType(employmentTypeToUpdate.getId(),employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
                 employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
-                employmentTypeDTO.isEditableAtUnitPosition());
+                employmentTypeDTO.isEditableAtEmployment());
         employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         return employmentTypeGraphRepository.save(employmentType);
     }

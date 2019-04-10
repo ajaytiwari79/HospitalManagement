@@ -1,6 +1,6 @@
 package com.kairos.dto.user.user.staff;
 
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -24,7 +24,7 @@ public class StaffAdditionalInfoDTO {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffUnitPositionDetails unitPosition;
+    private StaffEmploymentDetails employment;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
     private Map<Long, List<LocalDate>> publicHoliday;
@@ -46,13 +46,13 @@ public class StaffAdditionalInfoDTO {
     public StaffAdditionalInfoDTO() {
     }
 
-    public StaffAdditionalInfoDTO(StaffUnitPositionDetails unitPosition, List<DayTypeDTO> dayTypes) {
-        this.unitPosition = unitPosition;
+    public StaffAdditionalInfoDTO(StaffEmploymentDetails employment, List<DayTypeDTO> dayTypes) {
+        this.employment = employment;
         this.dayTypes = dayTypes;
     }
 
-    public StaffAdditionalInfoDTO( List<ReasonCodeDTO> reasonCodes,StaffUnitPositionDetails unitPosition) {
-        this.unitPosition = unitPosition;
+    public StaffAdditionalInfoDTO( List<ReasonCodeDTO> reasonCodes,StaffEmploymentDetails employment) {
+        this.employment = employment;
         this.reasonCodes = reasonCodes;
     }
 
@@ -169,12 +169,12 @@ public class StaffAdditionalInfoDTO {
         this.unitId = unitId;
     }
 
-    public StaffUnitPositionDetails getUnitPosition() {
-        return unitPosition;
+    public StaffEmploymentDetails getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(StaffUnitPositionDetails unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(StaffEmploymentDetails employment) {
+        this.employment = employment;
     }
 
     public Date getOrganizationNightStartTimeFrom() {

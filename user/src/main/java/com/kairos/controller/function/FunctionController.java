@@ -28,14 +28,14 @@ public class FunctionController {
     @PostMapping(API_ORGANIZATION_UNIT_URL+"/appliedFunctionsByUnitPositionIds")
     public ResponseEntity<Map<String, Object>> getUnitPositionIdWithFunctionIdShiftDateMap(@RequestBody Set<Long> unitPositionIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                functionService.getUnitPositionIdWithFunctionIdShiftDateMap(unitPositionIds));
+                functionService.getEmploymentIdWithFunctionIdShiftDateMap(unitPositionIds));
     }
 
     @ApiOperation(value = "")
     @PostMapping(API_ORGANIZATION_UNIT_URL+"/updateFunctionOnPhaseRestoration")
     public ResponseEntity<Map<String, Object>> updateUnitPositionFunctionRelationShipDates(@RequestBody Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                functionService.updateUnitPositionFunctionRelationShipDates(unitPositionIdWithShiftDateFunctionIdMap));
+                functionService.updateEmploymentFunctionRelationShipDates(unitPositionIdWithShiftDateFunctionIdMap));
     }
     //Functions
 
@@ -86,7 +86,7 @@ public class FunctionController {
     @GetMapping(value =API_V1+UNIT_URL +"/unit_position/functions")
     @ApiOperation("find functions")
     public ResponseEntity<Map<String, Object>> findAppliedFunctionsAtUnitPosition(@PathVariable Long unitId,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.findAppliedFunctionsAtUnitPosition(unitId,startDate,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.findAppliedFunctionsAtEmployment(unitId,startDate,endDate));
     }
 
 }

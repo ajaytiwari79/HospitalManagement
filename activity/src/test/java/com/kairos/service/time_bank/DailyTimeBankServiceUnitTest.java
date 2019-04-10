@@ -78,7 +78,7 @@ public class DailyTimeBankServiceUnitTest {
     public void getIntervalByDateOverviewTimebank(){
         //TODO Pradeep will fix it. as logic has been changed
 //        int year  = 2018;
-//        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
+//        EmploymentWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
 //        DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
 //        DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
 //        if(startDate.getYear()==new DateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay())){

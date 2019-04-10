@@ -46,7 +46,7 @@ public class TimeBankDTO {
     private TimeBankCTADistributionDTO timeBankDistribution;
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
-    private UnitPositionWithCtaDetailsDTO costTimeAgreement;
+    private EmploymentWithCtaDetailsDTO costTimeAgreement;
 
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
@@ -89,7 +89,7 @@ public class TimeBankDTO {
         this.phaseName = "Total";
     }
 
-    public TimeBankDTO(Date startDate, Date endDate, UnitPositionWithCtaDetailsDTO costTimeAgreement,Long staffId,Long unitPositionId,int totalWeeklyMin,int workingDaysInWeek) {
+    public TimeBankDTO(Date startDate, Date endDate, EmploymentWithCtaDetailsDTO costTimeAgreement, Long staffId, Long unitPositionId, int totalWeeklyMin, int workingDaysInWeek) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
@@ -228,11 +228,11 @@ public class TimeBankDTO {
         this.timeBankDistribution = timeBankDistribution;
     }
 
-    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement() {
+    public EmploymentWithCtaDetailsDTO getCostTimeAgreement() {
         return costTimeAgreement;
     }
 
-    public void setCostTimeAgreement(UnitPositionWithCtaDetailsDTO costTimeAgreement) {
+    public void setCostTimeAgreement(EmploymentWithCtaDetailsDTO costTimeAgreement) {
         this.costTimeAgreement = costTimeAgreement;
     }
 

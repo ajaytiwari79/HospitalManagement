@@ -1,6 +1,5 @@
 package com.kairos.utils.worktimeagreement;
 
-import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
@@ -467,7 +466,7 @@ public class RuletemplateUtils {
 
     public static void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
-        staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
+        staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
             List<LocalDate> publicHolidays = new ArrayList<>();
             for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {

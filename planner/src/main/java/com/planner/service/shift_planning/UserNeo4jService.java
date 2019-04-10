@@ -16,15 +16,15 @@ public class UserNeo4jService {
 
 
     /**
-     * Filter staff have no unitPositionId in this unit
+     * Filter staff have no employmentId in this unit
      *
      * @param staffIds
      * @return
      */
-    public List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId, List<Long> staffIds) {
+    public List<StaffQueryResult> getStaffWithSkillsAndEmploymentIds(Long unitId, List<Long> staffIds) {
         List<StaffQueryResult> staffQueryResults = new ArrayList<>();
-        for (StaffQueryResult staffQueryResult : userNeo4jRepo.getStaffWithSkillsAndUnitPostionIds(unitId, staffIds)) {
-            if (staffQueryResult.getStaffUnitPosition() != null) staffQueryResults.add(staffQueryResult);
+        for (StaffQueryResult staffQueryResult : userNeo4jRepo.getStaffWithSkillsAndEmploymentIds(unitId, staffIds)) {
+            if (staffQueryResult.getEmploymentId() != null) staffQueryResults.add(staffQueryResult);
         }
         return staffQueryResults;
 

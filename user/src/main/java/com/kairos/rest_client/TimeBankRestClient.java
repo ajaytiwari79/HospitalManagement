@@ -21,10 +21,10 @@ public class TimeBankRestClient {
 
 /*
     @Async
-    public Boolean createBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
+    public Boolean createBlankTimeBank(EmploymentWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<UnitPositionWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
+            HttpEntity<EmploymentWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
@@ -46,10 +46,10 @@ public class TimeBankRestClient {
 
     }
 
-    public Boolean updateBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
+    public Boolean updateBlankTimeBank(EmploymentWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<UnitPositionWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
+            HttpEntity<EmploymentWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(

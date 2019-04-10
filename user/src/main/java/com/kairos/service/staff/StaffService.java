@@ -6,7 +6,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -41,7 +41,7 @@ import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.unit_position.query_result.EmploymentLinesQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
@@ -54,7 +54,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.EmploymentGraphRepository;
 import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -103,7 +103,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
-import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
+import static com.kairos.service.unit_position.EmploymentUtility.convertEmploymentObject;
 import static com.kairos.utils.FileUtil.createDirectory;
 
 /**
@@ -157,7 +157,7 @@ public class StaffService {
     @Inject
     private OrganizationService organizationService;
     @Inject
-    private UnitPositionGraphRepository unitPositionGraphRepository;
+    private EmploymentGraphRepository employmentGraphRepository;
     @Inject
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
@@ -255,7 +255,7 @@ public class StaffService {
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
         if(!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
-            exceptionService.actionNotPermittedException("message.unitposition.expertise.notchanged");
+            exceptionService.actionNotPermittedException("message.employment.expertise.notchanged");
         }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
         Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
@@ -870,7 +870,7 @@ public class StaffService {
             // unit is parent so fetching all staff from itself
             staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         } else {
-            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingEmploymentByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         }
         return staffPersonalDetailDTOS;
     }
@@ -883,16 +883,16 @@ public class StaffService {
         return staffPersonalDetailList;
     }
 
-    public StaffUnitPositionDetails getUnitPositionOfStaff(long staffId, long unitId) {
-        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId);
-        StaffUnitPositionDetails unitPositionDetails = null;
-        if(Optional.ofNullable(unitPosition).isPresent()) {
-            unitPositionDetails = convertUnitPositionObject(unitPosition);
-            unitPositionDetails.setUnitId(unitId);
-            List<EmploymentLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
-            unitPositionDetails.setHourlyCost(CollectionUtils.isNotEmpty(data) ? data.get(0).getHourlyCost() : new BigDecimal(0));
+    public StaffEmploymentDetails getEmploymentOfStaff(long staffId, long unitId) {
+        EmploymentQueryResult employment = employmentGraphRepository.getEmploymentOfStaff(staffId, unitId);
+        StaffEmploymentDetails employmentDetails = null;
+        if(Optional.ofNullable(employment).isPresent()) {
+            employmentDetails = convertEmploymentObject(employment);
+            employmentDetails.setUnitId(unitId);
+            List<EmploymentLinesQueryResult> data = employmentGraphRepository.findFunctionalHourlyCost(Collections.singletonList(employment.getId()));
+            employmentDetails.setHourlyCost(CollectionUtils.isNotEmpty(data) ? data.get(0).getHourlyCost() : new BigDecimal(0));
         }
-        return unitPositionDetails;
+        return employmentDetails;
     }
 
     public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {

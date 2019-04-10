@@ -96,8 +96,8 @@ public class ActivityMongoService {
      * @param toDate
      * @return
      */
-    public List<Shift> getAllShiftsByUnitPositionIds(List<Long> organizationPositionIds, Date fromDate, Date toDate) {
-        return activityMongoRepository.getAllShiftsByUnitPositionIds(organizationPositionIds, fromDate, toDate);
+    public List<Shift> getAllShiftsByEmploymentIds(List<Long> organizationPositionIds, Date fromDate, Date toDate) {
+        return activityMongoRepository.getAllShiftsByEmploymentIds(organizationPositionIds, fromDate, toDate);
     }
 /***********************************************CTAService******************************************************************/
     /**
@@ -107,8 +107,8 @@ public class ActivityMongoService {
      * @param toPlanningDate
      * @return
      */
-    public  List<CTAResponseDTO>  getCTARuleTemplateByUnitPositionIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
-        return  activityMongoRepository.getCTARuleTemplateByUnitPositionIds(organizationPositionIds, fromPlanningDate, toPlanningDate);
+    public  List<CTAResponseDTO> getCTARuleTemplateByEmploymentIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+        return  activityMongoRepository.getCTARuleTemplateByEmploymentIds(organizationPositionIds, fromPlanningDate, toPlanningDate);
     }
     /*************************************WTAService***********************************************/
     /**Used in {@link WTAService}
@@ -117,8 +117,8 @@ public class ActivityMongoService {
      * @param toPlanningDate
      * @return
      */
-    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
-        return activityMongoRepository.getWTARuleTemplateByUnitPositionIds(organizationPositionIds,fromPlanningDate,toPlanningDate);
+    public List<WorkingTimeAgreement> getWTARuleTemplateByEmploymentIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+        return activityMongoRepository.getWTARuleTemplateByEmploymentIds(organizationPositionIds,fromPlanningDate,toPlanningDate);
     }
 
     //TODO temporary use ObjectMapperUtils(currently not working)

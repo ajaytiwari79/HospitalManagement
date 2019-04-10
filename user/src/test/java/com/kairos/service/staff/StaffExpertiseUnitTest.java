@@ -156,7 +156,7 @@ public class StaffExpertiseUnitTest {
         staffExpertiseQueryResult1.setNextSeniorityLevelInMonths(null);
         staffExpertiseQueryResult1.setSeniorityLevel(seniorityLevel);
         staffExpertiseQueryResult1.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007, 11, 15)));
-        staffExpertiseQueryResult1.setUnitPositionExists(true);
+        staffExpertiseQueryResult1.setEmploymentExists(true);
         staffExpertiseQueryResult1.setSeniorityLevels(seniorityLevels);
 
 
@@ -168,7 +168,7 @@ public class StaffExpertiseUnitTest {
         staffExpertiseQueryResult2.setNextSeniorityLevelInMonths(null);
         staffExpertiseQueryResult2.setSeniorityLevel(seniorityLevel1);
         staffExpertiseQueryResult2.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007, 11, 15)));
-        staffExpertiseQueryResult2.setUnitPositionExists(true);
+        staffExpertiseQueryResult2.setEmploymentExists(true);
         staffExpertiseQueryResult2.setSeniorityLevels(seniorityLevels);
         staffExpertiseQueryResults.add(staffExpertiseQueryResult1);
         staffExpertiseQueryResults.add(staffExpertiseQueryResult2);

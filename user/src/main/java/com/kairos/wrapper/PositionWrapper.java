@@ -2,7 +2,7 @@ package com.kairos.wrapper;
 
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.staff.position.PositionQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.EmploymentQueryResult;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 public class PositionWrapper {
 
     private List<ClientMinimumDTO> relatedCitizens;
-    private UnitPositionQueryResult unitPosition;
+    private EmploymentQueryResult unitPosition;
     private PositionQueryResult position;
 
 
@@ -34,7 +34,7 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public PositionWrapper(UnitPositionQueryResult unitPosition, PositionQueryResult position) {
+    public PositionWrapper(EmploymentQueryResult unitPosition, PositionQueryResult position) {
         this.unitPosition = unitPosition;
         this.position = position;
     }
@@ -47,11 +47,11 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public UnitPositionQueryResult getUnitPosition() {
+    public EmploymentQueryResult getUnitPosition() {
         return unitPosition;
     }
 
-    public void setUnitPosition(UnitPositionQueryResult unitPosition) {
+    public void setUnitPosition(EmploymentQueryResult unitPosition) {
         this.unitPosition = unitPosition;
     }
 

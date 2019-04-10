@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
 import com.kairos.commons.utils.DateUtils;
 
 import java.math.BigInteger;
@@ -19,7 +19,7 @@ public class UnitExperienceAndAssignedOpenShiftRule implements PriorityGroupRule
         this.assignedOpenShiftMap = assignedOpenShiftMap;
     }
     @Override
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
         final AtomicInteger thresholdShiftCount = new AtomicInteger();
         int experienceInDays = 0;
@@ -32,7 +32,7 @@ public class UnitExperienceAndAssignedOpenShiftRule implements PriorityGroupRule
             experienceInDays = priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()*7;
         }
         Long startDate = DateUtils.getLongFromLocalDate(LocalDate.now().minusDays(experienceInDays));
-        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()) {
+        for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
             entry.getValue().removeIf(staffUnitPosition-> (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()&&
                     assignedOpenShiftMap.containsKey(staffUnitPosition.getUnitPositionId())
                     &&(assignedOpenShiftMap.get(staffUnitPosition.getUnitPositionId())>thresholdShiftCount.get()))||

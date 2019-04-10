@@ -2,7 +2,7 @@ package com.kairos.controller.wta;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WTAService;
@@ -164,7 +164,7 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getAllWtaOfOrganizationByExpertise(unitId, expertiseId,selectedDate));
     }
 
-    @ApiOperation(value = "Update WTA of UnitPosition")
+    @ApiOperation(value = "Update WTA of Employment")
     @PutMapping(value =  UNIT_URL + "/wta")
     public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean unitPositionPublished) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId, wtadto, unitPositionPublished));
@@ -226,7 +226,7 @@ public class WTAController {
 
     @ApiOperation(value = "copy cta wta to new uniposition")
     @PostMapping(value = "/copy_wta_cta")
-    public ResponseEntity<Map<String, Object>> copyCTAWTAForUnitPositionId(@RequestBody List<UnitPositionIdDTO> unitPositionIDs) {
+    public ResponseEntity<Map<String, Object>> copyCTAWTAForUnitPositionId(@RequestBody List<EmploymentIdDTO> unitPositionIDs) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.copyWtaCTA(unitPositionIDs));
     }
     @ApiOperation(value = "get Wta rule template By wta Id")

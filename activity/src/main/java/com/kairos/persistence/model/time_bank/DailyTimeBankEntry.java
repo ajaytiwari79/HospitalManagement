@@ -14,7 +14,7 @@ import java.util.List;
 @Document(collection = "dailyTimeBankEntries")
 public class DailyTimeBankEntry extends MongoBaseEntity{
 
-    private Long unitPositionId;
+    private Long employmentId;
     private Long staffId;
     //In minutes
     private int totalTimeBankMin; //It is Delta timebank
@@ -28,8 +28,8 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int deltaAccumulatedTimebankMinutes;
 
 
-    public DailyTimeBankEntry(Long unitPositionId, Long staffId, LocalDate date) {
-        this.unitPositionId = unitPositionId;
+    public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.date = date;
     }
@@ -87,12 +87,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.timeBankMinWithCta = timeBankMinWithCta;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getStaffId() {

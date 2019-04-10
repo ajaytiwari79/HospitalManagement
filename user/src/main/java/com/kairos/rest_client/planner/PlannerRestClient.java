@@ -1,18 +1,13 @@
 package com.kairos.rest_client.planner;
 
-import com.kairos.dto.activity.wta.UnitPositionWtaDTO;
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.user.staff.staff.Staff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
 
 import static com.kairos.rest_client.RestClientURLUtil.getPlannerBaseUrl;
 
@@ -69,14 +64,14 @@ public class PlannerRestClient {
         String uri = "";
         if (t instanceof Staff) {
             uri = "staff/";
-        } else if (t instanceof UnitPositionWtaDTO && integrationOperation.equals(IntegrationOperation.CREATE)) {
+        } else if (t instanceof EmploymentWtaDTO && integrationOperation.equals(IntegrationOperation.CREATE)) {
             uri = String.format("staff/%s/unitposition/", pathParams);
-        } else if (t instanceof UnitPositionWtaDTO && (integrationOperation.equals(IntegrationOperation.UPDATE) || integrationOperation.equals(IntegrationOperation.DELETE))) {
+        } else if (t instanceof EmploymentWtaDTO && (integrationOperation.equals(IntegrationOperation.UPDATE) || integrationOperation.equals(IntegrationOperation.DELETE))) {
             uri = String.format("staff/%s/unitposition/%s", pathParams);
-        } else if (t instanceof UnitPositionWtaDTO) {
+        } else if (t instanceof EmploymentWtaDTO) {
             uri = integrationOperation.equals(IntegrationOperation.CREATE) ?
                     String.format("staff/%s/unitposition/", pathParams) : String.format("staff/%s/unitposition/%s", pathParams);
-        } else if (t instanceof UnitPositionWtaDTO && ((ArrayList) t).get(0) instanceof UnitPositionWtaDTO) {
+        } else if (t instanceof EmploymentWtaDTO && ((ArrayList) t).get(0) instanceof EmploymentWtaDTO) {
             uri = "/unitposition/multiple";
         } else if (t instanceof WTAResponseDTO) {
             uri = String.format("staff/%s/unitposition/%s/wta", pathParams);

@@ -5,7 +5,7 @@ import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.position.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDetail;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -14,7 +14,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
-import com.kairos.service.unit_position.UnitPositionJobService;
+import com.kairos.service.unit_position.EmploymentJobService;
 import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
@@ -64,7 +64,7 @@ public class StaffController {
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject
-    private UnitPositionJobService unitPositionJobService;
+    private EmploymentJobService employmentJobService;
     @Inject private StaffCreationService staffCreationService;
 
 
@@ -513,7 +513,7 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId, @PathVariable long staffId,
                                                                       @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(shiftDate, staffId, unitPositionId, unitId, type, reasonCodeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(shiftDate, staffId, unitPositionId, unitId, type, reasonCodeIds));
     }
 
     // We need only limited data so we are making a substitute of above API
@@ -535,7 +535,7 @@ public class StaffController {
     @ApiOperation("verify staff has unit employment in unit or not and get current unit position ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitPositionOfStaff(@PathVariable long unitId, @PathVariable long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitPositionOfStaff(staffId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getEmploymentOfStaff(staffId, unitId));
     }
 
 
@@ -556,7 +556,7 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/position", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
     public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) {
-        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId, unitId,positionDTO);
+        EmploymentAndPositionDTO response = employmentJobService.updateUnitPositionEndDateFromEmployment(staffId, unitId,positionDTO);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -619,7 +619,7 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByUnitPositionId(@RequestParam("type") String type, @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId,
                                                                                       @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByUnitPositionId(startDate, unitPositionId, unitId, type, reasonCodeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByEmploymentId(startDate, unitPositionId, unitId, type, reasonCodeIds));
     }
 
     @RequestMapping(value = "/staff_list/chat", method = RequestMethod.GET)

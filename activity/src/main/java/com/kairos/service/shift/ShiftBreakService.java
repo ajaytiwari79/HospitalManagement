@@ -1,6 +1,6 @@
 package com.kairos.service.shift;
 
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.enums.shift.ShiftStatus;
@@ -12,7 +12,6 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +50,12 @@ public class ShiftBreakService {
         return activityWrapperMap;
     }
 
-    public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffUnitPositionDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+    public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         return calculateBreakAndShiftDuration(activityWrapperMap, mainShift, unitPositionDetails, breakWTATemplate, timeSlot, false);
 
     }
 
-    private List<ShiftActivity> calculateBreakAndShiftDuration(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffUnitPositionDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, boolean updateShift) {
+    private List<ShiftActivity> calculateBreakAndShiftDuration(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, boolean updateShift) {
         List<ShiftActivity> shiftActivities=new ArrayList<>();
         if (activityWrapperMap.get(mainShift.getActivities().get(0).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
             Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
@@ -68,7 +67,7 @@ public class ShiftBreakService {
         return shiftActivities;
     }
 
-    public List<ShiftActivity> updateBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffUnitPositionDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+    public List<ShiftActivity> updateBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         removeAllPreviouslyAllottedBreaks(mainShift);
         return calculateBreakAndShiftDuration(activityWrapperMap, mainShift, unitPositionDetails, breakWTATemplate, timeSlot, true);
 

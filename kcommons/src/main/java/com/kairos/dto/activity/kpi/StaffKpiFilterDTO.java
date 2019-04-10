@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.kpi;
 
-import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 
 import java.util.List;
 
@@ -11,14 +11,14 @@ public class StaffKpiFilterDTO {
     List<Long> unitIds;
     private Long unitId;
     private String unitName;
-    private List<UnitPositionWithCtaDetailsDTO> unitPosition;
+    private List<EmploymentWithCtaDetailsDTO> unitPosition;
 
 
-    public List<UnitPositionWithCtaDetailsDTO> getUnitPosition() {
+    public List<EmploymentWithCtaDetailsDTO> getUnitPosition() {
         return unitPosition;
     }
 
-    public void setUnitPosition(List<UnitPositionWithCtaDetailsDTO> unitPosition) {
+    public void setUnitPosition(List<EmploymentWithCtaDetailsDTO> unitPosition) {
         this.unitPosition = unitPosition;
     }
 

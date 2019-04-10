@@ -5,7 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -42,7 +42,7 @@ public class TimeBankCalculationServiceTest {
     private TimeBankCalculationService timeBankCalculationService;
 
 
-    private StaffUnitPositionDetails unitPosition;
+    private StaffEmploymentDetails unitPosition;
     private Interval interval;
     private List<ShiftWithActivityDTO> shifts;
     private Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap;
@@ -55,7 +55,7 @@ public class TimeBankCalculationServiceTest {
         employmentLinesDTOS.add(new EmploymentLinesDTO(LocalDate.of(2019,4,9),null,5,35,2100,new BigDecimal(0.002)));
         interval = new Interval(asDate(LocalDate.of(2019,4,10)).getTime(),asDate(LocalDate.of(2019,4,11)).getTime());
         CTAResponseDTO ctaResponseDTO = new CTAResponseDTO();
-        unitPosition = new StaffUnitPositionDetails(15l,487l, employmentLinesDTOS,ctaResponseDTO);
+        unitPosition = new StaffEmploymentDetails(15l,487l, employmentLinesDTOS,ctaResponseDTO);
         unitPosition.setCtaRuleTemplates(getRuleTemplate());
         unitPosition.setEmploymentType(new EmploymentType(54l));
         shifts= getShifts();

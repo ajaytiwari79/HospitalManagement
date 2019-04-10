@@ -3,7 +3,7 @@ package com.kairos.service.priority_group.priority_group_rules;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 
@@ -21,9 +21,9 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
         this.openShiftMap = openShiftMap;
     }
     @Override
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
-        for (Map.Entry<BigInteger, List<StaffUnitPositionQueryResult>> entry : openShiftStaffMap.entrySet()) {
+        for (Map.Entry<BigInteger, List<StaffEmploymentQueryResult>> entry : openShiftStaffMap.entrySet()) {
             BigInteger activityId = null;
             LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
             Date unitFilterStartDate;
@@ -40,18 +40,18 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
                 activityDateTimeInterval = new DateTimeInterval(activityFilterStartDate.getTime(),filterEndDate.getTime());
                 activityId = openShiftMap.get(entry.getKey()).getActivityId();
             }
-            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
 
             removeStaffFromList(staffUnitPositionIterator,unitDateTimeInterval,activityDateTimeInterval,activityId);
         }
     }
 
-    private void removeStaffFromList(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator, DateTimeInterval unitDateTimeInterval,DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
+    private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator, DateTimeInterval unitDateTimeInterval, DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
                 while(staffUnitPositionIterator.hasNext()) {
             int shiftCountUnit = 0;
             int shiftCountActivity = 0;
-            StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-            List<Shift> shifts = shiftUnitPositionsMap.get(staffUnitPositionQueryResult.getUnitPositionId());
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
+            List<Shift> shifts = shiftUnitPositionsMap.get(staffEmploymentQueryResult.getUnitPositionId());
             if(Optional.ofNullable(shifts).isPresent()&&!shifts.isEmpty()) {
                 for (Shift shift : shifts) {
                     if (Optional.ofNullable(unitDateTimeInterval).isPresent()&&unitDateTimeInterval.overlaps(shift.getInterval())) {

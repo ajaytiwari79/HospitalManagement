@@ -35,16 +35,16 @@ public class PlannerSyncService {
         plannerRestClient.publish(createStaffList(staff),unitId,integrationOperation);
     }
     //@Async
-    public void publishWTA(Long unitId, Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
-        plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,unitPositionId);
+    public void publishWTA(Long unitId, Long employmentId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
+        plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,employmentId);
     }
-    /*
-    //@Async
-    public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
+
+   @Async
+    public void  publishEmployment(Long unitId, Employment employment, EmploymentType employmentType, IntegrationOperation integrationOperation) {
         if(integrationOperation.equals(IntegrationOperation.CREATE)){
-            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId());
+            plannerRestClient.publish(createEmploymentDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId());
         }else if(integrationOperation.equals(IntegrationOperation.UPDATE)){
-            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
+            plannerRestClient.publish(createEmploymentDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
         }
         else if(integrationOperation.equals(IntegrationOperation.DELETE)){
             plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
@@ -52,16 +52,16 @@ public class PlannerSyncService {
     }
     @Async
     public void publishAllUnitPositions(Long unitId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips, IntegrationOperation integrationOperation) {
-        plannerRestClient.publish(createUnitPositionDTOs(unitId,unitPositionEmploymentTypeRelationShips),unitId,integrationOperation);
+        plannerRestClient.publish(createEmploymentDTOs(unitId,unitPositionEmploymentTypeRelationShips),unitId,integrationOperation);
 
     }
 
-    /*@Async
-    public void  publishAllUnitPositions(Long unitId, List<UnitPosition> unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
+   @Async
+    public void  publishAllUnitPositions(Long unitId, List<Employment> unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
         if(integrationOperation.equals(IntegrationOperation.CREATE)){
-            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId());
+            plannerRestClient.publish(createEmploymentDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId());
         }else if(integrationOperation.equals(IntegrationOperation.UPDATE)){
-            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
+            plannerRestClient.publish(createEmploymentDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
         }
         else if(integrationOperation.equals(IntegrationOperation.DELETE)){
             plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
@@ -69,27 +69,27 @@ public class PlannerSyncService {
     }
 
 
-    private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType, Long unitId, WTAResponseDTO wtaResponseDTO) {
+    private EmploymentWtaDTO createEmploymentDTO(Employment unitPosition, EmploymentType employmentType, Long unitId, WTAResponseDTO wtaResponseDTO) {
         if(wtaResponseDTO==null){
             wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getId());
         }
-        UnitPositionWtaDTO unitPositionWtaDTO=new UnitPositionWtaDTO(unitPosition.getId(),unitPosition.getExpertise().getId(),unitPosition.getPositionCode().getId(),unitPosition.getStartDateMillis(),unitPosition.getEndDateMillis(),
+        EmploymentWtaDTO unitPositionWtaDTO=new EmploymentWtaDTO(unitPosition.getId(),unitPosition.getExpertise().getId(),unitPosition.getPositionCode().getId(),unitPosition.getStartDateMillis(),unitPosition.getEndDateMillis(),
                 unitPosition.getTotalWeeklyMinutes(),unitPosition.getTotalWeeklyMinutes()/60,unitPosition.getAvgDailyWorkingHours(),unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getHourlyWages(),unitPosition.getSalary(),employmentType.getId(),unitId,unitPosition.getSeniorityLevel().getId(),employmentType.getPaymentFrequency(),wtaResponseDTO, unitPosition.getStaff().getId());
         return unitPositionWtaDTO;
     }
 
-    private List<UnitPositionWtaDTO> createUnitPositionDTOs(Long unitId,List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips) {
-        List<UnitPositionWtaDTO> unitPositionWtaDTOS=new ArrayList<>();
+    private List<EmploymentWtaDTO> createEmploymentDTOs(Long unitId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips) {
+        List<EmploymentWtaDTO> unitPositionWtaDTOS=new ArrayList<>();
         List<Long> upIds=unitPositionEmploymentTypeRelationShips.stream().map(upr->upr.getId()).collect(Collectors.toList());
         List<WTAResponseDTO> wtaResponseDTOS=workingTimeAgreementRestClient.getWTAByIds(upIds);
-        Map<Long,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getUnitPositionId(), w->w));
+        Map<Long,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getEmploymentId(), w->w));
         unitPositionEmploymentTypeRelationShips.forEach(upr->{
-            unitPositionWtaDTOS.add(createUnitPositionDTO(upr.getUnitPosition(),upr.getEmploymentType(),unitId,wtaResponseDTOMap.get(upr.getUnitPosition().getId())));
+            unitPositionWtaDTOS.add(createEmploymentDTO(upr.getEmployment(),upr.getEmploymentType(),unitId,wtaResponseDTOMap.get(upr.getEmployment().getId())));
         });
         return unitPositionWtaDTOS;
     }
-*/
+
     private List<Staff> createStaffList(List<Staff> staff) {
         List<Staff> dtos= new ArrayList<>();
         for(Staff s:staff){

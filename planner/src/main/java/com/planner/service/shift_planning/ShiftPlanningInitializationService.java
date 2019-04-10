@@ -85,10 +85,10 @@ public class ShiftPlanningInitializationService {
             toPlanningDate = DateUtils.asDate(shiftPlanningProblemSubmitDTO.getEndDate());
         }
 
-        List<StaffQueryResult> staffWithSkillsAndUnitPostionIds = userNeo4jService.getStaffWithSkillsAndUnitPostionIds(unitId, staffIds);
-        List<Long> unitPositionIds = staffWithSkillsAndUnitPostionIds.stream().map(s -> s.getStaffUnitPosition()).collect(Collectors.toList());
+        List<StaffQueryResult> staffWithSkillsAndEmploymentIds = userNeo4jService.getStaffWithSkillsAndEmploymentIds(unitId, staffIds);
+        List<Long> employmentIds = staffWithSkillsAndEmploymentIds.stream().map(s -> s.getEmploymentId()).collect(Collectors.toList());
        //
-        List<Employee> employeeList = getAllEmployee(fromPlanningDate, toPlanningDate, staffWithSkillsAndUnitPostionIds, unitPositionIds);
+        List<Employee> employeeList = getAllEmployee(fromPlanningDate, toPlanningDate, staffWithSkillsAndEmploymentIds, employmentIds);
        //
         List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList = staffingLevelService.getShiftPlanningStaffingLevelDTOByUnitId(unitId, fromPlanningDate, toPlanningDate);
         Map<java.time.LocalDate, List<StaffingLevelInterval>> localDateStaffingLevelTimeSlotMap = staffingLevelService.getStaffingLevelTimeSlotByDate(shiftPlanningStaffingLevelDTOList);
@@ -117,7 +117,7 @@ public class ShiftPlanningInitializationService {
         List<LocalDate> weekDates=new ArrayList<>();
         weekDates.addAll(activitiesPerDayList.keySet());
 
-        List<ShiftImp> shiftImp = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList, dateWiseALIsList);
+        List<ShiftImp> shiftImp = getShiftRequestPhase(employmentIds, fromPlanningDate, toPlanningDate, employeeList, dateWiseALIsList);
         Map<LocalDate,Object[]> staffingLevelMatrix=createStaffingLevelMatrix(activityLineIntervalList,15,activitiesPerDayList);
         int[] activitiesRank=activityList.stream().mapToInt(a->a.getRank()).toArray();
         //
@@ -153,27 +153,27 @@ public class ShiftPlanningInitializationService {
      * between
      *
      * @param fromPlanningDate
-     * @param toPlanningDate   Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
-     *                         Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning
+     * @param toPlanningDate   Must have CTA associated with employmentId within planning range else Staff will be skipped in planning
+     *                         Must have WTA associated with employmentId within planning range else Staff will be skipped in planning
      * @return
      */
-    public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
+    public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndEmploymentIds, List<Long> employmentIds) {
         List<Employee> employeeList = new ArrayList<>();
-        if (staffWithSkillsAndUnitPostionIds.size() > 0) {
+        if (staffWithSkillsAndEmploymentIds.size() > 0) {
             //Prepare CTA & WTA data
-            Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = ctaService.getunitPositionIdWithLocalDateCTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
-            Map<Long, Map<java.time.LocalDate, WorkingTimeAgreement>> dateWTAMap = wtaService.getunitPositionIdWithLocalDateWTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
+            Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> employmentIdWithLocalDateCTAMap = ctaService.getEmploymentIdWithLocalDateCTAMap(employmentIds, fromPlanningDate, toPlanningDate);
+            Map<Long, Map<java.time.LocalDate, WorkingTimeAgreement>> dateWTAMap = wtaService.getEmploymentIdWithLocalDateWTAMap(employmentIds, fromPlanningDate, toPlanningDate);
 
             //Initialize Employee
-            for (StaffQueryResult staffQueryResult : staffWithSkillsAndUnitPostionIds) {
-                if (staffQueryResult.getStaffUnitPosition() != null && unitPositionIdWithLocalDateCTAMap.containsKey(staffQueryResult.getStaffUnitPosition())) {
+            for (StaffQueryResult staffQueryResult : staffWithSkillsAndEmploymentIds) {
+                if (staffQueryResult.getEmploymentId() != null && employmentIdWithLocalDateCTAMap.containsKey(staffQueryResult.getEmploymentId())) {
                     Employee employee = new Employee();
                     employee.setId(staffQueryResult.getStaffId().toString());
                     employee.setName(staffQueryResult.getStaffName());
-                    employee.setUnitPositionId(staffQueryResult.getStaffUnitPosition());
-                    employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByunitPositionId(unitPositionIdWithLocalDateCTAMap, staffQueryResult.getStaffUnitPosition()));
+                    employee.setEmploymentId(staffQueryResult.getEmploymentId());
+                    employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByEmploymentId(employmentIdWithLocalDateCTAMap, staffQueryResult.getEmploymentId()));
                     employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
-                    employee.setLocalDateWTAMap(wtaService.getLocalDateWTAMapByunitPositionId(dateWTAMap, staffQueryResult.getStaffUnitPosition()));//TODO
+                    employee.setLocalDateWTAMap(wtaService.getLocalDateWTAMapByEmploymentId(dateWTAMap, staffQueryResult.getEmploymentId()));//TODO
                     employeeList.add(employee);
                 }
             }
@@ -254,28 +254,28 @@ public class ShiftPlanningInitializationService {
     }
     /****************************Shift Initialization**********************************************************************************/
     /**
-     * @param unitPositionIds
+     * @param EmploymentIds
      * @param fromPlanningDate
      * @param toPlanningDate
      * @param employeeList
      * @param dateWiseALIsList
      * @return
      */
-    public List<ShiftImp> getShiftRequestPhase(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate, List<Employee> employeeList, Map<java.time.LocalDate, List<ActivityLineInterval>> dateWiseALIsList) {
-        List<Shift> shifts = activityMongoService.getAllShiftsByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
+    public List<ShiftImp> getShiftRequestPhase(List<Long> EmploymentIds, Date fromPlanningDate, Date toPlanningDate, List<Employee> employeeList, Map<java.time.LocalDate, List<ActivityLineInterval>> dateWiseALIsList) {
+        List<Shift> shifts = activityMongoService.getAllShiftsByEmploymentIds(EmploymentIds, fromPlanningDate, toPlanningDate);
         List<ShiftImp> shiftImpList = new ArrayList<>();
         if (shifts.size() > 0) {
-            Map<Long, Employee> unitPositionEmployeeMap = employeeList.stream().collect(Collectors.toMap(unitPositionId -> unitPositionId.getUnitPositionId(), emp -> emp));
+            Map<Long, Employee> employmentEmployeeMap = employeeList.stream().collect(Collectors.toMap(employmentId -> employmentId.getEmploymentId(), emp -> emp));
             //Initialize Shifts
             for (Shift shift : shifts) {
-                if (unitPositionEmployeeMap.containsKey(shift.getUnitPositionId())) {
+                if (employmentEmployeeMap.containsKey(shift.getEmploymentId())) {
                     ShiftImp shiftImp = new ShiftImp();
                     shiftImp.setStartDate(DateUtils.asLocalDate(shift.getStartDate()));
                     shiftImp.setEndDate(DateUtils.asLocalDate(shift.getEndDate()));
                     shiftImp.setId(UUID.randomUUID());//Temporary
                     shiftImp.setDate(DateUtils.asJodaLocalDate(shift.getStartDate()));//TODO check
                     //Set Appropriate Staff/Employee
-                    shiftImp.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
+                    shiftImp.setEmployee(employmentEmployeeMap.get(shift.getEmploymentId()));
                     //Set Matched ALI/s on the basis of its [Interval/Duration]
                     //shiftImp.setActivityLineIntervals(getApplicableALIs(shift, dateWiseALIsList));
                     shiftImpList.add(shiftImp);

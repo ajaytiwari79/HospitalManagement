@@ -12,7 +12,6 @@ import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplat
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,7 @@ public class WTAQueryResultDTO {
     private Long expiryDate;
     private String name;
     private String description;
-    private Long unitPositionId;
+    private Long employmentId;
     private BigInteger id;
     private ExpertiseResponseDTO expertise;
     private OrganizationDTO organization;
@@ -54,12 +53,12 @@ public class WTAQueryResultDTO {
         this.versions = versions;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     private List<TagDTO> tags = new ArrayList<>();

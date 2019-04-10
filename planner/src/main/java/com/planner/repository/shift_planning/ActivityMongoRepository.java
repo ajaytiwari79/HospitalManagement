@@ -69,14 +69,14 @@ public class ActivityMongoRepository {
     }
 /*******************************************CTA********************************************/
     /**
-     * @param unitPositionIds
+     * @param employmentIds
      * @return
      */
-    public List<CTAResponseDTO> getCTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+    public List<CTAResponseDTO> getCTARuleTemplateByEmploymentIds(List<Long> employmentIds, Date fromPlanningDate, Date toPlanningDate) {
         Criteria endDateCriteria1 = Criteria.where("endDate").exists(false);
         Criteria endDateCriteria2 = Criteria.where("endDate").gte(fromPlanningDate);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
+                match(Criteria.where("employmentId").in(employmentIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
                 lookup(CTA_RULE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
         AggregationResults<CTAResponseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, COST_TIME_AGGREMENET, CTAResponseDTO.class);
 
@@ -84,14 +84,14 @@ public class ActivityMongoRepository {
     }
 /*********************************************WTA******************************************/
     /**
-     * @param unitPositionIds
+     * @param employmentIds
      * @return
      */
-    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+    public List<WorkingTimeAgreement> getWTARuleTemplateByEmploymentIds(List<Long> employmentIds, Date fromPlanningDate, Date toPlanningDate) {
         Criteria endDateCriteria1 = Criteria.where("endDate").exists(false);
         Criteria endDateCriteria2 = Criteria.where("endDate").gte(fromPlanningDate);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
+                match(Criteria.where("employmentId").in(employmentIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
                 lookup(WTABASE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
         AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, Working_Time_AGREEMENT, WorkingTimeAgreement.class);
 
@@ -99,14 +99,14 @@ public class ActivityMongoRepository {
     }
 /*********************************************Shifts******************************************/
     /**
-     * @param unitPositionIds
+     * @param employmentIds
      * @param fromDate
      * @param toDate
      * @return
      */
-    public List<Shift> getAllShiftsByUnitPositionIds(List<Long> unitPositionIds, Date fromDate, Date toDate) {
+    public List<Shift> getAllShiftsByEmploymentIds(List<Long> employmentIds, Date fromDate, Date toDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(fromDate).and("endDate").lte(toDate))
+                match(Criteria.where("employmentId").in(employmentIds).and("startDate").gte(fromDate).and("endDate").lte(toDate))
         );
         AggregationResults<Shift> aggregationResults = mongoTemplate.aggregate(aggregation, SHIFTS, Shift.class);
         //return aggregationResults.getMappedResults();

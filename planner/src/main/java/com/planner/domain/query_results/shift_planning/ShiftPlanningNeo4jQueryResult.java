@@ -8,7 +8,7 @@ import java.util.List;
 @QueryResult
 public class ShiftPlanningNeo4jQueryResult {
     private List<StaffQueryResult> staffList;
-    private Long[] allStaffUnitPositionIds;
+    private Long[] allStaffEmploymentIds;
 
     public List<StaffQueryResult> getStaffList() {
         return staffList;
@@ -18,11 +18,11 @@ public class ShiftPlanningNeo4jQueryResult {
         this.staffList = staffList;
     }
 
-    public Long[] getAllStaffUnitPositionIds() {
-        return allStaffUnitPositionIds;
+    public Long[] getAllStaffEmploymentIds() {
+        return allStaffEmploymentIds;
     }
 
-    public void setAllStaffUnitPositionIds(Long[] allStaffUnitPositionIds) {
-        this.allStaffUnitPositionIds = allStaffUnitPositionIds;
+    public void setAllStaffEmploymentIds(Long[] allStaffEmploymentIds) {
+        this.allStaffEmploymentIds = allStaffEmploymentIds;
     }
 }

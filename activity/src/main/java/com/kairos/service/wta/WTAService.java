@@ -14,7 +14,7 @@ import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTa
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
-import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -439,7 +439,7 @@ public class WTAService extends MongoBaseService {
         List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(upIds);
         List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyPropertiesOfListByMapper(currentWTAList, WTAResponseDTO.class);
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
-        Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getUnitPositionId(), Collectors.toList()));
+        Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         parentWTA.forEach(currentWTA -> {
             List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyPropertiesOfListByMapper(verionWTAMap.get(currentWTA.getUnitPositionId()), WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(categoryList,  currentWTA.getRuleTemplates());
@@ -588,12 +588,12 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public List<CTAWTAResponseDTO> copyWtaCTA(List<UnitPositionIdDTO> unitPositionIDs) {
+    public List<CTAWTAResponseDTO> copyWtaCTA(List<EmploymentIdDTO> unitPositionIDs) {
 
         // List<CTAWTADTO> ctaWtas = wtaRepository.getCTAWTAByUnitPositionId(oldUnitPositionId);
 
         logger.info("Inside wtaservice");
-        List<Long> oldUnitPositionIds = unitPositionIDs.stream().map(unitPositionIdDTO -> unitPositionIdDTO.getOldUnitPositionID()).collect(Collectors.toList());
+        List<Long> oldUnitPositionIds = unitPositionIDs.stream().map(employmentIdDTO -> employmentIdDTO.getOldUnitPositionID()).collect(Collectors.toList());
         Map<Long, Long> newOldunitPositionIdMap = unitPositionIDs.stream().collect(toMap(k -> k.getOldUnitPositionID(), v -> v.getNewUnitPositionID()));
         List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByUnitPositionIds(oldUnitPositionIds, DateUtils.getCurrentDate());
 
@@ -615,7 +615,7 @@ public class WTAService extends MongoBaseService {
             List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
 
             WorkingTimeAgreement wtaDB = ObjectMapperUtils.copyPropertiesByMapper(wta, WorkingTimeAgreement.class);
-            wtaDB.setUnitPositionId(newOldunitPositionIdMap.get(wta.getUnitPositionId()));
+            wtaDB.setUnitPositionId(newOldunitPositionIdMap.get(wta.getEmploymentId()));
             wtaDB.setRuleTemplateIds(ruleTemplateIds);
             wtaDB.setId(null);
             newWtas.add(wtaDB);
@@ -640,7 +640,7 @@ public class WTAService extends MongoBaseService {
 
             List<BigInteger> ctaRuleTemplateIds = ctaRuleTemplates.stream().map(ctaRuleTemplate -> ctaRuleTemplate.getId()).collect(Collectors.toList());
             newCTA.setRuleTemplateIds(ctaRuleTemplateIds);
-            newCTA.setUnitPositionId(newOldunitPositionIdMap.get(cta.getUnitPositionId()));
+            newCTA.setUnitPositionId(newOldunitPositionIdMap.get(cta.getEmploymentId()));
             newCTA.setId(null);
             newCTAs.add(newCTA);
         }
