@@ -171,12 +171,17 @@ public class UserService {
      *
      */
     public Map<String, Object> authenticateUser(User user) {
-
+        //User currentUser = null;
        // User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
-        User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
-        if (currentUser == null) {
-            return null;
+          User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
+        if (!Optional.ofNullable(currentUser).isPresent()) {
+             currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
+           // return null;
+            if(!Optional.ofNullable(currentUser).isPresent()){
+                return null;
+            }
         }
+
         int otp = OtpGenerator.generateOtp();
         currentUser.setOtp(otp);
         userGraphRepository.save(currentUser);
@@ -475,14 +480,23 @@ public class UserService {
     }
 
     public boolean forgotPassword(String userEmail){
+      //  User currentUser= null;
         if(userEmail.endsWith("kairos.com")||userEmail.endsWith("kairosplanning.com")){
             LOGGER.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
             exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
         }
-        User currentUser = userGraphRepository.findByEmail(userEmail);
+        //User currentUser = userGraphRepository.findByEmail(userEmail);
+        User  currentUser = userGraphRepository.findByEmail("(?i)"+userEmail);
         if (!Optional.ofNullable(currentUser).isPresent()) {
             LOGGER.error("No User found by email " + userEmail);
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
+           // exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
+            currentUser = userGraphRepository.findUserByUserName("(?i)"+userEmail);
+            if (!Optional.ofNullable(currentUser).isPresent()) {
+                LOGGER.error("No User found by userName " + userEmail);
+                exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
+            }else {
+                userEmail = currentUser.getEmail();
+            }
         }
         String token = tokenService.createForgotPasswordToken(currentUser);
         Map<String,Object> templateParam = new HashMap<>();
