@@ -198,14 +198,14 @@ public class ActivityController {
 
 
     @ApiOperation("Update compositeShifts Tab of Activity")
-    @PutMapping(value = "/activity/{activityId}/compositeShifts")
+    @PutMapping(value = "/activity/{activityId}/allowed_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId,@RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId,compositeShiftActivityDTO));
     }
 
     @ApiOperation("get compositeShifts Tab of Activity")
-    @GetMapping(value = "/activity/{activityId}/compositeShifts")
+    @GetMapping(value = "/activity/{activityId}/allowed_child_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeAndChildActivityOfCountryActivity(activityId,countryId));
@@ -213,7 +213,7 @@ public class ActivityController {
 
 
     @ApiOperation("Update child activity Tab of Activity")
-    @PutMapping(value = "/activity/{activityId}/childActivities")
+    @PutMapping(value = "/activity/{activityId}/child_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId,@RequestBody Set<BigInteger> childActivitiesIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));
