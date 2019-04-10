@@ -15,13 +15,20 @@ buildscript {
 		classpath("net.saliman:gradle-cobertura-plugin:2.5.1")
 	}
 }
+
+plugins {
+	id 'jacoco'
+}
+
 ext {
 	versionslf4j='1.7.23'
 	springCloudVersion = 'Finchley.M8'
 	versionoptaplannerbom='7.14.0.Final'
 	versionlogback='1.2.3'
 }
+
 version = "$projectVersion-SNAPSHOT"
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -100,12 +107,28 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
+
+jacoco {
+	toolVersion = "0.8.3"
+	reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+
+
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled false
+		html.destination file("${buildDir}/jacocoHtml")
+	}
+}
+
 sonarqube {
 	properties {
 		property "sonar.projectName", "planner"
 		property "sonar.projectKey", "kairos:planner"
 		property "sonar.sources", "src/main"
-		property "sonar.skip.tests", "true"
-		property "sonar.exclusions", "**/*test*/**"
+		property "sonar.junit.reportPaths", "build/test-results/test"
+		property "sonar.jacoco.reportPaths" , "build/jacoco/test.exe"
 	}
 }

@@ -9,8 +9,9 @@ import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -23,8 +24,8 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
 
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private Set<BigInteger> plannedTimeIds = new HashSet<>();
+    private Set<BigInteger> timeTypeIds = new HashSet<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
 
@@ -38,19 +39,19 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
     }
 
 
-    public List<BigInteger> getPlannedTimeIds() {
+    public Set<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
+    public Set<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
         this.timeTypeIds = timeTypeIds;
     }
 
