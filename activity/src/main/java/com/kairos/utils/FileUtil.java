@@ -18,43 +18,25 @@ public class FileUtil {
 
     private FileUtil(){}
 
-    public static void writeFile(String path, MultipartFile multipartFile) throws IOException {
-        InputStream inputStream = null;
-        FileOutputStream fileOutputStream;
-        try {
-            inputStream = multipartFile.getInputStream();
-            byte[] buf = new byte[1024];
-            fileOutputStream = new FileOutputStream(new File(path));
+    public static void writeFile(String path, MultipartFile multipartFile) {
+        byte[] buf = new byte[1024];
+        try (InputStream inputStream = multipartFile.getInputStream(); FileOutputStream fileOutputStream = new FileOutputStream(new File(path))) {
             int numRead = 0;
             while ((numRead = inputStream.read(buf)) >= 0) {
                 fileOutputStream.write(buf, 0, numRead);
             }
-            if(inputStream!=null){
-                inputStream.close();
-            }
-            if(fileOutputStream!=null){
-                fileOutputStream.close();
-            }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            inputStream.close();
         }
     }
 
     public static void createDirectory(String dirPath) {
         File theDir = new File(dirPath);
         if (!theDir.exists()) {
-            logger.info("creating directory: " + dirPath);
-            boolean result = false;
             try {
                 theDir.mkdir();
-                result = true;
             } catch (SecurityException se) {
                 logger.info(se.toString());
-            }
-            if (result) {
-                logger.info("DIR created");
             }
         }
     }
