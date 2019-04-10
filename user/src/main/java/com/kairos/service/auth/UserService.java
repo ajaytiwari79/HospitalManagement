@@ -11,6 +11,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.dto.user.user.userDetailUpdate.UserDetailUpdateDTO;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -171,7 +172,8 @@ public class UserService {
      */
     public Map<String, Object> authenticateUser(User user) {
 
-        User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
+       // User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
+        User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
         if (currentUser == null) {
             return null;
         }
@@ -181,6 +183,7 @@ public class UserService {
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
         //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
+        map.put("isUserNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
         return map;
 
@@ -511,5 +514,24 @@ public class UserService {
         return true;
     }
 
+    public boolean updateUserName(UserDetailUpdateDTO userDetailUpdate) {
+        User user = userGraphRepository.findByEmail("(?i)" + userDetailUpdate.getEmail());
+        if (user == null) {
+            LOGGER.error("User not found belongs to this email " + userDetailUpdate.getEmail());
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailUpdate.getEmail());
+        }
+        User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" +userDetailUpdate.getUserName());
+        if (userNameAlreadyExist != null) {
+            LOGGER.error("This userName is already in use " + userDetailUpdate.getUserName());
+            exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailUpdate.getUserName());
+        }
+        if (userDetailUpdate.isUserNameUpdated()) {
+            user.setUserNameUpdated(true);
+            user.setUserName(userDetailUpdate.getUserName());
+            userGraphRepository.save(user);
+            return true;
+        }
+            return false;
+        }
 
 }

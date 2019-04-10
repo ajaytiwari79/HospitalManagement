@@ -294,9 +294,15 @@ public class StaffService {
         staffToUpdate.setLanguage(language);
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
+
+        if(userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())){
+            staffToUpdate.setUserName(staffPersonalDetail.getUserName());
+        }
+
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
-        staffGraphRepository.save(staffToUpdate);
+      Staff staff = staffGraphRepository.save(staffToUpdate);
+      staffPersonalDetail.setUserName(staff.getUser().getUserName());
         if(oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -438,6 +444,7 @@ public class StaffService {
                 String lastName = "";
                 String privateEmail = "";
                 String externalIdValueAsString = "";
+                String userName = "";
                 if(isNotNull(row.getCell(41, Row.RETURN_BLANK_AS_NULL))) {
                     cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
                 }
@@ -450,6 +457,22 @@ public class StaffService {
                 if(isNotNull(row.getCell(28, Row.RETURN_BLANK_AS_NULL))) {
                     privateEmail = getStringValueOfIndexedCell(row, 28);
                 }
+
+                if(String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).isEmpty()){
+                    String NewuserName = null;
+                    Random rand = new Random();
+                    NewuserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
+
+                    User  existingUserName = userGraphRepository.findUserByUserName("(?i)" +NewuserName);
+                    if(Optional.ofNullable(existingUserName).isPresent()){
+                        NewuserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
+                    }
+                    userName = NewuserName;
+                }
+                else {
+                    userName = getStringValueOfIndexedCell(row, 19);
+                }
+
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                 if(isCollectionNotEmpty(missingMandatoryFields) || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
                     StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Missing field(s) : " + StringUtils.join(missingMandatoryFields, ", "));
@@ -475,7 +498,8 @@ public class StaffService {
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    staff.setUserName(privateEmail);
+                    //staff.setUserName(privateEmail);
+                    staff.setUserName(userName);
                     staff.setFirstName(firstName);
                     staff.setLastName(lastName);
                     staff.setFamilyName(lastName);
@@ -491,8 +515,16 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if(isCollectionEmpty(missingMandatoryFields)) {
-                        user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(), "(?)" + privateEmail);
+                       // user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(),"(?)" + privateEmail);
+                        user = userGraphRepository.findByEmail(privateEmail);
+                        //if(Optional.ofNullable(user).isPresent()){
+                        if(user!=null){
+                            LOGGER.info(">>>>>>>>>>>>>am inside the check for findByEmail");
+                            user = userGraphRepository.findUserByCprNumber(cprAsLong.toString());
+
+                        }
                         if(!Optional.ofNullable(user).isPresent()) {
+                            LOGGER.info("am inside the check for new user");
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
@@ -501,8 +533,9 @@ public class StaffService {
                             user.setCprNumber(cprAsLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
+                            user.setUserName(userName);
                             if(Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
-                                user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
+                                //user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
                             } else {
                                 user.setEmail(user.getFirstName().trim() + KAIROS_EMAIL);
@@ -651,7 +684,7 @@ public class StaffService {
     public void setUserAndPosition(Organization organization, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
         Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(),user.getId());
         if(isNull(position)) {
-            Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+            Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(),
                     user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
             position=new Position();
             position.setStaff(staff);
@@ -685,7 +718,8 @@ public class StaffService {
     }
 
     public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
-        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+        Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(),
+                StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Position position = new Position();
         position.setStaff(staff);
         staff.setUser(user);
@@ -965,6 +999,7 @@ public class StaffService {
     }
 
     private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
+       // staffToUpdate.setUserName(staffPersonalDetail.getUserName());
         staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         staffToUpdate.setLastName(staffPersonalDetail.getLastName());
         staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());

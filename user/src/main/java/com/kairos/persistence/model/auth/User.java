@@ -79,11 +79,22 @@ public class User extends UserBaseEntity {
     private Boolean hubMember;
 
 
+    public boolean isUserNameUpdated() {
+        return isUserNameUpdated;
+    }
+
+    public void setUserNameUpdated(boolean userNameUpdated) {
+        isUserNameUpdated = userNameUpdated;
+    }
+
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
     @Relationship(type = SELECTED_LANGUAGE)
     private SystemLanguage userLanguage;
+
+    //define, first time UserName updated or not
+    private boolean isUserNameUpdated;
 
     public int getOtp() {
         return otp;

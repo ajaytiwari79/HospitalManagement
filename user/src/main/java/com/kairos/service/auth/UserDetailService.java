@@ -40,6 +40,7 @@ public class UserDetailService {
      */
     public User loadUserByEmail(String userName , String password) throws UsernameNotFoundException {
         User user=  userRepository.findUserByEmailInAnyOrganization("(?i)"+userName);
+
          if (user == null) {
               logger.info("User is null");
                return null;
@@ -53,6 +54,25 @@ public class UserDetailService {
 //                return passwordEncoder.matches(password, user.getPassword()) ? user : null;
             }
         }
+
+
+    public User loadUserByUserName(String userName , String password) throws UsernameNotFoundException {
+        // User user=  userRepository.findUserByEmailInAnyOrganization("(?i)"+userName);
+        User user=  userRepository.findUserByUserNameInAnyOrganization("(?i)"+userName);
+        if (user == null) {
+            logger.info("User is null");
+            return null;
+        } else {
+            if (passwordEncoder.matches(password, user.getPassword())){
+                logger.info("password matched");
+                return user;
+            }
+            logger.info("password  not  matched");
+            return null;
+//                return passwordEncoder.matches(password, user.getPassword()) ? user : null;
+        }
+    }
+
 
     }
 
