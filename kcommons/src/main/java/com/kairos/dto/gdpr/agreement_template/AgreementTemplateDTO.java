@@ -23,5 +23,7 @@ public class AgreementTemplateDTO {
     @NotNull(message = "error.message.templateType.notNull")
     protected Long templateTypeId;
 
+    private boolean dataHandlerAgreement;
+
 
 }

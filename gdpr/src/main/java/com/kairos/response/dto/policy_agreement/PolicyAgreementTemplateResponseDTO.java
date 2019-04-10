@@ -28,8 +28,8 @@ public class PolicyAgreementTemplateResponseDTO {
     private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
-
     private TemplateTypeResponseDTO templateType;
+    private boolean dataHandlerAgreement;
 
     public PolicyAgreementTemplateResponseDTO(Long id, String name, String description, TemplateTypeResponseDTO templateType) {
         this.id = id;

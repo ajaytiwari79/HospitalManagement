@@ -27,5 +27,16 @@ public interface PolicyAgreementRepository extends CustomGenericRepository<Polic
             " left Join AGS.clauses AGSC left join AGSS.clauses AGSSC where PAT.countryId = ?1  and (AGSC.id = ?2 or AGSSC.id =?2)  and PAT.deleted = false group by PAT.id")
     List<PolicyAgreementTemplate> getAllPolicyAgreementTemplateContainClauseByCountryIdAndClauseId(Long countryId, Long clauseId);
 
+    @Query(value = "SELECT EN FROM PolicyAgreementTemplate EN WHERE EN.countryId = ?1 and EN.deleted = false and lower(EN.name) = lower(?2) and EN.dataHandlerAgreement=true")
+    PolicyAgreementTemplate findByCountryIdAndNameAndDataHandlerAgreementTrue(Long countryId, String name);
+
+    @Query(value = "SELECT EN FROM PolicyAgreementTemplate EN WHERE EN.countryId = ?1 and EN.deleted = false and EN.id = ?2 and EN.dataHandlerAgreement=true")
+    PolicyAgreementTemplate findByCountryIdAndIdAndDataHandlerAgreementTrue(Long countryId, Long id);
+
+    @Query(value = "SELECT EN FROM PolicyAgreementTemplate EN WHERE EN.id = ?1 and EN.countryId = ?2 and EN.deleted = false and EN.dataHandlerAgreement = true")
+    PolicyAgreementTemplate findByIdAndCountryIdAndDeletedFalseAndDataHandlerTrue(Long id, Long countryId);
+
+
+
 
 }

@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 
@@ -32,27 +33,35 @@ class AgreementSectionController {
 
 
     @ApiOperation("save section of master Agreement template ,country level ")
-    @PostMapping(COUNTRY_URL+ "/agreement_template/{templateId}/section")
+    @PostMapping(COUNTRY_URL + "/agreement_template/{templateId}/section")
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> createMasterAgreementSection(@PathVariable Long countryId, @PathVariable Long templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId,false, templateId, agreementTemplateSectionDTO));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, false, templateId, agreementTemplateSectionDTO));
     }
+
 
     @ApiOperation("deleted agreement section , country level")
-    @DeleteMapping(COUNTRY_URL+"/agreement_template/{templateId}/section/delete/{id}")
+    @DeleteMapping(COUNTRY_URL + "/agreement_template/{templateId}/section/delete/{id}")
     public ResponseEntity<Object> deleteMasterAgreementSection(@PathVariable Long countryId, @PathVariable Long templateId, @PathVariable Long id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(countryId, false,templateId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(countryId, false, templateId, id));
 
     }
 
+    @ApiOperation("save section of master Agreement template ,country level ")
+    @PostMapping(COUNTRY_URL + "/data_handler_agreement/{templateId}/section")
+    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> createAndUpdateDataHandlerAgreement(@PathVariable Long countryId, @PathVariable Long templateId,@Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateDataHandlerAgreement(countryId,  templateId, agreementTemplateSectionDTO));
+    }
+
+
     @ApiOperation("deleted clause from section,clause")
-    @DeleteMapping(COUNTRY_URL+ "/agreement_template/section/{sectionId}/clause/{clauseId}")
+    @DeleteMapping(COUNTRY_URL + "/agreement_template/section/{sectionId}/clause/{clauseId}")
     public ResponseEntity<Object> deleteMasterClauseFromAgreementSection(@PathVariable Long sectionId, @PathVariable Long clauseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.removeClauseIdFromAgreementSection(sectionId, clauseId));
 
     }
 
     @ApiOperation("deleted agreement Sub Section  ")
-    @DeleteMapping(COUNTRY_URL+ "/agreement_template/section/{sectionId}/sub_section/{subSectionId}")
+    @DeleteMapping(COUNTRY_URL + "/agreement_template/section/{sectionId}/sub_section/{subSectionId}")
     public ResponseEntity<Object> deleteMasterSubSection(@PathVariable Long sectionId, @PathVariable Long subSectionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSubSection(sectionId, subSectionId));
 
@@ -60,28 +69,28 @@ class AgreementSectionController {
     //unit url
 
     @ApiOperation("save section of Agreement template ,org level ")
-    @PostMapping(UNIT_URL+ "/agreement_template/{templateId}/section")
+    @PostMapping(UNIT_URL + "/agreement_template/{templateId}/section")
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> createAgreementSection(@PathVariable Long unitId, @PathVariable Long templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(unitId,true, templateId, agreementTemplateSectionDTO));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(unitId, true, templateId, agreementTemplateSectionDTO));
     }
 
 
     @ApiOperation("deleted agreement section , org level")
-    @DeleteMapping(UNIT_URL+"/agreement_template/{templateId}/section/delete/{id}")
+    @DeleteMapping(UNIT_URL + "/agreement_template/{templateId}/section/delete/{id}")
     public ResponseEntity<Object> deleteAgreementSection(@PathVariable Long unitId, @PathVariable Long templateId, @PathVariable Long id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(unitId, true,templateId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(unitId, true, templateId, id));
 
     }
 
     @ApiOperation("deleted clause from section, org level")
-    @DeleteMapping(UNIT_URL+ "/agreement_template/section/{sectionId}/clause/{clauseId}")
+    @DeleteMapping(UNIT_URL + "/agreement_template/section/{sectionId}/clause/{clauseId}")
     public ResponseEntity<Object> deleteClauseFromAgreementSection(@PathVariable Long sectionId, @PathVariable Long clauseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.removeClauseIdFromAgreementSection(sectionId, clauseId));
 
     }
 
     @ApiOperation("deleted agreement Sub Section , org level")
-    @DeleteMapping(UNIT_URL+ "/agreement_template/section/{sectionId}/sub_section/{subSectionId}")
+    @DeleteMapping(UNIT_URL + "/agreement_template/section/{sectionId}/sub_section/{subSectionId}")
     public ResponseEntity<Object> deleteSubSection(@PathVariable Long sectionId, @PathVariable Long subSectionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSubSection(sectionId, subSectionId));
 

@@ -71,10 +71,28 @@ public class AgreementSectionService {
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }
+        updateSectionAndSubSection(policyAgreementTemplate, agreementTemplateSectionDTO, referenceId, isOrganization);
+        policyAgreementRepository.save(policyAgreementTemplate);
+        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, false, templateId);
+    }
+
+    public AgreementTemplateSectionResponseDTO createAndUpdateDataHandlerAgreement(Long countryId, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementRepository.findByIdAndCountryIdAndDeletedFalseAndDataHandlerTrue(templateId, countryId);
+        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
+        }
+        updateSectionAndSubSection(policyAgreementTemplate, agreementTemplateSectionDTO, countryId, false);
+        policyAgreementRepository.save(policyAgreementTemplate);
+        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId, false, true, templateId);
+    }
+
+
+    private void updateSectionAndSubSection(PolicyAgreementTemplate policyAgreementTemplate, AgreementTemplateSectionDTO agreementTemplateSectionDTO, long refrenceId, boolean isOrganization) {
+
         if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getAgreementSections())) {
             checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getAgreementSections());
-            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(referenceId, isOrganization, policyAgreementTemplate, agreementTemplateSectionDTO.getAgreementSections());
-            agreementSections.forEach(agreementSection -> agreementSection.linkSubSectionsWithParentSectionAndCountryOrUnitId(isOrganization, referenceId));
+            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(refrenceId, isOrganization, policyAgreementTemplate, agreementTemplateSectionDTO.getAgreementSections());
+            agreementSections.forEach(agreementSection -> agreementSection.linkSubSectionsWithParentSectionAndCountryOrUnitId(isOrganization, refrenceId));
             policyAgreementTemplate.setAgreementSections(agreementSections);
         }
         policyAgreementTemplate.setSignatureComponentAdded(agreementTemplateSectionDTO.isSignatureComponentAdded());
@@ -85,9 +103,8 @@ public class AgreementSectionService {
         policyAgreementTemplate.setCoverPageData(ObjectMapperUtils.copyPropertiesByMapper(agreementTemplateSectionDTO.getCoverPageData(), CoverPage.class));
         policyAgreementTemplate.setIncludeContentPage(agreementTemplateSectionDTO.isIncludeContentPage());
 
-        policyAgreementRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, templateId);
     }
+
 
     @SuppressWarnings("unchecked")
     private List<ClauseBasicDTO> findNewClauses(List<AgreementSectionDTO> sectionDTOList) {
