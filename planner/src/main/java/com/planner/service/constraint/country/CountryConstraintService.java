@@ -2,6 +2,7 @@ package com.planner.service.constraint.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.constarints.country.CountryConstraintDTO;
+import com.kairos.enums.planning_problem.PlanningProblemType;
 import com.planner.component.exception.ExceptionService;
 import com.planner.domain.constraint.common.Constraint;
 import com.planner.domain.constraint.country.CountryConstraint;
@@ -12,13 +13,15 @@ import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.service.constraint.country.default_.DefaultCountryConstraintService;
-import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 /**
  * Note:- All DTO fields null value validation if required will be validated on DTO itself
@@ -42,7 +45,7 @@ public class CountryConstraintService {
     public CountryConstraintDTO createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         if (preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
-            constraintsRepository.saveObject(countryConstraint);
+            constraintsRepository.saveEntity(countryConstraint);
             //Now copy same Constraints on units
             createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
             countryConstraintDTO.setId(countryConstraint.getId());
@@ -72,7 +75,7 @@ public class CountryConstraintService {
             }
 
             if (unitConstraintList.size() > 0) {
-                constraintsRepository.saveObjectList(unitConstraintList);
+                constraintsRepository.saveList(unitConstraintList);
             }
         }
     }
@@ -84,7 +87,7 @@ public class CountryConstraintService {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
             countryConstraint.setParentConstraintId(countryConstraintDTO.getId());
             countryConstraint.setId(null);//Unset Id
-            constraintsRepository.saveObject(countryConstraint);
+            constraintsRepository.saveEntity(countryConstraint);
             //Now copy same Constraints on unit
             createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
             countryConstraintDTO.setId(countryConstraint.getId());
@@ -103,7 +106,7 @@ public class CountryConstraintService {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
         if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, false)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
-            constraintsRepository.saveObject(countryConstraint);
+            constraintsRepository.saveEntity(countryConstraint);
         }
     }
 
@@ -143,13 +146,19 @@ public class CountryConstraintService {
 
     //============================Create Default constraints==================================
     public List<CountryConstraint> createDefaultCountryConstraints(Long countryId) {
-        PlanningProblem existingPlanningProblem=planningProblemRepository.findPlanningProblemByType("shiftPlanning");
+        PlanningProblem planningProblem=planningProblemRepository.findPlanningProblemByType("shiftPlanning");
         BigInteger planningProblemId=null;
-        if(existingPlanningProblem!=null) planningProblemId=existingPlanningProblem.getId();
-        else exceptionService.dataNotFoundByTypeException("message.type.dataNotFound","PlanningProblem","shiftPlanning");
+        if(isNotNull(planningProblem)){
+            planningProblemId=planningProblem.getId();
+        }
+        else {
+            planningProblem = new PlanningProblem("Shift planning","Shift planning", PlanningProblemType.SHIFT_PLANNING);
+            planningProblemRepository.saveEntity(planningProblem);
+            planningProblemId = planningProblem.getId();
+        }
         List<CountryConstraint> countryConstraintList = DefaultCountryConstraintService.createDefaultCountryConstraints(countryId,planningProblemId);
-        if (countryConstraintList.size() > 0) {
-            constraintsRepository.saveObjectList(countryConstraintList);
+        if (isCollectionNotEmpty(countryConstraintList)) {
+            constraintsRepository.saveList(countryConstraintList);
         }
         return countryConstraintList;
     }

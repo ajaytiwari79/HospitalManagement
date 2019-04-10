@@ -63,12 +63,12 @@ public class BaseRepository {
         if (externalId == null || unitId == null) return false;
         T entity = findByExternalId(externalId, unitId, class_Name);
         entity.setDeleted(true);
-        save(entity);
+        saveEntity(entity);
         return true;
     }
 
-    public <T extends BaseEntity> T save(T entity) {
-        /*log.info("save Object SuccessFully");
+    public <T extends BaseEntity> T saveEntity(T entity) {
+        /*log.info("saveEntity Object SuccessFully");
         if (entity.getId() == null) {
             entity.setId(UUIDs.random().toString());
         }
@@ -80,7 +80,7 @@ public class BaseRepository {
         return null;//cassandraTemplate.insert(entity);
     }
 
-    public boolean save(Object object, Class class_Name) {
+    public boolean saveEntity(Object object, Class class_Name) {
       //  return cassandraTemplate.exists(object,class_Name);
         return false;
     }
@@ -96,7 +96,7 @@ public class BaseRepository {
                 } else {
                     entity.setUpdatedDate(new Date());
                 }
-                save(entity);
+                saveEntity(entity);
             }
             return null;//cassandraTemplate.insert(entities);
         }

@@ -22,38 +22,38 @@ public class CountrySolverConfigController {
     private CountrySolverConfigService  countrySolverConfigService;
 
     @PostMapping
-    @ApiOperation("Create CountrySolverConfig")
+    @ApiOperation("Create Country Solver Config")
     public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigService.createCountrySolverConfig(countrySolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @PostMapping (value = "/copy")
-    @ApiOperation("Copy CountrySolverConfig")
+    @ApiOperation("Copy Country Solver Config")
     public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigService.copyCountrySolverConfig(countrySolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @GetMapping
-    @ApiOperation("GetAll CountrySolverConfigration By Country Id")
+    @ApiOperation("GetAll Country Solver Configration By Country Id")
     public ResponseEntity<Map<String, Object>> getAllCountrySolverConfigByCountryId(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getAllCountrySolverConfigByCountryId(countryId));
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.getAllCountrySolverConfigByCountryId(countryId));
     }
 
 
     @PatchMapping
-    @ApiOperation("Update CountrySolverConfigration")
+    @ApiOperation("Update Country Solver Configration")
     public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigService.updateCountrySolverConfig(countrySolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{solverConfigId}")
-    @ApiOperation("Delete CountrySolverConfigration")
+    @ApiOperation("Delete Country Solver Configration")
     public ResponseEntity<Map<String, Object>> deleteCountrySolverConfig(@PathVariable BigInteger solverConfigId) {
         countrySolverConfigService.deleteCountrySolverConfig(solverConfigId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     /**
@@ -62,8 +62,8 @@ public class CountrySolverConfigController {
      * @return
      */
     @GetMapping("/default_data")
-    @ApiOperation("Get DefaultData")
+    @ApiOperation("Get Default Data")
     public ResponseEntity<Map<String, Object>> getDefaultData(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getDefaultData(countryId));
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.getDefaultData(countryId));
     }
 }

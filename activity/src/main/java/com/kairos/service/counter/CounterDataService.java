@@ -18,7 +18,6 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
 import org.slf4j.Logger;
@@ -41,8 +40,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Service
 public class CounterDataService {
     private final static Logger logger = LoggerFactory.getLogger(CounterDataService.class);
-    @Inject
-    private VRPPlanningService vrpPlanningService;
     @Inject
     private TaskService taskService;
     @Inject
