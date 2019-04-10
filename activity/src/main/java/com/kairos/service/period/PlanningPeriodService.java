@@ -17,6 +17,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
@@ -526,10 +527,12 @@ public class PlanningPeriodService extends MongoBaseService {
         periodPhaseFlippingDate.setFlippingTime(DateUtils.getCurrentLocalTime());
         //TODO Work
         Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithShiftDateFunctionIdMap = getUnitPositionIdWithFunctionIdShiftDateMap(shifts, unitId);
+        if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())){
+            publishShiftAfterPhaseFlipContructionToDraft(planningPeriod.getId(),unitId);
+        }
         createShiftState(shifts, oldPlanningPeriodPhaseId, unitPositionWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
         save(planningPeriod);
-        //TODO uncomment while commit
         schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, null, null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
@@ -663,15 +666,6 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriodPhaseId;
     }
 
-    //TODO currently not use
-//    public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId) {
-//        //Question:- Planning Period required or not(phase within particular lies or not)
-//        List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
-//        //shiftList is zero
-//        restoreShifts(shiftStates, new ArrayList(), unitId);
-//        return true;
-//    }
-
     public void restoreShifts(List<ShiftState> shiftStates, List<Shift> shiftList, Long unitId, PlanningPeriod planningPeriod) {
         if (!shiftStates.isEmpty()) {
             List<Shift> shifts = new ArrayList<>();
@@ -780,5 +774,11 @@ public class PlanningPeriodService extends MongoBaseService {
             }
         }
         return true;
+    }
+
+    public void publishShiftAfterPhaseFlipContructionToDraft(BigInteger planningPeriodId,Long unitId){
+        LOGGER.info("publish shift after flipping planning period contruction to draft phase");
+        shiftMongoRepository.publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(planningPeriodId,unitId, ShiftStatus.PUBLISH);
+        LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
     }
 }

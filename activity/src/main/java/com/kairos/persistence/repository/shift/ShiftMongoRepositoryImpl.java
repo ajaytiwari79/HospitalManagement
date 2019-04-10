@@ -7,14 +7,17 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -35,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -591,6 +595,15 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         );
 
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
+    }
+
+    @Override
+    public boolean publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
+                        .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
+        Update update=new Update().push("activities.$[].status", "PUBLISH" );
+        UpdateResult updateResult=mongoTemplate.updateMulti(query,update,Shift.class);
+        return isNull(updateResult);
     }
 
     @Override
