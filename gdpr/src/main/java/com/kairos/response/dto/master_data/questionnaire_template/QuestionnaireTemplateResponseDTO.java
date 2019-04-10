@@ -3,6 +3,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
+import com.kairos.enums.gdpr.QuestionType;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -28,6 +30,7 @@ public class QuestionnaireTemplateResponseDTO {
     private QuestionnaireTemplateStatus templateStatus;
     private List<QuestionnaireSectionResponseDTO> sections;
     private QuestionnaireTemplateType riskAssociatedEntity;
+    private Map<String, QuestionType>  questionTypeMap;
 
     public QuestionnaireTemplateResponseDTO(Long id, String name, String description, QuestionnaireTemplateType templateType, boolean isDefaultAssetTemplate, QuestionnaireTemplateStatus templateStatus,QuestionnaireTemplateType riskAssociatedEntity) {
         this.id = id;
