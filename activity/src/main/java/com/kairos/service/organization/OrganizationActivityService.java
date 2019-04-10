@@ -65,6 +65,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -498,7 +499,8 @@ public class OrganizationActivityService extends MongoBaseService {
                     compositeActivityIterator.remove();
                 }
             }
-            for (BigInteger childActivityId : activity.getChildActivityIds()) {
+            List<BigInteger> copyChildActivtiies=new CopyOnWriteArrayList<>(activity.getChildActivityIds());
+            for (BigInteger childActivityId : copyChildActivtiies) {
                 if (activityIdMap.containsKey(childActivityId)) {
                     activity.getChildActivityIds().add(activityIdMap.get(childActivityId));
                 }
