@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -47,7 +48,7 @@ public class UnitPosition extends UserBaseEntity {
     private boolean published;
     @Relationship(type = HAS_POSITION_LINES)
     private List<UnitPositionLine> unitPositionLines;
-    private boolean mainUnitPosition;
+    private EmploymentSubType employmentSubType;
     private float taxDeductionPercentage;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
@@ -154,23 +155,13 @@ public class UnitPosition extends UserBaseEntity {
         this.published = published;
     }
 
-    public List<UnitPositionLine> getUnitPositionLines() {
-        return Optional.ofNullable(unitPositionLines).orElse(new ArrayList<>());
-    }
+    public List<UnitPositionLine> getUnitPositionLines() { return Optional.ofNullable(unitPositionLines).orElse(new ArrayList<>()); }
 
-    public void setUnitPositionLines(List<UnitPositionLine> unitPositionLines) {
-        this.unitPositionLines = unitPositionLines;
-    }
+    public void setUnitPositionLines(List<UnitPositionLine> unitPositionLines) { this.unitPositionLines = unitPositionLines; }
 
+    public EmploymentSubType getEmploymentSubType() { return employmentSubType; }
 
-
-    public boolean isMainUnitPosition() {
-        return mainUnitPosition;
-    }
-
-    public void setMainUnitPosition(boolean mainUnitPosition) {
-        this.mainUnitPosition = mainUnitPosition;
-    }
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) { this.employmentSubType = employmentSubType; }
 
     public float getTaxDeductionPercentage() {
         return taxDeductionPercentage;
@@ -195,6 +186,7 @@ public class UnitPosition extends UserBaseEntity {
     public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
+
 
     @Override
     public String toString() {

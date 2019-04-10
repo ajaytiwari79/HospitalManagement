@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
@@ -167,17 +168,24 @@ public class OrganizationActivityController {
 
 
     @ApiOperation("Update compositeShifts Tab of Activity")
-    @PutMapping(value = "/activity/{activityId}/compositeShifts")
+    @PutMapping(value = "/activity/{activityId}/allowed_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId, compositeShiftActivityDTO));
     }
 
-    @ApiOperation("get compositeShifts Tab of Activity")
-    @GetMapping(value = "/activity/{activityId}/compositeShifts")
+    @ApiOperation("Update compositeShifts Tab of Activity")
+    @PutMapping(value = "/activity/{activityId}/child_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeShiftTabOfActivity(activityId));
+    ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));
+    }
+
+    @ApiOperation("get compositeShifts Tab of Activity")
+    @GetMapping(value = "/activity/{activityId}/allowed_child_activities")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeAndChildActivityOfUnitActivity(activityId,unitId));
     }
 
 
@@ -338,7 +346,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Create default data for  Organization")
-    @RequestMapping(value = "/organization_default_data", method = RequestMethod.POST)
+    @PostMapping(value = "/organization_default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -352,7 +360,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Get All Activities by unitId")
-    @RequestMapping(value = "/activity", method = RequestMethod.GET)
+    @GetMapping(value = "/activity")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -360,7 +368,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Get All Activities and Phases by unitId")
-    @RequestMapping(value = "/activity_with_phase", method = RequestMethod.GET)
+    @GetMapping(value = "/activity_with_phase")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
