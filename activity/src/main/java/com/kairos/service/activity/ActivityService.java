@@ -84,6 +84,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
@@ -201,7 +202,7 @@ public class ActivityService extends MongoBaseService {
         Set<BigInteger> allowChildActivityIds=new HashSet<>();
         Set<BigInteger> childActivitiesIds=activities.stream().flatMap(activityTagDTO -> activityTagDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
         for (ActivityTagDTO activity : activities) {
-            if(!childActivitiesIds.contains(activity.getId()) && !activity.getId().equals(activityWithCompositeDTO.getId())){
+            if(!childActivitiesIds.contains(activity.getId()) && !activity.getId().equals(activityWithCompositeDTO.getId()) && isCollectionEmpty(activity.getChildActivityIds())){
                 allowChildActivityIds.add(activity.getId());
             }
         }
