@@ -128,29 +128,29 @@ public class CostTimeAgreementController {
 
     /**
      *
-     * @param unitPositionId
+     * @param employmentId
      * @param unitId
      * @param ctaId
      * @param ctaDTO
      * @return
      */
-    @ApiOperation(value = "Update Unit Position's CTA")
-    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateCostTimeAgreementForEmployment(unitId, unitPositionId, ctaId, ctaDTO));
+    @ApiOperation(value = "Update employment's CTA")
+    @PutMapping(value = UNIT_URL+"/employment/{employmentId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForEmployment(@PathVariable Long employmentId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateCostTimeAgreementForEmployment(unitId, employmentId, ctaId, ctaDTO));
     }
 
 
     /**
      *
-     * @param unitPositionId
+     * @param employmentId
      * @param unitId
      * @return
      */
-    @ApiOperation(value = "get unit_position's CTA")
-    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getEmploymentCTA(unitId, unitPositionId));
+    @ApiOperation(value = "get employment's CTA")
+    @GetMapping(value = UNIT_URL+"/employment/{employmentId}/cta")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long employmentId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getEmploymentCTA(unitId, employmentId));
     }
 
 

@@ -83,7 +83,7 @@ public class FunctionController {
 
     }
 
-    @GetMapping(value =API_V1+UNIT_URL +"/unit_position/functions")
+    @GetMapping(value =API_V1+UNIT_URL +"/employment/functions")
     @ApiOperation("find functions")
     public ResponseEntity<Map<String, Object>> findAppliedFunctionsAtEmployment(@PathVariable Long unitId,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.findAppliedFunctionsAtEmployment(unitId,startDate,endDate));

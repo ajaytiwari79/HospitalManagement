@@ -517,7 +517,7 @@ public class StaffController {
     }
 
     // We need only limited data so we are making a substitute of above API
-    @RequestMapping(value = "/{staffId}/unit_position/{employmentId}/functions", method = RequestMethod.GET)
+    @RequestMapping(value = "/{staffId}/employment/{employmentId}/functions", method = RequestMethod.GET)
     @ApiOperation("API for check unit position of staff and available functions and reasoncodes on unit")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@PathVariable Long employmentId, @PathVariable Long unitId) {
@@ -614,7 +614,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByIds(staffIds));
     }
 
-    @GetMapping(value = "/staff_employment_by_unit_position/{employmentId}")
+    @GetMapping(value = "/staff_employment/{employmentId}")
     @ApiOperation("get staff by employmentId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByEmploymentId(@RequestParam("type") String type, @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId,

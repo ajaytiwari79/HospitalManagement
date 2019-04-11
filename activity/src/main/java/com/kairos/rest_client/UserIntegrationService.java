@@ -78,7 +78,7 @@ public class UserIntegrationService {
     private UserRestClientForScheduler userRestClientForScheduler;
 
     public Long getEmploymentId(Long unitId, Long staffId, Long expertiseId) {
-        Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, staffId, expertiseId);
         if (value == null) {
             exceptionService.dataNotFoundByIdException("message.unitPosition.notFound", expertiseId);
@@ -97,7 +97,7 @@ public class UserIntegrationService {
     }
 
     public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EMPLOYMENTS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
         }, expertiseId);
     }
 
@@ -108,7 +108,7 @@ public class UserIntegrationService {
 
     public List<StaffEmploymentDetails> getStaffIdAndEmployment(Long unitId, List<Long> staffIds, Long expertiseId) {
 
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentDetails>>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_EMPLOYMENTS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentDetails>>>() {
         }, expertiseId);
 
     }
@@ -183,20 +183,20 @@ public class UserIntegrationService {
 
     public Long removeFunctionFromEmploymentByDate(Long unitId, Long unitPositionId, Date shiftDate) {
         BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", DateUtils.asLocalDate(shiftDate).toString());
-        Long functionId = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, UNIT_POSITION_UNIT_POSITION_ID_REMOVE_FUNCTION_ON_DELETE_SHIFT, Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long functionId = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTION_FROM_EMPLOYMENT_ON_DELETE_SHIFT, Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, unitPositionId);
         return functionId;
     }
 
     public Boolean restoreFunctionFromEmploymentByDate(Long unitId, Long unitPositionId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
 
-        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTIONS_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, unitPositionId);
 
     }
 
     public Map<LocalDate, Long> removeFunctionFromEmploymentByDates(Long unitId, Long unitPositionId, Set<LocalDate> dates) {
-        return genericRestClient.publishRequest(dates, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
+        return genericRestClient.publishRequest(dates, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTIONS_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
         }, unitPositionId);
     }
 
@@ -213,7 +213,7 @@ public class UserIntegrationService {
     }
 
     public EmploymentDTO getEmploymentDTO(Long unitId, Long unitEmploymentPositionId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentDTO>>() {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_EMPLOYMENT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentDTO>>() {
         }, unitEmploymentPositionId);
     }
 
@@ -344,7 +344,7 @@ public class UserIntegrationService {
 
     //Previously this API didn't match with any API on user micro-service (corrected)
     public Map<Long, Long> getEmploymentExpertiseMap(Long organizationId, Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, UNIT_POSITION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, Long>>>() {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, EMPLOYMENT_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, Long>>>() {
         });
     }
 
@@ -396,7 +396,7 @@ public class UserIntegrationService {
     }
 
     public StaffAdditionalInfoDTO verifyEmploymentAndFindFunctionsAfterDate(Long staffId, Long unitPositionId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_EMPLOYMENT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitPositionId);
     }
 
@@ -404,7 +404,7 @@ public class UserIntegrationService {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
         queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_OF_UNIT_POSITION, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,List<FunctionDTO>>>>() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_OF_EMPLOYMENT, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,List<FunctionDTO>>>>() {
         }, unitPositionId);
     }
 
@@ -454,7 +454,7 @@ public class UserIntegrationService {
 
     //TimeBankRestClient
     public EmploymentWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentWithCtaDetailsDTO>>() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentWithCtaDetailsDTO>>() {
         }, unitPositionId);
     }
 
@@ -706,12 +706,6 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
 
-
-    public Map<Long,Map<Long,Set<LocalDate>>> getEmploymentIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
-        return genericRestClient.publishRequest(unitPositionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Map<Long,Set<LocalDate>>>>>() {
-        });
-    }
-
     public void restoreFunctionsWithDatesByEmploymentIds(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap, Long unitId) {
         Boolean AreFunctionsRestored = genericRestClient.publishRequest(unitPositionIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
@@ -746,15 +740,15 @@ public class UserIntegrationService {
         });
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByEmploymentId(Long unitId, LocalDate shiftDate, String type, Long unitPositionId, Set<Long> reasonCodeIds) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByEmploymentId(Long unitId, LocalDate shiftDate, String type, Long employmentId, Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
         queryParamList.add(new BasicNameValuePair("startDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
         if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
             queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_EMPLOYMENT_BY_UNIT_POSITION_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
-        }, unitPositionId);
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_EMPLOYMENT_BY_EMPLOYMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, employmentId);
     }
 
     public boolean isReasonCodeLinkedToTimeType(Long countryId,BigInteger timeTypeId) {
@@ -763,7 +757,7 @@ public class UserIntegrationService {
     }
 
     public Long getUnitByEmploymentId(Long unitPositionId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_EMPLOYMENT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         },unitPositionId);
     }
 

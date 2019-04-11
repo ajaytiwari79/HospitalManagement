@@ -44,27 +44,26 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByUpIds(Set<Long> upIds, Date date);
 
-    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> unitPositionIds);
+    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> employmentIds);
 
-    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> unitPositionIds);
+    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> employmentIds);
 
-    WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long unitPositionId, Date date);
+    WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long employmentId, Date date);
 
-    List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> unitPositionIds, Date date);
+    List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> employmentIds, Date date);
 
-    List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate);
 
-    WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long unitPositionId, Date date);
+    WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date);
 
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
-    void setEndDateToWTAOfEmployment(Long unitPositionId, LocalDate endDate);
+    void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate);
 
-    boolean wtaExistsByUnitPositionIdAndDates(Long unitPositionId,Date startDate,Date endDate);
-    boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long unitPositionId, Date startDate, Date endDate);
+    boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate);
+    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long employmentId, Date startDate, Date endDate);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long unitPositionId, Date startDate, Date endDate, WTATemplateType templateType);
+    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType);
 
 }

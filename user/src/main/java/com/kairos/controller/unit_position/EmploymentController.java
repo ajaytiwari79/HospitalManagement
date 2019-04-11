@@ -138,7 +138,7 @@ public class EmploymentController {
     }
 
     @ApiOperation(value = "get unit positionsId based on expertise and staff list")
-    @RequestMapping(value = "/expertise/{expertiseId}/staff_and_unit_positions", method = RequestMethod.POST)
+    @RequestMapping(value = "/expertise/{expertiseId}/staff_and_employments", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> getStaffIdAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getStaffIdAndEmploymentId(unitId, expertiseId, staffList));
     }
@@ -163,8 +163,8 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-    @ApiOperation(value = "get unit_position's CTA")
-    @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
+    @ApiOperation(value = "get employment's CTA")
+    @GetMapping(value = "/cta_by_employment/{employmentId}")
     public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getEmploymentCTA(unitPositionId, unitId));
     }
@@ -197,7 +197,7 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getUnitByEmploymentId(unitPositionId));
     }
 
-    @GetMapping("/unit_position/expertise")
+    @GetMapping("/employment/expertise")
     @ApiOperation("fetch Map of unit position id and expertise id")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseOfUnitPosition(@PathVariable Long unitId) {

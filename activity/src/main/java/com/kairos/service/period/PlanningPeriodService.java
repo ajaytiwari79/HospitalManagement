@@ -547,7 +547,6 @@ public class PlanningPeriodService extends MongoBaseService {
                     employmentIds.add(employmentId);
                 }
             }
-            employmentIdWithFunctionIdShiftDateMap = userIntegrationService.getEmploymentIdWithFunctionIdShiftDateMap(unitId, employmentIds);
         }
         return employmentIdWithFunctionIdShiftDateMap;
     }
