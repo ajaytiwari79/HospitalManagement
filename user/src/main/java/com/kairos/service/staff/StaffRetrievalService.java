@@ -300,7 +300,7 @@ public class StaffRetrievalService {
             staffAccessGroupQueryResult = new StaffAccessGroupQueryResult();
             isSuperAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.SUPER_ADMIN);
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-            staffAccessGroupQueryResult.setCountryId(organizationGraphRepository.getCountryId(parentOrganization.getId()));
+            staffAccessGroupQueryResult.setCountryId(UserContext.getUserDetails().getCountryId());
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);

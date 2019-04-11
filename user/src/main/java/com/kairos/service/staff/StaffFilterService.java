@@ -97,7 +97,7 @@ public class StaffFilterService {
             }
             organization = organization.isParentOrganization() ? organization : organizationService.fetchParentOrganization(unitId);
         }
-        Long countryId = organizationGraphRepository.getCountryId(organization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notExist");
         }
