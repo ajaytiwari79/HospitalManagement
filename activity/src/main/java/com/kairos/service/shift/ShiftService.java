@@ -286,15 +286,19 @@ public class ShiftService extends MongoBaseService {
         }
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
-        if (isNotNull(functionId) && activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
-            Map<LocalDate,Long> dateAndFunctionIdMap=new HashMap<>();
-            dateAndFunctionIdMap.put(asLocalDate(shift.getStartDate()),functionId);
-            userIntegrationService.applyFunction(shift.getUnitId(),shift.getUnitPositionId(),dateAndFunctionIdMap,HttpMethod.POST,null);
+        if (isNotNull(functionId)) {
+            if(activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getBalanceSettingsActivityTab().getTimeType()))){
+                Map<LocalDate,Long> dateAndFunctionIdMap=new HashMap<>();
+                dateAndFunctionIdMap.put(asLocalDate(shift.getStartDate()),functionId);
+                userIntegrationService.applyFunction(shift.getUnitId(),shift.getUnitPositionId(),dateAndFunctionIdMap,HttpMethod.POST,null);
+            }
+            else {
+                exceptionService.actionNotPermittedException("error.function.can.not.apply.with.absence.activity");
+            }
         }
         else{
             BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", asLocalDate(shift.getStartDate()).toString());
             userIntegrationService.applyFunction(shift.getUnitId(),shift.getUnitPositionId(),null,HttpMethod.DELETE,Arrays.asList(appliedDate));
-            //userIntegrationService.removeFunctionFromUnitPositionByDate(shift.getUnitId(),shift.getUnitPositionId(),shift.getStartDate());
         }
         shiftMongoRepository.save(shift);
         if (!updateShift) {
