@@ -9,18 +9,18 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class EmploymentSeniorityLevelQueryResult {
 
-    private Long unitPositionId;
+    private Long employmentId;
     private SeniorityLevel seniorityLevel;
     private EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip;
     private EmploymentType employmentType;
     private EmploymentLine employmentLine;
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public SeniorityLevel getSeniorityLevel() {

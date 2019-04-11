@@ -15,8 +15,8 @@ public class EmploymentWithCtaDetailsDTO {
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
-    private LocalDate unitPositionStartDate;
-    private LocalDate unitPositionEndDate;
+    private LocalDate employmentStartDate;
+    private LocalDate employmentEndDate;
     private Long countryId;
     private int minutesFromCta;
     private ZoneId unitTimeZone;
@@ -42,12 +42,12 @@ public class EmploymentWithCtaDetailsDTO {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public LocalDate getUnitPositionEndDate() {
-        return unitPositionEndDate;
+    public LocalDate getEmploymentEndDate() {
+        return employmentEndDate;
     }
 
-    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
-        this.unitPositionEndDate = unitPositionEndDate;
+    public void setEmploymentEndDate(LocalDate employmentEndDate) {
+        this.employmentEndDate = employmentEndDate;
     }
 
     public int getMinutesFromCta() {
@@ -58,8 +58,8 @@ public class EmploymentWithCtaDetailsDTO {
         this.minutesFromCta = minutesFromCta;
     }
 
-    public EmploymentWithCtaDetailsDTO(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
+    public EmploymentWithCtaDetailsDTO(LocalDate employmentStartDate) {
+        this.employmentStartDate = employmentStartDate;
     }
 
     public Long getCountryId() {
@@ -70,12 +70,12 @@ public class EmploymentWithCtaDetailsDTO {
         this.countryId = countryId;
     }
 
-    public LocalDate getUnitPositionStartDate() {
-        return unitPositionStartDate;
+    public LocalDate getEmploymentStartDate() {
+        return employmentStartDate;
     }
 
-    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
+    public void setEmploymentStartDate(LocalDate employmentStartDate) {
+        this.employmentStartDate = employmentStartDate;
     }
 
 

@@ -1,5 +1,7 @@
 package com.kairos.service.time_bank;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.pay_out.EmploymentWithCtaDetailsDTO;
 import com.kairos.persistence.model.shift.Shift;
 import org.joda.time.*;
 
@@ -77,20 +79,20 @@ public class DailyTimeBankServiceUnitTest {
     @Test
     public void getIntervalByDateOverviewTimebank(){
         //TODO Pradeep will fix it. as logic has been changed
-//        int year  = 2018;
-//        EmploymentWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
-//        DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
-//        DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
-//        if(startDate.getYear()==new DateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay())){
-//            startDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay();
-//        }
-//        if(startDate.getYear()!=DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).getYear() && startDate.isAfter(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()))){
-//            startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
-//        }
-//        if(endDate.isAfter(new DateTime().plusDays(1).withTimeAtStartOfDay()) && endDate.getYear()==new DateTime().getYear()){
-//            endDate = new DateTime().withTimeAtStartOfDay();
-//        }
-//        Interval interval = new Interval(startDate,endDate);
+        int year  = 2018;
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
+        DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
+        DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
+        if(startDate.getYear()==new DateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).withTimeAtStartOfDay())){
+            startDate = DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).withTimeAtStartOfDay();
+        }
+        if(startDate.getYear()!=DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).getYear() && startDate.isAfter(DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()))){
+            startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
+        }
+        if(endDate.isAfter(new DateTime().plusDays(1).withTimeAtStartOfDay()) && endDate.getYear()==new DateTime().getYear()){
+            endDate = new DateTime().withTimeAtStartOfDay();
+        }
+        Interval interval = new Interval(startDate,endDate);
     }
     @Test
     public void getWeeksBYMonth(){

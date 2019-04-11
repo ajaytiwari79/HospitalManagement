@@ -47,8 +47,8 @@ public class EmploymentController {
     @Inject private UnionService unionService;
 
     @ApiOperation(value = "Create a New Position")
-    @PostMapping(value = "/unit_position")
-    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid EmploymentDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
+    @PostMapping(value = "/employment")
+    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid EmploymentDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, type, position, false, saveAsDraft));
     }
 
@@ -56,90 +56,90 @@ public class EmploymentController {
      * @auth vipul
      * used to get all positions of organization n by organization and staff Id
      * */
-    @ApiOperation(value = "Get all unit_position by organization and staff")
-    @RequestMapping(value = "/unit_position/staff/{staffId}")
-    ResponseEntity<Map<String, Object>> getUnitPositionsOfStaff(@PathVariable Long unitId, @RequestParam(value = "type",required = false) String type, @PathVariable Long staffId, @RequestParam("allOrganization") boolean allOrganization) {
+    @ApiOperation(value = "Get all employment by organization and staff")
+    @RequestMapping(value = "/employment/staff/{staffId}")
+    ResponseEntity<Map<String, Object>> getEmploymentsOfStaff(@PathVariable Long unitId, @RequestParam(value = "type",required = false) String type, @PathVariable Long staffId, @RequestParam("allOrganization") boolean allOrganization) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentsOfStaff(unitId, staffId, allOrganization));
     }
 
-    @ApiOperation(value = "Remove unit_position")
-    @DeleteMapping(value = "/unit_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> deleteUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.removePosition(unitPositionId, unitId));
+    @ApiOperation(value = "Remove employment")
+    @DeleteMapping(value = "/employment/{employmentId}")
+    public ResponseEntity<Map<String, Object>> deleteEmployment(@PathVariable Long unitId, @PathVariable Long employmentId) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.removePosition(employmentId, unitId));
     }
 
 
-    @ApiOperation(value = "Update unit_position")
-    @PutMapping(value = "/unit_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> updateUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId, @RequestBody @Valid EmploymentDTO position, @RequestParam("type") String type, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.updateEmployment(unitPositionId, position, unitId, type, saveAsDraft));
+    @ApiOperation(value = "Update employment")
+    @PutMapping(value = "/employment/{employmentId}")
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable Long employmentId, @RequestBody @Valid EmploymentDTO position, @RequestParam("type") String type, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.updateEmployment(employmentId, position, unitId, type, saveAsDraft));
     }
 
-    @ApiOperation(value = "Get unit_position")
-    @GetMapping(value = "/unit_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> getUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmployment(unitPositionId));
+    @ApiOperation(value = "Get employment")
+    @GetMapping(value = "/employment/{employmentId}")
+    public ResponseEntity<Map<String, Object>> getEmployment(@PathVariable Long unitId, @PathVariable Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmployment(employmentId));
     }
 
-    @ApiOperation(value = "Update unit_position's WTA")
-    @PutMapping(value = "/unit_position/{unitPositionId}/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.updateEmploymentWTA(unitId, unitPositionId, wtaId, wtadto));
+    @ApiOperation(value = "Update employment's WTA")
+    @PutMapping(value = "/employment/{employmentId}/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> updateEmploymentWTA(@PathVariable Long employmentId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.updateEmploymentWTA(unitId, employmentId, wtaId, wtadto));
     }
 
-    @ApiOperation(value = "apply function to unit position")
-    @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Long> payload) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.applyFunction(unitPositionId, payload,unitId));
+    @ApiOperation(value = "apply function to employment")
+    @PostMapping(value = "/employment/{employmentId}/applyFunction")
+    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long employmentId,@PathVariable Long unitId, @RequestBody Map<String, Long> payload) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.applyFunction(employmentId, payload,unitId));
     }
 
-    @ApiOperation(value = "apply function to unit position")
-    @PostMapping(value = "/unit_position/{unitPositionId}/restore_functions")
-    public ResponseEntity<Map<String, Object>> restoreFunctions(@PathVariable Long unitPositionId, @RequestBody Map<Long,Set<LocalDate>> payload)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.restoreFunctions(unitPositionId, payload));
+    @ApiOperation(value = "apply function to employment")
+    @PostMapping(value = "/employment/{employmentId}/restore_functions")
+    public ResponseEntity<Map<String, Object>> restoreFunctions(@PathVariable Long employmentId, @RequestBody Map<Long,Set<LocalDate>> payload)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.restoreFunctions(employmentId, payload));
     }
 
-    @ApiOperation(value = "remove function to unit position")
-    @DeleteMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunction(unitId,unitPositionId, appliedDate));
+    @ApiOperation(value = "remove function to employment")
+    @DeleteMapping(value = "/employment/{employmentId}/applyFunction")
+    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunction(unitId,employmentId, appliedDate));
     }
 
     @ApiOperation(value = "remove function to unit position on delete Shift")
-    @DeleteMapping(value = "/unit_position/{unitPositionId}/remove_function_on_delete_shift")
-    public ResponseEntity<Map<String, Object>> removeFunctionOnDeleteShift(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunctionOnDeleteShift(unitPositionId, appliedDate));
+    @DeleteMapping(value = "/employment/{employmentId}/remove_function_on_delete_shift")
+    public ResponseEntity<Map<String, Object>> removeFunctionOnDeleteShift(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunctionOnDeleteShift(employmentId, appliedDate));
     }
 
     /**
      *
-     * @param unitPositionId
+     * @param employmentId
      * @param appliedDates
      * @return
      * @throws ParseException
      * @Desc this endpoint will remove applied functions for multiple dates
      */
     @ApiOperation(value = "remove function to unit position")
-    @DeleteMapping(value = "/unit_position/{unitPositionId}/remove_functions")
-    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId, @RequestBody Set<LocalDate> appliedDates)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunctions(unitPositionId, appliedDates));
+    @DeleteMapping(value = "/employment/{employmentId}/remove_functions")
+    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long employmentId, @RequestBody Set<LocalDate> appliedDates)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunctions(employmentId, appliedDates));
     }
 
     @ApiOperation(value = "get employment's Id By Staff and expertise")
     @GetMapping(value = "/staff/{staffId}/expertise/{expertiseId}/employmentId")
-    public ResponseEntity<Map<String, Object>> getUnitPositionIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId, @PathVariable Long expertiseId) {
+    public ResponseEntity<Map<String, Object>> getEmploymentIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId, @PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentIdByStaffAndExpertise(unitId, staffId, expertiseId));
     }
 
     @ApiOperation(value = "get unit positions based on expertise and staff list")
     @RequestMapping(value = "/expertise/{expertiseId}/employments", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> getStaffsUnitPosition(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
+    public ResponseEntity<Map<String, Object>> getStaffsEmployment(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getStaffsEmployment(unitId, expertiseId, staffList));
     }
 
     @ApiOperation(value = "get unit positionsId based on expertise and staff list")
     @RequestMapping(value = "/expertise/{expertiseId}/staff_and_employments", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> getStaffIdAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
+    public ResponseEntity<Map<String, Object>> getStaffIdAndEmploymentId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getStaffIdAndEmploymentId(unitId, expertiseId, staffList));
     }
 
@@ -165,42 +165,42 @@ public class EmploymentController {
 
     @ApiOperation(value = "get employment's CTA")
     @GetMapping(value = "/cta_by_employment/{employmentId}")
-    public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getEmploymentCTA(unitPositionId, unitId));
+    public ResponseEntity<Map<String, Object>> getEmploymentCTA(@PathVariable Long employmentId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getEmploymentCTA(employmentId, unitId));
     }
 
 
-    @ApiOperation(value = "get UnitPositions Per Staff")
-    @GetMapping(value = "/staff/{staffId}/unit_positions")
-    public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
+    @ApiOperation(value = "get employments Per Staff")
+    @GetMapping(value = "/staff/{staffId}/employments")
+    public ResponseEntity<Map<String, Object>> getEmploymentsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentsByStaffId(unitId, staffId));
     }
 
     @ApiOperation(value = "get HourlyCost By employmentLine Wise")
-    @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
-    public ResponseEntity<Map<String, Object>> getEmploymentLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.getEmploymentLinesWithHourlyCost(unitId, staffId,unitPositionId));
+    @GetMapping(value = "/staff/{staffId}/employments/{employmentId}/hourly_cost")
+    public ResponseEntity<Map<String, Object>> getEmploymentLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.getEmploymentLinesWithHourlyCost(unitId, staffId,employmentId));
     }
 
-    @RequestMapping(value = "/unit_position/default_data", method = RequestMethod.GET)
+    @RequestMapping(value = "/employment/default_data", method = RequestMethod.GET)
     @ApiOperation("Get All default data for unit employment  by organization ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getUnitPositionDefaultData(@PathVariable Long unitId, @RequestParam("type") String type, @RequestParam("staffId") Long staffId) {
+    public ResponseEntity<Map<String, Object>> getEmploymentDefaultData(@PathVariable Long unitId, @RequestParam("type") String type, @RequestParam("staffId") Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unionService.getEmploymentDefaultData(unitId, type, staffId));
     }
 
 
     @ApiOperation(value = "get unit By unit position")
-    @GetMapping(value = "/unit_position/{unitPositionId}/get_unit")
-    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getUnitByEmploymentId(unitPositionId));
+    @GetMapping(value = "/employment/{employmentId}/get_unit")
+    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long employmentId)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getUnitByEmploymentId(employmentId));
     }
 
     @GetMapping("/employment/expertise")
     @ApiOperation("fetch Map of unit position id and expertise id")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseOfUnitPosition(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getExpertiseOfEmployment(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentExpertiseMap(unitId));
     }
 }

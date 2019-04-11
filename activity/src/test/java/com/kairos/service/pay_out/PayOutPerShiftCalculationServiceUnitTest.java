@@ -55,9 +55,9 @@ public class PayOutPerShiftCalculationServiceUnitTest {
     @Test
     public void calculatePayOut(){
         /*when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
-        EmploymentWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
-        PayOutPerShift payOut = new PayOutPerShift(unitPositionWithCtaDetailsDTO.getEmploymentId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
+        PayOutPerShift payOut = new PayOutPerShift(employmentWithCtaDetailsDTO.getEmploymentId(), employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+        payOutCalculationService.calculateAndUpdatePayOut(interval, employmentWithCtaDetailsDTO,shifts, payOut);
         Assert.assertEquals(payOut.getTotalPayOutMinutes(),1130);
         Assert.assertEquals(payOut.getScheduledMinutes(),1020);
         Assert.assertEquals(payOut.getContractualMin(),300);*/

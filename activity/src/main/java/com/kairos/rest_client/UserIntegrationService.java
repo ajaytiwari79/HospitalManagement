@@ -81,7 +81,7 @@ public class UserIntegrationService {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, staffId, expertiseId);
         if (value == null) {
-            exceptionService.dataNotFoundByIdException("message.unitPosition.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException("message.employment.notFound", expertiseId);
         }
         return value;
     }

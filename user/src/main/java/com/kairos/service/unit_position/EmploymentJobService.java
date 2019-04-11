@@ -63,15 +63,15 @@ public class EmploymentJobService {
             List<EmploymentSeniorityLevelQueryResult> employmentSeniorityLevelQueryResults = employmentGraphRepository.findEmploymentSeniorityLeveltoUpdate();
             if (!employmentSeniorityLevelQueryResults.isEmpty()) {
 
-                Map<Long, EmploymentSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResultMap
-                        = employmentSeniorityLevelQueryResults.stream().collect(Collectors.toMap(EmploymentSeniorityLevelQueryResult::getUnitPositionId, java.util.function.Function.identity()));
+                Map<Long, EmploymentSeniorityLevelQueryResult> employmentSeniorityLevelQueryResultMap
+                        = employmentSeniorityLevelQueryResults.stream().collect(Collectors.toMap(EmploymentSeniorityLevelQueryResult::getEmploymentId, java.util.function.Function.identity()));
 
-                Set<Long> unitPositionIds = unitPositionSeniorityLevelQueryResultMap.keySet();
-                Iterable<Employment> unitPositions = employmentGraphRepository.findAllById(unitPositionIds, 2);
+                Set<Long> employmentIds = employmentSeniorityLevelQueryResultMap.keySet();
+                Iterable<Employment> employments = employmentGraphRepository.findAllById(employmentIds, 2);
 
                 Map<EmploymentIdDTO, EmploymentLine> newEmploymentLineWithParentId = new HashMap<>();
 
-                for (Employment currentEmployment : unitPositions) {
+                for (Employment currentEmployment : employments) {
                     Optional<EmploymentLine> employmentLine = currentEmployment.getEmploymentLines().stream()
                             .filter(pl -> (todaysDate.isAfter(pl.getStartDate()) || todaysDate.isEqual(pl.getStartDate()) && (pl.getEndDate() == null || pl.getEndDate().isBefore(todaysDate) || pl.getEndDate().isEqual(todaysDate))))
                             .findAny();
@@ -85,7 +85,7 @@ public class EmploymentJobService {
                                 .setFullTimeWeeklyMinutes(employmentLine.get().getFullTimeWeeklyMinutes())
                                 .setWorkingDaysInWeek(employmentLine.get().getWorkingDaysInWeek())
                                 .setEndDate(employmentLine.get().getEndDate())
-                                .setSeniorityLevel(unitPositionSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel())
+                                .setSeniorityLevel(employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel())
                                 .build();
                         employmentLine.get().setEndDate(todaysDate);
                         currentEmployment.getEmploymentLines().add(newEmploymentLine);
@@ -96,7 +96,7 @@ public class EmploymentJobService {
                 List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
 
                 for (Map.Entry<EmploymentIdDTO, EmploymentLine> currentMap : newEmploymentLineWithParentId.entrySet()) {
-                    EmploymentSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldEmploymentId());
+                    EmploymentSeniorityLevelQueryResult currentObject = employmentSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldEmploymentId());
                     if (currentObject != null) {
                         EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip =
                                 new EmploymentLineEmploymentTypeRelationShip(currentMap.getValue(), currentObject.getEmploymentType(),
@@ -105,7 +105,7 @@ public class EmploymentJobService {
                     }
                 }
 
-                employmentGraphRepository.saveAll(unitPositions);
+                employmentGraphRepository.saveAll(employments);
                 employmentAndEmploymentTypeRelationShipGraphRepository.saveAll(employmentLineEmploymentTypeRelationShips);
 
             }
@@ -122,15 +122,13 @@ public class EmploymentJobService {
 
         kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
 
-        // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
     public EmploymentAndPositionDTO updateEmploymentEndDateFromPosition(Long staffId, Long unitId, PositionDTO positionDTO) {
-        Organization unit=organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
-        String unitPositionStartDateMax= employmentGraphRepository.getMaxEmploymentStartDate(staffId);
-        if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(unitPositionStartDateMax))) {
-            exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", unitPositionStartDateMax);
+        String employmentStartDateMax= employmentGraphRepository.getMaxEmploymentStartDate(staffId);
+        if (Optional.ofNullable(employmentStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(employmentStartDateMax))) {
+            exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", employmentStartDateMax);
 
         }
         List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());

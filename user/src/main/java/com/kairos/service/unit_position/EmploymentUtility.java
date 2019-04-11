@@ -15,51 +15,51 @@ import java.util.Optional;
  * CreatedBy vipulpandey on 27/10/18
  **/
 public class EmploymentUtility {
-    public static com.kairos.dto.activity.shift.StaffEmploymentDetails convertEmploymentObject(EmploymentQueryResult unitPosition) {
-        com.kairos.dto.activity.shift.StaffEmploymentDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffEmploymentDetails();
-        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
-        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
-        unitPositionDetails.setId(unitPosition.getId());
-        unitPositionDetails.setStartDate(unitPosition.getStartDate());
+    public static com.kairos.dto.activity.shift.StaffEmploymentDetails convertEmploymentObject(EmploymentQueryResult employment) {
+        com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = new com.kairos.dto.activity.shift.StaffEmploymentDetails();
+        employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
+        employmentDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
+        employmentDetails.setId(employment.getId());
+        employmentDetails.setStartDate(employment.getStartDate());
 
-        unitPositionDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getAppliedFunctions(),FunctionDTO.class));
-        unitPositionDetails.setEndDate(unitPosition.getEndDate());
-        unitPositionDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getEmploymentLines(), EmploymentLinesDTO.class));
-        unitPositionDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
-        unitPositionDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyMinutes());
-        unitPositionDetails.setTotalWeeklyHours(currentEmploymentLine.getTotalWeeklyHours());
-        unitPositionDetails.setWorkingDaysInWeek(currentEmploymentLine.getWorkingDaysInWeek());
-        unitPositionDetails.setAvgDailyWorkingHours(currentEmploymentLine.getAvgDailyWorkingHours());
-        unitPositionDetails.setHourlyCost(currentEmploymentLine.getHourlyCost());
-        unitPositionDetails.setPublished(unitPosition.getPublished());
-        unitPositionDetails.setEditable(unitPosition.getEditable());
-        unitPositionDetails.setAccumulatedTimebankMinutes(unitPosition.getAccumulatedTimebankMinutes());
-        unitPositionDetails.setAccumulatedTimebankDate(unitPosition.getAccumulatedTimebankDate());
-        return unitPositionDetails;
+        employmentDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOfListByMapper(employment.getAppliedFunctions(),FunctionDTO.class));
+        employmentDetails.setEndDate(employment.getEndDate());
+        employmentDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOfListByMapper(employment.getEmploymentLines(), EmploymentLinesDTO.class));
+        employmentDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
+        employmentDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyMinutes());
+        employmentDetails.setTotalWeeklyHours(currentEmploymentLine.getTotalWeeklyHours());
+        employmentDetails.setWorkingDaysInWeek(currentEmploymentLine.getWorkingDaysInWeek());
+        employmentDetails.setAvgDailyWorkingHours(currentEmploymentLine.getAvgDailyWorkingHours());
+        employmentDetails.setHourlyCost(currentEmploymentLine.getHourlyCost());
+        employmentDetails.setPublished(employment.getPublished());
+        employmentDetails.setEditable(employment.getEditable());
+        employmentDetails.setAccumulatedTimebankMinutes(employment.getAccumulatedTimebankMinutes());
+        employmentDetails.setAccumulatedTimebankDate(employment.getAccumulatedTimebankDate());
+        return employmentDetails;
     }
 
-    public static void convertStaffEmploymentObject(StaffEmploymentDetails unitPosition, com.kairos.dto.activity.shift.StaffEmploymentDetails unitPositionDetails, List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes ) {
-        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        unitPositionDetails.setStaff(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
-        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
+    public static void convertStaffEmploymentObject(StaffEmploymentDetails employment, com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails, List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes ) {
+        employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        employmentDetails.setStaff(ObjectMapperUtils.copyPropertiesByMapper(employment.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
+        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
         com.kairos.dto.activity.shift.EmploymentType employmentType =ObjectMapperUtils.copyPropertiesByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class);
         Optional<ExpertisePlannedTimeQueryResult> plannedTimeQueryResult=expertisePlannedTimes.stream().filter(
                 current -> current.getEmploymentTypes().stream()
                         .anyMatch(employmentTypeOfExpertise -> employmentType.getId().equals(employmentTypeOfExpertise.getId()))).findAny();
         if (plannedTimeQueryResult.isPresent()){
-            unitPositionDetails.setExcludedPlannedTime(plannedTimeQueryResult.get().getExcludedPlannedTime());
-            unitPositionDetails.setIncludedPlannedTime(plannedTimeQueryResult.get().getIncludedPlannedTime());
+            employmentDetails.setExcludedPlannedTime(plannedTimeQueryResult.get().getExcludedPlannedTime());
+            employmentDetails.setIncludedPlannedTime(plannedTimeQueryResult.get().getIncludedPlannedTime());
         }
-        unitPositionDetails.setEmploymentType(employmentType);
-        unitPositionDetails.setId(unitPosition.getId());
-        unitPositionDetails.setStartDate(unitPosition.getStartDate());
-        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
-        unitPositionDetails.setEndDate(unitPosition.getEndDate());
-        unitPositionDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
-        unitPositionDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyHours()*60+currentEmploymentLine.getTotalWeeklyMinutes());
-        unitPositionDetails.setWorkingDaysInWeek(currentEmploymentLine.getWorkingDaysInWeek());
-        unitPositionDetails.setAvgDailyWorkingHours(currentEmploymentLine.getAvgDailyWorkingHours());
+        employmentDetails.setEmploymentType(employmentType);
+        employmentDetails.setId(employment.getId());
+        employmentDetails.setStartDate(employment.getStartDate());
+        employmentDetails.setAppliedFunctions(employment.getAppliedFunctions());
+        employmentDetails.setEndDate(employment.getEndDate());
+        employmentDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
+        employmentDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyHours()*60+currentEmploymentLine.getTotalWeeklyMinutes());
+        employmentDetails.setWorkingDaysInWeek(currentEmploymentLine.getWorkingDaysInWeek());
+        employmentDetails.setAvgDailyWorkingHours(currentEmploymentLine.getAvgDailyWorkingHours());
 
     }
 
