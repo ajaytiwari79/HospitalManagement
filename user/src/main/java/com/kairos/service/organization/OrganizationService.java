@@ -74,6 +74,7 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -640,7 +641,7 @@ public class OrganizationService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
-        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
@@ -674,14 +675,12 @@ public class OrganizationService {
     }
 
     public List<DayType> getDayType(Long unitId, Date date) {
-        Organization parentOrganization = fetchParentOrganization(unitId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
     public List<DayType> getAllDayTypeofOrganization(Long organizationId) {
-        Organization parentOrganization = fetchParentOrganization(organizationId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getAllDayTypeByCountryId(countryId);
     }
 
@@ -821,7 +820,7 @@ public class OrganizationService {
     }
 
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId) {
-        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        Long countryId = UserContext.getUserDetails().getCountryId();
         OrderAndActivityDTO orderAndActivityDTO = activityIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
         OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
@@ -987,8 +986,7 @@ public class OrganizationService {
     }
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
-        Organization parentOrganization = fetchParentOrganization(unitId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         if(countryId == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
