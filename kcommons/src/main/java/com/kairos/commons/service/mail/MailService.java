@@ -148,9 +148,9 @@ public class MailService {
         Context context = new Context(Locale.ENGLISH);
         if(isMapNotEmpty(templateParam)){
             context.setVariables(templateParam);
-            context.setVariable("kairosLogo","http://dev.kairosplanning.com" + FORWARD_SLASH + envConfigCommon.getImagesPath()+KAIROS_LOGO);
+            context.setVariable("kairosLogo",envConfigCommon.getServerHost() + FORWARD_SLASH + envConfigCommon.getImagesPath()+KAIROS_LOGO);
             if(!templateParam.containsKey("receiverImage")){
-                context.setVariable("receiverImage","http://dev.kairosplanning.com" + FORWARD_SLASH + envConfigCommon.getImagesPath()+USER_DEFAULT_IMAGE);
+                context.setVariable("receiverImage",envConfigCommon.getServerHost() + FORWARD_SLASH + envConfigCommon.getImagesPath()+USER_DEFAULT_IMAGE);
             }
         }
         return context;
