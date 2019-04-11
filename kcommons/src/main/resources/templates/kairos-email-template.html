@@ -11,12 +11,12 @@
 <body style="font-family: lato; font-weight: 500; background: #eeeeee;">
     <section style="width: 100%; max-width: 450px; margin: 0 auto; padding: 25px 0;">
         <div style="height: 100px; background: #ffffff; text-align: center;">
-            <img src="http://dev.kairosplanning.com/static/kairos/images/1553607320480Kairoslogo.png" alt="Kairos logo"
+            <img th:src="@{${kairosLogo}}" alt="Kairos logo"
                 style=" margin-top: 35px; width: 100px;">
         </div>
         <div style="height: 170px; background: #212e66; color: #ffffff; text-align: center; padding: 15px 7% 0;">
             <div style="height: 80px; width: 80px; border-radius: 50%; overflow: hidden; padding: 2px; background: white; margin: 0px auto 0 auto;">
-                <img alt="Staff image" th:src="@{${imageResourceName}}"
+                <img alt="Staff image" th:src="@{${receiverImage}}"
                     style="width: 100%; height: 100%; border-radius: 50%">
             </div>
             <h4 style="margin-top: 10px;
@@ -30,7 +30,8 @@
         "></div>
         </div>
         <div style="min-height: 330px; background-image: linear-gradient(rgb(93,167,251) 0%, rgb(33,46,102) 75%); padding: 0 7% 10px; ">
-            <div style="background: white; min-height: 220px; padding: 0% 4%; text-align: justify; box-sizing: border-box; color: #666666" th:text="${description}">
+            <div style="background: white; min-height: 220px; padding: 0% 4%; text-align: justify; box-sizing: border-box; color: #666666">
+                <a href="https://kairos-v.atlassian.net/browse/KP-6716">test</a>
             </div>
             <div style="    background: #fff;
             padding: 0 4% 36px;

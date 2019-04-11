@@ -39,7 +39,7 @@ public class TimeBankDTO {
 
     //Distributed min on the basis of Interval;
     private List<TimeBankIntervalDTO> timeIntervals = new ArrayList<>();
-    private List<TimeBankCTADistributionDTO> timeBankDistributions = new ArrayList<>();
+    private List<CTADistributionDTO> timeBankDistributions = new ArrayList<>();
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private EmploymentWithCtaDetailsDTO costTimeAgreement;
@@ -127,11 +127,11 @@ public class TimeBankDTO {
         this.costTimeAgreement = costTimeAgreement;
     }
 
-    public List<TimeBankCTADistributionDTO> getTimeBankDistributions() {
+    public List<CTADistributionDTO> getTimeBankDistributions() {
         return timeBankDistributions;
     }
 
-    public void setTimeBankDistributions(List<TimeBankCTADistributionDTO> timeBankDistributions) {
+    public void setTimeBankDistributions(List<CTADistributionDTO> timeBankDistributions) {
         this.timeBankDistributions = timeBankDistributions;
     }
 

@@ -18,14 +18,15 @@ public class PayOutPerShift extends MongoBaseEntity{
     private BigInteger shiftId;
     private Long unitId;
     //In minutes
-    private long totalPayOutMin;
-    private long contractualMin;
-    private long scheduledMin;
-    private long payOutMinWithoutCta;
-    private long payOutMinWithCta;
+    private long totalPayOutMinutes;
+    //It is the scheduled minutes of Ruletemplate which accountType is equal to PAID_OUT
+    private long scheduledMinutes;
+    //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to PAID_OUT
+    private long ctaBonusMinutesOfPayOut;
     private long payoutBeforeThisDate;
     private LocalDate date;
     private boolean paidOut;
+    //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to PAID_OUT
     private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions;
 
 
@@ -84,10 +85,11 @@ public class PayOutPerShift extends MongoBaseEntity{
     public PayOutPerShift() {
     }
 
-    public PayOutPerShift(Long employmentId, Long staffId, long totalPayOutMin, LocalDate date) {
+
+    public PayOutPerShift(Long employmentId, Long staffId, long totalPayOutMinutes, LocalDate date) {
         this.employmentId = employmentId;
         this.staffId = staffId;
-        this.totalPayOutMin = totalPayOutMin;
+        this.totalPayOutMinutes = totalPayOutMinutes;
         this.date = date;
     }
 
@@ -99,28 +101,20 @@ public class PayOutPerShift extends MongoBaseEntity{
         this.date = date;
     }
 
-    public long getScheduledMin() {
-        return scheduledMin;
+    public long getScheduledMinutes() {
+        return scheduledMinutes;
     }
 
-    public void setScheduledMin(long scheduledMin) {
-        this.scheduledMin = scheduledMin;
+    public void setScheduledMinutes(long scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
     }
 
-    public long getPayOutMinWithoutCta() {
-        return payOutMinWithoutCta;
+    public long getCtaBonusMinutesOfPayOut() {
+        return ctaBonusMinutesOfPayOut;
     }
 
-    public void setPayOutMinWithoutCta(long payOutMinWithoutCta) {
-        this.payOutMinWithoutCta = payOutMinWithoutCta;
-    }
-
-    public long getPayOutMinWithCta() {
-        return payOutMinWithCta;
-    }
-
-    public void setPayOutMinWithCta(long payOutMinWithCta) {
-        this.payOutMinWithCta = payOutMinWithCta;
+    public void setCtaBonusMinutesOfPayOut(long ctaBonusMinutesOfPayOut) {
+        this.ctaBonusMinutesOfPayOut = ctaBonusMinutesOfPayOut;
     }
 
     public Long getEmploymentId() {
@@ -139,21 +133,14 @@ public class PayOutPerShift extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
-    public long getTotalPayOutMin() {
-        return totalPayOutMin;
+    public long getTotalPayOutMinutes() {
+        return totalPayOutMinutes;
     }
 
-    public void setTotalPayOutMin(long totalPayOutMin) {
-        this.totalPayOutMin = totalPayOutMin;
+    public void setTotalPayOutMinutes(long totalPayOutMinutes) {
+        this.totalPayOutMinutes = totalPayOutMinutes;
     }
 
-    public long getContractualMin() {
-        return contractualMin;
-    }
-
-    public void setContractualMin(long contractualMin) {
-        this.contractualMin = contractualMin;
-    }
 
 
 }

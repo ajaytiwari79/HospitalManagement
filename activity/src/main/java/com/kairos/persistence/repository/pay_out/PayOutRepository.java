@@ -31,5 +31,5 @@ public interface PayOutRepository extends MongoBaseRepository<PayOutPerShift,Big
     List<PayOutPerShift> findAllByEmploymentAndBeforeDate(Long unitPositionId, Date payOutDate);
 
     @Query("{shiftId:?0,deleted:false}")
-    List<PayOutPerShift> findAllByShiftId(BigInteger shiftId);
+    PayOutPerShift findAllByShiftId(BigInteger shiftId);
 }

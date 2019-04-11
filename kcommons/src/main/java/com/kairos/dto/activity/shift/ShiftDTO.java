@@ -68,7 +68,7 @@ public class ShiftDTO {
     private int timeBankCtaBonusMinutes;
     private int deltaTimeBankMinutes;
     private long accumulatedTimeBankMinutes;
-    private int plannedMinutes;
+    private int plannedMinutesOfTimebank;
     private boolean multipleActivity;
     private BigInteger planningPeriodId;
     private BigInteger phaseId;
@@ -401,12 +401,12 @@ public class ShiftDTO {
         this.accumulatedTimeBankMinutes = accumulatedTimeBankMinutes;
     }
 
-    public int getPlannedMinutes() {
-        return plannedMinutes;
+    public int getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
     }
 
-    public void setPlannedMinutes(int plannedMinutes) {
-        this.plannedMinutes = plannedMinutes;
+    public void setPlannedMinutesOfTimebank(int plannedMinutes) {
+        this.plannedMinutesOfTimebank = plannedMinutes;
     }
 
     public BigInteger getPlanningPeriodId() {

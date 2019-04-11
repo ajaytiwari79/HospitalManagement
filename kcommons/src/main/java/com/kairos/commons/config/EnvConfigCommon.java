@@ -26,11 +26,22 @@ public class EnvConfigCommon {
     @Value("${user.loginapi.authPassword}")
     private String userServiceAuthPassword;
 
+    @Value("${server.host.http.url}")
+    private String serverHost;
+
+    @Value("${webservice.imagesPath}")
+    private String imagesPath;
+
+
     @Value("${kpermissions.data.publish}")
     private String kpermissionDataPublish;
 
     @Value("${kpermissions.model.package.path}")
     private String modelPackagePath;
+
+    @Value("${spring.profiles.active}")
+    private  String currentProfile;
+
 
     public String getUserServiceUrl() {
         return userServiceUrl;
@@ -72,6 +83,14 @@ public class EnvConfigCommon {
         this.userServiceAuthPassword = userServiceAuthPassword;
     }
 
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    public String getImagesPath() {
+        return imagesPath;
+    }
+
     public String getKpermissionDataPublish() {
         return kpermissionDataPublish;
     }
@@ -86,5 +105,9 @@ public class EnvConfigCommon {
 
     public void setModelPackagePath(String modelPackagePath) {
         this.modelPackagePath = modelPackagePath;
+    }
+
+    public String getCurrentProfile() {
+        return currentProfile;
     }
 }

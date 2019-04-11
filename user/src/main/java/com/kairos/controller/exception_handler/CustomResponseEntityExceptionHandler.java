@@ -2,6 +2,7 @@ package com.kairos.controller.exception_handler;
 
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -47,6 +49,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @Autowired
     private LocaleService localeService;
+    @Inject
+    private MailService mailService;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -354,6 +358,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(ex.getMessage());
+        mailService.sendMailToBackendOnException(ex);
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 

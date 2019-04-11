@@ -157,7 +157,7 @@ public class PriorityGroupRulesDataGetterService {
 
                 plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
-                        dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMin() + d.getTimeBankMinWithCta()).sum();
+               dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMinutesOfTimeBank() + d.getCtaBonusMinutesOfTimeBank()).sum();
                 Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())),DateUtils.getDate(endDate));
                 timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
                         employmentWithCtaDetailsDTO,false,dailyTimeBankEntries,false);

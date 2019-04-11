@@ -105,10 +105,11 @@ public class TimeBankKpiCalculationService implements CounterService {
             Long totalTimeBankOfUnit = 0l;
             String unitName = (!unitAndStaffKpiFilterMap.get(unitId).isEmpty()) ? unitAndStaffKpiFilterMap.get(unitId).get(0).getUnitName() : "";
             for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
+
                 for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getUnitPosition()) {
                     List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionAndDailyTimeBank.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
                     int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId), new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)), DateUtils.getLongFromLocalDate(filterDates.get(1))), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-                    int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getTotalTimeBankMin()).sum();
+                    int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getDeltaTimeBankMinutes()).sum();
                     int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
                     logger.info(staffKpiFilterDTO.getFirstName() + "  " + totalTimeBank);
                     totalTimeBankOfUnit += totalTimeBank;

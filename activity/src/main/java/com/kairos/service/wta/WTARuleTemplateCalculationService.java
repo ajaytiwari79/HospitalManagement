@@ -35,7 +35,6 @@ import static java.util.Comparator.comparing;
 @Service
 public class WTARuleTemplateCalculationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WTARuleTemplateCalculationService.class);
 
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;

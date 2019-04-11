@@ -37,6 +37,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
 /*
 * Created By Mohit Shakya
 *
@@ -64,35 +67,6 @@ public class PayOutService extends MongoBaseService {
     @Inject private UserIntegrationService userIntegrationService;
 
 
-    /**
-     *
-     * @param staffAdditionalInfoDTO
-     * @param shift
-     * @param activityWrapperMap
-     */
-    public void savePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger,ActivityWrapper> activityWrapperMap) {
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
-        List<PayOutPerShift> payOutPerShifts = new ArrayList<>();
-        while (startDate.isBefore(endDate)) {
-            DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
-            PayOutPerShift payOutPerShift = new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
-            PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(shift.getEmploymentId(),DateUtils.getDateByZoneDateTime(startDate));
-            if(lastPayOutPerShift !=null) {
-                payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMin());
-            }
-            payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift,staffAdditionalInfoDTO.getDayTypes());
-            if(payOutPerShift.getTotalPayOutMin()>0) {
-                payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(),(int) payOutPerShift.getTotalPayOutMin());
-                payOutPerShifts.add(payOutPerShift);
-            }
-            startDate = startDate.plusDays(1);
-        }
-        if (!payOutPerShifts.isEmpty()) {
-            save(payOutPerShifts);
-        }
-    }
-
 
     /**
      *
@@ -105,30 +79,17 @@ public class PayOutService extends MongoBaseService {
         if (activityWrapperMap==null) {
          activityWrapperMap=activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> new ActivityWrapper(v, "")));
         }
-
-        PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(employmentDetails.getId(),shifts.get(0).getStartDate());
         for (Shift shift : shifts) {
             ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
-            ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
-            while (startDate.isBefore(endDate)) {
-                DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
-                PayOutPerShift payOutPerShift = new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
-                if(lastPayOutPerShift !=null) {
-                    payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMin());
-                }
-                payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, employmentDetails, shift, activityWrapperMap, payOutPerShift,dayTypeDTOS);
-                if(payOutPerShift.getTotalPayOutMin()>0) {
-                    //Todo Pradeep should reafctor this method so that we can calculate accumulated payout
-                    //payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(),(int) payOutPerShift.getTotalPayOutMin());
-                    lastPayOutPerShift = payOutPerShift;
-                    payOutPerShifts.add(payOutPerShift);
-
-                }
-                startDate = startDate.plusDays(1);
-            }
+            ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
+            PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
+            DateTimeInterval interval = new DateTimeInterval(startDate,endDate);
+            payOutPerShift = isNullOrElse(payOutPerShift,new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId()));
+            payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, employmentDetails, shift, activityWrapperMap, payOutPerShift,dayTypeDTOS);
+            payOutPerShifts.add(payOutPerShift);
         }
         if (!payOutPerShifts.isEmpty()) {
-            save(payOutPerShifts);
+            payOutRepository.saveEntities(payOutPerShifts);
         }
     }
 
@@ -145,9 +106,9 @@ public class PayOutService extends MongoBaseService {
         PayOutPerShift payOutPerShift = new PayOutPerShift(payOutTransaction.getEmploymentId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
         PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(payOutTransaction.getEmploymentId(),DateUtils.asDate(payOutTransaction.getDate()));
         if(lastPayOutPerShift !=null) {
-            payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMin());
+            payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMinutes());
         }
-        payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(),(int) payOutPerShift.getTotalPayOutMin());
+        payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(),(int) payOutPerShift.getTotalPayOutMinutes());
         save(payOutPerShift);
         return true;
     }
@@ -178,28 +139,12 @@ public class PayOutService extends MongoBaseService {
      */
     public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
-        List<PayOutPerShift> payOutPerShifts = payOutRepository.findAllByShiftId(shift.getId());
-        while (startDate.isBefore(endDate)) {
-            DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
-            Optional<PayOutPerShift> payOutOptional = payOutPerShifts.stream().filter(p -> p.getDate().equals(interval.getStartLocalDate())).findFirst();
-            PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(shift.getEmploymentId(),DateUtils.getDateByZoneDateTime(startDate));
-            PayOutPerShift payOutPerShift = payOutOptional.isPresent() ? payOutOptional.get() : new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
-
-            if(lastPayOutPerShift !=null) {
-                payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMin());
-            }
-            payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift,staffAdditionalInfoDTO.getDayTypes());
-            if(payOutPerShift.getTotalPayOutMin()>0) {
-                payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(),(int) payOutPerShift.getTotalPayOutMin());
-                payOutPerShifts.add(payOutPerShift);
-            }
-            startDate = startDate.plusDays(1);
-        }
-        if (!payOutPerShifts.isEmpty()) {
-            save(payOutPerShifts);
-        }
-
+        ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
+        PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
+        DateTimeInterval interval = new DateTimeInterval(startDate,endDate);
+        payOutPerShift = isNullOrElse(payOutPerShift,new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId()));
+        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift,staffAdditionalInfoDTO.getDayTypes());
+        payOutRepository.save(payOutPerShift);
     }
 
     /**
@@ -207,12 +152,10 @@ public class PayOutService extends MongoBaseService {
      * @param shiftId
      */
     public void deletePayOut(BigInteger shiftId){
-        List<PayOutPerShift> payOutPerShifts = payOutRepository.findAllByShiftId(shiftId);
-        if(!payOutPerShifts.isEmpty()) {
-            payOutPerShifts.forEach(p -> {
-                p.setDeleted(true);
-            });
-            save(payOutPerShifts);
+        PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shiftId);
+        if(isNotNull(payOutPerShift)) {
+            payOutPerShift.setDeleted(true);
+            payOutRepository.save(payOutPerShift);
         }
     }
 
