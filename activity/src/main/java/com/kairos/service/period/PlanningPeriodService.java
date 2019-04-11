@@ -40,6 +40,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
+import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +97,7 @@ public class PlanningPeriodService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftStateService shiftStateService;
+    @Inject private TimeBankService timeBankService;
 
     // To get list of phases with duration in days
     public Map<Long, List<PhaseDTO>> getPhasesWithDurationInDays(List<Long> unitIds) {
@@ -528,7 +530,7 @@ public class PlanningPeriodService extends MongoBaseService {
         //TODO Work
         Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithShiftDateFunctionIdMap = getUnitPositionIdWithFunctionIdShiftDateMap(shifts, unitId);
         if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())){
-            publishShiftAfterPhaseFlipContructionToDraft(planningPeriod.getId(),unitId);
+            publishShiftAfterPhaseFlipConstructionToDraft(planningPeriod.getId(),unitId);
         }
         createShiftState(shifts, oldPlanningPeriodPhaseId, unitPositionWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
@@ -776,8 +778,11 @@ public class PlanningPeriodService extends MongoBaseService {
         return true;
     }
 
-    public void publishShiftAfterPhaseFlipContructionToDraft(BigInteger planningPeriodId,Long unitId){
+    // use for publish shift after flipping planning period CONSTRUCTION to DRAFT phase via manual or job
+    public void publishShiftAfterPhaseFlipConstructionToDraft(BigInteger planningPeriodId, Long unitId){
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
+        List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,ShiftStatus.PUBLISH);
+        timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         shiftMongoRepository.publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(planningPeriodId,unitId, ShiftStatus.PUBLISH);
         LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
     }

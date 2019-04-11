@@ -83,5 +83,7 @@ public interface CustomShiftMongoRepository {
 
     boolean publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus);
 
+    List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,ShiftStatus shiftStatus);
+
 
 }

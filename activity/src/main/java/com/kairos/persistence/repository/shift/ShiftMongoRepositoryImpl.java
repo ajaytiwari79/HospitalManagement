@@ -601,9 +601,17 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public boolean publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
         Query query = new Query(Criteria.where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
                         .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
-        Update update=new Update().push("activities.$[].status", "PUBLISH" );
+        Update update=new Update().push("activities.$[].status", ShiftStatus.PUBLISH );
         UpdateResult updateResult=mongoTemplate.updateMulti(query,update,Shift.class);
         return isNull(updateResult);
+    }
+
+    @Override
+    public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
+                .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
+        return mongoTemplate.find(query,Shift.class);
+
     }
 
     @Override
