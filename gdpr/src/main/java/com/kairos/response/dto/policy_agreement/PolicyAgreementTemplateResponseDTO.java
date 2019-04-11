@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,11 +24,11 @@ public class PolicyAgreementTemplateResponseDTO {
     private Long id;
     private String name;
     private String description;
-    private List<AccountTypeVO> accountTypes;
-    private List<OrganizationTypeDTO> organizationTypes;
-    private List<OrganizationSubTypeDTO> organizationSubTypes;
-    private List<ServiceCategoryDTO> organizationServices;
-    private List<SubServiceCategoryDTO> organizationSubServices;
+    private List<AccountTypeVO> accountTypes= new ArrayList<>();
+    private List<OrganizationTypeDTO> organizationTypes=new ArrayList<>();
+    private List<OrganizationSubTypeDTO> organizationSubTypes=new ArrayList<>();
+    private List<ServiceCategoryDTO> organizationServices=new ArrayList<>();
+    private List<SubServiceCategoryDTO> organizationSubServices=new ArrayList<>();
     private TemplateTypeResponseDTO templateType;
     private boolean generalAgreementTemplate;
 
