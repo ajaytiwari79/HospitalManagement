@@ -20,6 +20,13 @@ public class TimeBankCTADistribution {
     }
 
 
+    public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId,LocalDate ctaDate) {
+        this.ctaName = ctaName;
+        this.minutes = minutes;
+        this.ctaRuleTemplateId = ctaRuleTemplateId;
+        this.ctaDate = ctaDate;
+    }
+
 
 
 

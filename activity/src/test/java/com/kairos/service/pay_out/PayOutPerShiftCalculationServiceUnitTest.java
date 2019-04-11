@@ -58,8 +58,8 @@ public class PayOutPerShiftCalculationServiceUnitTest {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
         PayOutPerShift payOut = new PayOutPerShift(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
-        Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
-        Assert.assertEquals(payOut.getScheduledMin(),1020);
+        Assert.assertEquals(payOut.getTotalPayOutMinutes(),1130);
+        Assert.assertEquals(payOut.getScheduledMinutes(),1020);
         Assert.assertEquals(payOut.getContractualMin(),300);*/
     }
 

@@ -6,9 +6,6 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
@@ -22,11 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +29,7 @@ import java.util.List;
  * Created by oodles on 24/3/17.
  */
 @Service
-public class GoogleCalenderService {
+public class CountryCalenderService {
 
     @Inject
     private CountryHolidayCalenderGraphRepository countryHolidayGraphRepository;
@@ -42,7 +37,7 @@ public class GoogleCalenderService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(GoogleCalenderService.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(CountryCalenderService.class);
 
 
 
@@ -69,7 +64,7 @@ public class GoogleCalenderService {
 
 
         // Load client secrets.
-//        InputStream targetStream =GoogleCalenderService.class.getResourceAsStream("/client_secret.json");
+//        InputStream targetStream =CountryCalenderService.class.getResourceAsStream("/client_secret.json");
 //        if (targetStream==null){
 //            System.out.print("No Stream found");
 //        }
@@ -98,7 +93,7 @@ public class GoogleCalenderService {
 
         // load client secrets
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(AppConstants.JSON_FACTORY,
-                new InputStreamReader(GoogleCalenderService.class.getResourceAsStream("/client_secret.json")));
+                new InputStreamReader(CountryCalenderService.class.getResourceAsStream("/client_secret.json")));
         // set up authorization code flow
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 AppConstants.HTTP_TRANSPORT, AppConstants.JSON_FACTORY, clientSecrets,
