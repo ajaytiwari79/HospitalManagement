@@ -359,27 +359,8 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateStatusOfShiftOnUpdate(Shift shift, ShiftDTO shiftDTO) {
-        int i = 0;
-        for (ShiftActivity shiftActivity : shift.getActivities()) {
-            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
-            if (notValid) {
-                try {
-                    ShiftActivityDTO updateShiftActivity = shiftDTO.getActivities().get(i);
-                    if (updateShiftActivity == null || updateShiftActivity.getStartDate().equals(shift.getStartDate()) || updateShiftActivity.getEndDate().equals(shift.getEndDate())) {
-                        exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
-                }
 
-            }
-            i++;
-        }
-
-    }
-
-    public void validateStatusOfShiftOnDelete(Shift shift) {
+    public void validateStatusOfShiftActivity(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
             if (notValid) {
@@ -389,7 +370,7 @@ public class ShiftValidatorService {
 
     }
 
-    public static List<ShiftWithActivityDTO> filterShiftsByPlannedTypeAndTimeTypeIds(List<ShiftWithActivityDTO> shifts, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
+    public static List<ShiftWithActivityDTO> filterShiftsByPlannedTypeAndTimeTypeIds(List<ShiftWithActivityDTO> shifts, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         shifts.forEach(shift -> {
             boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
@@ -765,6 +746,10 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
+        if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
+            shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
+        else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
+            shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.WORKING_TYPE);
         if (!shiftExists) {

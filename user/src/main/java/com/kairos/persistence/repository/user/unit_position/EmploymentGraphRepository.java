@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.unit_position;
 
 
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.Employment;
@@ -301,13 +302,14 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)  where id(staff)={0}\n" +
             "MATCH(user)<-[:"+BELONGS_TO+"]-(staffList:Staff)\n" +
-            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{mainEmployment:TRUE}) WHERE id(employment)<> {3} AND  " +
+            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{mainEmployment:TRUE}) WHERE id(employment)<> {3} " +
+            "AND employment.employmentSubType ={4} AND  " +
             "(({2} IS NULL AND (employment.endDate IS NULL OR DATE(employment.endDate) >= DATE({1}))) \n" +
             "OR ({2} IS NOT NULL AND DATE(employment.startDate) <= DATE({2}) AND (employment.endDate IS NULL OR DATE(employment.endDate)>DATE({1}))) ) \n" +
             "WITH employment  \n" +
             "MATCH(employment)-[:"+IN_UNIT+"]-(org:Organization)\n" +
             "RETURN id(employment) as id,employment.startDate as startDate,employment.endDate as endDate,org.name as unitName \n ")
-    EmploymentQueryResult findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate, long id);
+    EmploymentQueryResult findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate, long id, EmploymentSubType employmentSubType);
 
 
 }

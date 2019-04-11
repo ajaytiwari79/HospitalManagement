@@ -163,6 +163,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     workTimeAgreementRuleTemplateBalancesDTO = getWtaForCareDayRuleTemplateBalance(wtaForCareDays, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
                     break;
+                default:
+                    workTimeAgreementRuleTemplateBalancesDTO = null;
+                    break;
             }
             if (isNotNull(workTimeAgreementRuleTemplateBalancesDTO)) {
                 workTimeAgreementRuleTemplateBalances.add(workTimeAgreementRuleTemplateBalancesDTO);

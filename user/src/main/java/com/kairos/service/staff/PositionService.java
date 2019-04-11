@@ -14,6 +14,7 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
@@ -671,7 +672,7 @@ public class PositionService {
 
 
     public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long unitPositionId) {
-        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), unitPositionId);
+        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), unitPositionId,employmentDTO.getEmploymentSubType());
         if (employmentQueryResult != null) {
             if (employmentQueryResult.getEndDate() == null) {
                 exceptionService.actionNotPermittedException("message.main_unit_position.exists", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());

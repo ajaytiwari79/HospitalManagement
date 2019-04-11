@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -47,7 +48,7 @@ public class Employment extends UserBaseEntity {
     private boolean published;
     @Relationship(type = HAS_EMPLOYMENT_LINES)
     private List<EmploymentLine> employmentLines;
-    private boolean mainEmployment;
+    private EmploymentSubType employmentSubType;
     private float taxDeductionPercentage;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
@@ -162,15 +163,9 @@ public class Employment extends UserBaseEntity {
         this.employmentLines = employmentLines;
     }
 
+    public EmploymentSubType getEmploymentSubType() { return employmentSubType; }
 
-
-    public boolean isMainEmployment() {
-        return mainEmployment;
-    }
-
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
-    }
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) { this.employmentSubType = employmentSubType; }
 
     public float getTaxDeductionPercentage() {
         return taxDeductionPercentage;
@@ -195,6 +190,8 @@ public class Employment extends UserBaseEntity {
     public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
+
+
 
     @Override
     public String toString() {

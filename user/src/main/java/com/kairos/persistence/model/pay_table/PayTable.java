@@ -84,7 +84,7 @@ public class PayTable extends UserBaseEntity {
     }
 
     public List<PayGrade> getPayGrades() {
-        return payGrades;
+        return payGrades=Optional.ofNullable(payGrades).orElse(new ArrayList<>());
     }
 
     public void setPayGrades(List<PayGrade> payGrades) {

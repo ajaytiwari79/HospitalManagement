@@ -10,6 +10,7 @@ import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.unit_position.EmploymentDTO;
 import com.kairos.dto.user.staff.unit_position.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
@@ -176,8 +177,8 @@ public class EmploymentService {
         Employment employment = new Employment(organization, employmentDTO.getStartDate(), employmentDTO.getTimeCareExternalId(), !saveAsDraft, employmentDTO.getTaxDeductionPercentage(), employmentDTO.getAccumulatedTimebankMinutes(), employmentDTO.getAccumulatedTimebankDate());
 
         preparePosition(employment, employmentDTO);
-        if ((employmentDTO.isMainEmployment()) && positionService.eligibleForMainEmployment(employmentDTO, -1)) {
-            employment.setMainEmployment(true);
+        if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, -1)) {
+            employment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
         employmentGraphRepository.save(employment);
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToEmployment(employment, employmentDTO);
@@ -414,8 +415,8 @@ public class EmploymentService {
         }
 
         EmploymentType employmentType = employmentTypeGraphRepository.findById(employmentDTO.getEmploymentTypeId(), 0).orElse(null);
-        if (employmentDTO.isMainEmployment() && positionService.eligibleForMainEmployment(employmentDTO, employmentId)) {
-            oldEmployment.setMainEmployment(true);
+        if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, employmentId)) {
+            oldEmployment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
 
         EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip = employmentGraphRepository.findEmploymentTypeByEmploymentId(currentEmploymentLine.getId());
@@ -744,7 +745,7 @@ public class EmploymentService {
 
         return new EmploymentQueryResult(employment.getExpertise().retrieveBasicDetails(), employment.getStartDate(),
                 employment.getEndDate(), employment.getId(), employment.getUnion(), employment.getLastWorkingDate()
-                , wtaResponseDTO, employment.getUnit().getId(), parentOrganizationId, employment.isPublished(), reasonCode, unitInfo, employment.isMainEmployment(),
+                , wtaResponseDTO, employment.getUnit().getId(), parentOrganizationId, employment.isPublished(), reasonCode, unitInfo, employment.getEmploymentSubType(),
                 Collections.singletonList(employmentLinesQueryResult), employmentDTO.getTaxDeductionPercentage(), employment.getAccumulatedTimebankMinutes(), employment.getAccumulatedTimebankDate());
 
     }

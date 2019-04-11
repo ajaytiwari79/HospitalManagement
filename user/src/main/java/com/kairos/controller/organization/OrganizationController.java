@@ -53,7 +53,6 @@ import static com.kairos.constants.ApiConstants.*;
 @Api(API_V1)
 public class OrganizationController {
     private final static Logger LOGGER = LoggerFactory.getLogger(OrganizationController.class);
-
     @Inject
     private OrganizationService organizationService;
     @Inject
