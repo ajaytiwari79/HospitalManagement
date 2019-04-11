@@ -22,6 +22,7 @@ import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelState;
@@ -147,22 +148,22 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
 
             // Set flipping dates
-            FlippingDateDTO flippingDateDTO = null;
+            FlippingDateDTO flippingDateDTO ;
             for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
                 int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
                 switch (phaseSequence) {
                     case 4: {
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateDTO, flippingDateTime);
+                        flippingDateDTO = setFlippingDateAndTime( flippingDateTime);
                         planningPeriod.setConstructionToDraftDate(flippingDateDTO);
                         break;
                     }
                     case 3: {
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateDTO, flippingDateTime);
+                        flippingDateDTO = setFlippingDateAndTime( flippingDateTime);
                         planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
                         break;
                     }
                     case 2: {
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateDTO, flippingDateTime);
+                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
                         planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
                         break;
                     }
@@ -172,8 +173,8 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriods;
     }
 
-    public FlippingDateDTO setFlippingDateAndTime(FlippingDateDTO flippingDateDTO, PeriodPhaseDTO flippingDateTime) {
-        return flippingDateDTO = (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent()) ? new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute(), flippingDateTime.getFlippingTime().getSecond()) : null;
+    public FlippingDateDTO setFlippingDateAndTime(PeriodPhaseDTO flippingDateTime) {
+        return (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent()) ? new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute(), flippingDateTime.getFlippingTime().getSecond()) : null;
     }
 
 
@@ -561,7 +562,8 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
     }
 
-    public boolean updateFlippingDate(BigInteger periodId, Long unitId, BigInteger schedulerPanelId) {
+    // flip phase of planning period via job
+    public void updateFlippingDate(BigInteger periodId, Long unitId, BigInteger schedulerPanelId) {
         List<Shift> shifts = new ArrayList<>();
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
         BigInteger oldPlanningPeriodPhaseId = planningPeriod.getCurrentPhaseId();
@@ -586,7 +588,6 @@ public class PlanningPeriodService extends MongoBaseService {
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
         createShiftState(shifts, oldPlanningPeriodPhaseId, unitPositionWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
-        return true;
     }
 
 
@@ -782,8 +783,15 @@ public class PlanningPeriodService extends MongoBaseService {
     public void publishShiftAfterPhaseFlipConstructionToDraft(BigInteger planningPeriodId, Long unitId){
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
         List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,ShiftStatus.PUBLISH);
+        for (Shift shift : shifts) {
+            for (ShiftActivity shiftActivity : shift.getActivities()) {
+                if(!shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))
+                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+            }
+        }
         timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
-        shiftMongoRepository.publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(planningPeriodId,unitId, ShiftStatus.PUBLISH);
+        save(shifts);
+   //     shiftMongoRepository.publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(planningPeriodId,unitId, ShiftStatus.PUBLISH);
         LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
     }
 }
