@@ -82,7 +82,7 @@ public class TimeBankCalculationService {
     @Inject
     private PayOutRepository payOutRepository;
 
-    public DailyTimeBankEntry getTimeBankByInterval(StaffUnitPositionDetails unitPosition, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS) {
+    public DailyTimeBankEntry getTimeBankByInterval(StaffUnitPositionDetails unitPosition, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS,boolean validatedByPlanner) {
         DailyTimeBankEntry dailyTimeBank = null;
         boolean anyShiftPublish = false;
         if(isCollectionNotEmpty(shifts)) {
@@ -110,12 +110,12 @@ public class TimeBankCalculationService {
                                     int ctaBonusMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
                                     ctaBonusAndScheduledMinutes = ctaBonusMinutes;
                                     shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaBonusMinutes);
-                                    shiftActivity.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(shiftInterval.getStartMillis()), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0)));
+                                    shiftActivity.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(shiftInterval.getStartMillis()), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0)+ctaBonusMinutes));
                                 }
                                 shiftActivity.setPlannedMinutesOfTimebank(ctaBonusAndScheduledMinutes);
                                 totalDailyPlannedMinutes += ctaBonusAndScheduledMinutes;
                                 ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusAndScheduledMinutes);
-                                if(shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
+                                if(shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || validatedByPlanner) {
                                     totalPublishedDailyPlannedMinutes += ctaBonusAndScheduledMinutes;
                                     anyShiftPublish = true;
                                 }

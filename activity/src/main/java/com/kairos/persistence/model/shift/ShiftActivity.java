@@ -1,11 +1,15 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
 import java.math.BigInteger;
 import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -36,11 +40,14 @@ public class ShiftActivity {
     private boolean breakShift;
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
+    private int payoutCtaBonusMinutes;
     private Long allowedBreakDurationInMinute;
     private int timeBankCtaBonusMinutes;
     private String startLocation; // this is for the location from where activity will gets starts
     private String endLocation;   // this is for the location from where activity will gets ends
     private int plannedMinutesOfTimebank;
+    private int plannedMinutesOfPayout;
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
@@ -303,5 +310,29 @@ public class ShiftActivity {
 
     public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
         this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    }
+
+    public List<PayOutPerShiftCTADistribution> getPayoutPerShiftCTADistributions() {
+        return payoutPerShiftCTADistributions;
+    }
+
+    public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
+        this.payoutPerShiftCTADistributions = isNullOrElse(payoutPerShiftCTADistributions,new ArrayList<>());
+    }
+
+    public int getPayoutCtaBonusMinutes() {
+        return payoutCtaBonusMinutes;
+    }
+
+    public void setPayoutCtaBonusMinutes(int payoutCtaBonusMinutes) {
+        this.payoutCtaBonusMinutes = payoutCtaBonusMinutes;
+    }
+
+    public int getPlannedMinutesOfPayout() {
+        return plannedMinutesOfPayout;
+    }
+
+    public void setPlannedMinutesOfPayout(int plannedMinutesOfPayout) {
+        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
     }
 }

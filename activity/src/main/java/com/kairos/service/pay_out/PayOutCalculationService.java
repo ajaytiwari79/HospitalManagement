@@ -73,33 +73,32 @@ public class PayOutCalculationService {
         for (CTARuleTemplateDTO ruleTemplate : unitPositionDetails.getCtaRuleTemplates()) {
             int ctaScheduledOrCompensationMinutes = 0;
             for (ShiftActivity shiftActivity : shift.getActivities()) {
+                shiftActivity.setPayoutPerShiftCTADistributions(new ArrayList<>());
                 DateTimeInterval shiftInterval = new DateTimeInterval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime());
-                if (interval.overlaps(shiftInterval)) {
-                    shiftInterval = interval.overlap(shiftInterval);
                     Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
                     ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, unitPositionDetails, shift.getPhaseId(), activity.getId(), activity.getBalanceSettingsActivityTab().getTimeTypeId(), new DateTimeInterval(shiftInterval.getStart(), shiftInterval.getEnd()), shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                     if (ruleTemplateValid) {
-                        if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
+                        if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                             scheduledMinutesOfPayout += shiftActivity.getScheduledMinutes();
                             ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
                         } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                             ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval);
                             ctaBonusMinutes += ctaScheduledOrCompensationMinutes;
-                        }
-                        shiftActivity.getTimeBankCTADistributions().add(new TimeBankCTADistribution(ruleTemplate.getName(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0), ruleTemplate.getId(), shiftInterval.getStartLocalDate()));
-                        shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
-                    }
-                }
-            }
+                            shiftActivity.getPayoutPerShiftCTADistributions().add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0)+ctaScheduledOrCompensationMinutes, ruleTemplate.getId()));
+                            shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
 
+                        }
+                        ctaPayoutMinMap.put(ruleTemplate.getId(), ctaScheduledOrCompensationMinutes);
+                    }
+            }
             if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {
                 int value = timeBankCalculationService.getFunctionalBonusCompensation(unitPositionDetails,ruleTemplate,interval);
                 ctaScheduledOrCompensationMinutes = value;
                 ctaBonusMinutes += value;
+                ctaPayoutMinMap.put(ruleTemplate.getId(), ctaScheduledOrCompensationMinutes);
             }
-            ctaPayoutMinMap.put(ruleTemplate.getId(), ctaScheduledOrCompensationMinutes);
         }
-        payOutPerShift.setCtaBonusMinutesOfPayOut(ctaPayoutMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
+        payOutPerShift.setCtaBonusMinutesOfPayOut(ctaBonusMinutes);
         payOutPerShift.setScheduledMinutes(scheduledMinutesOfPayout);
         payOutPerShift.setTotalPayOutMinutes(ctaBonusMinutes+scheduledMinutesOfPayout);
         payOutPerShift.setPayOutPerShiftCTADistributions(getCTADistribution(unitPositionDetails.getCtaRuleTemplates(), ctaPayoutMinMap));
@@ -134,7 +133,7 @@ public class PayOutCalculationService {
     private List<PayOutPerShiftCTADistribution> getCTADistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalculatedTimeBankDTOS, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         List<PayOutPerShiftCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalculatedTimeBankDTOS.size());
         for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalculatedTimeBankDTOS) {
-            if (!CalculationFor.SCHEDULED_HOURS.equals(ruleTemplate.getCalculationFor()) && PAID_OUT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {
+            if (PAID_OUT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {
                 timeBankCTADistributions.add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0), ruleTemplate.getId()));
             }
         }
@@ -247,12 +246,12 @@ public class PayOutCalculationService {
         return payOutIntervalDTOS;
     }
 
-    public PayOutCTADistributionDTO getDistributionOfPayout(Map<String, Integer> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, long plannedMinutesOfTimebank) {
+    public PayOutCTADistributionDTO getDistributionOfPayout(Map<String, Integer> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, long plannedMinutesOfPayOut) {
         List<CTADistributionDTO> timeBankCTADistributionDTOS = new ArrayList<>();
         List<CTADistributionDTO> scheduledCTADistributions = new ArrayList<>();
         long ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
-            if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
+            if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
                 if(ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS)) {
                     CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                     timeBankCTADistributionDTOS.add(ctaDistributionDTO);
@@ -262,7 +261,7 @@ public class PayOutCalculationService {
                 }
             }
         }
-        return new PayOutCTADistributionDTO(scheduledCTADistributions, new CTARuletemplateBonus(timeBankCTADistributionDTOS, ctaBonusMinutes),plannedMinutesOfTimebank);
+        return new PayOutCTADistributionDTO(scheduledCTADistributions, new CTARuletemplateBonus(timeBankCTADistributionDTOS, ctaBonusMinutes),plannedMinutesOfPayOut);
     }
 
     private String getTitle(String query, Interval interval) {
