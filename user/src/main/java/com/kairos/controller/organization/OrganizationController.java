@@ -156,7 +156,7 @@ public class OrganizationController {
     @PutMapping(UNIT_URL + "/skill")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganizationSkills(@PathVariable long unitId, @RequestBody Map<String, Object> data, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.addNewSkill(unitId, Long.valueOf(String.valueOf(data.get("id"))), (boolean) data.get("isSelected"), type, (String) data.get("visitourId")));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.addNewSkill(unitId, Long.valueOf(String.valueOf(data.get("id"))), (boolean) data.get("isSelected"), type));
     }
 
     @ApiOperation(value = "update skill(visitour, custom Name) for an organization")

@@ -443,7 +443,8 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if(currentUser.getLastSelectedOrganizationId()!=organizationId){
             currentUser.setLastSelectedOrganizationId(organizationId);
-            Long countryId = organizationGraphRepository.getCountryId(organizationId);
+            Organization parent = organizationService.fetchParentOrganization(organizationId);
+            Long countryId = organizationGraphRepository.getCountryId(parent.getId());
             currentUser.setCountryId(countryId);
             userGraphRepository.save(currentUser);
         }
