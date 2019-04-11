@@ -35,18 +35,18 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds);
 
-    CTAResponseDTO getCTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
+    CTAResponseDTO getCTAByEmploymentIdAndDate(Long unitPositionId, Date date);
 
-    List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
+    List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> unitPositionIds, Date date);
 
-    List<CTAResponseDTO> getCTAByUnitPositionIdsAndDate(List<Long> unitPositionIds, Date startDate,Date endDate);
+    List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
 
-    CostTimeAgreement getCTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
+    CostTimeAgreement getCTABasicByEmploymentAndDate(Long unitPositionId, Date date);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
-    void setEndDateToCTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
+    void setEndDateToCTAOfEmployment(Long unitPositionId, LocalDate endDate);
 
-    List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId, Date startDate, Date endDate);
+    List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long unitPositionId, Date startDate, Date endDate);
 
     boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long unitPositionId, Date startDate, Date endDate);
 }

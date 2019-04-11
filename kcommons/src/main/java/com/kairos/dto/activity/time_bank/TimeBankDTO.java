@@ -17,7 +17,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeBankDTO {
 
-    private Long unitPositionId;
+    private Long employmentId;
     private Long staffId;
     private int workingDaysInWeek;
     private int totalWeeklyMin;
@@ -52,9 +52,9 @@ public class TimeBankDTO {
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
     private float hourlyCost;
 
-    public TimeBankDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
+    public TimeBankDTO(Long employmentId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.workingDaysInWeek = workingDaysInWeek;
         this.totalWeeklyMin = totalWeeklyMins;
@@ -89,11 +89,11 @@ public class TimeBankDTO {
         this.phaseName = "Total";
     }
 
-    public TimeBankDTO(Date startDate, Date endDate, EmploymentWithCtaDetailsDTO costTimeAgreement, Long staffId, Long unitPositionId, int totalWeeklyMin, int workingDaysInWeek) {
+    public TimeBankDTO(Date startDate, Date endDate, EmploymentWithCtaDetailsDTO costTimeAgreement, Long staffId, Long employmentId, int totalWeeklyMin, int workingDaysInWeek) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.costTimeAgreement = costTimeAgreement;
         this.phaseName = "Total";
         this.totalWeeklyMin = totalWeeklyMin;
@@ -314,11 +314,11 @@ public class TimeBankDTO {
     }
 
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

@@ -14,7 +14,7 @@ public class StaffResultDTO {
     private String unitName;
     private String timeZone;
     private List<ReasonCodeDTO> reasonCodes;
-    private List<EmploymentDTO> unitPosition;
+    private List<EmploymentDTO> employment;
     private Set<BigInteger> allowedTimeTypesForSick;  // added by vipul for
     public Long getStaffId() {
         return staffId;
@@ -68,11 +68,11 @@ public class StaffResultDTO {
         this.allowedTimeTypesForSick = allowedTimeTypesForSick;
     }
 
-    public List<EmploymentDTO> getUnitPosition() {
-        return unitPosition;
+    public List<EmploymentDTO> getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(List<EmploymentDTO> unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(List<EmploymentDTO> employment) {
+        this.employment = employment;
     }
 }

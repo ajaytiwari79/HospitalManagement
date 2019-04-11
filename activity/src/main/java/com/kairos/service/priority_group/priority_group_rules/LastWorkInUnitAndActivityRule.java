@@ -13,11 +13,11 @@ import java.util.*;
 
 public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
 
-    private Map<Long,List<Shift>> shiftUnitPositionsMap;
+    private Map<Long,List<Shift>> shiftEmploymentsMap;
     private Map<BigInteger, OpenShift> openShiftMap;
 
-    public LastWorkInUnitAndActivityRule(Map<Long,List<Shift>> shiftUnitPositionsMap,Map<BigInteger, OpenShift> openShiftMap) {
-        this.shiftUnitPositionsMap = shiftUnitPositionsMap;
+    public LastWorkInUnitAndActivityRule(Map<Long,List<Shift>> shiftEmploymentsMap, Map<BigInteger, OpenShift> openShiftMap) {
+        this.shiftEmploymentsMap = shiftEmploymentsMap;
         this.openShiftMap = openShiftMap;
     }
     @Override
@@ -40,18 +40,18 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
                 activityDateTimeInterval = new DateTimeInterval(activityFilterStartDate.getTime(),filterEndDate.getTime());
                 activityId = openShiftMap.get(entry.getKey()).getActivityId();
             }
-            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
 
-            removeStaffFromList(staffUnitPositionIterator,unitDateTimeInterval,activityDateTimeInterval,activityId);
+            removeStaffFromList(staffEmploymentIterator,unitDateTimeInterval,activityDateTimeInterval,activityId);
         }
     }
 
-    private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator, DateTimeInterval unitDateTimeInterval, DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
-                while(staffUnitPositionIterator.hasNext()) {
+    private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffEmploymentIterator, DateTimeInterval unitDateTimeInterval, DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
+                while(staffEmploymentIterator.hasNext()) {
             int shiftCountUnit = 0;
             int shiftCountActivity = 0;
-            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
-            List<Shift> shifts = shiftUnitPositionsMap.get(staffEmploymentQueryResult.getUnitPositionId());
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
+            List<Shift> shifts = shiftEmploymentsMap.get(staffEmploymentQueryResult.getEmploymentId());
             if(Optional.ofNullable(shifts).isPresent()&&!shifts.isEmpty()) {
                 for (Shift shift : shifts) {
                     if (Optional.ofNullable(unitDateTimeInterval).isPresent()&&unitDateTimeInterval.overlaps(shift.getInterval())) {
@@ -69,7 +69,7 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
                     }
                 }
             if(Optional.ofNullable(unitDateTimeInterval).isPresent()&&shiftCountUnit==0||(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shiftCountActivity==0)){
-                staffUnitPositionIterator.remove();
+                staffEmploymentIterator.remove();
 
             }
                 }

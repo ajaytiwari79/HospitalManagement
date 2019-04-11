@@ -19,16 +19,16 @@ import java.util.List;
 public interface PayOutRepository extends MongoBaseRepository<PayOutPerShift,BigInteger>,CustomPayOutRepository {
 
     @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutPerShift> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<PayOutPerShift> findAllByEmploymentsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutPerShift> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
+    List<PayOutPerShift> findAllByEmploymentAndDate(Long unitPositionId, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1},deleted:false}")
     PayOutPerShift findOneByUnitPositionAndDate(Long unitPositionId, Date payOutDate);
 
     @Query("{unitPositionId:?0,date:{$lt:?1},deleted:false}")
-    List<PayOutPerShift> findAllByUnitPositionAndBeforeDate(Long unitPositionId, Date payOutDate);
+    List<PayOutPerShift> findAllByEmploymentAndBeforeDate(Long unitPositionId, Date payOutDate);
 
     @Query("{shiftId:?0,deleted:false}")
     List<PayOutPerShift> findAllByShiftId(BigInteger shiftId);

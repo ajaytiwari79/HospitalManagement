@@ -5,16 +5,13 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.template_types.DurationBetweenShiftsWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 
@@ -62,7 +59,7 @@ public class WTARuleTemplateCalculationService {
             Date endDate = getStartOfDay(plusDays(shifts.get(shifts.size() - 1).getEndDate(), 1));
             List<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toList());
             Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds).stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
-            List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDatesWithRuleTemplateType(shifts.get(0).getUnitPositionId(), startDate, endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
+            List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDatesWithRuleTemplateType(shifts.get(0).getEmploymentId(), startDate, endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
             Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap = getIntervalWTARuletemplateMap(workingTimeAgreements, asLocalDate(endDate).plusDays(1));
             Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);

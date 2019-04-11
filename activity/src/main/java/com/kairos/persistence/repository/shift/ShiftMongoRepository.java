@@ -49,7 +49,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findAllByIdInAndDeletedFalseOrderByStartDateAsc(List<BigInteger> shiftIds);
 
     @Query("{'unitPositionId':{'$in':?0},'deleted':false, 'disabled':false,'$or':[{'startDate':{$gte:?1,$lte:?2}},{'endDate':{$gte:?1,$lte:?2}}]}")
-    List<Shift> findShiftBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<Shift> findShiftBetweenDurationByEmploymentIds(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, startDate:{$gte:?1,$lte:?2}}")
     List<Shift> findAllShiftsByStaffIds(List<Long> staffIds, Date startDate, Date endDate);
@@ -69,7 +69,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
 
    @Query("{'deleted':false, 'unitId':?1, 'startDate':{$gte:?2}, 'unitPositionId':?0, '$or':[{disabled:true},{sickShift:true}] }")
-    List<Shift> findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId, LocalDate startDate);
+    List<Shift> findAllDisabledOrSickShiftsByEmploymentIdAndUnitId(Long unitPositionId, Long unitId, LocalDate startDate);
 
     @Query("{deleted:false, disabled:false, planningPeriodId:?0,unitId:?1}")
     List<Shift> findAllShiftsByPlanningPeriod(BigInteger planningPeriodId, Long unitId);
@@ -91,7 +91,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findAllByDeletedFalse();
 
     @Query("{deleted:false,unitPositionId:?0,disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
-    List<Shift> findAllOverlappedShiftsAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
+    List<Shift> findAllOverlappedShiftsAndEmploymentId(Long unitPositionId, Date startDate, Date endDate);
 
     @Query(value = "{disabled:false,deleted:false,planningPeriodId:{$exists:false},shiftType:?0}")
     List<Shift> findAllAbsenceShifts(String shiftType);

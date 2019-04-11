@@ -405,7 +405,7 @@ public class TimeBankCalculationService {
         Map<Interval, List<DailyTimeBankEntry>> weeklyIntervalTimeBankMap = getTimebankIntervalsMap(weeklyIntervals, dailyTimeBankEntries);
         Map<Interval, List<DailyTimeBankEntry>> monthlyIntervalTimeBankMap = getTimebankIntervalsMap(monthlyIntervals, dailyTimeBankEntries);
         TimeBankDTO timeBankDTO = new TimeBankDTO();
-        timeBankDTO.setUnitPositionId(unitEmployementPositionId);
+        timeBankDTO.setEmploymentId(unitEmployementPositionId);
         List<TimeBankIntervalDTO> weeklyTimeBankIntervals = getTimeBankByIntervals(unitId,weeklyIntervals, weeklyIntervalTimeBankMap, WEEKLY, employmentWithCtaDetailsDTO);
         timeBankDTO.setTotalTimeBankMin(weeklyTimeBankIntervals.stream().mapToLong(t -> t.getTotalTimeBankMin()).sum());
         timeBankDTO.setWeeklyIntervalsTimeBank(weeklyTimeBankIntervals);

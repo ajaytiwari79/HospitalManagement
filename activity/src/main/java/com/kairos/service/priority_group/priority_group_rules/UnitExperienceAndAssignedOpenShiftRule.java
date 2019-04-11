@@ -33,10 +33,10 @@ public class UnitExperienceAndAssignedOpenShiftRule implements PriorityGroupRule
         }
         Long startDate = DateUtils.getLongFromLocalDate(LocalDate.now().minusDays(experienceInDays));
         for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            entry.getValue().removeIf(staffUnitPosition-> (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()&&
-                    assignedOpenShiftMap.containsKey(staffUnitPosition.getUnitPositionId())
-                    &&(assignedOpenShiftMap.get(staffUnitPosition.getUnitPositionId())>thresholdShiftCount.get()))||
-                    (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()).isPresent()&&staffUnitPosition.getStartDate()>startDate));
+            entry.getValue().removeIf(staffEmployment-> (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()&&
+                    assignedOpenShiftMap.containsKey(staffEmployment.getEmploymentId())
+                    &&(assignedOpenShiftMap.get(staffEmployment.getEmploymentId())>thresholdShiftCount.get()))||
+                    (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()).isPresent()&&staffEmployment.getStartDate()>startDate));
         }
     }
 

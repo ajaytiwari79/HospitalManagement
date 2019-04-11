@@ -28,7 +28,7 @@ public class WTAVersionDTO {
     private Long parentUnitId;
     private Long unitId;
     private Map<String, Object> unitInfo;
-    private Long unitPositionId;
+    private Long employmentId;
 
     public WTAVersionDTO() {
         //dc
@@ -36,12 +36,12 @@ public class WTAVersionDTO {
 
 
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Boolean getDisabled() {

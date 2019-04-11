@@ -44,8 +44,8 @@ public class ShiftDTO {
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     private Long staffId;
     @Range(min = 0)
-    @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
-    private Long unitPositionId;
+    @NotNull(message = "error.ShiftDTO.employmentId.notnull")
+    private Long employmentId;
     @NotNull(message = "message.shift.shiftDate")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
@@ -88,18 +88,18 @@ public class ShiftDTO {
        this.staffId = staffId;
    }
 
-    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
+    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
     }
 
-    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,Date startDate,Date endDate) {
+    public ShiftDTO(List<ShiftActivityDTO> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId, Date startDate, Date endDate) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -329,12 +329,12 @@ public class ShiftDTO {
         this.unitId = unitId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getAllowedBreakDurationInMinute() {

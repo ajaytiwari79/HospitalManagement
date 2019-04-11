@@ -23,15 +23,15 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
-    public DailyTimeBankEntry findLastTimeBankByUnitPositionId(Long unitPositionId, Date date) {
-        Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("date").lt(date).and("deleted").is(false));
+    public DailyTimeBankEntry findLastTimeBankByEmploymentId(Long employmentId, Date date) {
+        Query query = new Query(Criteria.where("employmentId").is(employmentId).and("date").lt(date).and("deleted").is(false));
         query.with(Sort.by(Sort.Direction.ASC,"date"));
         return mongoTemplate.findOne(query,DailyTimeBankEntry.class);
     }
 
     @Override
-    public List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate){
-        Criteria criteria = Criteria.where("unitPositionId").is(unitPositionId).and("deleted").is(false).and("date").gte(startDate);
+    public List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentIdAndBetweenDates(Long employmentId, Date startDate, Date endDate){
+        Criteria criteria = Criteria.where("employmentId").is(employmentId).and("deleted").is(false).and("date").gte(startDate);
         if(endDate!=null){
             criteria.lte(endDate);
         }
@@ -40,8 +40,8 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
     }
 
     @Override
-    public List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdsAndBetweenDates(List<Long> unitPositionIds, Date startDate, Date endDate){
-        Criteria criteria = Criteria.where("unitPositionId").in(unitPositionIds).and("deleted").is(false).and("date").gte(startDate);
+    public List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentsAndBetweenDates(List<Long> employmentIds, Date startDate, Date endDate){
+        Criteria criteria = Criteria.where("employmentId").in(employmentIds).and("deleted").is(false).and("date").gte(startDate);
         if(endDate!=null){
             criteria.lte(endDate);
         }

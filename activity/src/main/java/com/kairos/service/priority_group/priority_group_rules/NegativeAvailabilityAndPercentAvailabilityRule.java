@@ -29,7 +29,7 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
     public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
         for (Map.Entry<BigInteger, List<StaffEmploymentQueryResult>> entry : openShiftStaffMap.entrySet()) {
-            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
             Date filterEndDate = DateUtils.getEndOfDay(openShiftMap.get(entry.getKey()).getStartDate());
             Date filterStartDate = DateUtils.getStartOfDay(openShiftMap.get(entry.getKey()).getStartDate());
             Date flterStartDatePerAvailability = openShiftMap.get(entry.getKey()).getStartDate();
@@ -37,33 +37,31 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(), filterEndDate.getTime());
             DateTimeInterval dateTimeIntervalPerAvailability = new DateTimeInterval(flterStartDatePerAvailability.getTime(), filterEndDatePerAvailability.getTime());
 
-            /* Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
-                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getEmploymentId));*/
 
-            Set<Long> unitPositionIds = new HashSet<Long>();
+            Set<Long> employmentIds = new HashSet<Long>();
             for (Shift shift : shifts) {
                 if (priorityGroupDTO.getStaffExcludeFilter().isNegativeAvailabilityInCalender() && dateTimeInterval.overlaps(shift.getInterval())
-                        && unavailableActivitySet.contains(shift.getActivities().get(0).getActivityId()) && !unitPositionIds.contains(shift.getUnitPositionId())) {
-                    unitPositionIds.add(shift.getUnitPositionId());
+                        && unavailableActivitySet.contains(shift.getActivities().get(0).getActivityId()) && !employmentIds.contains(shift.getEmploymentId())) {
+                    employmentIds.add(shift.getEmploymentId());
                 }
                 if (Optional.ofNullable(priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability()).isPresent() && dateTimeIntervalPerAvailability.
                         overlaps(shift.getInterval()) && ((((int)dateTimeIntervalPerAvailability.overlap(shift.getInterval()).getMinutes()) /
                         (dateTimeIntervalPerAvailability.getMinutes())) * 100) < priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability() &&
-                        !unitPositionIds.contains(shift.getUnitPositionId())) {
-                    unitPositionIds.add(shift.getUnitPositionId());
+                        !employmentIds.contains(shift.getEmploymentId())) {
+                    employmentIds.add(shift.getEmploymentId());
 
                 }
             }
-            removeStaffFromList(staffUnitPositionIterator, unitPositionIds);
+            removeStaffFromList(staffEmploymentIterator, employmentIds);
 
         }
     }
-    private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator, Set<Long> unitPositionIds) {
+    private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffEmploymentIterator, Set<Long> employmentIds) {
 
-        while(staffUnitPositionIterator.hasNext()) {
-            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
-            if(unitPositionIds.contains(staffEmploymentQueryResult.getUnitPositionId())) {
-                staffUnitPositionIterator.remove();
+        while(staffEmploymentIterator.hasNext()) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
+            if(employmentIds.contains(staffEmploymentQueryResult.getEmploymentId())) {
+                staffEmploymentIterator.remove();
             }
         }
     }

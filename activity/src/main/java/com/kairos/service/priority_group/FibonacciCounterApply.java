@@ -16,24 +16,24 @@ public class FibonacciCounterApply {
     }
 
 
-    public List<FibonacciCounter> calculateFibonacciCounter(List<StaffEmploymentQueryResult> staffsUnitPositions, Map<Long,Integer> assignedOpenShiftMap) {
+    public List<FibonacciCounter> calculateFibonacciCounter(List<StaffEmploymentQueryResult> staffsEmployments, Map<Long,Integer> assignedOpenShiftMap) {
 
         List<FibonacciCounter> fibonacciCounters = new ArrayList<FibonacciCounter>();
 
-        Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = staffsUnitPositions.iterator();
-        while(staffUnitPositionIterator.hasNext()) {
-            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
+        Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = staffsEmployments.iterator();
+        while(staffEmploymentIterator.hasNext()) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
             FibonacciCounter fibonacciCounter = new FibonacciCounter(staffEmploymentQueryResult.getStaffId(), staffEmploymentQueryResult.getAccumulatedTimeBank(),
-                    Optional.ofNullable(assignedOpenShiftMap.get(staffEmploymentQueryResult.getUnitPositionId())).isPresent()?
-                            assignedOpenShiftMap.get(staffEmploymentQueryResult.getUnitPositionId()):0);
+                    Optional.ofNullable(assignedOpenShiftMap.get(staffEmploymentQueryResult.getEmploymentId())).isPresent()?
+                            assignedOpenShiftMap.get(staffEmploymentQueryResult.getEmploymentId()):0);
             fibonacciCounters.add(fibonacciCounter);
         }
         return fibonacciCounters;
     }
 
-    public List<FibonacciCounter> findBestCandidates(ImpactWeight impactWeight, List<StaffEmploymentQueryResult> staffsUnitPositions, Map<Long,Integer> assignedOpenShiftMap) {
+    public List<FibonacciCounter> findBestCandidates(ImpactWeight impactWeight, List<StaffEmploymentQueryResult> staffsEmployments, Map<Long,Integer> assignedOpenShiftMap) {
 
-        List<FibonacciCounter> fibonacciCounters = calculateFibonacciCounter(staffsUnitPositions,assignedOpenShiftMap);
+        List<FibonacciCounter> fibonacciCounters = calculateFibonacciCounter(staffsEmployments,assignedOpenShiftMap);
         fibonacciCounters.sort((FibonacciCounter f1,FibonacciCounter f2)->f1.getTimeBank()-f2.getTimeBank());
 
                 int i = 0;

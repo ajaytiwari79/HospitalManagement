@@ -58,37 +58,36 @@ public class PriorityGroupRulesDataGetterService {
     public PriorityGroupRuleDataDTO getData(PriorityGroupDTO priorityGroupDTO) {
 
         List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(priorityGroupDTO.getUnitId(),priorityGroupDTO.getOrderId());
-        List<BigInteger> openShiftIds = openShifts.stream().map(OpenShift:: getId).collect(Collectors.toList());
         LocalDate maxDate = DateUtils.asLocalDate(openShifts.stream().map(OpenShift::getEndDate).max(Date::compareTo).get());
         LocalDate minDate = DateUtils.asLocalDate(openShifts.stream().map(OpenShift::getStartDate).min(Date::compareTo).get());
         Long maxDateLong = DateUtils.getLongFromLocalDate(maxDate);
 
-        List<StaffEmploymentQueryResult> staffsUnitPositions = getStaffListByStaffIncludefilter(priorityGroupDTO,maxDateLong);
-        List<Long> unitPositionIds = staffsUnitPositions.stream().map(s -> s.getUnitPositionId()).collect(Collectors.toList());
-        List<Long> staffIds = staffsUnitPositions.stream().map(s -> s.getStaffId()).collect(Collectors.toList());
+        List<StaffEmploymentQueryResult> staffsEmployments = getStaffListByStaffIncludefilter(priorityGroupDTO,maxDateLong);
+        List<Long> employmentIds = staffsEmployments.stream().map(s -> s.getEmploymentId()).collect(Collectors.toList());
+        List<Long> staffIds = staffsEmployments.stream().map(s -> s.getStaffId()).collect(Collectors.toList());
 
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdsAndBeforDate(unitPositionIds, DateUtils.getISOEndOfWeekDate(maxDate));
-        Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap= dailyTimeBankEntries.stream().collect(groupingBy(DailyTimeBankEntry::getEmploymentId));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, DateUtils.getISOEndOfWeekDate(maxDate));
+        Map<Long, List<DailyTimeBankEntry>> employmentDailyTimeBankEntryMap= dailyTimeBankEntries.stream().collect(groupingBy(DailyTimeBankEntry::getEmploymentId));
 
         Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap =  new HashMap<BigInteger, List<StaffEmploymentQueryResult>>();
         Map<BigInteger, OpenShift> openShiftMap = new HashMap<BigInteger, OpenShift>();
         for(OpenShift openShift:openShifts) {
 
-            List<StaffEmploymentQueryResult> staffEmploymentQueryResults = new ArrayList<>(staffsUnitPositions);
-            staffEmploymentQueryResults.stream().filter(staffUnitPositionQueryResult -> staffUnitPositionQueryResult.getStartDate()<openShift.getStartDate().getTime());
+            List<StaffEmploymentQueryResult> staffEmploymentQueryResults = new ArrayList<>(staffsEmployments);
+            staffEmploymentQueryResults.stream().filter(staffEmploymentQueryResult -> staffEmploymentQueryResult.getStartDate()<openShift.getStartDate().getTime());
             openShiftStaffMap.put(openShift.getId(), staffEmploymentQueryResults);
             openShiftMap.put(openShift.getId(),openShift);
         }
-        calculateTimeBankAndPlannedHours(priorityGroupDTO.getUnitId(),unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
-        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByEmploymentId(unitPositionIds, new Date() );
-        Map<Long,Integer> assignedOpenShiftMap = shiftCountDTOS.stream().collect(Collectors.toMap(ShiftCountDTO::getUnitPositionId,ShiftCountDTO::getCount));
-        List<Shift> shifts = getShifts(priorityGroupDTO,maxDate,minDate,unitPositionIds);
+        calculateTimeBankAndPlannedHours(priorityGroupDTO.getUnitId(),employmentDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
+        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByEmploymentId(employmentIds, new Date() );
+        Map<Long,Integer> assignedOpenShiftMap = shiftCountDTOS.stream().collect(Collectors.toMap(ShiftCountDTO::getEmploymentId,ShiftCountDTO::getCount));
+        List<Shift> shifts = getShifts(priorityGroupDTO,maxDate,minDate,employmentIds);
 
-        Map<Long, List<Shift>> unitPositionShifts = shifts.stream().collect(groupingBy(Shift::getUnitPositionId));
+        Map<Long, List<Shift>> employmentAndShiftsMap = shifts.stream().collect(groupingBy(Shift::getEmploymentId));
 
         List<OpenShiftNotification> openShiftNotifications = openShiftNotificationMongoRepository.findByOpenShiftIds(staffIds);
         Set<BigInteger> unavailableActivitySet = activityMongoRepository.findAllActivitiesByUnitIdAndUnavailableTimeType(priorityGroupDTO.getUnitId());
-        return new PriorityGroupRuleDataDTO(unitPositionShifts,openShiftMap,openShiftStaffMap,shifts,
+        return new PriorityGroupRuleDataDTO(employmentAndShiftsMap,openShiftMap,openShiftStaffMap,shifts,
                 openShiftNotifications,assignedOpenShiftMap,unavailableActivitySet);
     }
 
@@ -104,7 +103,7 @@ public class PriorityGroupRulesDataGetterService {
         return userIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
 
     }
-    public List<Shift> getShifts(PriorityGroupDTO priorityGroupDTO, LocalDate maxDate, LocalDate minDate,List<Long> commonUnitPositionIds) {
+    public List<Shift> getShifts(PriorityGroupDTO priorityGroupDTO, LocalDate maxDate, LocalDate minDate,List<Long> commonEmploymentIds) {
 
         LocalDate filterShiftStartLocalDate;
         Date filterShiftStartDate;
@@ -124,36 +123,35 @@ public class PriorityGroupRulesDataGetterService {
         }
         filterShiftStartDate = DateUtils.getDateFromLocalDate(filterShiftStartLocalDate);
         filterShiftEndDate = DateUtils.getDateFromLocalDate(maxDate.plusDays(1));
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPositions(commonUnitPositionIds, filterShiftStartDate, filterShiftEndDate);
+        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentIds(commonEmploymentIds, filterShiftStartDate, filterShiftEndDate);
 
         return shifts;
     }
 //flagged to be changed after accumulatedtimebank has been
-    public void calculateTimeBankAndPlannedHours(Long unitId, Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap, Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {
+    public void calculateTimeBankAndPlannedHours(Long unitId, Map<Long, List<DailyTimeBankEntry>> employmentDailyTimeBankEntryMap, Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {
 
-        //Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = staffsUnitPositions.iterator();
 
 
         for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
             int timeBank;
             int deltaTimeBank;
             int plannedHoursWeekly;
-            while(staffUnitPositionIterator.hasNext()) {
+            while(staffEmploymentIterator.hasNext()) {
 
-                StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
+                StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
                 LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
                 Long endDate = DateUtils.getLongFromLocalDate(openShiftDate);
                 Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftDate).getTime();
                 Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftDate);
                 //Todo Yatharth please check it and change for totalWeekly hour
-                EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(staffEmploymentQueryResult.getUnitPositionId(),
+                EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(staffEmploymentQueryResult.getEmploymentId(),
                         Optional.ofNullable(staffEmploymentQueryResult.getContractedMinByWeek()).isPresent()? staffEmploymentQueryResult.getContractedMinByWeek():0,
                         Optional.ofNullable(staffEmploymentQueryResult.getWorkingDaysPerWeek()).isPresent()? staffEmploymentQueryResult.getWorkingDaysPerWeek():0,
                         DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getEndDate()), staffEmploymentQueryResult.getTotalWeeklyHours());
                 LocalDate startDatePlanned = DateUtils.getDateFromEpoch(DateUtils.getISOStartOfWeek(openShiftDate));
                 LocalDate endDatePlanned = DateUtils.asLocalDate(DateUtils.getISOEndOfWeekDate(openShiftDate));
-                List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionDailyTimeBankEntryMap.get(staffEmploymentQueryResult.getUnitPositionId());
+                List<DailyTimeBankEntry> dailyTimeBankEntries = employmentDailyTimeBankEntryMap.get(staffEmploymentQueryResult.getEmploymentId());
 
                 dailyTimeBankEntries = Optional.ofNullable(dailyTimeBankEntries).orElse(new ArrayList<>());
 
@@ -166,7 +164,6 @@ public class PriorityGroupRulesDataGetterService {
                 planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,DateUtils.getDate(startDateDeltaWeek),DateUtils.getDate(endDateDeltaWeek));
                 deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals,new Interval(startDateDeltaWeek,endDateDeltaWeek),
                         employmentWithCtaDetailsDTO,false,dailyTimeBankEntries, false);
-
                 staffEmploymentQueryResult.setAccumulatedTimeBank(timeBank);
                 staffEmploymentQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);
                 staffEmploymentQueryResult.setPlannedHoursWeek(plannedHoursWeekly);

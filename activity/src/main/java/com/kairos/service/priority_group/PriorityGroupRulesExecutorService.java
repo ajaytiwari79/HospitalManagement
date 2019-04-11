@@ -30,7 +30,7 @@ public class PriorityGroupRulesExecutorService {
         }
         if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit()).isPresent()||
                 Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity()).isPresent()) {
-            PriorityGroupRuleFilter priorityGroupRuleFilter = new LastWorkInUnitAndActivityRule(priorityGroupRuleDataDTO.getShiftUnitPositionsMap(),
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new LastWorkInUnitAndActivityRule(priorityGroupRuleDataDTO.getShiftEmploymentsMap(),
                     priorityGroupRuleDataDTO.getOpenShiftMap());
 
             priorityGroupRules.add(priorityGroupRuleFilter);
@@ -79,18 +79,18 @@ public class PriorityGroupRulesExecutorService {
         priorityGroupRuleDataDTO.setOpenShiftStaffMap(openShiftStaffMap);
     }
 
-    public List<StaffEmploymentQueryResult> applyFibonacci(List<StaffEmploymentQueryResult> staffsUnitPositions, Map<Long,Integer> assignedOpenShiftMap, ImpactWeight impactWeight) {
+    public List<StaffEmploymentQueryResult> applyFibonacci(List<StaffEmploymentQueryResult> staffsEmployments, Map<Long,Integer> assignedOpenShiftMap, ImpactWeight impactWeight) {
 
         FibonacciCounterApply fibonacciCounterApply = new FibonacciCounterApply();
-        List<FibonacciCounter> fibonacciCounters = fibonacciCounterApply.findBestCandidates(impactWeight,staffsUnitPositions, assignedOpenShiftMap);
-        Map<Long,StaffEmploymentQueryResult> staffUnitPositionMap = staffsUnitPositions.stream().collect(Collectors.toMap(
-                StaffEmploymentQueryResult::getStaffId, staffUnitPositionQueryResult -> staffUnitPositionQueryResult));
-        staffsUnitPositions = new ArrayList<>();
+        List<FibonacciCounter> fibonacciCounters = fibonacciCounterApply.findBestCandidates(impactWeight,staffsEmployments, assignedOpenShiftMap);
+        Map<Long,StaffEmploymentQueryResult> staffEmploymentMap = staffsEmployments.stream().collect(Collectors.toMap(
+                StaffEmploymentQueryResult::getStaffId, staffEmploymentQueryResult -> staffEmploymentQueryResult));
+        staffsEmployments = new ArrayList<>();
         for(FibonacciCounter fibonacciCounter:fibonacciCounters) {
-            staffsUnitPositions.add(staffUnitPositionMap.get(fibonacciCounter.getStaffId()));
+            staffsEmployments.add(staffEmploymentMap.get(fibonacciCounter.getStaffId()));
         }
 
-        return staffsUnitPositions;
+        return staffsEmployments;
     }
 
 

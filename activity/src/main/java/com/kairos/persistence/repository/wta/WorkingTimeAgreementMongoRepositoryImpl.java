@@ -56,7 +56,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public WTAQueryResultDTO getWTAByUnitPositionIdAndDate(Long unitPositionId, Date date) {
+    public WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long unitPositionId, Date date) {
         Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date), Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
@@ -222,7 +222,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
 
     @Override
-    public List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds, Date date) {
+    public List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> unitPositionIds, Date date) {
         Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date), Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
@@ -234,7 +234,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId, Date date) {
+    public WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long unitPositionId, Date date) {
         Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date), Criteria.where("endDate").exists(false).and("startDate").lte(date));
         WorkingTimeAgreement result = mongoTemplate.findOne(new Query(criteria), WorkingTimeAgreement.class);
         return result;
@@ -247,13 +247,13 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public void setEndDateToWTAOfUnitPosition(Long unitPositionId, LocalDate endDate){
+    public void setEndDateToWTAOfEmployment(Long unitPositionId, LocalDate endDate){
         Update update = Update.update("endDate", DateUtils.asDate(endDate));
         mongoTemplate.findAndModify(new Query(Criteria.where("unitPositionId").is(unitPositionId).and("endDate").exists(false)),update,WorkingTimeAgreement.class);
     }
 
     @Override
-    public List<WTAQueryResultDTO> getWTAByUnitPositionIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate) {
+    public List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
@@ -274,7 +274,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId, Date startDate, Date endDate){
+    public boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long unitPositionId, Date startDate, Date endDate){
         Criteria endDateCriteria = Criteria.where("endDate").exists(false).and("startDate").lte(startDate);
         Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(wtaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);

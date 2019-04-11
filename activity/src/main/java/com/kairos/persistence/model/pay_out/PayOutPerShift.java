@@ -13,7 +13,7 @@ import java.util.List;
 * */
 public class PayOutPerShift extends MongoBaseEntity{
 
-    private Long unitPositionId;
+    private Long employmentId;
     private Long staffId;
     private BigInteger shiftId;
     private Long unitId;
@@ -29,9 +29,9 @@ public class PayOutPerShift extends MongoBaseEntity{
     private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions;
 
 
-    public PayOutPerShift(BigInteger shiftId, Long unitPositionId, Long staffId, LocalDate date, Long unitId) {
+    public PayOutPerShift(BigInteger shiftId, Long employmentId, Long staffId, LocalDate date, Long unitId) {
         this.shiftId = shiftId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.date = date;
         this.unitId = unitId;
@@ -84,8 +84,8 @@ public class PayOutPerShift extends MongoBaseEntity{
     public PayOutPerShift() {
     }
 
-    public PayOutPerShift(Long unitPositionId, Long staffId, long totalPayOutMin, LocalDate date) {
-        this.unitPositionId = unitPositionId;
+    public PayOutPerShift(Long employmentId, Long staffId, long totalPayOutMin, LocalDate date) {
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.totalPayOutMin = totalPayOutMin;
         this.date = date;
@@ -123,12 +123,12 @@ public class PayOutPerShift extends MongoBaseEntity{
         this.payOutMinWithCta = payOutMinWithCta;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getStaffId() {

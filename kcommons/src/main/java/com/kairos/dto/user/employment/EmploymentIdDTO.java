@@ -2,34 +2,34 @@ package com.kairos.dto.user.employment;
 
 public class EmploymentIdDTO {
 
-    private Long oldUnitPositionID;
-    private Long newUnitPositionID;
+    private Long oldEmploymentId;
+    private Long newEmploymentId;
     private Long employmentLineId;
 
     public EmploymentIdDTO() {
 
     }
 
-    public EmploymentIdDTO(Long oldUnitPositionID, Long newUnitPositionID, Long employmentLineId) {
-        this.oldUnitPositionID = oldUnitPositionID;
-        this.newUnitPositionID = newUnitPositionID;
+    public EmploymentIdDTO(Long oldEmploymentId, Long newEmploymentId, Long employmentLineId) {
+        this.oldEmploymentId = oldEmploymentId;
+        this.newEmploymentId = newEmploymentId;
         this.employmentLineId = employmentLineId;
     }
 
-    public Long getOldUnitPositionID() {
-        return oldUnitPositionID;
+    public Long getOldEmploymentId() {
+        return oldEmploymentId;
     }
 
-    public void setOldUnitPositionID(Long oldUnitPositionID) {
-        this.oldUnitPositionID = oldUnitPositionID;
+    public void setOldEmploymentId(Long oldEmploymentId) {
+        this.oldEmploymentId = oldEmploymentId;
     }
 
-    public Long getNewUnitPositionID() {
-        return newUnitPositionID;
+    public Long getNewEmploymentId() {
+        return newEmploymentId;
     }
 
-    public void setNewUnitPositionID(Long newUnitPositionID) {
-        this.newUnitPositionID = newUnitPositionID;
+    public void setNewEmploymentId(Long newEmploymentId) {
+        this.newEmploymentId = newEmploymentId;
     }
 
     public Long getEmploymentLineId() {

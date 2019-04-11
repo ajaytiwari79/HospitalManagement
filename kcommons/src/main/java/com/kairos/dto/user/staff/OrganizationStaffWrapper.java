@@ -8,7 +8,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 public class OrganizationStaffWrapper {
     private OrganizationDTO organization;
     private StaffDTO staff;
-    private EmploymentDTO unitPosition;
+    private EmploymentDTO employment;
     public OrganizationStaffWrapper() {
     }
 
@@ -28,11 +28,11 @@ public class OrganizationStaffWrapper {
         this.staff = staff;
     }
 
-    public EmploymentDTO getUnitPosition() {
-        return unitPosition;
+    public EmploymentDTO getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(EmploymentDTO unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(EmploymentDTO employment) {
+        this.employment = employment;
     }
 }

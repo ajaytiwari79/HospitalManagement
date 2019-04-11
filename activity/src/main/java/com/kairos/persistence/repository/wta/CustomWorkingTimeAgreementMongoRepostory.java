@@ -48,20 +48,20 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> unitPositionIds);
 
-    WTAQueryResultDTO getWTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
+    WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long unitPositionId, Date date);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
+    List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> unitPositionIds, Date date);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate);
 
-    WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
+    WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long unitPositionId, Date date);
 
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
-    void setEndDateToWTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
+    void setEndDateToWTAOfEmployment(Long unitPositionId, LocalDate endDate);
 
     boolean wtaExistsByUnitPositionIdAndDates(Long unitPositionId,Date startDate,Date endDate);
-    boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId,Date startDate,Date endDate);
+    boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long unitPositionId, Date startDate, Date endDate);
 
     List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate);
 

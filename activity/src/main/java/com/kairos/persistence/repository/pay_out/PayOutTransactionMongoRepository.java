@@ -19,7 +19,7 @@ public interface PayOutTransactionMongoRepository extends MongoBaseRepository<Pa
     List<PayOutTransaction> findAllByUnitPositionIdsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutTransaction> findAllByUnitPositionIdAndDate(Long unitPositionId, Date startDate, Date endDate);
+    List<PayOutTransaction> findAllByEmploymentIdAndDate(Long unitPositionId, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1},deleted:false}")
     PayOutTransaction findOneByUnitPositionAndDate(Long unitPositionId, Date payOutDate);

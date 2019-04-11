@@ -42,7 +42,7 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         DateTimeInterval dateTimeIntervalBeforeStart = null;
         DateTimeInterval dateTimeIntervalAfterEnd = null;
         for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
 
             if(restingBeforeStart) {
                 LocalTime openShiftStartTime = DateUtils.asLocalTime(openShiftMap.get(entry.getKey()).getStartDate());
@@ -58,32 +58,28 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
                Date filterStartDateAfterEnd = openShiftMap.get(entry.getKey()).getEndDate();
                dateTimeIntervalAfterEnd = new DateTimeInterval(filterStartDateAfterEnd.getTime(),filterEndDateAfterEnd.getTime());
            }
-
-            /*DateTimeInterval dateTimeIntervalBeforeStart = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
-            DateTimeInterval dateTimeIntervalAfterEnd = new DateTimeInterval(filterStartDateAfterEnd.getTime(),filterEndDateAfterEnd.getTime());*/
-
-            removeStaffFromListByRestingHours(staffUnitPositionIterator,dateTimeIntervalBeforeStart,dateTimeIntervalAfterEnd,both,restingBeforeStart,restingAfterEnd);
+            removeStaffFromListByRestingHours(staffEmploymentIterator,dateTimeIntervalBeforeStart,dateTimeIntervalAfterEnd,both,restingBeforeStart,restingAfterEnd);
         }
     }
 
 
-    private void removeStaffFromListByRestingHours(Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator, DateTimeInterval dateTimeIntervalBeforeStart,
+    private void removeStaffFromListByRestingHours(Iterator<StaffEmploymentQueryResult> staffEmploymentIterator, DateTimeInterval dateTimeIntervalBeforeStart,
                                                    DateTimeInterval dateTimeIntervalAfterEnd, boolean both, boolean restingBeforeStart, boolean restingAfterEnd) {
 
-        Set<Long> unitPositionIds = new HashSet<Long>();
+        Set<Long> employmentIds = new HashSet<>();
         for(Shift shift:shifts) {
             if((both&&dateTimeIntervalBeforeStart.overlaps(shift.getInterval())||dateTimeIntervalAfterEnd.overlaps(shift.getInterval()))||
                     (restingBeforeStart&&dateTimeIntervalBeforeStart.overlaps(shift.getInterval()))||
                     (restingAfterEnd&&dateTimeIntervalAfterEnd.overlaps(shift.getInterval()))) {
-                if(!unitPositionIds.contains(shift.getUnitPositionId())) {
-                    unitPositionIds.add(shift.getUnitPositionId());
+                if(!employmentIds.contains(shift.getEmploymentId())) {
+                    employmentIds.add(shift.getEmploymentId());
                 }
             }
         }
-        while(staffUnitPositionIterator.hasNext()) {
-            StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
-            if(unitPositionIds.contains(staffEmploymentQueryResult.getUnitPositionId())) {
-                staffUnitPositionIterator.remove();
+        while(staffEmploymentIterator.hasNext()) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
+            if(employmentIds.contains(staffEmploymentQueryResult.getEmploymentId())) {
+                staffEmploymentIterator.remove();
             }
         }
     }

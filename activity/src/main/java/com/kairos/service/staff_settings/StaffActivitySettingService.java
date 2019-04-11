@@ -181,7 +181,7 @@ public class StaffActivitySettingService extends MongoBaseService {
        });
 
        activitySettingDTOMap.forEach((activityId,activitySetting)->{
-           StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getUnitPositionId(),
+           StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getEmploymentId(),
                    unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
                    activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes());

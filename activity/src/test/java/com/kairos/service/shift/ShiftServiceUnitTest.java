@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -179,7 +178,7 @@ public class ShiftServiceUnitTest {
         shiftDTO.setProbability(0);
         shiftDTO.setUnitId(958l);
         shiftDTO.setStaffId(834l);
-        shiftDTO.setUnitPositionId(1136l);
+        shiftDTO.setEmploymentId(1136l);
         shiftDTO.setActivities(Arrays.asList(activity1));
         shiftDTO.setScheduledMinutes(360);
         shiftDTO.setDurationMinutes(360);

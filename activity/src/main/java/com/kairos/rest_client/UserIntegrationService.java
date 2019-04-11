@@ -77,7 +77,7 @@ public class UserIntegrationService {
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
 
-    public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId) {
+    public Long getEmploymentId(Long unitId, Long staffId, Long expertiseId) {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, staffId, expertiseId);
         if (value == null) {
@@ -96,7 +96,7 @@ public class UserIntegrationService {
         });
     }
 
-    public StaffEmploymentUnitDataWrapper getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
+    public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, List<Long> staffIds, Long expertiseId) {
         return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
         }, expertiseId);
     }
@@ -106,7 +106,7 @@ public class UserIntegrationService {
         });
     }
 
-    public List<StaffEmploymentDetails> getStaffIdAndUnitPositionId(Long unitId, List<Long> staffIds, Long expertiseId) {
+    public List<StaffEmploymentDetails> getStaffIdAndEmployment(Long unitId, List<Long> staffIds, Long expertiseId) {
 
         return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentDetails>>>() {
         }, expertiseId);
@@ -181,21 +181,21 @@ public class UserIntegrationService {
 
     }
 
-    public Long removeFunctionFromUnitPositionByDate(Long unitId, Long unitPositionId, Date shiftDate) {
+    public Long removeFunctionFromEmploymentByDate(Long unitId, Long unitPositionId, Date shiftDate) {
         BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", DateUtils.asLocalDate(shiftDate).toString());
         Long functionId = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, UNIT_POSITION_UNIT_POSITION_ID_REMOVE_FUNCTION_ON_DELETE_SHIFT, Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, unitPositionId);
         return functionId;
     }
 
-    public Boolean restoreFunctionFromUnitPositionByDate(Long unitId, Long unitPositionId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
+    public Boolean restoreFunctionFromEmploymentByDate(Long unitId, Long unitPositionId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
 
         return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, unitPositionId);
 
     }
 
-    public Map<LocalDate, Long> removeFunctionFromUnitPositionByDates(Long unitId, Long unitPositionId, Set<LocalDate> dates) {
+    public Map<LocalDate, Long> removeFunctionFromEmploymentByDates(Long unitId, Long unitPositionId, Set<LocalDate> dates) {
         return genericRestClient.publishRequest(dates, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
         }, unitPositionId);
     }
@@ -343,7 +343,7 @@ public class UserIntegrationService {
     }
 
     //Previously this API didn't match with any API on user micro-service (corrected)
-    public Map<Long, Long> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
+    public Map<Long, Long> getEmploymentExpertiseMap(Long organizationId, Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, UNIT_POSITION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, Long>>>() {
         });
     }
@@ -395,12 +395,12 @@ public class UserIntegrationService {
         }, staffId, unitEmploymentId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(Long staffId, Long unitPositionId) {
+    public StaffAdditionalInfoDTO verifyEmploymentAndFindFunctionsAfterDate(Long staffId, Long unitPositionId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitPositionId);
     }
 
-    public Map<LocalDate,List<FunctionDTO>> getFunctionsByUnitPosition(Long unitPositionId,LocalDate startDate,LocalDate endDate) {
+    public Map<LocalDate,List<FunctionDTO>> getFunctionsOfEmployment(Long unitPositionId, LocalDate startDate, LocalDate endDate) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
         queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
@@ -707,12 +707,12 @@ public class UserIntegrationService {
     }
 
 
-    public Map<Long,Map<Long,Set<LocalDate>>> getUnitPositionIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
+    public Map<Long,Map<Long,Set<LocalDate>>> getEmploymentIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
         return genericRestClient.publishRequest(unitPositionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Map<Long,Set<LocalDate>>>>>() {
         });
     }
 
-    public void restoreFunctionsWithDatesByUnitPositionIds(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap, Long unitId) {
+    public void restoreFunctionsWithDatesByEmploymentIds(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap, Long unitId) {
         Boolean AreFunctionsRestored = genericRestClient.publishRequest(unitPositionIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }

@@ -184,7 +184,7 @@ public class ShiftStateService {
             exceptionService.dataNotFoundByIdException("message.shift.ids");
         }
         List<Long> staffIds = shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
-        List<Long> unitPositionIds = shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
+        List<Long> unitPositionIds = shifts.stream().map(shift -> shift.getEmploymentId()).collect(Collectors.toList());
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
         requestParam.add(new BasicNameValuePair("unitPositionIds", unitPositionIds.toString()));
@@ -200,7 +200,7 @@ public class ShiftStateService {
         Date shiftEndDate = shiftsList.get(shiftsList.size() - 1).getEndDate();
         startDate = startDate.before(shiftStartDate) ? startDate : shiftStartDate;
         endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate, endDate);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(unitPositionIds, startDate, endDate);
         Map<Long, List<CTAResponseDTO>> unitPositionAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
             if (unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId()) != null) {

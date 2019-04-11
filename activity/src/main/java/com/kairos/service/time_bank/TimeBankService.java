@@ -135,12 +135,12 @@ public class TimeBankService extends MongoBaseService {
         Date startDateTime = new DateTime(startDate).withTimeAtStartOfDay().toDate();
         Date endDateTime = new DateTime(endDate).plusDays(1).withTimeAtStartOfDay().toDate();
         Date shiftEndTime = new DateTime(shifts.get(shifts.size() - 1).getEndDate()).plusDays(1).withTimeAtStartOfDay().toDate();
-        List<Long> unitPositionIds = new ArrayList<>(staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmployment().getId()).collect(Collectors.toSet()));
-        timeBankRepository.deleteDailyTimeBank(unitPositionIds, startDateTime, endDateTime);
-        List<ShiftWithActivityDTO> shiftsList = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(unitPositionIds, startDateTime, endDateTime);
-        Map<String, List<ShiftWithActivityDTO>> shiftDateMap = shiftsList.stream().collect(Collectors.groupingBy(k -> k.getUnitPositionId() + "-" + DateUtils.asLocalDate(k.getStartDate())));
+        List<Long> employmentIds = new ArrayList<>(staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmployment().getId()).collect(Collectors.toSet()));
+        timeBankRepository.deleteDailyTimeBank(employmentIds, startDateTime, endDateTime);
+        List<ShiftWithActivityDTO> shiftsList = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, startDateTime, endDateTime);
+        Map<String, List<ShiftWithActivityDTO>> shiftDateMap = shiftsList.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId() + "-" + DateUtils.asLocalDate(k.getStartDate())));
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>();
-        List<PayOutPerShift> payOutPerShiftList = payOutRepository.findAllByUnitPositionsAndDate(unitPositionIds, startDateTime, endDateTime);
+        List<PayOutPerShift> payOutPerShiftList = payOutRepository.findAllByEmploymentsAndDate(employmentIds, startDateTime, endDateTime);
         Map<BigInteger, PayOutPerShift> shiftAndPayOutMap = payOutPerShiftList.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
         List<PayOutPerShift> payOutPerShifts = new ArrayList<>();
         Set<DateTimeInterval> dateTimeIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shifts.get(0).getUnitId(), startDateTime, endDateTime);
@@ -156,7 +156,7 @@ public class TimeBankService extends MongoBaseService {
                 DateTimeInterval dateTimeInterval = new DateTimeInterval(startDateTime.getTime(), plusDays(startDateTime,1).getTime());
                 List<Shift> shiftList = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftWithActivityDTOS, Shift.class);
                 for (Shift shift : shiftList) {
-                    PayOutPerShift payOutPerShift = shiftAndPayOutMap.getOrDefault(shift.getId(), new PayOutPerShift(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), dateTimeInterval.getStartLocalDate(), shift.getUnitId()));
+                    PayOutPerShift payOutPerShift = shiftAndPayOutMap.getOrDefault(shift.getId(), new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), dateTimeInterval.getStartLocalDate(), shift.getUnitId()));
                     payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(dateTimeInterval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift,staffAdditionalInfoDTO.getDayTypes());
                     if (payOutPerShift.getTotalPayOutMin() > 0) {
                         payOutPerShifts.add(payOutPerShift);
@@ -186,8 +186,8 @@ public class TimeBankService extends MongoBaseService {
     private List<DailyTimeBankEntry> renewDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = new DateTime(shift.getEndDate()).plusDays(1).withTimeAtStartOfDay();
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(), endDate.toDate());
-        Map<String,DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getEmploymentId()+"-"+k.getDate(), v->v));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByEmploymentIdAndBetweenDates(staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(), endDate.toDate());
+        Map<String,DailyTimeBankEntry> dailyTimeBankEntryAndEmploymentMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getEmploymentId()+"-"+k.getDate(), v->v));
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>();
         Set<DateTimeInterval> dateTimeIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shift.getUnitId(),startDate.toDate(),endDate.toDate());
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(),endDate.toDate());
@@ -195,7 +195,7 @@ public class TimeBankService extends MongoBaseService {
             Interval interval = new Interval(startDate, startDate.plusDays(1).withTimeAtStartOfDay());
             List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
             staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
-            DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getEmployment(), interval, shiftWithActivityDTOList,dailyTimeBankEntryAndUnitPositionMap,dateTimeIntervals,staffAdditionalInfoDTO.getDayTypes());
+            DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getEmployment(), interval, shiftWithActivityDTOList,dailyTimeBankEntryAndEmploymentMap,dateTimeIntervals,staffAdditionalInfoDTO.getDayTypes());
             if (dailyTimeBank != null) {
                 dailyTimeBanks.add(dailyTimeBank);
             }
@@ -210,8 +210,8 @@ public class TimeBankService extends MongoBaseService {
     private List<DailyTimeBankEntry> renewDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Date startDateTime, @Nullable Date endDateTime, Long unitId) {
         Date startDate = getStartOfDay(startDateTime);
         Date endDate = isNotNull(endDateTime) ? getEndOfDay(endDateTime) : null;
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
-        Map<String,DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getEmploymentId()+"-"+k.getDate(), v->v));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByEmploymentIdAndBetweenDates(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
+        Map<String,DailyTimeBankEntry> dailyTimeBankEntryAndEmploymentMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getEmploymentId()+"-"+k.getDate(), v->v));
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>();
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(staffAdditionalInfoDTO.getEmployment().getId(), startDate,endDate);
         if(isCollectionNotEmpty(shiftWithActivityDTOS)){
@@ -219,12 +219,12 @@ public class TimeBankService extends MongoBaseService {
                 endDate = getEndOfDay(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getEndDate());
             }
             Set<DateTimeInterval> dateTimeIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,startDate,endDate);
-            List<Shift> shifts = shiftMongoRepository.findAllOverlappedShiftsAndUnitPositionId(staffAdditionalInfoDTO.getEmployment().getId(), startDate,endDate);
+            List<Shift> shifts = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), startDate,endDate);
             while (startDate.before(endDate)) {
                 Interval interval = new Interval(startDate.getTime(), plusDays(startDate,1).getTime());
                 List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
                 staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
-                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getEmployment(), interval, shiftWithActivityDTOList,dailyTimeBankEntryAndUnitPositionMap,dateTimeIntervals,staffAdditionalInfoDTO.getDayTypes());
+                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getEmployment(), interval, shiftWithActivityDTOList,dailyTimeBankEntryAndEmploymentMap,dateTimeIntervals,staffAdditionalInfoDTO.getDayTypes());
                 if (dailyTimeBank != null) {
                     dailyTimeBanks.add(dailyTimeBank);
                 }
@@ -239,15 +239,15 @@ public class TimeBankService extends MongoBaseService {
 
 
     /**
-     * @param unitPositionId
+     * @param employmentId
      * @return EmploymentWithCtaDetailsDTO
      */
-    public EmploymentWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId, Date startDate, Date endDate) {
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(unitPositionId);
+    public EmploymentWithCtaDetailsDTO getCostTimeAgreement(Long employmentId, Date startDate, Date endDate) {
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(employmentId);
         if (!Optional.ofNullable(employmentWithCtaDetailsDTO).isPresent()) {
-            exceptionService.dataNotFoundException("message.staffUnitPosition.notFound");
+            exceptionService.dataNotFoundException("message.staffEmployment.notFound");
         }
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdBetweenDate(unitPositionId, startDate, endDate);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdBetweenDate(employmentId, startDate, endDate);
         List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(toList());
         ruleTemplates = ruleTemplates.stream().filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
         employmentWithCtaDetailsDTO.setCtaRuleTemplates(ruleTemplates);
@@ -256,23 +256,23 @@ public class TimeBankService extends MongoBaseService {
 
     /**
      * @param unitId
-     * @param unitPositionId
+     * @param employmentId
      * @param query
      * @param startDate
      * @param endDate
      * @return TimeBankAndPayoutDTO
      */
-    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId, Long unitPositionId, String query, Date startDate, Date endDate) {
+    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
         endDate = asDate(DateUtils.asLocalDate(endDate).plusDays(1));
-        List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentAndDate(unitPositionId, startDate, endDate);
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(unitPositionId, startDate, endDate);
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId, startDate, endDate);
+        List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentAndDate(employmentId, startDate, endDate);
+        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(employmentId, startDate, endDate);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getCostTimeAgreement(employmentId, startDate, endDate);
         long totalTimeBankBeforeStartDate = 0;
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeTypeByCountryId(employmentWithCtaDetailsDTO.getCountryId());
         if (new DateTime(startDate).isAfter(toJodaDateTime(employmentWithCtaDetailsDTO.getStartDate()))) {
             Interval interval = new Interval(toJodaDateTime(employmentWithCtaDetailsDTO.getStartDate()), new DateTime(startDate));
             //totaltimebank is timebank without daily timebank entries
-            List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankRepository.findAllByEmploymentIdAndBeforeDate(unitPositionId, new DateTime(startDate).toDate());
+            List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, new DateTime(startDate).toDate());
             Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, interval.getStart().toDate(), interval.getEnd().toDate());
             int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, employmentWithCtaDetailsDTO, false, dailyTimeBanksBeforeStartDate, false);
             totalTimeBankBeforeStartDate = isCollectionNotEmpty(dailyTimeBanksBeforeStartDate)
@@ -280,12 +280,12 @@ public class TimeBankService extends MongoBaseService {
             totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;
         }
         totalTimeBankBeforeStartDate+= employmentWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
-        List<PayOutTransaction> payOutTransactions = payOutTransactionMongoRepository.findAllByUnitPositionIdAndDate(unitPositionId, startDate, endDate);
-        List<PayOutPerShift> payOutPerShifts = payOutRepository.findAllByUnitPositionAndDate(unitPositionId, startDate, endDate);
+        List<PayOutTransaction> payOutTransactions = payOutTransactionMongoRepository.findAllByEmploymentIdAndDate(employmentId, startDate, endDate);
+        List<PayOutPerShift> payOutPerShifts = payOutRepository.findAllByEmploymentAndDate(employmentId, startDate, endDate);
         List<Interval> intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, payOutTransactions);
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankAdvanceView(intervals,unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentWithCtaDetailsDTO, timeTypeDTOS, payoutTransactionIntervalMap);
-        List<PayOutPerShift> payOutPerShiftBeforestartDate = payOutRepository.findAllByUnitPositionAndBeforeDate(unitPositionId,startDate);
+        List<PayOutPerShift> payOutPerShiftBeforestartDate = payOutRepository.findAllByEmploymentAndBeforeDate(employmentId,startDate);
         long payoutMinutesBefore = isCollectionNotEmpty(payOutPerShiftBeforestartDate)
                 ? payOutPerShiftBeforestartDate.stream().mapToLong(payout -> payout.getTotalPayOutMin()).sum() : 0;
         PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOutPerShifts,payoutMinutesBefore, payoutTransactionIntervalMap, employmentWithCtaDetailsDTO, query);
@@ -294,22 +294,22 @@ public class TimeBankService extends MongoBaseService {
     }
 
     /**
-     * @param unitPositionId
+     * @param employmentId
      * @param year
      * @return TimeBankDTO
      */
-    public TimeBankDTO getOverviewTimeBank(Long unitId, Long unitPositionId, Integer year) {
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(unitPositionId);
+    public TimeBankDTO getOverviewTimeBank(Long unitId, Long employmentId, Integer year) {
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(employmentId);
         Interval interval = getIntervalByDateTimeBank(employmentWithCtaDetailsDTO, year);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
         if (interval.getStart().getYear() <= new DateTime().getYear()) {
-            dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
+            dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
         }
-        return timeBankCalculationService.getTimeBankOverview(unitId, unitPositionId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
+        return timeBankCalculationService.getTimeBankOverview(unitId, employmentId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
     }
 
 
-    public TimeBankVisualViewDTO getTimeBankForVisualView(Long unitId, Long unitPositionId, String query, Integer value, Date startDate, Date endDate) {
+    public TimeBankVisualViewDTO getTimeBankForVisualView(Long unitId, Long employmentId, String query, Integer value, Date startDate, Date endDate) {
         ZonedDateTime endZonedDate = null;
         ZonedDateTime startZonedDate = null;
         if (StringUtils.isNotEmpty(query)) {
@@ -325,11 +325,11 @@ public class TimeBankService extends MongoBaseService {
             startDate = DateUtils.getDateByZoneDateTime(startZonedDate);
             endDate = DateUtils.getDateByZoneDateTime(endZonedDate);
         }
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId, startDate, endDate);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getCostTimeAgreement(employmentId, startDate, endDate);
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-        DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(unitPositionId, startDate);
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(unitPositionId, startDate, endDate);
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(unitPositionId, startDate, endDate);
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByEmploymentId(employmentId, startDate);
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(employmentId, startDate, endDate);
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, startDate, endDate);
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         Map<String, List<TimeType>> presenceAbsenceTimeTypeMap = timeTypeService.getPresenceAbsenceTimeType(countryId);
         return timeBankCalculationService.getVisualViewTimeBank(interval, dailyTimeBankEntry, shifts, dailyTimeBankEntries, presenceAbsenceTimeTypeMap, employmentWithCtaDetailsDTO);
@@ -344,11 +344,11 @@ public class TimeBankService extends MongoBaseService {
     private Interval getIntervalByDateTimeBank(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, Integer year) {
         ZonedDateTime startDate = ZonedDateTime.now().withYear(year).with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = startDate.with(TemporalAdjusters.lastDayOfYear());
-        Date unitPositionStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : asDate(employmentWithCtaDetailsDTO.getStartDate());
-        Date unitPositionEndDate = employmentWithCtaDetailsDTO.getEndDate() == null || employmentWithCtaDetailsDTO.getEndDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : asDate(employmentWithCtaDetailsDTO.getEndDate());
-        Interval unitPositionInterval = new Interval(unitPositionStartDate.getTime(), unitPositionEndDate.getTime());
+        Date employmentStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : asDate(employmentWithCtaDetailsDTO.getStartDate());
+        Date employmentEndDate = employmentWithCtaDetailsDTO.getEndDate() == null || employmentWithCtaDetailsDTO.getEndDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : asDate(employmentWithCtaDetailsDTO.getEndDate());
+        Interval employmentInterval = new Interval(employmentStartDate.getTime(), employmentEndDate.getTime());
         Interval selectedInterval = new Interval(startDate.toInstant().toEpochMilli(), endDate.toInstant().toEpochMilli());
-        Interval interval = selectedInterval.overlap(unitPositionInterval);
+        Interval interval = selectedInterval.overlap(employmentInterval);
         if (interval == null) {
             interval = new Interval(new DateTime().withTimeAtStartOfDay(), new DateTime().withTimeAtStartOfDay());
         }
@@ -363,7 +363,7 @@ public class TimeBankService extends MongoBaseService {
      */
     public boolean updateTimeBankOnFunctionChange(Date startDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Date endDate = plusMinutes(startDate,(int)ONE_DAY_MINUTES);
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), startDate);
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), startDate);
         if (ctaResponseDTO == null) {
             exceptionService.dataNotFoundException("message.cta.notFound");
         }
@@ -379,12 +379,12 @@ public class TimeBankService extends MongoBaseService {
     /**
      * This function is used to update TimeBank when Staff Personalized CTA
      * or individual employmentLine is changed at a time
-     * @param unitPositionId
+     * @param employmentId
      * @param startDate
      * @param staffAdditionalInfoDTO
      * @return
      */
-    public boolean updateTimeBankOnUnitPositionModification(BigInteger ctaId,Long unitPositionId, Date startDate, Date endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public boolean updateTimeBankOnEmploymentModification(BigInteger ctaId, Long employmentId, Date startDate, Date endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<LocalDate,CTAResponseDTO> ctaResponseDTOMap = new HashMap<>();
         List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), startDate,endDate);
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());
@@ -394,7 +394,7 @@ public class TimeBankService extends MongoBaseService {
             if(Optional.ofNullable(ctaId).isPresent()){
                 ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(ctaId);
             }else {
-                ctaResponseDTO = ctaResponseDTOMap.getOrDefault(shiftDate, costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(unitPositionId, DateUtils.asDate(shiftDate)));
+                ctaResponseDTO = ctaResponseDTOMap.getOrDefault(shiftDate, costTimeAgreementRepository.getCTAByEmploymentIdAndDate(employmentId, DateUtils.asDate(shiftDate)));
             }
             if (ctaResponseDTO == null) {
                 exceptionService.dataNotFoundException("message.cta.notFound");
@@ -449,22 +449,22 @@ public class TimeBankService extends MongoBaseService {
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());
         for (Shift shift : shifts) {
             try {
-                StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId(), new HashSet<>());
-                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
+                StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getEmploymentId(), new HashSet<>());
+                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
                 if(Optional.ofNullable(ctaResponseDTO).isPresent() && CollectionUtils.isNotEmpty(ctaResponseDTO.getRuleTemplates())){
                     staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     staffAdditionalInfoDTOMap.put(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO);
-                    if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId())) {
-                        dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()),shift));
+                    if (staffAdditionalInfoDTOMap.containsKey(shift.getEmploymentId())) {
+                        dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()),shift));
                     }
                 }
             } catch (Exception e) {
                 logger.info("staff is not the part of this Unit");
             }
 
-            if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId()) && CollectionUtils.isNotEmpty(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()).getEmployment().getCtaRuleTemplates())) {
-                List<DailyTimeBankEntry> dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()), shift);
+            if (staffAdditionalInfoDTOMap.containsKey(shift.getEmploymentId()) && CollectionUtils.isNotEmpty(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()).getEmployment().getCtaRuleTemplates())) {
+                List<DailyTimeBankEntry> dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()), shift);
                 dailyTimeBanks.addAll(dailyTimeBankEntries);
             }
         }
@@ -475,8 +475,8 @@ public class TimeBankService extends MongoBaseService {
 
     }
 
-    public void updateDailyTimeBankEntries(List<Shift> shifts, StaffEmploymentDetails staffUnitPosition, List<DayTypeDTO> dayTypeDTOS) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffUnitPosition,dayTypeDTOS);
+    public void updateDailyTimeBankEntries(List<Shift> shifts, StaffEmploymentDetails staffEmployment, List<DayTypeDTO> dayTypeDTOS) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmployment,dayTypeDTOS);
         if(isCollectionNotEmpty(shifts)) {
             shifts.sort(Comparator.comparing(Shift::getStartDate));
             Date startDate = shifts.get(0).getStartDate();
@@ -486,7 +486,7 @@ public class TimeBankService extends MongoBaseService {
     }
 
     public ShiftDTO updateShiftDTOWithTimebankDetails(ShiftDTO shiftDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getUnitPositionDetailDTO(staffAdditionalInfoDTO);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO);
         LocalDate startDate = employmentWithCtaDetailsDTO.getStartDate();
         LocalDate endDate = asLocalDate(shiftDTO.getStartDate());
         Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shiftDTO.getUnitId(), asDate(startDate), asDate(endDate));
@@ -520,11 +520,11 @@ public class TimeBankService extends MongoBaseService {
 
     public List<ShiftDTO> updateTimebankDetailsInShiftDTO(List<ShiftDTO> shiftDTOS,LocalDate startDate,LocalDate endDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         if(isCollectionNotEmpty(shiftDTOS)){
-            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getUnitPositionDetailDTO(staffAdditionalInfoDTO);
-            LocalDate unitPositionEndDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate().isAfter(endDate) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
+            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO);
+            LocalDate employmentEndDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate().isAfter(endDate) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
             logger.info("startDate : "+startDate +"endDate :"+endDate);
             List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentWithCtaDetailsDTO.getId(),asDate(employmentWithCtaDetailsDTO.getStartDate()),asDate(endDate));
-            Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shiftDTOS.get(0).getUnitId(), asDate(startDate), asDate(unitPositionEndDate));
+            Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shiftDTOS.get(0).getUnitId(), asDate(startDate), asDate(employmentEndDate));
             long accumulatedTimebank = 0;
             Map<LocalDate,List<ShiftDTO>> dateWiseShiftMap = shiftDTOS.stream().collect(Collectors.groupingBy(s->DateUtils.asLocalDate(s.getStartDate()),toList()));
             Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k->k.getDate(),v->v));
@@ -552,17 +552,17 @@ public class TimeBankService extends MongoBaseService {
     }
 
 
-    private EmploymentWithCtaDetailsDTO getUnitPositionDetailDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+    private EmploymentWithCtaDetailsDTO getEmploymentDetailDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         return new EmploymentWithCtaDetailsDTO(staffAdditionalInfoDTO.getEmployment().getId(),staffAdditionalInfoDTO.getEmployment().getTotalWeeklyHours(),staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes(),staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek(),staffAdditionalInfoDTO.getEmployment().getStaffId(),staffAdditionalInfoDTO.getEmployment().getStartDate(),staffAdditionalInfoDTO.getEmployment().getEndDate(),staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankMinutes(),staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankDate());
     }
 
     public void deleteDuplicateEntry(){
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllAndDeletedFalse();
-        Map<Long,TreeMap<LocalDate,DailyTimeBankEntry>> unitPositionIdAndDateMap = new TreeMap<>();
+        Map<Long,TreeMap<LocalDate,DailyTimeBankEntry>> employmentIdAndDateMap = new TreeMap<>();
         List<DailyTimeBankEntry> duplicateEntry = new ArrayList<>();
         for (DailyTimeBankEntry dailyTimeBankEntry : dailyTimeBankEntries) {
-            if(unitPositionIdAndDateMap.containsKey(dailyTimeBankEntry.getEmploymentId())){
-                Map<LocalDate,DailyTimeBankEntry> localDateDateMap = unitPositionIdAndDateMap.get(dailyTimeBankEntry.getEmploymentId());
+            if(employmentIdAndDateMap.containsKey(dailyTimeBankEntry.getEmploymentId())){
+                Map<LocalDate,DailyTimeBankEntry> localDateDateMap = employmentIdAndDateMap.get(dailyTimeBankEntry.getEmploymentId());
                 if(localDateDateMap.containsKey(dailyTimeBankEntry.getDate())){
                     DailyTimeBankEntry dailyTimeBankEntry1 = localDateDateMap.get(dailyTimeBankEntry.getDate());
                     if(dailyTimeBankEntry1.getUpdatedAt().after(dailyTimeBankEntry.getUpdatedAt())){
@@ -573,12 +573,12 @@ public class TimeBankService extends MongoBaseService {
                 }else {
                     localDateDateMap.put(dailyTimeBankEntry.getDate(),dailyTimeBankEntry);
                     logger.info("Date Map :"+localDateDateMap.size());
-                    logger.info("UnitPositionId Map :"+unitPositionIdAndDateMap.get(dailyTimeBankEntry.getEmploymentId()).size());
+                    logger.info(" employmentId Map :"+employmentIdAndDateMap.get(dailyTimeBankEntry.getEmploymentId()).size());
                 }
 
             }
             else {
-                unitPositionIdAndDateMap.put(dailyTimeBankEntry.getEmploymentId(),new TreeMap<>());
+                employmentIdAndDateMap.put(dailyTimeBankEntry.getEmploymentId(),new TreeMap<>());
             }
         }
         logger.info("Duplicate remove entry count is "+duplicateEntry.size());
@@ -595,25 +595,25 @@ public class TimeBankService extends MongoBaseService {
     public boolean updateDailyTimeBankEntriesForStaffs(List<Shift> shifts) {
         if (isCollectionNotEmpty(shifts)) {
             List<Long> staffIds = shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
-            List<Long> unitPositionIds = shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
+            List<Long> employmentIds = shifts.stream().map(shift -> shift.getEmploymentId()).collect(Collectors.toList());
             List<NameValuePair> requestParam = new ArrayList<>();
             requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
-            requestParam.add(new BasicNameValuePair("unitPositionIds", unitPositionIds.toString()));
+            requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
             List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(shifts.get(0).getUnitId(), requestParam);
             Date startDateTime = new DateTime(shifts.get(0).getStartDate()).withTimeAtStartOfDay().toDate();
             Date endDateTime = new DateTime(shifts.get(shifts.size() - 1).getEndDate()).plusDays(1).withTimeAtStartOfDay().toDate();
-            List<ShiftWithActivityDTO> shiftsList = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(unitPositionIds, startDateTime, endDateTime);
-            Map<String, List<ShiftWithActivityDTO>> shiftDateMap = shiftsList.stream().collect(Collectors.groupingBy(k -> k.getUnitPositionId() + "-" + DateUtils.asLocalDate(k.getStartDate())));
+            List<ShiftWithActivityDTO> shiftsList = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, startDateTime, endDateTime);
+            Map<String, List<ShiftWithActivityDTO>> shiftDateMap = shiftsList.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId() + "-" + DateUtils.asLocalDate(k.getStartDate())));
             List<DailyTimeBankEntry> updateDailyTimeBanks = new ArrayList<>();
-            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdsAndBetweenDates(unitPositionIds, startDateTime, endDateTime);
-            Map<String, DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getEmploymentId() + "-" + k.getDate(), v -> v));
+            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByEmploymentsAndBetweenDates(employmentIds, startDateTime, endDateTime);
+            Map<String, DailyTimeBankEntry> dailyTimeBankEntryAndEmploymentMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getEmploymentId() + "-" + k.getDate(), v -> v));
             Set<DateTimeInterval> dateTimeIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shifts.get(0).getUnitId(), startDateTime, endDateTime);
-            List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDateTime, endDateTime);
-            Map<Long, List<CTAResponseDTO>> unitPositionAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
+            List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, startDateTime, endDateTime);
+            Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
             Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(s -> s.getEmployment().getId(), v -> v));
             for (Shift shift : shifts) {
-                StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(shift.getUnitPositionId());
-                CTAResponseDTO ctaResponseDTO = getCTAByDate(unitPositionAndCTAResponseMap.get(shift.getUnitPositionId()), asLocalDate(shift.getStartDate()));
+                StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(shift.getEmploymentId());
+                CTAResponseDTO ctaResponseDTO = getCTAByDate(employmentAndCTAResponseMap.get(shift.getEmploymentId()), asLocalDate(shift.getStartDate()));
                 DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
                 DateTime endDate = new DateTime(shift.getEndDate()).plusDays(1).withTimeAtStartOfDay();
                 if (isNotNull(ctaResponseDTO)) {
@@ -623,7 +623,7 @@ public class TimeBankService extends MongoBaseService {
                         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftDateMap.getOrDefault(staffAdditionalInfoDTO.getEmployment().getId() + "-" + DateUtils.asLocalDate(startDateTime), new ArrayList<>());
                         Interval interval = new Interval(startDate, startDate.plusDays(1));
                         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
-                        DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getEmployment(), interval, shiftWithActivityDTOS, dailyTimeBankEntryAndUnitPositionMap, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes());
+                        DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getEmployment(), interval, shiftWithActivityDTOS, dailyTimeBankEntryAndEmploymentMap, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes());
                         if (dailyTimeBank != null) {
                             updateDailyTimeBanks.add(dailyTimeBank);
                         }
@@ -649,10 +649,10 @@ public class TimeBankService extends MongoBaseService {
         return ctaResponse;
     }
 
-    public Map<LocalDate, TimeBankByDateDTO> getAccumulatedTimebankAndDeltaDTO(Long unitPositionId, Long unitId, LocalDate startDate, LocalDate endDate) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, unitPositionId, new HashSet<>());
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndStartDate(unitPositionId, asDate(endDate));
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getUnitPositionDetailDTO(staffAdditionalInfoDTO);
+    public Map<LocalDate, TimeBankByDateDTO> getAccumulatedTimebankAndDeltaDTO(Long employmentId, Long unitId, LocalDate startDate, LocalDate endDate) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndStartDate(employmentId, asDate(endDate));
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO);
         Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, asDate(startDate), asDate(endDate));
         return timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals,dailyTimeBankEntries, employmentWithCtaDetailsDTO,startDate,endDate);
     }

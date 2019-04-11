@@ -9,7 +9,7 @@ public class StaffActivitySettingDTO {
     private BigInteger id;
     private Long staffId;
     private BigInteger activityId;
-    private Long unitPositionId;
+    private Long employmentId;
     private Long unitId;
     private Short shortestTime;
     private Short longestTime;
@@ -26,10 +26,10 @@ public class StaffActivitySettingDTO {
         //Default Constructor
     }
 
-    public StaffActivitySettingDTO(BigInteger activityId, Long unitPositionId, Short shortestTime,
+    public StaffActivitySettingDTO(BigInteger activityId, Long employmentId, Short shortestTime,
                                    Short longestTime, Integer minLength, Integer maxThisActivityPerShift, boolean eligibleForMove) {
         this.activityId = activityId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.shortestTime = shortestTime;
         this.longestTime = longestTime;
         this.minLength = minLength;
@@ -61,12 +61,12 @@ public class StaffActivitySettingDTO {
         this.activityId = activityId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getUnitId() {

@@ -125,14 +125,14 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.removeFunctions(unitPositionId, appliedDates));
     }
 
-    @ApiOperation(value = "get unit_position's Id By Staff and expertise")
-    @GetMapping(value = "/staff/{staffId}/expertise/{expertiseId}/unitPositionId")
+    @ApiOperation(value = "get employment's Id By Staff and expertise")
+    @GetMapping(value = "/staff/{staffId}/expertise/{expertiseId}/employmentId")
     public ResponseEntity<Map<String, Object>> getUnitPositionIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId, @PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentIdByStaffAndExpertise(unitId, staffId, expertiseId));
     }
 
     @ApiOperation(value = "get unit positions based on expertise and staff list")
-    @RequestMapping(value = "/expertise/{expertiseId}/unitPositions", method = RequestMethod.POST)
+    @RequestMapping(value = "/expertise/{expertiseId}/employments", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> getStaffsUnitPosition(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getStaffsEmployment(unitId, expertiseId, staffList));
     }

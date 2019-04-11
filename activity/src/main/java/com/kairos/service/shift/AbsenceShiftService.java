@@ -151,7 +151,7 @@ public class AbsenceShiftService {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         Set<LocalDateTime> dates = shiftDTOS.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
         Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shiftDTOS.get(0).getUnitId(), dates);
-        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shiftDTOS.get(0).getActivities().get(0).getStartDate());
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shiftDTOS.get(0).getActivities().get(0).getStartDate());
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.actionNotPermittedException("message.wta.notFound");
         }

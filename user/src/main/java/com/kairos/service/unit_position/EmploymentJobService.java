@@ -96,7 +96,7 @@ public class EmploymentJobService {
                 List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
 
                 for (Map.Entry<EmploymentIdDTO, EmploymentLine> currentMap : newEmploymentLineWithParentId.entrySet()) {
-                    EmploymentSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldUnitPositionID());
+                    EmploymentSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldEmploymentId());
                     if (currentObject != null) {
                         EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip =
                                 new EmploymentLineEmploymentTypeRelationShip(currentMap.getValue(), currentObject.getEmploymentType(),

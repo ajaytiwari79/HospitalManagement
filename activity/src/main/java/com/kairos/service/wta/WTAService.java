@@ -418,9 +418,9 @@ public class WTAService extends MongoBaseService {
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByOfUnitPosition(Long employmentId, LocalDate startDate) {
-        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(employmentId, asDate(startDate));
-        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(employmentId, asDate(startDate));
+    public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByEmployment(Long employmentId, LocalDate startDate) {
+        WorkingTimeAgreement wta = wtaRepository.getWTABasicByEmploymentAndDate(employmentId, asDate(startDate));
+        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByEmploymentAndDate(employmentId, asDate(startDate));
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (Optional.ofNullable(wta).isPresent()) {
             WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());
@@ -452,10 +452,10 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToUnitPosition(Long employmentId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToEmployment(Long employmentId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (wtaId != null) {
-            WTAResponseDTO wtaResponseDTO = assignWTATOUnitPosition(employmentId, wtaId, startDate);
+            WTAResponseDTO wtaResponseDTO = assignWTAToEmployment(employmentId, wtaId, startDate);
             ctawtaAndAccumulatedTimebankWrapper.setWta(Arrays.asList(wtaResponseDTO));
         }
         if (ctaId != null) {
@@ -466,13 +466,13 @@ public class WTAService extends MongoBaseService {
 
     }
 
-    public WTAResponseDTO getWTAOfUnitPosition(Long employmentId) {
-        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByUnitPositionIdAndDate(employmentId, new Date());
+    public WTAResponseDTO getWTAOfEmployment(Long employmentId) {
+        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByEmploymentIdAndDate(employmentId, new Date());
         return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
     }
 
 
-    private WTAResponseDTO assignWTATOUnitPosition(Long employmentId, BigInteger wtaId, LocalDate startLocalDate) {
+    private WTAResponseDTO assignWTAToEmployment(Long employmentId, BigInteger wtaId, LocalDate startLocalDate) {
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.duplicateDataException("message.wta.id", wtaId);
@@ -537,17 +537,17 @@ public class WTAService extends MongoBaseService {
         return true;
     }
 
-    public WTAResponseDTO updateWtaOfUnitPosition(Long unitId, WTADTO wtadto, Boolean oldUnitPositionPublished) {
+    public WTAResponseDTO updateWtaOfEmployment(Long unitId, WTADTO wtadto, Boolean oldEmploymentPublished) {
         Optional<WorkingTimeAgreement> oldWta = wtaRepository.findById(wtadto.getId());
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtadto.getId());
             exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
         WTAResponseDTO wtaResponseDTO;
-        if (oldUnitPositionPublished) {
-            wtaResponseDTO = updateWTAOfPublishedUnitPosition(oldWta.get(), wtadto,unitId);
+        if (oldEmploymentPublished) {
+            wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto,unitId);
         } else {
-            wtaResponseDTO = updateWTAOfUnpublishedUnitPosition(oldWta.get(), wtadto,unitId);
+            wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto,unitId);
             wtaRepository.save(oldWta.get());
         }
         wtaResponseDTO.setStartDate(wtadto.getStartDate());
@@ -557,9 +557,9 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    private WTAResponseDTO updateWTAOfUnpublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO,Long unitId) {
+    private WTAResponseDTO updateWTAOfUnpublishedEmployment(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long unitId) {
         if(!updateDTO.getStartDate().equals(oldWta.getStartDate())){
-            boolean wtaExists = wtaRepository.wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(oldWta.getId(),oldWta.getEmploymentId(),asDate(updateDTO.getStartDate()),isNotNull(updateDTO.getEndDate()) ? asDate(updateDTO.getEndDate()): null);
+            boolean wtaExists = wtaRepository.wtaExistsByEmploymentIdAndDatesAndNotEqualToId(oldWta.getId(),oldWta.getEmploymentId(),asDate(updateDTO.getStartDate()),isNotNull(updateDTO.getEndDate()) ? asDate(updateDTO.getEndDate()): null);
             if(wtaExists){
                 exceptionService.duplicateDataException("error.wta.invalid",updateDTO.getStartDate(),isNotNull(updateDTO.getEndDate()) ? asDate(updateDTO.getEndDate()): "");
             }
@@ -588,14 +588,13 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public List<CTAWTAResponseDTO> copyWtaCTA(List<EmploymentIdDTO> unitPositionIDs) {
+    public List<CTAWTAResponseDTO> copyWtaCTA(List<EmploymentIdDTO> employmentIds) {
 
-        // List<CTAWTADTO> ctaWtas = wtaRepository.getCTAWTAByUnitPositionId(oldUnitPositionId);
 
         logger.info("Inside wtaservice");
-        List<Long> oldUnitPositionIds = unitPositionIDs.stream().map(employmentIdDTO -> employmentIdDTO.getOldUnitPositionID()).collect(Collectors.toList());
-        Map<Long, Long> newOldemploymentIdMap = unitPositionIDs.stream().collect(toMap(k -> k.getOldUnitPositionID(), v -> v.getNewUnitPositionID()));
-        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByUnitPositionIds(oldUnitPositionIds, DateUtils.getCurrentDate());
+        List<Long> oldEmploymentIds = employmentIds.stream().map(employmentIdDTO -> employmentIdDTO.getOldEmploymentId()).collect(Collectors.toList());
+        Map<Long, Long> newOldemploymentIdMap = employmentIds.stream().collect(toMap(k -> k.getOldEmploymentId(), v -> v.getNewEmploymentId()));
+        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
 
         List<WorkingTimeAgreement> newWtas = new ArrayList<>();
 
@@ -624,7 +623,7 @@ public class WTAService extends MongoBaseService {
         if (!newWtas.isEmpty()) {
             save(newWtas);
         }
-        List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByUnitPositionIds(oldUnitPositionIds, DateUtils.getCurrentDate());
+        List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
 
 
         List<CostTimeAgreement> newCTAs = new ArrayList<>();
@@ -661,10 +660,10 @@ public class WTAService extends MongoBaseService {
         return ctaWtas;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToUnitPosition(Long employmentId, BigInteger wtaId, BigInteger oldwtaId, BigInteger ctaId, BigInteger oldctaId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToEmployment(Long employmentId, BigInteger wtaId, BigInteger oldwtaId, BigInteger ctaId, BigInteger oldctaId, LocalDate startDate) {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (wtaId != null) {
-            WTAResponseDTO wtaResponseDTO = assignWTATOUnitPosition(employmentId, wtaId, startDate);
+            WTAResponseDTO wtaResponseDTO = assignWTAToEmployment(employmentId, wtaId, startDate);
             ctawtaAndAccumulatedTimebankWrapper.setWta(Arrays.asList(wtaResponseDTO));
             wtaRepository.disableOldWta(oldwtaId, startDate.minusDays(1));
         }
@@ -677,9 +676,9 @@ public class WTAService extends MongoBaseService {
 
     }
 
-    public boolean setEndCTAWTAOfUnitPosition(Long employmentId, LocalDate endDate) {
-        wtaRepository.setEndDateToWTAOfUnitPosition(employmentId, endDate);
-        costTimeAgreementRepository.setEndDateToCTAOfUnitPosition(employmentId, endDate);
+    public boolean setEndCTAWTAOfEmployment(Long employmentId, LocalDate endDate) {
+        wtaRepository.setEndDateToWTAOfEmployment(employmentId, endDate);
+        costTimeAgreementRepository.setEndDateToCTAOfEmployment(employmentId, endDate);
         return true;
     }
 
@@ -712,9 +711,9 @@ public class WTAService extends MongoBaseService {
         return activitiesIdsAndUnitIdsMap;
     }
 
-    private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto,Long unitId) {
+    private WTAResponseDTO updateWTAOfPublishedEmployment(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId) {
         if(!wtadto.getStartDate().equals(oldWta.getStartDate())){
-            boolean wtaExists = wtaRepository.wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(oldWta.getId(),oldWta.getEmploymentId(),asDate(wtadto.getStartDate()),isNotNull(wtadto.getEndDate()) ? asDate(wtadto.getEndDate()): null);
+            boolean wtaExists = wtaRepository.wtaExistsByEmploymentIdAndDatesAndNotEqualToId(oldWta.getId(),oldWta.getEmploymentId(),asDate(wtadto.getStartDate()),isNotNull(wtadto.getEndDate()) ? asDate(wtadto.getEndDate()): null);
             if(wtaExists){
                 exceptionService.duplicateDataException("error.wta.invalid",wtadto.getStartDate(),isNotNull(wtadto.getEndDate()) ? wtadto.getEndDate() : "");
             }
@@ -726,7 +725,7 @@ public class WTAService extends MongoBaseService {
         }
         boolean isCalculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta, wtaBaseRuleTemplates);
         if (wtadto.getStartDate().isBefore(oldWta.getStartDate())|| wtadto.getStartDate().equals(oldWta.getStartDate()) || !isCalculatedValueChanged) {
-            wtaResponseDTO = updateWTAOfUnpublishedUnitPosition(oldWta, wtadto,unitId);
+            wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta, wtadto,unitId);
             oldWta.setStartDate(wtadto.getStartDate());
             wtaResponseDTO.setStartDate(wtadto.getStartDate());
             wtaRepository.save(oldWta);
@@ -793,7 +792,7 @@ public class WTAService extends MongoBaseService {
         return isCalculatedValueChanged;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getUnitpositionCtaWtaAndAccumulatedTimebank(Long unitId,Map<Long, List<EmploymentLinesDTO>> employmentLinesMap){
+    public CTAWTAAndAccumulatedTimebankWrapper getEmploymentCtaWtaAndAccumulatedTimebank(Long unitId, Map<Long, List<EmploymentLinesDTO>> employmentLinesMap){
         return getWTACTAByUpIds(employmentLinesMap.keySet());
     }
 
@@ -844,18 +843,18 @@ public class WTAService extends MongoBaseService {
             }
 
         }
-        workingTimeAgreements = wtaRepository.findWTAofUnitPositions();
-        Map<Long,Long> unitPositionAndUnitMap = new HashMap<>();
+        workingTimeAgreements = wtaRepository.findWTAOfEmployments();
+        Map<Long,Long> employmentAndUnitMap = new HashMap<>();
         for (WorkingTimeAgreement workingTimeAgreement : workingTimeAgreements) {
             Long unitId;
-            if(!unitPositionAndUnitMap.containsKey(workingTimeAgreement.getEmploymentId())){
+            if(!employmentAndUnitMap.containsKey(workingTimeAgreement.getEmploymentId())){
                 unitId = userIntegrationService.getUnitByEmploymentId(workingTimeAgreement.getEmploymentId());
                 if(isNotNull(unitId)) {
-                    unitPositionAndUnitMap.put(workingTimeAgreement.getEmploymentId(), unitId);
+                    employmentAndUnitMap.put(workingTimeAgreement.getEmploymentId(), unitId);
                 }
             }
             else {
-                unitId = unitPositionAndUnitMap.get(workingTimeAgreement.getEmploymentId());
+                unitId = employmentAndUnitMap.get(workingTimeAgreement.getEmploymentId());
             }
             Map<String,BigInteger> stringBigIntegerMap = new HashMap<>();
             boolean valid = false;

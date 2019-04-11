@@ -50,16 +50,16 @@ public class ShiftBreakService {
         return activityWrapperMap;
     }
 
-    public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
-        return calculateBreakAndShiftDuration(activityWrapperMap, mainShift, unitPositionDetails, breakWTATemplate, timeSlot, false);
+    public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails employmentDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+        return calculateBreakAndShiftDuration(activityWrapperMap, mainShift, employmentDetails, breakWTATemplate, timeSlot, false);
 
     }
 
-    private List<ShiftActivity> calculateBreakAndShiftDuration(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, boolean updateShift) {
+    private List<ShiftActivity> calculateBreakAndShiftDuration(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails employmentDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, boolean updateShift) {
         List<ShiftActivity> shiftActivities=new ArrayList<>();
         if (activityWrapperMap.get(mainShift.getActivities().get(0).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
             Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
-            List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(unitPositionDetails.getExpertise().getId(), shiftDurationInMinute);
+            List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(employmentDetails.getExpertise().getId(), shiftDurationInMinute);
             Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings, mainShift.getUnitId());
             activityWrapperMap.putAll(breakActivitiesMap);
             shiftActivities= addBreakInShifts(mainShift, breakSettings, shiftDurationInMinute, breakActivitiesMap, breakWTATemplate, timeSlot, updateShift);
@@ -67,9 +67,9 @@ public class ShiftBreakService {
         return shiftActivities;
     }
 
-    public List<ShiftActivity> updateBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+    public List<ShiftActivity> updateBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffEmploymentDetails employmentDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         removeAllPreviouslyAllottedBreaks(mainShift);
-        return calculateBreakAndShiftDuration(activityWrapperMap, mainShift, unitPositionDetails, breakWTATemplate, timeSlot, true);
+        return calculateBreakAndShiftDuration(activityWrapperMap, mainShift, employmentDetails, breakWTATemplate, timeSlot, true);
 
     }
 

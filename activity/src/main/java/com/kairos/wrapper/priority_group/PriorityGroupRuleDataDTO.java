@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class PriorityGroupRuleDataDTO {
 
-    private Map<Long,List<Shift>> shiftUnitPositionsMap;
+    private Map<Long,List<Shift>> shiftEmploymentsMap;
     private Map<BigInteger, OpenShift> openShiftMap;
     private Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap;
     private List<Shift> shifts;
@@ -31,10 +31,10 @@ public class PriorityGroupRuleDataDTO {
     public PriorityGroupRuleDataDTO() {
 
     }
-    public PriorityGroupRuleDataDTO(Map<Long,List<Shift>> shiftUnitPositionsMap, Map<BigInteger, OpenShift> openShiftMap, Map<BigInteger,
+    public PriorityGroupRuleDataDTO(Map<Long,List<Shift>> shiftEmploymentsMap, Map<BigInteger, OpenShift> openShiftMap, Map<BigInteger,
             List<StaffEmploymentQueryResult>> openShiftStaffMap, List<Shift> shifts, List<OpenShiftNotification> openShiftNotifications,
                                     Map<Long,Integer> assignedOpenShiftMap, Set<BigInteger> unavailableActivitySet) {
-        this.shiftUnitPositionsMap = shiftUnitPositionsMap;
+        this.shiftEmploymentsMap = shiftEmploymentsMap;
         this.openShiftMap = openShiftMap;
         this.openShiftStaffMap = openShiftStaffMap;
         this.shifts = shifts;
@@ -43,12 +43,12 @@ public class PriorityGroupRuleDataDTO {
         this.unavailableActivitySet = unavailableActivitySet;
     }
 
-    public Map<Long, List<Shift>> getShiftUnitPositionsMap() {
-        return shiftUnitPositionsMap;
+    public Map<Long, List<Shift>> getShiftEmploymentsMap() {
+        return shiftEmploymentsMap;
     }
 
-    public void setShiftUnitPositionsMap(Map<Long, List<Shift>> shiftUnitPositionsMap) {
-        this.shiftUnitPositionsMap = shiftUnitPositionsMap;
+    public void setShiftEmploymentsMap(Map<Long, List<Shift>> shiftEmploymentsMap) {
+        this.shiftEmploymentsMap = shiftEmploymentsMap;
     }
 
     public Map<BigInteger, OpenShift> getOpenShiftMap() {

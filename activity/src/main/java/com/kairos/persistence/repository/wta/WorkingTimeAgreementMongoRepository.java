@@ -38,7 +38,7 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     List<WorkingTimeAgreement> findWTAofOrganization();
 
     @Query(value = "{unitPositionId:{$exists:true},deleted:false}")
-    List<WorkingTimeAgreement> findWTAofUnitPositions();
+    List<WorkingTimeAgreement> findWTAOfEmployments();
 
 
 }

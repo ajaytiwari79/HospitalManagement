@@ -53,17 +53,17 @@ public class PayOutCalculationService {
 
     /**
      * @param interval
-     * @param unitPositionDetails
+     * @param employmentDetails
      * @param shift
      * @param activityWrapperMap
      * @param payOutPerShift
      * @return PayOutPerShift
      */
-    public PayOutPerShift calculateAndUpdatePayOut(DateTimeInterval interval, StaffEmploymentDetails unitPositionDetails, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOutPerShift payOutPerShift, List<DayTypeDTO> dayTypeDTOS) {
+    public PayOutPerShift calculateAndUpdatePayOut(DateTimeInterval interval, StaffEmploymentDetails employmentDetails, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOutPerShift payOutPerShift, List<DayTypeDTO> dayTypeDTOS) {
 
         int totalPayOut = 0;
         int scheduledMin = 0;
-        int contractualMin = interval.getStart().get(ChronoField.DAY_OF_WEEK) <= unitPositionDetails.getWorkingDaysInWeek() ? unitPositionDetails.getTotalWeeklyMinutes() / unitPositionDetails.getWorkingDaysInWeek() : 0;
+        int contractualMin = interval.getStart().get(ChronoField.DAY_OF_WEEK) <= employmentDetails.getWorkingDaysInWeek() ? employmentDetails.getTotalWeeklyMinutes() / employmentDetails.getWorkingDaysInWeek() : 0;
         Map<BigInteger, Integer> ctaPayoutMinMap = new HashMap<>();
         Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(), v->v));
 
@@ -72,8 +72,8 @@ public class PayOutCalculationService {
             DateTimeInterval shiftInterval = new DateTimeInterval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime());
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
-                for (CTARuleTemplateDTO ruleTemplate : unitPositionDetails.getCtaRuleTemplates()) {
-                    boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, unitPositionDetails, shift.getPhaseId(), activity.getId(),activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftInterval,shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
+                for (CTARuleTemplateDTO ruleTemplate : employmentDetails.getCtaRuleTemplates()) {
+                    boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, employmentDetails, shift.getPhaseId(), activity.getId(),activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftInterval,shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                     if (ruleTemplateValid) {
                         int ctaPayOutMin = 0;
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
@@ -112,7 +112,7 @@ public class PayOutCalculationService {
         payOutPerShift.setContractualMin(contractualMin);
         payOutPerShift.setScheduledMin(scheduledMin);
         payOutPerShift.setTotalPayOutMin(totalPayOut);
-        payOutPerShift.setPayOutPerShiftCTADistributions(getCTADistribution(unitPositionDetails.getCtaRuleTemplates(), ctaPayoutMinMap));
+        payOutPerShift.setPayOutPerShiftCTADistributions(getCTADistribution(employmentDetails.getCtaRuleTemplates(), ctaPayoutMinMap));
         return payOutPerShift;
     }
 

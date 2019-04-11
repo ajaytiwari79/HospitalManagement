@@ -167,7 +167,7 @@ public class WTAController {
     @ApiOperation(value = "Update WTA of Employment")
     @PutMapping(value =  UNIT_URL + "/wta")
     public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean unitPositionPublished) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId, wtadto, unitPositionPublished));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfEmployment(unitId, wtadto, unitPositionPublished));
     }
 
 
@@ -194,13 +194,13 @@ public class WTAController {
     @PostMapping(value =  UNIT_URL + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> assignCTAWTAToUnitPosition(@PathVariable Long unitPositionId,@PathVariable BigInteger wtaId,@PathVariable BigInteger ctaId,
      @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,ctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(unitPositionId,wtaId,ctaId,startDate));
     }
 
     @ApiOperation(value = "get wta of unitPosition")
     @GetMapping(value =  UNIT_URL + "/wta/unitPosition/{unitPositionId}")
     public ResponseEntity<Map<String, Object>> getWTAOfUnitPosition(@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAOfUnitPosition(unitPositionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAOfEmployment(unitPositionId));
     }
 
 
@@ -238,7 +238,7 @@ public class WTAController {
     @ApiOperation(value = "get current cta and wta applicable on unit position ")
     @GetMapping(value =  UNIT_URL + "/applicable-cta-wta")
     public ResponseEntity<Map<String, Object>> getWTACTAByOfUnitPosition(@RequestParam(value = "unitPositionId") Long unitPositionId, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByOfUnitPosition(unitPositionId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByEmployment(unitPositionId,startDate));
     }
 
 
@@ -250,7 +250,7 @@ public class WTAController {
                                                                           @RequestParam(value = "ctaId",required = false)   BigInteger ctaId,
                                                                           @RequestParam(value = "oldctaId",required = false)   BigInteger oldctaId,
                                                                           @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(unitPositionId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
     }
 
 
@@ -259,7 +259,7 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> setEndCTAWTAOfUnitPosition(@PathVariable Long unitPositionId,
                                                                           @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setEndCTAWTAOfUnitPosition(unitPositionId,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setEndCTAWTAOfEmployment(unitPositionId,endDate));
     }
 
    /* @ApiOperation(value = "check scheduler load balncing")
@@ -278,7 +278,7 @@ public class WTAController {
     @ApiOperation(value = "Get unitposition cta wta and accumulated timebank")
     @PostMapping(value =  UNIT_URL+ "/unitposition_cta_wta_and_accumulated_timebank")
     public ResponseEntity<Map<String, Object>> getUnitpositionCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<EmploymentLinesDTO>> employmentLinesMap) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getUnitpositionCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getEmploymentCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
     }
 
 

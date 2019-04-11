@@ -193,8 +193,8 @@ public class OpenShiftService extends MongoBaseService {
         Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
-            Long unitPositionId = userIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
-            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId,startDate,endDate);
+            Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
+            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(employmentId,startDate,endDate);
             data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), employmentWithCtaDetailsDTO);
         }
 
@@ -240,19 +240,19 @@ public class OpenShiftService extends MongoBaseService {
     }
 
     private boolean assignShiftToStaff(OpenShift openShift, Long unitId, List<Long> staffIds, Order order) {
-        List<StaffEmploymentDetails> unitPositionDetails = userIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
-        unitPositionDetails.forEach(unitPositionDetail -> {
-            if (!Optional.ofNullable(unitPositionDetail.getId()).isPresent() || openShift.getNoOfPersonRequired()<1 ||
-                    openShift.getAssignedStaff().contains(unitPositionDetail.getStaffId()) ) {
+        List<StaffEmploymentDetails> employmentDetails = userIntegrationService.getStaffIdAndEmployment(unitId, staffIds, order.getExpertiseId());
+        employmentDetails.forEach(employmentDetail -> {
+            if (!Optional.ofNullable(employmentDetail.getId()).isPresent() || openShift.getNoOfPersonRequired()<1 ||
+                    openShift.getAssignedStaff().contains(employmentDetail.getStaffId()) ) {
                 return;
             }
             ShiftActivityDTO shiftActivity = new ShiftActivityDTO("",openShift.getStartDate(),openShift.getEndDate(),openShift.getActivityId(),null);
-            ShiftDTO shiftDTO = new ShiftDTO(Arrays.asList(shiftActivity), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId());
+            ShiftDTO shiftDTO = new ShiftDTO(Arrays.asList(shiftActivity), unitId, employmentDetail.getStaffId(), employmentDetail.getId());
             shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
             shiftDTO.setParentOpenShiftId(openShift.getId());
             shiftService.createShift(unitId, shiftDTO, "Organization");
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired() - 1);
-            openShift.getAssignedStaff().add(unitPositionDetail.getStaffId());
+            openShift.getAssignedStaff().add(employmentDetail.getStaffId());
         });
         save(openShift);
         return true;

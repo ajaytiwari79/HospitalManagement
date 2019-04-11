@@ -28,12 +28,12 @@ public class PendingRequestRule implements PriorityGroupRuleFilter {
         int maxPendingRequests = priorityGroupDTO.getStaffExcludeFilter().getNumberOfPendingRequest();
         for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()){
 
-            Iterator<StaffEmploymentQueryResult> staffsUnitPositions = entry.getValue().iterator();
-            while(staffsUnitPositions.hasNext()) {
-                StaffEmploymentQueryResult staffUnitPosition = staffsUnitPositions.next();
-                if(staffOpenShiftNotificationsMap.containsKey(staffUnitPosition.getStaffId())&&
-                        staffOpenShiftNotificationsMap.get(staffUnitPosition.getStaffId()).size()>=maxPendingRequests){
-                    staffsUnitPositions.remove();
+            Iterator<StaffEmploymentQueryResult> staffsEmployments = entry.getValue().iterator();
+            while(staffsEmployments.hasNext()) {
+                StaffEmploymentQueryResult staffEmployment = staffsEmployments.next();
+                if(staffOpenShiftNotificationsMap.containsKey(staffEmployment.getStaffId())&&
+                        staffOpenShiftNotificationsMap.get(staffEmployment.getStaffId()).size()>=maxPendingRequests){
+                    staffsEmployments.remove();
                 }
             }
         }

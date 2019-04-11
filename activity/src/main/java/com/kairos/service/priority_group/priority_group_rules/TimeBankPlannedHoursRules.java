@@ -16,18 +16,18 @@ public class TimeBankPlannedHoursRules implements PriorityGroupRuleFilter{
     public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO){
 
         for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            Iterator<StaffEmploymentQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
 
-            while(staffUnitPositionIterator.hasNext()) {
+            while(staffEmploymentIterator.hasNext()) {
 
-                StaffEmploymentQueryResult staffEmploymentQueryResult = staffUnitPositionIterator.next();
+                StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
                 if((Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()).isPresent()&&
                         staffEmploymentQueryResult.getAccumulatedTimeBank()<priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank())||
                         (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime()).isPresent()&&
                         staffEmploymentQueryResult.getPlannedHoursWeek()>priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime())||
                 (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek()).isPresent()&&
                         staffEmploymentQueryResult.getDeltaWeeklytimeBank()>priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek())) {
-                  //  staffUnitPositionIterator.remove();
+                  //  staffEmploymentIterator.remove();
                 }
 
 
