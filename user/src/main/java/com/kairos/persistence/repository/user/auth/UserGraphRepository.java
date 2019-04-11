@@ -104,9 +104,8 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
   // @Query("MATCH (user:User) WHERE ( user.cprNumber={0} AND user.email=~{1} ) RETURN user")
     User findUserByCprNumberOrEmail(String cprNumber, String email);
 
-
     @Query("MATCH (user:User) WHERE user.userName=~{0}  RETURN user ")
-    User findUserByUserName(String UserName);
+    User findUserByUserName(String userName);
 
 
     @Query("MATCH (user:User) WHERE user.userName=~{0} " +

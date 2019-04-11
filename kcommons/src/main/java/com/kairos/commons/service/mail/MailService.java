@@ -131,13 +131,11 @@ public class MailService {
     }
 
     private Content getContent(String templateName,Map<String,Object> templateParam,String body){
-        Content content = null;
+        Content content = new Content(PLAIN_CONTENT_TYPE,body);
         if(StringUtils.isNotBlank(templateName)){
             final Context context = getContext(templateParam);
             body = templateEngine.process(templateName, context);
             content = new Content(HTML_CONTENT_TYPE,body);
-        }else {
-            content = new Content(PLAIN_CONTENT_TYPE,body);
         }
         return content;
     }

@@ -171,8 +171,6 @@ public class UserService {
      *
      */
     public Map<String, Object> authenticateUser(User user) {
-        //User currentUser = null;
-       // User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
           User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
         if (!Optional.ofNullable(currentUser).isPresent()) {
              currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
@@ -187,7 +185,6 @@ public class UserService {
         userGraphRepository.save(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
-        //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
         map.put("isUserNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
         return map;
