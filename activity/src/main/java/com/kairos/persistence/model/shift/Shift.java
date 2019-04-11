@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -61,7 +60,7 @@ public class Shift extends MongoBaseEntity {
     private int timeBankCtaBonusMinutes;
     private int plannedMinutesOfTimebank;
     private int payoutCtaBonusMinutes;
-    private int plannedMinutesOfpayout;
+    private int plannedMinutesOfPayout;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -366,12 +365,12 @@ public class Shift extends MongoBaseEntity {
         this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 
-    public int getPlannedMinutesOfpayout() {
-        return plannedMinutesOfpayout;
+    public int getPlannedMinutesOfPayout() {
+        return plannedMinutesOfPayout;
     }
 
-    public void setPlannedMinutesOfpayout(int plannedMinutesOfpayout) {
-        this.plannedMinutesOfpayout = plannedMinutesOfpayout;
+    public void setPlannedMinutesOfPayout(int plannedMinutesOfPayout) {
+        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
     }
 
     public int getPayoutCtaBonusMinutes() {

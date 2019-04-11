@@ -303,18 +303,18 @@ public class TimeBankCalculationService {
     }
 
     private Object[] getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts, List<PayOutPerShift> payOutPerShifts) {
-        List<ShiftWithActivityDTO> shifts1 = new ArrayList<>();
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>();
         Map<BigInteger, PayOutPerShift> payOutPerShiftMap = payOutPerShifts.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
         List<PayOutPerShift> intervalPayOutPerShifts = new ArrayList<>();
         shifts.forEach(shift -> {
             if(interval.contains(shift.getStartDate().getTime()) || interval.contains(shift.getEndDate().getTime())) {
-                shifts1.add(shift);
+                shiftWithActivityDTOS.add(shift);
                 if(payOutPerShiftMap.containsKey(shift.getId())) {
                     intervalPayOutPerShifts.add(payOutPerShiftMap.get(shift.getId()));
                 }
             }
         });
-        return new Object[]{shifts1, intervalPayOutPerShifts};
+        return new Object[]{shiftWithActivityDTOS, intervalPayOutPerShifts};
     }
 
     public TimeBankAndPayoutDTO getTimeBankAdvanceView(List<Interval> intervals, Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS, Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap) {
