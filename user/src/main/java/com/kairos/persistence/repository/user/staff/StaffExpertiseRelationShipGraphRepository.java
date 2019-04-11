@@ -50,8 +50,8 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "WITH sector,expertise, staff,rel,seniorityLevel ORDER By seniorityLevel.from " +
             "WITH expertise ,staff,rel,collect({id:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to}) as seniorityLevels,sector " +
             "OPTIONAL MATCH(expertise)<-[expRel:"+HAS_EXPERTISE_IN+"]-(up:Employment)<-["+BELONGS_TO_STAFF+"]-(staff) " +
-            "WITH expertise ,seniorityLevels,sector,CASE WHEN count(expRel)>0 THEN true ELSE false END as unitPositionExists,rel ORDER BY rel.expertiseStartDate " +
-            "RETURN id(sector) as id,sector.name as name, COLLECT({id:id(rel), expertiseId:id(expertise), name:expertise.name ,expertiseStartDate:rel.expertiseStartDate ,relevantExperienceInMonths:rel.relevantExperienceInMonths ,unitPositionExists:unitPositionExists,seniorityLevels:seniorityLevels}) as expertiseWithExperience ")
+            "WITH expertise ,seniorityLevels,sector,CASE WHEN count(expRel)>0 THEN true ELSE false END as employmentExists,rel ORDER BY rel.expertiseStartDate " +
+            "RETURN id(sector) as id,sector.name as name, COLLECT({id:id(rel), expertiseId:id(expertise), name:expertise.name ,expertiseStartDate:rel.expertiseStartDate ,relevantExperienceInMonths:rel.relevantExperienceInMonths ,employmentExists:employmentExists,seniorityLevels:seniorityLevels}) as expertiseWithExperience ")
     List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertiseWithExperience(Long staffId);
 
 

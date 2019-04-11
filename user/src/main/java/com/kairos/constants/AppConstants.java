@@ -203,9 +203,9 @@ public class AppConstants {
 
     //Query result Keys
     public static final String STAFF="staff";
-    public static final String UNIT_POSITION="unitPosition";
-    public static final String UNIT_POSITION_ORGANIZATION_RELATIONSHIP="unitPositionOrgRel";
-    public static final String UNIT_POSITION_STAFF_RELATIONSHIP="unitPositionStaffRel";
+    public static final String EMPLOYMENT ="employment";
+    public static final String EMPLOYMENT_ORGANIZATION_RELATIONSHIP ="employmentOrgRel";
+    public static final String EMPLOYMENT_STAFF_RELATIONSHIP ="employmentStaffRel";
 
     //organization Hierarchy Filter constants
     public static final String ORGANIZATION_TYPES = "organizationType";

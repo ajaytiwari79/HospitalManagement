@@ -220,8 +220,8 @@ public class WTAController {
 
     @ApiOperation(value = "get Wta with versions By Ids")
     @GetMapping(value =  UNIT_URL + "/wta/versions")
-    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId, @RequestParam List<Long> upIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId, upIds));
+    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId, @RequestParam List<Long> employmentIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId, employmentIds));
     }
 
     @ApiOperation(value = "copy cta wta to new uniposition")

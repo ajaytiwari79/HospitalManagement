@@ -2,7 +2,6 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.commons.utils.DateUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -32,7 +31,7 @@ public class WTADTO {
     private Long organizationType;
     private Long organizationSubType;
     private List<BigInteger> tags;
-    private LocalDate unitPositionEndDate;
+    private LocalDate employmentEndDate;
     private List<Long> unitIds;
 
     public WTADTO() {
@@ -138,12 +137,12 @@ public class WTADTO {
         this.tags = tags;
     }
 
-    public LocalDate getUnitPositionEndDate() {
-        return unitPositionEndDate;
+    public LocalDate getEmploymentEndDate() {
+        return employmentEndDate;
     }
 
-    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
-        this.unitPositionEndDate = unitPositionEndDate;
+    public void setEmploymentEndDate(LocalDate employmentEndDate) {
+        this.employmentEndDate = employmentEndDate;
     }
 
     public List<Long> getUnitIds() {

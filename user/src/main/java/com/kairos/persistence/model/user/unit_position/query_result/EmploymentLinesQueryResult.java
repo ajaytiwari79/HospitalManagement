@@ -5,7 +5,6 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ import java.util.Map;
 @QueryResult
 public class EmploymentLinesQueryResult {
     private Long id;
-    private Long unitPositionId;
+    private Long employmentId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer workingDaysInWeek;
@@ -36,7 +35,7 @@ public class EmploymentLinesQueryResult {
         //DC
     }
 
-    public EmploymentLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, BigDecimal hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel, Long unitPositionId, long accumulatedTimebankMinutes) {
+    public EmploymentLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, BigDecimal hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel, Long employmentId, long accumulatedTimebankMinutes) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -49,7 +48,7 @@ public class EmploymentLinesQueryResult {
         this.hourlyCost = hourlyCost;
         this.employmentType = employmentType;
         this.seniorityLevel = seniorityLevel;
-        this.unitPositionId=unitPositionId;
+        this.employmentId = employmentId;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
     }
 
@@ -149,12 +148,12 @@ public class EmploymentLinesQueryResult {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public WTAResponseDTO getWorkingTimeAgreement() {

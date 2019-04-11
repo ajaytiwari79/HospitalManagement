@@ -67,7 +67,7 @@ public class PriorityGroupRulesDataGetterService {
         List<Long> unitPositionIds = staffsUnitPositions.stream().map(s -> s.getUnitPositionId()).collect(Collectors.toList());
         List<Long> staffIds = staffsUnitPositions.stream().map(s -> s.getStaffId()).collect(Collectors.toList());
 
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionsAndBeforDate(unitPositionIds, DateUtils.getISOEndOfWeekDate(maxDate));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdsAndBeforDate(unitPositionIds, DateUtils.getISOEndOfWeekDate(maxDate));
         Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap= dailyTimeBankEntries.stream().collect(groupingBy(DailyTimeBankEntry::getEmploymentId));
 
         Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap =  new HashMap<BigInteger, List<StaffEmploymentQueryResult>>();
@@ -80,7 +80,7 @@ public class PriorityGroupRulesDataGetterService {
             openShiftMap.put(openShift.getId(),openShift);
         }
         calculateTimeBankAndPlannedHours(priorityGroupDTO.getUnitId(),unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
-        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByUnitPositionId(unitPositionIds, new Date() );
+        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByEmploymentId(unitPositionIds, new Date() );
         Map<Long,Integer> assignedOpenShiftMap = shiftCountDTOS.stream().collect(Collectors.toMap(ShiftCountDTO::getUnitPositionId,ShiftCountDTO::getCount));
         List<Shift> shifts = getShifts(priorityGroupDTO,maxDate,minDate,unitPositionIds);
 

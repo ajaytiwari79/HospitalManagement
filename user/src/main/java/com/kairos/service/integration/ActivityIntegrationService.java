@@ -116,17 +116,17 @@ public class ActivityIntegrationService {
         return ctawtaResponseDTOS;
     }
 
-    public void updateTimeBank(Long unitPositionId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void updateTimeBank(Long employmentId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         BasicNameValuePair startDate = new BasicNameValuePair("shiftStartDate", shiftStartDate.toString());
-        BasicNameValuePair unitPosition = new BasicNameValuePair("unitPositionId", unitPositionId + "");
+        BasicNameValuePair employment = new BasicNameValuePair("employmentId", employmentId + "");
         List<NameValuePair> param = new ArrayList<>();
-        param.add(unitPosition);
+        param.add(employment);
         param.add(startDate);
         genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
-    public void updateTimeBankOnUnitPositionUpdation(BigInteger collectiveTimeAgreementId,Long unitPositionId, LocalDate employmentLineStartDate, LocalDate employmentLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void updateTimeBankOnEmploymentUpdation(BigInteger collectiveTimeAgreementId, Long employmentId, LocalDate employmentLineStartDate, LocalDate employmentLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         BasicNameValuePair startDate = new BasicNameValuePair("employmentLineStartDate", employmentLineStartDate.toString());
         BasicNameValuePair endDate = new BasicNameValuePair("employmentLineEndDate", employmentLineEndDate!=null?employmentLineEndDate.toString():null);
         BasicNameValuePair ctaId = new BasicNameValuePair("ctaId", collectiveTimeAgreementId.toString());
@@ -134,8 +134,8 @@ public class ActivityIntegrationService {
         param.add(startDate);
         param.add(endDate);
         param.add(ctaId);
-        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/{unitPositionId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        },unitPositionId);
+        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/{employmentId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        },employmentId);
     }
 
     public void createTimeTypes(Long countryId){
@@ -143,7 +143,7 @@ public class ActivityIntegrationService {
         });
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<EmploymentLinesQueryResult>> employmentLinesMap, Long unitId){
+    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByEmployment(Map<Long, List<EmploymentLinesQueryResult>> employmentLinesMap, Long unitId){
         return genericRestClient.publishRequest(employmentLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
     }
 

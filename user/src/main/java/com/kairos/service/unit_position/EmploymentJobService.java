@@ -60,7 +60,7 @@ public class EmploymentJobService {
         String log = null;
         Result result = Result.SUCCESS;
         try {
-            List<EmploymentSeniorityLevelQueryResult> employmentSeniorityLevelQueryResults = employmentGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
+            List<EmploymentSeniorityLevelQueryResult> employmentSeniorityLevelQueryResults = employmentGraphRepository.findEmploymentSeniorityLeveltoUpdate();
             if (!employmentSeniorityLevelQueryResults.isEmpty()) {
 
                 Map<Long, EmploymentSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResultMap
@@ -125,15 +125,15 @@ public class EmploymentJobService {
         // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
-    public EmploymentAndPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, Long unitId, PositionDTO positionDTO) {
+    public EmploymentAndPositionDTO updateEmploymentEndDateFromPosition(Long staffId, Long unitId, PositionDTO positionDTO) {
         Organization unit=organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
-        String unitPositionStartDateMax= employmentGraphRepository.getMaxUnitPositionStartDate(staffId);
+        String unitPositionStartDateMax= employmentGraphRepository.getMaxEmploymentStartDate(staffId);
         if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(unitPositionStartDateMax))) {
             exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", unitPositionStartDateMax);
 
         }
-        List<Employment> employments = employmentGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
+        List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
         Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(positionDTO.getReasonCodeId(), 0);
         if (!reasonCode.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
@@ -159,7 +159,7 @@ public class EmploymentJobService {
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
         PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
-        return new EmploymentAndPositionDTO(positionQueryResult, employmentGraphRepository.getAllUnitPositionsByUser(user.getId()));
+        return new EmploymentAndPositionDTO(positionQueryResult, employmentGraphRepository.getAllEmploymentsByUser(user.getId()));
 
     }
 

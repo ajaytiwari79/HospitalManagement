@@ -95,10 +95,10 @@ public class EmploymentCTAWTAService {
     }
 
     //TODO this must be moved to activity
-    public EmploymentQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, BigInteger wtaId, WTADTO updateDTO) {
-        Employment employment = employmentGraphRepository.findOne(unitPositionId);
+    public EmploymentQueryResult updateEmploymentWTA(Long unitId, Long employmentId, BigInteger wtaId, WTADTO updateDTO) {
+        Employment employment = employmentGraphRepository.findOne(employmentId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
 
         }
         if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {
@@ -108,58 +108,58 @@ public class EmploymentCTAWTAService {
             exceptionService.actionNotPermittedException("start_date.from.end_date");
         }
         updateDTO.setId(wtaId);
-        updateDTO.setUnitPositionEndDate(employment.getEndDate());
-        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, employment.isPublished());
+        updateDTO.setEmploymentEndDate(employment.getEndDate());
+        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfEmployment(updateDTO, employment.isPublished());
         return employmentService.getBasicDetails(employment, wtaResponseDTO, employment.getEmploymentLines().get(0));
     }
     //  TODO Pradeep INCORRECT function NAME and working
-    public StaffEmploymentDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
-        EmploymentQueryResult unitPosition = employmentGraphRepository.getUnitPositionById(unitPositionId);
-        StaffEmploymentDetails unitPositionDetails = null;
-        if (Optional.ofNullable(unitPosition).isPresent()) {
+    public StaffEmploymentDetails getEmploymentCTA(Long employmentId, Long unitId) {
+        EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
+        StaffEmploymentDetails employmentDetails = null;
+        if (Optional.ofNullable(employment).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
             Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
-            unitPositionDetails = convertEmploymentObject(unitPosition);
-            unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-            unitPositionDetails.setCountryId(countryId);
+            employmentDetails = convertEmploymentObject(employment);
+            employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+            employmentDetails.setCountryId(countryId);
 
-            unitPositionDetails.setCountryId(countryId);
-            unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+            employmentDetails.setCountryId(countryId);
+            employmentDetails.setUnitTimeZone(organization.get().getTimeZone());
         }
-        return unitPositionDetails;
+        return employmentDetails;
 
     }
     public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllUnitPositionsBasicDetailsAndWTAByUser(user.getId());
-        List<Long> upIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
-        List<NameValuePair> requestParam = Collections.singletonList(new BasicNameValuePair("upIds", upIds.toString().replace("[", "").replace("]", "")));
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
+        List<NameValuePair> requestParam = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
         });
-        Map<Long, EmploymentQueryResult> unitPositionQueryResultMap = employmentQueryResults.stream().collect(Collectors.toMap(EmploymentQueryResult::getId, v -> v));
+        Map<Long, EmploymentQueryResult> employmentQueryResultMap = employmentQueryResults.stream().collect(Collectors.toMap(EmploymentQueryResult::getId, v -> v));
         ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
-            if (unitPositionQueryResultMap.containsKey(currentCTA.getEmploymentId())) {
-                EmploymentQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getEmploymentId());
-                currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
-                currentCTA.setEmploymentId(currentActiveUnitPosition.getId());
+            if (employmentQueryResultMap.containsKey(currentCTA.getEmploymentId())) {
+                EmploymentQueryResult currentActiveEmployment = employmentQueryResultMap.get(currentCTA.getEmploymentId());
+                currentCTA.setUnitInfo(currentActiveEmployment.getUnitInfo());
+                currentCTA.setEmploymentId(currentActiveEmployment.getId());
             }
         });
         return ctaTableSettingWrapper;
     }
     public WTATableSettingWrapper getAllWTAOfStaff(Long unitId, Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllUnitPositionsBasicDetailsAndWTAByUser(user.getId());
-        List<Long> unitpositionIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
 
-        List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("upIds", unitpositionIds.toString().replace("[", "").replace("]", "")));
+        List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));
         WTATableSettingWrapper wtaWithTableSettings = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_WTA, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTATableSettingWrapper>>() {
         });
-        Map<Long, EmploymentQueryResult> unitPositionQueryResultMap = employmentQueryResults.stream().filter(u -> u.getHistory() != null && u.getHistory().equals(false)).collect(Collectors.toMap(EmploymentQueryResult::getId, v -> v));
+        Map<Long, EmploymentQueryResult> employmentQueryResultMap = employmentQueryResults.stream().filter(u -> u.getHistory() != null && u.getHistory().equals(false)).collect(Collectors.toMap(EmploymentQueryResult::getId, v -> v));
         wtaWithTableSettings.getAgreements().forEach(currentWTA -> {
-            EmploymentQueryResult employmentQueryResult = unitPositionQueryResultMap.get(currentWTA.getUnitPositionId());
+            EmploymentQueryResult employmentQueryResult = employmentQueryResultMap.get(currentWTA.getEmploymentId());
             if (employmentQueryResult != null) {
                 currentWTA.setUnitInfo(employmentQueryResult.getUnitInfo());
-                currentWTA.setUnitPositionId(employmentQueryResult.getId());
+                currentWTA.setEmploymentId(employmentQueryResult.getId());
             }
         });
         return wtaWithTableSettings;

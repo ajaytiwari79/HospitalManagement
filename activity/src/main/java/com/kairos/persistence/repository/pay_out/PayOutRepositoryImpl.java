@@ -25,28 +25,15 @@ public class PayOutRepositoryImpl implements CustomPayOutRepository {
 
 
 
-    public PayOutPerShift findLastPayoutByUnitPositionId(Long unitPositionId, Date date) {
-        Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("date").lt(date).and("deleted").is(false));
+    public PayOutPerShift findLastPayoutByEmploymentId(Long employmentId, Date date) {
+        Query query = new Query(Criteria.where("employmentId").is(employmentId).and("date").lt(date).and("deleted").is(false));
         query.with(Sort.by(Sort.Direction.ASC,"date"));
         return mongoTemplate.findOne(query, PayOutPerShift.class);
     }
 
-    @Override
-    public List<PayOutPerShift> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionIds, Date startDate) {
-        Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where("unitPositionId").in(unitPositionIds).and("date").lt(startDate).and("deleted").is(false)),
-          Aggregation.sort(Sort.Direction.ASC,"date"),
-                Aggregation.group("unitPositionId").addToSet("$$ROOT").as("data"),
-                Aggregation.project().and("data").arrayElementAt(0),
-                Aggregation.replaceRoot("data")
-        );
-        AggregationResults aggregationResults=mongoTemplate.aggregate(aggregation, PayOutPerShift.class, PayOutPerShift.class);
-        return aggregationResults.getMappedResults();
-    }
 
-
-    public void updatePayOut(Long unitPositionId, int payOut) {
-        Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("deleted").is(false));
+    public void updatePayOut(Long employmentId, int payOut) {
+        Query query = new Query(Criteria.where("employmentId").is(employmentId).and("deleted").is(false));
         Update update = new Update().inc("payoutBeforeThisDate",payOut);
         mongoTemplate.updateMulti(query,update, PayOutPerShift.class);
 

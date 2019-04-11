@@ -223,19 +223,19 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
 
-    public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitPositionId) {
-        EmploymentDTO unitPosition = userIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
-        if (!Optional.ofNullable(unitPosition).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
+    public CTAResponseDTO getEmploymentCTA(Long unitId, Long employmentId) {
+        EmploymentDTO employment = userIntegrationService.getEmploymentDTO(unitId,employmentId);
+        if (!Optional.ofNullable(employment).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
 
         }
-        return costTimeAgreementRepository.getOneCtaById(unitPosition.getCostTimeAgreementId());
+        return costTimeAgreementRepository.getOneCtaById(employment.getCostTimeAgreementId());
     }
 
-    public StaffEmploymentDetails updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,null,ORGANIZATION,unitPositionId,new HashSet<>());
+    public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId,null,ORGANIZATION,employmentId,new HashSet<>());
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidUnitPositionId", unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate()!=null && ctaDTO.getEndDate()!=null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())){
             exceptionService.actionNotPermittedException("end_date.from.end_date",ctaDTO.getEndDate(),staffAdditionalInfoDTO.getEmployment().getEndDate());
@@ -250,18 +250,18 @@ public class CostTimeAgreementService extends MongoBaseService {
             updateSameCTA = !isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
         }
         if(updateSameCTA) {
-            responseCTA = updateUnitPositionCTA(oldCTA,ctaDTO);
+            responseCTA = updateEmploymentCTA(oldCTA,ctaDTO);
         }else {
-            responseCTA = updateUnitPositionCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
+            responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
         staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
-        timeBankService.updateDailyTimeBankOnCTAChangeOfUnitPosition(staffAdditionalInfoDTO,responseCTA);
+        timeBankService.updateDailyTimeBankOnCTAChangeOfEmployment(staffAdditionalInfoDTO,responseCTA);
         return staffAdditionalInfoDTO.getEmployment();
     }
 
-    private CTAResponseDTO updateUnitPositionCTA(CostTimeAgreement costTimeAgreement,CollectiveTimeAgreementDTO ctaDTO){
+    private CTAResponseDTO updateEmploymentCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO ctaDTO){
         if(!ctaDTO.getStartDate().equals(costTimeAgreement.getStartDate())){
-            boolean ctaExists = costTimeAgreementRepository.ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(costTimeAgreement.getId(),costTimeAgreement.getUnitPositionId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
+            boolean ctaExists = costTimeAgreementRepository.ctaExistsByEmploymentIdAndDatesAndNotEqualToId(costTimeAgreement.getId(),costTimeAgreement.getEmploymentId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
             if(ctaExists){
                 exceptionService.duplicateDataException("error.cta.invalid",ctaDTO.getStartDate(),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): "");
             }
@@ -280,12 +280,12 @@ public class CostTimeAgreementService extends MongoBaseService {
         save(costTimeAgreement);
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement.getExpertise(), ExpertiseResponseDTO.class);
-        return new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,costTimeAgreement.getUnitPositionId(),costTimeAgreement.getDescription());
+        return new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,costTimeAgreement.getEmploymentId(),costTimeAgreement.getDescription());
     }
 
-    private CTAResponseDTO updateUnitPositionCTAWhenCalculatedValueChanged(CostTimeAgreement oldCTA,CollectiveTimeAgreementDTO ctaDTO){
+    private CTAResponseDTO updateEmploymentCTAWhenCalculatedValueChanged(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO){
         if(!ctaDTO.getStartDate().equals(oldCTA.getStartDate())){
-            boolean ctaExists = costTimeAgreementRepository.ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(oldCTA.getId(),oldCTA.getUnitPositionId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
+            boolean ctaExists = costTimeAgreementRepository.ctaExistsByEmploymentIdAndDatesAndNotEqualToId(oldCTA.getId(),oldCTA.getEmploymentId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
             if(ctaExists){
                 exceptionService.duplicateDataException("error.cta.invalid",ctaDTO.getStartDate(),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): "");
             }
@@ -312,12 +312,12 @@ public class CostTimeAgreementService extends MongoBaseService {
         costTimeAgreement.setOrganizationType(oldCTA.getOrganizationType());
         costTimeAgreement.setOrganizationSubType(oldCTA.getOrganizationSubType());
         costTimeAgreement.setOrganization(oldCTA.getOrganization());
-        costTimeAgreement.setUnitPositionId(oldCTA.getUnitPositionId());
+        costTimeAgreement.setEmploymentId(oldCTA.getEmploymentId());
         costTimeAgreement.setDescription(ctaDTO.getDescription());
         costTimeAgreementRepository.save(costTimeAgreement);
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
-        CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,oldCTA.getUnitPositionId(),costTimeAgreement.getDescription());
+        CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,oldCTA.getEmploymentId(),costTimeAgreement.getDescription());
         responseCTA.setParentId(oldCTA.getId());
         responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
         CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA,CTAResponseDTO.class);
@@ -541,12 +541,12 @@ public class CostTimeAgreementService extends MongoBaseService {
         return ctaResponseDTOS.isEmpty() ? null : ctaResponseDTOS.get(0);
     }
 
-    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds) {
-        return costTimeAgreementRepository.getCTAByUpIds(unitPositionIds);
+    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds) {
+        return costTimeAgreementRepository.getCTAByUpIds(employmentIds);
     }
 
 
-    public CTAResponseDTO assignCTATOUnitPosition(Long unitPositionId, BigInteger ctaId, LocalDate startLocalDate) {
+    public CTAResponseDTO assignCTAToEmployment(Long employmentId, BigInteger ctaId, LocalDate startLocalDate) {
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(ctaId);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
@@ -558,7 +558,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         if (!ctaRuleTemplates.isEmpty()) {
             save(ctaRuleTemplates);
         }
-        costTimeAgreement.setUnitPositionId(unitPositionId);
+        costTimeAgreement.setEmploymentId(employmentId);
         List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         save(costTimeAgreement);

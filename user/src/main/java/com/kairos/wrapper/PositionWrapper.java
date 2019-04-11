@@ -13,7 +13,7 @@ import java.util.List;
 public class PositionWrapper {
 
     private List<ClientMinimumDTO> relatedCitizens;
-    private EmploymentQueryResult unitPosition;
+    private EmploymentQueryResult employment;
     private PositionQueryResult position;
 
 
@@ -34,8 +34,8 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public PositionWrapper(EmploymentQueryResult unitPosition, PositionQueryResult position) {
-        this.unitPosition = unitPosition;
+    public PositionWrapper(EmploymentQueryResult employment, PositionQueryResult position) {
+        this.employment = employment;
         this.position = position;
     }
 
@@ -47,12 +47,12 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public EmploymentQueryResult getUnitPosition() {
-        return unitPosition;
+    public EmploymentQueryResult getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(EmploymentQueryResult unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(EmploymentQueryResult employment) {
+        this.employment = employment;
     }
 
 }

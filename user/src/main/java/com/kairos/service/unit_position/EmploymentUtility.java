@@ -39,7 +39,7 @@ public class EmploymentUtility {
         return unitPositionDetails;
     }
 
-    public static void convertStaffUnitPositionObject(StaffEmploymentDetails unitPosition, com.kairos.dto.activity.shift.StaffEmploymentDetails unitPositionDetails, List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes ) {
+    public static void convertStaffEmploymentObject(StaffEmploymentDetails unitPosition, com.kairos.dto.activity.shift.StaffEmploymentDetails unitPositionDetails, List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes ) {
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
         unitPositionDetails.setStaff(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
         EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);

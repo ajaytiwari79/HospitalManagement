@@ -212,7 +212,7 @@ public class UserIntegrationService {
         });
     }
 
-    public EmploymentDTO getUnitPositionDTO(Long unitId, Long unitEmploymentPositionId) {
+    public EmploymentDTO getEmploymentDTO(Long unitId, Long unitEmploymentPositionId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentDTO>>() {
         }, unitEmploymentPositionId);
     }
@@ -746,7 +746,7 @@ public class UserIntegrationService {
         });
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByUnitPositionId(Long unitId,LocalDate shiftDate, String type, Long unitPositionId,Set<Long> reasonCodeIds) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByEmploymentId(Long unitId, LocalDate shiftDate, String type, Long unitPositionId, Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
         queryParamList.add(new BasicNameValuePair("startDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
@@ -762,7 +762,7 @@ public class UserIntegrationService {
         },timeTypeId);
     }
 
-    public Long getUnitByUnitPositionId(Long unitPositionId) {
+    public Long getUnitByEmploymentId(Long unitPositionId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         },unitPositionId);
     }

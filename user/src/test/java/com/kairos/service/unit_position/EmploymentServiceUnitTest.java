@@ -39,7 +39,7 @@ public class EmploymentServiceUnitTest {
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithoutEndDate() throws Exception {
         employmentDTO = new EmploymentDTO( 733L, LocalDate.of(2018,12,02), null, 100, 10.2f, new BigDecimal(10.2f), 10.2d, null);
-        boolean result = employmentService.validateUnitPositionWithExpertise(employments, employmentDTO);
+        boolean result = employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
@@ -47,16 +47,16 @@ public class EmploymentServiceUnitTest {
     public void validateUnitEmploymentPositionWithExpertiseWithEndDates() throws Exception {
         employmentDTO = new EmploymentDTO(733L,LocalDate.of(2018,12,02), LocalDate.of(2019,06,02), 100, 10.2f, new BigDecimal(10.2f), 10.2d, null);
         employments.get(1).setEndDate(LocalDate.now().plusDays(100));
-        boolean result= employmentService.validateUnitPositionWithExpertise(employments, employmentDTO);
+        boolean result= employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithEndDate() throws Exception {
-        employmentService.validateUnitPositionWithExpertise(employments, employmentDTO);
+        employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
         Employment uep5 = new Employment(LocalDate.now(), LocalDate.now().plusDays(5));
         employments.add(uep5);
-        boolean result= employmentService.validateUnitPositionWithExpertise(employments, employmentDTO);
+        boolean result= employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
@@ -65,7 +65,7 @@ public class EmploymentServiceUnitTest {
         employments.clear();
         Employment uep5 = new Employment(LocalDate.now(), LocalDate.now().plusDays(5));
         employments.add(uep5);
-        boolean result = employmentService.validateUnitPositionWithExpertise(employments, employmentDTO);
+        boolean result = employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
@@ -75,7 +75,7 @@ public class EmploymentServiceUnitTest {
         employments.clear();
         Employment uep5 = new Employment(LocalDate.now(), LocalDate.now().plusDays(5));
         employments.add(uep5);
-        boolean result =  employmentService.validateUnitPositionWithExpertise(employments, employmentDTO);
+        boolean result =  employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 

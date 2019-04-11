@@ -69,7 +69,7 @@ public class EmploymentDTO {
     private Long timeCareExternalId;
     private boolean published;
     private Long accessGroupId;
-    private boolean mainUnitPosition;
+    private boolean mainEmployment;
     private float taxDeductionPercentage;
     private ExpertiseResponseDTO expertise;
     //This is the Intial value of accumulatedTimebank
@@ -332,12 +332,12 @@ public class EmploymentDTO {
         this.employmentLineId = employmentLineId;
     }
 
-    public boolean isMainUnitPosition() {
-        return mainUnitPosition;
+    public boolean isMainEmployment() {
+        return mainEmployment;
     }
 
-    public void setMainUnitPosition(boolean mainUnitPosition) {
-        this.mainUnitPosition = mainUnitPosition;
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
     }
 
     public float getTaxDeductionPercentage() {

@@ -590,7 +590,7 @@ public class PositionService {
         Long employmentEndDate = null;
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        List<String> unitPositionsEndDate = employmentGraphRepository.getAllUnitPositionsByStaffId(staffId);
+        List<String> unitPositionsEndDate = employmentGraphRepository.getAllEmploymentsByStaffId(staffId);
         if (!unitPositionsEndDate.isEmpty()) {
             //java.lang.ClassCastException: java.lang.String cannot be cast to java.time.LocalDate
             LocalDate maxEndDate = LocalDate.parse(unitPositionsEndDate.get(0));
@@ -670,7 +670,7 @@ public class PositionService {
     }
 
 
-    public boolean eligibleForMainUnitPosition(EmploymentDTO employmentDTO, long unitPositionId) {
+    public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long unitPositionId) {
         EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), unitPositionId);
         if (employmentQueryResult != null) {
             if (employmentQueryResult.getEndDate() == null) {

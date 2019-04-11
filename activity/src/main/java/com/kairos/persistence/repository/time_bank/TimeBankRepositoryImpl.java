@@ -30,30 +30,6 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
     }
 
     @Override
-    public List<DailyTimeBankEntry> findLastTimeBankByUnitPositionIds(List<Long> unitPositionId, Date date) {
-        Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where("unitPositionId").in(unitPositionId).and("date").lt(date).and("deleted").is(false)),
-                Aggregation.sort(Sort.Direction.ASC,"date"),
-                Aggregation.group("unitPositionId").addToSet("$$ROOT").as("data"),
-                Aggregation.project().and("data").arrayElementAt(0),
-                Aggregation.replaceRoot("data")
-        );
-        AggregationResults aggregationResults=mongoTemplate.aggregate(aggregation,DailyTimeBankEntry.class,DailyTimeBankEntry.class);
-        return aggregationResults.getMappedResults();
-        //        Query query = new Query(Criteria.where("unitPositionId").in(unitPositionId).and("date").lt(date).and("deleted").is(false));
-//        query.with(Sort.by(Sort.Direction.ASC,"date"));
-//        return mongoTemplate.find(query,DailyTimeBankEntry.class);
-    }
-
-    @Override
-    public void updateAccumulatedTimeBank(Long unitPositionId, int timeBank) {
-        Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("deleted").is(false));
-        Update update = new Update().inc("accumultedTimeBankMin",timeBank);
-        mongoTemplate.updateMulti(query,update,DailyTimeBankEntry.class);
-
-    }
-
-    @Override
     public List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate){
         Criteria criteria = Criteria.where("unitPositionId").is(unitPositionId).and("deleted").is(false).and("date").gte(startDate);
         if(endDate!=null){

@@ -47,7 +47,7 @@ public class Employment extends UserBaseEntity {
     private boolean published;
     @Relationship(type = HAS_EMPLOYMENT_LINES)
     private List<EmploymentLine> employmentLines;
-    private boolean mainUnitPosition;
+    private boolean mainEmployment;
     private float taxDeductionPercentage;
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
@@ -164,12 +164,12 @@ public class Employment extends UserBaseEntity {
 
 
 
-    public boolean isMainUnitPosition() {
-        return mainUnitPosition;
+    public boolean isMainEmployment() {
+        return mainEmployment;
     }
 
-    public void setMainUnitPosition(boolean mainUnitPosition) {
-        this.mainUnitPosition = mainUnitPosition;
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
     }
 
     public float getTaxDeductionPercentage() {

@@ -76,11 +76,11 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "RETURN distinct function as function,rel.amount as amount,rel.amountEditableAtUnit as amountEditableAtUnit")
     List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId, Long expertiseId, Long seniorityLevelId, String selectedDate, List<Long> functions);
 
-    @Query("MATCH(o:Organization)<-[:"+IN_UNIT+"]-(unitPosition:Employment{deleted:false})-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(o)={0} AND " +
-            "({2} IS NULL AND (unitPosition.endDate IS NULL OR date(unitPosition.endDate) > DATE({1})))\n" +
+    @Query("MATCH(o:Organization)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(o)={0} AND " +
+            "({2} IS NULL AND (employment.endDate IS NULL OR date(employment.endDate) > DATE({1})))\n" +
             "OR \n" +
-            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < date(unitPosition.endDate) OR DATE({2})>date(unitPosition.startDate)))\n" +
-            "WITH unitPosition,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions\n" +
-            " RETURN  id(unitPosition) as id , appliedFunctions as appliedFunctions")
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < date(employment.endDate) OR DATE({2})>date(employment.startDate)))\n" +
+            "WITH employment,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions\n" +
+            " RETURN  id(employment) as id , appliedFunctions as appliedFunctions")
     List<EmploymentQueryResult> findAppliedFunctionsAtEmpployment(Long unitId, String startDate, String endDate);
 }

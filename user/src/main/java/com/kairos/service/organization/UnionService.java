@@ -598,7 +598,7 @@ public class UnionService {
         }
     }
 
-    public StaffUnionWrapper getUnitPositionDefaultData(Long unitId, String type, Long staffId) {
+    public StaffUnionWrapper getEmploymentDefaultData(Long unitId, String type, Long staffId) {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");

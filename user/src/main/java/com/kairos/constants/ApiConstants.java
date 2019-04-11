@@ -22,10 +22,10 @@ public final class ApiConstants {
     public static final String GET_VERSION_WTA = "/wta/versions";
     public static final String API_ALL_PHASES_URL = "/phase/all";
     public static final String APPLICABLE_CTA_WTA = "/applicable-cta-wta";
-    public static final String APPLY_CTA_WTA = "/unitPosition/{unitPositionId}/apply_cta_wta";
-    public static final String APPLY_CTA_WTA_END_DATE = "/unitPosition/{unitPositionId}/apply_end_date";
+    public static final String APPLY_CTA_WTA = "/employment/{employmentId}/apply_cta_wta";
+    public static final String APPLY_CTA_WTA_END_DATE = "/employment/{employmentId}/apply_end_date";
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
-    public static final String GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS = "/unitposition_cta_wta_and_accumulated_timebank";
+    public static final String GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS = "/employment_cta_wta_and_accumulated_timebank";
 
 
     //Scheduler restClient

@@ -137,7 +137,7 @@ public class CostTimeAgreementController {
     @ApiOperation(value = "Update Unit Position's CTA")
     @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateCostTimeAgreementForEmployment(unitId, unitPositionId, ctaId, ctaDTO));
     }
 
 
@@ -150,7 +150,7 @@ public class CostTimeAgreementController {
     @ApiOperation(value = "get unit_position's CTA")
     @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
     public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getUnitPositionCTA(unitId, unitPositionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getEmploymentCTA(unitId, unitPositionId));
     }
 
 
@@ -250,8 +250,8 @@ public class CostTimeAgreementController {
 
     @ApiOperation(value = "get versions cta")
     @GetMapping(value = UNIT_URL + "/get_versions_cta")
-    public ResponseEntity<Map<String, Object>> getVersionsCTA(@PathVariable Long unitId,@RequestParam List<Long> upIds)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getVersionsCTA(unitId,upIds));
+    public ResponseEntity<Map<String, Object>> getVersionsCTA(@PathVariable Long unitId,@RequestParam List<Long> employmentIds)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getVersionsCTA(unitId,employmentIds));
     }
 
     @ApiOperation(value = "get default cta")

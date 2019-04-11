@@ -24,7 +24,7 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffEmploymentDetails unitPosition;
+    private StaffEmploymentDetails employments;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
@@ -137,12 +137,12 @@ public class StaffAdditionalInfoQueryResult {
         this.unitId = unitId;
     }
 
-    public StaffEmploymentDetails getUnitPosition() {
-        return unitPosition;
+    public StaffEmploymentDetails getEmployments() {
+        return employments;
     }
 
-    public void setUnitPosition(StaffEmploymentDetails unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployments(StaffEmploymentDetails employments) {
+        this.employments = employments;
     }
 
     public Date getOrganizationNightStartTimeFrom() {

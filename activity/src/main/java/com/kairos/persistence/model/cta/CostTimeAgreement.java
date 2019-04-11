@@ -36,18 +36,18 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean disabled;
-    private Long unitPositionId;
+    private Long employmentId;
 
     public CostTimeAgreement() {
     }
 
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public WTAOrganization getOrganization() {

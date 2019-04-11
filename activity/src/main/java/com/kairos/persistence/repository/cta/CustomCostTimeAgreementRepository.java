@@ -48,5 +48,5 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId, Date startDate, Date endDate);
 
-    boolean ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger ctaId,Long unitPositionId,Date startDate,Date endDate);
+    boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long unitPositionId, Date startDate, Date endDate);
 }

@@ -117,7 +117,7 @@ public class AbsenceShiftService {
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
         Date endDate = plusDays(fromDate, activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ? 1 : 7);
-        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(shiftDTO.getId(),staffAdditionalInfoDTO.getEmployment().getId(), fromDate,endDate,null);
+        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentId(shiftDTO.getId(),staffAdditionalInfoDTO.getEmployment().getId(), fromDate,endDate,null);
         if (shiftExists) {
             exceptionService.actionNotPermittedException("message.shift.date.startandend", fromDate, endDate);
         }

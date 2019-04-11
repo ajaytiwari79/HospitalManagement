@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class WTAResponseDTO {
     private LocalDate endDate;
     private Long expiryDate;
     private String name;
-    private Long unitPositionId;
+    private Long employmentId;
     private String description;
     private BigInteger id;
     private ExpertiseResponseDTO expertise;
@@ -75,12 +74,12 @@ public class WTAResponseDTO {
         this.versions = versions;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public WTAResponseDTO getParentWTAResponse() {
