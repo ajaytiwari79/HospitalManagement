@@ -407,8 +407,7 @@ public class UserService {
 
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
-            Organization parentOrganization = organizationService.fetchParentOrganization(organizationId);
-            Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+            Long countryId = UserContext.getUserDetails().getCountryId();
             List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
             Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
             boolean checkDayType=true;
@@ -434,23 +433,25 @@ public class UserService {
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
-        updateLastSelectedOrganizationId(organizationId);
+        updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 
 
-    private Boolean updateLastSelectedOrganizationId(Long organizationId) {
+    private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        currentUser.setLastSelectedOrganizationId(organizationId);
-        userGraphRepository.save(currentUser);
-        return true;
+        if(currentUser.getLastSelectedOrganizationId()!=organizationId){
+            currentUser.setLastSelectedOrganizationId(organizationId);
+            Long countryId = organizationGraphRepository.getCountryId(organizationId);
+            currentUser.setCountryId(countryId);
+            userGraphRepository.save(currentUser);
+        }
     }
 
 
     public boolean updateDateOfBirthOfUserByCPRNumber() {
         List<User> users = userGraphRepository.findAll();
-
         users.stream().forEach(user -> {
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);

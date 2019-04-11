@@ -18,6 +18,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -84,7 +85,7 @@ public class UnitService {
         }
 
         Organization parentOrganization = organization.isParentOrganization()? organization : organizationService.fetchParentOrganization(organizationId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
