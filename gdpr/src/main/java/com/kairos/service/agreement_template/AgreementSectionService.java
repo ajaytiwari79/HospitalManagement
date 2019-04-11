@@ -73,17 +73,7 @@ public class AgreementSectionService {
         }
         updateSectionAndSubSection(policyAgreementTemplate, agreementTemplateSectionDTO, referenceId, isOrganization);
         policyAgreementRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization, false, templateId);
-    }
-
-    public AgreementTemplateSectionResponseDTO createAndUpdateDataHandlerAgreement(Long countryId, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementRepository.findByIdAndCountryIdAndDeletedFalseAndDataHandlerTrue(templateId, countryId);
-        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
-        }
-        updateSectionAndSubSection(policyAgreementTemplate, agreementTemplateSectionDTO, countryId, false);
-        policyAgreementRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId, false, true, templateId);
+        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isOrganization,  templateId);
     }
 
 

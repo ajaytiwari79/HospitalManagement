@@ -4,6 +4,7 @@ import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.GeneralAgreementTemplateResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
@@ -41,12 +42,6 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(countryId, false, agreementTemplateDto));
     }
 
-    @ApiOperation("save Data handler agreement template with basic detail")
-    @PostMapping(COUNTRY_URL + "/data_handler_agreement")
-    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createMasterDataHandler(@PathVariable Long countryId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
-        agreementTemplateDto.setDataHandlerAgreement(true);
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(countryId, false, agreementTemplateDto));
-    }
 
     @ApiOperation("upload cover image of agreement template , country level")
     @PostMapping(COUNTRY_URL + "/agreement_template/{agreementTemplateId}/upload")
@@ -57,16 +52,10 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.uploadCoverPageLogo(countryId, false, agreementTemplateId, file));
     }
 
-    @ApiOperation("get all agreement sections and sub section of master agreement template , country level ")
+    @ApiOperation("get sections and sub section of master agreement template and general agreement template, country level ")
     @GetMapping(COUNTRY_URL + "/agreement_template/{agreementTemplateId}/section")
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionsOfMasterAgreementTemplate(@PathVariable Long countryId, @PathVariable Long agreementTemplateId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId, false, false, agreementTemplateId));
-    }
-
-    @ApiOperation("get all agreement sections and sub section of master agreement template , country level ")
-    @GetMapping(COUNTRY_URL + "/data_handler_agreement/{templateId}/section")
-    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllDataHandlerSectionWithSubSection(@PathVariable Long countryId, @PathVariable Long templateId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId, false, true, templateId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId, false,  agreementTemplateId));
     }
 
 
@@ -85,8 +74,7 @@ class PolicyAgreementTemplateController {
 
     }
 
-
-    @ApiOperation("get all master  policy agreement Template with basic details ,country level  ")
+    @ApiOperation("get all master  policy agreement Template  and general data agreement template  basic details ,country level  ")
     @GetMapping(COUNTRY_URL + "/agreement_template")
     public ResponseEntity<ResponseDTO<List<PolicyAgreementTemplateResponseDTO>>> getAllMasterAgreementTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryId(countryId));
@@ -135,7 +123,7 @@ class PolicyAgreementTemplateController {
     @ApiOperation("get all agreement sections and sub section of agreement template , unit level ")
     @GetMapping(UNIT_URL + "/agreement_template/{agreementTemplateId}/section")
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable Long agreementTemplateId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId, true, false, agreementTemplateId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId, true,  agreementTemplateId));
     }
 
     @ApiOperation(value = "All Template Type type ")
@@ -143,5 +131,30 @@ class PolicyAgreementTemplateController {
     public ResponseEntity<Object> getAllTemplateType(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllTemplateType(unitId));
     }
+
+
+    @ApiOperation("save Data handler agreement template with basic detail")
+    @PostMapping(COUNTRY_URL + "/general_agreement_template")
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createMasterDataHandler(@PathVariable Long countryId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
+        agreementTemplateDto.setGeneralAgreementTemplate(true);
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(countryId, false, agreementTemplateDto));
+    }
+
+
+    @ApiOperation("update General agreement template")
+    @PutMapping(COUNTRY_URL + "/general_agreement_template/{agreementTemplateId}")
+    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long countryId, @PathVariable Long agreementTemplateId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
+        agreementTemplateDto.setGeneralAgreementTemplate(true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(countryId, false, agreementTemplateId, agreementTemplateDto));
+
+    }
+
+
+    @ApiOperation("get all general agreement template")
+    @GetMapping("/legal")
+    public ResponseEntity<ResponseDTO<List<GeneralAgreementTemplateResponseDTO>>> getAllGeneralAgreementTemplate() {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllGeneralAgreementTemplate());
+    }
+
 
 }
