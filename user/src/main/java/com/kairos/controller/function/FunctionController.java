@@ -23,7 +23,6 @@ public class FunctionController {
     @Inject
     private FunctionService functionService;
 
-    //===============================================================
     @ApiOperation(value = "")
     @PostMapping(API_ORGANIZATION_UNIT_URL+"/appliedFunctionsByEmploymentIds")
     public ResponseEntity<Map<String, Object>> getEmploymentIdWithFunctionIdShiftDateMap(@RequestBody Set<Long> employmentIds) {

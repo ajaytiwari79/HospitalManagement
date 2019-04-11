@@ -22,8 +22,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WTAQueryResultDTO getOne(BigInteger wtaId);
 
-    List<WTAQueryResultDTO> getAllWTAByOrganizationTypeId(long organizationId);
-
     List<WTAQueryResultDTO> getAllWTAByCountryId(long countryId);
 
     List<WTAQueryResultDTO> getAllWTAByOrganizationSubTypeIdAndCountryId(long organizationSubTypeId, long countryId);
@@ -33,8 +31,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId);
 
     List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
-
-    WTAQueryResultDTO getVersionOfWTA(BigInteger wtaId);
 
     List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate);
 
@@ -62,8 +58,8 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long employmentId, Date startDate, Date endDate);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType);
 
 }

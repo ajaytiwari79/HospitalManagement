@@ -59,7 +59,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> findCTAByUnitId(Long unitId) {
-        Query query = new Query(Criteria.where("organization._id").is(unitId).and("deleted").is(false).and("disabled").is(false).and("unitPositionId").exists(false));
+        Query query = new Query(Criteria.where("organization._id").is(unitId).and("deleted").is(false).and("disabled").is(false).and("employmentId").exists(false));
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
@@ -71,28 +71,28 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getDefaultCTAOfExpertiseAndDate(Long unitId, Long expertiseId,LocalDate selectedDate) {
-        Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false).and("unitPositionId").exists(false).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate)));
+        Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false).and("employmentId").exists(false).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate)));
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
     @Override
     public List<CTAResponseDTO> getDefaultCTA(Long unitId, Long expertiseId) {
-        Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false).and("unitPositionId").exists(false));
+        Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false).and("employmentId").exists(false));
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
     @Override
-    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
-        query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate").include("parentId").include("organizationParentId");
+    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("employmentId").in(employmentIds));
+        query.fields().include("name").include("description").include("employmentId").include("startDate").include("endDate").include("parentId").include("organizationParentId");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
 
     @Override
-    public List<CTAResponseDTO> getParentCTAByUpIds(List<Long> unitPositionIds) {
+    public List<CTAResponseDTO> getParentCTAByUpIds(List<Long> employmentIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).and("disabled").is(false)),
+                match(Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
@@ -100,8 +100,8 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
-    public CTAResponseDTO getCTAByEmploymentIdAndDate(Long unitPositionId, Date date) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+    public CTAResponseDTO getCTAByEmploymentIdAndDate(Long employmentId, Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
@@ -140,7 +140,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 "       }";
         Document document = Document.parse(query);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
+                match(Criteria.where("employmentId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
                 new CustomAggregationOperation(document)
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
@@ -148,8 +148,8 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
-    public List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long unitPositionId, Date startDate, Date endDate) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
+    public List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
@@ -159,32 +159,32 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
-    public List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> unitPositionIds, Date date) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+    public List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> employmentIds, Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise","organizationParentId", "organization", "parentId",  "startDate", "endDate", "ruleTemplates","unitPositionId")
+                project("name", "description", "disabled", "expertise","organizationParentId", "organization", "parentId",  "startDate", "endDate", "ruleTemplates","employmentId")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
+    public List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise","organizationParentId", "organization", "parentId", "startDate", "endDate", "ruleTemplates","unitPositionId")
+                project("name", "description", "disabled", "expertise","organizationParentId", "organization", "parentId", "startDate", "endDate", "ruleTemplates","employmentId")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public CostTimeAgreement getCTABasicByEmploymentAndDate(Long unitPositionId, Date date) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+    public CostTimeAgreement getCTABasicByEmploymentAndDate(Long employmentId, Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Query query = new Query(criteria);
         CostTimeAgreement result = mongoTemplate.findOne(query,CostTimeAgreement.class);
         return result;
@@ -198,17 +198,17 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     }
     @Override
-    public void setEndDateToCTAOfEmployment(Long unitPositionId, LocalDate endDate){
+    public void setEndDateToCTAOfEmployment(Long employmentId, LocalDate endDate){
         Update update=Update.update("endDate",DateUtils.asDate(endDate));
-        mongoTemplate.findAndModify(new Query(Criteria.where("unitPositionId").is(unitPositionId).and("endDate").exists(false)),update,CostTimeAgreement.class);
+        mongoTemplate.findAndModify(new Query(Criteria.where("employmentId").is(employmentId).and("endDate").exists(false)),update,CostTimeAgreement.class);
     }
 
-    //find Overlap wta of unitPositionId
+    //find Overlap wta of employmentId
 
     @Override
-    public boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long unitPositionId, Date startDate, Date endDate) {
+    public boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate) {
         Criteria endDateCriteria = Criteria.where("endDate").exists(false).and("startDate").lte(startDate);
-        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(ctaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
+        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(ctaId).and("employmentId").is(employmentId).orOperator(Criteria.where("startDate").lte(startDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
     }
 }

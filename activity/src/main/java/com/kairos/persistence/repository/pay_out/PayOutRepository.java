@@ -18,17 +18,14 @@ import java.util.List;
 @Repository
 public interface PayOutRepository extends MongoBaseRepository<PayOutPerShift,BigInteger>,CustomPayOutRepository {
 
-    @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutPerShift> findAllByEmploymentsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
+    @Query("{employmentId:{$in:?0},date:{$gte:?1 , $lte:?2},deleted:false}")
+    List<PayOutPerShift> findAllByEmploymentsAndDate(List<Long> employmentIds, Date startDate, Date endDate);
 
-    @Query("{unitPositionId:?0,date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutPerShift> findAllByEmploymentAndDate(Long unitPositionId, Date startDate, Date endDate);
-
-    @Query("{unitPositionId:?0,date:{$gte:?1},deleted:false}")
-    PayOutPerShift findOneByUnitPositionAndDate(Long unitPositionId, Date payOutDate);
-
-    @Query("{unitPositionId:?0,date:{$lt:?1},deleted:false}")
-    List<PayOutPerShift> findAllByEmploymentAndBeforeDate(Long unitPositionId, Date payOutDate);
+    @Query("{employmentId:?0,date:{$gte:?1 , $lte:?2},deleted:false}")
+    List<PayOutPerShift> findAllByEmploymentAndDate(Long employmentId, Date startDate, Date endDate);
+    
+    @Query("{employmentId:?0,date:{$lt:?1},deleted:false}")
+    List<PayOutPerShift> findAllByEmploymentAndBeforeDate(Long employmentId, Date payOutDate);
 
     @Query("{shiftId:?0,deleted:false}")
     PayOutPerShift findAllByShiftId(BigInteger shiftId);

@@ -17,7 +17,7 @@ public class SickSettings extends MongoBaseEntity {
     private BigInteger activityId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Long employmentId;   // This is required to find user shifts based on unitPosition Id
+    private Long employmentId;   // This is required to find user shifts based on employment Id
 
 
     public SickSettings() {

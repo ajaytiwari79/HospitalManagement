@@ -27,11 +27,11 @@ import java.util.Set;
 public interface CustomShiftMongoRepository {
 
 
-    List<ShiftDTO> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
+    List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployment(Long unitPositionId, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployment(Long employmentId, Date startDate, Date endDate);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(List<Long> employmentIds, Date startDate, Date endDate);
 
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
@@ -41,7 +41,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftDTO> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId);
 
-    List<ShiftCountDTO> getAssignedShiftsCountByEmploymentId(List<Long> unitPositionIds, Date startDate);
+    List<ShiftCountDTO> getAssignedShiftsCountByEmploymentId(List<Long> employmentIds, Date startDate);
 
     List<ShiftResponseDTO> findAllByIdGroupByDate(List<BigInteger> shiftIds);
 
@@ -59,7 +59,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId);
 
-    List<ShiftResponseDTO> findShiftsBetweenDurationByEmploymentIds(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<ShiftResponseDTO> findShiftsBetweenDurationByEmploymentIds(List<Long> employmentIds, Date startDate, Date endDate);
 
     List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds);
 
@@ -69,15 +69,13 @@ public interface CustomShiftMongoRepository {
 
     void updateRemarkInShiftActivity(BigInteger shiftActivityId, String remark);
 
-    List<Shift> findAllShiftByIntervalAndEmploymentId(Long unitPositionId, Date startDate, Date endDate);
+    List<Shift> findAllShiftByIntervalAndEmploymentId(Long employmentId, Date startDate, Date endDate);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentAndActivityIds(Long unitPositionId, Date startDate, Date endDate, Set<BigInteger> activityIds);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds);
 
-    boolean existShiftsBetweenDurationByEmploymentId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType);
-
-    ShiftDTO findOneByIdWithActivityPriority(BigInteger shiftId);
-
-    boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, TimeTypes timeType);
+    boolean existShiftsBetweenDurationByEmploymentId(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, ShiftType shiftType);
+    
+    boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType);
 
 
 }

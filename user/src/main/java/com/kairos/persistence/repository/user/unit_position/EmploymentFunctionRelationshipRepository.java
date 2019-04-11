@@ -22,17 +22,17 @@ public interface EmploymentFunctionRelationshipRepository extends Neo4jBaseRepos
             "MERGE(unitPosition)-[rel:APPLIED_FUNCTION ]->(function)\n" +
             "ON CREATE set rel.appliedDates = {2} " +
             "ON MATCH set rel.appliedDates = rel.appliedDates+{2} ")
-    void createUnitPositionFunctionRelationship(Long unitPositionId, Long functionId, List<String> localDate);
+    void createEmploymentFunctionRelationship(Long unitPositionId, Long functionId, List<String> localDate);
 
 
     @Query("MATCH (unitPosition:Employment)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates WITH rel,function,\n" +
             "FILTER (x IN rel.appliedDates WHERE x <> {1}) as filteredDates\n" +
             "SET rel.appliedDates = filteredDates RETURN id(function)")
-    Long removeDateFromUnitPositionFunctionRelationship(Long unitPositionId, String localDate);
+    Long removeDateFromEmploymentFunctionRelationship(Long unitPositionId, String localDate);
 
     @Query("MATCH (unitPosition:Employment{deleted:false}) ,(function:Function{deleted:false})  where id(unitPosition) = {0} AND id(function) IN {1} " +
             "MATCH(unitPosition)-[rel:APPLIED_FUNCTION]->(function) RETURN id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates ")
-    List<EmploymentFunctionRelationshipQueryResult> findAllByFunctionIdAndUnitPositionId(Long unitPositionId, Set<Long> functionIds);
+    List<EmploymentFunctionRelationshipQueryResult> findAllByFunctionIdAndEmploymentId(Long unitPositionId, Set<Long> functionIds);
 
     @Query("MATCH (unitPosition:Employment)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND any(x IN rel.appliedDates WHERE x IN {1}) RETURN id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates")
     List<EmploymentFunctionRelationshipQueryResult> findAllByAppliedDatesIn(Long unitPositionId, Set<String> appliedDates);

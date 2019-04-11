@@ -87,7 +87,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         Map<Long, Double> staffAndContractualHourMap = new HashMap<>();
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
             Long contractualMinutes = 0l;
-            for (EmploymentWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getUnitPosition()) {
+            for (EmploymentWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                 int totalWeeklyMinutes = 0;
                 interval = timeBankCalculationService.getIntervalByDateForAdvanceView(positionWithCtaDetailsDTO, interval);
                 if (interval != null) {

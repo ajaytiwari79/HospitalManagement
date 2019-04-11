@@ -29,51 +29,34 @@ public class TimeBankController {
     @Autowired
     private TimeBankService timeBankService;
 
-    /*@RequestMapping(value = "/createTimeBank", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> createTimeBank(TimeBankDTO timeBankDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.createTimeBank(timeBankDTO));
-    }
-
-    @RequestMapping(value = "/updateTimeBank", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateTimeBank(@RequestBody TimeBankDTO timeBankDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.updateTimeBankAfterCheckoutShift(timeBankDTO));
-    }
-
-    @RequestMapping(value = "/getTimeBank", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getTimeBank(Long unitEmpPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getTimeBank(unitEmpPositionId));
-    }
-
-    */
-
-    @GetMapping(value = "/unit_position/{unitPositionId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    @GetMapping(value = "/employment/{employmentId}/")
+    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getAdvanceViewTimeBank
-                (unitId,unitPositionId,query,startDate,endDate));
+                (unitId,employmentId,query,startDate,endDate));
     }
 
-    @GetMapping(value = "overview/unit_position/{unitPositionId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam Integer year) {
+    @GetMapping(value = "overview/employment/{employmentId}/")
+    public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam Integer year) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getOverviewTimeBank
-                (unitId,unitPositionId,year));
+                (unitId,employmentId,year));
     }
 
-    @GetMapping(value = "visual_view/unit_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long unitPositionId,@RequestParam(value = "query",required = false) String query,@RequestParam(value = "value",required = false) Integer value,@RequestParam(value = "startDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    @GetMapping(value = "visual_view/employment/{employmentId}")
+    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long employmentId,@RequestParam(value = "query",required = false) String query,@RequestParam(value = "value",required = false) Integer value,@RequestParam(value = "startDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getTimeBankForVisualView
-                (unitId,unitPositionId,query,value,startDate,endDate));
+                (unitId,employmentId,query,value,startDate,endDate));
     }
 
     @ApiOperation("Update time bank after applying function")
     @PutMapping("/update_time_bank")
-    public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+    public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long employmentId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnFunctionChange(shiftStartDate,staffAdditionalInfoDTO));
     }
 
     @ApiOperation("Update time bank after modification of employmentLine")
-    @PutMapping("unit_position/{unitPositionId}/update_time_bank")
-    public ResponseEntity<Map<String,Object>> updateTimeBankOnUnitPositionModification(@RequestParam BigInteger ctaId,@PathVariable Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date employmentLineStartDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date employmentLineEndDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnEmploymentModification(ctaId,unitPositionId,employmentLineStartDate,employmentLineEndDate,staffAdditionalInfoDTO));
+    @PutMapping("employment/{employmentId}/update_time_bank")
+    public ResponseEntity<Map<String,Object>> updateTimeBankOnEmploymentModification(@RequestParam BigInteger ctaId, @PathVariable Long employmentId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date employmentLineStartDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date employmentLineEndDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnEmploymentModification(ctaId,employmentId,employmentLineStartDate,employmentLineEndDate,staffAdditionalInfoDTO));
     }
 
 
@@ -94,8 +77,8 @@ public class TimeBankController {
     //As discussed with Shiv kumar API name should be get_timebank_metadata
     @ApiOperation("Get accumulated timebank and delta timebank")
     @GetMapping("/get_timebank_metadata")
-    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDeltaDTO(unitPositionId,unitId,startDate,endDate));
+    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long employmentId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,startDate,endDate));
     }
 
 

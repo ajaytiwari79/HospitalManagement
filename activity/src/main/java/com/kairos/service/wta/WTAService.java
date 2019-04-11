@@ -411,7 +411,7 @@ public class WTAService extends MongoBaseService {
         return wtaDefaultDataInfoDTO;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByUpIds(Set<Long> employmentIds) {
+    public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByEmploymentIds(Set<Long> employmentIds) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(employmentIds, new Date());
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementService.getCTAByUpIds(employmentIds);
@@ -793,7 +793,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public CTAWTAAndAccumulatedTimebankWrapper getEmploymentCtaWtaAndAccumulatedTimebank(Long unitId, Map<Long, List<EmploymentLinesDTO>> employmentLinesMap){
-        return getWTACTAByUpIds(employmentLinesMap.keySet());
+        return getWTACTAByEmploymentIds(employmentLinesMap.keySet());
     }
 
     public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId,Long employmentId,LocalDate startDate,LocalDate endDate){

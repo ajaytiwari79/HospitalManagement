@@ -8,18 +8,18 @@ public class StaffKpiFilterDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    List<Long> unitIds;
+    private List<Long> unitIds;
     private Long unitId;
     private String unitName;
-    private List<EmploymentWithCtaDetailsDTO> unitPosition;
+    private List<EmploymentWithCtaDetailsDTO> employment;
 
 
-    public List<EmploymentWithCtaDetailsDTO> getUnitPosition() {
-        return unitPosition;
+    public List<EmploymentWithCtaDetailsDTO> getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(List<EmploymentWithCtaDetailsDTO> unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(List<EmploymentWithCtaDetailsDTO> employment) {
+        this.employment = employment;
     }
 
     public Long getId() {

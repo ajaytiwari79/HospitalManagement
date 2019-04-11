@@ -45,43 +45,43 @@ public class EmploymentFunctionService {
     @Inject
     private ActivityIntegrationService activityIntegrationService;
 
-    public Boolean applyFunction(Long unitPositionId, Map<String, Long> payload, Long unitId) {
+    public Boolean applyFunction(Long employmentId, Map<String, Long> payload, Long unitId) {
 
         String dateAsString = new ArrayList<>(payload.keySet()).get(0);
 
         Long functionId = payload.get(dateAsString);
-        employmentFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(dateAsString).toString());
-        employmentFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId, Collections.singletonList(dateAsString));
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(dateAsString), employmentGraphRepository.getStaffIdFromEmployment(unitPositionId), unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
-        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
+        employmentFunctionRelationshipRepository.removeDateFromEmploymentFunctionRelationship(employmentId, DateUtils.asLocalDate(dateAsString).toString());
+        employmentFunctionRelationshipRepository.createEmploymentFunctionRelationship(employmentId, functionId, Collections.singletonList(dateAsString));
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(dateAsString), employmentGraphRepository.getStaffIdFromEmployment(employmentId), employmentId, unitId, ORGANIZATION, Collections.emptySet());
+        activityIntegrationService.updateTimeBank(employmentId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
 
         return true;
     }
 
-    public Long removeFunction(Long unitId, Long unitPositionId, Date appliedDate) {
-        Long functionId = employmentFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
-        Long staffId = employmentGraphRepository.getStaffIdFromEmployment(unitPositionId);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(appliedDate), staffId, unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
-        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(appliedDate), staffAdditionalInfoDTO);
+    public Long removeFunction(Long unitId, Long employmentId, Date appliedDate) {
+        Long functionId = employmentFunctionRelationshipRepository.removeDateFromEmploymentFunctionRelationship(employmentId, DateUtils.asLocalDate(appliedDate).toString());
+        Long staffId = employmentGraphRepository.getStaffIdFromEmployment(employmentId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(appliedDate), staffId, employmentId, unitId, ORGANIZATION, Collections.emptySet());
+        activityIntegrationService.updateTimeBank(employmentId, DateUtils.asLocalDate(appliedDate), staffAdditionalInfoDTO);
         return functionId;
     }
 
-    public Long removeFunctionOnDeleteShift(Long unitPositionId, Date appliedDate) {
-        return employmentFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+    public Long removeFunctionOnDeleteShift(Long employmentId, Date appliedDate) {
+        return employmentFunctionRelationshipRepository.removeDateFromEmploymentFunctionRelationship(employmentId, DateUtils.asLocalDate(appliedDate).toString());
     }
 
 
     /**
-     * @param unitPositionId
+     * @param employmentId
      * @param appliedDates
      * @return
      * @Desc this method will remove applied functions for multiple dates
      */
-    public Map<LocalDate, Long> removeFunctions(Long unitPositionId, Set<LocalDate> appliedDates) {
+    public Map<LocalDate, Long> removeFunctions(Long employmentId, Set<LocalDate> appliedDates) {
         Map<LocalDate, Long> localDateAndFunctionIdMap = new HashMap<>();
         List<EmploymentFunctionRelationship> employmentFunctionRelationships = new ArrayList<>();
         Set<String> localDatesAsString = ObjectMapperUtils.copyPropertiesOfSetByMapper(appliedDates, String.class);
-        List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationshipQueryResults = employmentFunctionRelationshipRepository.findAllByAppliedDatesIn(unitPositionId, localDatesAsString);
+        List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationshipQueryResults = employmentFunctionRelationshipRepository.findAllByAppliedDatesIn(employmentId, localDatesAsString);
         for (EmploymentFunctionRelationshipQueryResult employmentFunctionRelationshipQueryResult : employmentFunctionRelationshipQueryResults) {
             Set<LocalDate> dateToRemove = ArrayUtil.getIntersectedDates(employmentFunctionRelationshipQueryResult.getAppliedDates(), appliedDates);
             employmentFunctionRelationshipQueryResult.getAppliedDates().removeAll(dateToRemove);
@@ -95,8 +95,8 @@ public class EmploymentFunctionService {
         return localDateAndFunctionIdMap;
     }
 
-    public Boolean restoreFunctions(Long unitPositionId, Map<Long, Set<LocalDate>> payload) {
-        List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationshipQueryResults = employmentFunctionRelationshipRepository.findAllByFunctionIdAndUnitPositionId(unitPositionId, payload.keySet());
+    public Boolean restoreFunctions(Long employmentId, Map<Long, Set<LocalDate>> payload) {
+        List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationshipQueryResults = employmentFunctionRelationshipRepository.findAllByFunctionIdAndEmploymentId(employmentId, payload.keySet());
         List<EmploymentFunctionRelationship> employmentFunctionRelationships = new ArrayList<>();
 
         for (EmploymentFunctionRelationshipQueryResult current : employmentFunctionRelationshipQueryResults) {
@@ -114,23 +114,23 @@ public class EmploymentFunctionService {
      *
      * @param unitId
      * @param staffId
-     * @param unitPositionId
+     * @param employmentId
      * @return
      */
-    public List<EmploymentLineFunctionQueryResult> getEmploymentLinesWithHourlyCost(Long unitId, Long staffId, Long unitPositionId) {
-        String inValidField = employmentGraphRepository.validateOrganizationStaffEmployment(unitId, staffId, unitPositionId);
+    public List<EmploymentLineFunctionQueryResult> getEmploymentLinesWithHourlyCost(Long unitId, Long staffId, Long employmentId) {
+        String inValidField = employmentGraphRepository.validateOrganizationStaffEmployment(unitId, staffId, employmentId);
         if (ORGANIZATION.equals(inValidField)) {
             exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
         } else if (STAFF.equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
         } else if (EMPLOYMENT.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Employment", unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Employment", employmentId);
         } else if (EMPLOYMENT_ORGANIZATION_RELATIONSHIP.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionOrgRel");
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "employmentOrgRel");
         } else if (EMPLOYMENT_STAFF_RELATIONSHIP.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionStaffRel");
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "employmentStaffRel");
         }
-        List<EmploymentLineFunctionQueryResult> hourlyCostByEmploymentLines = employmentGraphRepository.getFunctionalHourlyCostByEmploymentId(unitId, unitPositionId);
+        List<EmploymentLineFunctionQueryResult> hourlyCostByEmploymentLines = employmentGraphRepository.getFunctionalHourlyCostByEmploymentId(unitId, employmentId);
         BigDecimal leapYearConst = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(LEAP_YEAR));
         BigDecimal nonLeapYearConst = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(NON_LEAP_YEAR));
         hourlyCostByEmploymentLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByEmploymentLines, EmploymentLineFunctionQueryResult.class);

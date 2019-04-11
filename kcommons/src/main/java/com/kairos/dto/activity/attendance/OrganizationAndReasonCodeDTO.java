@@ -9,16 +9,16 @@ public class OrganizationAndReasonCodeDTO {
     private Long id;
     private String name;
     private List<ReasonCodeDTO> reasonCode;
-    private List<EmploymentDTO> unitPosition;
+    private List<EmploymentDTO> employment;
 
     public OrganizationAndReasonCodeDTO() {
     }
 
-    public OrganizationAndReasonCodeDTO(Long id, String name, List<ReasonCodeDTO> reasonCode,List<EmploymentDTO> unitPosition) {
+    public OrganizationAndReasonCodeDTO(Long id, String name, List<ReasonCodeDTO> reasonCode,List<EmploymentDTO> employment) {
         this.id = id;
         this.name = name;
         this.reasonCode = reasonCode;
-        this.unitPosition=unitPosition;
+        this.employment = employment;
     }
 
     public Long getId() {
@@ -45,11 +45,11 @@ public class OrganizationAndReasonCodeDTO {
         this.reasonCode = reasonCode;
     }
 
-    public List<EmploymentDTO> getUnitPosition() {
-        return unitPosition;
+    public List<EmploymentDTO> getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(List<EmploymentDTO> unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(List<EmploymentDTO> employment) {
+        this.employment = employment;
     }
 }

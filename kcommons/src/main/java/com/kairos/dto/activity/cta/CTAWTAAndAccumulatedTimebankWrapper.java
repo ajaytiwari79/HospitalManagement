@@ -18,7 +18,7 @@ public class CTAWTAAndAccumulatedTimebankWrapper {
 
     private List<CTAResponseDTO> cta = new ArrayList<>();
     private List<WTAResponseDTO> wta = new ArrayList<>();
-    //This is a Map of UnitPositionId and employmentLine and AccumulatedTimebank in Minutes
+    //This is a Map of employmentId and employmentLine and AccumulatedTimebank in Minutes
     private Map<Long, Map<Long,Long>> employmentLineAndTimebankMinuteMap;
 
     public CTAWTAAndAccumulatedTimebankWrapper(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta) {

@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CustomPayOutRepository {
 
-    PayOutPerShift findLastPayoutByEmploymentId(Long unitPositionId, Date date);
+    PayOutPerShift findLastPayoutByEmploymentId(Long employmentId, Date date);
 
-    void updatePayOut(Long unitPositionId,int payOut);
+    void updatePayOut(Long employmentId,int payOut);
 }

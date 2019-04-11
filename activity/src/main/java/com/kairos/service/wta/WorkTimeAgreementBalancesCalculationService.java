@@ -131,7 +131,7 @@ public class WorkTimeAgreementBalancesCalculationService {
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException("message.staff.unit", staffAdditionalInfoDTO.getId(), unitId);
         }
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDates(unitPositionId, asDate(startDate), asDate(endDate));
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDates(unitPositionId, asDate(startDate), asDate(endDate));
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
         Set<BigInteger> activityIds = getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
         List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
