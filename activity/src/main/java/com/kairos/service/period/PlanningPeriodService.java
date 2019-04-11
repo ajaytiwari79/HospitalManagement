@@ -779,7 +779,7 @@ public class PlanningPeriodService extends MongoBaseService {
         return true;
     }
 
-    // use for publish shift after flipping planning period CONSTRUCTION to DRAFT phase via manual or job
+    // use for publish shift after flipping planning period CONSTRUCTION to DRAFT phase
     public void publishShiftAfterPhaseFlipConstructionToDraft(BigInteger planningPeriodId, Long unitId){
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
         List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,ShiftStatus.PUBLISH);
@@ -789,8 +789,9 @@ public class PlanningPeriodService extends MongoBaseService {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
             }
         }
-        timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         save(shifts);
+        timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+
    //     shiftMongoRepository.publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(planningPeriodId,unitId, ShiftStatus.PUBLISH);
         LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
     }
