@@ -531,7 +531,7 @@ public class PlanningPeriodService extends MongoBaseService {
         //TODO Work
         Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithShiftDateFunctionIdMap = getUnitPositionIdWithFunctionIdShiftDateMap(shifts, unitId);
         if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())){
-            publishShiftAfterPhaseFlipConstructionToDraft(planningPeriod.getId(),unitId);
+            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod.getId(),unitId);
         }
         createShiftState(shifts, oldPlanningPeriodPhaseId, unitPositionWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
@@ -780,7 +780,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     // use for publish shift after flipping planning period CONSTRUCTION to DRAFT phase
-    public void publishShiftAfterPhaseFlipConstructionToDraft(BigInteger planningPeriodId, Long unitId){
+    public void publishShiftsAfterFlippingPhaseConstructionToDraft(BigInteger planningPeriodId, Long unitId){
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
         List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,ShiftStatus.PUBLISH);
         for (Shift shift : shifts) {
@@ -791,8 +791,6 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         save(shifts);
         timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
-
-   //     shiftMongoRepository.publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(planningPeriodId,unitId, ShiftStatus.PUBLISH);
         LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
     }
 }

@@ -566,18 +566,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    @Override
-    public boolean existShiftsBetweenDurationByUnitPositionId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType) {
-        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lt(endDate).and("endDate").gt(startDate);
-        if (isNotNull(shiftId)) {
-            criteria.and("_id").ne(shiftId);
-        }
-        if (isNotNull(shiftType)) {
-            criteria.and("shiftType").is(shiftType.toString());
-        }
-        return mongoTemplate.exists(new Query(criteria), Shift.class);
-    }
-
 
     @Override
     public boolean existShiftsBetweenDurationByUnitPositionIdAndTimeType(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, TimeTypes timeType) {
@@ -597,14 +585,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
     }
 
-    @Override
-    public boolean publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
-                        .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
-        Update update=new Update().push("activities.$[].status", ShiftStatus.PUBLISH );
-        UpdateResult updateResult=mongoTemplate.updateMulti(query,update,Shift.class);
-        return isNull(updateResult);
-    }
 
     @Override
     public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
@@ -612,23 +592,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
         return mongoTemplate.find(query,Shift.class);
 
-    }
-
-    @Override
-    public ShiftDTO findOneByIdWithActivityPriority(BigInteger shiftId) {
-        Criteria criteria = Criteria.where("_id").is(shiftId).and("deleted").is(false);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                new CustomAggregationOperation(Document.parse(getShiftWithPrioritiesProjection())),
-                lookup("activityPriority", "activities.activity.activityPriorityId", "_id", "activities.activity.activityPriority"),
-                new CustomAggregationOperation(Document.parse(getSecondShiftActivityPriority())),
-                new CustomAggregationOperation(Document.parse(getShiftActivityPriorityGroup())),
-                new CustomAggregationOperation(Document.parse(getThirdShiftActivityPriority()))
-        );
-        List<ShiftDTO> shiftDTOS = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults();
-        return shiftDTOS.isEmpty() ? null : shiftDTOS.get(0);
     }
 
 

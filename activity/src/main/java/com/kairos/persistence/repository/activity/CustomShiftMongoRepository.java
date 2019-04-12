@@ -75,13 +75,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositionAndByactivityIds(Long unitPositionId, Date startDate, Date endDate,Set<BigInteger> activityIds);
 
-    boolean existShiftsBetweenDurationByUnitPositionId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType);
-
-    ShiftDTO findOneByIdWithActivityPriority(BigInteger shiftId);
-
     boolean existShiftsBetweenDurationByUnitPositionIdAndTimeType(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, TimeTypes timeType);
-
-    boolean publishShiftAfterFlippingPlanningPeriodConstructionToDraftPhase(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus);
 
     List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,ShiftStatus shiftStatus);
 
