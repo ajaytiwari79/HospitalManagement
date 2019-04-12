@@ -36,7 +36,7 @@ public class CollectiveTimeAgreementDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<Long> unitIds;
-    private List<TagDTO> tagList =new ArrayList<>();
+    private List<TagDTO> tags =new ArrayList<>();
 
     public CollectiveTimeAgreementDTO() {
 
@@ -122,9 +122,13 @@ public class CollectiveTimeAgreementDTO {
         this.unitIds = unitIds;
     }
 
-    public List<TagDTO> getTagList() { return tagList; }
+    public List<TagDTO> getTags() {
+        return tags;
+    }
 
-    public void setTagList(List<TagDTO> tagList) { this.tagList = tagList; }
+    public void setTags(List<TagDTO> tags) {
+        this.tags = tags;
+    }
 
     @Override
     public String toString() {

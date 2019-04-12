@@ -79,7 +79,7 @@ public class CountryCTAService extends MongoBaseService {
         costTimeAgreement.setId(null);
         buildCTA(null, costTimeAgreement, collectiveTimeAgreementDTO, false, true, ctaBasicDetailsDTO, null);
         costTimeAgreement.setCountryId(countryId);
-        costTimeAgreement.setTags(collectiveTimeAgreementDTO.getTagList().stream().map(TagDTO::getId).collect(Collectors.toList()));
+        costTimeAgreement.setTags(collectiveTimeAgreementDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toList()));
         this.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
         publishNewCTAToOrganizationByOrgSubType(null, costTimeAgreement, collectiveTimeAgreementDTO, ctaBasicDetailsDTO);
@@ -87,9 +87,9 @@ public class CountryCTAService extends MongoBaseService {
     }
 
     private CollectiveTimeAgreementDTO addTagsInResponse(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CostTimeAgreement costTimeAgreement) {
-        List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTagList();
+        List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CollectiveTimeAgreementDTO.class);
-        collectiveTimeAgreementDTO.setTagList(tagDTOS);
+        collectiveTimeAgreementDTO.setTags(tagDTOS);
         return collectiveTimeAgreementDTO;
     }
 
@@ -114,7 +114,7 @@ public class CountryCTAService extends MongoBaseService {
         buildCTA(null, costTimeAgreement, collectiveTimeAgreementDTO, false, false, ctaBasicDetailsDTO, null);
 
         //costTimeAgreement.setCountryId(countryId);
-        costTimeAgreement.setTags(collectiveTimeAgreementDTO.getTagList().stream().map(TagDTO::getId).collect(Collectors.toList()));
+        costTimeAgreement.setTags(collectiveTimeAgreementDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toList()));
         this.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
         publishNewCTAToOrganizationByOrgSubType(unitId, costTimeAgreement, collectiveTimeAgreementDTO, ctaBasicDetailsDTO);
@@ -257,7 +257,7 @@ public class CountryCTAService extends MongoBaseService {
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
-        updateCostTimeAgreement.setTags(collectiveTimeAgreementDTO.getTagList().stream().map(TagDTO::getId).collect(Collectors.toList()));
+        updateCostTimeAgreement.setTags(collectiveTimeAgreementDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toList()));
         buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, ctaBasicDetailsDTO, null);
         this.save(updateCostTimeAgreement);
         return addTagsInResponse(collectiveTimeAgreementDTO, updateCostTimeAgreement);
@@ -289,7 +289,7 @@ public class CountryCTAService extends MongoBaseService {
         this.save(costTimeAgreement);
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
-        updateCostTimeAgreement.setTags(collectiveTimeAgreementDTO.getTagList().stream().map(TagDTO::getId).collect(Collectors.toList()));
+        updateCostTimeAgreement.setTags(collectiveTimeAgreementDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toList()));
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, false, null, null);
         this.save(updateCostTimeAgreement);
