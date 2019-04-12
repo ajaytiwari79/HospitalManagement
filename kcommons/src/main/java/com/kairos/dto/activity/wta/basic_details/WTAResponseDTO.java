@@ -2,8 +2,8 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 
 import javax.validation.constraints.NotNull;

@@ -35,6 +35,7 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private List<BigInteger> ruleTemplateIds =new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
+    private List<BigInteger> tags;
     private boolean disabled;
     private Long employmentId;
 
@@ -171,6 +172,14 @@ public class CostTimeAgreement extends MongoBaseEntity {
 
     public void setOrganizationParentId(BigInteger organizationParentId) {
         this.organizationParentId = organizationParentId;
+    }
+
+    public List<BigInteger> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<BigInteger> tags) {
+        this.tags = tags;
     }
 
     @Override

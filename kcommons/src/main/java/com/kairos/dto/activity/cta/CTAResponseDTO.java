@@ -3,6 +3,7 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 
@@ -37,6 +38,7 @@ public class CTAResponseDTO {
     private Map<String, Object> unitInfo;
     private Long employmentId;
     private Boolean disabled;
+    private List<TagDTO> tags;
 
     public CTAResponseDTO() {
         //Default constructor
@@ -58,6 +60,10 @@ public class CTAResponseDTO {
         this.description=description;
     }
 
+
+    public List<TagDTO> getTags() { return tags; }
+
+    public void setTags(List<TagDTO> tags) { this.tags = tags; }
 
     public OrganizationDTO getOrganization() {
         return organization;
