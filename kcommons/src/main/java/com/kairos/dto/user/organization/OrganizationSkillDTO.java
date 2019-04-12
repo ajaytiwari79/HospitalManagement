@@ -9,9 +9,6 @@ import java.util.List;
 public class OrganizationSkillDTO {
 
     private String customName;
-
-    private String visitourId;
-
     private List<Long> tags = new ArrayList<Long>();
 
     public String getCustomName() {
@@ -20,14 +17,6 @@ public class OrganizationSkillDTO {
 
     public void setCustomName(String customName) {
         this.customName = customName;
-    }
-
-    public String getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(String visitourId) {
-        this.visitourId = visitourId;
     }
 
     public List<Long> getTags() {

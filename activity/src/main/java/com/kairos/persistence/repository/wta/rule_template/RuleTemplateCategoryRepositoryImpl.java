@@ -31,7 +31,6 @@ public class RuleTemplateCategoryRepositoryImpl implements CustomRuleTemplateCat
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("countryId").is(countryId).and("ruleTemplateCategoryType").is(RuleTemplateCategoryType.WTA)),
-                unwind("tags",true),
                 lookup("tag", "tags", "_id", "tags"),
                 project("name", "description", "tags")
         );

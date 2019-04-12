@@ -111,5 +111,14 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDeltaDTO(unitPositionId,unitId,startDate,endDate));
     }
 
+    //Todo remove this API after sprint 46 is closed
+    @ApiOperation("Update Daily Timebank")
+    @GetMapping("/update_daily_timebank")
+    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId){
+        timeBankService.updateDailyTimebank(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
+    }
+
+
 
 }
