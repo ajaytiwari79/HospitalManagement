@@ -391,7 +391,7 @@ public class ActivityService extends MongoBaseService {
         }
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(compositeShiftIds);
-        if (activityMatched.size() != compositeShiftIds.size() || (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(AppConstants.FULL_WEEK) || (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(AppConstants.FULL_DAY_CALCULATION)))) {
+        if (activityMatched.size() != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.activity.notallow");
         }
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
