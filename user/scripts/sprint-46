@@ -1,0 +1,3 @@
+//Set Country Id in User
+MATCH (n:User) where n.countryId is null set n.countryId=18712;
+
