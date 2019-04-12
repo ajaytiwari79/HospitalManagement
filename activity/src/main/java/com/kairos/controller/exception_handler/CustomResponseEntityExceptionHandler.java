@@ -3,6 +3,8 @@ package com.kairos.controller.exception_handler;
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 
+import com.kairos.commons.service.mail.MailService;
+import com.kairos.config.env.EnvConfig;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
@@ -52,6 +54,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Inject
 	private LocaleService localeService;
+	@Inject private MailService mailService;
 
 	private String convertMessage(String message, Object... params) {
 		for (int i = 0; i < params.length; i++) {
@@ -383,6 +386,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		errorMessage.setMessage(ex.getMessage());
 		errorMessage.setData(ex.getMessage());
 		errorMessage.setPath(httprequest.getRequestURL().toString());
+		mailService.sendMailToBackendOnException(ex);
+		logger.info("exception {}",ex.getCause());
 		return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 	}
 

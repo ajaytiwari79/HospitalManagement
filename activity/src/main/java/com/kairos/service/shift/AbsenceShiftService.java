@@ -182,7 +182,7 @@ public class AbsenceShiftService {
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS,staffAdditionalInfoDTO.getUserAccessRoleDTO());
             LocalDate startLocalDate = staffAdditionalInfoDTO.getUnitPosition().getStartDate();
             LocalDate endLocalDate = asLocalDate(shiftDTOS.get(shiftDTOS.size() - 1).getStartDate());
-            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS, startLocalDate, endLocalDate, staffAdditionalInfoDTO);
+            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
         }
         shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
         return shiftWithViolatedInfoDTO;

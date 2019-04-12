@@ -379,7 +379,7 @@ public class CounterDataService {
 
 //    public Map<Long,Long> calculatePlannedHour(Set<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
 //        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
-//        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
+//        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getDeltaTimeBankMinutes()+d.getContractualMinutes())));
 //        return staffPlannedHours;
 //    }
 }
