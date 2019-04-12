@@ -188,7 +188,7 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-        List<ActivityTagDTO> activityTagDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId), ActivityTagDTO.class);
+        List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByCountry(countryId);
         //In Country Module any Activity can be copied
         activityTagDTOS.forEach(activityTagDTO -> {
             activityTagDTO.setActivityCanBeCopied(true);

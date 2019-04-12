@@ -787,6 +787,13 @@ public class UserIntegrationService {
     public SelfRosteringMetaData getPublicHolidaysDayTypeAndReasonCodeByUnitId(long unitId){
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SelfRosteringMetaData>>() {});
     }
+
+    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId,long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,
+                IS_ACTIVITY_ASSIGNED,Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+                },activityId);
+    }
 }
 
 
