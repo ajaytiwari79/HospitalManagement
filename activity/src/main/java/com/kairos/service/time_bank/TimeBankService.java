@@ -9,6 +9,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -581,11 +582,17 @@ public class TimeBankService extends MongoBaseService {
         return timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals, dailyTimeBankEntries, unitPositionWithCtaDetailsDTO, startDate, endDate);
     }
 
-    /*public Map<Long,Map<Long,Long>> getAccumulatedTimebankByUnitPositions(Map<Long, List<UnitPositionLinesDTO>> positionLinesMap){
-        List<UnitPositionLinesDTO> unitPositionLinesDTOS = positionLinesMap.values().stream().flatMap(unitPositionLines -> unitPositionLines.stream()).collect(toList());
-        unitPositionLinesDTOS.sort(Comparator.comparing(UnitPositionLinesDTO::getEndDateForAccumulatedTimebank));
-        unitPositionLinesDTOS.
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeAndEqualsDate(unitPositionId, asDate(endDate));
-    }*/
+    public void updateDailyTimebank(Long unitId){
+        List<Shift> shifts = shiftMongoRepository.findAllByUnitId(unitId);
+        for (Shift shift : shifts) {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId(), new HashSet<>());
+            CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
+            if(isNotNull(ctaResponseDTO) && isCollectionNotEmpty(ctaResponseDTO.getRuleTemplates()) && isNotNull(staffAdditionalInfoDTO) && isNotNull(staffAdditionalInfoDTO.getUnitPosition())) {
+                staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                updateTimeBank(staffAdditionalInfoDTO,shift, false);
+            }
+        }
+    }
 
 }

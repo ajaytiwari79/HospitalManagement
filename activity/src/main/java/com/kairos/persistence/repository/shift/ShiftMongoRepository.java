@@ -95,4 +95,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{disabled:false,deleted:false,planningPeriodId:{$exists:false},shiftType:?0}")
     List<Shift> findAllAbsenceShifts(String shiftType);
+
+    @Query(value = "{disabled:false,deleted:false,unitId:?0}")
+    List<Shift> findAllByUnitId(Long unitId);
 }
