@@ -185,9 +185,9 @@ import javax.inject.Inject;
         @GetMapping("/team/is_assigned_activity")
         @ApiOperation("verify is activity assign to any team")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> verifyActivityAssignedToTeam(@Validated @RequestParam BigInteger activityId) {
+        public ResponseEntity<Map<String, Object>> verifyIsActivityAssignedToTeam(@Validated @RequestParam BigInteger activityId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.verifyActivityAssignedToTeam(activityId));
+                    teamService.verifyIsActivityAssignedToTeam(activityId));
         }
 
     }
