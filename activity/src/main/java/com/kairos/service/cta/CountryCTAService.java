@@ -2,6 +2,7 @@ package com.kairos.service.cta;
 
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.wta.OrganizationType;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
@@ -54,6 +56,9 @@ public class CountryCTAService extends MongoBaseService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private CTARuleTemplateRepository ctaRuleTemplateRepository;
+
+    @Inject
+    private TagMongoRepository tagMongoRepository;
 
     /**
      * @param countryId
@@ -244,6 +249,7 @@ public class CountryCTAService extends MongoBaseService {
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
+        updateCostTimeAgreement.setTags(collectiveTimeAgreementDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toList()));
         buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, ctaBasicDetailsDTO, null);
         this.save(updateCostTimeAgreement);
         return ObjectMapperUtils.copyPropertiesByMapper(updateCostTimeAgreement, CollectiveTimeAgreementDTO.class);
@@ -275,6 +281,7 @@ public class CountryCTAService extends MongoBaseService {
         this.save(costTimeAgreement);
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+        updateCostTimeAgreement.setTags(collectiveTimeAgreementDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toList()));
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, false, null, null);
         this.save(updateCostTimeAgreement);
