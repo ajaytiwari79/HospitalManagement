@@ -336,7 +336,7 @@ public class TeamService {
        return teamGraphRepository.getTeamActivitiesOfStaff(staffId);
     }
 
-    public boolean verifyIsActivityAssignedToTeam(BigInteger activityId) {
+    public boolean isActivityAssignedToTeam(BigInteger activityId) {
         return teamGraphRepository.activityExistInTeamByActivityId(activityId);
 
     }

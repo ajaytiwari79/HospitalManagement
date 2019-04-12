@@ -182,12 +182,12 @@ import javax.inject.Inject;
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeamGeneralDetails(unitId, teamDTO));
         }
 
-        @GetMapping("/team/is_assigned_activity")
+        @GetMapping("/team/is_activity_assigned")
         @ApiOperation("verify is activity assign to any team")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> verifyIsActivityAssignedToTeam(@Validated @RequestParam BigInteger activityId) {
+        public ResponseEntity<Map<String, Object>> isActivityAssignedToTeam(@RequestParam BigInteger activityId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.verifyIsActivityAssignedToTeam(activityId));
+                    teamService.isActivityAssignedToTeam(activityId));
         }
 
     }
