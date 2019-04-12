@@ -240,7 +240,7 @@ public class TimeBankService extends MongoBaseService {
      * @return employmentWithCtaDetailsDTO
      */
     public EmploymentWithCtaDetailsDTO getCostTimeAgreement(Long employmentId, Date startDate, Date endDate) {
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(employmentId);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getEmploymentDetails(employmentId);
         if(!Optional.ofNullable(employmentWithCtaDetailsDTO).isPresent()) {
             exceptionService.dataNotFoundException("message.staffEmployment.notFound");
         }
@@ -288,7 +288,7 @@ public class TimeBankService extends MongoBaseService {
      * @return TimeBankDTO
      */
     public TimeBankDTO getOverviewTimeBank(Long unitId, Long employmentId, Integer year) {
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(employmentId);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getEmploymentDetails(employmentId);
         Interval interval = getIntervalByDateTimeBank(employmentWithCtaDetailsDTO, year);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
         if(interval.getStart().getYear() <= new DateTime().getYear()) {

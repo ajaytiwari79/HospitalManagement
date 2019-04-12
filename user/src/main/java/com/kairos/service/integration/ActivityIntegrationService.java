@@ -107,14 +107,6 @@ public class ActivityIntegrationService {
         genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/" + staffId, queryParams);
     }
 
-    public List<CTAWTAResponseDTO> copyWTACTA(List<EmploymentIdDTO> employmentIdDTOS) {
-
-
-        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(employmentIdDTOS, null, false, IntegrationOperation.CREATE, "copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTAWTAResponseDTO>>>() {
-        });
-
-        return ctawtaResponseDTOS;
-    }
 
     public void updateTimeBank(Long employmentId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         BasicNameValuePair startDate = new BasicNameValuePair("shiftStartDate", shiftStartDate.toString());

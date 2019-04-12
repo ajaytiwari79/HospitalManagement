@@ -112,8 +112,7 @@ public class EmploymentCTAWTAService {
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfEmployment(updateDTO, employment.isPublished());
         return employmentService.getBasicDetails(employment, wtaResponseDTO, employment.getEmploymentLines().get(0));
     }
-    //  TODO Pradeep INCORRECT function NAME and working
-    public StaffEmploymentDetails getEmploymentCTA(Long employmentId, Long unitId) {
+    public StaffEmploymentDetails getEmploymentDetails(Long employmentId, Long unitId) {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {

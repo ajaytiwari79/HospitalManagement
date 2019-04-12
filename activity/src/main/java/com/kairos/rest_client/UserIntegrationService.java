@@ -453,7 +453,7 @@ public class UserIntegrationService {
     }
 
     //TimeBankRestClient
-    public EmploymentWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long employmentId) {
+    public EmploymentWithCtaDetailsDTO getEmploymentDetails(Long employmentId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentWithCtaDetailsDTO>>() {
         }, employmentId);
     }

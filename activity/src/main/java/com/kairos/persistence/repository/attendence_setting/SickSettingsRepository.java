@@ -38,7 +38,6 @@ public class SickSettingsRepository {
 
     public List<SickSettings> findAllSickUsersOfUnit(Long unitId) {
         Query query = new Query(Criteria.where("unitId").is(unitId).and("endDate").is(null));
-        List<SickSettings> results = mongoTemplate.find(query, SickSettings.class);
-        return results;
+        return mongoTemplate.find(query, SickSettings.class);
     }
 }
