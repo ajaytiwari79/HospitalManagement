@@ -786,7 +786,7 @@ public class UserIntegrationService {
 
     public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId,long unitId){
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,
-                VERIFY_IS_ASSIGNED_ACTIVITY,Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
+                IS_ACTIVITY_ASSIGNED,Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
                 },activityId);
     }
