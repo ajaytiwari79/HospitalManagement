@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Created by oodles on 28/11/17.
  */
-// TODO incorrect Its a jumbled file We need to fix impact StaffRetrivalService getStaffsEmploymentData  this id name is already present in unit position
+// TODO incorrect Its a jumbled file We need to fix impact StaffRetrivalService getStaffsEmploymentData  this id name is already present in employment
 public class StaffAdditionalInfoDTO {
 
     private String name;

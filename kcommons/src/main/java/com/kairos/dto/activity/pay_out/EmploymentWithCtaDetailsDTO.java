@@ -10,7 +10,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EmploymentWithCtaDetailsDTO {
 
-    private Long unitPositionId;
+    private Long employmentId;
     private List<CTARuleTemplateCalulatedPayOutDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
@@ -22,8 +22,8 @@ public class EmploymentWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
 
 
-    public EmploymentWithCtaDetailsDTO(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public EmploymentWithCtaDetailsDTO(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public EmploymentWithCtaDetailsDTO() {
@@ -103,12 +103,12 @@ public class EmploymentWithCtaDetailsDTO {
         this.workingDaysPerWeek = workingDaysPerWeek;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public List<CTARuleTemplateCalulatedPayOutDTO> getCtaRuleTemplates() {

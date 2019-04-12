@@ -9,8 +9,8 @@ import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
-import com.kairos.service.unit_position.EmploymentCTAWTAService;
-import com.kairos.service.unit_position.EmploymentService;
+import com.kairos.service.employment.EmploymentCTAWTAService;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

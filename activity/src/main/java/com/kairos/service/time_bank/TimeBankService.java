@@ -346,7 +346,7 @@ public class TimeBankService extends MongoBaseService {
      * @param startDate
      * @param staffAdditionalInfoDTO
      * @return
-     * @Desc to update Time Bank after applying function in Unit position
+     * @Desc to update Time Bank after applying function in Employment
      */
     public boolean updateTimeBankOnFunctionChange(Date startDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Date endDate = plusMinutes(startDate, (int) ONE_DAY_MINUTES);
@@ -596,5 +596,18 @@ public class TimeBankService extends MongoBaseService {
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO);
         Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, asDate(startDate), asDate(endDate));
         return timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals, dailyTimeBankEntries, employmentWithCtaDetailsDTO, startDate, endDate);
+    }
+
+    public void updateDailyTimebank(Long unitId){
+        List<Shift> shifts = shiftMongoRepository.findAllByUnitId(unitId);
+        for (Shift shift : shifts) {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getEmploymentId(), new HashSet<>());
+            CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
+            if(isNotNull(ctaResponseDTO) && isCollectionNotEmpty(ctaResponseDTO.getRuleTemplates()) && isNotNull(staffAdditionalInfoDTO) && isNotNull(staffAdditionalInfoDTO.getEmployment())) {
+                staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                updateTimeBank(staffAdditionalInfoDTO,shift, false);
+            }
+        }
     }
 }

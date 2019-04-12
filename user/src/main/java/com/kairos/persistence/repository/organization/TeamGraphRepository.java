@@ -180,9 +180,9 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (team:Team),(skill:Skill) WHERE id (team)={0} AND id(skill)={1} with team,skill\n" +
             "Merge (team)-[r:"+TEAM_HAS_SKILLS+"]->(skill)\n" +
-            "ON CREATE SET r.visitourId={2},r.creationDate={3},r.lastModificationDate={4},r.isEnabled={5}\n" +
-            "ON MATCH SET r.visitourId={2},r.lastModificationDate={3},r.isEnabled={5} ")
-    void addSkillInTeam(long teamId, long skillId, String visitourId, long creationDate, long lastModificationDate, boolean isEnabled);
+            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3},r.isEnabled={4}\n" +
+            "ON MATCH SET r.lastModificationDate={2},r.isEnabled={4} ")
+    void addSkillInTeam(long teamId, long skillId, long creationDate, long lastModificationDate, boolean isEnabled);
 
     @Query("MATCH (organization:Organization)-[:"+ HAS_TEAMS +"]->(team:Team) WHERE id(organization)={0} RETURN team")
     List<Team> getTeamsByOrganization(long organizationId);

@@ -55,7 +55,7 @@ public class NightWorkerService extends MongoBaseService {
 
     public NightWorkerGeneralResponseDTO getNightWorkerDetailsOfStaff(Long unitId, Long staffId){
 
-        // TODO set night worker details only if Staff is employed (Unit Position has been created)
+        // TODO set night worker details only if Staff is employed (Employment has been created)
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffAndUnitId(staffId, unitId);
         if(Optional.ofNullable(nightWorker).isPresent()){
             return ObjectMapperUtils.copyPropertiesByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);

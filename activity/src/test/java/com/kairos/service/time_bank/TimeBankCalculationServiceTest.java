@@ -42,7 +42,7 @@ public class TimeBankCalculationServiceTest {
     private TimeBankCalculationService timeBankCalculationService;
 
 
-    private StaffEmploymentDetails unitPosition;
+    private StaffEmploymentDetails staffEmploymentDetails;
     private Interval interval;
     private List<ShiftWithActivityDTO> shifts;
     private Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap;
@@ -55,9 +55,9 @@ public class TimeBankCalculationServiceTest {
         employmentLinesDTOS.add(new EmploymentLinesDTO(LocalDate.of(2019,4,9),null,5,35,2100,new BigDecimal(0.002)));
         interval = new Interval(asDate(LocalDate.of(2019,4,10)).getTime(),asDate(LocalDate.of(2019,4,11)).getTime());
         CTAResponseDTO ctaResponseDTO = new CTAResponseDTO();
-        unitPosition = new StaffEmploymentDetails(15l,487l, employmentLinesDTOS,ctaResponseDTO);
-        unitPosition.setCtaRuleTemplates(getRuleTemplate());
-        unitPosition.setEmploymentType(new EmploymentType(54l));
+        staffEmploymentDetails = new StaffEmploymentDetails(15l,487l, employmentLinesDTOS,ctaResponseDTO);
+        staffEmploymentDetails.setCtaRuleTemplates(getRuleTemplate());
+        staffEmploymentDetails.setEmploymentType(new EmploymentType(54l));
         shifts= getShifts();
         dailyTimeBankEntryMap = new HashMap<>();
         planningPeriodIntervals = newHashSet(new DateTimeInterval(asDate(LocalDate.of(2019,4,8)),asDate(LocalDate.of(2019,4,21))));
@@ -66,7 +66,7 @@ public class TimeBankCalculationServiceTest {
 
     //@Test
     public void getTimeBankByInterval() {
-        //DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition,interval,shifts,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS);
+        //DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(staffEmploymentDetails,interval,shifts,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS);
         //LOGGER.info("daily timebank : {}",dailyTimeBankEntry);
     }
 

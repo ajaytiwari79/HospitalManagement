@@ -7,7 +7,7 @@ public class StaffEmploymentQueryResult {
 
     private Long staffId;
     private String staffEmail;
-    private Long unitPositionId;
+    private Long employmentId;
     private Integer workingDaysPerWeek;
     private Integer contractedMinByWeek;
     private Long startDate;
@@ -66,11 +66,11 @@ public class StaffEmploymentQueryResult {
         this.staffId = staffId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

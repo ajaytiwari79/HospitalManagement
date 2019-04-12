@@ -8,13 +8,12 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.staff.unit_position.EmploymentDTO;
+import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
@@ -29,14 +28,14 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.unit_position.query_result.EmploymentQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.persistence.repository.user.unit_position.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -58,7 +57,6 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -288,7 +286,7 @@ public class PositionService {
 
         unitPermission.setOrganization(unit);
 
-        //set permission in unit position
+        //set permission in employment
         AccessPermission accessPermission = new AccessPermission(accessGroup);
         UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
         unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
@@ -588,28 +586,26 @@ public class PositionService {
     }
 
     private Long getMaxEmploymentEndDate(Long staffId) {
-        Long employmentEndDate = null;
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        List<String> unitPositionsEndDate = employmentGraphRepository.getAllEmploymentsByStaffId(staffId);
-        if (!unitPositionsEndDate.isEmpty()) {
+        Long positionEndDate = null;
+        List<String> employmentsEndDate = employmentGraphRepository.getAllEmploymentsByStaffId(staffId);
+        if (!employmentsEndDate.isEmpty()) {
             //java.lang.ClassCastException: java.lang.String cannot be cast to java.time.LocalDate
-            LocalDate maxEndDate = LocalDate.parse(unitPositionsEndDate.get(0));
+            LocalDate maxEndDate = LocalDate.parse(employmentsEndDate.get(0));
             boolean isEndDateBlank = false;
-            //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
-            for (String unitPositionEndDateString : unitPositionsEndDate) {
-                LocalDate unitPositionEndDate = unitPositionEndDateString == null ? null : LocalDate.parse(unitPositionEndDateString);
-                if (!Optional.ofNullable(unitPositionEndDate).isPresent()) {
+            //TODO Get employments with date more than the sent employment's end date at query level itself
+            for (String employmentEndDateString : employmentsEndDate) {
+                LocalDate employmentEndDate = employmentEndDateString == null ? null : LocalDate.parse(employmentEndDateString);
+                if (!Optional.ofNullable(employmentEndDate).isPresent()) {
                     isEndDateBlank = true;
                     break;
                 }
-                if (maxEndDate.isBefore(unitPositionEndDate)) {
-                    maxEndDate = unitPositionEndDate;
+                if (maxEndDate.isBefore(employmentEndDate)) {
+                    maxEndDate = employmentEndDate;
                 }
             }
-            employmentEndDate = isEndDateBlank ? null : DateUtils.getLongFromLocalDate(maxEndDate);
+            positionEndDate = isEndDateBlank ? null : DateUtils.getLongFromLocalDate(maxEndDate);
         }
-        return employmentEndDate;
+        return positionEndDate;
 
     }
 
@@ -671,13 +667,13 @@ public class PositionService {
     }
 
 
-    public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long unitPositionId) {
-        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), unitPositionId,employmentDTO.getEmploymentSubType());
+    public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long employmentId) {
+        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), employmentId,employmentDTO.getEmploymentSubType());
         if (employmentQueryResult != null) {
             if (employmentQueryResult.getEndDate() == null) {
-                exceptionService.actionNotPermittedException("message.main_unit_position.exists", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());
+                exceptionService.actionNotPermittedException("message.main_employment.exists", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());
             } else {
-                exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate(), employmentQueryResult.getEndDate());
+                exceptionService.actionNotPermittedException("message.main_employment.exists_with_end_date", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate(), employmentQueryResult.getEndDate());
             }
         }
         return true;

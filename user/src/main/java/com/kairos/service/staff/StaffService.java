@@ -40,8 +40,8 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.unit_position.query_result.EmploymentLinesQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.EmploymentQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
@@ -54,7 +54,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.persistence.repository.user.unit_position.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -103,7 +103,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
-import static com.kairos.service.unit_position.EmploymentUtility.convertEmploymentObject;
+import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 import static com.kairos.utils.FileUtil.createDirectory;
 
 /**

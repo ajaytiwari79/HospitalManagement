@@ -57,7 +57,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 @Service
 @Transactional
 public class UnionService {
-    private final Logger logger = LoggerFactory.getLogger(UnionService.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(UnionService.class);
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -85,76 +85,6 @@ public class UnionService {
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
-
-    public UnionQueryWrapper getAllUnionOfCountry(Long countryId) {
-        UnionQueryWrapper unionQueryWrapper = new UnionQueryWrapper();
-
-        OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getAllUnionOfCountry(countryId);
-        OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
-        List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
-        organizationCreationData.setZipCodes(zipCodes);
-        organizationCreationData.setCompanyTypes(CompanyType.getListOfCompanyType());
-        organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
-        organizationCreationData.setAccessGroups(accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
-        List<Map<String, Object>> orgData = new ArrayList<>();
-        for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
-            HashMap<String, Object> orgBasicData = new HashMap<>();
-            orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
-            orgBasicData.put("municipalities", (address.get("zipCode") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCode"))));
-            orgData.add(orgBasicData);
-        }
-        unionQueryWrapper.setGlobalData(organizationCreationData);
-        unionQueryWrapper.setUnions(orgData);
-
-        return unionQueryWrapper;
-    }
-
-    // TODO USED IN FUTURE
-    public List<UnionResponseDTO> getAllUnionByOrganization(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
-
-        }
-        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
-        List<UnionResponseDTO> organizationQueryResult = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
-        return organizationQueryResult;
-    }
-
-
-    public List<UnionResponseDTO> getAllApplicableUnionsForOrganization(Long unitId) {
-        List<UnionResponseDTO> allUnions = new ArrayList<>();
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
-
-        }
-        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
-
-        allUnions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
-        return allUnions;
-
-    }
-
-    public boolean addUnionInOrganization(Long unionId, Long organizationId, boolean joined) {
-        Organization organization = organizationGraphRepository.findOne(organizationId);
-        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
-
-        }
-        Organization union = organizationGraphRepository.findOne(unionId);
-        if (!Optional.ofNullable(union).isPresent() || union.isUnion() == false || union.isEnable() == false) {
-            exceptionService.dataNotFoundByIdException("message.union.id.notFound");
-
-        }
-        if (joined)
-            organizationGraphRepository.addUnionInOrganization(organizationId, unionId, DateUtils.getCurrentDate().getTime());
-        else
-            organizationGraphRepository.removeUnionFromOrganization(organizationId, unionId, DateUtils.getCurrentDate().getTime());
-
-        return joined;
-    }
 
     public List<Sector> findAllSectorsByCountry(Long countryId) {
         List<Sector> sectors = sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId);
@@ -440,13 +370,6 @@ public class UnionService {
         return unionData;
     }
 
-//    public void getUnionsGlobalData(Long countryId) {
-//
-//        List<>
-//
-//    }
-
-
     public boolean validateAddress(ContactAddressDTO addressDTO) {
         Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()), exceptionService.convertMessage("message.houseNumber.null"));
         Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()), exceptionService.convertMessage("message.province.null"));
@@ -615,18 +538,8 @@ public class UnionService {
         List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
         if (organization.isParentOrganization()) {
             organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(organization.getId());
-            /*
-            ////Can create Unit Position for WorkCentre only
-            if (organization.isWorkcentre()) {
-                OrganizationBasicResponse currentOrganization = new OrganizationBasicResponse(organization.getId(), organization.getName());
-                organizationHierarchy.add(currentOrganization);
-            }*/
         } else {
             OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(organization.getId());
-                /*
-                //Can create Unit Position for WorkCentre only
-                OrganizationBasicResponse parentOrganization = new OrganizationBasicResponse(data.getParent().getId(), data.getParent().getName());
-                organizationHierarchy.add(parentOrganization);*/
             Iterator itr = data.getChildUnits().listIterator();
             while (itr.hasNext()) {
                 Organization thisOrganization = (Organization) itr.next();

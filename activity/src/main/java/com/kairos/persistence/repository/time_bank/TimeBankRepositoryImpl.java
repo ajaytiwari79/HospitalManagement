@@ -38,16 +38,4 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
         Query query = new Query(criteria);
         return mongoTemplate.find(query,DailyTimeBankEntry.class);
     }
-
-    @Override
-    public List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentsAndBetweenDates(List<Long> employmentIds, Date startDate, Date endDate){
-        Criteria criteria = Criteria.where("employmentId").in(employmentIds).and("deleted").is(false).and("date").gte(startDate);
-        if(endDate!=null){
-            criteria.lte(endDate);
-        }
-        Query query = new Query(criteria);
-        return mongoTemplate.find(query,DailyTimeBankEntry.class);
-    }
-
-
 }

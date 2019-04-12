@@ -16,7 +16,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 public class EmploymentLinesDTO {
 
     private Long id;
-    private Long unitPositionId;
+    private Long employmentId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer workingDaysInWeek;
@@ -24,7 +24,7 @@ public class EmploymentLinesDTO {
     private Float avgDailyWorkingHours;
     private Integer fullTimeWeeklyMinutes;
     private Integer totalWeeklyMinutes;
-    //This is the Intial value of accumulatedTimebank of unitPosition
+    //This is the Intial value of accumulatedTimebank of employment
     private long accumulatedTimebankMinutes;
     private BigDecimal hourlyCost;
 
@@ -47,12 +47,12 @@ public class EmploymentLinesDTO {
         this.id = id;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public LocalDate getStartDate() {

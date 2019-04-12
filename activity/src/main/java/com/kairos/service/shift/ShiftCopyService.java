@@ -9,7 +9,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.staff.unit_position.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -183,7 +183,7 @@ public class ShiftCopyService extends MongoBaseService {
                     }
                     validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffEmployment, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs));
                 } else {
-                    validationMessages.add(convertMessage("message.unit_position.not.active", shiftCreationStartDate));
+                    validationMessages.add(convertMessage("message.employment.not.active", shiftCreationStartDate));
                 }
                 shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {

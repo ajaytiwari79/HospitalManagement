@@ -15,7 +15,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
-import com.kairos.dto.user.staff.unit_position.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -738,7 +738,7 @@ public class ShiftValidatorService {
             exceptionService.invalidRequestException("message.shift.not.published");
         }
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-            exceptionService.actionNotPermittedException("message.unit.position");
+            exceptionService.actionNotPermittedException("message.employment.absent");
         }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
             exceptionService.invalidRequestException("message.shift.not.published");

@@ -39,8 +39,8 @@ import com.kairos.dto.user.staff.OrganizationStaffWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
-import com.kairos.dto.user.staff.unit_position.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
+import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
@@ -181,28 +181,28 @@ public class UserIntegrationService {
 
     }
 
-    public Long removeFunctionFromEmploymentByDate(Long unitId, Long unitPositionId, Date shiftDate) {
+    public Long removeFunctionFromEmploymentByDate(Long unitId, Long employmentId, Date shiftDate) {
         BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", DateUtils.asLocalDate(shiftDate).toString());
         Long functionId = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTION_FROM_EMPLOYMENT_ON_DELETE_SHIFT, Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
-        }, unitPositionId);
+        }, employmentId);
         return functionId;
     }
 
-    public Boolean restoreFunctionFromEmploymentByDate(Long unitId, Long unitPositionId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
+    public Boolean restoreFunctionFromEmploymentByDate(Long unitId, Long employmentId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
 
         return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTIONS_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, unitPositionId);
+        }, employmentId);
 
     }
 
-    public Map<LocalDate, Long> removeFunctionFromEmploymentByDates(Long unitId, Long unitPositionId, Set<LocalDate> dates) {
+    public Map<LocalDate, Long> removeFunctionFromEmploymentByDates(Long unitId, Long employmentId, Set<LocalDate> dates) {
         return genericRestClient.publishRequest(dates, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTIONS_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
-        }, unitPositionId);
+        }, employmentId);
     }
 
-    public Boolean applyFunction(Long unitId, Long unitPositionId, Map<LocalDate, Long> requestBody,HttpMethod httpMethod,List<NameValuePair>  queryParams) {
+    public Boolean applyFunction(Long unitId, Long employmentId, Map<LocalDate, Long> requestBody,HttpMethod httpMethod,List<NameValuePair>  queryParams) {
         return genericRestClient.publishRequest(requestBody, unitId, RestClientUrlType.UNIT, httpMethod, APPLY_FUNCTION, queryParams, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, unitPositionId);
+        }, employmentId);
     }
 
     //~ Added by mohit TODO remove comment after verification
@@ -395,17 +395,17 @@ public class UserIntegrationService {
         }, staffId, unitEmploymentId);
     }
 
-    public StaffAdditionalInfoDTO verifyEmploymentAndFindFunctionsAfterDate(Long staffId, Long unitPositionId) {
+    public StaffAdditionalInfoDTO verifyEmploymentAndFindFunctionsAfterDate(Long staffId, Long employmentId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_EMPLOYMENT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
-        }, staffId, unitPositionId);
+        }, staffId, employmentId);
     }
 
-    public Map<LocalDate,List<FunctionDTO>> getFunctionsOfEmployment(Long unitPositionId, LocalDate startDate, LocalDate endDate) {
+    public Map<LocalDate,List<FunctionDTO>> getFunctionsOfEmployment(Long employmentId, LocalDate startDate, LocalDate endDate) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
         queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_OF_EMPLOYMENT, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,List<FunctionDTO>>>>() {
-        }, unitPositionId);
+        }, employmentId);
     }
 
     public StaffDTO getStaffByUser(Long userId) {
@@ -453,9 +453,9 @@ public class UserIntegrationService {
     }
 
     //TimeBankRestClient
-    public EmploymentWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
+    public EmploymentWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long employmentId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<EmploymentWithCtaDetailsDTO>>() {
-        }, unitPositionId);
+        }, employmentId);
     }
 
     //WTADetailRestClient
@@ -706,8 +706,8 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
 
-    public void restoreFunctionsWithDatesByEmploymentIds(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap, Long unitId) {
-        Boolean AreFunctionsRestored = genericRestClient.publishRequest(unitPositionIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+    public void restoreFunctionsWithDatesByEmploymentIds(Map<Long, Map<LocalDate, Long>> employmentIdWithShiftDateFunctionIdMap, Long unitId) {
+        Boolean AreFunctionsRestored = genericRestClient.publishRequest(employmentIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
     public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
@@ -756,9 +756,9 @@ public class UserIntegrationService {
         },timeTypeId);
     }
 
-    public Long getUnitByEmploymentId(Long unitPositionId) {
+    public Long getUnitByEmploymentId(Long employmentId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_EMPLOYMENT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
-        },unitPositionId);
+        },employmentId);
     }
 
 

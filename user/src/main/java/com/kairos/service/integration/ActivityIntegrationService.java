@@ -15,7 +15,7 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
-import com.kairos.persistence.model.user.unit_position.query_result.EmploymentLinesQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -134,7 +134,7 @@ public class ActivityIntegrationService {
         param.add(startDate);
         param.add(endDate);
         param.add(ctaId);
-        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/{employmentId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/employment/{employmentId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         },employmentId);
     }
 

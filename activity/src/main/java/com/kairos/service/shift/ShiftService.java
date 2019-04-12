@@ -569,7 +569,7 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId);
             }
             if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-                exceptionService.actionNotPermittedException("message.unit.position", startDate.toString());
+                exceptionService.actionNotPermittedException("message.employment.absent", startDate.toString());
             }
             reasonCodeDTOS = staffAdditionalInfoDTO.getReasonCodes();
             List<FunctionDTO> appliedFunctionDTOs = null;

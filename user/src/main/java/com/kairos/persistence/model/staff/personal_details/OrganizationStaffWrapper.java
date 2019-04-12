@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.staff.personal_details;
 
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.unit_position.Employment;
+import com.kairos.persistence.model.user.employment.Employment;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**

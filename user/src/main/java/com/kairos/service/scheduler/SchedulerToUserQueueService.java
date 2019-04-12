@@ -5,7 +5,7 @@ import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.service.staff.PositionService;
-import com.kairos.service.unit_position.EmploymentJobService;
+import com.kairos.service.employment.EmploymentJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

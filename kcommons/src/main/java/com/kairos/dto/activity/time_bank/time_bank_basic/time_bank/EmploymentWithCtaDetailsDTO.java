@@ -11,13 +11,13 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EmploymentWithCtaDetailsDTO {
 
-    private Long unitPositionId;
+    private Long employmentId;
     private List<CTARuleTemplateCalulatedTimeBankDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
-    private LocalDate unitPositionStartDate;
-    private LocalDate unitPositionEndDate;
+    private LocalDate employmentStartDate;
+    private LocalDate employmentEndDate;
     private int totalWeeklyMinutes;
     private int fullTimeWeeklyMinutes;
     private Long countryId;
@@ -27,16 +27,16 @@ public class EmploymentWithCtaDetailsDTO {
 
 
 
-    public EmploymentWithCtaDetailsDTO(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public EmploymentWithCtaDetailsDTO(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
-    public EmploymentWithCtaDetailsDTO(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
-        this.unitPositionId = unitPositionId;
+    public EmploymentWithCtaDetailsDTO(Long employmentId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate employmentStartDate, LocalDate employmentEndDate) {
+        this.employmentId = employmentId;
         this.contractedMinByWeek = contractedMinByWeek;
         this.workingDaysPerWeek = workingDaysPerWeek;
-        this.unitPositionStartDate = unitPositionStartDate;
-        this.unitPositionEndDate = unitPositionEndDate;
+        this.employmentStartDate = employmentStartDate;
+        this.employmentEndDate = employmentEndDate;
     }
 
     public EmploymentWithCtaDetailsDTO() {
@@ -70,12 +70,12 @@ public class EmploymentWithCtaDetailsDTO {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public LocalDate getUnitPositionEndDate() {
-        return unitPositionEndDate;
+    public LocalDate getEmploymentEndDate() {
+        return employmentEndDate;
     }
 
-    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
-        this.unitPositionEndDate = unitPositionEndDate;
+    public void setEmploymentEndDate(LocalDate employmentEndDate) {
+        this.employmentEndDate = employmentEndDate;
     }
 
     public int getMinutesFromCta() {
@@ -86,8 +86,8 @@ public class EmploymentWithCtaDetailsDTO {
         this.minutesFromCta = minutesFromCta;
     }
 
-    public EmploymentWithCtaDetailsDTO(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
+    public EmploymentWithCtaDetailsDTO(LocalDate employmentStartDate) {
+        this.employmentStartDate = employmentStartDate;
     }
 
     public Long getCountryId() {
@@ -98,12 +98,12 @@ public class EmploymentWithCtaDetailsDTO {
         this.countryId = countryId;
     }
 
-    public LocalDate getUnitPositionStartDate() {
-        return unitPositionStartDate;
+    public LocalDate getEmploymentStartDate() {
+        return employmentStartDate;
     }
 
-    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
+    public void setEmploymentStartDate(LocalDate employmentStartDate) {
+        this.employmentStartDate = employmentStartDate;
     }
 
 
@@ -131,12 +131,12 @@ public class EmploymentWithCtaDetailsDTO {
         this.workingDaysPerWeek = workingDaysPerWeek;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public List<CTARuleTemplateCalulatedTimeBankDTO> getCtaRuleTemplates() {

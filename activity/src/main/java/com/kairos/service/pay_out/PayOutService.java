@@ -123,7 +123,7 @@ public class PayOutService extends MongoBaseService {
     public boolean requestPayOut(Long staffId,Long employmentId,int amount){
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getCTAbyUnitEmployementPosition(employmentId);
         if(employmentWithCtaDetailsDTO ==null){
-            exceptionService.invalidRequestException("message.unit.position");
+            exceptionService.invalidRequestException("message.employment.absent");
         }
         PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId,employmentId, PayOutTrasactionStatus.REQUESTED,amount, LocalDate.now());
         save(requestPayOutTransaction);

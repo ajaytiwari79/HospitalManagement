@@ -130,7 +130,7 @@ public class StaffFilterService {
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
-            case UNIT_POSITION: {
+            case EMPLOYMENT: {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             }
 

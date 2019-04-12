@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 
 import java.math.BigInteger;
 import java.util.List;

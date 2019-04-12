@@ -14,7 +14,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
-import com.kairos.service.unit_position.EmploymentJobService;
+import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
@@ -518,7 +518,7 @@ public class StaffController {
 
     // We need only limited data so we are making a substitute of above API
     @RequestMapping(value = "/{staffId}/employment/{employmentId}/functions", method = RequestMethod.GET)
-    @ApiOperation("API for check unit position of staff and available functions and reasoncodes on unit")
+    @ApiOperation("API for check employment of staff and available functions and reasoncodes on unit")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@PathVariable Long employmentId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(employmentId, unitId));
@@ -532,7 +532,7 @@ public class StaffController {
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
-    @ApiOperation("verify staff has unit employment in unit or not and get current unit position ")
+    @ApiOperation("verify staff has unit employment in unit or not and get current employment ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentOfStaff(@PathVariable long unitId, @PathVariable long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getEmploymentOfStaff(staffId, unitId));

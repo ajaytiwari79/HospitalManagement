@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group;
 
 import com.kairos.dto.activity.open_shift.FibonacciCounter;
-import com.kairos.dto.user.staff.unit_position.StaffEmploymentQueryResult;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
