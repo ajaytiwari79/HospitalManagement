@@ -760,6 +760,7 @@ public class UserIntegrationService {
     public boolean isReasonCodeLinkedToTimeType(Long countryId,BigInteger timeTypeId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, REASON_CODE_LINK_WITH_TIME_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         },timeTypeId);
+
     }
 
     public Long getUnitByUnitPositionId(Long unitPositionId) {
@@ -781,6 +782,13 @@ public class UserIntegrationService {
 
     public SelfRosteringMetaData getPublicHolidaysDayTypeAndReasonCodeByUnitId(long unitId){
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SelfRosteringMetaData>>() {});
+    }
+
+    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId,long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,
+                VERIFY_IS_ASSIGNED_ACTIVITY,Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+                },activityId);
     }
 }
 

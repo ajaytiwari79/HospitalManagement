@@ -268,6 +268,13 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
+       boolean isPartOfTeam = timeTypeMongoRepository.existsByIdAndPartOfTeam(generalDTO.getTimeTypeId(),true);
+        if(!isPartOfTeam) {
+            boolean isActivityPresent = userIntegrationService.verifyingIsActivityAlreadyAssigned(generalDTO.getActivityId(), unitId);
+            if (isActivityPresent) {
+                exceptionService.actionNotPermittedException("message.activity.timeType.already.used");
+            }
+        }
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }

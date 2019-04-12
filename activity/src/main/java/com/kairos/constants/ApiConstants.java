@@ -161,7 +161,7 @@ public final class ApiConstants {
 
     public static final String TEAM_ACTIVITIES="/staff/{staffId}/team_activities";
 
-
+    public static final String VERIFY_IS_ASSIGNED_ACTIVITY= "/team/is_assigned_activity";
 
 
 }
