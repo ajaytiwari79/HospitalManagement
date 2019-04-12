@@ -3,7 +3,9 @@ package com.kairos.dto.planner.solverconfig;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.enums.TimeTypeEnum;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -16,16 +18,21 @@ import java.util.List;
 public class SolverConfigDTO {
     //Common
     protected BigInteger id;
+    @NotNull
     protected String name;//Unique
     protected String description;
+    @NotNull
     protected Long phaseId;
     protected Long planningPeriodId;
     protected byte threadCount;
     protected short terminationTimeInMinutes;
+    @NotNull
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
     protected BigInteger parentSolverConfigId;
     private List<ConstraintDTO> constraints;
+    @NotNull
+    protected TimeTypeEnum typeOfTimeType;
 
     public SolverConfigDTO() {
     }
@@ -117,8 +124,14 @@ public class SolverConfigDTO {
         this.constraintIds = constraintIds;
     }
 
+    public TimeTypeEnum getTypeOfTimeType() {
+        return typeOfTimeType;
+    }
 
-    /*****************************SolverConfigDTO Builder****************************************/
+    public void setTypeOfTimeType(TimeTypeEnum typeOfTimeType) {
+        this.typeOfTimeType = typeOfTimeType;
+    }
+
     public SolverConfigDTO setNameBuilder(String name) {
         this.name = name;
         return this;
