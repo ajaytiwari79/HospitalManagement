@@ -35,6 +35,7 @@ public class CollectiveTimeAgreementDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<Long> unitIds;
+    private List<BigInteger> tags;
 
     public CollectiveTimeAgreementDTO() {
 
@@ -111,6 +112,10 @@ public class CollectiveTimeAgreementDTO {
     public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
+
+    public List<BigInteger> getTags() { return tags; }
+
+    public void setTags(List<BigInteger> tags) { this.tags = tags; }
 
     public List<Long> getUnitIds() {
         return unitIds;

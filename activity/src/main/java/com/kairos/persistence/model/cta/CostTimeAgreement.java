@@ -35,12 +35,17 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private List<BigInteger> ruleTemplateIds =new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
+    private List<BigInteger> tags;
     private boolean disabled;
     private Long unitPositionId;
 
     public CostTimeAgreement() {
     }
 
+
+    public List<BigInteger> getTags() { return tags; }
+
+    public void setTags(List<BigInteger> tags) { this.tags = tags; }
 
     public Long getUnitPositionId() {
         return unitPositionId;
