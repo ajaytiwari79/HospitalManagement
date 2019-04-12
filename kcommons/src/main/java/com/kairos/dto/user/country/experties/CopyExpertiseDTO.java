@@ -3,11 +3,14 @@ package com.kairos.dto.user.country.experties;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
+import org.joda.time.DateTime;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class CopyExpertiseDTO {
@@ -15,29 +18,17 @@ public class CopyExpertiseDTO {
     @NotBlank(message = "Expertise name is required")
     private String name;
     private String description;
-    @NotNull(message = "Start date can't be null")
-
-
     private LocalDate startDate;
-
     private LocalDate endDate;
-
-    @NotNull(message = "Level can not be null")
     private Long organizationLevelId;
-
-    @NotNull(message = "services can not be null")
     private Set<Long> organizationServiceIds;
-
-    @NotNull(message = "union can not be null")
     /*private Long unionId;*/
     private UnionIDNameDTO union;
-    @NotNull(message = "FullTime Weekly Minutes can not be null")
     private Integer fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
     private List<SeniorityLevelDTO> seniorityLevels;
     private List<Long> tags;
-    @NotNull(message = "Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
     private Long parentId;
     // TODO REMOVE FOR FE compactibility
@@ -197,5 +188,17 @@ public class CopyExpertiseDTO {
 
     public void setUnion(UnionIDNameDTO union) {
         this.union = union;
+    }
+
+    @AssertTrue(message = "message.start_date.less_than.end_date")
+    public boolean isValid() {
+        if (!Optional.ofNullable(this.startDateMillis).isPresent() && Optional.ofNullable(this.endDateMillis).isPresent()) {
+            return false;
+        } else if (Optional.ofNullable(this.startDateMillis).isPresent() && (Optional.ofNullable(this.endDateMillis).isPresent())) {
+            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            return !endDateAsUtc.isBefore(startDateAsUtc);
+        }
+        return true;
     }
 }
