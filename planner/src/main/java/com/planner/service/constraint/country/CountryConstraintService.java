@@ -152,7 +152,7 @@ public class CountryConstraintService {
             planningProblemId=planningProblem.getId();
         }
         else {
-            planningProblem = new PlanningProblem("Shift planning","Shift planning", PlanningProblemType.SHIFT_PLANNING);
+            planningProblem = new PlanningProblem("Shift planning","Shift planning", PlanningProblemType.SHIFT_PLANNING,countryId);
             planningProblemRepository.saveEntity(planningProblem);
             planningProblemId = planningProblem.getId();
         }

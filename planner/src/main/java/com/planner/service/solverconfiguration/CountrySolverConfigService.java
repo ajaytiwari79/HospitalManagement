@@ -2,16 +2,19 @@ package com.planner.service.solverconfiguration;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.planner.component.exception.ExceptionService;
+import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.country.CountrySolverConfig;
 import com.planner.domain.solverconfig.unit.UnitSolverConfig;
+import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
@@ -38,13 +41,15 @@ public class CountrySolverConfigService {
     private UserNeo4jRepo userNeo4jRepo;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private PlanningProblemRepository planningProblemRepository;
 
     //================================================================
 
     /**
      * @param countrySolverConfigDTO
      */
-    public CountrySolverConfigDTO createCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
+    public CountrySolverConfigDTO createCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
+        countrySolverConfigDTO.setCountryId(countryId);
         if (preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             solverConfigRepository.saveEntity(countrySolverConfig);
@@ -92,8 +97,9 @@ public class CountrySolverConfigService {
      * Here TypeCasting is not required because coming DTO might get changed,so we require only
      * id field from previous saved solver-config.
      */
-    public CountrySolverConfigDTO copyCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
+    public CountrySolverConfigDTO copyCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(countrySolverConfigDTO.getId());
+        countrySolverConfigDTO.setCountryId(countryId);
         if (solverConfig != null && preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             countrySolverConfig.setId(null);//UnSet
@@ -115,7 +121,8 @@ public class CountrySolverConfigService {
 
     //=============================================================================
     //Only update if present
-    public CountrySolverConfigDTO updateCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
+    public CountrySolverConfigDTO updateCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
+        countrySolverConfigDTO.setCountryId(countryId);
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(countrySolverConfigDTO.getId());
         if (solverConfig != null && preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
@@ -136,10 +143,11 @@ public class CountrySolverConfigService {
 
     /*=================================Country Default Data===============================================*/
     public DefaultDataDTO getDefaultData(Long countryId) {
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
                 .setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
                 .setPhaseDTOSBuilder(getAllPhases(countryId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
-                .setConstraintTypesBuilder(getConstraintTypes());
+                .setConstraintTypesBuilder(getConstraintTypes()).setPlanningProblemsBuilder(planningProblemDTOS);
         return defaultDataDTO;
     }
 

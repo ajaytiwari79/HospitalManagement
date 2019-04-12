@@ -80,5 +80,9 @@ public class TimeBankCTADistribution {
                 .append(ctaRuleTemplateId, that.ctaRuleTemplateId)
                 .isEquals();
     }
-    
+
+    @Override
+    public String toString() {
+        return "TimeBankCTADistribution{" + "ctaName='" + ctaName + '\'' + ", minutes=" + minutes + ", ctaRuleTemplateId=" + ctaRuleTemplateId + '}';
+    }
 }

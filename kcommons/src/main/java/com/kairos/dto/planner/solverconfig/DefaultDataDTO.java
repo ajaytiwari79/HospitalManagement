@@ -2,6 +2,7 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
@@ -18,6 +19,7 @@ public class DefaultDataDTO {
     private List<PlanningPeriodDTO> planningPeriods;
     private List<TimeTypeEnum> timeTypeEnums;
     private Map<ConstraintType, Set<ConstraintSubType>> constraintTypes;
+    private List<PlanningProblemDTO> planningProblems;
 
     public Map<ConstraintType, Set<ConstraintSubType>> getConstraintTypes() {
         return constraintTypes;
@@ -57,6 +59,11 @@ public class DefaultDataDTO {
 
     public void setTimeTypeEnums(List<TimeTypeEnum> timeTypeEnums) {
         this.timeTypeEnums = timeTypeEnums;
+    }
+
+    public DefaultDataDTO setPlanningProblemsBuilder(List<PlanningProblemDTO> planningProblems) {
+        this.planningProblems = planningProblems;
+        return this;
     }
 
     public DefaultDataDTO setConstraintTypesBuilder(Map<ConstraintType, Set<ConstraintSubType>> constraintTypes) {

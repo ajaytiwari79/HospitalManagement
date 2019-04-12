@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -23,14 +24,14 @@ public class CountryConstraintController {
 //=============================================================
     @PostMapping
     @ApiOperation("Create CountryConstraint")
-    public ResponseEntity<Map<String, Object>> createCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
+    public ResponseEntity<Map<String, Object>> createCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.createCountryConstraint(countryConstraintDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @PostMapping (value = "/copy")
     @ApiOperation("Copy CountryConstraint")
-    public ResponseEntity<Map<String, Object>> copyCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
+    public ResponseEntity<Map<String, Object>> copyCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.copyCountryConstraint(countryConstraintDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
@@ -44,7 +45,7 @@ public class CountryConstraintController {
 
     @PatchMapping
     @ApiOperation("Update CountryConstraint")
-    public ResponseEntity<Map<String, Object>> updateCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
+    public ResponseEntity<Map<String, Object>> updateCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.updateCountryConstraint(countryConstraintDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }

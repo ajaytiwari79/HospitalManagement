@@ -3,12 +3,14 @@ package com.planner.service.solverconfiguration;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.planner.component.exception.ExceptionService;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.unit.UnitSolverConfig;
+import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
@@ -34,6 +36,7 @@ public class UnitSolverConfigService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private CountrySolverConfigService countrySolverConfigService;
+    @Inject private PlanningProblemRepository planningProblemRepository;
 
 
     //===================================================================================
@@ -90,12 +93,13 @@ public class UnitSolverConfigService {
 
     /*==============================Country Default Data==================================*/
     public DefaultDataDTO getDefaultData(Long unitId) {
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
                 //get All Phases
                 .setPhaseDTOSBuilder(getAllPhases(unitId))
                 //getAllPlanningPeriod
                 .setPlanningPeriodBuilder(getAllPlanningPeriods(unitId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
-                .setConstraintTypesBuilder(countrySolverConfigService.getConstraintTypes());
+                .setConstraintTypesBuilder(countrySolverConfigService.getConstraintTypes()).setPlanningProblemsBuilder(planningProblemDTOS);
 
 
         return defaultDataDTO;

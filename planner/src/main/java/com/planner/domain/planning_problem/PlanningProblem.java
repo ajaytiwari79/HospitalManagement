@@ -9,14 +9,24 @@ public class PlanningProblem extends MongoBaseEntity{
     private String name;
     private String description;
     private PlanningProblemType type;
+    private Long countryId;
 
     public PlanningProblem() {
     }
 
-    public PlanningProblem(String name, String description, PlanningProblemType type) {
+    public PlanningProblem(String name, String description, PlanningProblemType type,Long countryId) {
         this.name = name;
         this.description = description;
         this.type = type;
+        this.countryId = countryId;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     public String getName() {

@@ -103,6 +103,16 @@ public class ObjectMapperUtils {
         return null;
     }
 
+    public static <T extends Object,E extends Object> List<E> JsonStringToList(String json, Class className) {
+        try {
+            return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(
+                    List.class, className));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     //Todo Please don't use again pradeep remove this method
     @Deprecated
     public static void copyProperties(Object source,Object destination){
