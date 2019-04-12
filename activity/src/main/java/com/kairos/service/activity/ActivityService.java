@@ -283,7 +283,7 @@ public class ActivityService extends MongoBaseService {
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
-        //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        //   generalTab.setTagList(tagMongoRepository.getTagsById(generalDTO.getTagList()));
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
         if (!generalDTO.getTags().isEmpty()) {

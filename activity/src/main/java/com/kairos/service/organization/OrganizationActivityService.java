@@ -223,8 +223,8 @@ public class OrganizationActivityService extends MongoBaseService {
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-        logger.info("activity.getTags() ================ > " + activity.getTags());
-        //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        logger.info("activity.getTagList() ================ > " + activity.getTags());
+        //generalTab.setTagList(tagMongoRepository.getTagsById(activity.getTagList()));
         logger.info("activityId " + activityId);
         generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
@@ -298,7 +298,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setTags(generalDTO.getTags());
 
 
-        // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        // generalTab.setTagList(tagMongoRepository.getTagsById(generalDTO.getTagList()));
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
