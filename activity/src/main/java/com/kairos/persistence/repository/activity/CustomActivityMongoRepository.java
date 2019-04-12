@@ -83,7 +83,7 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<ActivityWrapper> findActivityAndTimeTypeByActivityIds(Set<BigInteger> activityIds);
+    List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds);
 
     List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds);
 
