@@ -1,1 +1,21 @@
 {server URL}/kairos/activity/api/v1/unit/{unitId}/timeBank/update_daily_timebank GET
+
+
+
+
+// Queries related to changes from UnitPosition to employment
+db.costTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.payOutPerShift.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.shifts.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.staffActivitySetting.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.dailyTimeBankEntries.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.staffWTACounter.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )

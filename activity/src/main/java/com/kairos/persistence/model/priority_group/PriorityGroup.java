@@ -28,17 +28,6 @@ public class PriorityGroup extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public PriorityGroup(PriorityGroupName name, boolean deActivated, OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
-                         StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId, ScheduledProcess scheduledProcess) {
-        this.name=name;
-        this.deActivated = deActivated;
-        this.roundRules = roundRules;
-        this.staffExcludeFilter = staffExcludeFilter;
-        this.staffIncludeFilter = staffIncludeFilter;
-        this.countryId = countryId;
-        this.unitId = unitId;
-    }
-
     public boolean isDeActivated() {
         return deActivated;
     }

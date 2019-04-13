@@ -22,7 +22,7 @@ public class CTAResponseDTO {
     @NotNull
     private BigInteger id;
     private BigInteger parentId;
-    private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
+    private BigInteger organizationParentId;// cta id of parent organization and this must not be changable
     private String name;
     private String description;
     private ExpertiseResponseDTO expertise;
@@ -48,6 +48,7 @@ public class CTAResponseDTO {
         this.id = id;
         this.parentId = parentId;
     }
+
     public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled, Long employmentId, String description) {
         this.id = id;
         this.name = name;

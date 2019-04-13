@@ -41,9 +41,9 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /*
-* Created By Mohit Shakya
-*
-* */
+ * Created By Mohit Shakya
+ *
+ * */
 @Transactional
 @Service
 public class PayOutService extends MongoBaseService {
@@ -53,39 +53,32 @@ public class PayOutService extends MongoBaseService {
     @Inject
     private PayOutRepository payOutRepository;
     @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
     private PayOutCalculationService payOutCalculationService;
     @Inject
-    private ActivityMongoRepository activityMongoRepository;
-    @Inject private TimeBankService timeBankService;
-    @Inject private TimeTypeService timeTypeService;
-    @Inject private TimeBankRepository timeBankRepository;
-    @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
-    @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
-    @Inject private ExceptionService exceptionService;
-    @Inject private UserIntegrationService userIntegrationService;
-
+    private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
 
     /**
-     *
      * @param employmentDetails
      * @param shifts
      * @param activities
      */
-    public void savePayOuts(StaffEmploymentDetails employmentDetails, List<Shift> shifts, List<Activity> activities, Map<BigInteger,ActivityWrapper> activityWrapperMap, List<DayTypeDTO> dayTypeDTOS) {
+    public void savePayOuts(StaffEmploymentDetails employmentDetails, List<Shift> shifts, List<Activity> activities, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<DayTypeDTO> dayTypeDTOS) {
         List<PayOutPerShift> payOutPerShifts = new ArrayList<>();
-        if (activityWrapperMap==null) {
-         activityWrapperMap=activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> new ActivityWrapper(v, "")));
+        if (activityWrapperMap == null) {
+            activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> new ActivityWrapper(v, "")));
         }
         for (Shift shift : shifts) {
             ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
             ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
             PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
-            DateTimeInterval interval = new DateTimeInterval(startDate,endDate);
-            payOutPerShift = isNullOrElse(payOutPerShift,new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId()));
-            payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, employmentDetails, shift, activityWrapperMap, payOutPerShift,dayTypeDTOS);
+            DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+            payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
+            payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, employmentDetails, shift, activityWrapperMap, payOutPerShift, dayTypeDTOS);
             payOutPerShifts.add(payOutPerShift);
         }
         if (!payOutPerShifts.isEmpty()) {
@@ -95,44 +88,41 @@ public class PayOutService extends MongoBaseService {
 
 
     /**
-     *
      * @param payOutTransactionId
      * @return boolean
      */
-    public boolean approvePayOutRequest(BigInteger payOutTransactionId){
+    public boolean approvePayOutRequest(BigInteger payOutTransactionId) {
         PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
-        PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getEmploymentId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
+        PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(), payOutTransaction.getEmploymentId(), PayOutTrasactionStatus.APPROVED, payOutTransaction.getMinutes(), LocalDate.now());
         save(approvedPayOutTransaction);
-        PayOutPerShift payOutPerShift = new PayOutPerShift(payOutTransaction.getEmploymentId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
-        PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(payOutTransaction.getEmploymentId(),DateUtils.asDate(payOutTransaction.getDate()));
-        if(lastPayOutPerShift !=null) {
+        PayOutPerShift payOutPerShift = new PayOutPerShift(payOutTransaction.getEmploymentId(), payOutTransaction.getStaffId(), payOutTransaction.getMinutes(), payOutTransaction.getDate());
+        PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(payOutTransaction.getEmploymentId(), DateUtils.asDate(payOutTransaction.getDate()));
+        if (lastPayOutPerShift != null) {
             payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMinutes());
         }
-        payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(),(int) payOutPerShift.getTotalPayOutMinutes());
+        payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(), (int) payOutPerShift.getTotalPayOutMinutes());
         save(payOutPerShift);
         return true;
     }
 
     /**
-     *
      * @param staffId
      * @param employmentId
      * @param amount
      * @return boolean
      */
-    public boolean requestPayOut(Long staffId,Long employmentId,int amount){
+    public boolean requestPayOut(Long staffId, Long employmentId, int amount) {
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getEmploymentDetails(employmentId);
-        if(employmentWithCtaDetailsDTO ==null){
+        if (employmentWithCtaDetailsDTO == null) {
             exceptionService.invalidRequestException("message.employment.absent");
         }
-        PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId,employmentId, PayOutTrasactionStatus.REQUESTED,amount, LocalDate.now());
+        PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId, employmentId, PayOutTrasactionStatus.REQUESTED, amount, LocalDate.now());
         save(requestPayOutTransaction);
         return true;
 
     }
 
     /**
-     *
      * @param staffAdditionalInfoDTO
      * @param shift
      * @param activityWrapperMap
@@ -141,54 +131,21 @@ public class PayOutService extends MongoBaseService {
         ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
         PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
-        DateTimeInterval interval = new DateTimeInterval(startDate,endDate);
-        payOutPerShift = isNullOrElse(payOutPerShift,new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId()));
-        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift,staffAdditionalInfoDTO.getDayTypes());
+        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+        payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
+        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
         payOutRepository.save(payOutPerShift);
     }
 
     /**
-     *
      * @param shiftId
      */
-    public void deletePayOut(BigInteger shiftId){
+    public void deletePayOut(BigInteger shiftId) {
         PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shiftId);
-        if(isNotNull(payOutPerShift)) {
+        if (isNotNull(payOutPerShift)) {
             payOutPerShift.setDeleted(true);
             payOutRepository.save(payOutPerShift);
         }
     }
-
-
-    /**
-     *
-     * @param employmentIds
-     * @param shiftQueryResultWithActivities
-     * @return Map<Long, List<ShiftWithActivityDTO>>
-     */
-    public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> employmentIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
-        Map<Long, List<ShiftWithActivityDTO>> shiftsMap = new HashMap<>(employmentIds.size());
-        employmentIds.forEach(uEPId -> {
-            shiftsMap.put(uEPId, getShiftsByUEP(uEPId, shiftQueryResultWithActivities));
-        });
-        return shiftsMap;
-    }
-
-    /**
-     *
-     * @param employmentId
-     * @param shiftQueryResultWithActivities
-     * @return List<ShiftWithActivityDTO>
-     */
-    private List<ShiftWithActivityDTO> getShiftsByUEP(Long employmentId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
-        List<ShiftWithActivityDTO> shifts = new ArrayList<>();
-        shiftQueryResultWithActivities.forEach(s -> {
-            if (s.getEmploymentId().equals(employmentId)) {
-                shifts.add(s);
-            }
-        });
-        return shifts;
-    }
-
 
 }

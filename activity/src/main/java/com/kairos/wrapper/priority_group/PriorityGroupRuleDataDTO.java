@@ -31,6 +31,7 @@ public class PriorityGroupRuleDataDTO {
     public PriorityGroupRuleDataDTO() {
 
     }
+
     public PriorityGroupRuleDataDTO(Map<Long,List<Shift>> shiftEmploymentsMap, Map<BigInteger, OpenShift> openShiftMap, Map<BigInteger,
             List<StaffEmploymentQueryResult>> openShiftStaffMap, List<Shift> shifts, List<OpenShiftNotification> openShiftNotifications,
                                     Map<Long,Integer> assignedOpenShiftMap, Set<BigInteger> unavailableActivitySet) {

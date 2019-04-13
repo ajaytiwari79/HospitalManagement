@@ -40,9 +40,6 @@ public class ActivityController {
 
     @Inject
     private ActivityService activityService;
-    @Inject private TimeTypeService timeTypeService;
-    @Inject
-    private UserIntegrationService userIntegrationService;
 
 
     @ApiOperation("Create Activity")

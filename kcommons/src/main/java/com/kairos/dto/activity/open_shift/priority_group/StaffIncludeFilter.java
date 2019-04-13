@@ -14,12 +14,6 @@ public class StaffIncludeFilter {
         //Default Constructor
     }
 
-    public StaffIncludeFilter(boolean allowForFlexPool,  Float staffAvailability, Integer distanceFromUnit) {
-        this.allowForFlexPool = allowForFlexPool;
-        this.staffAvailability=staffAvailability;
-        this.distanceFromUnit=distanceFromUnit;
-    }
-
     public boolean isAllowForFlexPool() {
         return allowForFlexPool;
     }
