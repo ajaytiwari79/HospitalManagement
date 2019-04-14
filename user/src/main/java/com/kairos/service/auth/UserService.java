@@ -175,11 +175,11 @@ public class UserService {
        // User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
           User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
         if (!Optional.ofNullable(currentUser).isPresent()) {
-             currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
+            // currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
            // return null;
-            if(!Optional.ofNullable(currentUser).isPresent()){
+           // if(!Optional.ofNullable(currentUser).isPresent()){
                 return null;
-            }
+           // }
         }
 
         int otp = OtpGenerator.generateOtp();
