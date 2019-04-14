@@ -47,7 +47,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private IndividualPointsActivityTab individualPointsActivityTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
     private List<CompositeActivity> compositeActivities;
-
+    private Set<BigInteger> childActivityIds;
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;
@@ -64,6 +64,11 @@ public class Activity extends MongoBaseEntity implements Serializable {
     //time care id
     private String externalId;
 
+    public Activity() {
+    // default constructor
+    }
+
+
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;
         this.description = description;
@@ -74,10 +79,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     public Activity(BalanceSettingsActivityTab balanceSettingsActivityTab) {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
-    }
-
-    public Activity() {
-// default constructor
     }
 
 
@@ -345,6 +346,14 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     public void setActivityPriorityId(BigInteger activityPriorityId) {
         this.activityPriorityId = activityPriorityId;
+    }
+
+    public Set<BigInteger> getChildActivityIds() {
+        return childActivityIds =Optional.ofNullable(childActivityIds).orElse(new HashSet<>());
+    }
+
+    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
+        this.childActivityIds = childActivityIds;
     }
 
     @Override

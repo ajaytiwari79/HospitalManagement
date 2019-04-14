@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRe
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,7 @@ public class ResourceService {
     }
 
     public ResourceTypeWrapper getUnitResourcesTypes(Long unitId) {
-        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        Long countryId = UserContext.getUserDetails().getCountryId();
         List<Vehicle> vehicleTypes = countryService.getVehicleList(countryId);
         ResourceTypeWrapper resourceWrapper = new ResourceTypeWrapper(vehicleTypes, Arrays.asList(FuelType.values()));
         return resourceWrapper;

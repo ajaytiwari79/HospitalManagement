@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.STOP_BRICK_BLOCKING_POINT;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -163,6 +164,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     workTimeAgreementRuleTemplateBalancesDTO = getWtaForCareDayRuleTemplateBalance(wtaForCareDays, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
                     break;
+                default:
+                    workTimeAgreementRuleTemplateBalancesDTO = null;
+                    break;
             }
             if (isNotNull(workTimeAgreementRuleTemplateBalancesDTO)) {
                 workTimeAgreementRuleTemplateBalances.add(workTimeAgreementRuleTemplateBalancesDTO);
@@ -194,9 +198,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                         for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
                             if ((shiftActivityDTO.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(shiftActivityDTO.getStartDate()))) {
                                 if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getStopBrickActivityId())) {
-                                    scheduledActivityCount = scheduledActivityCount + 0.5f;
-                                    if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)) {
-                                        approveActivityCount = approveActivityCount + 0.5f;
+                                    scheduledActivityCount = scheduledActivityCount + STOP_BRICK_BLOCKING_POINT;
+                                    if(shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)){
+                                        approveActivityCount = approveActivityCount + STOP_BRICK_BLOCKING_POINT;
                                     }
                                 } else if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getVetoActivityId())) {
                                     scheduledActivityCount++;

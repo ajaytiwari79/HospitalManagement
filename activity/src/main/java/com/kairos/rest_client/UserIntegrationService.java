@@ -14,6 +14,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.Expertise;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
@@ -199,6 +200,11 @@ public class UserIntegrationService {
         }, unitPositionId);
     }
 
+    public Boolean applyFunction(Long unitId, Long unitPositionId, Map<LocalDate, Long> requestBody,HttpMethod httpMethod,List<NameValuePair>  queryParams) {
+        return genericRestClient.publishRequest(requestBody, unitId, RestClientUrlType.UNIT, httpMethod, APPLY_FUNCTION, queryParams, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        }, unitPositionId);
+    }
+
     //~ Added by mohit TODO remove comment after verification
 
     public OrganizationDTO getOrganizationDTO(Long unitId) {
@@ -298,8 +304,8 @@ public class UserIntegrationService {
     }
 
     public boolean isCountryExists(long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        });
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
+        }) != null;
     }
 
     public List<DayType> getDayTypes(List<Long> dayTypes) {
@@ -370,21 +376,21 @@ public class UserIntegrationService {
         }, staffId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId,Set<Long> reasonCodeIds) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId, Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
-        if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
-            queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
+            queryParamList.add(new BasicNameValuePair("reasonCodeIds", RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffWithUnitId(Long unitId,LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffWithUnitId(Long unitId, LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
     }
@@ -393,6 +399,15 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitPositionId);
     }
+
+    public Map<LocalDate,List<FunctionDTO>> getFunctionsByUnitPosition(Long unitPositionId,LocalDate startDate,LocalDate endDate) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
+        queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_OF_UNIT_POSITION, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,List<FunctionDTO>>>>() {
+        }, unitPositionId);
+    }
+
     public StaffDTO getStaffByUser(Long userId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, userId);
@@ -415,12 +430,12 @@ public class UserIntegrationService {
 
 
     //shift service
-    public List<StaffAdditionalInfoDTO> getStaffAditionalDTOS(Long unitId,List<NameValuePair> requestParam) {
-       return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/verifyUnitEmployments", requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {
+    public List<StaffAdditionalInfoDTO> getStaffAditionalDTOS(Long unitId, List<NameValuePair> requestParam) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/verifyUnitEmployments", requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {
         });
     }
 
-    public ReasonCodeWrapper getUnitInfoAndReasonCodes(Long unitId,List<NameValuePair> requestParam) {
+    public ReasonCodeWrapper getUnitInfoAndReasonCodes(Long unitId, List<NameValuePair> requestParam) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, UNIT_LOCATION_AND_REASON_CODE, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
         });
     }
@@ -447,13 +462,13 @@ public class UserIntegrationService {
     public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId, List<Long> unitIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("countryId", countryId.toString()));
-        if(isNotNull(organizationId)) {
+        if (isNotNull(organizationId)) {
             queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
         }
         queryParamList.add(new BasicNameValuePair("organizationTypeId", organizationTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationSubTypeId", organizationSubTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("expertiseId", expertiseId.toString()));
-        if(CollectionUtils.isNotEmpty(unitIds)){
+        if (CollectionUtils.isNotEmpty(unitIds)) {
             queryParamList.add(new BasicNameValuePair("unitIds", unitIds.toString().replace("[", "").replace("]", "")));
         }
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, WTA_RULE_INFO, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTABasicDetailsDTO>>() {
@@ -535,7 +550,7 @@ public class UserIntegrationService {
 
     //Note here 2nd argument is taken just because of unitId(might not present in UserContext) not null in url
     public List<ClientOrganizationIds> getCitizenIdsByUnitIds(List<Long> unitIds) {
-        return genericRestClient.publishRequestWithoutAuth(unitIds,null, RestClientUrlType.UNIT, HttpMethod.POST, GET_UNIT_IDS_BY_CLIENT_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientOrganizationIds>>>() {
+        return genericRestClient.publishRequestWithoutAuth(unitIds, null, RestClientUrlType.UNIT, HttpMethod.POST, GET_UNIT_IDS_BY_CLIENT_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientOrganizationIds>>>() {
         });
     }
 
@@ -555,6 +570,7 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, COMMON_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
         });
     }
+
     //TODO Testing
     public boolean setOneTimeSyncPerformed(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.PUT, ONE_TIME_SYNC, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
@@ -658,7 +674,7 @@ public class UserIntegrationService {
         });
     }
 
-      public List<DayType> getDayTypesByCountryId(Long countryId) {
+    public List<DayType> getDayTypesByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, DAY_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayType>>>() {
         });
     }
@@ -679,21 +695,23 @@ public class UserIntegrationService {
     }
 
     public String getTimezone() {
-        return userRestClientForScheduler.publishRequest(null,2567L,RestClientUrlType.UNIT,HttpMethod.GET,MicroService.USER,"/time_zone",null,new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
+        return userRestClientForScheduler.publishRequest(null, 2567L, RestClientUrlType.UNIT, HttpMethod.GET, MicroService.USER, "/time_zone", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
         });
     }
+
 
     public StaffDTO getStaff(Long unitId,Long staffId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {}, staffId);
     }
 
     public Expertise getExpertise(Long countryId, Long expertiseId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET, API_EXPERTISE_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {
+        }, expertiseId);
     }
 
 
-    public Map<Long,Map<Long,Set<LocalDate>>> getUnitPositionIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
-        return genericRestClient.publishRequest(unitPositionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Map<Long,Set<LocalDate>>>>>() {
+    public Map<Long, Map<Long, Set<LocalDate>>> getUnitPositionIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
+        return genericRestClient.publishRequest(unitPositionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, Map<Long, Set<LocalDate>>>>>() {
         });
     }
 
@@ -701,17 +719,19 @@ public class UserIntegrationService {
         Boolean AreFunctionsRestored = genericRestClient.publishRequest(unitPositionIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
-    public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
-        return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
-    }
 
-    public String getTimeZoneByUnitId(Long unitId){
-        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT_WITHOUT_PARENT_ORG,HttpMethod.GET,UNIT_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+    public List<SchedulerPanelDTO> registerNextTrigger(Long unitId, List<SchedulerPanelDTO> schedulerPanelDTOS) {
+        return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST, MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
     }
 
-    public Map<Long,String> getTimeZoneByUnitIds(Set<Long> unitIds){
-        return genericRestClient.publishRequest(unitIds,null,RestClientUrlType.ORGANIZATION,HttpMethod.POST,UNITS_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
+    public String getTimeZoneByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, UNIT_TIMEZONE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        });
+    }
+
+    public Map<Long, String> getTimeZoneByUnitIds(Set<Long> unitIds) {
+        return genericRestClient.publishRequest(unitIds, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, UNITS_TIMEZONE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, String>>>() {
         });
     }
 
@@ -731,25 +751,25 @@ public class UserIntegrationService {
         });
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByUnitPositionId(Long unitId,LocalDate shiftDate, String type, Long unitPositionId,Set<Long> reasonCodeIds) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByUnitPositionId(Long unitId, LocalDate shiftDate, String type, Long unitPositionId, Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("startDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
-        if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
-            queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
+        queryParamList.add(new BasicNameValuePair("startDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
+            queryParamList.add(new BasicNameValuePair("reasonCodeIds", RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_EMPLOYMENT_BY_UNIT_POSITION_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, unitPositionId);
     }
 
-    public boolean isReasonCodeLinkedToTimeType(Long countryId,BigInteger timeTypeId) {
+    public boolean isReasonCodeLinkedToTimeType(Long countryId, BigInteger timeTypeId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, REASON_CODE_LINK_WITH_TIME_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        },timeTypeId);
+        }, timeTypeId);
     }
 
     public Long getUnitByUnitPositionId(Long unitPositionId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_UNIT_BY_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
-        },unitPositionId);
+        }, unitPositionId);
     }
 
 
@@ -766,6 +786,13 @@ public class UserIntegrationService {
 
     public SelfRosteringMetaData getPublicHolidaysDayTypeAndReasonCodeByUnitId(long unitId){
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SelfRosteringMetaData>>() {});
+    }
+
+    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId,long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,
+                IS_ACTIVITY_ASSIGNED,Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+                },activityId);
     }
 }
 

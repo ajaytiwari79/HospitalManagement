@@ -1,5 +1,6 @@
 package com.planner.domain.solverconfig.common;
 
+import com.kairos.enums.TimeTypeEnum;
 import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,6 +19,7 @@ public class SolverConfig extends MongoBaseEntity {
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
     protected BigInteger parentSolverConfigId;//copiedFrom
+    protected TimeTypeEnum typeOfTimeType;
 
 
     //Constructors
@@ -90,8 +92,6 @@ public class SolverConfig extends MongoBaseEntity {
     public void setConstraintIds(List<BigInteger> constraintIds) {
         this.constraintIds = constraintIds;
     }
-
-
 
 
     /*****************************SolverConfig Builder****************************************/

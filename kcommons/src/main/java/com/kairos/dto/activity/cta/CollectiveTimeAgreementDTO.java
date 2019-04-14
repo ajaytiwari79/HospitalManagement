@@ -2,6 +2,7 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 
@@ -35,6 +36,7 @@ public class CollectiveTimeAgreementDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<Long> unitIds;
+    private List<TagDTO> tags =new ArrayList<>();
 
     public CollectiveTimeAgreementDTO() {
 
@@ -118,6 +120,14 @@ public class CollectiveTimeAgreementDTO {
 
     public void setUnitIds(List<Long> unitIds) {
         this.unitIds = unitIds;
+    }
+
+    public List<TagDTO> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagDTO> tags) {
+        this.tags = tags;
     }
 
     @Override

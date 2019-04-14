@@ -3,7 +3,7 @@ package com.planner.service.shift_planning;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

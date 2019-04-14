@@ -2,8 +2,8 @@
 <solver>
   <!--<environmentMode>FULL_ASSERT</environmentMode>-->
   <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
-  <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
-  <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImp</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>
   <scoreDirectorFactory>
       <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning.drl</scoreDrl>
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
@@ -13,7 +13,7 @@
     <constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="shiftEntitySelector">
-                <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImp</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="shiftEntitySelector"/>
@@ -32,7 +32,7 @@
     <constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="indirectActivityEntitySelector">
-                <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="indirectActivityEntitySelector"/>

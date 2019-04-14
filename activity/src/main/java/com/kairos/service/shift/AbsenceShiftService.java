@@ -117,11 +117,7 @@ public class AbsenceShiftService {
         shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
-        Date endDate = plusDays(fromDate, activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ? 1 : 7);
-        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(shiftDTO.getId(),staffAdditionalInfoDTO.getUnitPosition().getId(), fromDate,endDate,null);
-        if (shiftExists) {
-            exceptionService.actionNotPermittedException("message.shift.date.startandend", fromDate, endDate);
-        }
+
         return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(), startDateTime.toDate(), startDateTime.plusMinutes(contractualMinutesInADay).toDate());
     }
 
@@ -186,7 +182,7 @@ public class AbsenceShiftService {
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS,staffAdditionalInfoDTO.getUserAccessRoleDTO());
             LocalDate startLocalDate = staffAdditionalInfoDTO.getUnitPosition().getStartDate();
             LocalDate endLocalDate = asLocalDate(shiftDTOS.get(shiftDTOS.size() - 1).getStartDate());
-            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS, startLocalDate, endLocalDate, staffAdditionalInfoDTO);
+            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
         }
         shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
         return shiftWithViolatedInfoDTO;

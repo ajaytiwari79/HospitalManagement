@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
+import static com.kairos.constants.CommonConstants.RESET_PASSWORD;
 
 
 /**
@@ -415,8 +416,7 @@ public class UserService {
 
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
-            Organization parentOrganization = organizationService.fetchParentOrganization(organizationId);
-            Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+            Long countryId = UserContext.getUserDetails().getCountryId();
             List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
             Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
             boolean checkDayType=true;
@@ -442,23 +442,26 @@ public class UserService {
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
-        updateLastSelectedOrganizationId(organizationId);
+        updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 
 
-    private Boolean updateLastSelectedOrganizationId(Long organizationId) {
+    private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        currentUser.setLastSelectedOrganizationId(organizationId);
-        userGraphRepository.save(currentUser);
-        return true;
+        if(currentUser.getLastSelectedOrganizationId()!=organizationId){
+            currentUser.setLastSelectedOrganizationId(organizationId);
+            Organization parent = organizationService.fetchParentOrganization(organizationId);
+            Long countryId = organizationGraphRepository.getCountryId(parent.getId());
+            currentUser.setCountryId(countryId);
+            userGraphRepository.save(currentUser);
+        }
     }
 
 
     public boolean updateDateOfBirthOfUserByCPRNumber() {
         List<User> users = userGraphRepository.findAll();
-
         users.stream().forEach(user -> {
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
@@ -501,8 +504,10 @@ public class UserService {
         String token = tokenService.createForgotPasswordToken(currentUser);
         Map<String,Object> templateParam = new HashMap<>();
         templateParam.put("receiverName",currentUser.getFullName());
-        templateParam.put("description",AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,userEmail);
+        templateParam.put("description",AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
+        templateParam.put("hyperLink",config.getForgotPasswordApiLink()+token);
+        templateParam.put("hyperLinkName",RESET_PASSWORD);
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,currentUser.getEmail());
         return true;
     }
 

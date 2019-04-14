@@ -1,6 +1,7 @@
 package com.kairos.service.unit_position;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
@@ -21,7 +22,8 @@ public class UnitPositionUtility {
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
         unitPositionDetails.setStartDate(unitPosition.getStartDate());
-        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
+
+        unitPositionDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getAppliedFunctions(),FunctionDTO.class));
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
         unitPositionDetails.setPositionLines(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getPositionLines(), UnitPositionLinesDTO.class));
         unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
