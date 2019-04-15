@@ -38,7 +38,7 @@ public class FibonacciKPIService {
         fibonacciKPIDTO.setConfLevel(confLevel);
         FibonacciKPI fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO, FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
-        return null;
+        return fibonacciKPIDTO;
     }
 
     public FibonacciKPIDTO updateFibonacciKPI(Long referenceId,FibonacciKPIDTO fibonacciKPIDTO,ConfLevel confLevel){
@@ -56,7 +56,7 @@ public class FibonacciKPIService {
         }
         fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO,FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
-        return null;
+        return fibonacciKPIDTO;
     }
 
     public List<FibonacciKPIDTO> getAllFibonacciKPI(Long referenceId,ConfLevel confLevel){
