@@ -74,7 +74,7 @@ class PolicyAgreementTemplateController {
 
     }
 
-    @ApiOperation("get all master  policy agreement Template  and general data agreement template  basic details ,country level  ")
+    @ApiOperation("get all master  policy agreement Template  and general  agreement template  basic details ,country level  ")
     @GetMapping(COUNTRY_URL + "/agreement_template")
     public ResponseEntity<ResponseDTO<List<PolicyAgreementTemplateResponseDTO>>> getAllMasterAgreementTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryId(countryId));
@@ -119,7 +119,6 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByUnitId(unitId));
 
     }
-
     @ApiOperation("get all agreement sections and sub section of agreement template , unit level ")
     @GetMapping(UNIT_URL + "/agreement_template/{agreementTemplateId}/section")
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable Long agreementTemplateId) {
@@ -133,9 +132,9 @@ class PolicyAgreementTemplateController {
     }
 
 
-    @ApiOperation("save Data handler agreement template with basic detail")
+    @ApiOperation("save General agreement template with basic detail")
     @PostMapping(COUNTRY_URL + "/general_agreement_template")
-    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createMasterDataHandler(@PathVariable Long countryId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> createMasterGeneralAgreementTemplate(@PathVariable Long countryId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
         agreementTemplateDto.setGeneralAgreementTemplate(true);
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.saveAgreementTemplate(countryId, false, agreementTemplateDto));
     }
