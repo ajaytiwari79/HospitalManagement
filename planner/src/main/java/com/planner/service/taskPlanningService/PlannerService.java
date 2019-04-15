@@ -79,7 +79,7 @@ public class PlannerService {
             //planningProblem.setUnitId(taskPlanningDTO.getUnitId());
             planningProblem.setStatus(PlanningStatus.UNSOLVED);
             //planningProblem.setProblemXml(getStringBySolutionObject(taskPlanningSolution));
-            planningProblem = (PlanningProblem) planningRepository.save(planningProblem);
+            planningProblem = (PlanningProblem) planningRepository.saveEntity(planningProblem);
             //taskPlanningDTO.setOptaPlannerId(planningProblem.getId());
             //taskPlanningDTO.setPlanningProblemStatus(planningProblem.getStatus().toValue());
         }
@@ -144,7 +144,7 @@ public class PlannerService {
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2]);*/
         VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(solverConfigId);
        /* vrpPlanningSolution.setSolverConfigId(solverConfigId);
-        vrpPlanningMongoRepository.save(vrpPlanningSolution);*/
+        vrpPlanningMongoRepository.saveEntity(vrpPlanningSolution);*/
 /*
         */return ObjectMapperUtils.copyPropertiesByMapper(solution,VrpTaskPlanningDTO.class);
     }
