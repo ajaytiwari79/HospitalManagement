@@ -1,5 +1,6 @@
 package com.kairos.service.counter;
 
+import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import org.springframework.stereotype.Service;
 
