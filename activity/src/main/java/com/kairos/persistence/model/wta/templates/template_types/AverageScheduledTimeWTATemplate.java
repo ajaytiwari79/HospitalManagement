@@ -20,7 +20,8 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.service.shift.ShiftValidatorService.*;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
