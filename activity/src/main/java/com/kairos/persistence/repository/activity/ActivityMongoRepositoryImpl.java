@@ -115,6 +115,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
+
     }
 
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
@@ -122,7 +123,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab","timeCalculationActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeCalculationActivityTab.methodForCalculatingTime").as("methodForCalculatingTime")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
@@ -137,7 +139,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab","timeCalculationActivityTab", "tags","activityPriorityId","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "tags","activityPriorityId","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeCalculationActivityTab.methodForCalculatingTime").as("methodForCalculatingTime")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
         );
