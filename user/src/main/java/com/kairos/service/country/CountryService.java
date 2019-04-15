@@ -40,7 +40,7 @@ import com.kairos.rest_client.PlannedTimeTypeRestClient;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.google_calender.GoogleCalenderService;
+import com.kairos.service.google_calender.CountryCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -223,7 +223,7 @@ public class CountryService {
 
         }
         try {
-            List<Event> eventList = GoogleCalenderService.getEventsFromGoogleCalender();
+            List<Event> eventList = CountryCalenderService.getEventsFromGoogleCalender();
             if (eventList != null) {
                 logger.info("No. of Events received are: " + eventList.size());
             }

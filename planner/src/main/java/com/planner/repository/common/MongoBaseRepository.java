@@ -18,18 +18,14 @@ public interface MongoBaseRepository<T, ID> extends MongoRepository<T, ID> {
     @Deprecated
     List<T> findAllSolverConfigNotDeletedByType(String solverConfigType);
 
-    /**
-     *
-     * @param checkForCountry can be either country  or unit
-     * @return
-     */
+
+    <T extends MongoBaseEntity> T saveEntity(T entity);
+
     List<T> findAllObjectsNotDeletedById(boolean checkForCountry,Long countryOrUnitId);
 
     T findByIdNotDeleted(BigInteger objectId);
 
-    <T extends MongoBaseEntity> T saveObject(T entity);
-
-    <T extends MongoBaseEntity> List<T> saveObjectList(List<T> entity);
+    <T extends MongoBaseEntity> List<T> saveList(List<T> entity);
 
     boolean safeDeleteById(BigInteger id);
 

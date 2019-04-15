@@ -27,6 +27,6 @@ public class TomtomRouteRunnable implements Runnable {
 
         }
         atoBRoute.setRoute(route);
-        atoBRouteRepository.save(atoBRoute);
+        atoBRouteRepository.saveEntity(atoBRoute);
     }
 }

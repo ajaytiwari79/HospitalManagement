@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.cta;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ import java.util.Set;
  */
 
 public interface CustomCostTimeAgreementRepository {
+
+    List<CTAResponseDTO> findCTAByCountryId(Long countryId);
 
     CTAResponseDTO getOneCtaById(BigInteger ctaId);
 

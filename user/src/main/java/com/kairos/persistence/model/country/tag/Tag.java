@@ -30,8 +30,14 @@ public class Tag extends UserBaseEntity {
 
     private boolean countryTag;
 
-    Tag(){}
-    
+    public Tag(){}
+
+    public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
+        this.name = name;
+        this.masterDataType = masterDataType;
+        this.countryTag = countryTag;
+    }
+
     public String getName() {
         return name;
     }

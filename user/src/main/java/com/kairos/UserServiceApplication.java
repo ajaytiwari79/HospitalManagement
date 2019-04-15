@@ -31,6 +31,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

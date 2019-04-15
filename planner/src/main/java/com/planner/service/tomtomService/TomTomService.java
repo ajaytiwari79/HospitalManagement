@@ -79,7 +79,7 @@ public class TomTomService {
                 e.printStackTrace();
             }
             //i++;
-           // tomTomRepository.save(response);
+           // tomTomRepository.saveEntity(response);
             List<LocationDistance> locationDistances = processLocationDistance(response,origin,tasks);
             locationService.saveLocation(locationDistances);
             //if(i==2){
@@ -105,7 +105,7 @@ public class TomTomService {
                 locationDistances.add(new LocationDistance(origin.get(i).getInstallationNo(),destination.get(j).getInstallationNo(),(double)matrix.getResponse().getRouteSummary().getLengthInMeters(),(double)matrix.getResponse().getRouteSummary().getTravelTimeInSeconds()));
             }
         }
-        tomTomRepository.save(response);
+        tomTomRepository.saveEntity(response);
         return locationDistances;
     }
 
