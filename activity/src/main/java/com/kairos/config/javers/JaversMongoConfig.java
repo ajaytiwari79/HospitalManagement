@@ -2,10 +2,9 @@ package com.kairos.config.javers;
 
 
 import com.google.common.collect.ImmutableMap;
-import com.kairos.config.env.EnvConfig;
 import com.kairos.config.codec.BigIntegerCodecProvider;
 import com.kairos.config.codec.BigIntegerTransformer;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.config.env.EnvConfig;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -30,9 +29,7 @@ import org.springframework.core.annotation.Order;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Configuration
 @EnableAspectJAutoProxy
