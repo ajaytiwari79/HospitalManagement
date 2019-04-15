@@ -92,8 +92,8 @@ public class StaffingLevelUtil {
             activityIdStaffMinMaxMap.put(staffingLevelActivity.getActivityId(), new StaffingLevelStaffMinMax(staffingLevelActivity.getMinNoOfStaff(), staffingLevelActivity.getMaxNoOfStaff()));
         } else {
             StaffingLevelStaffMinMax staffingLevelStaffMinMax = activityIdStaffMinMaxMap.get(parentActivityId);
-            staffingLevelActivity.setMinNoOfStaff(staffingLevelActivity.getMinNoOfStaff() + staffingLevelActivity.getMinNoOfStaff());
-            staffingLevelActivity.setMaxNoOfStaff(staffingLevelActivity.getMaxNoOfStaff() + staffingLevelActivity.getMaxNoOfStaff());
+            staffingLevelStaffMinMax.setMinNoOfStaffChildActivities(staffingLevelStaffMinMax.getMinNoOfStaffChildActivities() + staffingLevelActivity.getMinNoOfStaff());
+            staffingLevelStaffMinMax.setMaxNoOfStaffChildActivities(staffingLevelStaffMinMax.getMaxNoOfStaffChildActivities() + staffingLevelActivity.getMaxNoOfStaff());
             if (staffingLevelStaffMinMax.getMinNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMinNoOfStaffChildActivities() || staffingLevelStaffMinMax.getMaxNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMaxNoOfStaffChildActivities()) {
                 throw new InvalidRequestException("message.child.staffing.level.sum.greater.than.parent");
             }

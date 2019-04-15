@@ -350,7 +350,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
     // 403
-    @ExceptionHandler({AccessDeniedException.class, InvalidRequestException.class})
+    @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDeniedException(final Exception ex, final WebRequest request) {
         logger.error("exception in activity service", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
@@ -509,7 +509,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     }
 
-    @ExceptionHandler(value = {InvalidRequestException.class,})
+    @ExceptionHandler(value = {InvalidRequestException.class})
     @ResponseBody
     protected ResponseEntity<Object> exceptionHandler(RuntimeException ex, HttpServletRequest request) {
 
