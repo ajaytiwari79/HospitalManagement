@@ -482,34 +482,32 @@ public class UserService {
         return userGraphRepository.getUserSelectedLanguageId(userId);
     }
 
-    public boolean forgotPassword(String userEmail){
-      //  User currentUser= null;
-        if(userEmail.endsWith("kairos.com")||userEmail.endsWith("kairosplanning.com")){
+    public boolean forgotPassword(String userEmail) {
+        //  User currentUser= null;
+        if (userEmail.endsWith("kairos.com") || userEmail.endsWith("kairosplanning.com")) {
             LOGGER.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
             exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
         }
         //User currentUser = userGraphRepository.findByEmail(userEmail);
-        User  currentUser = userGraphRepository.findByEmail("(?i)"+userEmail);
+        User currentUser = userGraphRepository.findByEmail("(?i)" + userEmail);
         if (!Optional.ofNullable(currentUser).isPresent()) {
             LOGGER.error("No User found by email " + userEmail);
-           // exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
-            currentUser = userGraphRepository.findUserByUserName("(?i)"+userEmail);
+            // exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
+            currentUser = userGraphRepository.findUserByUserName("(?i)" + userEmail);
             if (!Optional.ofNullable(currentUser).isPresent()) {
                 LOGGER.error("No User found by userName " + userEmail);
                 exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
-            }else {
-                userEmail = currentUser.getEmail();
             }
         }
-        String token = tokenService.createForgotPasswordToken(currentUser);
-        Map<String,Object> templateParam = new HashMap<>();
-        templateParam.put("receiverName",currentUser.getFullName());
-        templateParam.put("description",AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
-        templateParam.put("hyperLink",config.getForgotPasswordApiLink()+token);
-        templateParam.put("hyperLinkName",RESET_PASSWORD);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,currentUser.getEmail());
-        return true;
-    }
+            String token = tokenService.createForgotPasswordToken(currentUser);
+            Map<String, Object> templateParam = new HashMap<>();
+            templateParam.put("receiverName", currentUser.getFullName());
+            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
+            templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
+            templateParam.put("hyperLinkName", RESET_PASSWORD);
+            mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+            return true;
+        }
 
     public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
         if(!passwordUpdateDTO.isValid()){
