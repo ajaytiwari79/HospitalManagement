@@ -93,10 +93,7 @@ public class StaffingLevelUtil {
             throw new InvalidRequestException("Min should be less than max");
         }
         if (parentActivityId == null) {
-            staffingLevelStaffMinMax = activityIdStaffMinMaxMap.get(staffingLevelActivity.getActivityId());
-            if (staffingLevelStaffMinMax == null) {
-                staffingLevelStaffMinMax = new StaffingLevelStaffMinMax();
-            }
+            staffingLevelStaffMinMax = activityIdStaffMinMaxMap.getOrDefault(staffingLevelActivity.getActivityId(), new StaffingLevelStaffMinMax());
             staffingLevelStaffMinMax.setMinNoOfStaffParentActivity(staffingLevelActivity.getMinNoOfStaff());
             staffingLevelStaffMinMax.setMaxNoOfStaffParentActivity(staffingLevelActivity.getMaxNoOfStaff());
             if (staffingLevelStaffMinMax.getMinNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMinNoOfStaffChildActivities() || staffingLevelStaffMinMax.getMaxNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMaxNoOfStaffChildActivities()) {
