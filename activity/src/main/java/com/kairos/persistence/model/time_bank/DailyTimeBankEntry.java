@@ -133,6 +133,6 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
 
     @Override
     public String toString() {
-        return "DailyTimeBankEntry{" + "unitPositionId=" + unitPositionId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
+        return "DailyTimeBankEntry{" + "unitPositionId=" + employmentId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
     }
 }

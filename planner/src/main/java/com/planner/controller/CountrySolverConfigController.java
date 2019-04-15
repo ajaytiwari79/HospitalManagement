@@ -42,7 +42,7 @@ public class CountrySolverConfigController {
     }
 
 
-    @PatchMapping
+    @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("Update Country Solver Configration")
     public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigService.updateCountrySolverConfig(countryId,countrySolverConfigDTO);
