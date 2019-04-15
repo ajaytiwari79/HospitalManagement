@@ -7,14 +7,17 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -35,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -562,18 +566,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    @Override
-    public boolean existShiftsBetweenDurationByUnitPositionId(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, ShiftType shiftType) {
-        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("unitPositionId").is(unitPositionId).and("startDate").lt(endDate).and("endDate").gt(startDate);
-        if (isNotNull(shiftId)) {
-            criteria.and("_id").ne(shiftId);
-        }
-        if (isNotNull(shiftType)) {
-            criteria.and("shiftType").is(shiftType.toString());
-        }
-        return mongoTemplate.exists(new Query(criteria), Shift.class);
-    }
-
 
     @Override
     public boolean existShiftsBetweenDurationByUnitPositionIdAndTimeType(BigInteger shiftId, Long unitPositionId, Date startDate, Date endDate, TimeTypes timeType) {
@@ -593,21 +585,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
     }
 
+
     @Override
-    public ShiftDTO findOneByIdWithActivityPriority(BigInteger shiftId) {
-        Criteria criteria = Criteria.where("_id").is(shiftId).and("deleted").is(false);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                new CustomAggregationOperation(Document.parse(getShiftWithPrioritiesProjection())),
-                lookup("activityPriority", "activities.activity.activityPriorityId", "_id", "activities.activity.activityPriority"),
-                new CustomAggregationOperation(Document.parse(getSecondShiftActivityPriority())),
-                new CustomAggregationOperation(Document.parse(getShiftActivityPriorityGroup())),
-                new CustomAggregationOperation(Document.parse(getThirdShiftActivityPriority()))
-        );
-        List<ShiftDTO> shiftDTOS = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults();
-        return shiftDTOS.isEmpty() ? null : shiftDTOS.get(0);
+    public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
+                .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
+        return mongoTemplate.find(query,Shift.class);
+
     }
 
 
