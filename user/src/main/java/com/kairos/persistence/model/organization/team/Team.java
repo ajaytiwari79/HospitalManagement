@@ -26,9 +26,6 @@ public class Team extends UserBaseEntity {
 
     private String name;
     private String description;
-    /**
-     * Specifies if team's address is same as unit's address
-     */
 
     @Relationship(type = TEAM_HAS_SKILLS)
     private List<Skill> skillList;
@@ -38,7 +35,7 @@ public class Team extends UserBaseEntity {
 
     private boolean isEnabled = true;
     private Set<BigInteger> activityIds;
-    Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
+    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
     public Team() {
     }

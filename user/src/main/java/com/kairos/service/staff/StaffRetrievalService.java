@@ -281,7 +281,7 @@ public class StaffRetrievalService {
     }
 
 
-    public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+    public List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffIds) {
         return unitPositionGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
     }
 
@@ -294,18 +294,18 @@ public class StaffRetrievalService {
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         Long staffId = getStaffIdOfLoggedInUser(unitId);
         long loggedinUserId = UserContext.getUserDetails().getId();
-        Boolean isCountryAdmin = false;
+        Boolean isSuperAdmin = false;
         staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         if (!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()) {
             staffAccessGroupQueryResult = new StaffAccessGroupQueryResult();
-            isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+            isSuperAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.SUPER_ADMIN);
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
             staffAccessGroupQueryResult.setCountryId(organizationGraphRepository.getCountryId(parentOrganization.getId()));
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
-        staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
+        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }

@@ -54,6 +54,7 @@ public class CompanyDefaultDataService {
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
             orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
+            orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
             activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
             activityIntegrationService.createDefaultKPISetting(
@@ -71,6 +72,8 @@ public class CompanyDefaultDataService {
     public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
 
                                                                          List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+            orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
+            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO);
             vrpClientService.createDefaultPreferredTimeWindow(organization);
             organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
@@ -78,8 +81,6 @@ public class CompanyDefaultDataService {
             timeSlotService.createDefaultTimeSlots(organization, timeSlots);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
-            activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
             reasonCodeService.createDefaultDataForUnit(organization, countryId);
             gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }

@@ -17,14 +17,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 import static com.kairos.service.shift.ShiftValidatorService.*;
+
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -35,8 +33,8 @@ import static com.kairos.service.shift.ShiftValidatorService.*;
 public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private Set<BigInteger> plannedTimeIds = new HashSet<>();
+    private Set<BigInteger> timeTypeIds = new HashSet<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
     @Positive(message = "message.ruleTemplate.interval.notNull")
@@ -69,19 +67,19 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public List<BigInteger> getPlannedTimeIds() {
+    public Set<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
+    public Set<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
         this.timeTypeIds = timeTypeIds;
     }
 
@@ -130,7 +128,8 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     int consecutiveDays = getConsecutiveDaysInDate(shiftDates);
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
-                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.DAYS,limitAndCounter[0]);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
+                            limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
                 }
             }
         }

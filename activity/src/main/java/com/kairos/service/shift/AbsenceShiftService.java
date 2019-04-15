@@ -54,7 +54,7 @@ public class AbsenceShiftService {
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
 
-    public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean shiftOverlappedWithNonWorkingType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
         if (activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
@@ -65,7 +65,7 @@ public class AbsenceShiftService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), null);
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
-            shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase);
+            shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase,shiftOverlappedWithNonWorkingType);
         } else {
             shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId);
         }
@@ -117,11 +117,7 @@ public class AbsenceShiftService {
         shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
-        Date endDate = plusDays(fromDate, activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ? 1 : 7);
-        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionId(shiftDTO.getId(),staffAdditionalInfoDTO.getUnitPosition().getId(), fromDate,endDate,null);
-        if (shiftExists) {
-            exceptionService.actionNotPermittedException("message.shift.date.startandend", fromDate, endDate);
-        }
+
         return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(), startDateTime.toDate(), startDateTime.plusMinutes(contractualMinutesInADay).toDate());
     }
 

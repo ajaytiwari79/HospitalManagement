@@ -16,20 +16,15 @@ import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionTypeMongoRepository;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.aggregator.AggregatorService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.fls_visitour.schedule.SchedulerImpl;
-import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.rule_validator.task.TaskLocationSpecification;
-import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.functional_interface.PerformCalculation;
 import com.kairos.wrapper.task.TaskGanttDTO;
@@ -44,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -76,16 +70,11 @@ public class ClientExceptionService extends MongoBaseService {
 
     @Inject
     private ClientExceptionTypeMongoRepository clientExceptionTypeMongoRepository;
-    @Inject
-    private SchedulerImpl scheduler;
+
     @Inject
     private ClientExceptionMongoRepository clientExceptionMongoRepository;
     @Inject
     private TaskService taskService;
-    @Inject
-    private TaskConverterService taskConverterService;
-    @Inject
-    MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
     private PlannerService plannerService;
@@ -100,23 +89,8 @@ public class ClientExceptionService extends MongoBaseService {
     @Inject
     ExceptionService exceptionService;
 
-
-
-
-    public static Date stringToDate(String stringDate) {
-        DateFormat dateFormat = new SimpleDateFormat(ISO_FORMAT);
-        try {
-            return dateFormat.parse(stringDate);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
     public Map<String, Object> createClientException(ClientExceptionDTO clientExceptionDto, long unitId, long clientId) throws ParseException {
-
-
         logger.info("client exception dto :: " + clientExceptionDto.toString());
-
         // Client client = clientGraphRepository.findById(clientId, 0);
         Client client = userIntegrationService.getClient(clientId);
         if (client == null) {
@@ -126,7 +100,7 @@ public class ClientExceptionService extends MongoBaseService {
         if (!clientExceptionTypeOptional.isPresent()) {
             exceptionService.internalError("error.exception.type.null");
         }
-        ClientExceptionType clientExceptionType=clientExceptionTypeOptional.get();
+        ClientExceptionType clientExceptionType = clientExceptionTypeOptional.get();
         ClientException clientException;
         List<Task> tasksToReturn;
         List<ClientException> clientExceptions = new ArrayList<>();
@@ -194,7 +168,6 @@ public class ClientExceptionService extends MongoBaseService {
 
             }
             case CHANGE_LOCATION: {
-
                 ClientTemporaryAddress clientTemporaryAddress = userIntegrationService.updateClientTemporaryAddress(clientExceptionDto, unitId, clientId);
                 return createChangeLocationException(unitId, clientId, clientExceptionDto, clientExceptionType, clientTemporaryAddress);
             }
@@ -204,7 +177,6 @@ public class ClientExceptionService extends MongoBaseService {
                     toTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDto.getToTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 }
                 for (String selectedDate : clientExceptionDto.getSelectedDates()) {
-
                     if (fromTime != null && toTime != null) {
                         timeFrom = LocalDate.parse(selectedDate).atTime(fromTime.getHour(), fromTime.getMinute());
                         timeTo = LocalDate.parse(selectedDate).atTime(toTime.getHour(), toTime.getMinute());
@@ -216,7 +188,7 @@ public class ClientExceptionService extends MongoBaseService {
                         dateTo.setHours(DAY_END_HOUR);
                         dateTo.setMinutes(DAY_END_HOUR);
                     }
-                    validateClientException(Arrays.asList(clientId),dateFrom,dateTo,clientExceptionType.getId());
+                    validateClientException(Arrays.asList(clientId), dateFrom, dateTo, clientExceptionType.getId());
                     clientException = getClientExceptionObj(clientExceptionDto, dateFrom, dateTo, clientExceptionType, clientId, unitId);
                     save(clientException);
                     clientExceptions.add(clientException);
@@ -237,12 +209,11 @@ public class ClientExceptionService extends MongoBaseService {
         }
         map.put("exceptionList", clientExceptions);
         map.put("taskList", plannerService.customizeTaskData(allUnhandledTasks));
-
         return map;
     }
 
-    private Map<String,Object> createChangeLocationException(Long unitId, Long clientId, ClientExceptionDTO clientExceptionDTO,
-                                                             ClientExceptionType clientExceptionType, ClientTemporaryAddress clientTemporaryAddress) throws ParseException {
+    private Map<String, Object> createChangeLocationException(Long unitId, Long clientId, ClientExceptionDTO clientExceptionDTO,
+                                                              ClientExceptionType clientExceptionType, ClientTemporaryAddress clientTemporaryAddress) throws ParseException {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ONLY_DATE);
         List<String> exceptionDates = clientExceptionDTO.getSelectedDates();
         Collections.sort(exceptionDates, Comparator.comparing(s -> LocalDate.parse(s, dateTimeFormatter)));
@@ -275,7 +246,7 @@ public class ClientExceptionService extends MongoBaseService {
         }
         ClientException exceptionAtFirstIndex = clientExceptions.get(0);
         ClientException exceptionAtLastIndex = clientExceptions.get(clientExceptions.size() - 1);
-        clientExceptions = copyExceptionsForHouseHoldMembers(clientExceptions, clientExceptionDTO,clientId);
+        clientExceptions = copyExceptionsForHouseHoldMembers(clientExceptions, clientExceptionDTO, clientId);
         save(clientExceptions);
         List<Long> houseHoldMembers = new ArrayList<>(clientExceptionDTO.getHouseHoldMembers());
         houseHoldMembers.add(clientId);
@@ -289,15 +260,15 @@ public class ClientExceptionService extends MongoBaseService {
                 updateTaskAddress(taskUnderException, clientTemporaryAddress);
             });
         });
-        if(!tasksUnderException.isEmpty()){
+        if (!tasksUnderException.isEmpty()) {
             save(tasksUnderException);
         }
-        updateAggregatorForChangeLocationException(tasksUnderException,clientExceptions,houseHoldMembers,unitId);
-        Map<String,Object> response = new HashMap<>();
-        response.put("exceptionList", clientExceptions.stream().filter(clientException->clientException.getClientId() == clientId).collect(Collectors.toList()));
+        updateAggregatorForChangeLocationException(tasksUnderException, clientExceptions, houseHoldMembers, unitId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("exceptionList", clientExceptions.stream().filter(clientException -> clientException.getClientId() == clientId).collect(Collectors.toList()));
         response.put("taskList", plannerService.customizeTaskData(tasksUnderException.stream().filter
-                (task->task.getCitizenId() == clientId).collect(Collectors.toList())));
-        response.put("tempAddress",clientTemporaryAddress);
+                (task -> task.getCitizenId() == clientId).collect(Collectors.toList())));
+        response.put("tempAddress", clientTemporaryAddress);
         return response;
 
     }
@@ -319,9 +290,7 @@ public class ClientExceptionService extends MongoBaseService {
         return allExceptions;
     }
 
-
     private void checkExceptionDateValidation(Long clientId, List<String> exceptionDates, ClientExceptionDTO clientExceptionDTO) throws ParseException {
-
         LocalDateTime startTime = null;
         LocalDateTime endTime = null;
         if (clientExceptionDTO.getFromTime() != null && clientExceptionDTO.getToTime() != null) {
@@ -343,24 +312,21 @@ public class ClientExceptionService extends MongoBaseService {
             dateTo.setHours(DAY_END_HOUR);
             dateTo.setMinutes(DAY_END_HOUR);
         }
-
         List<Long> houseHoldMembers = new ArrayList<>(clientExceptionDTO.getHouseHoldMembers());
         houseHoldMembers.add(clientId);
-
         validateClientException(houseHoldMembers, dateFrom, dateTo, new BigInteger(clientExceptionDTO.getExceptionTypeId()));
     }
 
-    private void updateAggregatorForChangeLocationException(List<Task> tasks,List<ClientException> clientExceptions,List<Long> citizensId,Long unitId){
+    private void updateAggregatorForChangeLocationException(List<Task> tasks, List<ClientException> clientExceptions, List<Long> citizensId, Long unitId) {
         PerformCalculation performCalculation = (n) -> n + 1;
-        citizensId.forEach(citizenId->{
+        citizensId.forEach(citizenId -> {
             List<Task> taskByCitizen = tasks.stream().filter(task -> task.getCitizenId() == citizenId).collect(Collectors.toList());
-            List<ClientException> exceptionsByCitizen = clientExceptions.stream().filter(clientException-> clientException.getClientId() == citizenId)
+            List<ClientException> exceptionsByCitizen = clientExceptions.stream().filter(clientException -> clientException.getClientId() == citizenId)
                     .collect(Collectors.toList());
             ClientAggregator clientAggregator = taskExceptionService.updateTaskCountInAggregator(taskByCitizen, unitId, citizenId, false);
             updateClientAggregator(exceptionsByCitizen, performCalculation, clientAggregator);
         });
     }
-
 
     private List<Task> updateTasksInKairosAndVisitour(ClientExceptionDTO clientExceptionDTO, long unitId, long clientId,
                                                       Date dateFrom, Date dateTo, ClientException clientException,
@@ -375,7 +341,6 @@ public class ClientExceptionService extends MongoBaseService {
             updatePriorityAndDuration(clientExceptionDTO, unhandledTask);
             if (!exceptionHandled)
                 persistExceptionInTask(unhandledTask, clientException, objectMapper);
-
             boolean hasPrimaryAddress = false;
             if (Optional.ofNullable(unhandledTask.getTaskTypeId()).isPresent()) {
                 TaskType taskType = taskTypeMongoRepository.findById(unhandledTask.getTaskTypeId()).get();
@@ -384,33 +349,19 @@ public class ClientExceptionService extends MongoBaseService {
                     hasPrimaryAddress = taskTypeDefination.isHasPrimaryAddress();
 
             }
-
             if (exceptionHandled && clientTemporaryAddress != null && !hasPrimaryAddress) {
                 updateTaskAddress(unhandledTask, clientTemporaryAddress);
             }
         });
         Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-        taskConverterService.createFlsCallFromTasks(unhandledTasks, flsCredentials);
+        //taskConverterService.createFlsCallFromTasks(unhandledTasks, flsCredentials);
         return unhandledTasks;
     }
 
-    /*
-    rule_validator to check presence of client required for task
-    if task can be deliverd without presence of client, then task will not consider unhandled task ( unhandled task which
-    effects by exception)
-     //TODO we will use this method later after implement merge task functionality because now merge task can be create without task type
-     */
-    private boolean clientPresenceRequiredForTask(TaskType taskType,Task task){
-        TaskSpecification<Task> taskLocationSpecification = new TaskLocationSpecification(taskType.isClientPresenceRequired());
-        return taskLocationSpecification.isSatisfied(task);
-    }
-
     private void updateTaskInfo(ClientExceptionDTO clientExceptionDTO, Task task) {
-
         if (clientExceptionDTO.getInfo1() != null) {
             task.setInfo1((task.getInfo1() == null ? clientExceptionDTO.getInfo1() : task.getInfo1() + clientExceptionDTO.getInfo1()));
         }
-
         if (clientExceptionDTO.getInfo2() != null) {
             task.setInfo2((task.getInfo2() == null ? clientExceptionDTO.getInfo2() : task.getInfo2() + clientExceptionDTO.getInfo2()));
         }
@@ -432,7 +383,6 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     private void updatePriorityAndDuration(ClientExceptionDTO clientExceptionDTO, Task actualTask) {
-
         if (clientExceptionDTO.isUpdateTaskDuration()) {
             if (clientExceptionDTO.getNewTaskDuration() < 1) {
                 exceptionService.internalError("error.task.duration");
@@ -446,12 +396,10 @@ public class ClientExceptionService extends MongoBaseService {
         }
     }
 
-
     private ClientException getClientExceptionObj(ClientExceptionDTO clientExceptionDTO, Date fromTime, Date toTime,
                                                   ClientExceptionType clientExceptionType, long clientId, long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         ClientException clientException = objectMapper.convertValue(clientExceptionDTO, ClientException.class);
-
         clientException.setFromTime(fromTime);
         clientException.setToTime(toTime);
         clientException.setName(clientExceptionType.getName());
@@ -487,13 +435,12 @@ public class ClientExceptionService extends MongoBaseService {
         if (!clientExceptionTypeOptional.isPresent()) {
             return null;
         }
-        ClientExceptionType type=clientExceptionTypeOptional.get();
+        ClientExceptionType type = clientExceptionTypeOptional.get();
         type.setName(clientExceptionType.getName());
         type.setDescription(clientExceptionType.getDescription());
         type.setValue(clientExceptionType.getValue());
         return save(type);
     }
-
 
     public List<ClientExceptionType> getTaskExceptionType() {
         logger.info("Service Hit");
@@ -502,7 +449,6 @@ public class ClientExceptionService extends MongoBaseService {
         return data;
 
     }
-
 
     public boolean deleteTaskExceptionType(String id) {
         Optional<ClientExceptionType> clientExceptionTypeOptional = clientExceptionTypeMongoRepository.findById(new BigInteger(id));
@@ -514,16 +460,15 @@ public class ClientExceptionService extends MongoBaseService {
         return true;
     }
 
-
     public List<TaskGanttDTO> deleteClientException(BigInteger exceptionId, long unitId) {
         Optional<ClientException> clientExceptionOptional = clientExceptionMongoRepository.findById(exceptionId);
         if (!clientExceptionOptional.isPresent()) {
             exceptionService.internalError("error.exception.notfound");
         }
-        ClientException  clientException=clientExceptionOptional.get();
+        ClientException clientException = clientExceptionOptional.get();
         List<Task> tasksToHandle = taskMongoRepository.getTaskByException(clientException.getClientId(), unitId, exceptionId);
         if (!tasksToHandle.isEmpty()) {
-            deleteExceptionFromTask(tasksToHandle, clientException.getId());
+            deleteExceptionByIdFromTask(tasksToHandle, clientException.getId());
             save(tasksToHandle);
         }
         ClientAggregator clientAggregator = taskExceptionService.updateTaskCountInAggregator(tasksToHandle, unitId, clientException.getClientId(), true);
@@ -537,23 +482,7 @@ public class ClientExceptionService extends MongoBaseService {
 
     }
 
-    private void deleteExceptionFromTasK(List<Task> tasksToHandle, BigInteger clientExceptionId) {
-
-        tasksToHandle.forEach(task -> {
-            Iterator<Task.ClientException> clientExceptionIterator = task.getClientExceptions().iterator();
-            while (clientExceptionIterator.hasNext()) {
-                Task.ClientException exceptionToDelete = clientExceptionIterator.next();
-                if (exceptionToDelete.getId().equals(clientExceptionId)) {
-                    clientExceptionIterator.remove();
-                    break;
-                }
-            }
-        });
-    }
-
-
     public HashMap<String, Object> bulkDeleteClientException(ClientExceptionDTO exceptionDTO, long unitId) throws ParseException {
-
         List<Date> exceptionDatesToDelete = null;
         List<Task> allTask = new ArrayList<>();
         List<ClientException> allExceptions = new ArrayList<>();
@@ -571,7 +500,7 @@ public class ClientExceptionService extends MongoBaseService {
                 exceptionIdsToDelete.addAll(exceptionIds);
                 List<Task> tasksToHandle = taskMongoRepository.getTasksByException(clientExceptions.get(0).getClientId(), unitId, exceptionIds);
                 exceptionIds.forEach(exceptionId -> {
-                    deleteExceptionFromTask(tasksToHandle, exceptionId);
+                    deleteExceptionByIdFromTask(tasksToHandle, exceptionId);
                 });
                 allTask.addAll(tasksToHandle);
             }
@@ -582,7 +511,6 @@ public class ClientExceptionService extends MongoBaseService {
         if (!allExceptions.isEmpty()) {
             clientExceptionMongoRepository.deleteAll(allExceptions);
         }
-
         // to update client aggregator object
         ClientAggregator clientAggregator = taskExceptionService.updateTaskCountInAggregator(allTask, unitId, exceptionDTO.getClientId(), true);
         if (clientAggregator != null) {
@@ -618,8 +546,7 @@ public class ClientExceptionService extends MongoBaseService {
         data.put("newTaskPriority", clientException.getNewTaskPriority());
         data.put("temporaryAddress", clientException.getTemporaryAddressId() != null ? clientException.getTemporaryAddressId().toString() : "");
         data.put("taskStatus", clientException.getTaskStatus());
-        data.put("houseHoldMembers",clientException.getHouseHoldMembers());
-
+        data.put("houseHoldMembers", clientException.getHouseHoldMembers());
         return data;
 
     }
@@ -630,12 +557,11 @@ public class ClientExceptionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.exception.task.notfound");
         }
         logger.info("Preparing response");
-        ClientException clientException=clientExceptionOptional.get();
+        ClientException clientException = clientExceptionOptional.get();
         return prepareResponse(clientException);
     }
 
     public List<ClientException> getClientExceptionOnDates(ClientExceptionDTO exceptionDTO, long unitId) throws ParseException {
-
         if (exceptionDTO.getSelectedDates() == null || exceptionDTO.getSelectedDates().isEmpty()) {
             return Collections.emptyList();
         }
@@ -644,10 +570,8 @@ public class ClientExceptionService extends MongoBaseService {
         SimpleDateFormat executionDateFormat = new SimpleDateFormat(ONLY_DATE);
         Date startDate = executionDateFormat.parse(firstElement);
         Date endDate = executionDateFormat.parse(lastElement);
-
         DateTime startOfDate = new DateTime(startDate).withTimeAtStartOfDay();
         DateTime endOfDay = new DateTime(endDate).withTime(DAY_END_HOUR, DAY_END_MINUTE, DAY_END_SECOND, DAY_END_NANO);
-
         List<Date> selectedDates = new ArrayList<>();
         for (String date : exceptionDTO.getSelectedDates()) {
             selectedDates.add(DateUtils.convertToOnlyDate(date, ONLY_DATE));
@@ -660,12 +584,12 @@ public class ClientExceptionService extends MongoBaseService {
         if (!clientExceptionOptional.isPresent()) {
             exceptionService.internalError("error.exception.notfound");
         }
-        ClientException clientException=clientExceptionOptional.get();
+        ClientException clientException = clientExceptionOptional.get();
         Optional<ClientExceptionType> clientExceptionTypeOptional = clientExceptionTypeMongoRepository.findById(new BigInteger(clientExceptionDto.getExceptionTypeId()));
         if (!clientExceptionTypeOptional.isPresent()) {
             exceptionService.internalError("error.exception.type");
         }
-        ClientExceptionType clientExceptionType=clientExceptionTypeOptional.get();
+        ClientExceptionType clientExceptionType = clientExceptionTypeOptional.get();
         List<Task> tasksToReturn;
         List<ClientException> clientExceptions = null;
         List<BigInteger> exceptionIds = null;
@@ -720,7 +644,7 @@ public class ClientExceptionService extends MongoBaseService {
                 break;
             }
             case CHANGE_LOCATION: {
-                return updateChangeLocationException(clientException,clientExceptionDto);
+                return updateChangeLocationException(clientException, clientExceptionDto);
             }
             case IN_HOSPITAL: {
                 validateClientException(clientExceptionDto, clientException);
@@ -748,43 +672,43 @@ public class ClientExceptionService extends MongoBaseService {
 
     }
 
-    private Map<String, Object> updateChangeLocationException(ClientException exceptionOfCitizen,ClientExceptionDTO clientExceptionDTO) throws ParseException {
-        List<ClientException> exceptionsOfHouseHoldMembers = getExceptionsOfHouseHoldMembers(exceptionOfCitizen,clientExceptionDTO);
+    private Map<String, Object> updateChangeLocationException(ClientException exceptionOfCitizen, ClientExceptionDTO clientExceptionDTO) throws ParseException {
+        List<ClientException> exceptionsOfHouseHoldMembers = getExceptionsOfHouseHoldMembers(exceptionOfCitizen, clientExceptionDTO);
         exceptionsOfHouseHoldMembers.add(exceptionOfCitizen);
-        List<BigInteger> exceptionIds = exceptionsOfHouseHoldMembers.stream().map(clientException-> clientException.getId()).collect(Collectors.toList());
+        List<BigInteger> exceptionIds = exceptionsOfHouseHoldMembers.stream().map(clientException -> clientException.getId()).collect(Collectors.toList());
         exceptionIds.add(exceptionOfCitizen.getId());
         List<Long> houseHoldMembers = new ArrayList<>(clientExceptionDTO.getHouseHoldMembers());
         houseHoldMembers.add(exceptionOfCitizen.getClientId());
-        validateTimeSlotsForException(clientExceptionDTO,exceptionOfCitizen,houseHoldMembers,exceptionIds);
+        validateTimeSlotsForException(clientExceptionDTO, exceptionOfCitizen, houseHoldMembers, exceptionIds);
         ClientTemporaryAddress clientTemporaryAddress = userIntegrationService.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getUnitId(), exceptionOfCitizen.getClientId());
-        List<Task> updatedTasks = updateTasksOnCreatingChangeLocationException(houseHoldMembers,exceptionOfCitizen,clientExceptionDTO,clientTemporaryAddress,exceptionsOfHouseHoldMembers);
-        for(ClientException exceptionsOfHouseHoldMember : exceptionsOfHouseHoldMembers){
+        List<Task> updatedTasks = updateTasksOnCreatingChangeLocationException(houseHoldMembers, exceptionOfCitizen, clientExceptionDTO, clientTemporaryAddress, exceptionsOfHouseHoldMembers);
+        for (ClientException exceptionsOfHouseHoldMember : exceptionsOfHouseHoldMembers) {
             exceptionsOfHouseHoldMember.setTemporaryAddressId(clientTemporaryAddress.getId());
             updateClientException(exceptionsOfHouseHoldMember, clientExceptionDTO);
         }
         save(exceptionsOfHouseHoldMembers);
-        updateUnhandledTaskCountForChangeLocationException(updatedTasks,houseHoldMembers,exceptionOfCitizen.getUnitId());
-        Map<String,Object> response = new HashMap<>();
-        response.put("exceptionList",Arrays.asList(exceptionOfCitizen));
-        response.put("taskList",updatedTasks.parallelStream().filter(task -> task.getCitizenId() == exceptionOfCitizen.getClientId()).collect(Collectors.toList()));
+        updateUnhandledTaskCountForChangeLocationException(updatedTasks, houseHoldMembers, exceptionOfCitizen.getUnitId());
+        Map<String, Object> response = new HashMap<>();
+        response.put("exceptionList", Arrays.asList(exceptionOfCitizen));
+        response.put("taskList", updatedTasks.parallelStream().filter(task -> task.getCitizenId() == exceptionOfCitizen.getClientId()).collect(Collectors.toList()));
         return response;
     }
 
-    private void updateUnhandledTaskCountForChangeLocationException(List<Task> allUnhandledTasks,List<Long> clientIds,Long unitId){
-        for(Long clientId:clientIds){
-            List<Task> taskOfCitizen = allUnhandledTasks.stream().filter(unhandledTask->unhandledTask.getCitizenId()==clientId).collect(Collectors.toList());
+    private void updateUnhandledTaskCountForChangeLocationException(List<Task> allUnhandledTasks, List<Long> clientIds, Long unitId) {
+        for (Long clientId : clientIds) {
+            List<Task> taskOfCitizen = allUnhandledTasks.stream().filter(unhandledTask -> unhandledTask.getCitizenId() == clientId).collect(Collectors.toList());
             taskExceptionService.updateTaskCountInAggregator(taskOfCitizen, unitId, clientId, false);
         }
 
     }
 
-    private List<ClientException> getExceptionsOfHouseHoldMembers(ClientException exceptionOfCitizen,ClientExceptionDTO clientExceptionDTO){
+    private List<ClientException> getExceptionsOfHouseHoldMembers(ClientException exceptionOfCitizen, ClientExceptionDTO clientExceptionDTO) {
         return clientExceptionMongoRepository.findExceptionByClientIdInAndExceptionTypeIdAndFromTimeAndToTime(clientExceptionDTO.getHouseHoldMembers(),
-                exceptionOfCitizen.getExceptionTypeId(),exceptionOfCitizen.getFromTime(),exceptionOfCitizen.getToTime());
+                exceptionOfCitizen.getExceptionTypeId(), exceptionOfCitizen.getFromTime(), exceptionOfCitizen.getToTime());
     }
 
-    private void validateTimeSlotsForException(ClientExceptionDTO clientExceptionDTO,ClientException exceptionOfCitizen,
-                                               List<Long> clientIds,List<BigInteger> exceptionIds) throws ParseException {
+    private void validateTimeSlotsForException(ClientExceptionDTO clientExceptionDTO, ClientException exceptionOfCitizen,
+                                               List<Long> clientIds, List<BigInteger> exceptionIds) throws ParseException {
         LocalDateTime fromTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDTO.getFromTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
         LocalDateTime toTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDTO.getToTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
         Date newDateFrom = DateUtils.getDate(exceptionOfCitizen.getFromTime().getTime());
@@ -793,7 +717,7 @@ public class ClientExceptionService extends MongoBaseService {
         Date newDateTO = DateUtils.getDate(exceptionOfCitizen.getToTime().getTime());
         newDateTO.setHours(toTime.getHour());
         newDateTO.setMinutes(toTime.getMinute());
-        validateClientException(newDateFrom,newDateTO,exceptionIds,clientIds);
+        validateClientException(newDateFrom, newDateTO, exceptionIds, clientIds);
 
     }
 
@@ -837,7 +761,7 @@ public class ClientExceptionService extends MongoBaseService {
             }
         });
         Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-        taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
+        //taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }
 
@@ -861,8 +785,8 @@ public class ClientExceptionService extends MongoBaseService {
             }
             updateTaskInfo(clientExceptionDTO, task);
             updatePriorityAndDuration(clientExceptionDTO, task);
-            Optional<ClientException> result = clientExceptions.stream().filter(clientException-> clientException.getClientId() == task.getCitizenId()).findFirst();
-            if(result.isPresent()){
+            Optional<ClientException> result = clientExceptions.stream().filter(clientException -> clientException.getClientId() == task.getCitizenId()).findFirst();
+            if (result.isPresent()) {
                 persistExceptionInTask(task, result.get(), objectMapper);
             }
             if (clientTemporaryAddress != null) {
@@ -872,20 +796,19 @@ public class ClientExceptionService extends MongoBaseService {
         tasksByOldDate.forEach(oldTask -> {
             long count = tasksByNewDate.stream().filter(newTask -> newTask.getId().equals(oldTask.getId())).count();
             if (count == 0) {
-                Optional<ClientException> result = clientExceptions.stream().filter(clientException-> clientException.getClientId() == oldTask.getCitizenId()).findFirst();
-                if(result.isPresent()){
+                Optional<ClientException> result = clientExceptions.stream().filter(clientException -> clientException.getClientId() == oldTask.getCitizenId()).findFirst();
+                if (result.isPresent()) {
                     deleteExceptionFromTask(oldTask, result.get());
                 }
                 tasksByNewDate.add(oldTask);
             }
         });
         Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(exceptionOfCitizen.getUnitId());
-        taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
+        //taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }
 
     private Task deleteExceptionFromTask(Task task, ClientException clientException) {
-
         Iterator<Task.ClientException> clientExceptionIterator = task.getClientExceptions().iterator();
         while (clientExceptionIterator.hasNext()) {
             Task.ClientException exceptionToDelete = clientExceptionIterator.next();
@@ -898,8 +821,7 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     //TODO refactor this method, need to refactor name
-    private void deleteExceptionFromTask(List<Task> tasksToHandle, BigInteger clientExceptionId) {
-
+    private void deleteExceptionByIdFromTask(List<Task> tasksToHandle, BigInteger clientExceptionId) {
         tasksToHandle.forEach(task -> {
             Iterator<Task.ClientException> clientExceptionIterator = task.getClientExceptions().iterator();
             while (clientExceptionIterator.hasNext()) {
@@ -911,7 +833,6 @@ public class ClientExceptionService extends MongoBaseService {
             }
         });
     }
-
 
     private ClientException updateClientException(ClientException clientException, ClientExceptionDTO clientExceptionDTO) throws ParseException {
         if (!GenericValidator.isBlankOrNull(clientExceptionDTO.getFromTime()) && !GenericValidator.isBlankOrNull(clientExceptionDTO.getToTime())) {
@@ -941,7 +862,6 @@ public class ClientExceptionService extends MongoBaseService {
         actualTask.setClientExceptions(exceptions);
     }
 
-
     private void validateClientException(List<Long> clientId, Date dateFrom, Date dateTo, BigInteger exceptionTypeId) {
         if (clientExceptionMongoRepository.isExceptionTypeExistBetweenDate(clientId, dateFrom, dateTo, exceptionTypeId)) {
             exceptionService.invalidClientException("message.exception.timeslot.create");
@@ -949,7 +869,6 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     private void validateClientException(ClientExceptionDTO clientExceptionDTO, ClientException clientException) throws ParseException {
-
         LocalDateTime fromTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDTO.getFromTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
         LocalDateTime toTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDTO.getToTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
         Date newDateFrom = DateUtils.getDate(clientException.getFromTime().getTime());
@@ -963,15 +882,13 @@ public class ClientExceptionService extends MongoBaseService {
         }
     }
 
-    private void validateClientException(Date dateFrom, Date dateTo, List<BigInteger> exceptionIds,List<Long> clientIds) throws ParseException {
-
+    private void validateClientException(Date dateFrom, Date dateTo, List<BigInteger> exceptionIds, List<Long> clientIds) throws ParseException {
         if (clientExceptionMongoRepository.isExceptionExistBetweenDate(clientIds, dateFrom, dateTo, exceptionIds)) {
             exceptionService.invalidClientException("message.exception.timeslot.create");
         }
     }
 
     private void validateSickException(DateTime initialDate, int daysToReview, long citizenId) {
-
         DateTime startDate = initialDate.withTimeAtStartOfDay();
         ;
         long count = clientExceptionMongoRepository.countSickExceptionsAfterDate(citizenId, startDate.toDate());
@@ -981,7 +898,6 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     private void updateClientAggregator(List<ClientException> clientExceptions, PerformCalculation performCalculation, ClientAggregator clientAggregator) {
-
         List<ClientExceptionCount> clientExceptionCounts = clientAggregator.getClientExceptionCounts();
         for (ClientException clientException : clientExceptions) {
             updateExceptionCountObj(clientException, performCalculation, clientExceptionCounts);
@@ -991,7 +907,6 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     private void updateClientAggregator(ClientException clientException, PerformCalculation performCalculation, ClientAggregator clientAggregator) {
-
         if (clientAggregator == null) {
             clientAggregator = new ClientAggregator(clientException.getUnitId(), clientException.getClientId());
         }
@@ -1001,9 +916,7 @@ public class ClientExceptionService extends MongoBaseService {
         save(clientAggregator);
     }
 
-
     private void updateExceptionCountObj(ClientException clientException, PerformCalculation performCalculation, List<ClientExceptionCount> clientExceptionCounts) {
-
         Optional<ClientExceptionCount> exceptionCount = clientExceptionCounts.stream().filter(clientExceptionCount -> clientExceptionCount.getExceptionTypeId().equals(clientException.getExceptionTypeId())).findFirst();
         ClientExceptionCount clientExceptionCount = (exceptionCount.isPresent()) ? exceptionCount.get() : new ClientExceptionCount(clientException.getExceptionTypeId());
         updateCountInException(clientException, clientExceptionCount, performCalculation, FourWeekFrequency.getInstance());
@@ -1012,10 +925,8 @@ public class ClientExceptionService extends MongoBaseService {
         }
     }
 
-
     public void updateCountInException(ClientException clientException, ClientExceptionCount clientExceptionCount, PerformCalculation performCalculation,
                                        FourWeekFrequency fourWeekFrequency) {
-
         LocalDateTime exceptionStartTime = LocalDateTime.ofInstant(clientException.getFromTime().toInstant(), ZoneId.systemDefault());
         if (exceptionStartTime.isEqual(fourWeekFrequency.getStartOfDay()) || (exceptionStartTime.isAfter(fourWeekFrequency.getStartOfDay()) && exceptionStartTime.isBefore(fourWeekFrequency.getEndOfDay()))) {
             clientExceptionCount.setExceptionsTodayCount(performCalculation.performCalculation(clientExceptionCount.getExceptionsTodayCount()));
@@ -1043,13 +954,11 @@ public class ClientExceptionService extends MongoBaseService {
 
     /**
      * this method will return clients only which are having exceptions for current week
-     *
      * @param unitId
      * @return
      */
     public List<ClientExceptionCountWrapper> getExceptionClients(long unitId) {
         return aggregatorService.getClientAggregateData(unitId);
     }
-
 
 }

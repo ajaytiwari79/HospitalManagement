@@ -101,7 +101,7 @@ public class TaskDemandController {
      */
     @RequestMapping(value ="/organization/{organizationId}/service/{serviceId}",method = RequestMethod.POST)
     @ApiOperation("getOrganizationClientsInfo")
-    public ResponseEntity<Map<String, Object>> createTaskDemandsOfKMD(@PathVariable  Long serviceId,@RequestBody Map<String, Object> grantObject) throws CloneNotSupportedException {
+    public ResponseEntity<Map<String, Object>> createTaskDemandsOfKMD(@PathVariable  Long serviceId,@RequestBody Map<String, Object> grantObject) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 taskDemandService.createGrants(grantObject,serviceId));
     }

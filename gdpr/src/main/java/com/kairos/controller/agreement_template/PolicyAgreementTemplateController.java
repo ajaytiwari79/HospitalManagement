@@ -9,8 +9,6 @@ import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +29,6 @@ import static com.kairos.constants.ApiConstant.*;
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
 class PolicyAgreementTemplateController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateController.class);
 
     @Inject
     private PolicyAgreementTemplateService policyAgreementTemplateService;
@@ -128,15 +124,6 @@ class PolicyAgreementTemplateController {
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable Long agreementTemplateId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId,true, agreementTemplateId));
     }
-
-
-    //TODO
-   /* @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
-    @PutMapping(UNIT_URL+"/agreement_template/clause/version")
-    public ResponseEntity<Object> updateTemplateClauseWithNewVersion(@PathVariable Long unitId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(unitId, true,agreementTemplateClauseUpdateDTO));
-
-    }*/
 
     @ApiOperation(value = "All Template Type type ")
     @GetMapping(UNIT_URL+"/template/all")

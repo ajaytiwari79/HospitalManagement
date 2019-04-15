@@ -190,7 +190,7 @@ public class ShiftServiceUnitTest {
         shiftDTO.setShiftId(BigInteger.valueOf(354));
         when(userIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
-        when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
+        when(phaseService.shiftEditableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
         try {
             shiftValidatorService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
         }catch (Exception e){

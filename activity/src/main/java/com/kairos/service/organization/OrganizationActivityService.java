@@ -20,6 +20,7 @@ import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
@@ -38,12 +39,10 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.ActivityUtil;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.activity.*;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
@@ -55,6 +54,7 @@ import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.slf4j.Logger;
@@ -120,6 +120,10 @@ public class OrganizationActivityService extends MongoBaseService {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private ActivityPriorityService activityPriorityService;
+    @Inject
+    private OpenShiftRuleTemplateService openShiftRuleTemplateService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -170,6 +174,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
+        activityDTO.setBalanceSettingsActivityTab(ObjectMapperUtils.copyPropertiesByMapper(activity.getBalanceSettingsActivityTab(),BalanceSettingActivityTabDTO.class));
         BeanUtils.copyProperties(activity, activityDTO);
         /*Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(timeType.isPresent()){
@@ -257,6 +262,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
+        activityCopied.setActivityPriorityId(activity.getActivityPriorityId());
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
@@ -455,15 +461,18 @@ public class OrganizationActivityService extends MongoBaseService {
                     activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
                 }
                 save(activityCopiedList);
-                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
+                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
                 wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
                 updateCompositeActivitiesIds(activityCopiedList);
             }
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
             timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         }
+        activityPriorityService.createActivityPriorityForNewOrganization(unitId,orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId,orgTypeAndSubTypeDTO);
+
         return true;
     }
 
@@ -537,5 +546,9 @@ public class OrganizationActivityService extends MongoBaseService {
         }
     }
 
-
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId,Long staffId,List<ActivityWithCompositeDTO> staffPersonalizedActivities){
+        Set<BigInteger> activityList=userIntegrationService.getTeamActivitiesOfStaff(unitId,staffId);
+        activityList.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
+        return activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(new ArrayList<>(activityList));
+    }
 }

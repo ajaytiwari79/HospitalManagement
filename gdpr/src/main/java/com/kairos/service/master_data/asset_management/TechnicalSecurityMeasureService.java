@@ -122,7 +122,7 @@ public class TechnicalSecurityMeasureService {
         }
         Integer resultCount = technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.tecnicalSecurityMeasure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.technicalSecurityMeasure", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, technicalSecurityMeasureDTO.getName());
         }
@@ -155,7 +155,7 @@ public class TechnicalSecurityMeasureService {
         if (updateCount > 0) {
             LOGGER.info("Technical Security Measures are updated successfully with ids :: {}", techSecurityMeasureIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.tecnicalSecurityMeasure", techSecurityMeasureIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.technicalSecurityMeasure", techSecurityMeasureIds);
         }
         return technicalSecurityMeasureRepository.findAllByIds(techSecurityMeasureIds);
     }

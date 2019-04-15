@@ -1,6 +1,5 @@
 package com.kairos.service.counter;
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
@@ -58,11 +57,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-/*
- * @author: mohit.shakya@oodlestechnologies.com
- * @dated: Jun/26/2018
- */
-
 @Service
 public class CounterDistService extends MongoBaseService {
     @Inject
@@ -80,7 +74,7 @@ public class CounterDistService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
 
-    private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CounterDistService.class);
 
     //get access group page and dashboard tab
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long refId, ConfLevel level) {
@@ -111,19 +105,17 @@ public class CounterDistService extends MongoBaseService {
         });
     }
 
-
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
         if (ConfLevel.STAFF.equals(level)) {
             refId = userIntegrationService.getStaffIdByUserId(refId);
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level, false);
         if (kpidtos.isEmpty()) {
-            logger.info("KPI not found for Unit id " + refId);
+            LOGGER.info("KPI not found for Unit id " + refId);
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
         return kpidtos;
     }
-
 
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level) {
         List<KPICategoryDTO> categories = counterRepository.getKPICategory(null, level, refId);
@@ -189,8 +181,6 @@ public class CounterDistService extends MongoBaseService {
         }
 
     }
-
-    //settings for KPI-Module configuration
 
     public List<BigInteger> getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level) {
         Long countryId = null;
@@ -375,7 +365,6 @@ public class CounterDistService extends MongoBaseService {
         save(tabKPIConfs);
     }
 
-
     public void removeTabKPIEntries(TabKPIMappingDTO tabKPIMappingDTO, Long refId, ConfLevel level) {
         if (ConfLevel.STAFF.equals(level)) {
             AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
@@ -386,7 +375,6 @@ public class CounterDistService extends MongoBaseService {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
     }
-
     //setting accessGroup-KPI configuration
 
     public List<BigInteger> getInitialAccessGroupKPIDataConf(Long accessGroupId, Long refId, ConfLevel level) {
@@ -394,7 +382,6 @@ public class CounterDistService extends MongoBaseService {
         if (AccessGroupMappingIds == null || AccessGroupMappingIds.isEmpty()) return new ArrayList<>();
         return AccessGroupMappingIds;
     }
-
 
     public void addAccessGroupKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf, Long refId, ConfLevel level) {
         Long countryId = ConfLevel.COUNTRY.equals(level) ? refId : null;
@@ -530,11 +517,10 @@ public class CounterDistService extends MongoBaseService {
             });
             counterRepository.removeApplicableKPI(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi, unitId, ConfLevel.STAFF);
             counterRepository.removeTabKPIEntry(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi, ConfLevel.STAFF);
-            counterRepository.removeDashboardTabOfStaff(accessGroupAndStaffDTO.getStaffId(),unitId,ConfLevel.STAFF);
+            counterRepository.removeDashboardTabOfStaff(accessGroupAndStaffDTO.getStaffId(), unitId, ConfLevel.STAFF);
         }
     }
     //setting orgType-KPI configuration
-
 
     public List<BigInteger> getInitialOrgTypeKPIDataConf(Long orgTypeId, Long countryId) {
         List<BigInteger> orgTypeKPIEntries = counterRepository.getOrgTypeKPIIdsOrgTypeIds(Arrays.asList(orgTypeId), new ArrayList<>());
@@ -631,12 +617,8 @@ public class CounterDistService extends MongoBaseService {
         }
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(), OrgTypeKPIEntry.class);
     }
-
     //dashboard setting for all level
-
-
     //default setting
-
     public void createDefaultStaffKPISetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
         List<ApplicableKPI> applicableKPIS = new ArrayList<>();
         List<ApplicableKPI> applicableKpis = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(), Arrays.asList(unitId), ConfLevel.UNIT);
@@ -775,7 +757,6 @@ public class CounterDistService extends MongoBaseService {
         }
     }
 
-
     private String createModuleId(BigInteger id, String parentModuleId) {
         return parentModuleId + "_" + id;
     }
@@ -791,7 +772,6 @@ public class CounterDistService extends MongoBaseService {
         });
         if (!kpiDashboards.isEmpty()) save(kpiDashboards);
     }
-
 
     //kpi default data and copy and save filter
     public KPIDTO getDefaultFilterDataOfKpi(String tabId, BigInteger kpiId, Long refId, ConfLevel level) {
@@ -1005,4 +985,3 @@ public class CounterDistService extends MongoBaseService {
     }
 
 }
-

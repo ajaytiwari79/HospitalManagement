@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 
@@ -79,18 +80,33 @@ public class ShiftWithActivityDTO {
         this.probability = probability;
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
         this.remarks = remarks;
-        this.activities = activities;
+        if(isNotNull(activities)){
+            activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+            this.activities = activities;
+            this.startDate = activities.get(0).getStartDate();
+            this.endDate = activities.get(activities.size()-1).getEndDate();
+        }else {
+            this.activities = new ArrayList<>();
+        }
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.unitId = unitId;
     }
 
-    public ShiftWithActivityDTO(Date startDate, Date endDate, Activity activity) {
+    public ShiftWithActivityDTO(BigInteger phaseId,List<ShiftActivityDTO> activities) {
+        this.phaseId= phaseId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activities = activities;
-    }
+        if(isNotNull(activities)){
+            activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+            this.activities = activities;
+            this.startDate = activities.get(0).getStartDate();
+            this.endDate = activities.get(activities.size()-1).getEndDate();
+        }else {
+            this.activities = new ArrayList<>();
+        }
 
+    }
 
     public List<BigInteger> getActivitiesTimeTypeIds(){
         if(activitiesTimeTypeIds.isEmpty()) {
@@ -162,9 +178,14 @@ public class ShiftWithActivityDTO {
     }
 
     public void setActivities(List<ShiftActivityDTO> activities) {
-        activities = isNull(activities) ? new ArrayList<>() : activities;
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
-        this.activities = activities;
+        if(isNotNull(activities)){
+            activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+            this.activities = activities;
+            this.startDate = activities.get(0).getStartDate();
+            this.endDate = activities.get(activities.size()-1).getEndDate();
+        }else {
+            activities = new ArrayList<>();
+        }
     }
 
     public void setUnitPositionId(Long unitPositionId) {

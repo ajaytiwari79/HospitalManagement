@@ -17,9 +17,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.*;
@@ -37,33 +35,33 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private Set<BigInteger> plannedTimeIds = new HashSet<>();
+    private Set<BigInteger> timeTypeIds = new HashSet<>();
+    private Set<PartOfDay> partOfDays = new HashSet<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
-    public List<BigInteger> getPlannedTimeIds() {
+    public Set<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
+    public Set<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<PartOfDay> getPartOfDays() {
+    public Set<PartOfDay> getPartOfDays() {
         return partOfDays;
     }
 
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
+    public void setPartOfDays(Set<PartOfDay> partOfDays) {
         this.partOfDays = partOfDays;
     }
 
@@ -150,7 +148,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                         }
                     }
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin / (60 * (int) dateTimeInterval.getDays()));
-                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,limitAndCounter[0]/60);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]));
                 }
             }
         }

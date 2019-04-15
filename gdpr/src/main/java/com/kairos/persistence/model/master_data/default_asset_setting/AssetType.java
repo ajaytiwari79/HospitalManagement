@@ -47,6 +47,11 @@ public class AssetType extends BaseEntity {
         this.isSubAssetType = isSubAssetType;
     }
 
+    public AssetType( Long countryId,  SuggestedDataStatus suggestedDataStatus) {
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
     public List<Risk> getRisks() {
         return risks;
     }

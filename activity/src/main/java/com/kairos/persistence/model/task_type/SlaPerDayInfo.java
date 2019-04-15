@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.task_type;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by oodles on 21/6/17.
  */
 @Document
-public class SlaPerDayInfo extends MongoBaseEntity implements Cloneable{
+public class SlaPerDayInfo extends MongoBaseEntity {
 
     private TaskTypeEnum.TaskTypeSlaDay taskTypeSlaDay;
     private int slaStartDuration; //in minutes
@@ -37,9 +38,9 @@ public class SlaPerDayInfo extends MongoBaseEntity implements Cloneable{
         this.slaStartDuration = slaStartDuration;
     }
 
-    @Override
-    public SlaPerDayInfo clone() throws CloneNotSupportedException {
-        SlaPerDayInfo slaPerDayInfo = (SlaPerDayInfo) super.clone();
+    //@Override
+    public SlaPerDayInfo copyObject() {
+        SlaPerDayInfo slaPerDayInfo = ObjectMapperUtils.copyPropertiesByMapper(this,SlaPerDayInfo.class);
         slaPerDayInfo.setId(null);
         return slaPerDayInfo;
     }

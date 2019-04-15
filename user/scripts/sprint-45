@@ -1,0 +1,9 @@
+MATCH(ag:AccessGroup) where ag.name="AG_COUNTRY_ADMIN"
+SET ag.name='SUPER_ADMIN';
+
+
+
+MATCH(systemSetting:AccessPage{moduleId:"module_11"})
+MATCH(tabsHierarchy:AccessPage{moduleId:"tab_119"})<-[r:SUB_PAGE]-(countryTab:AccessPage{moduleId:"module_4"})
+delete r
+CREATE UNIQUE(tabsHierarchy)<-[r1:SUB_PAGE]-(systemSetting)

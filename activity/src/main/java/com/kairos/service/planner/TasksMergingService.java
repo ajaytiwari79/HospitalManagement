@@ -8,8 +8,6 @@ import com.kairos.persistence.model.task.TaskStatus;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
@@ -50,17 +48,11 @@ public class TasksMergingService extends MongoBaseService {
 
     @Inject
     TaskService taskService;
-    @Inject
-    MongoTemplate mongoTemplate;
-    @Inject
-    Scheduler scheduler;
-    @Inject
-    TaskConverterService taskConverterService;
     @Autowired
     UserIntegrationService userIntegrationService;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(TasksMergingService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TasksMergingService.class);
 
 
     public List<TaskGanttDTO> mergeMultipleTasks(long unitId, long citizenId, Map<String, Object> tasksData, boolean isActualPlanningScreen) throws CloneNotSupportedException {
@@ -70,7 +62,7 @@ public class TasksMergingService extends MongoBaseService {
 
         List<String> jointEventsIds = new ArrayList<>();
 
-        logger.debug("tasksData payload <><><><><><><><>" + tasksData);
+        LOGGER.debug("tasksData payload <><><><><><><><>" + tasksData);
 
         List<String> taskIds = new ArrayList<>();
         SimpleDateFormat executionDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -84,12 +76,12 @@ public class TasksMergingService extends MongoBaseService {
                 e.printStackTrace();
             }
         }
-        logger.debug("taskIds <><><><><><><><>" + taskIds);
+        LOGGER.debug("taskIds <><><><><><><><>" + taskIds);
         List<Task> taskList = mergeRepetitions(taskIds, jointEventsIds, startDate, citizenId, unitId, tasksData.get("mainTaskName").toString(), isActualPlanningScreen);
         List<TaskGanttDTO> responseList = taskService.customizeTaskData(taskList);
 
-        logger.debug("Execution Time :(PlannerService:mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
-        logger.debug("responseList " + responseList);
+        LOGGER.debug("Execution Time :(PlannerService:mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.debug("responseList " + responseList);
         return responseList;
     }
 
@@ -131,18 +123,18 @@ public class TasksMergingService extends MongoBaseService {
                     new CustomAggregationOperation(groupObject),
                     sort(Sort.Direction.DESC, "dateFrom")
             );
-            logger.debug("Merge Repetitions Query: " + aggregation.toString());
+            LOGGER.debug("Merge Repetitions Query: " + aggregation.toString());
 
             // Result
             AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
 
             List<Map> taskIdsGroupByDate = finalResult.getMappedResults();
-            logger.debug("taskIdsGroupByDate: " + taskIdsGroupByDate);
+            LOGGER.debug("taskIdsGroupByDate: " + taskIdsGroupByDate);
 
             for (Map map : taskIdsGroupByDate) {
 
                 taskIds = (List<String>) map.get("taskIds");
-                logger.debug("taskIds: " + taskIds);
+                LOGGER.debug("taskIds: " + taskIds);
 
                 Task mergedTask = mergeTasksWithIds(taskIds, unitId, citizenId, mainTaskName, isActualPlanningScreen, uniqueID, taskAddress, loggedInUser, preferredStaffIds, forbiddenStaffIds, flsCredentials);
                 taskList.add(mergedTask);
@@ -151,7 +143,7 @@ public class TasksMergingService extends MongoBaseService {
             Task mergedTask = mergeTasksWithIds(taskIds, unitId, citizenId, mainTaskName, isActualPlanningScreen, uniqueID, taskAddress, loggedInUser, preferredStaffIds, forbiddenStaffIds, flsCredentials);
             taskList.add(mergedTask);
         }
-        taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
+        //taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
         return taskList;
     }
 
@@ -183,7 +175,7 @@ public class TasksMergingService extends MongoBaseService {
         for (Task task : tasksToMergeList) {
 
             jointEventsIds.add(task.getJoinEventId());
-            logger.info("isActualPlanningScreen " +isActualPlanningScreen);
+            LOGGER.info("isActualPlanningScreen " +isActualPlanningScreen);
             if (isActualPlanningScreen) {
                 if (TaskTypeEnum.TaskOriginator.PRE_PLANNING.equals(task.getTaskOriginator()) && !task.isHasActualTask()) {
                     Task actualPlanningTask = new Task();
@@ -314,7 +306,7 @@ public class TasksMergingService extends MongoBaseService {
         List<Task> tasksToReturn = new ArrayList<>();
         List<Task> tasksToCreate = new ArrayList<>();
         List<Task> tasksToDelete = new ArrayList<>();
-        logger.debug("tasksData payload <><><><><><><><>" + tasksData);
+        LOGGER.debug("tasksData payload <><><><><><><><>" + tasksData);
         String mainTaskId = tasksData.get("mainTaskId").toString();
         Task mainTask = taskMongoRepository.findById(new BigInteger(mainTaskId)).get();
 
@@ -388,12 +380,12 @@ public class TasksMergingService extends MongoBaseService {
         }
 
         Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-        if (tasksToCreate.size() > 0) {
+       /* if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {
-            logger.info("NO Tasks Available");
+            LOGGER.info("NO Tasks Available");
         }
-
+*/
         /*for (Task task : tasksToDelete) {
             Map<String, Object> callMetaData = new HashMap<>();
             callMetaData.put("functionCode", 4);
@@ -403,7 +395,7 @@ public class TasksMergingService extends MongoBaseService {
         }*/
 
         List<TaskGanttDTO> responseList = taskService.customizeTaskData(tasksToReturn);
-        logger.info("Execution Time :(PlannerService:Un-mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.info("Execution Time :(PlannerService:Un-mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
         return responseList;
     }
 

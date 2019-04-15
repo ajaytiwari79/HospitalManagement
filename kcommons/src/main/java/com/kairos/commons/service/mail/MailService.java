@@ -1,11 +1,15 @@
 package com.kairos.commons.service.mail;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.sendgrid.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -13,14 +17,16 @@ import javax.inject.Inject;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
 import static com.kairos.constants.CommonConstants.*;
 
 
@@ -36,30 +42,37 @@ public class MailService {
     final static Logger logger = LoggerFactory.getLogger(MailService.class);
 
     @Inject
-    JavaMailSender javaMailSender;
+    private JavaMailSender javaMailSender;
+    @Inject
+    private TemplateEngine templateEngine;
 
-
-    public void sendPlainMailWithSendGrid(String receiver, String body, String subject) {
-       Email from=new Email(NO_REPLY_EMAIL);
-       Email to=new Email(receiver);
-       Content content=new Content("text/plain",body);
-       Mail mail=new Mail(from,subject,to,content);
-       SendGrid sg = new SendGrid(SEND_GRID_API_KEY);
+    /***
+     *
+     * @param templateName can be null if User want to send mail without any template
+     * @param templateParam can be null if User want to send mail without any template or in case of template doesn't have any Context param
+     * @param body can be null if mail send with template
+     * @param subject should not be null or blank
+     * @param receiver can't be null if null this method throw InvalidRequestException
+     */
+    public void sendMailWithSendGrid(String templateName,Map<String,Object> templateParam,String body, String subject, String... receiver) {
+        Mail mail = getMail(templateName, templateParam, body, subject, receiver);
+        SendGrid sendGrid = new SendGrid(SEND_GRID_API_KEY);
         Request request = new Request();
         try {
             request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
+            request.setEndpoint(MAIL_REQUEST_ENDPOINT);
             request.setBody(mail.build());
-            sg.api(request);
-            logger.info("Email sent");
+            Response response = sendGrid.api(request);
+            logger.info("Email sent to {}", receiver.toString());
+            logger.info("Mail response {}", response.getBody());
         } catch (IOException ex) {
-            logger.error("exception occured {}",ex);
+            logger.error("exception occured {}", ex);
         }
-
 
     }
 
 
+    //TODO we need to refactor this method as per the requirement
     public boolean sendMailWithAttachment(String[] recipients, String message, String subject, File filePath) {
         DataSource source = new FileDataSource(filePath);
         Multipart multipart = new MimeMultipart();
@@ -76,7 +89,6 @@ public class MailService {
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
             mail.setText(message);
-
             bodyPart.setFileName(source.getName());
             logger.info("File has dataType: "+source.getContentType());
             bodyPart.setDataHandler(new DataHandler(source));
@@ -94,6 +106,48 @@ public class MailService {
              return false;
             }
 
+    }
+
+    private Mail getMail(String templateName, Map<String,Object> templateParam, String body, String subject,String... receivers){
+        if(StringUtils.isBlank(subject)){
+            throw new InvalidRequestException("Subject should not be blank");
+        }
+        Personalization personalization = new Personalization();
+        for (String receiver : receivers) {
+            if(StringUtils.isBlank(receiver) || StringUtils.containsWhitespace(receiver)){
+                logger.info("Receiver is {}",receiver);
+                throw new InvalidRequestException("Receiver E-mail id is not correct");
+            }
+            personalization.addTo(new Email(receiver));
+        }
+        Email from=new Email(NO_REPLY_EMAIL);
+        Content content= getContent(templateName,templateParam,body);
+        Mail mail = new Mail();
+        mail.setSubject(subject);
+        mail.setFrom(from);
+        mail.addContent(content);
+        mail.addPersonalization(personalization);
+        return mail;
+    }
+
+    private Content getContent(String templateName,Map<String,Object> templateParam,String body){
+        Content content = null;
+        if(StringUtils.isNotBlank(templateName)){
+            final Context context = getContext(templateParam);
+            body = templateEngine.process(templateName, context);
+            content = new Content(HTML_CONTENT_TYPE,body);
+        }else {
+            content = new Content(PLAIN_CONTENT_TYPE,body);
+        }
+        return content;
+    }
+
+    private Context getContext(Map<String,Object> templateParam){
+        Context context = new Context(Locale.ENGLISH);
+        if(isMapNotEmpty(templateParam)){
+            context.setVariables(templateParam);
+        }
+        return context;
     }
 
     private StringBuilder getRecipientsFromArray(String[] recipients) {

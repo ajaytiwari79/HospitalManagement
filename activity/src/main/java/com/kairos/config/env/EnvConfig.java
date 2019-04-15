@@ -59,6 +59,9 @@ public class EnvConfig {
     @Value("${spring.profiles.active}")
     private  String currentProfile;
 
+    @Value("${webservice.imagesPath}")
+    private String imagesPath;
+
 
     public String getGoogleCalendarAPIV3Url(String vCardId) {
         return googleCalendarAPIV3Url.replace("{countryVCard}", vCardId); }
@@ -116,5 +119,9 @@ public class EnvConfig {
 
     public String getCurrentProfile() {
         return currentProfile;
+    }
+
+    public String getImagesPath() {
+        return imagesPath;
     }
 }

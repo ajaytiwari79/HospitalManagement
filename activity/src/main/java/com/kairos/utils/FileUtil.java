@@ -18,7 +18,7 @@ public class FileUtil {
 
     private FileUtil(){}
 
-    public static void writeFile(String path, MultipartFile multipartFile) {
+    public static void writeFile(String path, MultipartFile multipartFile) throws IOException {
         InputStream inputStream = null;
         FileOutputStream fileOutputStream;
         try {
@@ -37,6 +37,8 @@ public class FileUtil {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            inputStream.close();
         }
     }
 

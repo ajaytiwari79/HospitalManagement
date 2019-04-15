@@ -11,6 +11,13 @@ public class CTARuleTemplatePhaseInfo{
         DAYS,HOURS;
     }
 
+    public CTARuleTemplatePhaseInfo() {
+    }
+
+    public CTARuleTemplatePhaseInfo(BigInteger phaseId) {
+        this.phaseId = phaseId;
+    }
+
     public BigInteger getPhaseId() {
         return phaseId;
     }

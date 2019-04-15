@@ -2,11 +2,14 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.experties.*;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
@@ -14,6 +17,9 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
+import com.kairos.enums.scheduler.JobFrequencyType;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
@@ -45,20 +51,29 @@ import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepos
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
@@ -68,6 +83,8 @@ import static javax.management.timer.Timer.ONE_DAY;
 @Service
 @Transactional
 public class ExpertiseService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpertiseService.class);
 
     @Inject
     private
@@ -111,7 +128,8 @@ public class ExpertiseService {
 
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
-
+    @Inject
+    private SchedulerServiceRestClient schedulerRestClient;
     @Inject
     private com.kairos.service.organization.OrganizationService organizationService;
     @Inject
@@ -131,7 +149,7 @@ public class ExpertiseService {
             else
                 isExpertiseExists = expertiseGraphRepository.findExpertiseByUniqueName("(?i)" + expertiseDTO.getName().trim());
             if (isExpertiseExists) {
-                exceptionService.duplicateDataException("message.duplicate", "expertise",expertiseDTO.getName());
+                exceptionService.duplicateDataException("message.duplicate", "expertise", expertiseDTO.getName());
             }
             Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
                 if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
@@ -141,7 +159,7 @@ public class ExpertiseService {
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
                     getSector(expertiseDTO.getSector(), country));
-            prepareExpertise(expertise, expertiseDTO, country,true);
+            prepareExpertise(expertise, expertiseDTO, country, true);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
@@ -280,11 +298,10 @@ public class ExpertiseService {
             }
             expertise.setOrganizationServices(organizationService);
         });
-        Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
-            expertise.setUnion(getUnion(unionIDNameDTO.getId(), unionIDNameDTO.getName(), country));
-        });
-        if (expertiseDTO.getSeniorityLevel() != null &&  (create || isCollectionEmpty(expertise.getSeniorityLevel()))) {
-            SeniorityLevel  seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
+        expertise.setSector(Optional.ofNullable(expertiseDTO.getSector()).isPresent() ? getSector(expertiseDTO.getSector(), country) : null);
+        expertise.setUnion(Optional.ofNullable(expertiseDTO.getUnion()).isPresent() ? getUnion(expertiseDTO.getUnion().getId(), expertiseDTO.getUnion().getName(), country) : null);
+        if (expertiseDTO.getSeniorityLevel() != null && (create || isCollectionEmpty(expertise.getSeniorityLevel()))) {
+            SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
                     expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
             seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
@@ -382,21 +399,13 @@ public class ExpertiseService {
             expertiseResponseDTO.getUnion().setId(copiedExpertise.getUnion().getId());
 
         } else {
-            prepareExpertise(currentExpertise, expertiseDTO, country,false);
+            prepareExpertise(currentExpertise, expertiseDTO, country, false);
             // update in current expertise :)
             if (seniorityLevelToUpdate.isPresent()) {
                 validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
                 boolean levelChanged = updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
                 updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get(), levelChanged);
             }
-            // organization Level is changed so need to set new
-            Optional.ofNullable(expertiseDTO.getSector()).ifPresent(sectorDTO -> {
-                currentExpertise.setSector(getSector(expertiseDTO.getSector(), country));
-            });
-            Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
-                currentExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(), expertiseDTO.getUnion().getName(), country));
-            });
-
             expertiseGraphRepository.save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
             expertiseDTO.setPublished(currentExpertise.isPublished());
@@ -578,7 +587,6 @@ public class ExpertiseService {
     }
 
 
-
     public UnionServiceWrapper getUnionsAndService(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -597,6 +605,7 @@ public class ExpertiseService {
 
      * */
     public ExpertiseQueryResult publishExpertise(Long expertiseId, Long publishedDateMillis) {
+        List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
@@ -619,6 +628,10 @@ public class ExpertiseService {
         expertise.setStartDateMillis(new Date(publishedDateMillis));
         expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
+        if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDateMillis()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
+            //exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
+            exceptionService.actionNotPermittedException("message.expertise.publish.with.future.startDate");
+        }
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
@@ -629,10 +642,23 @@ public class ExpertiseService {
             parentExp.setHistory(true);
             parentExp.setId(expertise.getId());
             expertiseGraphRepository.save(parentExp);
+            if(isNotNull(parentExp.getEndDateMillis()) && !getLocalDate(publishedDateMillis).isBefore(getLocalDate())) {
+                schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(getLocalDate(publishedDateMillis)), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+            }
             expertise.setId(parentExpertise.getId());
             expertiseGraphRepository.save(expertise);
         }
+        if(isNotNull(expertise.getEndDateMillis()) && !getLocalDateFromDate(expertise.getEndDateMillis()).isBefore(getLocalDate())){
+            schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(asLocalDate(expertise.getEndDateMillis())), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+        }
 
+        // create job for unassign experties from activity
+        try {
+            registerJobForUnassingExpertiesFromActivity(schedulerPanelDTOS);
+        }
+        catch (Exception e){
+            LOGGER.info("Exception occured in scheduling job for unassign experties from activity");
+        }
         return parentExpertise;
     }
 
@@ -906,5 +932,16 @@ public class ExpertiseService {
         return getPlannedTimeAndEmploymentType(organization.getCountry().getId());
     }
 
+    //register a job for unassign expertise from activity and this method call when set enddate of publish expertise
+    public boolean registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS)
+    {   if(isCollectionNotEmpty(schedulerPanelDTOS)) {
+        LOGGER.info("create job for add planning period");
+        // using -1 for unitId becounse this is not unit base job
+        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+        });
+        LOGGER.info("successfully job registered of add planning period");
+    }
+        return isCollectionNotEmpty(schedulerPanelDTOS);
+    }
 
 }
