@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.2.RELEASE'
+		springBootVersion = '2.0.5.RELEASE'
 		projectVersion = "0.0.1"
 	}
 	repositories {
@@ -23,7 +23,7 @@ plugins {
 ext {
 	versionslf4j='1.7.23'
 	springCloudVersion = 'Finchley.M8'
-	versionoptaplannerbom='7.19.0.Final'
+	versionoptaplannerbom='7.20.0.Final'
 	versionlogback='1.2.3'
 }
 
@@ -71,7 +71,7 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')//c
 	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
 	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
 	testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -82,25 +82,22 @@ subprojects {
 		mavenCentral()
 		maven { url 'https://repository.jboss.org/'}
 	}
-	if (!it.name.startsWith('responseWrapper')) {
-		apply plugin: 'java'
-		dependencies {
-			compile project(':kcommons')
-			compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
-			compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-			compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
-			compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
-			compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
-			compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
-			compile 'org.freemarker:freemarker:2.3.28'
-			compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
-			compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
-			compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
-			testCompile group: 'junit', name: 'junit', version: '4.12'
-			compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
-		}
+	apply plugin: 'java'
+	dependencies {
+		compile project(':kcommons')
+		compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
+		compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+		compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
+		compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
+		compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
+		compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
+		compile 'org.freemarker:freemarker:2.3.28'
+		compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
+		compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
+		compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+		testCompile group: 'junit', name: 'junit', version: '4.12'
+		compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
 	}
-
 }
 dependencyManagement {
 	imports {

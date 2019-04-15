@@ -35,7 +35,7 @@ public class ShiftPlanningInitializationController {
      */
 
     ResponseEntity<Map<String, Object>> getActivities() {
-        return null;//ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, shiftPlanningInitializationService.getActivities(2567L, new Date(1530383400000l), new Date(1532975400000l)));
+        return null;//ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.OK, shiftPlanningInitializationService.getActivities(2567L, new Date(1530383400000l), new Date(1532975400000l)));
     }
 
     /**
@@ -48,6 +48,6 @@ public class ShiftPlanningInitializationController {
         Long[] staffIds = {34246L, 27075L, 27079L, 34251L, 34246L, 34272L};
         shiftPlanningInitializationService.initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
 
-        return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.FOUND);
+        return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.OK);
     }
 }

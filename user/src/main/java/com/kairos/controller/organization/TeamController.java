@@ -181,4 +181,13 @@ import javax.inject.Inject;
         public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO) throws ParseException {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeamGeneralDetails(unitId, teamDTO));
         }
+
+        @GetMapping("/team/is_activity_assigned")
+        @ApiOperation("verify is activity assign to any team")
+        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> isActivityAssignedToTeam(@RequestParam BigInteger activityId) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.isActivityAssignedToTeam(activityId));
+        }
+
     }

@@ -61,7 +61,7 @@ public class VRPPlannerService {
         Object[] solvedTasks = getSolvedTasks(solution.getShifts(), indictment);
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
         //vrpPlanningSolution.setId(solution.getId());
-        vrpPlanningMongoRepository.save(vrpPlanningSolution);
+        vrpPlanningMongoRepository.saveEntity(vrpPlanningSolution);
         /*if(!solver.isTerminateEarly()){
             plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
         }*/
@@ -81,7 +81,7 @@ public class VRPPlannerService {
             medium+=hardMediumSoftLongScore.getMediumScore();
             soft+=hardMediumSoftLongScore.getSoftScore();
         }
-        indictmentMongoRepository.save(new VRPIndictment(solverConfigId,new Score(hard,medium,soft),constraintScores));
+        indictmentMongoRepository.saveEntity(new VRPIndictment(solverConfigId,new Score(hard,medium,soft),constraintScores));
     }
 
 

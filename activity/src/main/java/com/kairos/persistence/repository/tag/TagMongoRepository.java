@@ -29,8 +29,6 @@ public interface TagMongoRepository extends MongoRepository<Tag,BigInteger>,Cust
     Tag findTagByIdAndCountryIdAndDeletedAndCountryTagTrue(BigInteger id, Long countryId, boolean deleted);
 
 
-
-
     Tag findTagByNameIgnoreCaseAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(String name, Long organizatonId, String masterDataTypeEnum, boolean deleted);
 
     Tag findTagByIdAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(BigInteger id, Long organizatonId, String masterDataTypeEnum, boolean deleted);
