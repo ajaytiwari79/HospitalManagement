@@ -20,6 +20,7 @@ import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -695,4 +696,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Update update=new Update().pull("expertises",expertiseId);
         return mongoTemplate.updateMulti(new Query(),update,Activity.class).wasAcknowledged();
     }
+
+    @Override
+    public boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId) {
+        Update update = new Update().pull("compositeActivities",new Document().append( "activityId", activityId));
+        return mongoTemplate.updateMulti(new Query(),update,Activity.class).wasAcknowledged();
+    }
+
+
 }

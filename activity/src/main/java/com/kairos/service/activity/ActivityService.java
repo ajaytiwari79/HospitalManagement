@@ -89,6 +89,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
+import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static com.kairos.service.activity.ActivityUtil.*;
 
@@ -369,19 +370,34 @@ public class ActivityService extends MongoBaseService {
         activity.getGeneralActivityTab().setCategoryId(category.getId());
     }
 
-    public ActivityTabsWrapper updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO) {
+    public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO ,boolean availableAllowActivity) {
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
         ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", timeCalculationActivityDTO.getActivityId());
         }
-        activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
-        if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
-            timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO,availableAllowActivity);
+        if(!timeCalculationActivityDTO.isAvailableAllowActivity()) {
+            activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
+            if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
+                timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+            }
+            save(activity);
         }
-        save(activity);
-        return new ActivityTabsWrapper(timeCalculationActivityTab);
+        return timeCalculationActivityDTO;
+    }
+
+    private TimeCalculationActivityDTO verifyAndDeleteCompositeActivity(TimeCalculationActivityDTO timeCalculationActivityDTO ,boolean availableAllowActivity){
+            if (timeCalculationActivityDTO.getMethodForCalculatingTime().equals(FULL_WEEK) || timeCalculationActivityDTO.getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
+                boolean availableAllowActivities = activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
+                    if(availableAllowActivities && availableAllowActivity){
+                        activityMongoRepository.unassignCompositeActivityFromActivitiesByactivityId(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
+                    }else {
+                        timeCalculationActivityDTO.setAvailableAllowActivity(true);
+                    }
+                }
+        return timeCalculationActivityDTO;
     }
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {

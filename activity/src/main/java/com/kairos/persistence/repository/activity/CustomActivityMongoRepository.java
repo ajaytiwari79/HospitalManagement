@@ -91,5 +91,7 @@ public interface CustomActivityMongoRepository {
 
     boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId);
 
+    boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId);
+
     List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
 }
