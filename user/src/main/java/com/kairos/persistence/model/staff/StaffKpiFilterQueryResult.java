@@ -13,7 +13,7 @@ public class StaffKpiFilterQueryResult {
     private List<Long> unitIds;
     private Long unitId;
     private String unitName;
-    private List<EmploymentQueryResult> employments;
+    private List<EmploymentQueryResult> employment;
 
     public StaffKpiFilterQueryResult() {
     }
@@ -42,12 +42,12 @@ public class StaffKpiFilterQueryResult {
         this.lastName = lastName;
     }
 
-    public List<EmploymentQueryResult> getEmployments() {
-        return employments;
+    public List<EmploymentQueryResult> getEmployment() {
+        return employment;
     }
 
-    public void setEmployments(List<EmploymentQueryResult> employments) {
-        this.employments = employments;
+    public void setEmployment(List<EmploymentQueryResult> employment) {
+        this.employment = employment;
     }
 
     public Long getUnitId() {

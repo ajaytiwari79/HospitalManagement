@@ -177,7 +177,7 @@ public class EmploymentController {
     }
 
     @ApiOperation(value = "get HourlyCost By employmentLine Wise")
-    @GetMapping(value = "/staff/{staffId}/employments/{employmentId}/hourly_cost")
+    @GetMapping(value = "/staff/{staffId}/employment/{employmentId}/hourly_cost")
     public ResponseEntity<Map<String, Object>> getEmploymentLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long employmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.getEmploymentLinesWithHourlyCost(unitId, staffId,employmentId));
     }

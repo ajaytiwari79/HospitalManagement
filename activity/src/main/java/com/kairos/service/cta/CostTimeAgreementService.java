@@ -541,7 +541,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         return ctaResponseDTOS.isEmpty() ? null : ctaResponseDTOS.get(0);
     }
 
-    public List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds) {
+    public List<CTAResponseDTO> getCTAByEmploymentIds(Set<Long> employmentIds) {
         return costTimeAgreementRepository.getCTAByUpIds(employmentIds);
     }
 
