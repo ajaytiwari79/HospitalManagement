@@ -509,17 +509,5 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     }
 
-    @ExceptionHandler(value = {InvalidRequestException.class})
-    @ResponseBody
-    protected ResponseEntity<Object> exceptionHandler(RuntimeException ex, HttpServletRequest request) {
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("message", convertMessage(ex.getMessage()));
-        result.put("cause", ex.getCause());
-        result.put("request URl", request.getRequestURI());
-        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
-
-    }
-
 
 }

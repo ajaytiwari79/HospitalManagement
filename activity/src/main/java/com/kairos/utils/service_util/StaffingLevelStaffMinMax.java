@@ -23,11 +23,10 @@ public class StaffingLevelStaffMinMax {
 
     public void setMaxNoOfStaffChildActivities(int maxNoOfStaffChildActivities) { this.maxNoOfStaffChildActivities = maxNoOfStaffChildActivities; }
 
-    public StaffingLevelStaffMinMax(int minNoOfStaffParentActivity, int maxNoOfStaffParentActivity) {
-        this.minNoOfStaffParentActivity = minNoOfStaffParentActivity;
-        this.maxNoOfStaffParentActivity = maxNoOfStaffParentActivity;
+    public StaffingLevelStaffMinMax(int minNoOfStaffChildActivities, int maxNoOfStaffChildActivities) {
+        this.minNoOfStaffChildActivities = minNoOfStaffChildActivities;
+        this.maxNoOfStaffChildActivities = maxNoOfStaffChildActivities;
     }
-
 
     public StaffingLevelStaffMinMax() {
     }
