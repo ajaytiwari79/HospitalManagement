@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.wta;
 
+
 /**
  * @author pradeep
  * @date - 11/4/18
@@ -18,6 +19,8 @@ public class Expertise {
         this.name = name;
         this.description = description;
     }
+
+
 
     public Long getId() {
         return id;
