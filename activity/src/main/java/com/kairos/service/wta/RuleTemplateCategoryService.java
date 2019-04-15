@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.kairos.enums.RuleTemplateCategoryType.CTA;
 import static com.kairos.enums.RuleTemplateCategoryType.WTA;
@@ -110,8 +111,8 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         ruleTemplateCategoryDTO.setId(ruleTemplateCategory.getId());
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates);
         List<TagDTO> tagDTOS = tagMongoRepository.findAllTagsByIdIn(ruleTemplateCategoryDTO.getTags());
-        RuleTemplateCategoryDTO ruleTemplateCatg = new RuleTemplateCategoryDTO();
-        ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCatg);
+        ruleTemplateCategoryDTO.setTags(null);
+        RuleTemplateCategoryDTO ruleTemplateCatg = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplateCategoryDTO, RuleTemplateCategoryDTO.class);
         ruleTemplateCatg.setTags(tagDTOS);
         wtaBaseRuleTemplateDTOS.forEach(wtaBaseRuleTemplateDTO -> wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCatg));
         return new RuleTemplateAndCategoryResponseDTO(ruleTemplateCategoryDTO, wtaBaseRuleTemplateDTOS);
