@@ -89,6 +89,9 @@ public class StaffingLevelUtil {
     private static void validateParentChildActivityStaffingLevelMinMaxNumberOfStaff(Map<BigInteger, BigInteger> childAndParentActivityIdMap, Map<BigInteger, StaffingLevelStaffMinMax> activityIdStaffMinMaxMap, StaffingLevelActivity staffingLevelActivity) {
         BigInteger parentActivityId = childAndParentActivityIdMap.getOrDefault(staffingLevelActivity.getActivityId(), null);
         StaffingLevelStaffMinMax staffingLevelStaffMinMax;
+        if (staffingLevelActivity.getMinNoOfStaff() > staffingLevelActivity.getMaxNoOfStaff()) {
+            throw new InvalidRequestException("Min should be less than max");
+        }
         if (parentActivityId == null) {
             staffingLevelStaffMinMax = activityIdStaffMinMaxMap.get(staffingLevelActivity.getActivityId());
             if (staffingLevelStaffMinMax == null) {
