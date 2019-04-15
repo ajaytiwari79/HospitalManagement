@@ -994,7 +994,7 @@ public class StaffService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
-        staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(), unitId,envConfig.getServerHost() + FORWARD_SLASH));
+        staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(), unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()));
         return staffEmploymentTypeWrapper;
     }
 

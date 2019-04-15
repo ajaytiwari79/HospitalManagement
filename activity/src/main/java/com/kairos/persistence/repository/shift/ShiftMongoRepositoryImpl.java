@@ -7,14 +7,17 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -35,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -547,6 +551,23 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return mongoTemplate.exists(new Query(criteria), Shift.class);
     }
 
+    //@Override
+    public ShiftDTO findOneByIdWithActivityPriority(BigInteger shiftId) {
+        Criteria criteria = Criteria.where("_id").is(shiftId).and("deleted").is(false);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                unwind("activities", true),
+                lookup("activities", "activities.activityId", "_id", "activities.activity"),
+                new CustomAggregationOperation(Document.parse(getShiftWithPrioritiesProjection())),
+                lookup("activityPriority", "activities.activity.activityPriorityId", "_id", "activities.activity.activityPriority"),
+                new CustomAggregationOperation(Document.parse(getSecondShiftActivityPriority())),
+                new CustomAggregationOperation(Document.parse(getShiftActivityPriorityGroup())),
+                new CustomAggregationOperation(Document.parse(getThirdShiftActivityPriority()))
+        );
+        List<ShiftDTO> shiftDTOS = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults();
+        return shiftDTOS.isEmpty() ? null : shiftDTOS.get(0);
+    }
+
 
     @Override
     public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType) {
@@ -564,6 +585,258 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         );
 
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
+    }
+
+
+    @Override
+    public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, ShiftStatus shiftStatus) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
+                .and("activities").elemMatch(Criteria.where("status").ne(shiftStatus)));
+        return mongoTemplate.find(query,Shift.class);
+
+    }
+
+
+    private String getShiftWithPrioritiesProjection() {
+        return "{  \n" +
+                "      \"$project\":{  \n" +
+                "         \"startDate\":1,\n" +
+                "         \"endDate\":1,\n" +
+                "         \"disabled\":1,\n" +
+                "         \"bid\":1,\n" +
+                "         \"pId\":1,\n" +
+                "         \"bonusTimeBank\":1,\n" +
+                "         \"amount\":1,\n" +
+                "         \"probability\":1,\n" +
+                "         \"accumulatedTimeBankInMinutes\":1,\n" +
+                "         \"remarks\":1,\n" +
+                "         \"staffId\":1,\n" +
+                "         \"phaseId\":1,\n" +
+                "         \"planningPeriodId\":1,\n" +
+                "         \"weekCount\":1,\n" +
+                "         \"unitId\":1,\n" +
+                "         \"scheduledMinutes\":1,\n" +
+                "         \"durationMinutes\":1,\n" +
+                "         \"externalId\":1,\n" +
+                "         \"employmentId\":1,\n" +
+                "         \"parentOpenShiftId\":1,\n" +
+                "         \"copiedFromShiftId\":1,\n" +
+                "         \"sickShift\":1,\n" +
+                "         \"functionId\":1,\n" +
+                "         \"staffUserId\":1,\n" +
+                "         \"shiftType\":1,\n" +
+                "         \"timeBankCtaBonusMinutes\":1,\n" +
+                "         \"dayOfWeek\":{  \n" +
+                "            \"$dayOfWeek\":\"$startDate\"\n" +
+                "         },\n" +
+                "         \"status\":1,\n" +
+                "         \"activities.activityId\":1,\n" +
+                "         \"activities.startDate\":1,\n" +
+                "         \"activities.endDate\":1,\n" +
+                "         \"activities.scheduledMinutes\":1,\n" +
+                "         \"activities.durationMinutes\":1,\n" +
+                "         \"activities.activityName\":1,\n" +
+                "         \"activities.bid\":1,\n" +
+                "         \"activities.pId\":1,\n" +
+                "         \"activities.reasonCodeId\":1,\n" +
+                "         \"activities.absenceReasonCodeId\":1,\n" +
+                "         \"activities.remarks\":1,\n" +
+                "         \"activities._id\":1,\n" +
+                "         \"activities.timeType\":1,\n" +
+                "         \"activities.backgroundColor\":1,\n" +
+                "         \"activities.haltBreak\":1,\n" +
+                "         \"activities.plannedTimeId\":1,\n" +
+                "         \"activities.breakShift\":1,\n" +
+                "         \"activities.breakReplaced\":1,\n" +
+                "         \"activities.timeBankCTADistributions\":1,\n" +
+                "         \"activities.allowedBreakDurationInMinute\":1,\n" +
+                "         \"activities.timeBankCtaBonusMinutes\":1,\n" +
+                "         \"activities.startLocation\":1,\n" +
+                "         \"activities.endLocation\":1,\n" +
+                "         \"activities.status\":1,\n" +
+                "         \"activities.activity\":{  \n" +
+                "            \"$arrayElemAt\":[  \n" +
+                "               \"$activities.activity\",\n" +
+                "               0\n" +
+                "            ]\n" +
+                "         }\n" +
+                "      }\n" +
+                "   }";
+    }
+
+    private String getShiftActivityPriorityGroup() {
+        return "{  \n" +
+                "      \"$project\":{  \n" +
+                "          \"_id\":1,\n" +
+                "         \"startDate\":1,\n" +
+                "         \"endDate\":1,\n" +
+                "         \"disabled\":1,\n" +
+                "         \"bid\":1,\n" +
+                "         \"pId\":1,\n" +
+                "         \"bonusTimeBank\":1,\n" +
+                "         \"amount\":1,\n" +
+                "         \"probability\":1,\n" +
+                "         \"accumulatedTimeBankInMinutes\":1,\n" +
+                "         \"remarks\":1,\n" +
+                "         \"staffId\":1,\n" +
+                "         \"phaseId\":1,\n" +
+                "         \"planningPeriodId\":1,\n" +
+                "         \"weekCount\":1,\n" +
+                "         \"unitId\":1,\n" +
+                "         \"scheduledMinutes\":1,\n" +
+                "         \"durationMinutes\":1,\n" +
+                "         \"externalId\":1,\n" +
+                "         \"employmentId\":1,\n" +
+                "         \"parentOpenShiftId\":1,\n" +
+                "         \"copiedFromShiftId\":1,\n" +
+                "         \"sickShift\":1,\n" +
+                "         \"functionId\":1,\n" +
+                "         \"staffUserId\":1,\n" +
+                "         \"shiftType\":1,\n" +
+                "         \"timeBankCtaBonusMinutes\":1,\n" +
+                "         \"dayOfWeek\":{  \n" +
+                "            \"$dayOfWeek\":\"$startDate\"\n" +
+                "         },\n" +
+                "         \"status\":1,\n" +
+                "         \"activities.activityId\":1,\n" +
+                "         \"activities.startDate\":1,\n" +
+                "         \"activities.endDate\":1,\n" +
+                "         \"activities.scheduledMinutes\":1,\n" +
+                "         \"activities.durationMinutes\":1,\n" +
+                "         \"activities.activityName\":1,\n" +
+                "         \"activities.bid\":1,\n" +
+                "         \"activities.pId\":1,\n" +
+                "         \"activities.id\":1,\n" +
+                "         \"activities.reasonCodeId\":1,\n" +
+                "         \"activities.absenceReasonCodeId\":1,\n" +
+                "         \"activities.remarks\":1,\n" +
+                "         \"activities._id\":1,\n" +
+                "         \"activities.timeType\":1,\n" +
+                "         \"activities.backgroundColor\":1,\n" +
+                "         \"activities.haltBreak\":1,\n" +
+                "         \"activities.plannedTimeId\":1,\n" +
+                "         \"activities.breakShift\":1,\n" +
+                "         \"activities.breakReplaced\":1,\n" +
+                "         \"activities.timeBankCTADistributions\":1,\n" +
+                "         \"activities.allowedBreakDurationInMinute\":1,\n" +
+                "         \"activities.timeBankCtaBonusMinutes\":1,\n" +
+                "         \"activities.startLocation\":1,\n" +
+                "         \"activities.endLocation\":1,\n" +
+                "         \"activities.status\":1,\n" +
+                "         \"activities.activity.activityPriority\":{  \n" +
+                "            \"$arrayElemAt\":[  \n" +
+                "               \"$activities.activity.activityPriority\",\n" +
+                "               0\n" +
+                "            ]\n" +
+                "         }\n" +
+                "      }\n" +
+                "   }";
+    }
+
+    private String getSecondShiftActivityPriority() {
+        return "{  \n" +
+                "      \"$project\":{  \n" +
+                "          \"_id\":1,\n" +
+                "         \"startDate\":1,\n" +
+                "         \"endDate\":1,\n" +
+                "         \"disabled\":1,\n" +
+                "         \"bid\":1,\n" +
+                "         \"pId\":1,\n" +
+                "         \"bonusTimeBank\":1,\n" +
+                "         \"amount\":1,\n" +
+                "         \"probability\":1,\n" +
+                "         \"accumulatedTimeBankInMinutes\":1,\n" +
+                "         \"remarks\":1,\n" +
+                "         \"staffId\":1,\n" +
+                "         \"phaseId\":1,\n" +
+                "         \"planningPeriodId\":1,\n" +
+                "         \"weekCount\":1,\n" +
+                "         \"unitId\":1,\n" +
+                "         \"scheduledMinutes\":1,\n" +
+                "         \"durationMinutes\":1,\n" +
+                "         \"externalId\":1,\n" +
+                "         \"employmentId\":1,\n" +
+                "         \"parentOpenShiftId\":1,\n" +
+                "         \"copiedFromShiftId\":1,\n" +
+                "         \"sickShift\":1,\n" +
+                "         \"functionId\":1,\n" +
+                "         \"staffUserId\":1,\n" +
+                "         \"shiftType\":1,\n" +
+                "         \"timeBankCtaBonusMinutes\":1,\n" +
+                "         \"dayOfWeek\":{  \n" +
+                "            \"$dayOfWeek\":\"$startDate\"\n" +
+                "         },\n" +
+                "         \"status\":1,\n" +
+                "         \"activities.activityId\":1,\n" +
+                "         \"activities.startDate\":1,\n" +
+                "         \"activities.endDate\":1,\n" +
+                "         \"activities.scheduledMinutes\":1,\n" +
+                "         \"activities.durationMinutes\":1,\n" +
+                "         \"activities.activityName\":1,\n" +
+                "         \"activities.bid\":1,\n" +
+                "         \"activities.pId\":1,\n" +
+                "         \"activities.id\":1,\n" +
+                "         \"activities.reasonCodeId\":1,\n" +
+                "         \"activities.absenceReasonCodeId\":1,\n" +
+                "         \"activities.remarks\":1,\n" +
+                "         \"activities._id\":1,\n" +
+                "         \"activities.timeType\":1,\n" +
+                "         \"activities.backgroundColor\":1,\n" +
+                "         \"activities.haltBreak\":1,\n" +
+                "         \"activities.plannedTimeId\":1,\n" +
+                "         \"activities.breakShift\":1,\n" +
+                "         \"activities.breakReplaced\":1,\n" +
+                "         \"activities.timeBankCTADistributions\":1,\n" +
+                "         \"activities.allowedBreakDurationInMinute\":1,\n" +
+                "         \"activities.timeBankCtaBonusMinutes\":1,\n" +
+                "         \"activities.startLocation\":1,\n" +
+                "         \"activities.endLocation\":1,\n" +
+                "         \"activities.status\":1,\n" +
+                "         \"activities.activity.activityPriority\":{  \n" +
+                "            \"$arrayElemAt\":[  \n" +
+                "               \"$activities.activity.activityPriority\",\n" +
+                "               0\n" +
+                "            ]\n" +
+                "         }\n" +
+                "      }\n" +
+                "   }";
+    }
+
+    private String getThirdShiftActivityPriority() {
+        return "{  \n" +
+                "      \"$project\":{\n" +
+                "        \"_id._id\":1,  \n" +
+                "         \"_id.startDate\":1,\n" +
+                "         \"_id.endDate\":1,\n" +
+                "         \"_id.disabled\":1,\n" +
+                "         \"_id.bid\":1,\n" +
+                "         \"_id.pId\":1,\n" +
+                "         \"_id.bonusTimeBank\":1,\n" +
+                "         \"_id.amount\":1,\n" +
+                "         \"_id.probability\":1,\n" +
+                "         \"_id.accumulatedTimeBankInMinutes\":1,\n" +
+                "         \"_id.remarks\":1,\n" +
+                "         \"_id.staffId\":1,\n" +
+                "         \"_id.phaseId\":1,\n" +
+                "         \"_id.planningPeriodId\":1,\n" +
+                "         \"_id.weekCount\":1,\n" +
+                "         \"_id.unitId\":1,\n" +
+                "         \"_id.scheduledMinutes\":1,\n" +
+                "         \"_id.durationMinutes\":1,\n" +
+                "         \"_id.externalId\":1,\n" +
+                "         \"_id.employmentId\":1,\n" +
+                "         \"_id.parentOpenShiftId\":1,\n" +
+                "         \"_id.copiedFromShiftId\":1,\n" +
+                "         \"_id.sickShift\":1,\n" +
+                "         \"_id.functionId\":1,\n" +
+                "         \"_id.staffUserId\":1,\n" +
+                "         \"_id.shiftType\":1,\n" +
+                "         \"_id.timeBankCtaBonusMinutes\":1,\n" +
+                "         \"_id.dayOfWeek\":1,\n" +
+                "         \"_id.status\":1,\n" +
+                "         \"_id.activities\":\"$activities\"\n" +
+                "      }\n" +
+                "   }";
     }
 
 }
