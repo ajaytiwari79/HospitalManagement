@@ -205,9 +205,80 @@ public class StaffCreationServiceTest {
         //doNothing().when(staffCreationService).createEmployment(null,null,null,null,null,false);
         when(accessGroupRepository.findOne(accessGroup.getId())).thenReturn(accessGroup);
          //when(staffCreationService.createStaffFromWeb(1L,staffCreationDTO)).thenReturn(staffDTO);
+
+
+
+    }
+
+
+    @Test
+    public void createStaffFromWebForCheckingStaffExist() {
+
+        ContactAddress contactAddress = new ContactAddress();
+
+        ZipCode zipCode = new ZipCode();
+        zipCode.setEnable(true);
+        zipCode.setName("India");
+        zipCode.setZipCode(45454);
+
+        Municipality municipality = new Municipality();
+        municipality.setCode("111");
+        municipality.setEnable(true);
+        municipality.setName("NCR");
+
+
+        Staff staff = new Staff();
+        staff.setUserName("testUser");
+
+        StaffCreationDTO staffCreationDTO = new StaffCreationDTO();
+        staffCreationDTO.setCprNumber("123456789");
+        staffCreationDTO.setPrivateEmail("test@gmail.com");
+        StaffCreationDTO newStaffCreationDTO = new StaffCreationDTO();
+        newStaffCreationDTO.setCprNumber("123456789");
+
+
+
+        contactAddress.setId(1L);
+        //ContactAddress contactAddress = new ContactAddress();
+        contactAddress.setCity("gurgaon");
+        contactAddress.setStreet("sohna road");
+        contactAddress.setZipCode(zipCode);
+        contactAddress.setHouseNumber("163");
+        contactAddress.setLongitude(1.0f);
+        contactAddress.setLatitude(1.0f);
+        contactAddress.setFloorNumber(1);
+        contactAddress.setMunicipality(municipality);
+        contactAddress.setCountry("India");
+        contactAddress.setRegionName("gurgaon");
+        contactAddress.setRegionCode("101");
+        contactAddress.setProvince("province");
+        contactAddress.setPrimary(true);
+
+        ContactAddress contactAddressNew =new ContactAddress();
+
+
+        Organization organization = new Organization();
+        organization.setId(1L);
+        organization.setOrganizationLevel(OrganizationLevel.COUNTRY);
+        organization.setParentOrganization(false);
+        organization.setContactAddress(contactAddress);
+
+
+        when(organizationGraphRepository.findOne(1L)).thenReturn(organization);
+        when(organizationGraphRepository.getParentOrganizationOfCityLevel(1L)).thenReturn(organization);
+
+
+        when(staffGraphRepository.findStaffByEmailInOrganization(staffCreationDTO.getPrivateEmail(),1L)).thenReturn(staff);
         StaffDTO staffDTOResult = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
-        Assert.assertEquals(staffDTO,staffDTOResult);
+
+        User user = new User();
+        user.setEmail("test@gmail.com");
+        user.setUserName("test");
+        when(userGraphRepository.findUserByUserName("test@gmail.com")).thenReturn(user);
+
+    }
+
+*/
 
 
-    }*/
 }

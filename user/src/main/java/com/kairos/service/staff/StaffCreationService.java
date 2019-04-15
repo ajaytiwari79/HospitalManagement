@@ -126,6 +126,7 @@ public class StaffCreationService {
             LOGGER.info("Creating new staff with kmd external id " + payload.getExternalId() + " in unit " + unit.getId());
             staff = new Staff();
         }
+        staff.setUserName(payload.getUserName());
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
         staff.setExternalId(payload.getExternalId());

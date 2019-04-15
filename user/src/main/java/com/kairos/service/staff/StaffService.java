@@ -507,7 +507,7 @@ public class StaffService {
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
                         // user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(),"(?)" + privateEmail);
-                        user = userGraphRepository.findByEmail(privateEmail);
+                        user = userGraphRepository.findByEmail("?" +privateEmail);
                         //if(Optional.ofNullable(user).isPresent()){
                         if (user != null) {
                             LOGGER.info(">>>>>>>>>>>>>am inside the check for findByEmail");
