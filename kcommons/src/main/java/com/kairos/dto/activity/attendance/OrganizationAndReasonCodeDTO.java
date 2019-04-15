@@ -12,6 +12,7 @@ public class OrganizationAndReasonCodeDTO {
     private List<EmploymentDTO> employment;
 
     public OrganizationAndReasonCodeDTO() {
+        //Default Constructor
     }
 
     public OrganizationAndReasonCodeDTO(Long id, String name, List<ReasonCodeDTO> reasonCode,List<EmploymentDTO> employment) {

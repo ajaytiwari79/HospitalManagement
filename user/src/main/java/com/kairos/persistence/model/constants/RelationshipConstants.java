@@ -45,8 +45,6 @@ public abstract class RelationshipConstants {
     public final static String EMPLOYMENT_TYPE_SETTINGS = "EMPLOYMENT_TYPE_SETTINGS";
 
     // Group
-    public final static String GROUP_HAS_SKILLS = "GROUP_HAS_SKILLS";
-    public final static String GROUP_HAS_SERVICES = "GROUP_HAS_SERVICES";
     public final static String HAS_TEAMS = "HAS_TEAMS";
 
     // Team
@@ -92,7 +90,6 @@ public abstract class RelationshipConstants {
     public final static String HAS_ALLERGY = "HAS_ALLERGY";
 
     public final static String ORGANIZATION_HAS_RESOURCE = "ORGANIZATION_HAS_RESOURCE";
-    public final static String ORGANIZATION_HAS_DEPARTMENT = "ORGANIZATION_HAS_DEPARTMENT";
     public final static String ORGANIZATION_SUB_SERVICE = "ORGANIZATION_SUB_SERVICE";
     public final static String LINK_WITH_EXTERNAL_SERVICE = "LINK_WITH_EXTERNAL_SERVICE";
 

@@ -62,7 +62,7 @@ public class EmploymentQueryResult {
     }
 
     public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
-                                   Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> positionLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+                                   Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -76,7 +76,7 @@ public class EmploymentQueryResult {
         this.reasonCode=reasonCode;
         this.unitInfo=unitInfo;
         this.employmentSubType =employmentSubType;
-        this.employmentLines=positionLines;
+        this.employmentLines=employmentLines;
         this.taxDeductionPercentage=taxDeductionPercentage;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
         this.accumulatedTimebankDate = accumulatedTimebankDate;

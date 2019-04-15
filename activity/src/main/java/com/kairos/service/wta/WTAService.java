@@ -807,12 +807,12 @@ public class WTAService extends MongoBaseService {
        return getWTACTAByEmploymentIds(employmentLinesMap.keySet());
     }
 
-    public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId, Long unitPositionId, LocalDate startDate, LocalDate endDate) {
-        return workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(unitId, unitPositionId, startDate, endDate);
+    public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId, Long employmentId, LocalDate startDate, LocalDate endDate) {
+        return workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(unitId, employmentId, startDate, endDate);
     }
 
-    public void updateExistingPhaseIdOfWTA(List<PhaseTemplateValue> phaseTemplateValues, Long unitId, Long refrenceId, boolean creatingFromCountry) {
-        List<Phase> countryPhase = creatingFromCountry ? phaseMongoRepository.findAllBycountryIdAndDeletedFalse(refrenceId) : phaseMongoRepository.findByOrganizationIdAndDeletedFalse(refrenceId);
+    public void updateExistingPhaseIdOfWTA(List<PhaseTemplateValue> phaseTemplateValues, Long unitId, Long referenceId, boolean creatingFromCountry) {
+        List<Phase> countryPhase = creatingFromCountry ? phaseMongoRepository.findAllBycountryIdAndDeletedFalse(referenceId) : phaseMongoRepository.findByOrganizationIdAndDeletedFalse(referenceId);
         Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap = countryPhase.stream().collect(Collectors.toMap(Phase::getId, Phase::getPhaseEnum));
         List<Phase> unitPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = unitPhases.stream().collect(Collectors.toMap(Phase::getPhaseEnum, Phase::getId));
@@ -855,16 +855,16 @@ public class WTAService extends MongoBaseService {
 
         }
         workingTimeAgreements = wtaRepository.findWTAOfEmployments();
-        Map<Long, Long> unitPositionAndUnitMap = new HashMap<>();
+        Map<Long, Long> employmentAndUnitMap = new HashMap<>();
         for (WorkingTimeAgreement workingTimeAgreement : workingTimeAgreements) {
             Long unitId;
-            if (!unitPositionAndUnitMap.containsKey(workingTimeAgreement.getEmploymentId())) {
+            if (!employmentAndUnitMap.containsKey(workingTimeAgreement.getEmploymentId())) {
                 unitId = userIntegrationService.getUnitByEmploymentId(workingTimeAgreement.getEmploymentId());
                 if (isNotNull(unitId)) {
-                    unitPositionAndUnitMap.put(workingTimeAgreement.getEmploymentId(), unitId);
+                    employmentAndUnitMap.put(workingTimeAgreement.getEmploymentId(), unitId);
                 }
             } else {
-                unitId = unitPositionAndUnitMap.get(workingTimeAgreement.getEmploymentId());
+                unitId = employmentAndUnitMap.get(workingTimeAgreement.getEmploymentId());
             }
             Map<String, BigInteger> stringBigIntegerMap = new HashMap<>();
             boolean valid = false;

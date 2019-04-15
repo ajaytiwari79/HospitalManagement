@@ -61,7 +61,7 @@ public class TimeBankCalculationServiceTest {
         shifts = ObjectMapperUtils.JsonStringToList(getShiftJson(),Shift.class);
     }
 
-    //@Test
+    @Test
     public void getTimeBankByInterval() {
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(staffEmploymentDetails,interval,shiftWithActivityDTOS,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS,validatedByPlanner);
         LOGGER.info("daily timebank : {}",dailyTimeBankEntry);

@@ -23,7 +23,7 @@ import java.util.Set;
 
 @XStreamAlias("Employee")
 public class Employee {
-    private static Logger log= LoggerFactory.getLogger(Employee.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Employee.class);
     private String id;
     private BigDecimal baseCost;
     transient private WorkingTimeConstraints workingTimeConstraints;
@@ -226,7 +226,7 @@ public class Employee {
                 .append(id)
                 .toHashCode();*/
         int hashcode=id.hashCode();
-        //log.info("Employee hashcode:"+id+":"+hashcode);
+        //LOGGER.info("Employee hashcode:"+id+":"+hashcode);
         return hashcode;
     }
     public int checkConstraints(List<Shift> shifts, int index){

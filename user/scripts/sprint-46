@@ -1,3 +1,16 @@
 //Set Country Id in User
 MATCH (n:User) where n.countryId is null set n.countryId=18712;
 
+MATCH (unitPosition:UnitPosition)
+REMOVE unitPosition:UnitPosition
+SET unitPosition:Employment
+
+
+MATCH (unitPositionLine:UnitPositionLine)
+REMOVE unitPositionLine:UnitPositionLine
+SET unitPositionLine:EmploymentLine
+
+
+MATCH(employment:Employment)-[r:HAS_POSITION_LINES]->(employmentLine:EmploymentLine)
+delete r
+CREATE UNIQUE(employment)-[r1:HAS_EMPLOYMENT_LINES]->(employmentLine)

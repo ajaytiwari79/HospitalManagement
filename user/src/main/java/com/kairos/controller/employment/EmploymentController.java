@@ -48,13 +48,13 @@ public class EmploymentController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid EmploymentDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, type, position, false, saveAsDraft));
+    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, type, employmentDTO, false, saveAsDraft));
     }
 
     /*
      * @auth vipul
-     * used to get all positions of organization n by organization and staff Id
+     * used to get all employments of organization n by organization and staff Id
      * */
     @ApiOperation(value = "Get all employment by organization and staff")
     @RequestMapping(value = "/employment/staff/{staffId}")
@@ -65,7 +65,7 @@ public class EmploymentController {
     @ApiOperation(value = "Remove employment")
     @DeleteMapping(value = "/employment/{employmentId}")
     public ResponseEntity<Map<String, Object>> deleteEmployment(@PathVariable Long unitId, @PathVariable Long employmentId) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.removePosition(employmentId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.removeEmployment(employmentId, unitId));
     }
 
 

@@ -549,7 +549,7 @@ public class EmploymentService {
         employmentLine.setEndDate(employmentDTO.getEndDate());
     }
 
-    public PositionQueryResult removePosition(long positionId, Long unitId) throws Exception {
+    public PositionQueryResult removeEmployment(long positionId, Long unitId) throws Exception {
         Employment employment = employmentGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(employment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.employment.id.notexist", positionId);
