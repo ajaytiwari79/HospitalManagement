@@ -749,7 +749,11 @@ public class ShiftValidatorService {
         if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
             shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
         else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
-            shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
+            if(shiftDTO.isMidnightToMidnightShift()){
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
+            }else {
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
+            }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByUnitPositionIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.WORKING_TYPE);
         if (!shiftExists) {
