@@ -107,6 +107,7 @@ public class TimeBankCalculationService {
                                 if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && dateTimeInterval.contains(shiftActivity.getStartDate().getTime())) {
                                     scheduledMinutesOfTimeBank += shiftActivity.getScheduledMinutes();
                                     ctaBonusAndScheduledMinutes = shiftActivity.getScheduledMinutes();
+                                    shiftActivity.setScheduledMinutesOfTimebank(shiftActivity.getScheduledMinutes()+shiftActivity.getScheduledMinutesOfTimebank());
                                 } else if(ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                     int ctaBonusMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
                                     ctaBonusAndScheduledMinutes = ctaBonusMinutes;

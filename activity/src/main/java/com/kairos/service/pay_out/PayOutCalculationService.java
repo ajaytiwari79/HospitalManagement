@@ -82,6 +82,7 @@ public class PayOutCalculationService {
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                             scheduledMinutesOfPayout += shiftActivity.getScheduledMinutes();
                             ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
+                            shiftActivity.setScheduledMinutesOfTimebank(shiftActivity.getScheduledMinutes()+shiftActivity.getScheduledMinutesOfTimebank());
                         } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                             ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval);
                             ctaBonusMinutes += ctaScheduledOrCompensationMinutes;

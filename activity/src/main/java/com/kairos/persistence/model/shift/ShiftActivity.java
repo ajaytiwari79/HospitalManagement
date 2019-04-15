@@ -48,6 +48,8 @@ public class ShiftActivity {
     private String endLocation;   // this is for the location from where activity will gets ends
     private int plannedMinutesOfTimebank;
     private int plannedMinutesOfPayout;
+    private int scheduledMinutesOfTimebank;
+    private int scheduledMinutesOfPayout;
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
@@ -334,5 +336,21 @@ public class ShiftActivity {
 
     public void setPlannedMinutesOfPayout(int plannedMinutesOfPayout) {
         this.plannedMinutesOfPayout = plannedMinutesOfPayout;
+    }
+
+    public int getScheduledMinutesOfTimebank() {
+        return scheduledMinutesOfTimebank;
+    }
+
+    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
+        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
+    }
+
+    public int getScheduledMinutesOfPayout() {
+        return scheduledMinutesOfPayout;
+    }
+
+    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
+        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
     }
 }

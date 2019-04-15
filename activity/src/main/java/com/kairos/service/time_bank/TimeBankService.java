@@ -416,6 +416,7 @@ public class TimeBankService extends MongoBaseService {
             for (Shift shift : shifts) {
                 int timeBankCtaBonusMinutes = 0;
                 int plannedMinutesOfTimebank = 0;
+                int timeBankScheduledMinutes = 0;
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
                     if(shiftActivityDTOMap.containsKey(shiftActivity.getId())) {
                         ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
@@ -424,8 +425,11 @@ public class TimeBankService extends MongoBaseService {
                         shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
                         shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutes() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
                         plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
+                        shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
+                        timeBankScheduledMinutes+=shiftActivity.getScheduledMinutesOfTimebank();
                     }
                 }
+                shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
                 shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
                 shift.setPlannedMinutesOfTimebank(plannedMinutesOfTimebank);
             }
@@ -481,7 +485,7 @@ public class TimeBankService extends MongoBaseService {
                 int timeBankCtaBonusMinutes = 0;
                 int scheduledMinutes = 0;
                 for (ShiftActivityDTO activity : shiftDTO.getActivities()) {
-                    activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutes() + activity.getTimeBankCtaBonusMinutes());
+                    activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutesOfTimebank() + activity.getTimeBankCtaBonusMinutes());
                     plannedMinutes += activity.getPlannedMinutesOfTimebank();
                     timeBankCtaBonusMinutes += activity.getTimeBankCtaBonusMinutes();
                     scheduledMinutes += activity.getScheduledMinutes();

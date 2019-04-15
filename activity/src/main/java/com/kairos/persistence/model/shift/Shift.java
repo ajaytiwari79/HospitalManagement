@@ -61,6 +61,8 @@ public class Shift extends MongoBaseEntity {
     private int plannedMinutesOfTimebank;
     private int payoutCtaBonusMinutes;
     private int plannedMinutesOfPayout;
+    private int scheduledMinutesOfTimebank;
+    private int scheduledMinutesOfPayout;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -379,6 +381,22 @@ public class Shift extends MongoBaseEntity {
 
     public void setPayoutCtaBonusMinutes(int payoutCtaBonusMinutes) {
         this.payoutCtaBonusMinutes = payoutCtaBonusMinutes;
+    }
+
+    public int getScheduledMinutesOfTimebank() {
+        return scheduledMinutesOfTimebank;
+    }
+
+    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
+        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
+    }
+
+    public int getScheduledMinutesOfPayout() {
+        return scheduledMinutesOfPayout;
+    }
+
+    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
+        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
     }
 
     @Override

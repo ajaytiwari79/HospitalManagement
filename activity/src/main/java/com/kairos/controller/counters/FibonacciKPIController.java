@@ -27,7 +27,7 @@ import static com.kairos.constants.ApiConstants.API_V1;
 @Api(API_V1)
 public class FibonacciKPIController {
 
-    @Inject private FibonacciKPIService fibonacciKPIService;
+ /*   @Inject private FibonacciKPIService fibonacciKPIService;
 
     @PostMapping(value = COUNTRY_URL+FIBONACCI)
     public ResponseEntity<ResponseDTO<Object>> createFibonacciKPI(@PathVariable Long countryId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
@@ -71,5 +71,5 @@ public class FibonacciKPIController {
     @PostMapping(value = UNIT_URL+FIBONACCI+"/{fibonacciKPIId}")
     public ResponseEntity<ResponseDTO<Object>> deleteFibonacciKPIAtUnit(@PathVariable BigInteger fibonacciKPIId){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.deleteFibonacciKPI(fibonacciKPIId));
-    }
+    }*/
 }
