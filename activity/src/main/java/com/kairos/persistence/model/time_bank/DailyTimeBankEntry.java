@@ -130,4 +130,9 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
         this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
+
+    @Override
+    public String toString() {
+        return "DailyTimeBankEntry{" + "unitPositionId=" + unitPositionId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
+    }
 }

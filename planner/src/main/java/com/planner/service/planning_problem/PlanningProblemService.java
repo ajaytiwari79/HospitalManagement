@@ -2,6 +2,7 @@ package com.planner.service.planning_problem;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
+import com.kairos.enums.planning_problem.PlanningProblemType;
 import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
 import org.springframework.stereotype.Service;
@@ -15,21 +16,11 @@ public class PlanningProblemService {
     @Inject
     private PlanningProblemRepository planningProblemRepository;
 
-    //=====================================================================
-
-    /**
-     * @param planningProblemDTO
-     */
     public void createPlanningProblem(PlanningProblemDTO planningProblemDTO) {
         PlanningProblem planningProblem = ObjectMapperUtils.copyPropertiesByMapper(planningProblemDTO, PlanningProblem.class);
-        planningProblemRepository.saveObject(planningProblem);
+        planningProblemRepository.saveEntity(planningProblem);
     }
-    //=====================================================================
 
-    /**
-     * @param planningProblemDTOId
-     * @return
-     */
     public PlanningProblemDTO getPlanningProblem(String planningProblemDTOId) {
         Optional<PlanningProblem> planningProblemOptional = planningProblemRepository.findById(planningProblemDTOId);
         PlanningProblemDTO planningProblemDTO = null;
@@ -38,41 +29,29 @@ public class PlanningProblemService {
         }
         return planningProblemDTO;
     }
-    //====================================================================
 
-    /**
-     * @return
-     */
     public List<PlanningProblemDTO> getAllPlanningProblem() {
         List<PlanningProblem> planningProblems = planningProblemRepository.findAll();
         return ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblems, PlanningProblemDTO.class);
     }
-    //===================================================================
 
-    /**
-     * @param planningProblemDTO
-     */
     public void updatePlanningProblem(PlanningProblemDTO planningProblemDTO) {
         Optional<PlanningProblem> planningProblemOptional = planningProblemRepository.findById(planningProblemDTO.getId() + "");
         PlanningProblem planningProblem;
         if (planningProblemOptional.isPresent()) {
             planningProblem = planningProblemOptional.get();
-            planningProblemRepository.saveObject(planningProblem);
+            planningProblemRepository.saveEntity(planningProblem);
         }
 
     }
-    //=================================================================================
 
-    /**
-     * @param planningProblemDTOId
-     */
     public void deletePlanningProblem(String planningProblemDTOId) {
         Optional<PlanningProblem> planningProblemOptional = planningProblemRepository.findById(planningProblemDTOId);
         PlanningProblem planningProblem;
         if (planningProblemOptional.isPresent()) {
             planningProblem = planningProblemOptional.get();
             planningProblem.setDeleted(true);
-            planningProblemRepository.saveObject(planningProblem);
+            planningProblemRepository.saveEntity(planningProblem);
         }
     }
 
@@ -82,8 +61,8 @@ public class PlanningProblemService {
         PlanningProblem defaultPlanningProblem = new PlanningProblem();
         defaultPlanningProblem.setName("ShiftPlanning");
         defaultPlanningProblem.setDescription("This is for ShiftPlanning");
-        defaultPlanningProblem.setType("shiftPlanning");
-        planningProblemRepository.saveObject(defaultPlanningProblem);
+        defaultPlanningProblem.setType(PlanningProblemType.SHIFT_PLANNING);
+        planningProblemRepository.saveEntity(defaultPlanningProblem);
         PlanningProblemDTO planningProblemDTO = ObjectMapperUtils.copyPropertiesByMapper(defaultPlanningProblem, PlanningProblemDTO.class);
         return planningProblemDTO;
     }

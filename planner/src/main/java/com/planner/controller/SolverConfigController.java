@@ -28,7 +28,7 @@
 //    public ResponseEntity<Map<String, Object>> addSolverConfig(@RequestBody SolverConfigWTADTO solverConfigWTADTO,
 //                                                                @PathVariable Long unitId) {
 //        solverConfigService.addSolverConfig(unitId, solverConfigWTADTO);
-//        return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
+//        return ResponseHandler.generateResponse("Success",HttpStatus.OK);
 //    }
 //
 //}

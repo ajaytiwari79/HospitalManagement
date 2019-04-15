@@ -25,6 +25,7 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.enums.FilterType;
@@ -73,6 +74,7 @@ public class CounterDistService extends MongoBaseService {
     private ActivityService activityService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject private FibonacciKPIService fibonacciKPIService;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -110,8 +112,10 @@ public class CounterDistService extends MongoBaseService {
             refId = userIntegrationService.getStaffIdByUserId(refId);
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level, false);
+        List<KPIDTO> fibonacciDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIService.getAllFibonacciKPI(refId,level),KPIDTO.class);
+        kpidtos.addAll(fibonacciDtos);
         if (kpidtos.isEmpty()) {
-            LOGGER.info("KPI not found for Unit id " + refId);
+            LOGGER.info("KPI not found for {} id " + refId,level);
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
         return kpidtos;
@@ -121,6 +125,12 @@ public class CounterDistService extends MongoBaseService {
         List<KPICategoryDTO> categories = counterRepository.getKPICategory(null, level, refId);
         List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryIds);
+        List<FibonacciKPIDTO> fibonacciKPIDTOS = fibonacciKPIService.getAllFibonacciKPI(refId,level);
+        Map<BigInteger,List<FibonacciKPIDTO>> categoryIdAndFibonacciKPI = fibonacciKPIDTOS.stream().collect(Collectors.groupingBy(k->k.getCategoryId(),Collectors.toList()));
+        for (CategoryKPIMappingDTO categoryKPIMappingDTO : categoryKPIMapping) {
+            if(categoryIdAndFibonacciKPI.containsKey(categoryKPIMappingDTO.getCategoryId())){
+                categoryKPIMappingDTO.getKpiId().addAll(categoryIdAndFibonacciKPI.get(categoryKPIMappingDTO.getCategoryId()).stream().map(FibonacciKPIDTO::getId).collect(toList()));            }
+        }
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
 

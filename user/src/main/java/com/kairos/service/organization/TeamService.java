@@ -335,4 +335,9 @@ public class TeamService {
     public List<BigInteger> getTeamActivitiesOfStaff(Long staffId) {
        return teamGraphRepository.getTeamActivitiesOfStaff(staffId);
     }
+
+    public boolean isActivityAssignedToTeam(BigInteger activityId) {
+        return teamGraphRepository.activityExistInTeamByActivityId(activityId);
+
+    }
 }

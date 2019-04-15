@@ -12,7 +12,7 @@ public class StaticField {
 	public final static String SERVERCONFIGFILE = "com/kairos/planning/configuration/OutdoorTaskPlanning.solver.xml";
 	public final static String AUTHORIZATION = "Basic a2llc2VydmVyOmtpZXNlcnZlcg==";
 	public final static String KAIROSURL = "http://localhost:8090/kairos/activity/";
-	public final static String SAVE_SUCCESS = "save Data successFully";
+	public final static String SAVE_SUCCESS = "saveEntity Data successFully";
 	public final static String FETCH_SUCCESS = "fetch Data successFully";
 	public final static String UPDATE_SUCCESS = "Update Data sucessFully";
 	public final static String DELETE_SUCCESS = "Delete sucessFully";
