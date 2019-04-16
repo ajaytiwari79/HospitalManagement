@@ -10,6 +10,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
@@ -46,7 +47,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ActivityRuleViolation activityRuleViolation = null;
-            if (!shiftActivityDTO.getActivity().getExpertises().contains(expertise.getId())) {
+            if (isNotNull(shiftActivityDTO.getActivity().getExpertises()) && !shiftActivityDTO.getActivity().getExpertises().contains(expertise.getId())) {
                 errorMessages.add(convertMessage("message.activity.expertise.match", shiftActivityDTO.getActivity().getName(), expertise.getName()));
                 activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
                 if (activityRuleViolation == null) {
