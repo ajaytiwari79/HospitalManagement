@@ -31,6 +31,7 @@ public class TimeCalculationActivityDTO {
     private DayOfWeek fullWeekEnd;
     private int historyDuration;
     private LocalTime defaultStartTime;
+    private boolean midnightToMidnightShift;
 
     public TimeCalculationActivityDTO() {
         //dc
@@ -186,5 +187,13 @@ public class TimeCalculationActivityDTO {
 
     public void setFullWeekCalculationType(TimeCalaculationType fullWeekCalculationType) {
         this.fullWeekCalculationType = fullWeekCalculationType;
+    }
+
+    public boolean isMidnightToMidnightShift() {
+        return midnightToMidnightShift;
+    }
+
+    public void setMidnightToMidnightShift(boolean midnightToMidnightShift) {
+        this.midnightToMidnightShift = midnightToMidnightShift;
     }
 }
