@@ -49,7 +49,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
         customAgregationForCompositeActivity.add(match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true)));
         customAgregationForCompositeActivity.add(lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeTypeInfo"));
-        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory());
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(true));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
@@ -250,7 +250,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
         customAgregationForCompositeActivity.add(match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)));
         customAgregationForCompositeActivity.add(lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeTypeInfo"));
-        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory());
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false));
         //customAgregationForCompositeActivity.add(project("name", "categoryId", "categoryName").and("timeTypeInfo").as("timeTypeInfo").and("childActivities").as("childActivities"));
         customAgregationForCompositeActivity.add(match(Criteria.where("timeTypeInfo.partOfTeam").is(true)));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
@@ -613,7 +613,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.find(query,Activity.class);
     }
 
-    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory() {
+    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel) {
+        if (isChildActivityEligibleForStaffingLevel)
+        {
+
+        }
         String group = "{  \n" +
                 "      \"$group\":{  \n" +
                 "         \"_id\":{  \n" +
@@ -631,19 +635,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "         }\n" +
                 "      }\n" +
                 "   }";
-        String projection = "{  \n" +
-                "      \"$project\":{  \n" +
-                "         \"childActivities\":\"$childActivities\",\n" +
-                "         \"timeCalculationActivityTab\":\"$_id.timeCalculationActivityTab\",\n" +
-                "         \"balanceSettingsActivityTab\":\"$_id.balanceSettingsActivityTab\",\n" +
-                "         \"_id\":\"$_id.id\",\n" +
-                "         \"name\":\"$_id.name\",\n" +
-                "         \"timeTypeInfo\":\"$_id.timeTypeInfo\"," +
-                "         \"allowChildActivities\":\"$_id.timeTypeInfo.allowChildActivities\",\n" +
-                "         \"categoryId\":\"$_id.categoryId\",\n" +
-                "         \"categoryName\":\"$_id.categoryName\"\n" +
-                "      }\n" +
-                "   }";
+        String projection = new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel?  "{'$cond':[ '$childActivities.rulesActivityTab.eligibleForStaffingLevel' ,'$childActivities',[]]}":"'$childActivities'" ).append(",'timeCalculationActivityTab':'$_id.timeCalculationActivityTab','balanceSettingsActivityTab':'$_id.balanceSettingsActivityTab','_id':'$_id.id','name':'$_id.name','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName'}}").toString();
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         aggregationOperations.add(lookup("activity_category", "generalActivityTab.categoryId", "_id",
