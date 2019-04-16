@@ -42,6 +42,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -424,7 +425,7 @@ public class TimeBankService extends MongoBaseService {
                         shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
                         timeBankCtaBonusMinutes += shiftActivityDTO.getTimeBankCtaBonusMinutes();
                         shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
-                        shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutes() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
+                        shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
                         plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
                         shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
                         timeBankScheduledMinutes+=shiftActivity.getScheduledMinutesOfTimebank();

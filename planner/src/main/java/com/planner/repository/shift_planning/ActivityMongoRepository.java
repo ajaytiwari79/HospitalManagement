@@ -33,8 +33,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Repository
 public class ActivityMongoRepository {
 
-    @Autowired
-    @Qualifier("ActivityMongoTemplate")
+   // @Autowired
+   // @Qualifier("ActivityMongoTemplate")
     private MongoTemplate mongoTemplate;
 
     /*******************************************StaffingLevel********************************************/
