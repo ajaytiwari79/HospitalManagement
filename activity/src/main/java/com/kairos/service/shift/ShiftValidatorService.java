@@ -359,7 +359,6 @@ public class ShiftValidatorService {
     }
 
 
-
     public void validateStatusOfShiftActivity(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
@@ -415,7 +414,7 @@ public class ShiftValidatorService {
                                 || (rankOfExisting.getRank() > rankOfReplaced.getRank() && BALANCED.equals(staffingLevelForReplacedActivity))
                                 || (BALANCED.equals(staffingLevelForReplacedActivity) && BALANCED.equals(staffingLevelForExistingActivity))
                                 || (staffingLevelForReplacedActivity == null && rankOfExisting.getRank() > rankOfReplaced.getRank())
-                                ) {
+                        ) {
                             logger.info("shift can be replaced");
                         } else {
                             exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
@@ -576,6 +575,7 @@ public class ShiftValidatorService {
 
     private void checkStaffingLevelInterval(int lowerLimit, int upperLimit, List<StaffingLevelInterval> applicableIntervals, StaffingLevel staffingLevel,
                                             List<ShiftActivity> shiftActivities, boolean checkOverStaffing, ShiftActivity shiftActivity) {
+        BigInteger parentActivityId = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId()).getId();
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             int shiftsCount = 0;
             Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
@@ -591,11 +591,14 @@ public class ShiftValidatorService {
                 int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
                 if ((checkOverStaffing && totalCount >= 0)) {
                     exceptionService.actionNotPermittedException("message.shift.overStaffing");
-
                 }
                 if (!checkOverStaffing && totalCount <= 0) {
                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
-
+                }
+                if (isNotNull(parentActivityId)) {
+                    shiftActivity.setParentActivityId(parentActivityId);
+                    applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(staffingLevelActivityObj -> staffingLevelActivityObj.getActivityId().equals(parentActivityId) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()).
+                            findFirst().ifPresent(staffingLevelActivity1 -> exceptionService.actionNotPermittedException("message.shift.underStaffing"));
                 }
             } else {
                 exceptionService.actionNotPermittedException("message.staffingLevel.activity", shiftActivity.getActivityName());
@@ -651,7 +654,7 @@ public class ShiftValidatorService {
         }
         //    shiftValidatorService.validateGracePeriod(shiftDTO, validatedByStaff, unitId, staffShiftDTO);
         BigInteger shiftStateId = shiftDTO.getId();
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.updateShift(shiftDTO, type, true,!validatedByStaff);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.updateShift(shiftDTO, type, true, !validatedByStaff);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
             shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftDTO, shiftState, validatedByStaff, actualPhases, shiftStateId);
             shiftDTO.setEscalationReasons(shiftWithViolatedInfoDTO.getShifts().get(0).getEscalationReasons());
