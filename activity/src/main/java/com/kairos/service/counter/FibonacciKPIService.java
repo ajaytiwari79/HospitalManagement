@@ -3,7 +3,6 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
-import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.counter.FibonacciKPI;
 import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -12,12 +11,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Service
@@ -38,6 +33,7 @@ public class FibonacciKPIService {
         fibonacciKPIDTO.setConfLevel(confLevel);
         FibonacciKPI fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO, FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
+        fibonacciKPIDTO.setId(fibonacciKPI.getId());
         return fibonacciKPIDTO;
     }
 
@@ -56,11 +52,23 @@ public class FibonacciKPIService {
         }
         fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO,FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
+        fibonacciKPIDTO.setId(fibonacciKPI.getId());
         return fibonacciKPIDTO;
     }
 
     public List<FibonacciKPIDTO> getAllFibonacciKPI(Long referenceId,ConfLevel confLevel){
-        return fibonacciKPIRepository.findAllFibonacciKPIByCountryId(referenceId,confLevel);
+        List<FibonacciKPIDTO> fibonacciKPIDTOS = fibonacciKPIRepository.findAllFibonacciKPIByCountryId(referenceId,confLevel);
+        for (FibonacciKPIDTO fibonacciKPIDTO : fibonacciKPIDTOS) {
+            fibonacciKPIDTO.setFibonacciKPI(true);
+        }
+        return fibonacciKPIDTOS;
+    }
+
+    public FibonacciKPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId){
+        FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findFibonacciKPIById(fibonacciKPIId);
+        FibonacciKPIDTO fibonacciKPIDTO = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPI,FibonacciKPIDTO.class);
+        fibonacciKPIDTO.setFibonacciKPI(true);
+        return fibonacciKPIDTO;
     }
 
     public boolean deleteFibonacciKPI(BigInteger fibonacciKPIId){

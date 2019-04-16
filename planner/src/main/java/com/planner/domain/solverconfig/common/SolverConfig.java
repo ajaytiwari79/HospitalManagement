@@ -5,7 +5,10 @@ import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Document(collection = "solverConfig")
 public class SolverConfig extends MongoBaseEntity {
@@ -86,11 +89,11 @@ public class SolverConfig extends MongoBaseEntity {
     }
 
     public List<BigInteger> getConstraintIds() {
-        return constraintIds;
+        return isNullOrElse(constraintIds,new ArrayList<>());
     }
 
     public void setConstraintIds(List<BigInteger> constraintIds) {
-        this.constraintIds = constraintIds;
+        this.constraintIds = isNullOrElse(constraintIds,new ArrayList<>());
     }
 
     public TimeTypeEnum getTypeOfTimeType() {
