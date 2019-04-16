@@ -93,54 +93,12 @@ public class SolverConfig extends MongoBaseEntity {
         this.constraintIds = constraintIds;
     }
 
-
-    /*****************************SolverConfig Builder****************************************/
-    public SolverConfig setIdBuilder(BigInteger id) {
-        this.id = id;
-        return this;
+    public TimeTypeEnum getTypeOfTimeType() {
+        return typeOfTimeType;
     }
 
-    public SolverConfig setNameBuilder(String name) {
-        this.name = name;
-        return this;
-    }
-
-
-
-    public SolverConfig setDescriptionBuilder(String description) {
-        this.description = description;
-        return this;
-    }
-
-
-    public SolverConfig setPhaseIdBuilder(Long phaseId) {
-        this.phaseId = phaseId;
-        return this;
-    }
-
-    public SolverConfig setPlanningPeriodIdBuilder(Long planningPeriodId) {
-        this.planningPeriodId = planningPeriodId;
-        return this;
-    }
-
-    public SolverConfig setThreadCountBuilder(byte threadCount) {
-        this.threadCount = threadCount;
-        return this;
-    }
-
-    public SolverConfig setTerminationTimeInMinutesBuilder(short terminationTimeInMinutes) {
-        this.terminationTimeInMinutes = terminationTimeInMinutes;
-        return this;
-    }
-
-    public SolverConfig setPlanningProblemIdBuilder(Long planningProblemId) {
-        this.planningProblemId = planningProblemId;
-        return this;
-    }
-
-    public SolverConfig setConstraintIdsBuilder(List<BigInteger> constraintIds) {
-        this.constraintIds = constraintIds;
-        return this;
+    public void setTypeOfTimeType(TimeTypeEnum typeOfTimeType) {
+        this.typeOfTimeType = typeOfTimeType;
     }
 
     public BigInteger getParentSolverConfigId() {
