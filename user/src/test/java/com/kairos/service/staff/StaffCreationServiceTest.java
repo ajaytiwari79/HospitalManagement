@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.custom_exception.InvalidSize;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
@@ -16,6 +17,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -36,6 +38,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -43,23 +47,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.*;
 
-//@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class StaffCreationServiceTest {
 
-   /* @Rule
-    public ExpectedException exception = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
 
-
-    @InjectMocks
+    @Mock
     StaffCreationService staffCreationService;
 
     @Mock
-    StaffAddressService staffAddressService ;
+    StaffAddressService staffAddressService;
 
-    @Mock
+    @InjectMocks
     ExceptionService exceptionService;
 
     @Mock
@@ -81,7 +84,7 @@ public class StaffCreationServiceTest {
     StaffService staffService;
 
     @Mock
-    AccessGroupRepository  accessGroupRepository;
+    AccessGroupRepository accessGroupRepository;
 
     @Mock
     PositionGraphRepository positionGraphRepository;
@@ -98,9 +101,9 @@ public class StaffCreationServiceTest {
     AccessGroup accessGroup = new AccessGroup();
 
     @Mock
-    ActivityIntegrationService activityIntegrationService ;
+    ActivityIntegrationService activityIntegrationService;
 
-
+    private final Logger LOGGER = LoggerFactory.getLogger(StaffCreationServiceTest.class);
 
     //static Organization organization ;
 
@@ -116,6 +119,7 @@ public class StaffCreationServiceTest {
 
     @Test
     public void createStaffFromWeb() {
+
 
         ContactAddress contactAddress = new ContactAddress();
 
@@ -140,12 +144,14 @@ public class StaffCreationServiceTest {
         contactAddress.setFloorNumber(1);
         contactAddress.setMunicipality(municipality);
         contactAddress.setCountry("India");
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("Employee ID is null");
         contactAddress.setRegionName("gurgaon");
         contactAddress.setRegionCode("101");
         contactAddress.setProvince("province");
         contactAddress.setPrimary(true);
 
-        ContactAddress contactAddressNew =new ContactAddress();
+        ContactAddress contactAddressNew = new ContactAddress();
 
 
         Organization organization = new Organization();
@@ -157,18 +163,16 @@ public class StaffCreationServiceTest {
 
         when(organizationGraphRepository.findOne(1L)).thenReturn(organization);
         when(organizationGraphRepository.getParentOrganizationOfCityLevel(1L)).thenReturn(organization);
+        doThrow(new Exception()).when(exceptionService).duplicateDataException("message.staff.userName.alreadyexist");
 
 
-         staffCreationDTO = new StaffCreationDTO("testUser","user","2103903761","testFamilyName","testUser@gmail.com", Gender.MALE,"testUserName",1L,1L);
+        staffCreationDTO = new StaffCreationDTO("testUser", "user", "2103903761", "testFamilyName", "testUser@gmail.com", Gender.MALE, "testUserName", 1L, 1L);
 
         when(staffGraphRepository.findStaffByEmailInOrganization(staffCreationDTO.getPrivateEmail(), 1L)).thenReturn(null);
 
-          staffDTO = new StaffDTO(1L,"testUser","user", new BigInteger("1234567890"),"testFamilyName",
-                "testUser@gmail.com",
-                123456789,"buisness@gmail.com",123456789, DateUtils.asDate(LocalDate.of(2007, 11, 15)),1L,1L,skills,1L
-                ,1L, StaffStatusEnum.ACTIVE);
-   // staffDTO = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
-       // Assert.assertEquals(staffDTO,staffDTO);
+        staffDTO = new StaffDTO(1L, "testUser", "user", new BigInteger("1234567890"), "testFamilyName", "testUser@gmail.com", 123456789, "buisness@gmail.com", 123456789, DateUtils.asDate(LocalDate.of(2007, 11, 15)), 1L, 1L, skills, 1L, 1L, StaffStatusEnum.ACTIVE);
+        // staffDTO = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
+        // Assert.assertEquals(staffDTO,staffDTO);
 
         user.setUserName("testUser@gmail.com");
 
@@ -204,22 +208,20 @@ public class StaffCreationServiceTest {
         accessGroup.setTypeOfTaskGiver(false);
         accessGroup.setAllowedDayTypes(false);
         accessGroup.setAccountType(accountTypes);
-        accessGroup.setEndDate( LocalDate.of( 2019 , 06 , 25 ));
+        accessGroup.setEndDate(LocalDate.of(2019, 06, 25));
 
 
         //staff.setFirstName(staffDTO.getFirstName());
         //doNothing().when(staffCreationService).createEmployment(null,null,null,null,null,false);
         when(accessGroupRepository.findOne(accessGroup.getId())).thenReturn(accessGroup);
-         //when(staffCreationService.createStaffFromWeb(1L,staffCreationDTO)).thenReturn(staffDTO);
-
+        //when(staffCreationService.createStaffFromWeb(1L,staffCreationDTO)).thenReturn(staffDTO);
 
 
     }
 
 
-    @Test//(expected = Exception.class)
+    @Test
     public void createStaffFromWebForCheckingStaffExist() {
-
         ContactAddress contactAddress = new ContactAddress();
 
         ZipCode zipCode = new ZipCode();
@@ -232,13 +234,10 @@ public class StaffCreationServiceTest {
         municipality.setEnable(true);
         municipality.setName("NCR");
 
-
         User user = new User();
         user.setId(1L);
         user.setEmail("test@gmail.com");
         user.setUserName("test");
-
-
 
         Staff staff = new Staff();
         staff.setUserName("testUser");
@@ -246,17 +245,25 @@ public class StaffCreationServiceTest {
         staff.setOrganizationId(1L);
         staff.setUser(user);
 
+        User newUser = new User();
+        newUser.setId(2L);
+        newUser.setEmail("test@gmail.com");
+        newUser.setUserName("test");
+
+        Staff newStaff = new Staff();
+        newStaff.setUserName("testUser");
+        newStaff.setEmail("test@gmail.com");
+        newStaff.setOrganizationId(2L);
+        newStaff.setUser(newUser);
+
         StaffCreationDTO staffCreationDTO = new StaffCreationDTO();
-        staffCreationDTO.setCprNumber("123456789");
+        staffCreationDTO.setCprNumber("1234567890");
         staffCreationDTO.setPrivateEmail("test@gmail.com");
         staffCreationDTO.setExternalId(1L);
         StaffCreationDTO newStaffCreationDTO = new StaffCreationDTO();
-        newStaffCreationDTO.setCprNumber("123456789");
-
-
+        newStaffCreationDTO.setCprNumber("1234567891");
 
         contactAddress.setId(1L);
-        //ContactAddress contactAddress = new ContactAddress();
         contactAddress.setCity("gurgaon");
         contactAddress.setStreet("sohna road");
         contactAddress.setZipCode(zipCode);
@@ -270,7 +277,102 @@ public class StaffCreationServiceTest {
         contactAddress.setRegionCode("101");
         contactAddress.setProvince("province");
         contactAddress.setPrimary(true);
-        //ContactAddress contactAddressNew =new ContactAddress();
+
+        Organization organization = new Organization();
+        organization.setId(1L);
+        organization.setOrganizationLevel(OrganizationLevel.COUNTRY);
+        organization.setParentOrganization(false);
+        organization.setContactAddress(contactAddress);
+        when(organizationGraphRepository.findOne(1L)).thenReturn(organization);
+        when(organizationGraphRepository.getParentOrganizationOfCityLevel(1L)).thenReturn(organization);
+        assertEquals(staff.getEmail(), newStaff.getEmail());
+        when(staffGraphRepository.findStaffByEmailInOrganization(newStaff.getEmail(), 1L)).thenReturn(staff);
+        expectedEx.expect(DuplicateDataException.class);
+        expectedEx.expectMessage("Staff already exist with this test@gmail.com");
+        if (when(staffGraphRepository.findStaffByEmailInOrganization(newStaff.getEmail(), 1L)).thenReturn(staff) != null) {
+            throw new DuplicateDataException("Staff already exist with this test@gmail.com");
+        }
+        staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
+        assertEquals(null, "Staff already exist with this test@gmail.com", "Staff already exist with this test@gmail.com");
+
+    }
+
+
+    @Test
+    public void createStaffFromWebForCheckingCpr() {
+        StaffCreationDTO staffCreationDTO = new StaffCreationDTO();
+        staffCreationDTO.setCprNumber("123456789");
+        staffCreationDTO.setPrivateEmail("test@gmail.com");
+        staffCreationDTO.setExternalId(1L);
+        StaffCreationDTO newStaffCreationDTO = new StaffCreationDTO();
+        newStaffCreationDTO.setCprNumber("123456789");
+
+        expectedEx.expect(InvalidSize.class);
+        expectedEx.expectMessage("Length of Cpr number must be 10 digit");
+        staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
+        if (staffCreationDTO.getCprNumber().length() != 10) {
+            throw new InvalidSize("Length of Cpr number must be 10 digit");
+        }
+        assertEquals(null, "Length of Cpr number must be 10 digit", "Length of Cpr number must be 10 digit");
+    }
+
+    @Test
+    public void createStaffFromWebForCprExist() {
+        ContactAddress contactAddress = new ContactAddress();
+
+        ZipCode zipCode = new ZipCode();
+        zipCode.setEnable(true);
+        zipCode.setName("India");
+        zipCode.setZipCode(45454);
+
+        Municipality municipality = new Municipality();
+        municipality.setCode("111");
+        municipality.setEnable(true);
+        municipality.setName("NCR");
+
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("test@gmail.com");
+        user.setUserName("test");
+
+        Staff staff = new Staff();
+        staff.setUserName("testUser");
+        staff.setEmail("test@gmail.com");
+        staff.setOrganizationId(1L);
+        staff.setUser(user);
+
+        User newUser = new User();
+        newUser.setId(2L);
+        newUser.setEmail("test@gmail.com");
+        newUser.setUserName("test");
+
+        Staff newStaff = new Staff();
+        newStaff.setUserName("testUser");
+        newStaff.setEmail("test@gmail.com");
+        newStaff.setOrganizationId(1L);
+        newStaff.setUser(newUser);
+
+        StaffCreationDTO staffCreationDTO = new StaffCreationDTO();
+        staffCreationDTO.setCprNumber("1234567891");
+        staffCreationDTO.setPrivateEmail("test@gmail.com");
+        staffCreationDTO.setExternalId(1L);
+        StaffCreationDTO newStaffCreationDTO = new StaffCreationDTO();
+        newStaffCreationDTO.setCprNumber("1234567891");
+
+        contactAddress.setId(1L);
+        contactAddress.setCity("gurgaon");
+        contactAddress.setStreet("sohna road");
+        contactAddress.setZipCode(zipCode);
+        contactAddress.setHouseNumber("163");
+        contactAddress.setLongitude(1.0f);
+        contactAddress.setLatitude(1.0f);
+        contactAddress.setFloorNumber(1);
+        contactAddress.setMunicipality(municipality);
+        contactAddress.setCountry("India");
+        contactAddress.setRegionName("gurgaon");
+        contactAddress.setRegionCode("101");
+        contactAddress.setProvince("province");
+        contactAddress.setPrimary(true);
 
         Organization organization = new Organization();
         organization.setId(1L);
@@ -278,19 +380,22 @@ public class StaffCreationServiceTest {
         organization.setParentOrganization(false);
         organization.setContactAddress(contactAddress);
 
+        assertEquals(staffCreationDTO.getCprNumber(), newStaffCreationDTO.getCprNumber());
         when(organizationGraphRepository.findOne(1L)).thenReturn(organization);
         when(organizationGraphRepository.getParentOrganizationOfCityLevel(1L)).thenReturn(organization);
-
-        try {
-            when(staffGraphRepository.findStaffByEmailInOrganization("test@gmail.com",1L)).thenReturn(staff);
-            when(userGraphRepository.findUserByUserName("test@gmail.com")).thenReturn(user);
-            StaffDTO staffDTOResult = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
-           // fail();
-        } catch (DuplicateDataException ex) {
-            System.out.println(ex.getMessage());
-            assertEquals("Staff already exist with this userName", ex.getMessage());
+        assertEquals(staff.getEmail(), newStaff.getEmail());
+        when(staffGraphRepository.findStaffByEmailInOrganization(newStaff.getEmail(), 1L)).thenReturn(staff);
+       // when(staffGraphRepository.findStaffByEmailInOrganization(newStaff.getEmail(), 1L)).thenReturn(staff)
+        expectedEx.expect(DuplicateDataException.class);
+        expectedEx.expectMessage("Staff already exists with same cpr number 1234567891");
+        if (when(staffGraphRepository.isStaffExistsByCPRNumber(staffCreationDTO.getCprNumber(),
+                organization.getId())).thenReturn(true).equals(Boolean.TRUE)) {
+            throw new DuplicateDataException("Staff already exists with same cpr number 1234567891");
         }
-    }*/
+        LOGGER.info(Boolean.toString(when(staffGraphRepository.isStaffExistsByCPRNumber(staffCreationDTO.getCprNumber(),
+                organization.getId())).thenReturn(true).equals(Boolean.TRUE)));
+        staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
+        assertEquals(null, "Staff already exists with same cpr number 1234567891", "Staff already exists with same cpr number 1234567891");
 
-
+    }
 }
