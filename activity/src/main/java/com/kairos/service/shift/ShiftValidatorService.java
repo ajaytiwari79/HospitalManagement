@@ -346,15 +346,12 @@ public class ShiftValidatorService {
     public List<String> validateShiftWhileCopy(StaffUnitPositionUnitDataWrapper dataWrapper, ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails, List<WTAQueryResultDTO> wtaQueryResultDTOS, PlanningPeriodDTO planningPeriod, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs) {
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, shiftWithActivityDTO, wtaQueryResultDTOS.get(0), staffUnitPositionDetails, activityWrapperMap, dataWrapper, newCreatedShiftWithActivityDTOs);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
-        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffUnitPositionDetails.getExpertise(), null);
-
+        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffUnitPositionDetails.getExpertise(), ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification
                 .and(wtaRulesSpecification);
         List<String> voilatedRules;
         activitySpecification.validateRules(shiftWithActivityDTO);
-
         voilatedRules = filterVoilatedRules(ruleTemplateSpecificInfo.getViolatedRules());
-        voilatedRules.addAll(activitySpecification.isSatisfiedString(shiftWithActivityDTO));
         return voilatedRules;
     }
 
