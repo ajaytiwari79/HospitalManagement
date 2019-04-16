@@ -1,12 +1,10 @@
 package com.kairos.utils;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.Gender;
 import org.apache.commons.lang.StringUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Date;
 
 /**
  * Created by pavan on 14/2/18.

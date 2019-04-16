@@ -19,7 +19,7 @@ public class DateConverter {
         return new DateTime(time).toDate();
     }
 
-    public static Date parseDate(String date) throws ParseException {
+    public static Date parseDate(String date) {
 
         DateTime dateTime = new DateTime(date);
         return dateTime.toDate();
