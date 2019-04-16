@@ -393,7 +393,7 @@ public class ActivityService extends MongoBaseService {
                 boolean availableAllowActivities = activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
                     if(availableAllowActivities && availableAllowActivity){
                         activityMongoRepository.unassignCompositeActivityFromActivitiesByactivityId(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
-                    }else {
+                    }else if(availableAllowActivities) {
                         timeCalculationActivityDTO.setAvailableAllowActivity(true);
                     }
                 }
