@@ -1,5 +1,6 @@
 package com.kairos.service.staff;
 
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -28,7 +29,9 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -46,7 +49,11 @@ import static org.mockito.Mockito.when;
 //@RunWith(MockitoJUnitRunner.class)
 public class StaffCreationServiceTest {
 
-   /* @InjectMocks
+   /* @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+
+    @InjectMocks
     StaffCreationService staffCreationService;
 
     @Mock
@@ -200,7 +207,6 @@ public class StaffCreationServiceTest {
         accessGroup.setEndDate( LocalDate.of( 2019 , 06 , 25 ));
 
 
-
         //staff.setFirstName(staffDTO.getFirstName());
         //doNothing().when(staffCreationService).createEmployment(null,null,null,null,null,false);
         when(accessGroupRepository.findOne(accessGroup.getId())).thenReturn(accessGroup);
@@ -211,7 +217,7 @@ public class StaffCreationServiceTest {
     }
 
 
-    @Test
+    @Test//(expected = Exception.class)
     public void createStaffFromWebForCheckingStaffExist() {
 
         ContactAddress contactAddress = new ContactAddress();
@@ -227,12 +233,23 @@ public class StaffCreationServiceTest {
         municipality.setName("NCR");
 
 
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("test@gmail.com");
+        user.setUserName("test");
+
+
+
         Staff staff = new Staff();
         staff.setUserName("testUser");
+        staff.setEmail("test@gmail.com");
+        staff.setOrganizationId(1L);
+        staff.setUser(user);
 
         StaffCreationDTO staffCreationDTO = new StaffCreationDTO();
         staffCreationDTO.setCprNumber("123456789");
         staffCreationDTO.setPrivateEmail("test@gmail.com");
+        staffCreationDTO.setExternalId(1L);
         StaffCreationDTO newStaffCreationDTO = new StaffCreationDTO();
         newStaffCreationDTO.setCprNumber("123456789");
 
@@ -253,9 +270,7 @@ public class StaffCreationServiceTest {
         contactAddress.setRegionCode("101");
         contactAddress.setProvince("province");
         contactAddress.setPrimary(true);
-
-        ContactAddress contactAddressNew =new ContactAddress();
-
+        //ContactAddress contactAddressNew =new ContactAddress();
 
         Organization organization = new Organization();
         organization.setId(1L);
@@ -263,22 +278,19 @@ public class StaffCreationServiceTest {
         organization.setParentOrganization(false);
         organization.setContactAddress(contactAddress);
 
-
         when(organizationGraphRepository.findOne(1L)).thenReturn(organization);
         when(organizationGraphRepository.getParentOrganizationOfCityLevel(1L)).thenReturn(organization);
 
-
-        when(staffGraphRepository.findStaffByEmailInOrganization(staffCreationDTO.getPrivateEmail(),1L)).thenReturn(staff);
-        StaffDTO staffDTOResult = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
-
-        User user = new User();
-        user.setEmail("test@gmail.com");
-        user.setUserName("test");
-        when(userGraphRepository.findUserByUserName("test@gmail.com")).thenReturn(user);
-
-    }
-
-*/
+        try {
+            when(staffGraphRepository.findStaffByEmailInOrganization("test@gmail.com",1L)).thenReturn(staff);
+            when(userGraphRepository.findUserByUserName("test@gmail.com")).thenReturn(user);
+            StaffDTO staffDTOResult = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
+           // fail();
+        } catch (DuplicateDataException ex) {
+            System.out.println(ex.getMessage());
+            assertEquals("Staff already exist with this userName", ex.getMessage());
+        }
+    }*/
 
 
 }

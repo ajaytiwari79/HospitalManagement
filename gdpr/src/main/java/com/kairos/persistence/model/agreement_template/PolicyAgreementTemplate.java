@@ -54,6 +54,7 @@ public class PolicyAgreementTemplate extends BaseEntity {
     private boolean signatureComponentAdded;
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
+    private boolean generalAgreementTemplate;
 
     @Column(columnDefinition = "text")
     private String  signatureHtml;

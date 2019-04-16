@@ -58,6 +58,8 @@ public class ShiftActivityDTO {
     private int plannedMinutesOfTimebank;
     private String startLocation; // this is for the location from where activity will gets starts
     private String endLocation;   // this is for the location from where activity will gets ends
+    private int scheduledMinutesOfTimebank;
+    private int scheduledMinutesOfPayout;
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
         this.activityId = activityId;
@@ -361,5 +363,21 @@ public class ShiftActivityDTO {
 
     public void setEndLocation(String endLocation) {
         this.endLocation = endLocation;
+    }
+
+    public int getScheduledMinutesOfTimebank() {
+        return scheduledMinutesOfTimebank;
+    }
+
+    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
+        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
+    }
+
+    public int getScheduledMinutesOfPayout() {
+        return scheduledMinutesOfPayout;
+    }
+
+    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
+        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
     }
 }
