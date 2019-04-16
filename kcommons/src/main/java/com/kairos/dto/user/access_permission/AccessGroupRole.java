@@ -1,9 +1,8 @@
 package com.kairos.dto.user.access_permission;
 
-import com.kairos.enums.shift.ShiftStatus;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by prerna on 21/3/18.

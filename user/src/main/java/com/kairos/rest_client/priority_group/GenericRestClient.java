@@ -1,11 +1,10 @@
 package com.kairos.rest_client.priority_group;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.ResponseEnvelope;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;

@@ -5,7 +5,6 @@ import com.kairos.dto.activity.payroll_setting.UnitPayrollSettingDTO;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import org.apache.commons.collections.ComparatorUtils;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;

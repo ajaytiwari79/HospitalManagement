@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;

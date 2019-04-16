@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.NON_LEAP_YEAR;
 
 /**
  * CreatedBy vipulpandey on 28/11/18

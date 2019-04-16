@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.pay_table;
 
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import org.neo4j.ogm.annotation.EndNode;
-import org.neo4j.ogm.annotation.StartNode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;

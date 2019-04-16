@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;

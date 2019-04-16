@@ -8,7 +8,9 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLIED_FUNCTION;
 

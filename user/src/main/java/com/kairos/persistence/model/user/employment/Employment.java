@@ -3,10 +3,10 @@ package com.kairos.persistence.model.user.employment;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 

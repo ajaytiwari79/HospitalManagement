@@ -19,9 +19,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by vipul on 30/8/17.

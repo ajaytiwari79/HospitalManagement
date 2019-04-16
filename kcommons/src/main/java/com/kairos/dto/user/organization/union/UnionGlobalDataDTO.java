@@ -1,8 +1,9 @@
 package com.kairos.dto.user.organization.union;
 
 import com.kairos.dto.user.organization.ZipCodeDTO;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
 public class UnionGlobalDataDTO {
 
     private List<ZipCodeDTO> zipCodes = new ArrayList<>();

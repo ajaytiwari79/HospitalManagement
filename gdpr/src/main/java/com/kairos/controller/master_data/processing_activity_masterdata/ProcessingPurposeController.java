@@ -1,8 +1,8 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
 import java.util.Optional;
 import java.util.Set;
 

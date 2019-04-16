@@ -10,7 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
 
 /**
  * Created by vipul on 29/3/18.

@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.priority_group;
 
-import com.kairos.dto.activity.open_shift.priority_group.*;
+import com.kairos.dto.activity.open_shift.priority_group.DecisionCriteria;
+import com.kairos.dto.activity.open_shift.priority_group.RoundRules;
+import com.kairos.dto.activity.open_shift.priority_group.StaffExcludeFilter;
+import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.enums.PriorityGroupName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 

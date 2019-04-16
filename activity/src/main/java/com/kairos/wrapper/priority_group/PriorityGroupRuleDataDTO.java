@@ -1,9 +1,9 @@
 package com.kairos.wrapper.priority_group;
 
-import com.kairos.persistence.model.shift.Shift;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
-import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
+import com.kairos.persistence.model.shift.Shift;
 
 import java.math.BigInteger;
 import java.util.List;

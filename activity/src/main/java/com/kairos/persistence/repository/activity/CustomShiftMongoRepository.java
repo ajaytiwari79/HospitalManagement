@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
 
-import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -11,12 +10,10 @@ import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;

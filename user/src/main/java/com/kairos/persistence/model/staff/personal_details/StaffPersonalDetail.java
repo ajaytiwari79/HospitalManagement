@@ -6,11 +6,9 @@ import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

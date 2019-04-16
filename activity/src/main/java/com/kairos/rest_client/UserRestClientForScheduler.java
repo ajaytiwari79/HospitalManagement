@@ -3,7 +3,6 @@ package com.kairos.rest_client;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.service.TokenAuthService;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.service.exception.ExceptionService;
@@ -25,8 +24,6 @@ import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static com.kairos.enums.rest_client.MicroService.SCHEDULER;
-import static com.kairos.enums.rest_client.MicroService.USER;
 import static com.kairos.utils.RestClientUrlUtil.getSchedulerBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 

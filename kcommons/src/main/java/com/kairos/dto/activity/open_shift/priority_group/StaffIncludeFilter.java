@@ -1,9 +1,5 @@
 package com.kairos.dto.activity.open_shift.priority_group;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public class StaffIncludeFilter {
 
     private boolean allowForFlexPool;

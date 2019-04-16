@@ -4,8 +4,8 @@ import com.kairos.dto.user.organization.MunicipalityDTO;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 public class UnionDataDTO {
 
     private Long id;

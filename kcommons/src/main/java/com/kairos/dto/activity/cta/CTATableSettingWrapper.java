@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.cta;
 
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 
 import java.util.List;

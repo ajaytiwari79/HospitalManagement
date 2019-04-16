@@ -25,7 +25,7 @@ import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.RelatedProcessingActivityResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
-import com.kairos.service.master_data.asset_management.*;
+import com.kairos.service.master_data.asset_management.MasterAssetService;
 import com.kairos.service.risk_management.RiskService;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;

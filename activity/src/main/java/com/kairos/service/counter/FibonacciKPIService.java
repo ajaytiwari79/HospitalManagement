@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Service

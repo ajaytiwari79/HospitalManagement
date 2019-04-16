@@ -1,10 +1,10 @@
 package com.kairos.service.visitator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
-import com.kairos.rest_client.*;
-import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskPackage;
 import com.kairos.persistence.model.task_demand.TaskDemand;
@@ -16,13 +16,13 @@ import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskPackageMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TasksMergingService;
 import com.kairos.service.task_type.TaskDemandService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task.TaskDemandDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,6 +43,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static java.lang.Math.toIntExact;
 import static java.time.ZoneId.systemDefault;

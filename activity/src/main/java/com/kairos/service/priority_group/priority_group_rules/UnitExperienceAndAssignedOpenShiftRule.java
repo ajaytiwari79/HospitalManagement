@@ -1,8 +1,8 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
-import com.kairos.commons.utils.DateUtils;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

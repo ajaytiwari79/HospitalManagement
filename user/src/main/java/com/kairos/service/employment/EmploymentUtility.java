@@ -1,12 +1,12 @@
 package com.kairos.service.employment;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.activity.shift.FunctionDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
+import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 
 import java.util.List;
 import java.util.Optional;

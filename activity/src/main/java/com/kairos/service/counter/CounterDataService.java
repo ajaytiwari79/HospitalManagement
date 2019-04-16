@@ -5,15 +5,13 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.counter.CounterServiceMapping;
-import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.TabKPIConf;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -26,7 +24,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;

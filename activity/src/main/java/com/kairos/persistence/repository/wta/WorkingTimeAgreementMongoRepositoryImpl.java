@@ -7,7 +7,8 @@ import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -19,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**

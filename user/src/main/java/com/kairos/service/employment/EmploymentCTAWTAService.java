@@ -13,18 +13,18 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
-import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
@@ -45,7 +45,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
+import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 
 /**

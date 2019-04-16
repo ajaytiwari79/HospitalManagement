@@ -1,9 +1,8 @@
 package com.kairos.dto.activity.wta.version;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.commons.utils.DateUtils;
-
 
 import java.math.BigInteger;
 import java.time.LocalDate;

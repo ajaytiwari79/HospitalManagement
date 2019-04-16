@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.solver_config;
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.constraint.ConstraintCategory;
 import com.kairos.enums.solver_config.PlanningType;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 
 /**
  * @author pradeep

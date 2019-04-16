@@ -4,9 +4,6 @@ package com.kairos.dto.activity.activity;
  *
  */
 
-import com.google.common.base.Strings;
-
-import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;

@@ -3,8 +3,9 @@ package com.kairos.service.time_bank;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.pay_out.EmploymentWithCtaDetailsDTO;
 import com.kairos.persistence.model.shift.Shift;
-import org.joda.time.*;
-
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Interval;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -13,7 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DailyTimeBankServiceUnitTest {

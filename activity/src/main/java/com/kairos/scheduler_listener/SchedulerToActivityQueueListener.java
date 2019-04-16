@@ -1,15 +1,13 @@
 package com.kairos.scheduler_listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import javax.inject.Inject;
 
-import static com.kairos.constants.AppConstants.SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC;
+import javax.inject.Inject;
 
 @Component
 public class SchedulerToActivityQueueListener {

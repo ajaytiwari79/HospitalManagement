@@ -1,6 +1,5 @@
 package com.kairos.commons.utils;
 
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 
 public class TimeInterval {

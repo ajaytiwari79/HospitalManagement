@@ -9,13 +9,11 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
-import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -32,7 +30,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
 
 @Service

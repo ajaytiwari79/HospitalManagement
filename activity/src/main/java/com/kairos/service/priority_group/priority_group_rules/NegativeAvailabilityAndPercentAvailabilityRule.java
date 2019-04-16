@@ -1,11 +1,11 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
-import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
+import com.kairos.persistence.model.open_shift.OpenShift;
+import com.kairos.persistence.model.shift.Shift;
 
 import java.math.BigInteger;
 import java.util.*;

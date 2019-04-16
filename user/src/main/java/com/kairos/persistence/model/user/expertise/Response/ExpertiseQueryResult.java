@@ -7,8 +7,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
-import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.pay_table.PayTable;
+import com.kairos.persistence.model.user.expertise.CareDays;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

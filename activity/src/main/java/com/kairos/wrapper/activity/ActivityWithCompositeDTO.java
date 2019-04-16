@@ -7,8 +7,8 @@ import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
 import java.time.LocalTime;

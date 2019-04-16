@@ -2,12 +2,12 @@ package com.kairos.controller.employment;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.service.organization.UnionService;
+import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentFunctionService;
 import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.employment.EmploymentService;
-import com.kairos.dto.user.staff.employment.EmploymentDTO;
+import com.kairos.service.organization.UnionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;

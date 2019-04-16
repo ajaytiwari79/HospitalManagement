@@ -2,9 +2,9 @@ package com.kairos.dto.user.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.staff.ContactAddress;
 import com.kairos.dto.user.staff.ContactDetail;
 import com.kairos.enums.Gender;
-import com.kairos.dto.user.staff.ContactAddress;
 
 
 /**

@@ -1,16 +1,18 @@
 package com.kairos.service.pay_out;
 
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
-import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.CTARuletemplateBonus;
-import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
-import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
@@ -18,11 +20,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.dto.user.country.agreement.cta.CalculationFor;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Interval;
@@ -37,11 +35,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
-import static com.kairos.constants.AppConstants.*;
-import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 
 
 /*

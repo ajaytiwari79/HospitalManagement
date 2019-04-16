@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.common;
 
-import com.mongodb.DBObject;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;

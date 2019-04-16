@@ -1,11 +1,14 @@
 package com.kairos.persistence.model.cta;
 
 
-import com.kairos.dto.activity.cta.*;
-import com.kairos.enums.cta.*;
-import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplatePhaseInfo;
+import com.kairos.dto.activity.cta.CompensationTable;
+import com.kairos.dto.activity.cta.PlannedTimeWithFactor;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.enums.cta.*;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.*;

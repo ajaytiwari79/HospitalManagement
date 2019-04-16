@@ -2,9 +2,9 @@ package com.kairos.persistence.model.solver_config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.Date;

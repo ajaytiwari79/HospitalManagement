@@ -1,15 +1,14 @@
 package com.kairos.persistence.repository.period;
 
-import com.kairos.dto.activity.period.PeriodDTO;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;

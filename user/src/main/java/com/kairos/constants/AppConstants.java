@@ -5,7 +5,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 
 import java.io.File;
 import java.math.BigDecimal;

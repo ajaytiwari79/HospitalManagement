@@ -1,21 +1,9 @@
 package com.kairos.controller.counters;
 
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
-import com.kairos.dto.response.ResponseDTO;
-import com.kairos.service.counter.FibonacciKPIService;
-import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-
-import java.math.BigInteger;
-
-import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.ApiConstants.API_V1;
 
 /**

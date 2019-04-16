@@ -29,8 +29,8 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
-import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,11 +45,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
 
 /**

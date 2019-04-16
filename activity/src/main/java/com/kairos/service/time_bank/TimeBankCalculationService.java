@@ -17,9 +17,9 @@ import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.ScheduledActi
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
-import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
@@ -47,6 +47,7 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -57,6 +58,7 @@ import java.time.Month;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;

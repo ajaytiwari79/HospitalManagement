@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.wta;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.wrapper.wta.CTAWTADTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

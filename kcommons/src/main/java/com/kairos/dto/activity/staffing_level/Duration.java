@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-//import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+
+//import org.springframework.format.annotation.DateTimeFormat;
 
 public class Duration {
     //@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)

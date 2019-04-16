@@ -6,10 +6,8 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /*
 * Created By Pradeep singh rajawat

@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,8 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**

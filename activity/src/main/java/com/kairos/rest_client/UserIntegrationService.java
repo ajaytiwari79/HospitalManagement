@@ -37,10 +37,10 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.OrganizationStaffWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
-import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
@@ -63,7 +63,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.*;
 
 

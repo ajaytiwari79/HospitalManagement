@@ -3,12 +3,14 @@ package com.kairos.wrapper.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
+import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
+import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
-import com.kairos.dto.user.country.tag.TagDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

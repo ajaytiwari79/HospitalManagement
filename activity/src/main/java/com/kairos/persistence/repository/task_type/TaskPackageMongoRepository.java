@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.task_type;
+
 import com.kairos.persistence.model.task.TaskPackage;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;

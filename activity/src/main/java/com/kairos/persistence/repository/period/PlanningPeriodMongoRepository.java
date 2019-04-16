@@ -5,7 +5,6 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.kairos.controller.country;
 
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.utils.response.ResponseHandler;
@@ -16,9 +16,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by pavan on 23/3/18.

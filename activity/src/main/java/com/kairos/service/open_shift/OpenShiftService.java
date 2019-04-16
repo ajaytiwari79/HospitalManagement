@@ -1,33 +1,33 @@
 package com.kairos.service.open_shift;
 
 import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.open_shift.OpenShiftAction;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftActivityWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.open_shift.Order;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -39,9 +39,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION_MESSAGE;
+import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
 
 @Service
 @Transactional

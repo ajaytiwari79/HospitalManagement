@@ -1,7 +1,5 @@
 package com.kairos.dto.user.organization;
 
-import javax.validation.constraints.NotBlank;
-
 public class ProvinceDTO {
     private Long id;
     private String name;

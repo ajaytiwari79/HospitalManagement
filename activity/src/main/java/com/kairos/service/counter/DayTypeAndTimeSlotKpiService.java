@@ -35,9 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 @Service
 public class DayTypeAndTimeSlotKpiService implements CounterService {

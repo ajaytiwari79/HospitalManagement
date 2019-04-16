@@ -3,9 +3,9 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 

@@ -1,11 +1,10 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 

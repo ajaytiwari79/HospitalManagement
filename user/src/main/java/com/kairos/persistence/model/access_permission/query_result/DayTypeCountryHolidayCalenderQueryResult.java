@@ -2,8 +2,9 @@ package com.kairos.persistence.model.access_permission.query_result;
 
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
-import org.springframework.data.neo4j.annotation.QueryResult;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;

@@ -14,7 +14,6 @@ import com.kairos.persistence.model.wta.templates.template_types.DurationBetween
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-
 import com.kairos.service.phase.PhaseService;
 import org.springframework.stereotype.Service;
 

@@ -3,7 +3,6 @@ package com.kairos.scheduler.queue.producer;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
-import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.SchedulerServiceRestClient;
@@ -11,18 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import javax.inject.Inject;
-
-import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.JOB_DETAILS;
 import static com.kairos.constants.AppConstants.USER_TO_SCHEDULER_JOB_QUEUE_TOPIC;
-import static com.kairos.constants.AppConstants.USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC;
 
 @Component
 public class KafkaProducer {

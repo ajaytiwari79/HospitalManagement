@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.EmploymentSubType;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;

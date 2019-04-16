@@ -1,9 +1,7 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 
-import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.Min;

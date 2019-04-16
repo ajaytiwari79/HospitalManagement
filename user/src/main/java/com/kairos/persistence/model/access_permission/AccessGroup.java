@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;

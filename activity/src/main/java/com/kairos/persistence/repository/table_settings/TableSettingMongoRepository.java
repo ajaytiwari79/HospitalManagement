@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.table_settings;
 
 import com.kairos.persistence.model.table_settings.TableSetting;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
