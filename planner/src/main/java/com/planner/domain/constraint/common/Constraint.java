@@ -1,5 +1,6 @@
 package com.planner.domain.constraint.common;
 
+import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ConstraintLevel;
@@ -109,4 +110,10 @@ public class Constraint extends MongoBaseEntity{
     public void setParentConstraintId(BigInteger parentConstraintId) {
         this.parentConstraintId = parentConstraintId;
     }
+
+    public boolean isEqualsWithSpecificField(ConstraintDTO constraintDTO) {
+        return constraintType.equals(constraintDTO.getConstraintType()) && constraintSubType.equals(constraintDTO.getConstraintSubType()) && constraintLevel.equals(constraintDTO.getConstraintLevel()) && penalty==penalty;
+    }
+
+
 }
