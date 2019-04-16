@@ -680,7 +680,7 @@ public class StaffService {
         positionGraphRepository.save(position);
     }
 
-    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
+    public void setUnitManagerAndPosition(Organization organization, User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Position position = new Position();
         position.setStaff(staff);

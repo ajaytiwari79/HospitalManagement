@@ -155,7 +155,7 @@ public class EmploymentService {
 
         Position position = positionGraphRepository.findByStaffId(employmentDTO.getStaffId());
         if (!Optional.ofNullable(position).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.position.notFound", employmentDTO.getStaffId());
+            exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", employmentDTO.getStaffId());
         }
         if (position.getStartDateMillis() != null) {
             if (employmentDTO.getStartDate().isBefore(DateUtils.getDateFromEpoch(position.getStartDateMillis()))) {

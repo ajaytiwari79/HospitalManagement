@@ -412,7 +412,7 @@ public class StaffCreationService {
             setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
-        staffService.setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId());
+        staffService.setUnitManagerAndPosition(organization, user, staffCreationData.getAccessGroupId());
         return user;
     }
 

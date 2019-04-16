@@ -557,7 +557,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/position", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) {
+    public ResponseEntity<Map<String, Object>> updatePosition(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody PositionDTO positionDTO) {
         EmploymentAndPositionDTO response = employmentJobService.updateEmploymentEndDateFromPosition(staffId, unitId,positionDTO);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
