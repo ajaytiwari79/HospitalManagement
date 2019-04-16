@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.wta.rule_template;
 
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
@@ -35,6 +36,17 @@ public class RuleTemplateCategoryRepositoryImpl implements CustomRuleTemplateCat
                 project("name", "description", "tags")
         );
         AggregationResults<RuleTemplateCategoryTagDTO> result = mongoTemplate.aggregate(aggregation, RuleTemplateCategory.class, RuleTemplateCategoryTagDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<RuleTemplateCategoryDTO> findAllUsingCountryIdAndType(Long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("countryId").is(countryId).and("ruleTemplateCategoryType").is(ruleTemplateCategoryType)),
+                lookup("tag", "tags", "_id", "tags")
+        );
+        AggregationResults<RuleTemplateCategoryDTO> result = mongoTemplate.aggregate(aggregation, RuleTemplateCategory.class, RuleTemplateCategoryDTO.class);
         return result.getMappedResults();
     }
 
