@@ -183,6 +183,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
+        ruleTemplateCategoryObj.setTags(ruleTemplateCategoryDTO.getTags());
         save(ruleTemplateCategoryObj);
         RuleTemplateAndCategoryResponseDTO ruleTemplateAndCategoryResponseDTO;
         if (ruleTemplateCategoryObj.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.WTA)) {
