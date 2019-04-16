@@ -332,9 +332,8 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @return CTARuleTemplateCategoryWrapper
      */
     public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByCountry(Long countryId, Long organizationId) {
-        List<RuleTemplateCategory> ruleTemplateCategories = ruleTemplateCategoryRepository.getRuleTemplateCategoryByCountry(countryId, RuleTemplateCategoryType.CTA);
-        List<RuleTemplateCategoryDTO> ctaRuleTemplateCategoryList = ObjectMapperUtils.copyPropertiesOfListByMapper(ruleTemplateCategories, RuleTemplateCategoryDTO.class);
-        Map<BigInteger, RuleTemplateCategoryDTO> ruleTemplateCategoryDTOMap = ctaRuleTemplateCategoryList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        List<RuleTemplateCategoryDTO> ruleTemplateCategories = ruleTemplateCategoryRepository.findAllUsingCountryIdAndType(countryId, RuleTemplateCategoryType.CTA);
+        Map<BigInteger, RuleTemplateCategoryDTO> ruleTemplateCategoryDTOMap = ruleTemplateCategories.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaRuleTemplateRepository.findByCountryIdAndDeletedFalse(countryId);
         if (isNotNull(organizationId)) {
             updateExistingPhaseIdOfCTA(ctaRuleTemplateDTOS, organizationId, countryId);
@@ -342,7 +341,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         ctaRuleTemplateDTOS.forEach(c -> {
             c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
         });
-        return new CTARuleTemplateCategoryWrapper(ctaRuleTemplateCategoryList, ctaRuleTemplateDTOS);
+        return new CTARuleTemplateCategoryWrapper(ruleTemplateCategories, ctaRuleTemplateDTOS);
     }
 
     /**
