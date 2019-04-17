@@ -46,7 +46,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         Criteria criteria=Criteria.where("deleted").ne(true).and(applicableIdField).is(countryOrUnitId);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("solverConfig", "constraintIds", "_id", "constraints"));
+                lookup("constraint", "constraintIds", "_id", "constraints"));
         Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
         AggregationResults<SolverConfigDTO> result = mongoTemplate.aggregate(aggregation, SolverConfig.class, className);
         return result.getMappedResults();
