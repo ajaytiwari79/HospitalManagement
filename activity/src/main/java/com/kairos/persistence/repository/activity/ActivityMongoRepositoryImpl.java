@@ -106,7 +106,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "activityPriorityId","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "activityPriorityId", "childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities"),
@@ -121,7 +121,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab","timeCalculationActivityTab", "tags","activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "timeCalculationActivityTab", "tags", "activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
@@ -136,7 +136,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab","timeCalculationActivityTab", "tags","activityPriorityId","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "timeCalculationActivityTab", "tags", "activityPriorityId", "childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
         );
@@ -148,10 +148,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("name", "countryId", "isParentActivity", "generalActivityTab","childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "countryId", "isParentActivity", "generalActivityTab", "childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities"),
-                    match(Criteria.where("applicableForChildActivities").is(true))
+                match(Criteria.where("applicableForChildActivities").is(true))
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
@@ -162,13 +162,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("activities", "_id", "childActivityIds", "parentActivity"),
-                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab","activityPriorityId","childActivityIds","compositeActivities").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "activityPriorityId", "childActivityIds", "compositeActivities").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("parentActivity._id").as("parentActivityId")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
         );
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
-        return isCollectionNotEmpty(result.getMappedResults()) ?result.getMappedResults().get(0) : null;
+        return isCollectionNotEmpty(result.getMappedResults()) ? result.getMappedResults().get(0) : null;
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
@@ -207,7 +207,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                project("name", "generalActivityTab", "compositeActivities","balanceSettingsActivityTab"));
+                project("name", "generalActivityTab", "compositeActivities", "balanceSettingsActivityTab"));
 
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
@@ -595,7 +595,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("id").in(activityIds).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("name","id","childActivityIds")
+                project("name", "id", "childActivityIds")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities"),
                 match(Criteria.where("applicableForChildActivities").is(true))
@@ -605,18 +605,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     public boolean existsByActivityIdInChildActivities(BigInteger activityId) {
-        Query query=new Query(Criteria.where("childActivityIds").is(activityId).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED));
-        return isNotNull(mongoTemplate.findOne(query,Activity.class));
+        Query query = new Query(Criteria.where("childActivityIds").is(activityId).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED));
+        return isNotNull(mongoTemplate.findOne(query, Activity.class));
     }
 
     public List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds) {
-        Query query=new Query(Criteria.where("_id").ne(activityId).and("childActivityIds").in(allowedActivityIds).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED));
-        return mongoTemplate.find(query,Activity.class);
+        Query query = new Query(Criteria.where("_id").ne(activityId).and("childActivityIds").in(allowedActivityIds).and("deleted").is(false).and("state").is(ActivityStateEnum.PUBLISHED));
+        return mongoTemplate.find(query, Activity.class);
     }
 
     private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel) {
-        if (isChildActivityEligibleForStaffingLevel)
-        {
+        if (isChildActivityEligibleForStaffingLevel) {
 
         }
         String group = "{  \n" +
@@ -626,7 +625,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "            \"balanceSettingsActivityTab\":\"$balanceSettingsActivityTab\",\n" +
                 "            \"name\":\"$name\",\n" +
                 "            'timeTypeInfo':'$timeTypeInfo',\n" +
-                "            'compositeTimeTypeInfo':'$compositeTimeTypeInfo',\n"+
+                "            'compositeTimeTypeInfo':'$compositeTimeTypeInfo',\n" +
                 "             \"id\":\"$_id\",\n" +
                 "            \"categoryId\":\"$categoryId\",\n" +
                 "            \"categoryName\":\"$categoryName\"\n" +
@@ -636,7 +635,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "         }\n" +
                 "      }\n" +
                 "   }";
-        String projection = new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel?  "{'$cond':[ '$childActivities.rulesActivityTab.eligibleForStaffingLevel' ,'$childActivities',[]]}":"'$childActivities'" ).append(",'timeCalculationActivityTab':'$_id.timeCalculationActivityTab','balanceSettingsActivityTab':'$_id.balanceSettingsActivityTab','_id':'$_id.id','name':'$_id.name','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName'}}").toString();
+        String projection = new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.rulesActivityTab.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'timeCalculationActivityTab':'$_id.timeCalculationActivityTab','balanceSettingsActivityTab':'$_id.balanceSettingsActivityTab','_id':'$_id.id','name':'$_id.name','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName'}}").toString();
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         aggregationOperations.add(lookup("activity_category", "generalActivityTab.categoryId", "_id",
@@ -649,10 +648,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         aggregationOperations.add(lookup("time_Type", "childActivities.balanceSettingsActivityTab.timeTypeId", "_id",
                 "compositeTimeTypeInfo"));
         aggregationOperations.add(project("childActivities", "timeCalculationActivityTab", "timeTypeInfo", "balanceSettingsActivityTab", "name", "categoryId", "categoryName").and("childActivities").arrayElementAt(0).as("childActivities").and("compositeTimeTypeInfo").arrayElementAt(0).as("compositeTimeTypeInfo"));
-        aggregationOperations.add(project("timeCalculationActivityTab", "compositeTimeTypeInfo","timeTypeInfo", "balanceSettingsActivityTab", "name", "categoryId", "categoryName","childActivities"));
-        aggregationOperations.add(project("timeCalculationActivityTab","timeTypeInfo", "balanceSettingsActivityTab", "name", "categoryId", "categoryName").and("compositeTimeTypeInfo.allowChildActivities").as("compositeActivities.allowChildActivities").
+        aggregationOperations.add(project("timeCalculationActivityTab", "compositeTimeTypeInfo", "timeTypeInfo", "balanceSettingsActivityTab", "name", "categoryId", "categoryName", "childActivities"));
+        aggregationOperations.add(project("timeCalculationActivityTab", "timeTypeInfo", "balanceSettingsActivityTab", "name", "categoryId", "categoryName").and("compositeTimeTypeInfo.allowChildActivities").as("compositeActivities.allowChildActivities").
                 and("childActivities.timeCalculationActivityTab").as("childActivities.timeCalculationActivityTab")
                 .and("childActivities.balanceSettingsActivityTab").as("childActivities.balanceSettingsActivityTab")
+                .and("childActivities.rulesActivityTab").as("childActivities.rulesActivityTab")
                 .and("childActivities._id").as("childActivities._id")
                 .and("childActivities.name").as("childActivities.name")
                 .and("childActivities.categoryId").as("childActivities.categoryId")
@@ -680,7 +680,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId) {
-        Update update=new Update().pull("expertises",expertiseId);
-        return mongoTemplate.updateMulti(new Query(),update,Activity.class).wasAcknowledged();
+        Update update = new Update().pull("expertises", expertiseId);
+        return mongoTemplate.updateMulti(new Query(), update, Activity.class).wasAcknowledged();
     }
 }
