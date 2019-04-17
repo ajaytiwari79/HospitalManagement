@@ -725,10 +725,6 @@ public class ShiftValidatorService {
     public boolean validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
-        boolean absenceShiftExists=shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(),asDateStartOfDay(shiftDTO.getShiftDate()),asDateEndOfDay(shiftDTO.getShiftDate()),shiftDTO.getStaffId());
-        if(absenceShiftExists){
-            exceptionService.actionNotPermittedException("message.shift.overlap.with.full_day");
-        }
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.invalidRequestException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
         }
