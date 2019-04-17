@@ -459,7 +459,19 @@ public class StaffService {
                 }
 
                 if (String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).isEmpty()) {
+
                     userName = createNewUserName(firstName, lastName);
+
+                    Random rand = new Random();
+
+                    String newUsername = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
+
+                    User existingUserName = userGraphRepository.findUserByUserName("(?i)" + newUsername);
+                    if (Optional.ofNullable(existingUserName).isPresent()) {
+                        newUsername = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
+                    }
+                    userName = newUsername;
+
                 } else {
                     userName = getStringValueOfIndexedCell(row, 19);
                 }
@@ -506,8 +518,12 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
+
                         // user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(),"(?)" + privateEmail);
                         user = userGraphRepository.findByEmail("?" +privateEmail);
+
+                         user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(),"(?)" + privateEmail);
+                        user = userGraphRepository.findByEmail(privateEmail);
                         //if(Optional.ofNullable(user).isPresent()){
                         if (user != null) {
                             LOGGER.info(">>>>>>>>>>>>>am inside the check for findByEmail");
@@ -675,7 +691,9 @@ public class StaffService {
     public void setUserAndPosition(Organization organization, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
         Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(), user.getId());
         if (isNull(position)) {
+
             Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+
             position = new Position();
             position.setStaff(staff);
             staff.setUser(user);

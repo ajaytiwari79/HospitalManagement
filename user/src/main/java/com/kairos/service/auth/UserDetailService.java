@@ -57,7 +57,6 @@ public class UserDetailService {
 
 
     public User loadUserByUserName(String userName , String password) throws UsernameNotFoundException {
-        // User user=  userRepository.findUserByEmailInAnyOrganization("(?i)"+userName);
         User user=  userRepository.findUserByUserNameInAnyOrganization("(?i)"+userName);
         if (user == null) {
             logger.info("User is null");
@@ -69,7 +68,6 @@ public class UserDetailService {
             }
             logger.info("password  not  matched");
             return null;
-//                return passwordEncoder.matches(password, user.getPassword()) ? user : null;
         }
     }
 
