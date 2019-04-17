@@ -568,5 +568,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
+    public FibonacciKPI findFibonacciKPIById(BigInteger id){
+        Query query = new Query(Criteria.where("deleted").is(false).and("id").is(id));
+        return mongoTemplate.findOne(query, FibonacciKPI.class);
+    }
 
 }
