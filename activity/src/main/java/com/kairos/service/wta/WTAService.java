@@ -148,8 +148,7 @@ public class WTAService extends MongoBaseService {
         }
         wta.setStartDate(wtaDTO.getStartDate());
         if (isCollectionNotEmpty(wtaDTO.getTags())) {
-            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA);
-            wta.setTags(tags.stream().map(t -> t.getId()).collect(Collectors.toList()));
+            wta.setTags(wtaDTO.getTags());
         }
         prepareWtaWhileCreate(wta, wtaDTO, wtaBasicDetailsDTO);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();

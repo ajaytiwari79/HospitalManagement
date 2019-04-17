@@ -35,6 +35,11 @@ public interface ClauseRepository extends JpaRepository<Clause, Long> {
     @Query(value = "Select c from Clause c JOIN c.templateTypes as t  where c.organizationId = ?1 and t.id in ?2 and c.deleted = false order by c.createdAt desc")
     List<Clause> findAllClauseByUnitIdAndTemplateTypeId(Long organizationId, List<Long> templateTypeIds);
 
+
+    @Query(value = "Select c from Clause c JOIN c.templateTypes as t  where c.countryId = ?1 and t.id in ?2 and c.deleted = false order by c.createdAt desc")
+    List<Clause> findAllClauseByCountryIdAndTemplateTypeId(Long countryId, List<Long> templateTypeIds);
+
+
     @Query(value = "Select c from Clause c where c.id = ?1 and c.countryId = ?2 and c.deleted = false")
     Clause findByIdAndCountryId(Long id, Long countryId);
 

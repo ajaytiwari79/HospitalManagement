@@ -1,27 +1,26 @@
 package com.planner.appConfig.dbConfig;
 
 import com.kairos.activity.config.mongo_converter.*;
+import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-import org.springframework.data.mongodb.core.convert.DbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.planner.constants.ActivityMongoConstant.DB_NAME;
+import static com.planner.constants.ActivityMongoConstant.MONGO_URI;
 
 /**
  * This is required to get another mongoTemplate instance with different database
@@ -29,34 +28,41 @@ import java.util.List;
  */
 @Configuration
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-public class MongoDb2ndInstanceConfig extends AbstractMongoConfiguration {
+public class MongoDb2ndInstanceConfig extends AbstractMongoConfiguration implements EnvironmentAware {
 
-    @Override
-    public MongoClient mongoClient() {
-        return new MongoClient(new MongoClientURI("mongodb://localhost/kairos"));
-    }
+    Environment environment;
 
-    @Override
-    protected String getDatabaseName() {
-        return "kairos";
-    }
+
+
     @Override
     @Bean("ActivityMongoTemplate")
     public MongoTemplate mongoTemplate() throws Exception {
         MongoTemplate mongoTemplate = new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
         return mongoTemplate;
     }
+
     @Override
     @Bean("kairosMongoDbFactory")
     public MongoDbFactory mongoDbFactory() {
-        return new SimpleMongoDbFactory(this.mongoClient(), this.getDatabaseName());
+        return new SimpleMongoDbFactory(mongoClient(), getDatabaseName());
     }
 
+    @Override
+    protected String getDatabaseName() {
+        return this.environment.getProperty(DB_NAME);
+    }
+    @Override
+    public MongoClient mongoClient() {
+        return new MongoClient(new MongoClientURI(this.environment.getProperty(MONGO_URI)));
+    }
+
+    @Bean
     @Override
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converterList = new ArrayList<Converter<?, ?>>();
         converterList.add(new LocalDateReadConverter());
         converterList.add(new LocalDateWriteConverter());
+        converterList.add(new LocalDateToStringReadConverter());
         converterList.add(new LocalTimeReadConverter());
         converterList.add(new LocalTimeWriteConverter());
         converterList.add(new LocalDateTimeWriteConverter());
@@ -64,12 +70,10 @@ public class MongoDb2ndInstanceConfig extends AbstractMongoConfiguration {
         return new MongoCustomConversions(converterList);
     }
 
+
     @Override
-    public MappingMongoConverter mappingMongoConverter() throws Exception {
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory());
-        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext());
-        converter.setCustomConversions(customConversions());
-        return converter;
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
 
