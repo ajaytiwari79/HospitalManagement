@@ -1,6 +1,7 @@
 package com.kairos.controller.auth;
 
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user.user.userDetailUpdate.UserDetailUpdateDTO;
 import com.kairos.persistence.model.auth.User;
@@ -199,8 +200,8 @@ public class AuthController {
 
     /* @PreAuthorize("@customPermissionEvaluator.isAuthorized(#organizationId,#tabId,#httpServletRequest)")*/
     @PutMapping(value = "/update_user_name")
-    ResponseEntity<Map<String,Object>> updateUserName(@Valid @RequestBody UserDetailUpdateDTO userDetailUpdate){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailUpdate));
+    ResponseEntity<Map<String,Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailsDTO));
     }
 
 

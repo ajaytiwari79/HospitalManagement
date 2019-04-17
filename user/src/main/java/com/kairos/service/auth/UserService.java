@@ -8,6 +8,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -174,11 +175,7 @@ public class UserService {
     public Map<String, Object> authenticateUser(User user) {
           User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
         if (!Optional.ofNullable(currentUser).isPresent()) {
-            // currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
-           // return null;
-           // if(!Optional.ofNullable(currentUser).isPresent()){
                 return null;
-           // }
         }
 
         int otp = OtpGenerator.generateOtp();
@@ -528,20 +525,20 @@ public class UserService {
         return true;
     }
 
-    public boolean updateUserName(UserDetailUpdateDTO userDetailUpdate) {
-        User user = userGraphRepository.findByEmail("(?i)" + userDetailUpdate.getEmail());
+    public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
+        User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
         if (user == null) {
-            LOGGER.error("User not found belongs to this email " + userDetailUpdate.getEmail());
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailUpdate.getEmail());
+            LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
         }
-        User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" +userDetailUpdate.getUserName());
+        User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" +userDetailsDTO.getUserName());
         if (userNameAlreadyExist != null) {
-            LOGGER.error("This userName is already in use " + userDetailUpdate.getUserName());
-            exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailUpdate.getUserName());
+            LOGGER.error("This userName is already in use " + userDetailsDTO.getUserName());
+            exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailsDTO.getUserName());
         }
-        if (userDetailUpdate.isUserNameUpdated()) {
+        if (userDetailsDTO.isUserNameUpdated()) {
             user.setUserNameUpdated(true);
-            user.setUserName(userDetailUpdate.getUserName());
+            user.setUserName(userDetailsDTO.getUserName());
             userGraphRepository.save(user);
             return true;
         }
