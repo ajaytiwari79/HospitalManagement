@@ -750,7 +750,7 @@ public class ShiftValidatorService {
         }
         if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
            // shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType()))) {
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullWeekCalculationType()))) {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
             } else {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
