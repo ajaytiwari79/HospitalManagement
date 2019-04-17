@@ -2,6 +2,7 @@ package com.kairos.dto.activity.counter.configuration;
 
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ChartType;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.FilterType;
@@ -22,6 +23,8 @@ public class KPIDTO {
     private List<FilterCriteria> defaultFilters;
     //selected filer by staff
     private List<FilterCriteria> selectedFilters;
+    private ConfLevel applicableFor;
+    private boolean fibonacciKPI;
     public KPIDTO(){
 
     }
@@ -104,5 +107,21 @@ public class KPIDTO {
 
     public void setType(CounterType type) {
         this.type = type;
+    }
+
+    public ConfLevel getApplicableFor() {
+        return applicableFor;
+    }
+
+    public void setApplicableFor(ConfLevel applicableFor) {
+        this.applicableFor = applicableFor;
+    }
+
+    public boolean isFibonacciKPI() {
+        return fibonacciKPI;
+    }
+
+    public void setFibonacciKPI(boolean fibonacciKPI) {
+        this.fibonacciKPI = fibonacciKPI;
     }
 }
