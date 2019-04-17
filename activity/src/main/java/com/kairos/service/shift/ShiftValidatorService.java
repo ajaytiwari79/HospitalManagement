@@ -812,6 +812,7 @@ public class ShiftValidatorService {
         }
     }
 
+    //This method is being used to check overlapping shift with full day and full week activity
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
         Date startDate;
         Date endDate;
