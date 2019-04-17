@@ -821,7 +821,7 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
     private void updateStaffingLevelInterval(int lowerLimit, int upperLimit, StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean deleted) {
-        BigInteger parentActivityId = shiftActivity.getParentActivityId();
+        BigInteger parentActivityId = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId()).getId();
         int currentAvailableStaffCount = 0;
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             if (currentIndex >= staffingLevel.getPresenceStaffingLevelInterval().size()) {

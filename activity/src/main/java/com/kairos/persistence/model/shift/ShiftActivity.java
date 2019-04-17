@@ -50,7 +50,6 @@ public class ShiftActivity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
-    private BigInteger parentActivityId;// used for validating staffing level
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
@@ -68,14 +67,6 @@ public class ShiftActivity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
-    }
-
-    public BigInteger getParentActivityId() {
-        return parentActivityId;
-    }
-
-    public void setParentActivityId(BigInteger parentActivityId) {
-        this.parentActivityId = parentActivityId;
     }
 
     public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, String startLocation, String endLocation) {
