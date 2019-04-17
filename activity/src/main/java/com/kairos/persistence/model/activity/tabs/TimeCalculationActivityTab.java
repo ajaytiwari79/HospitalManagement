@@ -29,7 +29,7 @@ public class TimeCalculationActivityTab implements Serializable {
     private int historyDuration;
     private LocalTime defaultStartTime;
     private List<Long> dayTypes = new ArrayList<>();
-    private boolean midnightToMidnightShift;
+
 
     public TimeCalculationActivityTab() {
     }
@@ -180,13 +180,5 @@ public class TimeCalculationActivityTab implements Serializable {
         this.multiplyWith = multiplyWith;
         this.defaultStartTime = defaultStartTime;
         this.multiplyWithValue = multiplyWithValue;
-    }
-
-    public boolean isMidnightToMidnightShift() {
-        return midnightToMidnightShift;
-    }
-
-    public void setMidnightToMidnightShift(boolean midnightToMidnightShift) {
-        this.midnightToMidnightShift = midnightToMidnightShift;
     }
 }

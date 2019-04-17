@@ -6,5 +6,5 @@ package com.kairos.enums;
  */
 public enum TimeCalaculationType {
     FULL_TIME_WEEKLY_HOURS_TYPE,
-    WEEKLY_HOURS_TYPE
+    WEEKLY_HOURS_TYPE,MIDNIGHT_TO_MIDNIGHT_TYPE
 }
