@@ -10,8 +10,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
 import java.util.ArrayList;
@@ -24,11 +26,11 @@ import static com.planner.constants.ActivityMongoConstant.MONGO_URI;
  * This is required to get another mongoTemplate instance with different database
  * of same mongod(server).
  */
-//@Configuration
-//@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-public class MongoDb2ndInstanceConfig {//extends AbstractMongoConfiguration implements EnvironmentAware {
+@Configuration
+@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+public class MongoDb2ndInstanceConfig extends AbstractMongoConfiguration implements EnvironmentAware {
 
-   /* Environment environment;
+    Environment environment;
 
 
 
@@ -40,6 +42,12 @@ public class MongoDb2ndInstanceConfig {//extends AbstractMongoConfiguration impl
     }
 
     @Override
+    @Bean("kairosMongoDbFactory")
+    public MongoDbFactory mongoDbFactory() {
+        return new SimpleMongoDbFactory(mongoClient(), getDatabaseName());
+    }
+
+    @Override
     protected String getDatabaseName() {
         return this.environment.getProperty(DB_NAME);
     }
@@ -47,10 +55,7 @@ public class MongoDb2ndInstanceConfig {//extends AbstractMongoConfiguration impl
     public MongoClient mongoClient() {
         return new MongoClient(new MongoClientURI(this.environment.getProperty(MONGO_URI)));
     }
-    @Bean("kairosMongoDbFactory")
-    public DB getDb(){
-        return  mongoClient().getDB(getDatabaseName());
-    }
+
     @Bean
     @Override
     public MongoCustomConversions customConversions() {
@@ -69,7 +74,7 @@ public class MongoDb2ndInstanceConfig {//extends AbstractMongoConfiguration impl
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
-    }*/
+    }
 
 
 }
