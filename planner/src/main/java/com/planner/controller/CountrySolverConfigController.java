@@ -24,15 +24,15 @@ public class CountrySolverConfigController {
     @PostMapping
     @ApiOperation("Create Country Solver Config")
     public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
-        countrySolverConfigService.createCountrySolverConfig(countryId,countrySolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+        ;
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.createCountrySolverConfig(countryId,countrySolverConfigDTO));
     }
 
     @PostMapping (value = "/copy")
     @ApiOperation("Copy Country Solver Config")
     public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
-        countrySolverConfigService.copyCountrySolverConfig(countryId,countrySolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+        ;
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.copyCountrySolverConfig(countryId,countrySolverConfigDTO));
     }
 
     @GetMapping
@@ -45,15 +45,15 @@ public class CountrySolverConfigController {
     @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("Update Country Solver Configration")
     public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
-        countrySolverConfigService.updateCountrySolverConfig(countryId,countrySolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+        ;
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.updateCountrySolverConfig(countryId,countrySolverConfigDTO));
     }
 
     @DeleteMapping(value = "/{solverConfigId}")
     @ApiOperation("Delete Country Solver Configration")
     public ResponseEntity<Map<String, Object>> deleteCountrySolverConfig(@PathVariable Long countryId, @PathVariable BigInteger solverConfigId) {
-        countrySolverConfigService.deleteCountrySolverConfig(solverConfigId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+        ;
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.deleteCountrySolverConfig(solverConfigId));
     }
 
     /**
