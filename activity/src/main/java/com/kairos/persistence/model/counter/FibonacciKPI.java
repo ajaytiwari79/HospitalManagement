@@ -22,4 +22,10 @@ public class FibonacciKPI extends Counter{
     private Long referenceId;
     private ConfLevel confLevel;
     private List<FibonacciKPIConfig> fibonacciKPIConfigs;
+    private boolean fibonacciKPI;
+
+    public FibonacciKPI() {
+        this.setType(CounterType.FIBONACCI);
+        this.setFibonacciKPI(true);
+    }
 }
