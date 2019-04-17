@@ -163,12 +163,9 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
             exceptionService.invalidRequestException("error.cta.notFound", asDate(shiftDTO.getShiftDate()));
         }
+        shiftValidatorService.checkAbsenceTypeShift(shiftDTO);
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
-        boolean absenceShiftExists=shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(),asDateStartOfDay(shiftDTO.getShiftDate()),asDateEndOfDay(shiftDTO.getShiftDate()),shiftDTO.getStaffId());
-        if(absenceShiftExists){
-            exceptionService.actionNotPermittedException("message.shift.overlap.with.full_day");
-        }
         if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);

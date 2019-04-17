@@ -834,5 +834,22 @@ public class ShiftValidatorService {
         }
     }
 
+    //This method is being used to check overlapping shift with full day and full week activity
+    public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
+        Date startDate;
+        Date endDate;
+        if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
+            startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
+            endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
+        } else {
+            startDate = asDateStartOfDay(shiftDTO.getShiftDate());
+            endDate = asDateEndOfDay(shiftDTO.getShiftDate());
+        }
+        boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
+        if (absenceShiftExists) {
+            exceptionService.actionNotPermittedException("message.shift.overlap.with.full_day");
+        }
+    }
+
 
 }
