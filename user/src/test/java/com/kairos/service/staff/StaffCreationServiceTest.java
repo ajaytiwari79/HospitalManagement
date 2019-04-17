@@ -50,10 +50,10 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
-//@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class StaffCreationServiceTest {
 
-    /*@Rule
+    @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Mock
@@ -397,5 +397,5 @@ public class StaffCreationServiceTest {
         staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
         assertEquals(null, "Staff already exists with same cpr number 1234567891", "Staff already exists with same cpr number 1234567891");
 
-    }*/
+    }
 }
