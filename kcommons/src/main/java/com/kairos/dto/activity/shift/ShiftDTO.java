@@ -75,7 +75,7 @@ public class ShiftDTO {
     private int restingMinutes;
     private Set<ShiftEscalationReason> escalationReasons;
     private Long functionId;
-    private boolean midnightToMidnightShift;
+
 
     public ShiftDTO() {
         //default Const
@@ -450,11 +450,6 @@ public class ShiftDTO {
         this.functionId = functionId;
     }
 
-    public boolean isMidnightToMidnightShift() { return midnightToMidnightShift;
-    }
-
-    public void setMidnightToMidnightShift(boolean midnightToMidnightShift) { this.midnightToMidnightShift = midnightToMidnightShift;
-    }
 
     @Override
     public String toString() {
