@@ -195,7 +195,7 @@ public class StaffingLevelService extends MongoBaseService {
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
         if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
             LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
-            exceptionService.unsupportedOperationException("validattion.stafflevel.currentdate.update");
+            exceptionService.unsupportedOperationException("message.stafflevel.currentdate.update");
         }
         List<ActivityDTO> activityDTOS = activityMongoRepository.findChildActivityActivityIds(presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank().keySet());
         Map<BigInteger, BigInteger> childAndParentActivityIdMap = new HashMap<>();
