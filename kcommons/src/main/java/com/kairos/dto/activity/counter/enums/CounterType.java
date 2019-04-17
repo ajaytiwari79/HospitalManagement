@@ -26,7 +26,8 @@ public enum CounterType {
     FLEXI_TIME_TASK_PERCENT("Flex Time Task time"),
     TOTAL_KM_DRIVEN_PER_STAFF("Total Distance Driven Per Staff"),
     TASK_EFFICIENCY("Task Efficiency"),
-    WORKING_HOUR_PER_SHIFT("Working Time")
+    WORKING_HOUR_PER_SHIFT("Working Time"),
+    FIBONACCI("Fibonacci")
     //COMPLETED
 
     ;
