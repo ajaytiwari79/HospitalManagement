@@ -112,8 +112,8 @@ public class CounterDistService extends MongoBaseService {
             refId = userIntegrationService.getStaffIdByUserId(refId);
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level, false);
-        List<KPIDTO> fibonacciDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIService.getAllFibonacciKPI(refId,level),KPIDTO.class);
-        kpidtos.addAll(fibonacciDtos);
+//        List<KPIDTO> fibonacciDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIService.getAllFibonacciKPI(refId,level),KPIDTO.class);
+//        fibonacciDtos.addAll(kpidtos);
         if (kpidtos.isEmpty()) {
             LOGGER.info("KPI not found for {} id " + refId,level);
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
@@ -126,7 +126,7 @@ public class CounterDistService extends MongoBaseService {
         List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryIds);
         List<FibonacciKPIDTO> fibonacciKPIDTOS = fibonacciKPIService.getAllFibonacciKPI(refId,level);
-        Map<BigInteger,List<FibonacciKPIDTO>> categoryIdAndFibonacciKPI = fibonacciKPIDTOS.stream().collect(Collectors.groupingBy(k->k.getCategoryId(),Collectors.toList()));
+        Map<BigInteger,List<FibonacciKPIDTO>> categoryIdAndFibonacciKPI = fibonacciKPIDTOS.stream().filter(fibonacciKPIDTO -> isNotNull(fibonacciKPIDTO.getCategoryId())).collect(Collectors.groupingBy(k->k.getCategoryId(),Collectors.toList()));
         for (CategoryKPIMappingDTO categoryKPIMappingDTO : categoryKPIMapping) {
             if(categoryIdAndFibonacciKPI.containsKey(categoryKPIMappingDTO.getCategoryId())){
                 categoryKPIMappingDTO.getKpiId().addAll(categoryIdAndFibonacciKPI.get(categoryKPIMappingDTO.getCategoryId()).stream().map(FibonacciKPIDTO::getId).collect(toList()));            }

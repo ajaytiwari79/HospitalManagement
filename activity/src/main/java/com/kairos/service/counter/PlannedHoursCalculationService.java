@@ -46,7 +46,7 @@ public class PlannedHoursCalculationService implements CounterService {
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
         List<String> shiftActivityStatus = (filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) != null) ? filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) : new ArrayList<>();
         List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
-        if (filterBasedCriteria.get(FilterType.TIME_TYPE) != null && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE))) {
+        if (filterBasedCriteria.containsKey(FilterType.TIME_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE))) {
             if (filterBasedCriteria.get(FilterType.TIME_TYPE).get(0) instanceof String) {
                 timeTypeIds = timeTypeMongoRepository.findTimeTypeIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
             } else {
@@ -60,7 +60,7 @@ public class PlannedHoursCalculationService implements CounterService {
         List<CommonKpiDataUnit> basicChartKpiDateUnits = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         basicChartKpiDateUnits.forEach(kpiData -> {
             kpiData.setLabel(staffIdAndNameMap.get(kpiData.getRefId()));
-            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(), Arrays.asList(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(), DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit) kpiData).getValue())))));
+            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(),((BasicChartKpiDateUnit) kpiData).getValue(), Arrays.asList(new ClusteredBarChartKpiDataUnit(kpiData.getLabel(), DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit) kpiData).getValue()))),kpiData.getRefId().longValue()));
         });
         return kpiDataUnits;
     }
@@ -76,5 +76,10 @@ public class PlannedHoursCalculationService implements CounterService {
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, false);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+    }
+
+    @Override
+    public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+        return getPlannedHoursKpiData(organizationId, filterBasedCriteria, true).stream().collect(Collectors.toMap(k->k.getRefId().longValue(),v->((ClusteredBarChartKpiDataUnit)v).getNumberValue()));
     }
 }

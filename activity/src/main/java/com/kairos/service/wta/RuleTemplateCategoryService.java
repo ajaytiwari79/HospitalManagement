@@ -119,7 +119,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     }
 
 
-    public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
+    public List<RuleTemplateCategory> getRulesTemplateCategory(Long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (country == null) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
@@ -183,6 +183,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
+        ruleTemplateCategoryObj.setTags(ruleTemplateCategoryDTO.getTags());
         save(ruleTemplateCategoryObj);
         RuleTemplateAndCategoryResponseDTO ruleTemplateAndCategoryResponseDTO;
         if (ruleTemplateCategoryObj.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.WTA)) {

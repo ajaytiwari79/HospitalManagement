@@ -28,7 +28,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/resources/**", "/configuration/ui",  "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs","/webjars/**").permitAll()
-                .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/actuator/**","/api/v1/legal").permitAll()
                 .antMatchers("/**").authenticated();
     }
 

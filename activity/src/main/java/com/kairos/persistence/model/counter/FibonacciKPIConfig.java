@@ -10,7 +10,7 @@ import java.math.BigInteger;
 
 @Getter
 @Setter
-public class FibinacciKPIConfig {
+public class FibonacciKPIConfig {
 
     private BigInteger kpiId;
     private int impactWeight;

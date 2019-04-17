@@ -81,7 +81,7 @@ public class PayOutCalculationService {
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                             scheduledMinutesOfPayout += shiftActivity.getScheduledMinutes();
                             ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
-                            shiftActivity.setScheduledMinutesOfTimebank(shiftActivity.getScheduledMinutes()+shiftActivity.getScheduledMinutesOfTimebank());
+                            shiftActivity.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutes()+shiftActivity.getScheduledMinutesOfPayout());
                         } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                             ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval);
                             ctaBonusMinutes += ctaScheduledOrCompensationMinutes;
@@ -89,7 +89,7 @@ public class PayOutCalculationService {
                             shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
 
                         }
-                        ctaPayoutMinMap.put(ruleTemplate.getId(), ctaScheduledOrCompensationMinutes);
+                        ctaPayoutMinMap.put(ruleTemplate.getId(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaScheduledOrCompensationMinutes);
                     }
             }
             if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {

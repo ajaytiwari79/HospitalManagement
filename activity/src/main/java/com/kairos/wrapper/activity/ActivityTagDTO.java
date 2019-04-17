@@ -48,6 +48,8 @@ public class ActivityTagDTO {
     private boolean allowChildActivities;
     private boolean applicableForChildActivities;
     private Set<BigInteger> childActivityIds=new HashSet<>();
+    // for filter FullDay and Full week activity
+    private String methodForCalculatingTime;
 
     public ActivityTagDTO() {
         //default constructor
@@ -255,6 +257,14 @@ public class ActivityTagDTO {
 
     public void setApplicableForChildActivities(boolean applicableForChildActivities) {
         this.applicableForChildActivities = applicableForChildActivities;
+    }
+
+    public String getMethodForCalculatingTime() {
+        return methodForCalculatingTime;
+    }
+
+    public void setMethodForCalculatingTime(String methodForCalculatingTime) {
+        this.methodForCalculatingTime = methodForCalculatingTime;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
