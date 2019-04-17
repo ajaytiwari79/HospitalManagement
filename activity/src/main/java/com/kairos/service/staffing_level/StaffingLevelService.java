@@ -821,7 +821,7 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
     private void updateStaffingLevelInterval(int lowerLimit, int upperLimit, StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean deleted) {
-        BigInteger parentActivityId = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId()).getId();
+        Activity parentActivity = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId());
         int currentAvailableStaffCount = 0;
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             if (currentIndex >= staffingLevel.getPresenceStaffingLevelInterval().size()) {
@@ -833,13 +833,13 @@ public class StaffingLevelService extends MongoBaseService {
             if (deleted) {
                 staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(--currentAvailableStaffCount);
                 updateStaffingLevelOfChildAndParent(staffingLevel, deleted, currentIndex, shiftActivity.getActivityId());
-                if (isNotNull(parentActivityId))
-                    updateStaffingLevelOfChildAndParent(staffingLevel, deleted, currentIndex, parentActivityId);
+                if (isNotNull(parentActivity))
+                    updateStaffingLevelOfChildAndParent(staffingLevel, deleted, currentIndex, parentActivity.getId());
             } else {
                 staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(++currentAvailableStaffCount);
                 updateStaffingLevelOfChildAndParent(staffingLevel, false, currentIndex, shiftActivity.getActivityId());
-                if (isNotNull(parentActivityId))
-                    updateStaffingLevelOfChildAndParent(staffingLevel, false, currentIndex, parentActivityId);
+                if (isNotNull(parentActivity))
+                    updateStaffingLevelOfChildAndParent(staffingLevel, false, currentIndex, parentActivity.getId());
             }
         }
 

@@ -572,7 +572,11 @@ public class ShiftValidatorService {
 
     private void checkStaffingLevelInterval(int lowerLimit, int upperLimit, List<StaffingLevelInterval> applicableIntervals, StaffingLevel staffingLevel,
                                             List<ShiftActivity> shiftActivities, boolean checkOverStaffing, ShiftActivity shiftActivity) {
-        BigInteger parentActivityId = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId()).getId();
+        Activity parentActivity = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId());
+        Activity activity = null;
+        if (isNull(parentActivity)) {
+            activity = activityMongoRepository.findActivityByIdAndEnabled(shiftActivity.getActivityId());
+        }
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             int shiftsCount = 0;
             Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
@@ -583,6 +587,8 @@ public class ShiftValidatorService {
                 for (ShiftActivity shiftActivityDB : shiftActivities) {
                     if (shiftActivityDB.getActivityId().equals(shiftActivity.getActivityId()) && interval.overlaps(shiftActivityDB.getInterval())) {
                         shiftsCount++;
+                    } else if (activity != null && activity.getChildActivityIds().contains(shiftActivityDB.getActivityId())) {
+                        shiftsCount++;
                     }
                 }
                 int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
@@ -592,14 +598,21 @@ public class ShiftValidatorService {
                 if (!checkOverStaffing && totalCount <= 0) {
                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                 }
-                if (isNotNull(parentActivityId)) {
-                    applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(staffingLevelActivityObj -> staffingLevelActivityObj.getActivityId().equals(parentActivityId) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()).
-                            findFirst().ifPresent(staffingLevelActivity1 -> exceptionService.actionNotPermittedException("message.shift.underStaffing"));
+
+                if (isNotNull(parentActivity)) {
+                    applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().forEach(staffingLevelActivityObj ->
+                            {
+                                if (staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()) {
+                                    exceptionService.actionNotPermittedException("message.shift.overStaffing");
+                                }
+                            }
+                    );
                 }
             } else {
                 exceptionService.actionNotPermittedException("message.staffingLevel.activity", shiftActivity.getActivityName());
             }
         }
+
     }
 
     public void validateShifts(List<ShiftDTO> shiftDTOS) {
@@ -611,12 +624,14 @@ public class ShiftValidatorService {
         }
     }
 
-    public boolean validateAccessGroup(ActivityShiftStatusSettings activityShiftStatusSettings, StaffAccessGroupDTO staffAccessGroupDTO) {
+    public boolean validateAccessGroup(ActivityShiftStatusSettings activityShiftStatusSettings, StaffAccessGroupDTO
+            staffAccessGroupDTO) {
         return activityShiftStatusSettings != null && staffAccessGroupDTO != null && CollectionUtils.containsAny(activityShiftStatusSettings.getAccessGroupIds(), staffAccessGroupDTO.getAccessGroupIds());
     }
 
 
-    public List<ShiftActivityDTO> findShiftActivityToValidateStaffingLevel(List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
+    public List<ShiftActivityDTO> findShiftActivityToValidateStaffingLevel
+            (List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
         List<ShiftActivityDTO> shiftActivities = new ArrayList<>();
         try {
             for (int i = 0; i < arrivedShiftActivities.size(); i++) {
@@ -635,7 +650,8 @@ public class ShiftValidatorService {
         return shiftActivities;
     }
 
-    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
+    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String
+            type) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.validation.access");
@@ -660,7 +676,8 @@ public class ShiftValidatorService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, ShiftState shiftState, Boolean validatedByStaff, Phase actualPhases, BigInteger shiftStateId) {
+    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, ShiftState shiftState, Boolean
+            validatedByStaff, Phase actualPhases, BigInteger shiftStateId) {
         shiftState = shiftStateMongoRepository.findOne(shiftStateId);
         if (shiftState == null) {
             Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
@@ -724,7 +741,8 @@ public class ShiftValidatorService {
         }
     }
 
-    public boolean validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
+    public boolean validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO
+            shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -790,7 +808,8 @@ public class ShiftValidatorService {
         return true;
     }
 
-    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities) {
+    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity
+            shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities) {
         if (CollectionUtils.isEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
             exceptionService.actionNotPermittedException("message.staffingLevel.absent");
         }
