@@ -4,7 +4,6 @@ import java.math.BigInteger;
 
 public class StaffingLevelStaffMinMax {
 
-    private BigInteger parentActivityId;
     private int minNoOfStaffParentActivity;
     private int maxNoOfStaffParentActivity;
     private int minNoOfStaffChildActivities;
@@ -31,9 +30,6 @@ public class StaffingLevelStaffMinMax {
         this.maxNoOfStaffChildActivities = maxNoOfStaffChildActivities;
     }
 
-    public BigInteger getParentActivityId() { return parentActivityId; }
-
-    public void setParentActivityId(BigInteger parentActivityId) { this.parentActivityId = parentActivityId; }
 
     public StaffingLevelStaffMinMax() {
     }
