@@ -81,13 +81,15 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<ActivityWrapper> findActivityAndTimeTypeByActivityIds(Set<BigInteger> activityIds);
+    List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds);
 
     List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds);
 
     boolean existsByActivityIdInChildActivities(BigInteger activityId);
 
     boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId);
+
+    boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId);
 
     List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
 }

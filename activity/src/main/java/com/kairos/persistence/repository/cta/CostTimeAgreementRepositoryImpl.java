@@ -63,8 +63,11 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
-        Query query = new Query(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and("countryId").is(countryId).and("deleted").is(false).and("disabled").is(false));
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, CostTimeAgreement.class), CTAResponseDTO.class);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and("countryId").is(countryId).and("deleted").is(false).and("disabled").is(false)),
+                lookup("tag", "tags", "_id", "tags")
+                );
+        return mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class).getMappedResults();
     }
 
     @Override

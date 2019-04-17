@@ -1,6 +1,7 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
@@ -86,6 +87,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
+import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static com.kairos.service.activity.ActivityUtil.*;
 
@@ -366,19 +368,34 @@ public class ActivityService extends MongoBaseService {
         activity.getGeneralActivityTab().setCategoryId(category.getId());
     }
 
-    public ActivityTabsWrapper updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO) {
+    public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO ,boolean availableAllowActivity) {
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
         ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", timeCalculationActivityDTO.getActivityId());
         }
-        activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
-        if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
-            timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO,availableAllowActivity);
+        if(!timeCalculationActivityDTO.isAvailableAllowActivity()) {
+            activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
+            if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
+                timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+            }
+            save(activity);
         }
-        save(activity);
-        return new ActivityTabsWrapper(timeCalculationActivityTab);
+        return timeCalculationActivityDTO;
+    }
+
+    private TimeCalculationActivityDTO verifyAndDeleteCompositeActivity(TimeCalculationActivityDTO timeCalculationActivityDTO ,boolean availableAllowActivity){
+            if (timeCalculationActivityDTO.getMethodForCalculatingTime().equals(FULL_WEEK) || timeCalculationActivityDTO.getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
+                boolean availableAllowActivities = activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
+                    if(availableAllowActivities && availableAllowActivity){
+                        activityMongoRepository.unassignCompositeActivityFromActivitiesByactivityId(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
+                    }else if(availableAllowActivities) {
+                        timeCalculationActivityDTO.setAvailableAllowActivity(true);
+                    }
+                }
+        return timeCalculationActivityDTO;
     }
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
@@ -387,11 +404,10 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
-        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(compositeShiftIds);
+        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(compositeShiftIds);
         if (activityMatched.size() != compositeShiftIds.size()) {
-            exceptionService.illegalArgumentException("message.mismatched-ids");
+            exceptionService.illegalArgumentException("message.activity.notallow");
         }
-        organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
@@ -876,7 +892,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.activity.published", activityId);
         }
         if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null) {
-            exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null", activity.getName());
+            exceptionService.actionNotPermittedException("message.activity.timeType.absent", activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);
