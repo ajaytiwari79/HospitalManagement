@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.repository.Query;
 import java.math.BigInteger;
 import java.util.List;
 
-public interface FibonacciKPIRepository extends MongoBaseRepository<FibonacciKPI, BigInteger> {
+public interface FibonacciKPIRepository extends MongoBaseRepository<FibonacciKPI, BigInteger> ,CustomFibonacciKPIRepository{
 
-    @Query("{'deleted' : false,'_id':?0}")
+    @Query("{'deleted':false,'_id':?0}")
     FibonacciKPI findFibonacciKPIById(BigInteger id);
 
-    @Query("{'deleted' : false,'referenceId':?0,'confLevel':?1}")
+    @Query("{deleted:false,referenceId:?0,confLevel:?1}")
     List<FibonacciKPIDTO> findAllFibonacciKPIByCountryId(Long referenceId, ConfLevel confLevel);
 }

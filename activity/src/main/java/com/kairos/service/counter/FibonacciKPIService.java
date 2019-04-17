@@ -33,6 +33,7 @@ public class FibonacciKPIService {
         fibonacciKPIDTO.setConfLevel(confLevel);
         FibonacciKPI fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO, FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
+        fibonacciKPIDTO.setId(fibonacciKPI.getId());
         return fibonacciKPIDTO;
     }
 
@@ -51,11 +52,23 @@ public class FibonacciKPIService {
         }
         fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO,FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
+        fibonacciKPIDTO.setId(fibonacciKPI.getId());
         return fibonacciKPIDTO;
     }
 
     public List<FibonacciKPIDTO> getAllFibonacciKPI(Long referenceId,ConfLevel confLevel){
-        return fibonacciKPIRepository.findAllFibonacciKPIByCountryId(referenceId,confLevel);
+        List<FibonacciKPIDTO> fibonacciKPIDTOS = fibonacciKPIRepository.findAllFibonacciKPIByCountryId(referenceId,confLevel);
+        for (FibonacciKPIDTO fibonacciKPIDTO : fibonacciKPIDTOS) {
+            fibonacciKPIDTO.setFibonacciKPI(true);
+        }
+        return fibonacciKPIDTOS;
+    }
+
+    public FibonacciKPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId){
+        FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findFibonacciKPIById(fibonacciKPIId);
+        FibonacciKPIDTO fibonacciKPIDTO = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPI,FibonacciKPIDTO.class);
+        fibonacciKPIDTO.setFibonacciKPI(true);
+        return fibonacciKPIDTO;
     }
 
     public boolean deleteFibonacciKPI(BigInteger fibonacciKPIId){

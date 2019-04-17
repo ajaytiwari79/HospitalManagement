@@ -86,7 +86,7 @@ public class PayOutCalculationService {
                             shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
 
                         }
-                        ctaPayoutMinMap.put(ruleTemplate.getId(), ctaScheduledOrCompensationMinutes);
+                        ctaPayoutMinMap.put(ruleTemplate.getId(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaScheduledOrCompensationMinutes);
                     }
             }
             if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {

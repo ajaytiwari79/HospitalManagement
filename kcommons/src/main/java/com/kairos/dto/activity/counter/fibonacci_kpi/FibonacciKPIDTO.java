@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.counter.fibonacci_kpi;
 
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.FilterType;
@@ -24,8 +25,9 @@ public class FibonacciKPIDTO {
     private ConfLevel confLevel;
     private List<FilterType> filterTypes;
     private List<FilterCriteria> criteriaList;
-    private List<FibinacciKPIConfigDTO> fibinacciKPIConfigs;
+    private List<FibonacciKPIConfigDTO> fibonacciKPIConfigs;
     private BigInteger categoryId;
+    private boolean fibonacciKPI;
 
 
 }

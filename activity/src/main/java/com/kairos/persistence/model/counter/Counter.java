@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.counter;
 
 import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.enums.FilterType;
@@ -14,7 +15,6 @@ import java.util.Set;
  * @author: mohit.shakya@oodlestechnologies.com
  * @dated: Jun/26/2018
  */
-
 public class Counter extends MongoBaseEntity {
 
     private CounterType type;
@@ -28,6 +28,7 @@ public class Counter extends MongoBaseEntity {
     private Set<ModuleType> supportedModuleTypes;
     //calculation formula of per KPI
     private String calculationFormula;
+    private ConfLevel applicableFor;
 
     public Counter() {
     }
@@ -126,5 +127,13 @@ public class Counter extends MongoBaseEntity {
 
     public void setCalculationFormula(String calculationFormula) {
         this.calculationFormula = calculationFormula;
+    }
+
+    public ConfLevel getApplicableFor() {
+        return applicableFor;
+    }
+
+    public void setApplicableFor(ConfLevel applicableFor) {
+        this.applicableFor = applicableFor;
     }
 }

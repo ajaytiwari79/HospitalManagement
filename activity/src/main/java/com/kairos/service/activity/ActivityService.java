@@ -902,10 +902,11 @@ public class ActivityService extends MongoBaseService {
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
-        activityCopied.setState(ActivityStateEnum.PUBLISHED);
+        activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
+        activityDTO.setActivityCanBeCopied(true);
         return activityDTO;
     }
 

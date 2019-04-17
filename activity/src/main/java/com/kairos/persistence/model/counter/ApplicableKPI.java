@@ -14,6 +14,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private ConfLevel level;
     private String title;
     private ApplicableFilter applicableFilter;
+    private boolean fibonacciKPI;
     // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
     private boolean copy;
 
@@ -112,5 +113,13 @@ public class ApplicableKPI extends MongoBaseEntity {
 
     public void setCopy(boolean copy) {
         this.copy = copy;
+    }
+
+    public boolean isFibonacciKPI() {
+        return fibonacciKPI;
+    }
+
+    public void setFibonacciKPI(boolean fibonacciKPI) {
+        this.fibonacciKPI = fibonacciKPI;
     }
 }

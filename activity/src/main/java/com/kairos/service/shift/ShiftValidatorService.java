@@ -77,6 +77,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asDateEndOfDay;
+import static com.kairos.commons.utils.DateUtils.asDateStartOfDay;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
@@ -721,17 +723,21 @@ public class ShiftValidatorService {
     public boolean validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
+        boolean absenceShiftExists=shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(),asDateStartOfDay(shiftDTO.getShiftDate()),asDateEndOfDay(shiftDTO.getShiftDate()),shiftDTO.getStaffId());
+        if(absenceShiftExists){
+            exceptionService.actionNotPermittedException("message.shift.overlap.with.full_day");
+        }
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.invalidRequestException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
         }
         if (staffAdditionalInfoDTO == null) {
             exceptionService.invalidRequestException("message.staff.notfound");
         }
-        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException("message.shift.not.published");
-        }
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.actionNotPermittedException("message.employment.absent");
+        }
+        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
+            exceptionService.invalidRequestException("message.shift.not.published");
         }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
             exceptionService.invalidRequestException("message.shift.not.published");
@@ -761,13 +767,13 @@ public class ShiftValidatorService {
 
     public boolean deleteDuplicateEntryOfShiftViolatedInfo() {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAll();
-        Map<BigInteger, ShiftViolatedRules> longShiftViolatedRulesTreeMap = new HashMap<>();
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = new HashMap<>();
         List<ShiftViolatedRules> violatedRules = new ArrayList<>();
         for (ShiftViolatedRules shiftViolatedRules1 : shiftViolatedRules) {
-            if (longShiftViolatedRulesTreeMap.containsKey(shiftViolatedRules1.getShiftId())) {
+            if (shiftViolatedRulesMap.containsKey(shiftViolatedRules1.getShiftId())) {
                 violatedRules.add(shiftViolatedRules1);
             } else {
-                longShiftViolatedRulesTreeMap.put(shiftViolatedRules1.getShiftId(), shiftViolatedRules1);
+                shiftViolatedRulesMap.put(shiftViolatedRules1.getShiftId(), shiftViolatedRules1);
             }
         }
         logger.info("Duplicate remove entry count is " + violatedRules.size());
