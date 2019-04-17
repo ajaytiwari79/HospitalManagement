@@ -69,7 +69,7 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,String startLocation,String endLocation) {
+    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, String startLocation, String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
