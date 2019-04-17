@@ -145,22 +145,28 @@ public class TimeBankCalculationService {
     private int getAndUpdateCtaBonusMinutes(DateTimeInterval dateTimeInterval, Map<BigInteger, Integer> ctaTimeBankMinMap, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity) {
         DateTimeInterval shiftInterval = dateTimeInterval.overlap(new DateTimeInterval(shiftActivity.getStartDate(),shiftActivity.getEndDate()));
         int ctaBonusAndScheduledMinutes = 0;
-        if (isNotNull(shiftInterval)) {
-            int ctaBonusMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
-            ctaBonusAndScheduledMinutes = ctaBonusMinutes;
-            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaBonusMinutes);
-            shiftActivity.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(new Date()), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusMinutes));
-        }if(asLocalDate(shiftActivity.getStartDate()).isBefore(asLocalDate(shiftActivity.getEndDate()))){
+        ctaBonusAndScheduledMinutes = calculateBonusAndUpdateShiftActivity(dateTimeInterval, ctaTimeBankMinMap, ruleTemplate, shiftActivity, shiftInterval);
+        if(asLocalDate(shiftActivity.getStartDate()).isBefore(asLocalDate(shiftActivity.getEndDate()))){
             DateTimeInterval nextDayInterval = new DateTimeInterval(getStartOfDay(shiftActivity.getEndDate()),getEndOfDay(shiftActivity.getEndDate()));
-            shiftInterval = nextDayInterval.overlap(new DateTimeInterval(shiftActivity.getStartDate(),shiftActivity.getEndDate()));
-            if (isNotNull(shiftInterval)) {
-                int ctaBonusMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
-                ctaBonusAndScheduledMinutes = ctaBonusMinutes;
-                shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaBonusMinutes);
+            shiftInterval = nextDayInterval.overlap(new DateTimeInterval(getStartOfDay(shiftActivity.getEndDate()),shiftActivity.getEndDate()));
+            ctaBonusAndScheduledMinutes += calculateBonusAndUpdateShiftActivity(nextDayInterval, ctaTimeBankMinMap, ruleTemplate, shiftActivity, shiftInterval);
+        }
+        return ctaBonusAndScheduledMinutes;
+    }
+
+    private int calculateBonusAndUpdateShiftActivity(DateTimeInterval dateTimeInterval, Map<BigInteger, Integer> ctaTimeBankMinMap, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity, DateTimeInterval shiftInterval) {
+        int ctaBonusMinutes = 0;
+        if (isNotNull(shiftInterval)) {
+            ctaBonusMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
+            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaBonusMinutes);
+            Optional<TimeBankDistributionDTO> timeBankDistributionDTOOptional = shiftActivity.getTimeBankCTADistributions().stream().filter(timeBankDistributionDTO -> timeBankDistributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findFirst();
+            if (timeBankDistributionDTOOptional.isPresent()) {
+                timeBankDistributionDTOOptional.get().setMinutes(ctaBonusMinutes + timeBankDistributionDTOOptional.get().getMinutes());
+            } else {
                 shiftActivity.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(new Date()), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusMinutes));
             }
         }
-        return ctaBonusAndScheduledMinutes;
+        return ctaBonusMinutes;
     }
 
     public int getFunctionalBonusCompensation(StaffUnitPositionDetails unitPosition, CTARuleTemplateDTO ruleTemplate, DateTimeInterval interval) {

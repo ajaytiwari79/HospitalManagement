@@ -393,7 +393,8 @@ public class TimeBankService extends MongoBaseService {
         DateTimeInterval dateTimeInterval = new DateTimeInterval(interval.getStartMillis(), interval.getEndMillis());
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftWithActivityDTOS.forEach(shift -> {
-            if(dateTimeInterval.contains(shift.getStartDate())) {
+            DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
+            if(dateTimeInterval.overlaps(shiftInterval)) {
                 shifts.add(shift);
             }
         });
