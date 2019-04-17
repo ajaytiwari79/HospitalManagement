@@ -76,7 +76,7 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void getTimeBankByInterval() {
-        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition,interval,shiftWithActivityDTOS,dailyTimeBankEntryMap,planningPeriodIntervals,dayTypeDTOS,validatedByPlanner);
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition,interval,shiftWithActivityDTOS,null,planningPeriodIntervals,dayTypeDTOS,validatedByPlanner);
         LOGGER.info("daily timebank : {}",dailyTimeBankEntry);
         Map<BigInteger,Integer> ctaDistributionCalculation = new HashMap<>(8);
         ctaDistributionCalculation.put(new BigInteger("3061"),480);
