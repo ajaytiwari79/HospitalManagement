@@ -512,6 +512,10 @@ public  class DateUtils {
         return Date.from(localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
     }
 
+    public static Date asDateStartOfDay(LocalDate localDate) {
+        return Date.from(localDate.atTime(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public static Date asDate(LocalDate localDate, LocalTime localTime) {
         return Date.from(localDate.atTime(localTime).atZone(ZoneId.systemDefault()).toInstant());
     }

@@ -1,19 +1,24 @@
 package com.kairos.service.staffing_level;
 
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
-import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
-import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -25,14 +30,8 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.event.ShiftNotificationEvent;
 import com.kairos.utils.service_util.StaffingLevelUtil;
-import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
-import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -56,7 +55,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -74,7 +76,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.getWeekNumberByLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
@@ -197,11 +200,11 @@ public class StaffingLevelService extends MongoBaseService {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findChildActivityActivityIds(presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank().keySet());
         Map<BigInteger, BigInteger> childAndParentActivityIdMap = new HashMap<>();
         activityDTOS.forEach(activityDTO -> {
-                if (isCollectionNotEmpty(activityDTO.getChildActivityIds())) {
-                    activityDTO.getChildActivityIds().forEach(childActivityId -> childAndParentActivityIdMap.put(childActivityId,activityDTO.getId()));
-                }
+            if (isCollectionNotEmpty(activityDTO.getChildActivityIds())) {
+                activityDTO.getChildActivityIds().forEach(childActivityId -> childAndParentActivityIdMap.put(childActivityId, activityDTO.getId()));
+            }
         });
-        staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel,childAndParentActivityIdMap);
+        staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel, childAndParentActivityIdMap);
         this.save(staffingLevel);
         staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()), staffingLevel.getId(), staffingLevel.getStaffingLevelSetting().getActivitiesRank());
         Collections.sort(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval(), Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence));
@@ -795,6 +798,7 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
     private List<StaffingLevel> updatePresenceStaffingLevelAvailableStaffCount(List<StaffingLevel> staffingLevels, ShiftNotificationEvent shiftNotificationEvent, boolean deleted) {
+
         for (ShiftActivity shiftActivity : shiftNotificationEvent.getShift().getActivities()) {
             int lowerLimit = 0;
             int upperLimit = 0;
@@ -821,7 +825,7 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
     private void updateStaffingLevelInterval(int lowerLimit, int upperLimit, StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean deleted) {
-
+        Activity parentActivity = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId());
         int currentAvailableStaffCount = 0;
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             if (currentIndex >= staffingLevel.getPresenceStaffingLevelInterval().size()) {
@@ -832,18 +836,33 @@ public class StaffingLevelService extends MongoBaseService {
             currentAvailableStaffCount = staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getAvailableNoOfStaff();
             if (deleted) {
                 staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(--currentAvailableStaffCount);
-                staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
-                        filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(shiftActivity.getActivityId())).findFirst().
-                        ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() > 0 ? staffingLevelActivity.getAvailableNoOfStaff() - 1 : 0));
+                updateStaffingLevelOfChildAndParent(staffingLevel, deleted, currentIndex, shiftActivity.getActivityId());
+                if (isNotNull(parentActivity))
+                    updateStaffingLevelOfChildAndParent(staffingLevel, deleted, currentIndex, parentActivity.getId());
             } else {
                 staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(++currentAvailableStaffCount);
-                staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
-                        filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(shiftActivity.getActivityId())).findFirst().
-                        ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() + 1));
+                updateStaffingLevelOfChildAndParent(staffingLevel, false, currentIndex, shiftActivity.getActivityId());
+                if (isNotNull(parentActivity))
+                    updateStaffingLevelOfChildAndParent(staffingLevel, false, currentIndex, parentActivity.getId());
             }
         }
 
     }
+
+    private void updateStaffingLevelOfChildAndParent(StaffingLevel staffingLevel, boolean deleted, int currentIndex, BigInteger activityId) {
+
+        if (deleted) {
+            staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
+                    filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activityId)).findFirst().
+                    ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() > 0 ? staffingLevelActivity.getAvailableNoOfStaff() - 1 : 0));
+        } else {
+            staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
+                    filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activityId)).findFirst().
+                    ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() + 1));
+
+        }
+    }
+
 
     public Map<String, Object> createStaffingLevelFromStaffingLevelTemplate(Long unitId, StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO, BigInteger templateId) {
         Map<String, Object> response = new HashMap<>();
