@@ -234,15 +234,4 @@ public class ActivityUtil {
 
     }
 
-    public static List<String> verifyCompositeActivities(boolean breakAllowed, List<ActivityWrapper> activities){
-        List<String> invalidActivities=new ArrayList<>();
-        activities.forEach(activity -> {
-            if (activity.getActivity().getRulesActivityTab().isBreakAllowed() != breakAllowed
-                    && !TimeTypeEnum.PAID_BREAK.equals(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())
-                    && !TimeTypeEnum.UNPAID_BREAK.equals(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())) {
-                invalidActivities.add(activity.getActivity().getName());
-            }
-        });
-        return invalidActivities;
-    }
 }

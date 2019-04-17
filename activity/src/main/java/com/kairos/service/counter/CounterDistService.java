@@ -112,13 +112,13 @@ public class CounterDistService extends MongoBaseService {
             refId = userIntegrationService.getStaffIdByUserId(refId);
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level, false);
-        List<KPIDTO> fibonacciDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIService.getAllFibonacciKPI(refId,level),KPIDTO.class);
-        fibonacciDtos.addAll(kpidtos);
-        if (fibonacciDtos.isEmpty()) {
+//        List<KPIDTO> fibonacciDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIService.getAllFibonacciKPI(refId,level),KPIDTO.class);
+//        fibonacciDtos.addAll(kpidtos);
+        if (kpidtos.isEmpty()) {
             LOGGER.info("KPI not found for {} id " + refId,level);
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        return fibonacciDtos;
+        return kpidtos;
     }
 
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level) {

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
@@ -19,6 +20,7 @@ import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -114,6 +116,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
+
     }
 
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
@@ -121,7 +124,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "timeCalculationActivityTab", "tags", "activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "tags", "activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeCalculationActivityTab.methodForCalculatingTime").as("methodForCalculatingTime")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
@@ -136,7 +141,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "timeCalculationActivityTab", "tags", "activityPriorityId", "childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                project("name", "state", "description", "countryId", "isParentActivity", "generalActivityTab", "tags", "activityPriorityId", "childActivityIds").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
+                        .and("timeCalculationActivityTab.methodForCalculatingTime").as("methodForCalculatingTime")
+
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
                         .and("timeType.allowChildActivities").arrayElementAt(0).as("applicableForChildActivities")
         );
@@ -575,9 +582,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityWrapper> findActivityAndTimeTypeByActivityIds(Set<BigInteger> activityIds) {
+    public List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("id").in(activityIds).and("deleted").is(false)),
+                match(Criteria.where("id").in(activityIds).and("deleted").is(false).and("timeCalculationActivityTab.methodForCalculatingTime").nin(AppConstants.FULL_DAY_CALCULATION, AppConstants.FULL_WEEK)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "timeType"),
                 project().and("id").as("activity._id").and("name").as("activity.name")
@@ -683,4 +690,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Update update = new Update().pull("expertises", expertiseId);
         return mongoTemplate.updateMulti(new Query(), update, Activity.class).wasAcknowledged();
     }
+
+    @Override
+    public boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId) {
+        Update update = new Update().pull("compositeActivities", new Document().append("activityId", activityId));
+        return mongoTemplate.updateMulti(new Query(), update, Activity.class).wasAcknowledged();
+    }
+
+
 }

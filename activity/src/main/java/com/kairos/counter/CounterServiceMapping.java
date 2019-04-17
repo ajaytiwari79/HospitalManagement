@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /*
@@ -19,7 +20,7 @@ import java.util.Map;
 @Component
 public class CounterServiceMapping {
     private final static Logger LOGGER = LoggerFactory.getLogger(CounterServiceMapping.class);
-    private Map<CounterType, CounterService> counters = new HashMap();
+    private Map<CounterType, CounterService> counters = new ConcurrentHashMap<>();
 
     @Inject
     public void setCounterService(RestingHoursCalculationService restingHoursCalculationService) {
