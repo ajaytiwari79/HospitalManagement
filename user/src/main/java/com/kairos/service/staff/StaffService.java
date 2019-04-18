@@ -459,18 +459,7 @@ public class StaffService {
                 }
 
                 if (String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).isEmpty()) {
-
                     userName = createNewUserName(firstName, lastName);
-
-                    Random rand = new Random();
-
-                    String newUsername = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
-
-                    User existingUserName = userGraphRepository.findUserByUserName("(?i)" + newUsername);
-                    if (Optional.ofNullable(existingUserName).isPresent()) {
-                        newUsername = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
-                    }
-                    userName = newUsername;
 
                 } else {
                     userName = getStringValueOfIndexedCell(row, 19);
@@ -517,7 +506,7 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
-                        user = userGraphRepository.findByEmail("?" +privateEmail);
+                        user = userGraphRepository.findByEmail("(?i)"+privateEmail);
                         if (user != null) {
                             user = userGraphRepository.findUserByCprNumber(cprAsLong.toString());
                         }
@@ -1038,12 +1027,9 @@ public class StaffService {
         Random rand = new Random();
         String newGeneratedUserName = null;
         while (newUserName == null) {
-            LOGGER.info(">>>>>>>>>>>>>am in the while loop>>>>>>>>>>>>>>>>>"+newUserName);
             newGeneratedUserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
             existingUserName = userGraphRepository.findUserByUserName(newGeneratedUserName);
             if (!Optional.ofNullable(existingUserName).isPresent()) {
-                LOGGER.info("<<<<<<<<<<<<<<<creating the newuserName>>>>>>>>>>>>>>>>>"+newGeneratedUserName);
-                // newUserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
                 newUserName = newGeneratedUserName;
                 break;
             }
