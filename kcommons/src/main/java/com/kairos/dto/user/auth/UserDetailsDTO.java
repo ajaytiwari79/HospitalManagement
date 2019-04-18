@@ -12,7 +12,6 @@ public class UserDetailsDTO {
     private  int age;
     private Long countryId;
     private boolean hubMember;
-    private boolean userNameUpdated;
 
     public Long getId() {
         return id;
@@ -103,12 +102,4 @@ public class UserDetailsDTO {
     }
 
     private Long languageId;
-
-    public boolean isUserNameUpdated() {
-        return userNameUpdated;
-    }
-
-    public void setUserNameUpdated(boolean userNameUpdated) {
-        this.userNameUpdated = userNameUpdated;
-    }
 }

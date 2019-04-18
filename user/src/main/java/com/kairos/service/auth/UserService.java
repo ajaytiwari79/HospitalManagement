@@ -4,6 +4,7 @@ import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -522,22 +523,22 @@ public class UserService {
 
     public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
-        if (user == null) {
+        if (!ObjectUtils.isNotNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
         }
-        User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" +userDetailsDTO.getUserName());
-        if (userNameAlreadyExist != null) {
-            LOGGER.error("This userName is already in use " + userDetailsDTO.getUserName());
-            exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailsDTO.getUserName());
-        }
-        if (userDetailsDTO.isUserNameUpdated()) {
+        if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
+            user.setUserNameUpdated(true);
+        } else {
+            User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" + userDetailsDTO.getUserName());
+            if (!ObjectUtils.isNotNull(userNameAlreadyExist)) {
+                LOGGER.error("This userName is already in use " + userDetailsDTO.getUserName());
+                exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailsDTO.getUserName());
+            }
             user.setUserNameUpdated(true);
             user.setUserName(userDetailsDTO.getUserName());
-            userGraphRepository.save(user);
-            return true;
         }
-            return false;
-        }
-
+        userGraphRepository.save(user);
+        return true;
+    }
 }
