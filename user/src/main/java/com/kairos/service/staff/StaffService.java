@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
@@ -459,18 +460,7 @@ public class StaffService {
                 }
 
                 if (String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).isEmpty()) {
-
                     userName = createNewUserName(firstName, lastName);
-
-                    Random rand = new Random();
-
-                    String newUsername = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
-
-                    User existingUserName = userGraphRepository.findUserByUserName("(?i)" + newUsername);
-                    if (Optional.ofNullable(existingUserName).isPresent()) {
-                        newUsername = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
-                    }
-                    userName = newUsername;
 
                 } else {
                     userName = getStringValueOfIndexedCell(row, 19);
@@ -517,8 +507,8 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
-                        user = userGraphRepository.findByEmail("?" +privateEmail);
-                        if (user != null) {
+                        user = userGraphRepository.findByEmail("(?i)"+privateEmail);
+                        if (ObjectUtils.isNotNull(user)) {
                             user = userGraphRepository.findUserByCprNumber(cprAsLong.toString());
                         }
                         if (!Optional.ofNullable(user).isPresent()) {
@@ -1038,12 +1028,9 @@ public class StaffService {
         Random rand = new Random();
         String newGeneratedUserName = null;
         while (newUserName == null) {
-            LOGGER.info(">>>>>>>>>>>>>am in the while loop>>>>>>>>>>>>>>>>>"+newUserName);
             newGeneratedUserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
             existingUserName = userGraphRepository.findUserByUserName(newGeneratedUserName);
             if (!Optional.ofNullable(existingUserName).isPresent()) {
-                LOGGER.info("<<<<<<<<<<<<<<<creating the newuserName>>>>>>>>>>>>>>>>>"+newGeneratedUserName);
-                // newUserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
                 newUserName = newGeneratedUserName;
                 break;
             }
