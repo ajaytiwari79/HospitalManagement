@@ -58,6 +58,12 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.DAYTYPE_AND_TIMESLOT, dayTypeAndTimeSlotKpiService);
     }
 
+    @Inject
+    public void setCounterService(FibonacciKPIService fibonacciKPIService) {
+        LOGGER.info("Enum mapping for resting hours: "+this.counters);
+        this.counters.put(CounterType.FIBONACCI, fibonacciKPIService);
+    }
+
 
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);

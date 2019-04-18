@@ -118,7 +118,7 @@ public class StaffCreationServiceTest {
     }
 
     @Test
-    public void createStaffFromWeb() {
+    public void createStaff() {
 
 
         ContactAddress contactAddress = new ContactAddress();
@@ -171,7 +171,7 @@ public class StaffCreationServiceTest {
         when(staffGraphRepository.findStaffByEmailInOrganization(staffCreationDTO.getPrivateEmail(), 1L)).thenReturn(null);
 
         staffDTO = new StaffDTO(1L, "testUser", "user", new BigInteger("1234567890"), "testFamilyName", "testUser@gmail.com", 123456789, "buisness@gmail.com", 123456789, DateUtils.asDate(LocalDate.of(2007, 11, 15)), 1L, 1L, skills, 1L, 1L, StaffStatusEnum.ACTIVE);
-        // staffDTO = staffCreationService.createStaffFromWeb(1L,staffCreationDTO);
+        // staffDTO = staffCreationService.createStaff(1L,staffCreationDTO);
         // Assert.assertEquals(staffDTO,staffDTO);
 
         user.setUserName("testUser@gmail.com");
@@ -214,7 +214,7 @@ public class StaffCreationServiceTest {
         //staff.setFirstName(staffDTO.getFirstName());
         //doNothing().when(staffCreationService).createEmployment(null,null,null,null,null,false);
         when(accessGroupRepository.findOne(accessGroup.getId())).thenReturn(accessGroup);
-        //when(staffCreationService.createStaffFromWeb(1L,staffCreationDTO)).thenReturn(staffDTO);
+        //when(staffCreationService.createStaff(1L,staffCreationDTO)).thenReturn(staffDTO);
 
 
     }
@@ -292,7 +292,7 @@ public class StaffCreationServiceTest {
         if (when(staffGraphRepository.findStaffByEmailInOrganization(newStaff.getEmail(), 1L)).thenReturn(staff) != null) {
             throw new DuplicateDataException("Staff already exist with this test@gmail.com");
         }
-        staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
+        staffCreationService.createStaff(1L, staffCreationDTO);
         assertEquals(null, "Staff already exist with this test@gmail.com", "Staff already exist with this test@gmail.com");
 
     }
@@ -309,7 +309,7 @@ public class StaffCreationServiceTest {
 
         expectedEx.expect(InvalidSize.class);
         expectedEx.expectMessage("Length of Cpr number must be 10 digit");
-        staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
+        staffCreationService.createStaff(1L, staffCreationDTO);
         if (staffCreationDTO.getCprNumber().length() != 10) {
             throw new InvalidSize("Length of Cpr number must be 10 digit");
         }
@@ -394,7 +394,7 @@ public class StaffCreationServiceTest {
         }
         LOGGER.info(Boolean.toString(when(staffGraphRepository.isStaffExistsByCPRNumber(staffCreationDTO.getCprNumber(),
                 organization.getId())).thenReturn(true).equals(Boolean.TRUE)));
-        staffCreationService.createStaffFromWeb(1L, staffCreationDTO);
+        staffCreationService.createStaff(1L, staffCreationDTO);
         assertEquals(null, "Staff already exists with same cpr number 1234567891", "Staff already exists with same cpr number 1234567891");
 
     }*/

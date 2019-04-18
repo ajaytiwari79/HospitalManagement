@@ -118,7 +118,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     @Override
-    public Map<Long,Number>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+    public Map<Long,Integer>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
         return new HashMap<>();//getContractualAndPlannedHoursKpiDate(organizationId, filterBasedCriteria).stream().;
     }
 

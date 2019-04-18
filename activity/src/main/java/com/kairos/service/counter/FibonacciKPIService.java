@@ -1,17 +1,19 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.counter.CounterServiceMapping;
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.KPIAxisData;
+import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
-import com.kairos.persistence.model.counter.ApplicableFilter;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPI;
-import com.kairos.persistence.model.counter.TabKPIConf;
+import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
@@ -20,20 +22,20 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Service
-public class FibonacciKPIService {
+public class FibonacciKPIService implements CounterService{
 
     @Inject private FibonacciKPIRepository fibonacciKPIRepository;
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ExceptionService exceptionService;
     @Inject private CounterServiceMapping counterServiceMapping;
+    @Inject private CounterRepository counterRepository;
 
     public FibonacciKPIDTO createFibonacciKPI(Long referenceId, FibonacciKPIDTO fibonacciKPIDTO, ConfLevel confLevel) {
         boolean existByName = fibonacciKPIRepository.existByName(null,fibonacciKPIDTO.getTitle(),confLevel,referenceId);
@@ -117,4 +119,25 @@ public class FibonacciKPIService {
         }
     }
 
+    @Override
+    public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
+        return null;
+    }
+
+    @Override
+    public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
+        Map<BigInteger,FibonacciKPIConfig> fibonacciKPIConfigMap = ((FibonacciKPI)kpi).getFibonacciKPIConfigs().stream().collect(Collectors.toMap(fibonacciKPIConfig -> fibonacciKPIConfig.getKpiId(),v->v));
+        List<KPI> counters = counterRepository.getKPIsByIds(new ArrayList<>(fibonacciKPIConfigMap.keySet()));
+        Map<BigInteger,Map<Long, Number>> countersCalculationMap = new TreeMap<>(Com);
+        for (KPI counter : counters) {
+            Map<Long, Double> kpiCalculation = counterServiceMapping.getService(counter.getType()).getFibonacciCalculatedCounter(filterBasedCriteria,organizationId);
+            countersCalculationMap.put(counter.getId(),kpiCalculation);
+        }
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+    }
+
+    @Override
+    public Map<Long, Double> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+        return null;
+    }
 }

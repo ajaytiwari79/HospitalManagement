@@ -356,7 +356,7 @@ public class StaffCreationService {
     }
 
 
-    public StaffDTO createStaffFromWeb(Long unitId, StaffCreationDTO payload) {
+    public StaffDTO createStaff(Long unitId, StaffCreationDTO payload) {
         if (payload.getCprNumber().length() != 10) {
             exceptionService.invalidSize("message.cprNumber.size");
         }
@@ -406,9 +406,7 @@ public class StaffCreationService {
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
-        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge(
-
-        ));
+        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
     }
 
     public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {

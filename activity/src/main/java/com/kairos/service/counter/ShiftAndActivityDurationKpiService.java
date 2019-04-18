@@ -100,7 +100,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
     }
 
     @Override
-    public Map<Long,Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+    public Map<Long,Integer> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
         return new HashMap<>();
     }
 }

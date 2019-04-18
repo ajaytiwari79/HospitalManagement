@@ -79,7 +79,7 @@ public class PlannedHoursCalculationService implements CounterService {
     }
 
     @Override
-    public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
-        return getPlannedHoursKpiData(organizationId, filterBasedCriteria, true).stream().collect(Collectors.toMap(k->k.getRefId().longValue(),v->((ClusteredBarChartKpiDataUnit)v).getNumberValue()));
+    public Map<Long, Integer> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+        return null;//getPlannedHoursKpiData(organizationId, filterBasedCriteria, true).stream().collect(Collectors.toMap(k->k.getRefId().longValue(),v->((ClusteredBarChartKpiDataUnit)v).getNumberValue()));
     }
 }

@@ -14,10 +14,13 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.dto.activity.counter.enums.ChartType.BAR;
+import static com.kairos.dto.activity.counter.enums.CounterSize.SIZE_8X2;
+
 @Getter
 @Setter
 @Document(collection = "counter")
-public class FibonacciKPI extends Counter{
+public class FibonacciKPI extends KPI{
     private String description;
     private Long referenceId;
     private ConfLevel confLevel;
@@ -25,7 +28,9 @@ public class FibonacciKPI extends Counter{
     private boolean fibonacciKPI;
 
     public FibonacciKPI() {
-        this.setType(CounterType.FIBONACCI);
-        this.setFibonacciKPI(true);
+        this.type = CounterType.FIBONACCI;
+        this.fibonacciKPI = true;
+        this.chart = BAR;
+        this.size = SIZE_8X2;
     }
 }

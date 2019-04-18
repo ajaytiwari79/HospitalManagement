@@ -41,5 +41,5 @@ public interface CounterService {
 
     CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi);
 
-    Map<Long,Number>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId);
+    Map<Long,Integer>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId);
 }
