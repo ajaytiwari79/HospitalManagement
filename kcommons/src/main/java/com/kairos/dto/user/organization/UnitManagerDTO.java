@@ -16,8 +16,9 @@ public class UnitManagerDTO {
     private String lastName;
     private String email;
     private String accessGroupName;
+    private String userName;
 
-    public UnitManagerDTO(){
+    public UnitManagerDTO() {
         // default constructor
     }
 
@@ -59,6 +60,14 @@ public class UnitManagerDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getAccessGroupName() {

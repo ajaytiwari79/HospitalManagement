@@ -126,6 +126,7 @@ public class StaffCreationService {
             LOGGER.info("Creating new staff with kmd external id " + payload.getExternalId() + " in unit " + unit.getId());
             staff = new Staff();
         }
+        staff.setUserName(payload.getUserName());
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
         staff.setExternalId(payload.getExternalId());
@@ -388,6 +389,11 @@ public class StaffCreationService {
             exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
 
         }
+        User userWithExistingUserName = userGraphRepository.findUserByUserName("(?i)" +payload.getUserName());
+        if(Optional.ofNullable(userWithExistingUserName).isPresent()){
+            exceptionService.duplicateDataException("message.staff.userName.alreadyexist");
+        }
+
         setBasicDetailsOfUser(user, payload);
         // Set default language of User
         Long countryId = UserContext.getUserDetails().getCountryId();
@@ -400,7 +406,9 @@ public class StaffCreationService {
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
-        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
+        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge(
+
+        ));
     }
 
     public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
@@ -501,7 +509,7 @@ public class StaffCreationService {
 
     public void setBasicDetailsOfUser(User user, StaffCreationDTO staffCreationDTO) {
         user.setEmail(staffCreationDTO.getPrivateEmail());
-        user.setUserName(staffCreationDTO.getPrivateEmail());
+        user.setUserName(staffCreationDTO.getUserName());
         user.setFirstName(staffCreationDTO.getFirstName());
         user.setLastName(staffCreationDTO.getLastName());
         user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent() ? new BCryptPasswordEncoder().encode(user.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH) : null);

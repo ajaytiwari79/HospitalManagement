@@ -1,6 +1,7 @@
 package com.kairos.controller.auth;
 
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
@@ -27,10 +28,8 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
-
 
 /**
  * Controller to authenticate User
@@ -196,4 +195,9 @@ public class AuthController {
     }
 
 
+    /* @PreAuthorize("@customPermissionEvaluator.isAuthorized(#organizationId,#tabId,#httpServletRequest)")*/
+    @PutMapping(value = "/update_user_name")
+    ResponseEntity<Map<String,Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailsDTO));
+    }
 }
