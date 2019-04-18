@@ -82,7 +82,6 @@ public class User extends UserBaseEntity {
         isUserNameUpdated = userNameUpdated;
     }
 
-
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 

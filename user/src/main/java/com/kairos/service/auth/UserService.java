@@ -12,7 +12,6 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.dto.user.user.userDetailUpdate.UserDetailUpdateDTO;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -177,7 +176,6 @@ public class UserService {
         if (!Optional.ofNullable(currentUser).isPresent()) {
                 return null;
         }
-
         int otp = OtpGenerator.generateOtp();
         currentUser.setOtp(otp);
         userGraphRepository.save(currentUser);
@@ -477,16 +475,13 @@ public class UserService {
     }
 
     public boolean forgotPassword(String userEmail) {
-        //  User currentUser= null;
         if (userEmail.endsWith("kairos.com") || userEmail.endsWith("kairosplanning.com")) {
             LOGGER.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
             exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
         }
-        //User currentUser = userGraphRepository.findByEmail(userEmail);
         User currentUser = userGraphRepository.findByEmail("(?i)" + userEmail);
         if (!Optional.ofNullable(currentUser).isPresent()) {
             LOGGER.error("No User found by email " + userEmail);
-            // exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
             currentUser = userGraphRepository.findUserByUserName("(?i)" + userEmail);
             if (!Optional.ofNullable(currentUser).isPresent()) {
                 LOGGER.error("No User found by userName " + userEmail);

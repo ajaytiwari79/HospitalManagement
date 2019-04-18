@@ -3,7 +3,6 @@ package com.kairos.controller.auth;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.dto.user.user.userDetailUpdate.UserDetailUpdateDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.auth.UserService;
