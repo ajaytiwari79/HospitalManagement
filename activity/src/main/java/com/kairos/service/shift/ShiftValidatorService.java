@@ -76,10 +76,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asDateEndOfDay;
-import static com.kairos.commons.utils.DateUtils.asDateStartOfDay;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
@@ -184,10 +183,10 @@ public class ShiftValidatorService {
 
 
     public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean byUpdate, boolean byTandAPhase) {
-        if (wtaQueryResultDTO.getEndDate() != null && wtaQueryResultDTO.getEndDate().isBefore(DateUtils.asLocalDate(shift.getEndDate()))) {
+        if (wtaQueryResultDTO.getEndDate() != null && wtaQueryResultDTO.getEndDate().isBefore(asLocalDate(shift.getEndDate()))) {
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
-        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getStartDate()));
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), asLocalDate(shift.getStartDate()));
         if (planningPeriod == null) {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shift.getStartDate());
         }
@@ -391,8 +390,8 @@ public class ShiftValidatorService {
                         exceptionService.actionNotPermittedException("message.staffingLevel.absent");
                     }
                     List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftActivities.get(0).getStartDate(), shiftActivities.get(0).getEndDate(), unitId);
-                    StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
-                    StaffingLevelActivityRank rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
+                    StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
+                    StaffingLevelActivityRank rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
                     String staffingLevelForExistingActivity = getStaffingLevel(existing, staffingLevels, shifts, false);
                     String staffingLevelForReplacedActivity = getStaffingLevel(arrived, staffingLevels, shifts, true);
                     boolean checkForStaff = userAccessRoleDTO.getStaff();
@@ -409,7 +408,7 @@ public class ShiftValidatorService {
                                 || (rankOfExisting.getRank() > rankOfReplaced.getRank() && BALANCED.equals(staffingLevelForReplacedActivity))
                                 || (BALANCED.equals(staffingLevelForReplacedActivity) && BALANCED.equals(staffingLevelForExistingActivity))
                                 || (staffingLevelForReplacedActivity == null && rankOfExisting.getRank() > rankOfReplaced.getRank())
-                        ) {
+                                ) {
                             logger.info("shift can be replaced");
                         } else {
                             exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
@@ -648,8 +647,7 @@ public class ShiftValidatorService {
         return shiftActivities;
     }
 
-    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String
-            type) {
+    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.validation.access");
