@@ -169,8 +169,8 @@ public class ShiftService extends MongoBaseService {
             if(TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType())) || TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullWeekCalculationType()))){
                 shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MIN)));
                 shiftDTO.getActivities().get(0).setStartDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MIN)));
-                shiftDTO.getActivities().get(0).setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
-                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
+                shiftDTO.getActivities().get(0).setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1).atTime(LocalTime.MIN)));
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1).atTime(LocalTime.MIN)));
                 boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
                 Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, shiftDTO.getActivities().get(0).getStartDate(), null);
                 shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase,shiftOverlappedWithNonWorkingType );
