@@ -84,10 +84,9 @@ public class TimeBankCalculationService {
     private PayOutRepository payOutRepository;
 
     public DailyTimeBankEntry getTimeBankByInterval(StaffUnitPositionDetails unitPosition, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS,boolean validatedByPlanner) {
-        DailyTimeBankEntry dailyTimeBank = null;
         boolean anyShiftPublish = false;
         if(isCollectionNotEmpty(shifts)) {
-            dailyTimeBank = isNullOrElse(dailyTimeBankEntry, new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(), dateTimeInterval.getStartLocalDate()));
+            dailyTimeBankEntry = isNullOrElse(dailyTimeBankEntry, new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(), dateTimeInterval.getStartLocalDate()));
             int totalDailyPlannedMinutes = 0;
             int scheduledMinutesOfTimeBank = 0;
             int totalPublishedDailyPlannedMinutes = 0;
@@ -127,19 +126,19 @@ public class TimeBankCalculationService {
             }
             int deltaTimeBankMinutes = totalDailyPlannedMinutes - contractualMinutes;
             int timeBankMinWithoutCta = scheduledMinutesOfTimeBank - contractualMinutes;
-            dailyTimeBank.setStaffId(unitPosition.getStaffId());
-            dailyTimeBank.setTimeBankMinutesWithoutCta(timeBankMinWithoutCta);
-            dailyTimeBank.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes);
-            dailyTimeBank.setDeltaAccumulatedTimebankMinutes(anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0);
-            dailyTimeBank.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum());
-            dailyTimeBank.setContractualMinutes(contractualMinutes);
-            dailyTimeBank.setScheduledMinutesOfTimeBank(scheduledMinutesOfTimeBank);
-            dailyTimeBank.setDeltaTimeBankMinutes(deltaTimeBankMinutes);
-            dailyTimeBank.setTimeBankCTADistributionList(getScheduledCTADistributions(unitPosition.getCtaRuleTemplates(), ctaTimeBankMinMap));
-        } else if(isNotNull(dailyTimeBank)){
-            dailyTimeBank.setDeleted(true);
-        }
-        return dailyTimeBank;
+            dailyTimeBankEntry.setStaffId(unitPosition.getStaffId());
+            dailyTimeBankEntry.setTimeBankMinutesWithoutCta(timeBankMinWithoutCta);
+            dailyTimeBankEntry.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes);
+            dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0);
+            dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum());
+            dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
+            dailyTimeBankEntry.setScheduledMinutesOfTimeBank(scheduledMinutesOfTimeBank);
+            dailyTimeBankEntry.setDeltaTimeBankMinutes(deltaTimeBankMinutes);
+            dailyTimeBankEntry.setTimeBankCTADistributionList(getScheduledCTADistributions(unitPosition.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        } else if (isNotNull(dailyTimeBankEntry)) {
+                dailyTimeBankEntry.setDeleted(true);
+            }
+        return dailyTimeBankEntry;
     }
 
     private int getAndUpdateCtaBonusMinutes(DateTimeInterval dateTimeInterval, Map<BigInteger, Integer> ctaTimeBankMinMap, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity) {

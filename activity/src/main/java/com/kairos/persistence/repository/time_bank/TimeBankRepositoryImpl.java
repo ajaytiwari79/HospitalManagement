@@ -54,13 +54,13 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
     }
 
     @Override
-    public DailyTimeBankEntry findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate){
+    public List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate){
         Criteria criteria = Criteria.where("unitPositionId").is(unitPositionId).and("deleted").is(false).and("date").gte(startDate);
         if(endDate!=null){
             criteria.lte(endDate);
         }
         Query query = new Query(criteria);
-        return mongoTemplate.findOne(query,DailyTimeBankEntry.class);
+        return mongoTemplate.find(query,DailyTimeBankEntry.class);
     }
 
     @Override

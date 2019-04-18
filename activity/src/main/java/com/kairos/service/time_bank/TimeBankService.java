@@ -9,7 +9,6 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -43,7 +42,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -66,7 +64,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ONE_DAY_MINUTES;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 /*
  * Created By Pradeep singh rajawat
@@ -200,7 +199,8 @@ public class TimeBankService extends MongoBaseService {
     private List<DailyTimeBankEntry> renewDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Date startDateTime, @Nullable Date endDateTime, Long unitId) {
         Date startDate = getStartOfDay(startDateTime);
         Date endDate = isNotNull(endDateTime) ? getEndOfDay(endDateTime) : null;
-        DailyTimeBankEntry dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate, endDate);
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate, endDate);
+        Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getDate(),v->v));
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>();
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate, endDate);
         if(isCollectionNotEmpty(shiftWithActivityDTOS)) {
@@ -213,7 +213,7 @@ public class TimeBankService extends MongoBaseService {
                 DateTimeInterval interval = new DateTimeInterval(startDate.getTime(), plusDays(startDate, 1).getTime());
                 List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
                 staffAdditionalInfoDTO.getUnitPosition().setStaffId(staffAdditionalInfoDTO.getId());
-                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getUnitPosition(), interval, shiftWithActivityDTOList, dailyTimeBankEntries, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes(), false);
+                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getUnitPosition(), interval, shiftWithActivityDTOList, dateDailyTimeBankEntryMap.get(asLocalDate(startDate)), dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes(), false);
                 if(dailyTimeBank != null) {
                     dailyTimeBanks.add(dailyTimeBank);
                 }
@@ -393,8 +393,7 @@ public class TimeBankService extends MongoBaseService {
         DateTimeInterval dateTimeInterval = new DateTimeInterval(interval.getStartMillis(), interval.getEndMillis());
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftWithActivityDTOS.forEach(shift -> {
-            DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
-            if(dateTimeInterval.overlaps(shiftInterval)) {
+            if(dateTimeInterval.contains(shift.getStartDate())) {
                 shifts.add(shift);
             }
         });
