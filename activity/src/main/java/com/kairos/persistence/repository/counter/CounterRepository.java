@@ -129,7 +129,8 @@ public class CounterRepository {
                 lookup("counter", "activeKpiId", "_id", "kpi"),
                 project("title").and("kpi").arrayElementAt(0).as("kpi"),
                 project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
-                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
+                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
+                        and("kpi.fibonacciKPI").as("fibonacciKPI")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();

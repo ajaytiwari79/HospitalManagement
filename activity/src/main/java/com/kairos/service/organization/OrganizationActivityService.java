@@ -518,19 +518,6 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<ActivityWrapper> activities) {
-        List<String> invalidActivities = ActivityUtil.verifyCompositeActivities(breakAllowed, activities);
-        if (invalidActivities.size() != 0) {
-            List<String> errorMessages = new ArrayList<>(invalidActivities);
-            if (breakAllowed) {
-                exceptionService.actionNotPermittedException("activities.not.support.break", errorMessages);
-            }
-            if (!breakAllowed) {
-                exceptionService.actionNotPermittedException("activities.support.break", errorMessages);
-            }
-
-        }
-    }
 
     /**
      *

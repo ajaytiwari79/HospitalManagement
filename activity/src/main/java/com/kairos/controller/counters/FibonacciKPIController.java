@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import java.math.BigInteger;
 
@@ -30,12 +31,12 @@ public class FibonacciKPIController {
     @Inject private FibonacciKPIService fibonacciKPIService;
 
     @PostMapping(value = COUNTRY_URL+FIBONACCI)
-    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.createFibonacciKPI(countryId,fibonacciKPIDTO, ConfLevel.COUNTRY));
     }
 
     @PutMapping(value = COUNTRY_URL+FIBONACCI+"/{fibonacciKPIId}")
-    public ResponseEntity<ResponseDTO<Object>> updateFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> updateFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true,  fibonacciKPIService.updateFibonacciKPI(countryId,fibonacciKPIDTO,ConfLevel.COUNTRY));
     }
 
@@ -60,12 +61,12 @@ public class FibonacciKPIController {
     }
 
     @PostMapping(value = UNIT_URL+FIBONACCI)
-    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.createFibonacciKPI(unitId,fibonacciKPIDTO, ConfLevel.UNIT));
     }
 
     @PutMapping(value = UNIT_URL+FIBONACCI+"/{fibonacciKPIId}")
-    public ResponseEntity<ResponseDTO<Object>> updateFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> updateFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.updateFibonacciKPI(unitId,fibonacciKPIDTO,ConfLevel.UNIT));
     }
 

@@ -1,5 +1,7 @@
 package com.kairos.utils.service_util;
 
+import java.math.BigInteger;
+
 public class StaffingLevelStaffMinMax {
 
     private int minNoOfStaffParentActivity;
@@ -27,6 +29,7 @@ public class StaffingLevelStaffMinMax {
         this.minNoOfStaffChildActivities = minNoOfStaffChildActivities;
         this.maxNoOfStaffChildActivities = maxNoOfStaffChildActivities;
     }
+
 
     public StaffingLevelStaffMinMax() {
     }
