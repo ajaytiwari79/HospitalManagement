@@ -202,7 +202,4 @@ public class AuthController {
     ResponseEntity<Map<String,Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailsDTO));
     }
-
-
-
 }

@@ -389,8 +389,6 @@ public class StaffCreationService {
             exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
 
         }
-
-        //User userWithExistingUserName = userGraphRepository.findByUserNameIgnoreCase(payload.getUserName());
         User userWithExistingUserName = userGraphRepository.findUserByUserName("(?i)" +payload.getUserName());
         if(Optional.ofNullable(userWithExistingUserName).isPresent()){
             exceptionService.duplicateDataException("message.staff.userName.alreadyexist");

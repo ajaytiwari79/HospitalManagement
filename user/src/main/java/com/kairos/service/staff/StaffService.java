@@ -501,7 +501,6 @@ public class StaffService {
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    //staff.setUserName(privateEmail);
                     staff.setUserName(userName);
                     staff.setFirstName(firstName);
                     staff.setLastName(lastName);
@@ -518,20 +517,11 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
-
-                        // user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(),"(?)" + privateEmail);
                         user = userGraphRepository.findByEmail("?" +privateEmail);
-
-                         user = userGraphRepository.findUserByCprNumberOrEmail(cprAsLong.toString(),"(?)" + privateEmail);
-                        user = userGraphRepository.findByEmail(privateEmail);
-                        //if(Optional.ofNullable(user).isPresent()){
                         if (user != null) {
-                            LOGGER.info(">>>>>>>>>>>>>am inside the check for findByEmail");
                             user = userGraphRepository.findUserByCprNumber(cprAsLong.toString());
-
                         }
                         if (!Optional.ofNullable(user).isPresent()) {
-                            LOGGER.info("am inside the check for new user");
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
@@ -1005,7 +995,6 @@ public class StaffService {
     }
 
     private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
-        // staffToUpdate.setUserName(staffPersonalDetail.getUserName());
         staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         staffToUpdate.setLastName(staffPersonalDetail.getLastName());
         staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());

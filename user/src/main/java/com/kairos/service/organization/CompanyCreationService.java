@@ -323,7 +323,6 @@ public class CompanyCreationService {
                     exceptionService.duplicateDataException("message.cprNumberEmail.notNull");
                 }
                 user.setEmail(unitManagerDTO.getEmail());
-                //user.setUserName(unitManagerDTO.getEmail());
                 user.setUserName(unitManagerDTO.getUserName());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
