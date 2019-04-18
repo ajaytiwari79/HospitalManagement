@@ -878,7 +878,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.activity.published", activityId);
         }
         if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null) {
-            exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null", activity.getName());
+            exceptionService.actionNotPermittedException("message.activity.timeType.absent", activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);
@@ -904,10 +904,11 @@ public class ActivityService extends MongoBaseService {
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
-        activityCopied.setState(ActivityStateEnum.PUBLISHED);
+        activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
+        activityDTO.setActivityCanBeCopied(true);
         return activityDTO;
     }
 

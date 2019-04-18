@@ -47,7 +47,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private IndividualPointsActivityTab individualPointsActivityTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
     private List<CompositeActivity> compositeActivities;
-    private Set<BigInteger> childActivityIds;
+    private Set<BigInteger> childActivityIds=new HashSet<>();
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;

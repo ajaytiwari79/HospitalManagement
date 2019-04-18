@@ -82,9 +82,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.asDateEndOfDay;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.shift.ShiftStatus.REQUEST;
@@ -163,6 +163,7 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
             exceptionService.invalidRequestException("error.cta.notFound", asDate(shiftDTO.getShiftDate()));
         }
+        shiftValidatorService.checkAbsenceTypeShift(shiftDTO);
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
         if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
