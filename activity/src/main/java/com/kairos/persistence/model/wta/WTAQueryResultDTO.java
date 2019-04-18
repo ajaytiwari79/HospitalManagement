@@ -43,6 +43,8 @@ public class WTAQueryResultDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
     private List<WTAQueryResultDTO> versions = new ArrayList<>();
+    private List<TagDTO> tags = new ArrayList<>();
+
 
     private List<WTABaseRuleTemplate> ruleTemplates;
 
@@ -62,7 +64,6 @@ public class WTAQueryResultDTO {
         this.unitPositionId = unitPositionId;
     }
 
-    private List<TagDTO> tags = new ArrayList<>();
 
     public List<WTABaseRuleTemplate> getRuleTemplates() {
         return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
