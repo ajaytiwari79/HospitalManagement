@@ -421,7 +421,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
