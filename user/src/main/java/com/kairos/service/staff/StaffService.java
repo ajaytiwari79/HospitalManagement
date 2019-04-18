@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
@@ -507,7 +508,7 @@ public class StaffService {
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
                         user = userGraphRepository.findByEmail("(?i)"+privateEmail);
-                        if (user != null) {
+                        if (ObjectUtils.isNotNull(user)) {
                             user = userGraphRepository.findUserByCprNumber(cprAsLong.toString());
                         }
                         if (!Optional.ofNullable(user).isPresent()) {
