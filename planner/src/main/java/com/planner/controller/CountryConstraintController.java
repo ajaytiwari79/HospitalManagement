@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -23,37 +24,37 @@ public class CountryConstraintController {
 //=============================================================
     @PostMapping
     @ApiOperation("Create CountryConstraint")
-    public ResponseEntity<Map<String, Object>> createCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
+    public ResponseEntity<Map<String, Object>> createCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.createCountryConstraint(countryConstraintDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @PostMapping (value = "/copy")
     @ApiOperation("Copy CountryConstraint")
-    public ResponseEntity<Map<String, Object>> copyCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
+    public ResponseEntity<Map<String, Object>> copyCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.copyCountryConstraint(countryConstraintDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @GetMapping
     @ApiOperation("Get CountryConstraint")
     public ResponseEntity<Map<String, Object>> getAllCountryConstraintByCountryId(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countryConstraintService.getAllCountryConstraintByCountryId(countryId));
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countryConstraintService.getAllCountryConstraintByCountryId(countryId));
     }
 
 
     @PatchMapping
     @ApiOperation("Update CountryConstraint")
-    public ResponseEntity<Map<String, Object>> updateCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
+    public ResponseEntity<Map<String, Object>> updateCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.updateCountryConstraint(countryConstraintDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{countryConstraintId}")
     @ApiOperation("Delete CountryConstraint")
     public ResponseEntity<Map<String, Object>> deleteCountryConstraint(@PathVariable BigInteger countryConstraintId) {
         countryConstraintService.deleteCountryConstraint(countryConstraintId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     //=================================================================
@@ -61,7 +62,7 @@ public class CountryConstraintController {
     @ApiOperation("Create Default CountryConstraint")
     public ResponseEntity<Map<String, Object>> createDefaultCountryConstraints(@PathVariable Long countryId) {
         countryConstraintService.createDefaultCountryConstraints(countryId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
 }

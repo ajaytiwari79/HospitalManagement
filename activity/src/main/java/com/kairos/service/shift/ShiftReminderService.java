@@ -135,7 +135,9 @@ public class ShiftReminderService extends MongoBaseService {
         Map<String,Object> templateParam = new HashMap<>();
         templateParam.put("receiverName",staffDTO.getFullName());
         templateParam.put("description", description);
-        templateParam.put("imageResourceName",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
+        if(StringUtils.isNotBlank(staffDTO.getProfilePic())) {
+               templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
+        }
         mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getEmail());
 
 

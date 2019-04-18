@@ -1,11 +1,15 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
 import java.math.BigInteger;
 import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -36,10 +40,16 @@ public class ShiftActivity {
     private boolean breakShift;
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
+    private int payoutCtaBonusMinutes;
     private Long allowedBreakDurationInMinute;
     private int timeBankCtaBonusMinutes;
     private String startLocation; // this is for the location from where activity will gets starts
     private String endLocation;   // this is for the location from where activity will gets ends
+    private int plannedMinutesOfTimebank;
+    private int plannedMinutesOfPayout;
+    private int scheduledMinutesOfTimebank;
+    private int scheduledMinutesOfPayout;
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
@@ -59,7 +69,7 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute) {
+    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, String startLocation, String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -67,9 +77,12 @@ public class ShiftActivity {
         this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,String remarks) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
+                          Long allowedBreakDurationInMinute,String remarks,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -78,8 +91,11 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.remarks = remarks;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,boolean breakReplaced) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
+                          Long allowedBreakDurationInMinute,boolean breakReplaced,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -88,6 +104,8 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.breakReplaced=breakReplaced;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
@@ -286,5 +304,53 @@ public class ShiftActivity {
 
     public void setEndLocation(String endLocation) {
         this.endLocation = endLocation;
+    }
+
+    public int getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
+    }
+
+    public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    }
+
+    public List<PayOutPerShiftCTADistribution> getPayoutPerShiftCTADistributions() {
+        return payoutPerShiftCTADistributions;
+    }
+
+    public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
+        this.payoutPerShiftCTADistributions = isNullOrElse(payoutPerShiftCTADistributions,new ArrayList<>());
+    }
+
+    public int getPayoutCtaBonusMinutes() {
+        return payoutCtaBonusMinutes;
+    }
+
+    public void setPayoutCtaBonusMinutes(int payoutCtaBonusMinutes) {
+        this.payoutCtaBonusMinutes = payoutCtaBonusMinutes;
+    }
+
+    public int getPlannedMinutesOfPayout() {
+        return plannedMinutesOfPayout;
+    }
+
+    public void setPlannedMinutesOfPayout(int plannedMinutesOfPayout) {
+        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
+    }
+
+    public int getScheduledMinutesOfTimebank() {
+        return scheduledMinutesOfTimebank;
+    }
+
+    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
+        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
+    }
+
+    public int getScheduledMinutesOfPayout() {
+        return scheduledMinutesOfPayout;
+    }
+
+    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
+        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
     }
 }

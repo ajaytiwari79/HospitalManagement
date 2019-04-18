@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.enums.FilterType;
@@ -39,4 +40,6 @@ public interface CounterService {
     CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi);
 
     CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi);
+
+    Map<Long,Number>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId);
 }

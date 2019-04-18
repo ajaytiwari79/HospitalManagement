@@ -1,6 +1,10 @@
 package com.kairos.persistence.model.embeddables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
@@ -9,34 +13,18 @@ import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ManagingOrganization {
 
 
     @NotNull
     private Long managingOrgId;
 
-    @NotBlank(message = "ManagingOrganization name can't be empty")
+    @NotBlank(message = "error.message.managingDepartment.name.notNull")
     private String managingOrgName;
-
-    public Long getManagingOrgId() {
-        return managingOrgId;
-    }
-
-    public ManagingOrganization(@NotNull Long managingOrgId, @NotBlank(message = "ManagingOrganization name can't be empty") String name) {
-        this.managingOrgId = managingOrgId;
-        this.managingOrgName = name;
-    }
-
-    public void setManagingOrgId(Long managingOrgId) {
-        this.managingOrgId = managingOrgId;
-    }
-
-    public String getName() { return managingOrgName; }
-
-    public void setName(String name) { this.managingOrgName = name; }
-
-
-
 
     @Override
     public boolean equals(Object o) {
@@ -53,6 +41,4 @@ public class ManagingOrganization {
         return Objects.hash(managingOrgId, managingOrgName);
     }
 
-    public ManagingOrganization() {
-    }
 }

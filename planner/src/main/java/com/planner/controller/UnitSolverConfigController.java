@@ -24,20 +24,20 @@ public class UnitSolverConfigController {
     @ApiOperation("Create UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
         unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @PostMapping(value = "/copy")
     @ApiOperation("Copy UnitSolverConfig")
     public ResponseEntity<Map<String, Object>> copyUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
         unitSolverConfigService.copyUnitSolverConfig(unitSolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @GetMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Get UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> getAllUnitSolverConfigByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND, unitSolverConfigService.getAllUnitSolverConfigByUnitId(unitId));
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK, unitSolverConfigService.getAllUnitSolverConfigByUnitId(unitId));
     }
 
 
@@ -51,20 +51,20 @@ public class UnitSolverConfigController {
     @ApiOperation("Update UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
         unitSolverConfigService.updateUnitSolverConfig(unitSolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Delete UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> deleteUnitSolverConfig(@PathVariable BigInteger unitSolverConfigId) {
         unitSolverConfigService.deleteUnitSolverConfig(unitSolverConfigId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
 
     @GetMapping("/default_data")
     @ApiOperation("Get DefaultData")
     public ResponseEntity<Map<String, Object>> getDefaultData(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND, unitSolverConfigService.getDefaultData(unitId));
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK, unitSolverConfigService.getDefaultData(unitId));
     }
 }

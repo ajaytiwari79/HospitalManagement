@@ -12,6 +12,7 @@ buildscript {
         jcenter()
         maven { url "http://repo.spring.io/release/"}
         maven { url "https://plugins.gradle.org/m2/"}
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 
     }
     dependencies {
@@ -20,6 +21,10 @@ buildscript {
     }
 
 }
+plugins {
+    id 'jacoco'
+}
+
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
@@ -42,13 +47,14 @@ repositories {
 }
 task wrapper(type: Wrapper) { gradleVersion = '4.4' }
 
+
 ext {
     springCloudVersion = 'Finchley.RELEASE'
 }
 
 dependencies {
     compile project(':kcommons')
-
+    compile project(':kpermissions')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.springframework.boot:spring-boot-starter-cache')
@@ -111,6 +117,23 @@ dependencyManagement {
     }
 }
 
+
+jacoco {
+    toolVersion = "0.8.3"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+
 /*configurations { c ->
     println 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC $c'+configurations.compile.collect { it.getName() }.join(' ')
 }*/
@@ -143,7 +166,7 @@ sonarqube {
         property "sonar.projectName", "user"
         property "sonar.projectKey", "kairos:user"
         property "sonar.sources", "src/main"
-        property "sonar.skip.tests", "true"
-        property "sonar.exclusions", "**/*test*/**"
+        property "sonar.junit.reportPaths", "build/test-results/test"
+        property "sonar.jacoco.reportPaths" , "build/jacoco/test.exe"
     }
 }

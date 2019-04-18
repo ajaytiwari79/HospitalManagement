@@ -1,40 +1,24 @@
 package com.kairos.dto.activity.time_bank;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
+
 public class TimeBankDistributionDTO {
 
     //cta ruletemplate based distributions
-    private Long id;
-    private String name;
+    private String ctaName;
+    private BigInteger ctaRuleTemplateId;
+    private LocalDate ctaDate;
     private int minutes;
 
     public TimeBankDistributionDTO() {
     }
 
-    public TimeBankDistributionDTO(Long id, String name, int minutes) {
-        this.id = id;
-        this.name = name;
+    public TimeBankDistributionDTO(String ctaName, BigInteger ctaRuleTemplateId, LocalDate ctaDate, int minutes) {
+        this.ctaName = ctaName;
+        this.ctaRuleTemplateId = ctaRuleTemplateId;
+        this.ctaDate = ctaDate;
         this.minutes = minutes;
-    }
-
-    public TimeBankDistributionDTO(Long id, int minutes) {
-        this.id = id;
-        this.minutes = minutes;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public int getMinutes() {
@@ -43,5 +27,29 @@ public class TimeBankDistributionDTO {
 
     public void setMinutes(int minutes) {
         this.minutes = minutes;
+    }
+
+    public String getCtaName() {
+        return ctaName;
+    }
+
+    public void setCtaName(String ctaName) {
+        this.ctaName = ctaName;
+    }
+
+    public BigInteger getCtaRuleTemplateId() {
+        return ctaRuleTemplateId;
+    }
+
+    public void setCtaRuleTemplateId(BigInteger ctaRuleTemplateId) {
+        this.ctaRuleTemplateId = ctaRuleTemplateId;
+    }
+
+    public LocalDate getCtaDate() {
+        return ctaDate;
+    }
+
+    public void setCtaDate(LocalDate ctaDate) {
+        this.ctaDate = ctaDate;
     }
 }

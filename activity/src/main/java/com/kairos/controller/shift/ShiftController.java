@@ -70,7 +70,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false,false));
     }
 
     @ApiOperation("delete a Shift of a staff")

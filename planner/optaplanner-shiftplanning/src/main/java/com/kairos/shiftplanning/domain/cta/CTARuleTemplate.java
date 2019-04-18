@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain.cta;
 
-import com.kairos.shiftplanning.domain.Activity;
+import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.dto.ActivityIntervalDTO;
 import org.joda.time.LocalDate;
 

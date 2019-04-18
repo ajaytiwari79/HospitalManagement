@@ -31,6 +31,7 @@ public class TimeCalculationActivityDTO {
     private DayOfWeek fullWeekEnd;
     private int historyDuration;
     private LocalTime defaultStartTime;
+    private boolean availableAllowActivity;
 
     public TimeCalculationActivityDTO() {
         //dc
@@ -186,5 +187,13 @@ public class TimeCalculationActivityDTO {
 
     public void setFullWeekCalculationType(TimeCalaculationType fullWeekCalculationType) {
         this.fullWeekCalculationType = fullWeekCalculationType;
+    }
+
+    public boolean isAvailableAllowActivity() {
+        return availableAllowActivity;
+    }
+
+    public void setAvailableAllowActivity(boolean availableAllowActivity) {
+        this.availableAllowActivity = availableAllowActivity;
     }
 }

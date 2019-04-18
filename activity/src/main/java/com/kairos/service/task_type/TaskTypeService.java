@@ -901,7 +901,7 @@ public class TaskTypeService extends MongoBaseService {
         final String path = IMAGES_PATH + File.separator + fileName;
         try {
             FileUtil.writeFile(path, multipartFile);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         taskType.setIcon(fileName);

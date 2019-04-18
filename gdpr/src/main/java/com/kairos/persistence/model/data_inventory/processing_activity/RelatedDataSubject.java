@@ -2,6 +2,9 @@ package com.kairos.persistence.model.data_inventory.processing_activity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,45 +13,20 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class RelatedDataSubject  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private
-    Long id;
+    private  Long id;
 
     @NotNull
     private String name;
 
-    public RelatedDataSubject() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     @OneToMany(cascade = CascadeType.ALL)
     private List<RelatedDataCategory> dataCategories = new ArrayList<>();
-
-    public List<RelatedDataCategory> getDataCategories() {
-        return dataCategories;
-    }
-
-    public void setDataCategories(List<RelatedDataCategory> dataCategories) {
-        this.dataCategories = dataCategories;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public RelatedDataSubject(Long id, @NotNull String name) {
         this.id = id;

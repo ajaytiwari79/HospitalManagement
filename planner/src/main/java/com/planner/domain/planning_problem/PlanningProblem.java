@@ -1,5 +1,6 @@
 package com.planner.domain.planning_problem;
 
+import com.kairos.enums.planning_problem.PlanningProblemType;
 import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -7,7 +8,26 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class PlanningProblem extends MongoBaseEntity{
     private String name;
     private String description;
-    private String type;
+    private PlanningProblemType type;
+    private Long countryId;
+
+    public PlanningProblem() {
+    }
+
+    public PlanningProblem(String name, String description, PlanningProblemType type,Long countryId) {
+        this.name = name;
+        this.description = description;
+        this.type = type;
+        this.countryId = countryId;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public String getName() {
         return name;
@@ -25,11 +45,11 @@ public class PlanningProblem extends MongoBaseEntity{
         this.description = description;
     }
 
-    public String getType() {
+    public PlanningProblemType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(PlanningProblemType type) {
         this.type = type;
     }
 }

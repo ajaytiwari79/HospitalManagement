@@ -1,10 +1,14 @@
 package com.planner.domain.solverconfig.common;
 
+import com.kairos.enums.TimeTypeEnum;
 import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Document(collection = "solverConfig")
 public class SolverConfig extends MongoBaseEntity {
@@ -18,6 +22,7 @@ public class SolverConfig extends MongoBaseEntity {
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
     protected BigInteger parentSolverConfigId;//copiedFrom
+    protected TimeTypeEnum typeOfTimeType;
 
 
     //Constructors
@@ -84,63 +89,19 @@ public class SolverConfig extends MongoBaseEntity {
     }
 
     public List<BigInteger> getConstraintIds() {
-        return constraintIds;
+        return isNullOrElse(constraintIds,new ArrayList<>());
     }
 
     public void setConstraintIds(List<BigInteger> constraintIds) {
-        this.constraintIds = constraintIds;
+        this.constraintIds = isNullOrElse(constraintIds,new ArrayList<>());
     }
 
-
-
-
-    /*****************************SolverConfig Builder****************************************/
-    public SolverConfig setIdBuilder(BigInteger id) {
-        this.id = id;
-        return this;
+    public TimeTypeEnum getTypeOfTimeType() {
+        return typeOfTimeType;
     }
 
-    public SolverConfig setNameBuilder(String name) {
-        this.name = name;
-        return this;
-    }
-
-
-
-    public SolverConfig setDescriptionBuilder(String description) {
-        this.description = description;
-        return this;
-    }
-
-
-    public SolverConfig setPhaseIdBuilder(Long phaseId) {
-        this.phaseId = phaseId;
-        return this;
-    }
-
-    public SolverConfig setPlanningPeriodIdBuilder(Long planningPeriodId) {
-        this.planningPeriodId = planningPeriodId;
-        return this;
-    }
-
-    public SolverConfig setThreadCountBuilder(byte threadCount) {
-        this.threadCount = threadCount;
-        return this;
-    }
-
-    public SolverConfig setTerminationTimeInMinutesBuilder(short terminationTimeInMinutes) {
-        this.terminationTimeInMinutes = terminationTimeInMinutes;
-        return this;
-    }
-
-    public SolverConfig setPlanningProblemIdBuilder(Long planningProblemId) {
-        this.planningProblemId = planningProblemId;
-        return this;
-    }
-
-    public SolverConfig setConstraintIdsBuilder(List<BigInteger> constraintIds) {
-        this.constraintIds = constraintIds;
-        return this;
+    public void setTypeOfTimeType(TimeTypeEnum typeOfTimeType) {
+        this.typeOfTimeType = typeOfTimeType;
     }
 
     public BigInteger getParentSolverConfigId() {

@@ -74,8 +74,7 @@ public class UserPrincipal implements UserDetails, Authentication {
                 this.user.firstName, this.user.getLastName(), this.user.getEmail(), this.user.isPasswordUpdated());
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
-        Optional<Country> country = Optional.ofNullable(this.user.getCountryList()).map(countryList -> countryList.get(0));
-        country.ifPresent(c -> details.setCountryId(c.getId()));
+        details.setCountryId(this.getUser().getCountryId());
         return details;
     }
 

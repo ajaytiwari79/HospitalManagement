@@ -20,6 +20,13 @@ public class TimeBankCTADistribution {
     }
 
 
+    public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId,LocalDate ctaDate) {
+        this.ctaName = ctaName;
+        this.minutes = minutes;
+        this.ctaRuleTemplateId = ctaRuleTemplateId;
+        this.ctaDate = ctaDate;
+    }
+
 
 
 
@@ -73,5 +80,9 @@ public class TimeBankCTADistribution {
                 .append(ctaRuleTemplateId, that.ctaRuleTemplateId)
                 .isEquals();
     }
-    
+
+    @Override
+    public String toString() {
+        return "TimeBankCTADistribution{" + "ctaName='" + ctaName + '\'' + ", minutes=" + minutes + ", ctaRuleTemplateId=" + ctaRuleTemplateId + '}';
+    }
 }

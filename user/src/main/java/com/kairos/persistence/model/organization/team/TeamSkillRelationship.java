@@ -19,15 +19,6 @@ public class TeamSkillRelationship extends UserBaseEntity {
     @StartNode private Team team;
     @EndNode private Skill skill;
     @Property boolean isEnabled = true;
-    private String visitourId;
-
-    public String getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(String visitourId) {
-        this.visitourId = visitourId;
-    }
 
     public Team getTeam() {
         return team;

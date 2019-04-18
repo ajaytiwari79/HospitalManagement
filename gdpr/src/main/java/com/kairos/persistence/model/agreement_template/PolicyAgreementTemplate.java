@@ -4,6 +4,9 @@ package com.kairos.persistence.model.agreement_template;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class PolicyAgreementTemplate extends BaseEntity {
 
     @NotBlank(message = "error.message.title.notNull.orEmpty")
@@ -48,6 +54,7 @@ public class PolicyAgreementTemplate extends BaseEntity {
     private boolean signatureComponentAdded;
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
+    private boolean generalAgreementTemplate;
 
     @Column(columnDefinition = "text")
     private String  signatureHtml;
@@ -65,120 +72,15 @@ public class PolicyAgreementTemplate extends BaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, TemplateType templateType) {
+    public PolicyAgreementTemplate(@NotBlank(message = "error.message.name.notnull") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, TemplateType templateType) {
         this.name = name;
         this.description = description;
         this.templateType = templateType;
     }
 
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-
-
-
-
-    public boolean isIncludeContentPage() { return includeContentPage; }
-
-    public void setIncludeContentPage(boolean includeContentPage) { this.includeContentPage = includeContentPage; }
-
-    public PolicyAgreementTemplate() {
-    }
-
-    public boolean isCoverPageAdded() { return coverPageAdded; }
-
-    public void setCoverPageAdded(boolean coverPageAdded) { this.coverPageAdded = coverPageAdded; }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public List<ServiceCategory> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public List<SubServiceCategory> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public List<AccountType> getAccountTypes() { return accountTypes; }
-
-    public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
-
-    public void setSignatureComponentAdded(boolean signatureComponentAdded) { this.signatureComponentAdded = signatureComponentAdded; }
-
-    public String getSignatureHtml() { return signatureHtml; }
-
-    public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
-
-    public boolean isSignatureComponentLeftAlign() { return signatureComponentLeftAlign; }
-
-    public void setSignatureComponentLeftAlign(boolean signatureComponentLeftAlign) { this.signatureComponentLeftAlign = signatureComponentLeftAlign; }
-
-    public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
-
-    public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
-
     public List<AgreementSection> getAgreementSections() {
         return agreementSections.stream().filter(agreementSection -> !agreementSection.isDeleted()).collect(Collectors.toList());
     }
-
-    public void setAgreementSections(List<AgreementSection> agreementSections) {
-        this.agreementSections = agreementSections;
-    }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public TemplateType getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(TemplateType templateType) {
-        this.templateType = templateType;
-    }
-
-    public CoverPage getCoverPageData() {
-        return coverPageData;
-    }
-
-    public void setCoverPageData(CoverPage coverPageData) {
-        this.coverPageData = coverPageData;
-    }
-
-    public void setName(String name) { this.name = name; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public void setAccountTypes(List<AccountType> accountTypes) { this.accountTypes = accountTypes; }
-
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
-
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
-
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     @Override
     public void delete() {

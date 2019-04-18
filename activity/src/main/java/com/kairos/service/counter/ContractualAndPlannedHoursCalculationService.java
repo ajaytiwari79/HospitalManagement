@@ -117,5 +117,10 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.CONTRACTUAL_HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
     }
 
+    @Override
+    public Map<Long,Number>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+        return new HashMap<>();//getContractualAndPlannedHoursKpiDate(organizationId, filterBasedCriteria).stream().;
+    }
+
 
 }

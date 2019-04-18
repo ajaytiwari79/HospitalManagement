@@ -1,9 +1,13 @@
 package com.kairos.persistence.model.clause;
 
 
+import com.kairos.annotations.PermissionModel;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.template_type.TemplateType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.annotation.Nullable;
 import javax.persistence.Column;
@@ -17,8 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
+@PermissionModel
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Clause extends BaseEntity {
 
     @NotBlank(message = "error.message.title.notNull.orEmpty")
@@ -59,58 +66,5 @@ public class Clause extends BaseEntity {
         this.templateTypes=templateTypes;
         this.tempClauseId=tempClauseId;
     }
-    public Clause() {
-    }
-
-    public List<TemplateType> getTemplateTypes() {
-        return templateTypes;
-    }
-
-    public void setTemplateTypes(List<TemplateType> templateTypes) {
-        this.templateTypes = templateTypes;
-    }
-
-
-    public Long getParentClauseId() {
-        return parentClauseId;
-    }
-
-    public void setParentClauseId(Long parentClauseId) {
-        this.parentClauseId = parentClauseId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<ClauseTag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<ClauseTag> tags) {
-        this.tags = tags;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public UUID getTempClauseId() {
-        return tempClauseId;
-    }
-
-    public void setTempClauseId(UUID tempClauseId) {
-        this.tempClauseId = tempClauseId;
-    }
-
 
 }

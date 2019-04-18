@@ -2,15 +2,20 @@ package com.kairos.dto.gdpr.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class QuestionnaireSectionDTO {
 
     private Long id;
@@ -20,27 +25,8 @@ public class QuestionnaireSectionDTO {
     @Valid
     private List<QuestionDTO> questions=new ArrayList<>();
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title.trim();
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<QuestionDTO> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<QuestionDTO> questions) {
-        this.questions = questions;
-    }
 }

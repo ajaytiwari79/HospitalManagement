@@ -6,6 +6,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
@@ -22,7 +24,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Stream;
 
 
 @Service
@@ -127,7 +131,7 @@ public class QuestionnaireTemplateService {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
                     }
                     AssetType subAssetType = isOrganization ? assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId);
-                    questionnaireTemplate.setAssetSubType(subAssetType);
+                    questionnaireTemplate.setSubAssetType(subAssetType);
                 }
             }
         }
@@ -159,7 +163,7 @@ public class QuestionnaireTemplateService {
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
                 }
-                questionnaireTemplate.setAssetSubType(selectedAssetSubType);
+                questionnaireTemplate.setSubAssetType(selectedAssetSubType);
             }
             questionnaireTemplate.setAssetType(assetType);
 
@@ -241,12 +245,13 @@ public class QuestionnaireTemplateService {
      * This method is used to prepare Questionnaire template Response object from actual entity object
      */
     QuestionnaireTemplateResponseDTO prepareQuestionnaireTemplateResponseData(QuestionnaireTemplate questionnaireTemplate) {
+
         QuestionnaireTemplateResponseDTO questionnaireTemplateResponseDTO = new QuestionnaireTemplateResponseDTO(questionnaireTemplate.getId(), questionnaireTemplate.getName(), questionnaireTemplate.getDescription(), questionnaireTemplate.getTemplateType(), questionnaireTemplate.isDefaultAssetTemplate(), questionnaireTemplate.getTemplateStatus(), questionnaireTemplate.getRiskAssociatedEntity());
         if (Optional.ofNullable(questionnaireTemplate.getAssetType()).isPresent()) {
             questionnaireTemplateResponseDTO.setAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetType().getName(), questionnaireTemplate.getAssetType().isSubAssetType()));
         }
-        if (Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
-            questionnaireTemplateResponseDTO.setAssetSubType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetSubType().getId(), questionnaireTemplate.getAssetSubType().getName(), questionnaireTemplate.getAssetSubType().isSubAssetType()));
+        if (Optional.ofNullable(questionnaireTemplate.getSubAssetType()).isPresent()) {
+            questionnaireTemplateResponseDTO.setSubAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getSubAssetType().getId(), questionnaireTemplate.getSubAssetType().getName(), questionnaireTemplate.getSubAssetType().isSubAssetType()));
         }
         questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
 
@@ -268,17 +273,43 @@ public class QuestionnaireTemplateService {
     }
 
 
-    public Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
+    public  Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
 
         QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
+        Map<String, QuestionType> questionTypeMap = new HashMap<>();
         switch (questionnaireTemplateType) {
             case ASSET_TYPE:
+               /* Arrays.stream(AssetAttributeName.values()).forEach(assetAttributeName -> questionTypeMap.put(assetAttributeName.value, getQuestionTypeByAttributeName(Asset.class, assetAttributeName.value)));
+                break;*/
                 return AssetAttributeName.values();
             case PROCESSING_ACTIVITY:
+               /* Arrays.stream(ProcessingActivityAttributeName.values()).forEach(processingActivityAttributeName -> questionTypeMap.put(processingActivityAttributeName.value, getQuestionTypeByAttributeName(ProcessingActivity.class, processingActivityAttributeName.value)));
+                break;*/
                 return ProcessingActivityAttributeName.values();
-            default:
-                return null;
+                default:
+                    return null;
         }
+
+        //return questionTypeMap;
+    }
+
+    private QuestionType getQuestionTypeByAttributeName(Class aClass, String attributeName) {
+        QuestionType questionType = null;
+        try {
+            if (List.class.equals(aClass.getDeclaredField(attributeName).getType())) {
+                questionType = QuestionType.MULTIPLE_CHOICE;
+            } else if (String.class.equals(aClass.getDeclaredField(attributeName).getType()) || String.class.equals(aClass.getDeclaredField(attributeName).getType())) {
+                questionType = QuestionType.TEXTBOX;
+            } else if (List.class.equals(aClass.getDeclaredField(attributeName).getType())) {
+                questionType = QuestionType.YES_NO_MAYBE;
+            } else {
+                questionType = QuestionType.SELECT_BOX;
+            }
+        } catch (NoSuchFieldException e) {
+            LOGGER.debug("message.invalid.field.atrributename  getQuestionTypeByAttributeName() ");
+            exceptionService.internalServerError("message.invalid.field.atrributename");
+        }
+        return questionType;
     }
 
 
@@ -297,8 +328,8 @@ public class QuestionnaireTemplateService {
         QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), questionnaireTemplateDTO.getTemplateType(), QuestionnaireTemplateStatus.DRAFT, unitId);
         validateQuestionnaireTemplateAndAddTemplateType(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
         questionnaireTemplateRepository.save(questionnaireTemplate);
-        return questionnaireTemplateDTO.setId(questionnaireTemplate.getId());
-
+        questionnaireTemplateDTO.setId(questionnaireTemplate.getId());
+        return questionnaireTemplateDTO;
     }
 
 
