@@ -15,6 +15,7 @@ public class OrganizationStaffWrapper {
     private UnitPosition unitPosition;
 
     public OrganizationStaffWrapper() {
+        //Default Constructor
     }
 
     public Organization getOrganization() {

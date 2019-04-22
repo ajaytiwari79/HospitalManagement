@@ -13,6 +13,7 @@ public class ClinicTypeDTO {
     private String description;
 
     public ClinicTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

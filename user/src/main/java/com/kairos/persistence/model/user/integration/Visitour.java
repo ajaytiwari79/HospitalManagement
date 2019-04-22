@@ -7,11 +7,15 @@ import org.springframework.beans.BeanUtils;
  * Created by oodles on 21/2/17.
  */
 @NodeEntity
-public class Visitour  extends UserBaseEntity implements Cloneable {
+public class Visitour  extends UserBaseEntity{
     private String serverName;
     private String username;
     private String password;
     private Long organizationId;
+
+    public Visitour() {
+        //Default Constructor
+    }
 
     public String getServerName() {
         return serverName;
@@ -43,9 +47,6 @@ public class Visitour  extends UserBaseEntity implements Cloneable {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
-    }
-
-    public Visitour() {
     }
 
     public static Visitour getInstance(){

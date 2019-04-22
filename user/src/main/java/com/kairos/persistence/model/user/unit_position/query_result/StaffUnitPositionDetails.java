@@ -44,6 +44,7 @@ public class StaffUnitPositionDetails {
     private List<UnitPositionLinesQueryResult> positionLines;
 
     public StaffUnitPositionDetails() {
+        //Default Constructor
     }
 
     public LocalDate getStartDate() {

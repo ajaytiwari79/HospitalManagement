@@ -12,6 +12,7 @@ public class OwnershipTypeDTO {
     private String description;
 
     public OwnershipTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

@@ -20,6 +20,7 @@ public class OrganizationLevelPayGroupAreaDTO {
     private List<PayGroupArea> payGroupAreas;
 
     public OrganizationLevelPayGroupAreaDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

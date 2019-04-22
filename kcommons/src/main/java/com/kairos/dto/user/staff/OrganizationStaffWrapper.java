@@ -9,7 +9,9 @@ public class OrganizationStaffWrapper {
     private OrganizationDTO organization;
     private StaffDTO staff;
     private UnitPositionDTO unitPosition;
+
     public OrganizationStaffWrapper() {
+        //Default Constructor
     }
 
     public OrganizationDTO getOrganization() {

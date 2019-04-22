@@ -35,6 +35,10 @@ public class StaffAdditionalInfoQueryResult {
     private Long staffUserId;
     private String cprNumber;
 
+    public StaffAdditionalInfoQueryResult() {
+        //Default Constructor
+    }
+
 
     public String getCprNumber() {
         return cprNumber;
@@ -82,9 +86,6 @@ public class StaffAdditionalInfoQueryResult {
 
     public void setDayTypes(List<DayTypeDTO> dayTypes) {
         this.dayTypes = dayTypes;
-    }
-
-    public StaffAdditionalInfoQueryResult() {
     }
 
     public void setProfilePic(String profilePic) {

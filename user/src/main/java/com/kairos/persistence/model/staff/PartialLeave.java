@@ -18,6 +18,7 @@ public class PartialLeave extends UserBaseEntity {
     private String employmentId;
     private String note;
     public PartialLeave() {
+        //Default Constructor
     }
 
     public void setStartDate(long startDate) {
