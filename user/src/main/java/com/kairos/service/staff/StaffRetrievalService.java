@@ -333,35 +333,6 @@ public class StaffRetrievalService {
         return map;
     }
 
-    /**
-     * Assuming Hub member/staff is not the part of Organization at same time
-     *
-     * @param staff
-     * @param unitId
-     * @param userId
-     * @return
-     * @author mohit
-     */
-    private List<StaffPersonalDetailDTO> filterStaffByRoles(List<StaffPersonalDetailDTO> staff, Long unitId, Long userId) {
-        List<StaffPersonalDetailDTO> staffListByRole = new ArrayList<>();
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        if (staffAtHub != null) {
-            staffListByRole = staff;
-        } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
-            String STAFF_CURRENT_ROLE;
-            if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE = setStaffAccessRole(accessGroupQueryResult);
-                if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
-                    staffListByRole = staff;
-                } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId().equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staffPersonalDetail);
-                }
-            }
-        }
-        return staffListByRole;
-    }
 
     /**
      * Method to set current staff role if present
@@ -421,7 +392,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
