@@ -4,10 +4,12 @@ import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -171,17 +173,16 @@ public class UserService {
      *
      */
     public Map<String, Object> authenticateUser(User user) {
-
-        User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
-        if (currentUser == null) {
-            return null;
+          User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
+        if (!Optional.ofNullable(currentUser).isPresent()) {
+                return null;
         }
         int otp = OtpGenerator.generateOtp();
         currentUser.setOtp(otp);
         userGraphRepository.save(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
-        //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
+        map.put("isUserNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
         return map;
 
@@ -474,25 +475,29 @@ public class UserService {
         return userGraphRepository.getUserSelectedLanguageId(userId);
     }
 
-    public boolean forgotPassword(String userEmail){
-        if(userEmail.endsWith("kairos.com")||userEmail.endsWith("kairosplanning.com")){
+    public boolean forgotPassword(String userEmail) {
+        if (userEmail.endsWith("kairos.com") || userEmail.endsWith("kairosplanning.com")) {
             LOGGER.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
             exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
         }
-        User currentUser = userGraphRepository.findByEmail(userEmail);
+        User currentUser = userGraphRepository.findByEmail("(?i)" + userEmail);
         if (!Optional.ofNullable(currentUser).isPresent()) {
             LOGGER.error("No User found by email " + userEmail);
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
+            currentUser = userGraphRepository.findUserByUserName("(?i)" + userEmail);
+            if (!Optional.ofNullable(currentUser).isPresent()) {
+                LOGGER.error("No User found by userName " + userEmail);
+                exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
+            }
         }
-        String token = tokenService.createForgotPasswordToken(currentUser);
-        Map<String,Object> templateParam = new HashMap<>();
-        templateParam.put("receiverName",currentUser.getFullName());
-        templateParam.put("description",AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
-        templateParam.put("hyperLink",config.getForgotPasswordApiLink()+token);
-        templateParam.put("hyperLinkName",RESET_PASSWORD);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam,null,AppConstants.MAIL_SUBJECT,currentUser.getEmail());
-        return true;
-    }
+            String token = tokenService.createForgotPasswordToken(currentUser);
+            Map<String, Object> templateParam = new HashMap<>();
+            templateParam.put("receiverName", currentUser.getFullName());
+            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
+            templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
+            templateParam.put("hyperLinkName", RESET_PASSWORD);
+            mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+            return true;
+        }
 
     public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
         if(!passwordUpdateDTO.isValid()){
@@ -516,5 +521,24 @@ public class UserService {
         return true;
     }
 
-
+    public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
+        User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
+        if (!ObjectUtils.isNotNull(user)) {
+            LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
+        }
+        if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
+            user.setUserNameUpdated(true);
+        } else {
+            User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" + userDetailsDTO.getUserName());
+            if (!ObjectUtils.isNotNull(userNameAlreadyExist)) {
+                LOGGER.error("This userName is already in use " + userDetailsDTO.getUserName());
+                exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailsDTO.getUserName());
+            }
+            user.setUserNameUpdated(true);
+            user.setUserName(userDetailsDTO.getUserName());
+        }
+        userGraphRepository.save(user);
+        return true;
+    }
 }
