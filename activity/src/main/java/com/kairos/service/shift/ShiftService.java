@@ -163,7 +163,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.invalidRequestException("error.cta.notFound", asDate(shiftDTO.getShiftDate()));
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = validateForFullWeekAndFullDayShifts(shiftDTO,activityWrapper,staffAdditionalInfoDTO,unitId);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = validateAndUpdateFullWeekOrFullDayShift(shiftDTO,activityWrapper,staffAdditionalInfoDTO,unitId);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -993,7 +993,7 @@ public class ShiftService extends MongoBaseService {
         return violatedRuleTemplateIds.equals(updatedViolatedRuleTemplateIds);
     }
 
-    public ShiftWithViolatedInfoDTO validateForFullWeekAndFullDayShifts(ShiftDTO shiftDTO,
+    public ShiftWithViolatedInfoDTO validateAndUpdateFullWeekOrFullDayShift(ShiftDTO shiftDTO,
                                                                        ActivityWrapper activityWrapper,StaffAdditionalInfoDTO staffAdditionalInfoDTO,Long unitId){
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
         if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
