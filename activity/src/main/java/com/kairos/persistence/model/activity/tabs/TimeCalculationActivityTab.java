@@ -30,6 +30,7 @@ public class TimeCalculationActivityTab implements Serializable {
     private LocalTime defaultStartTime;
     private List<Long> dayTypes = new ArrayList<>();
 
+
     public TimeCalculationActivityTab() {
     }
 
@@ -180,6 +181,4 @@ public class TimeCalculationActivityTab implements Serializable {
         this.defaultStartTime = defaultStartTime;
         this.multiplyWithValue = multiplyWithValue;
     }
-
-
 }
