@@ -204,6 +204,7 @@ public class StaffRetrievalService {
     private Map<String, Object> retrievePersonalInfo(Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
+        map.put("userName", staff.getUserName());
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
         map.put("profilePic", (isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
@@ -333,35 +334,6 @@ public class StaffRetrievalService {
         return map;
     }
 
-    /**
-     * Assuming Hub member/staff is not the part of Organization at same time
-     *
-     * @param staff
-     * @param unitId
-     * @param userId
-     * @return
-     * @author mohit
-     */
-    private List<StaffPersonalDetailDTO> filterStaffByRoles(List<StaffPersonalDetailDTO> staff, Long unitId, Long userId) {
-        List<StaffPersonalDetailDTO> staffListByRole = new ArrayList<>();
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        if (staffAtHub != null) {
-            staffListByRole = staff;
-        } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
-            String STAFF_CURRENT_ROLE;
-            if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE = setStaffAccessRole(accessGroupQueryResult);
-                if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
-                    staffListByRole = staff;
-                } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId().equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staffPersonalDetail);
-                }
-            }
-        }
-        return staffListByRole;
-    }
 
     /**
      * Method to set current staff role if present

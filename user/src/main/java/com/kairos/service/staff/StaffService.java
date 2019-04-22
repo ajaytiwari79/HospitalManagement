@@ -459,7 +459,13 @@ public class StaffService {
                     userName = createNewUserName(firstName, lastName);
 
                 } else {
-                    userName = getStringValueOfIndexedCell(row, 19);
+                   User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
+                   if(Optional.ofNullable(user).isPresent()){
+                       userName = createNewUserName(firstName, lastName);
+                   }else {
+                       userName = getStringValueOfIndexedCell(row, 19);
+                   }
+
                 }
 
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
