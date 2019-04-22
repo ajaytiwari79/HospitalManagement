@@ -17,6 +17,6 @@ public class CustomStompFrameHandler implements StompFrameHandler {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-
+        //This is override method
     }
 }

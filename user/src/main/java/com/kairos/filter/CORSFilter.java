@@ -14,6 +14,7 @@ import java.io.IOException;
 public class CORSFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        //This is override method
     }
     private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";
     private static final String ALLOWED_METHODS = "GET,PUT,POST,DELETE,OPTIONS";
@@ -35,5 +36,6 @@ public class CORSFilter implements Filter {
 
     @Override
     public void destroy() {
+        //This is override method
     }
 }

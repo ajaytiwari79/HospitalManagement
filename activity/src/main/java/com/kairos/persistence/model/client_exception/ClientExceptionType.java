@@ -14,7 +14,9 @@ public class ClientExceptionType extends MongoBaseEntity {
     private String value;
     private String description;
 
-
+    public ClientExceptionType() {
+        //Default Constructor
+    }
 
     public String getValue() {
         return value;
@@ -59,6 +61,5 @@ public class ClientExceptionType extends MongoBaseEntity {
                 '}';
     }
 
-    public ClientExceptionType() {
-    }
+
 }

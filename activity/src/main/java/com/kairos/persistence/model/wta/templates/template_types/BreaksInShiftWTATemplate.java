@@ -42,6 +42,7 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+        //This is override method
 
     }
 

@@ -50,6 +50,6 @@ public class StompClientWebSocketHandler implements StompSessionHandler {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-
+        //This is override method
     }
 }
