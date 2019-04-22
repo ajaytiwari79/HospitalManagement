@@ -2,24 +2,15 @@ package com.kairos.service.time_bank;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.cta.*;
-import com.kairos.dto.activity.shift.EmploymentType;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.user.country.agreement.cta.CalculationFor;
-import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.enums.TimeTypes;
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import org.joda.time.Interval;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,20 +20,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
-import static org.junit.Assert.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class TimeBankCalculationServiceTest {
 
@@ -64,13 +48,13 @@ public class TimeBankCalculationServiceTest {
 
     @Before
     public void init(){
-        unitPosition = ObjectMapperUtils.JsonStringToObject(getUnitPositionDetailJson(),StaffUnitPositionDetails.class);
+        unitPosition = ObjectMapperUtils.jsonStringToObject(getUnitPositionDetailJson(),StaffUnitPositionDetails.class);
         interval = new DateTimeInterval(1555718400000l,1555804800000l);
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getShiftJson(),ShiftWithActivityDTO.class);;
         dailyTimeBankEntryMap = new HashMap<>();
         planningPeriodIntervals = newHashSet(new DateTimeInterval(1555286400000l,1555804800000l));
         dayTypeDTOS = ObjectMapperUtils.JsonStringToList(getDayTypeJson(),DayTypeDTO.class);
-        activity = ObjectMapperUtils.JsonStringToObject(getActivityJson(),Activity.class);
+        activity = ObjectMapperUtils.jsonStringToObject(getActivityJson(),Activity.class);
         shifts = ObjectMapperUtils.JsonStringToList(getShiftJson(),Shift.class);
     }
 

@@ -14,6 +14,7 @@ public class GetAllWorkPlacesResponse {
     private List<GetAllWorkPlacesResult> GetAllWorkPlacesResult;
 
     public GetAllWorkPlacesResponse() {
+        //Default Constructor
     }
 
     public List<GetAllWorkPlacesResult> getWorkPlaceList() {

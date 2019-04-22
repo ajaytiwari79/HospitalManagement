@@ -13,7 +13,6 @@ import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
-import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -21,7 +20,6 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -70,7 +68,6 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
@@ -101,10 +98,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
@@ -1005,7 +1001,7 @@ public class StaffService {
         staffToUpdate.getUser().setLastName(staffPersonalDetail.getLastName());
         staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
-            staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
+            staffToUpdate.setInactiveFrom(parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
     }
 

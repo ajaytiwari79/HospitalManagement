@@ -1,12 +1,10 @@
 package com.kairos.utils;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.Gender;
 import org.apache.commons.lang.StringUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Date;
 
 /**
  * Created by pavan on 14/2/18.
@@ -17,12 +15,12 @@ public class CPRUtil {
         return StringUtils.isNotBlank(cprNumber) ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : 0;
     }
 
-    public static Integer getAgeByCPRNumberAndStartDate(String cprNumber,LocalDate startDate) {
+    public static Integer getAgeByCPRNumberAndStartDate(String cprNumber, LocalDate startDate) {
         return StringUtils.isNotBlank(cprNumber) ? Period.between(getDateOfBirthFromCPR(cprNumber), startDate).getYears() : 0;
     }
 
     public static LocalDate fetchDateOfBirthFromCPR(String cprNumber) {
-         return cprNumber!=null?getDateOfBirthFromCPR(cprNumber):null;
+        return cprNumber != null ? getDateOfBirthFromCPR(cprNumber) : null;
     }
 
     public static Gender getGenderFromCPRNumber(String cprNumber) {
@@ -34,52 +32,27 @@ public class CPRUtil {
 
     //Method for getting the DateOfBirth From CPR Number
     public static LocalDate getDateOfBirthFromCPR(String cprNumber) {
-        LocalDate birthday = null;
         if (cprNumber == null) {
             return null;
-
         }
         if (cprNumber.length() == 9) {
             cprNumber = "0" + cprNumber;
         }
+        Integer year = Integer.valueOf(cprNumber.substring(4, 6));
+        Integer month = Integer.valueOf(cprNumber.substring(2, 4));
+        Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+        Integer centuryDigit = Integer.parseInt(cprNumber.substring(6, 7));
+        LocalDate birthday;
+        int century = 1900;
 
-        if (cprNumber != null) {
-            Integer year = Integer.valueOf(cprNumber.substring(4, 6));
-            Integer month = Integer.valueOf(cprNumber.substring(2, 4));
-            Integer day = Integer.valueOf(cprNumber.substring(0, 2));
-            Integer century = Integer.parseInt(cprNumber.substring(6, 7));
-
-            if (century >= 0 && century <= 3) {
-                century = 1900;
-            }
-            if (century == 4) {
-                if (year <= 36) {
-                    century = 2000;
-                } else {
-                    century = 1900;
-                }
-            }
-            if (century >= 5 && century <= 8) {
-                if (year <= 57) {
-                    century = 2000;
-                }
-                if (year >= 58 && year <= 99) {
-                    century = 1800;
-                }
-            }
-            if (century == 9) {
-                if (year <= 36) {
-                    century = 2000;
-                } else {
-                    century = 1900;
-                }
-            }
-            year = century + year;
-
-            birthday = LocalDate.of(year, month, day);
-
-
+        if (((centuryDigit == 4 || centuryDigit == 9) && year <= 36) || (centuryDigit >= 5 && centuryDigit <= 8 && year <= 57)) {
+            century = 2000;
+        } else if (centuryDigit >= 5 && centuryDigit <= 8 && year >= 58 && year <= 99) {
+            century = 1800;
         }
+        year = century + year;
+
+        birthday = LocalDate.of(year, month, day);
         return birthday;
     }
 }

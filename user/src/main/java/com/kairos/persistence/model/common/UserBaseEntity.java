@@ -2,9 +2,6 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.config.security.CurrentUserDetails;
-import com.kairos.dto.activity.common.UserInfo;
-import com.kairos.persistence.model.auth.User;
 import org.neo4j.ogm.annotation.GraphId;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;

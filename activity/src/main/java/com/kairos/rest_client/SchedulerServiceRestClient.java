@@ -9,7 +9,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -93,7 +92,7 @@ public class SchedulerServiceRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
         return responseData;
     }

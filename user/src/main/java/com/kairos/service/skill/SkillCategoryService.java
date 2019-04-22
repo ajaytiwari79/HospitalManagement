@@ -69,15 +69,6 @@ public class SkillCategoryService {
      * @return
      */
     public List<SkillCategory> getAllSkillCategory(){
-//        String[] types = skillCategoryGraphRepository.findAll();
-//        logger.info("\n"+"Categories found: "+types[0]+types[1]+"\n");
-//        List<SkillWrapper> skillWrappers = new ArrayList<>();
-//        for (String type:
-//             types) {
-//         SkillWrapper skillWrapper = new SkillWrapper(type,skillCategoryGraphRepository.getThisCategorySkills(type));
-//            skillWrappers.add(skillWrapper);
-//
-//        }
         return  skillCategoryGraphRepository.findAll();
     }
 
