@@ -43,6 +43,13 @@ public class CPRUtil {
         Integer day = Integer.valueOf(cprNumber.substring(0, 2));
         Integer centuryDigit = Integer.parseInt(cprNumber.substring(6, 7));
         LocalDate birthday;
+        year = getYearFromCPR(year, centuryDigit);
+
+        birthday = LocalDate.of(year, month, day);
+        return birthday;
+    }
+
+    private static Integer getYearFromCPR(Integer year, Integer centuryDigit) {
         int century = 1900;
 
         if (((centuryDigit == 4 || centuryDigit == 9) && year <= 36) || (centuryDigit >= 5 && centuryDigit <= 8 && year <= 57)) {
@@ -51,8 +58,6 @@ public class CPRUtil {
             century = 1800;
         }
         year = century + year;
-
-        birthday = LocalDate.of(year, month, day);
-        return birthday;
+        return year;
     }
 }
