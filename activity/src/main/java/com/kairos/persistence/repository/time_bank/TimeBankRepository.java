@@ -41,6 +41,6 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     List<DailyTimeBankEntry> findAllByEmploymentIdAndStartDate(Long employmentId, Date timeBankDate);
 
     @Query("{employmentId:?0,deleted:false,date:?1}")
-    DailyTimeBankEntry findByEmploymentAndDate(Long unitPositionId, LocalDate startDate);
+    DailyTimeBankEntry findByEmploymentAndDate(Long employmentId, LocalDate startDate);
 
 }

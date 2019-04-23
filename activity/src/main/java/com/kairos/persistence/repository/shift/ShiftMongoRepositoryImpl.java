@@ -102,8 +102,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
 
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositionId(Long unitPositionId, Date startDate, Date endDate) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate).lt(endDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),

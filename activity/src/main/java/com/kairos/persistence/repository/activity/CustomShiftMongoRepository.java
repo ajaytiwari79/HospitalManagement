@@ -79,7 +79,7 @@ public interface CustomShiftMongoRepository {
     List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,ShiftStatus shiftStatus);
 
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
 
     boolean absenceShiftExistsByDate(Long unitId,Date startDate,Date endDate,Long staffId);
 
