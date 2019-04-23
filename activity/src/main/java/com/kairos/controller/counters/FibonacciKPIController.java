@@ -31,7 +31,7 @@ public class FibonacciKPIController {
     @Inject private FibonacciKPIService fibonacciKPIService;
 
     @PostMapping(value = COUNTRY_URL+FIBONACCI)
-    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.createFibonacciKPI(countryId,fibonacciKPIDTO, ConfLevel.COUNTRY));
     }
 
@@ -61,7 +61,7 @@ public class FibonacciKPIController {
     }
 
     @PostMapping(value = UNIT_URL+FIBONACCI)
-    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.createFibonacciKPI(unitId,fibonacciKPIDTO, ConfLevel.UNIT));
     }
 

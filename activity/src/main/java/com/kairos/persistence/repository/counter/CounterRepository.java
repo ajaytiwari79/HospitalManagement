@@ -132,7 +132,27 @@ public class CounterRepository {
                 project("title").and("kpi").arrayElementAt(0).as("kpi"),
                 project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
-                        and("kpi.fibonacciKPI").as("fibonacciKPI")
+                        and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
+                        .and("kpi.referenceId").as("referenceId").and("kpi.fibonacciKPIConfigs").as("fibonacciKPIConfigs")
+        );
+        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List<KPIDTO> getFibonacciKpiForReferenceId(Long refId, ConfLevel level, boolean copy) {
+        String refQueryField = getRefQueryField(level);
+        Criteria criteria = Criteria.where("deleted").is(false).and(refQueryField).is(refId).and("level").is(level).and("fibonacciKPI").is(true);
+        if (copy) {
+            criteria.and("copy").is(copy);
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("counter", "activeKpiId", "_id", "kpi"),
+                project("title").and("kpi").arrayElementAt(0).as("kpi"),
+                project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
+                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
+                        and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
+                        .and("kpi.referenceId").as("referenceId").and("kpi.fibonacciKPIConfigs").as("fibonacciKPIConfigs")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();

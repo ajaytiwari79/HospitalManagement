@@ -14,6 +14,8 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.Direction;
+import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -28,7 +30,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.KPIUtils.getLongValue;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 
 @Service
 public class RestingHoursCalculationService implements CounterService {
@@ -43,21 +48,21 @@ public class RestingHoursCalculationService implements CounterService {
     @Inject
     private UserIntegrationService userIntegrationService;
 
-    public double getTotalRestingHours(List<Shift> shifts, long initTs, long endTs) {
+    public Integer getTotalRestingHours(List<Shift> shifts, long initTs, long endTs) {
         //all shifts should be sorted on startDate
         DateTimeInterval dateTimeInterval = new DateTimeInterval(initTs, endTs);
-        long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
+        Integer totalrestingMinutes = (int)dateTimeInterval.getMinutes();
         for (Shift shift : shifts) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             if (dateTimeInterval.overlaps(shiftInterval)) {
-                totalrestingMinutes -= dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
+                totalrestingMinutes -= (int)dateTimeInterval.overlap(shiftInterval).getMinutes();
             }
         }
-        return DateUtils.getHoursFromTotalMilliSeconds(totalrestingMinutes);
+        return totalrestingMinutes;
     }
 
-    public Map<Long, Double> calculateRestingHours(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate) {
-        Map<Long, Double> staffRestingHours = new HashMap<>();
+    public Map<Long, Number> calculateRestingHours(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate,boolean calculateFibonacci) {
+        Map<Long, Number> staffRestingHours = new HashMap<>();
         //currently not use
 //        Long countryId = userIntegrationService.getCountryIdOfOrganization(organizationId);
 //        List<BigInteger> activityIds = getPresenceTimeTypeActivitiesIds(countryId);
@@ -65,8 +70,8 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
         staffIds.forEach(staffId -> {
             if (staffId != null) {
-                Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate), DateUtils.getLongFromLocalDateimeTime(endDate));
-                staffRestingHours.put(staffId, restingHours);
+                Integer restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate), DateUtils.getLongFromLocalDateimeTime(endDate));
+                staffRestingHours.put(staffId, calculateFibonacci ? restingHours : DateUtils.getHoursByMinutes(restingHours));
             }
         });
         return staffRestingHours;
@@ -82,11 +87,11 @@ public class RestingHoursCalculationService implements CounterService {
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1));
+        Map<Long, Number> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1),false);
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
-        for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {
-            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
+        for (Map.Entry<Long, Number> entry : staffRestingHours.entrySet()) {
+            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), ((Double) entry.getValue()) * multiplicationFactor))));
         }
         return kpiDataUnits;
     }
@@ -105,8 +110,15 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     @Override
-    public Map<Long,Integer> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
-        return new HashMap<>();//getRestingHoursKpiData(filterBasedCriteria, organizationId, true, false);
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
+        List<Long> staffIds = getLongValue(filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS, new ArrayList<>()));
+        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null)&& isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+        Map<Long, Number> staffRestingHours = calculateRestingHours(staffIds, DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1),true);
+        Map<Long, Integer> staffAndRestingHoursMap = new HashMap<>(staffRestingHours.size());
+        for (Map.Entry<Long, Number> staffRestingHour : staffRestingHours.entrySet()) {
+            staffAndRestingHoursMap.put(staffRestingHour.getKey(),(Integer) staffRestingHour.getValue());
+        }
+        return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
     }
 
 }

@@ -19,7 +19,7 @@ import static com.kairos.dto.activity.counter.enums.CounterSize.SIZE_8X2;
 
 @Getter
 @Setter
-@Document(collection = "counter")
+//@Document(collection = "counter")
 public class FibonacciKPI extends KPI{
     private String description;
     private Long referenceId;

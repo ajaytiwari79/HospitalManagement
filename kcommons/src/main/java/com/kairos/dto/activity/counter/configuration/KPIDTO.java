@@ -5,6 +5,7 @@ import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.enums.FilterType;
 
 import java.math.BigInteger;
@@ -25,6 +26,11 @@ public class KPIDTO {
     private List<FilterCriteria> selectedFilters;
     private ConfLevel applicableFor;
     private boolean fibonacciKPI;
+    private String description;
+    private Long referenceId;
+    private BigInteger categoryId;
+    private ConfLevel confLevel;
+    private List<FibonacciKPIConfigDTO> fibonacciKPIConfigs;
     public KPIDTO(){
 
     }
@@ -123,5 +129,45 @@ public class KPIDTO {
 
     public void setFibonacciKPI(boolean fibonacciKPI) {
         this.fibonacciKPI = fibonacciKPI;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public ConfLevel getConfLevel() {
+        return confLevel;
+    }
+
+    public void setConfLevel(ConfLevel confLevel) {
+        this.confLevel = confLevel;
+    }
+
+    public List<FibonacciKPIConfigDTO> getFibonacciKPIConfigs() {
+        return fibonacciKPIConfigs;
+    }
+
+    public void setFibonacciKPIConfigs(List<FibonacciKPIConfigDTO> fibonacciKPIConfigs) {
+        this.fibonacciKPIConfigs = fibonacciKPIConfigs;
+    }
+
+    public BigInteger getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(BigInteger categoryId) {
+        this.categoryId = categoryId;
     }
 }

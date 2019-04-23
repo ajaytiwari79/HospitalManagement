@@ -3,6 +3,7 @@ package com.kairos.dto.activity.counter.fibonacci_kpi;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.FilterType;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.math.BigInteger;
 import java.util.List;
+
+import static com.kairos.dto.activity.counter.enums.ChartType.BAR;
+import static com.kairos.dto.activity.counter.enums.CounterSize.SIZE_8X2;
 
 /**
  * pradeep
@@ -38,5 +42,9 @@ public class FibonacciKPIDTO {
 
     public void setTitle(String title) {
         this.title = title.trim();
+    }
+
+    public FibonacciKPIDTO() {
+        this.fibonacciKPI = true;
     }
 }
