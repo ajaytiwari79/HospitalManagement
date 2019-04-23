@@ -71,6 +71,6 @@ public class LocationTypeService {
         } else {
             exceptionService.dataNotFoundByIdException("error.LocationType.notfound");
         }
-        return true;
+        return false;
     }
 }

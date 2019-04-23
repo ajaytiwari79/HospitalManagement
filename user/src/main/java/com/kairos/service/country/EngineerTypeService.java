@@ -71,6 +71,6 @@ public class EngineerTypeService{
         } else {
             exceptionService.dataNotFoundByIdException("error.EngineerType.notfound");
         }
-        return true;
+        return false;
     }
 }

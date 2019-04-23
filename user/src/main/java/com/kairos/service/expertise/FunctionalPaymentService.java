@@ -75,7 +75,6 @@ public class FunctionalPaymentService {
 
     private FunctionalPayment validateAndGetDomainObject(FunctionalPaymentDTO functionalPaymentDTO, Expertise expertise) {
         FunctionalPayment functionalPaymentFromDb = functionalPaymentGraphRepository.getLastFunctionalPaymentOfExpertise(expertise.getId());
-
         Specification<FunctionalPaymentDTO> isGreaterThanStartDateAndToday = new IsGreaterThanStartDate(expertise, exceptionService)
                 .and(new IsGreaterThanToday(exceptionService))
                 .and(new IsFunctionalPaymentAvailable(functionalPaymentFromDb, exceptionService));

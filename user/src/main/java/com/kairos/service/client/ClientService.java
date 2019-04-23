@@ -166,14 +166,18 @@ public class ClientService {
     private ExceptionService exceptionService;
     @Inject
     private AsynchronousService asynchronousService;
-    @Inject private ClientContactPersonRelationshipRepository clientContactPersonRelationshipRepository;
-    @Inject private ClientContactPersonGraphRepository clientContactPersonGraphRepository;
-    @Inject private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private ClientContactPersonRelationshipRepository clientContactPersonRelationshipRepository;
+    @Inject
+    private ClientContactPersonGraphRepository clientContactPersonGraphRepository;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
     @Inject
     private com.kairos.service.organization.OrganizationService organizationService;
 
-    public void  delete(Long clientId){
-         clientGraphRepository.delete(clientId);;
+    public void delete(Long clientId) {
+        clientGraphRepository.delete(clientId);
+        ;
     }
 
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
@@ -671,6 +675,9 @@ public class ClientService {
                 citizen.setTerminatedDate(deathDateInDateFormat.getTime());
                 plannerRestClient.deleteTaskForCitizen(clientId, TERMINATED, deathDate);
                 break;
+            default:
+                //intentionally left blank
+                break;
         }
         clientGraphRepository.save(citizen);
         return true;
@@ -947,7 +954,7 @@ public class ClientService {
     }
 
 
-    public HashMap<String, Object> getOrganizationAllClients( long unitId, long staffId) {
+    public HashMap<String, Object> getOrganizationAllClients(long unitId, long staffId) {
         List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(unitId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
@@ -956,7 +963,7 @@ public class ClientService {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration( unitId, staffId)));
+        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(unitId, staffId)));
         return response;
     }
 
@@ -1090,7 +1097,7 @@ public class ClientService {
             clientTemporaryAddress.setLatitude(addressDTO.getLatitude());
             zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
         } else {
-             clientTemporaryAddress.setVerifiedByVisitour(false);
+            clientTemporaryAddress.setVerifiedByVisitour(false);
             clientTemporaryAddress.setCountry("Denmark");
             clientTemporaryAddress.setLongitude(clientTemporaryAddress.getLongitude());
             clientTemporaryAddress.setLatitude(clientTemporaryAddress.getLatitude());
@@ -1357,7 +1364,7 @@ public class ClientService {
         OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         Staff staff = staffGraphRepository.findOne(staffId);
 
-     if (!Optional.ofNullable(clientContactPerson).isPresent()) {
+        if (!Optional.ofNullable(clientContactPerson).isPresent()) {
             households.add(clientId);
             clientContactPerson = new ClientContactPerson();
             clientContactPerson.setOrganizationService(organizationService);
