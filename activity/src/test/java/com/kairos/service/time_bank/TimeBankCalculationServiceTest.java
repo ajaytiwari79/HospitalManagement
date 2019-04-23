@@ -29,6 +29,7 @@ import java.util.Set;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.AppConstants.*;
 
+
 @RunWith(MockitoJUnitRunner.class)
 public class TimeBankCalculationServiceTest {
 
@@ -50,14 +51,13 @@ public class TimeBankCalculationServiceTest {
 
     @Before
     public void init() {
-        unitPosition = ObjectMapperUtils.JsonStringToObject(getUnitPositionDetailJson(), StaffUnitPositionDetails.class);
+        unitPosition = ObjectMapperUtils.jsonStringToObject(getUnitPositionDetailJson(), StaffUnitPositionDetails.class);
         interval = new DateTimeInterval(1555698600000l, 1555785000000l);
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getShiftJson(), ShiftWithActivityDTO.class);
-        ;
         dailyTimeBankEntryMap = new HashMap<>();
         planningPeriodIntervals = newHashSet(new DateTimeInterval(1555286400000l, 1555804800000l));
         dayTypeDTOS = ObjectMapperUtils.JsonStringToList(getDayTypeJson(), DayTypeDTO.class);
-        activity = ObjectMapperUtils.JsonStringToObject(getActivityJson(), Activity.class);
+        activity = ObjectMapperUtils.jsonStringToObject(getActivityJson(), Activity.class);
         shifts = ObjectMapperUtils.JsonStringToList(getShiftJson(), Shift.class);
 
     }

@@ -34,6 +34,8 @@ public final class ApiConstants {
     public static final String DELETE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/delete_job_by_sub_type_and_entity_id";
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";
     public final static String JOB_DETAILS = "/job_details";
+    public static final String LOCAL_AREA_TAG_URL="/localAreaTags";
+    public static final String ORG_PAYMENT_SETTING="/organization_payment_settings";
 
 
 

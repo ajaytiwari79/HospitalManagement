@@ -26,8 +26,9 @@ public class DayTypeCountryHolidayCalenderQueryResult {
     private List<CountryHolidayCalendarQueryResult> countryHolidayCalenders;
 
 
-    // Constructor
+
     public DayTypeCountryHolidayCalenderQueryResult() {
+        //Default Constructor
     }
 
     public Long getId() {

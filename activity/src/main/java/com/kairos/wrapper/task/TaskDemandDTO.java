@@ -295,30 +295,6 @@ public class TaskDemandDTO {
         this.endAfterOccurrence = endAfterOccurrence;
     }
 
-   /* public Date getStartDate() {
-        return DateConverter.convertInUTC(startDate);
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return DateConverter.convertInUTC(endDate);
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public Date getNextVisit() {
-        return DateConverter.convertInUTC(nextVisit);
-    }
-
-    public void setNextVisit(String nextVisit) {
-        this.nextVisit = nextVisit;
-    }
-*/
     @Override
     public String toString() {
         return "TaskDemandDTO{" +

@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class ContactAddress extends UserBaseEntity implements Cloneable{
+public class ContactAddress extends UserBaseEntity{
 
     private String street;
 

@@ -8,7 +8,7 @@ public class StaffKpiFilterDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    List<Long> unitIds;
+    private List<Long> unitIds;
     private Long unitId;
     private String unitName;
     private List<UnitPositionWithCtaDetailsDTO> unitPosition;

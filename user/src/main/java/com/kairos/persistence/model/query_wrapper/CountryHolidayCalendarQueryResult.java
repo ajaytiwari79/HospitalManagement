@@ -29,7 +29,9 @@ public class CountryHolidayCalendarQueryResult {
     private String googleCalId;
 
 
-    public CountryHolidayCalendarQueryResult(){}
+    public CountryHolidayCalendarQueryResult(){
+        //Default Constructor
+    }
 
     public LocalDate getHolidayDate() {
         return holidayDate;

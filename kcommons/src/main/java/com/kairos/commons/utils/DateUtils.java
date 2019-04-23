@@ -744,4 +744,8 @@ public  class DateUtils {
     public static Date minusMonths(Date date,int minusMonths) {
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusMonths(minusMonths));
     }
+    public static Date parseDate(String date){
+        DateTime dateTime = new DateTime(date);
+        return dateTime.toDate();
+    }
 }

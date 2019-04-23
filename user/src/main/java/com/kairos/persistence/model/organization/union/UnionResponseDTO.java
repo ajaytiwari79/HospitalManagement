@@ -11,6 +11,7 @@ public class UnionResponseDTO {
     private String name;
 
     public UnionResponseDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

@@ -13,6 +13,7 @@ public class UnionQueryWrapper {
     private  List<Map<String, Object>> unions;
 
     public UnionQueryWrapper() {
+        //Default Constructor
     }
 
     public OrganizationCreationData getGlobalData() {

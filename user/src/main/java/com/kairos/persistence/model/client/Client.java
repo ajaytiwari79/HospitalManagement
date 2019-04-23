@@ -12,7 +12,6 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -20,6 +19,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.enums.CitizenHealthStatus.ALIVE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -788,9 +788,9 @@ public class Client extends UserBaseEntity {
         map.put("peopleInHousehold", this.peopleInHousehold);
         map.put("livesAlone", this.livesAlone);
         map.put("healthStatus", this.healthStatus);
-        map.put("deathDate", DateConverter.getDate(this.deceasedDate));
-        map.put("deceasedDate", DateConverter.getDate(this.deceasedDate));
-        map.put("terminatedDate", DateConverter.getDate(this.terminatedDate));
+        map.put("deathDate", getDate(this.deceasedDate));
+        map.put("deceasedDate", getDate(this.deceasedDate));
+        map.put("terminatedDate", getDate(this.terminatedDate));
         return map;
     }
 
