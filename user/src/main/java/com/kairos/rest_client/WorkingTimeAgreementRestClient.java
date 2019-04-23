@@ -65,58 +65,6 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public WTAResponseDTO getWTAById(Long unitPositionId) {
-        String baseUrl = getBaseUrl(true);
-        try {
-            // HttpEntity<BigInteger> request = new HttpEntity<>(wtaId);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/wta/unitPosition/{unitPositionId}",
-                            HttpMethod.GET, null, typeReference, unitPositionId);
-
-            RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
-        }
-
-    }
-
-    public List<WTAResponseDTO> getWTAByIds(List<Long> upIds) {
-        String baseUrl = getBaseUrl(true);
-        String param = upIds.toString().replace("[", "").replace("]", "");
-        try {
-            //HttpEntity<List<BigInteger>> request = new HttpEntity<>(wtaIds);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/wta/getWTAByIds?upIds=" + param,
-                            HttpMethod.GET, null, typeReference);
-
-            RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
-        }
-
-    }
 
     public CTAWTAAndAccumulatedTimebankWrapper assignWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
         String baseUrl = getBaseUrl(true);
@@ -170,57 +118,6 @@ public class WorkingTimeAgreementRestClient {
         return null;
     }
 
-    public Boolean makeDefaultDateForOrganization(List<Long> subTypeIds, Long unitId, Long countryId) {
-        String baseUrl = getBaseUrl(false) + "/country/" + countryId;
-        try {
-            HttpEntity<List<Long>> request = new HttpEntity<>(subTypeIds);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/wta/organization/{unitId}",
-                            HttpMethod.POST, request, typeReference, unitId);
-
-            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
-        }
-    }
-
-    public WTATableSettingWrapper getWTAWithVersionIds(List<BigInteger> wtaIds) {
-        String baseUrl = getBaseUrl(true);
-        String param = wtaIds.toString().replace("[", "").replace("]", "");
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTATableSettingWrapper>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTATableSettingWrapper>>() {
-                    };
-            ResponseEntity<RestTemplateResponseEnvelope<WTATableSettingWrapper>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/wta/versions?wtaIds=" + param,
-                            HttpMethod.GET, null, typeReference);
-
-            RestTemplateResponseEnvelope<WTATableSettingWrapper> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
-        }
-
-    }
 
 
 }
