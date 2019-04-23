@@ -95,7 +95,7 @@ public class CounterDataService extends MongoBaseService {
 
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
-        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
+        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
@@ -104,9 +104,9 @@ public class CounterDataService extends MongoBaseService {
         } else {
             List<ApplicableKPI> staffApplicableKPIS;
             if (filters.isCountryAdmin()) {
-                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi->kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
+                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
             } else {
-                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi->kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
+                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
             }
             for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
                 Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();

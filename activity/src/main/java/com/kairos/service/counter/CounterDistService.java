@@ -59,7 +59,8 @@ public class CounterDistService extends MongoBaseService {
     private ActivityService activityService;
     @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject private FibonacciKPIService fibonacciKPIService;
+    @Inject
+    private FibonacciKPIService fibonacciKPIService;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -100,7 +101,7 @@ public class CounterDistService extends MongoBaseService {
 //        List<KPIDTO> fibonacciDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIService.getAllFibonacciKPI(refId,level),KPIDTO.class);
 //        fibonacciDtos.addAll(kpidtos);
         if (kpidtos.isEmpty()) {
-            LOGGER.info("KPI not found for {} id " + refId,level);
+            LOGGER.info("KPI not found for {} id " + refId, level);
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
         return kpidtos;
@@ -110,11 +111,12 @@ public class CounterDistService extends MongoBaseService {
         List<KPICategoryDTO> categories = counterRepository.getKPICategory(null, level, refId);
         List<BigInteger> categoryIds = categories.stream().map(KPICategoryDTO::getId).collect(toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryIds);
-        List<FibonacciKPIDTO> fibonacciKPIDTOS = fibonacciKPIService.getAllFibonacciKPI(refId,level);
-        Map<BigInteger,List<FibonacciKPIDTO>> categoryIdAndFibonacciKPI = fibonacciKPIDTOS.stream().filter(fibonacciKPIDTO -> isNotNull(fibonacciKPIDTO.getCategoryId())).collect(Collectors.groupingBy(FibonacciKPIDTO::getCategoryId,Collectors.toList()));
+        List<FibonacciKPIDTO> fibonacciKPIDTOS = fibonacciKPIService.getAllFibonacciKPI(refId, level);
+        Map<BigInteger, List<FibonacciKPIDTO>> categoryIdAndFibonacciKPI = fibonacciKPIDTOS.stream().filter(fibonacciKPIDTO -> isNotNull(fibonacciKPIDTO.getCategoryId())).collect(Collectors.groupingBy(FibonacciKPIDTO::getCategoryId, Collectors.toList()));
         for (CategoryKPIMappingDTO categoryKPIMappingDTO : categoryKPIMapping) {
-            if(categoryIdAndFibonacciKPI.containsKey(categoryKPIMappingDTO.getCategoryId())){
-                categoryKPIMappingDTO.getKpiId().addAll(categoryIdAndFibonacciKPI.get(categoryKPIMappingDTO.getCategoryId()).stream().map(FibonacciKPIDTO::getId).collect(toList()));            }
+            if (categoryIdAndFibonacciKPI.containsKey(categoryKPIMappingDTO.getCategoryId())) {
+                categoryKPIMappingDTO.getKpiId().addAll(categoryIdAndFibonacciKPI.get(categoryKPIMappingDTO.getCategoryId()).stream().map(FibonacciKPIDTO::getId).collect(toList()));
+            }
         }
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
@@ -575,6 +577,7 @@ public class CounterDistService extends MongoBaseService {
         }
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(), OrgTypeKPIEntry.class);
     }
+
     //dashboard setting for all level
     //default setting
     public void createDefaultStaffKPISetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
@@ -633,7 +636,7 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void setDefaultSettingUnit(DefaultKPISettingDTO defalutKPISettingDTO, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
-        List<AccessGroupMappingDTO> accessGroupMappingDTOS ;
+        List<AccessGroupMappingDTO> accessGroupMappingDTOS;
         Long refId = ConfLevel.COUNTRY.equals(level) ? defalutKPISettingDTO.getCountryId() : defalutKPISettingDTO.getParentUnitId();
         List<CategoryKPIConf> categoryKPIConfToSave = new ArrayList<>();
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
