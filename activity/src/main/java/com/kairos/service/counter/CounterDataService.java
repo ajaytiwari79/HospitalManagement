@@ -155,6 +155,16 @@ public class CounterDataService extends MongoBaseService {
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
+        getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
+        kpi.setDefaultFilters(criteriaList);
+        kpi.setTitle(applicableKPIS.get(0).getTitle());
+        if (isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
+            kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
+        }
+        return kpi;
+    }
+
+    private void getSelectedFilterDefaultData(ConfLevel level, List<FilterCriteria> criteriaList, KPIDTO kpi, DefaultKpiDataDTO defaultKpiDataDTO) {
         if (kpi.getFilterTypes().contains(FilterType.EMPLOYMENT_TYPE)) {
             getEmploymentTypeDefaultData(criteriaList, defaultKpiDataDTO);
         }
@@ -189,12 +199,6 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_IDS)) {
             getActivityDefaultData(criteriaList, unitIds);
         }
-        kpi.setDefaultFilters(criteriaList);
-        kpi.setTitle(applicableKPIS.get(0).getTitle());
-        if (isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
-            kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
-        }
-        return kpi;
     }
 
     private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {

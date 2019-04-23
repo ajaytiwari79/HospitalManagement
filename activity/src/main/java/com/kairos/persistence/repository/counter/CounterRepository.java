@@ -17,7 +17,6 @@ import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
