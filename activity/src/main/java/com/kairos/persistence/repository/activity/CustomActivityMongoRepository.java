@@ -94,4 +94,6 @@ public interface CustomActivityMongoRepository {
     boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId);
 
     List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
+
+    ActivityDTO findByIdAndChildActivityEligableForStaffingLevelTrue(BigInteger activityId);
 }
