@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  *  UserDetailService
@@ -58,18 +59,18 @@ public class UserDetailService {
 
     public User loadUserByUserName(String userName , String password) throws UsernameNotFoundException {
         User user=  userRepository.findUserByUserNameInAnyOrganization("(?i)"+userName);
-        if (user == null) {
-            logger.info("User is null");
-            return null;
-        } else {
-            if (passwordEncoder.matches(password, user.getPassword())){
-                logger.info("password matched");
-                return user;
+            if(Optional.ofNullable(user).isPresent()) {
+                if (passwordEncoder.matches(password, user.getPassword())) {
+                    logger.info("password matched");
+                    return user;
+                }
+                logger.info("password  not  matched");
+                return null;
             }
-            logger.info("password  not  matched");
-            return null;
+        logger.info("User not found by username");
+        return null;
         }
     }
-    }
+
 
 
