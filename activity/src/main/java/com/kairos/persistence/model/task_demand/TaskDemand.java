@@ -96,8 +96,9 @@ public class TaskDemand extends MongoBaseEntity {
 
     private Date taskCreatedTillDate;
 
-    // Constructors
+
     public TaskDemand() {
+        //Default Constructor
     }
 
     public boolean isDeleted() {

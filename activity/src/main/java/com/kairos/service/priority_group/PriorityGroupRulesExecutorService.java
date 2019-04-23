@@ -16,7 +16,7 @@ public class PriorityGroupRulesExecutorService {
 
 
     public PriorityGroupRulesExecutorService() {
-
+        //Default Constructor
     }
 // TODO refactor this method to createRulesList
     private List<PriorityGroupRuleFilter> getRulesList(PriorityGroupDTO priorityGroupDTO,PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) {

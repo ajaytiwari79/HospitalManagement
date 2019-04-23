@@ -17,6 +17,7 @@ public class StaffKpiFilterQueryResult {
     private List<UnitPositionQueryResult> unitPosition;
 
     public StaffKpiFilterQueryResult() {
+        //Default Constructor
     }
 
     public Long getId() {

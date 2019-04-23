@@ -49,7 +49,7 @@ public class ExpertiseController {
     @Inject private  UnitPositionCTAWTAService unitPositionCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
-    @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/expertise/staff/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody List<Long> expertiseIds) {
 
@@ -68,7 +68,7 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "Get Staff expertise")
-    @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.GET)
+    @GetMapping(value = "/expertise/staff/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseToStaff(@PathVariable Long staffId) {
         Map<String, Object> expertise = expertiseService.getExpertiseToStaff(staffId);
@@ -86,20 +86,20 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "Get Available expertise")
-    @RequestMapping(value =  COUNTRY_URL + "/all_expertise", method = RequestMethod.GET)
+    @GetMapping(value =  COUNTRY_URL + "/all_expertise")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnpublishedExpertise(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnpublishedExpertise(countryId));
     }
 
-    @RequestMapping(value =  "/unit/{unitId}/cta/expertise", method = RequestMethod.GET)
+    @GetMapping(value =  "/unit/{unitId}/cta/expertise")
     @ApiOperation("get expertise for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseForOrgCTA(unitId));
     }
 
     @ApiOperation(value = "Get all expertise by orgSubType")
-    @RequestMapping(value =  COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise", method = RequestMethod.GET)
+    @GetMapping(value =  COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId, @PathVariable long organizationSubTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId));
@@ -112,69 +112,73 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "save a functional payment settings for expertise")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.POST)
+    @PostMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")
     public ResponseEntity<Map<String, Object>> saveFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.saveFunctionalPayment(expertiseId, functionalPaymentDTO));
     }
 
     @ApiOperation(value = "get  functional payment settings of expertise")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
+    @GetMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")
     public ResponseEntity<Map<String, Object>> getFunctionalPayment(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
     }
 
     @ApiOperation(value = "update a functional payment settings for expertise")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.PUT)
+    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")
     public ResponseEntity<Map<String, Object>> updateFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(expertiseId, functionalPaymentDTO));
     }
 
     @ApiOperation(value = "Add a functional payment settings for functional_payment")
-    @RequestMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.POST)
+    @PostMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}")
     public ResponseEntity<Map<String, Object>> addMatrixInFunctionalPayment(@PathVariable Long functionalPaymentId, @RequestBody @Valid FunctionalSeniorityLevelDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.addMatrixInFunctionalPayment(functionalPaymentDTO));
     }
 
     @ApiOperation(value = "GET a functional payment settings for functional_payment")
-    @RequestMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.GET)
+    @GetMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}")
     public ResponseEntity<Map<String, Object>> getMatrixOfFunctionalPayment(@PathVariable Long functionalPaymentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getMatrixOfFunctionalPayment(functionalPaymentId));
     }
 
     @ApiOperation(value = "Add a functional payment settings for functional_payment")
-    @RequestMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.PUT)
+    @PutMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}")
     public ResponseEntity<Map<String, Object>> updateMatrixInFunctionalPayment(@PathVariable Long functionalPaymentId, @RequestBody @Valid FunctionalSeniorityLevelDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateMatrixInFunctionalPayment(functionalPaymentDTO));
     }
 
     @ApiOperation(value = "publish a functional payment settings for expertise")
-    @RequestMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}/publish", method = RequestMethod.PUT)
+    @PutMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}/publish")
     public ResponseEntity<Map<String, Object>> publishFunctionalPayment(@PathVariable Long functionalPaymentId, @RequestBody FunctionalPaymentDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.publishFunctionalPayment(functionalPaymentId, functionalPaymentDTO));
-
-
     }
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.POST)
+    @PostMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/planned_time")
     public ResponseEntity<Map<String, Object>> addPlannedTimeInExpertise(@PathVariable Long countryId, @PathVariable Long expertiseId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addPlannedTimeInExpertise(expertiseId, expertiseEmploymentTypeDTO));
     }
 
+    @ApiOperation(value = "delete a functional payment settings for expertise")
+    @DeleteMapping(value =  COUNTRY_URL + "/functional_payment/{functionalPaymentId}")
+    public ResponseEntity<Map<String, Object>> deleteFunctionalPayment(@PathVariable Long functionalPaymentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.deleteFunctionalPayment(functionalPaymentId));
+    }
+
     @ApiOperation(value = "get planned time for employment type and expertise ")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.GET)
+    @GetMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/planned_time")
     public ResponseEntity<Map<String, Object>> getPlannedTimeInExpertise(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeInExpertise(expertiseId));
     }
 
     @ApiOperation(value = "All planned time and employment type")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/planned_time/default_data", method = RequestMethod.GET)
+    @GetMapping(value =  COUNTRY_URL + "/expertise/planned_time/default_data")
     public ResponseEntity<Map<String, Object>> getPlannedTimeAndEmploymentType(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeAndEmploymentType(countryId));
     }
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
-    @RequestMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.PUT)
+    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/planned_time")
     public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long expertiseId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseId, expertiseEmploymentTypeDTO));
     }

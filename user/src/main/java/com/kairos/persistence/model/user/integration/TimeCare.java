@@ -14,6 +14,10 @@ public class TimeCare  extends UserBaseEntity {
     private Long organizationId;
     private String timeCareExternalId;
 
+    public TimeCare() {
+        //Default Constructor
+    }
+
     public Integer getIntegrationId() {
         return integrationId;
     }
@@ -36,8 +40,5 @@ public class TimeCare  extends UserBaseEntity {
 
     public void setTimeCareExternalId(String timeCareExternalId) {
         this.timeCareExternalId = timeCareExternalId;
-    }
-
-    public TimeCare() {
     }
 }

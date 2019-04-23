@@ -13,6 +13,7 @@ public class VehicleLocationDTO {
     private String description;
 
     public VehicleLocationDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

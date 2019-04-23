@@ -13,6 +13,7 @@ public class PaymentTypeDTO {
     private String description;
 
     public PaymentTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

@@ -42,8 +42,6 @@ public class RestingHoursCalculationService implements CounterService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private RepresentationService representationService;
-    @Inject
     private ActivityService activityService;
     @Inject
     private UserIntegrationService userIntegrationService;

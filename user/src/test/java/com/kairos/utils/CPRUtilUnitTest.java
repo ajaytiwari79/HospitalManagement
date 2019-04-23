@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
     }
 
     @Test
-    public void getDateOfBirthFromCPR() throws Exception {
-        LocalDate expectedDOB=CPRUtil.getDateOfBirthFromCPR("0403812765");
-        assertEquals(expectedDOB,LocalDate.of(1981,03,04));
+    public void getDateOfBirthFromCPR() {
+        LocalDate expectedDOB=CPRUtil.getDateOfBirthFromCPR("1210611556");
+        assertEquals(expectedDOB,LocalDate.of(1961,10,12));
     }
 }

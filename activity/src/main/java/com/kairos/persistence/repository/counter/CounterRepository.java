@@ -141,7 +141,7 @@ public class CounterRepository {
 
     public List<KPIDTO> getFibonacciKpiForReferenceId(Long refId, ConfLevel level, boolean copy) {
         String refQueryField = getRefQueryField(level);
-        Criteria criteria = Criteria.where("deleted").is(false).and(refQueryField).is(refId).and("level").is(level).and("fibonacciKPI").is(true);
+        Criteria criteria = Criteria.where("deleted").is(false).and(refQueryField).is(refId).and("level").is(level);
         if (copy) {
             criteria.and("copy").is(copy);
         }
@@ -149,6 +149,7 @@ public class CounterRepository {
                 match(criteria),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
                 project("title").and("kpi").arrayElementAt(0).as("kpi"),
+                match(Criteria.where("kpi.fibonacciKPI").is(true)),
                 project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
                         and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
@@ -591,9 +592,5 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
-    public FibonacciKPI findFibonacciKPIById(BigInteger id){
-        Query query = new Query(Criteria.where("deleted").is(false).and("id").is(id));
-        return mongoTemplate.findOne(query, FibonacciKPI.class);
-    }
 
 }

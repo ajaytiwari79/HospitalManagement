@@ -1,17 +1,13 @@
 package com.kairos.scheduler.kafka.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-
-import static com.kairos.scheduler.constants.AppConstants.USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC;
 
 @Component
 public class UserToSchedulerLogsQueueListener {
@@ -24,7 +20,7 @@ public class UserToSchedulerLogsQueueListener {
     //@KafkaListener(topics=USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC)
     public void processMessage(String message) {
         try {
-            KairosSchedulerLogsDTO schedulerLogs = ObjectMapperUtils.JsonStringToObject(message,KairosSchedulerLogsDTO.class);
+            KairosSchedulerLogsDTO schedulerLogs = ObjectMapperUtils.jsonStringToObject(message,KairosSchedulerLogsDTO.class);
             schedulerPanelService.createJobScheduleDetails(schedulerLogs);
             logger.info("Job Details--------------------->"+schedulerLogs.getResult()+schedulerLogs.getStartedDate());
         }

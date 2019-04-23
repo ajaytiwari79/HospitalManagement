@@ -29,8 +29,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 @Service
 public class FibonacciKPIService implements CounterService{
@@ -95,11 +94,14 @@ public class FibonacciKPIService implements CounterService{
     public List<KPIDTO> getAllFibonacciKPI(Long referenceId,ConfLevel confLevel){
         List<KPIDTO> kpidtos = counterRepository.getFibonacciKpiForReferenceId(referenceId, confLevel, false);
         List<KPIDTO> fibonacciKPIDTOS = fibonacciKPIRepository.findAllFibonacciKPIByReferenceId(referenceId,confLevel);
-        kpidtos.addAll(fibonacciKPIDTOS);
+        if(isCollectionNotEmpty(fibonacciKPIDTOS)){
+            kpidtos = new ArrayList<>(kpidtos);
+            kpidtos.addAll(fibonacciKPIDTOS);
+        }/*
         if (kpidtos.isEmpty()) {
             LOGGER.info("Fibonacci KPI not found for {} id " + referenceId,confLevel);
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
-        }
+        }*/
         return kpidtos;
     }
 

@@ -21,7 +21,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private boolean copy;
 
     public ApplicableKPI() {
-
+        //Default Constructor
     }
 
     public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {

@@ -71,7 +71,6 @@ import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -84,6 +83,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.Day.EVERYDAY;
@@ -204,13 +204,14 @@ public class StaffRetrievalService {
     private Map<String, Object> retrievePersonalInfo(Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
+        map.put("userName", staff.getUserName());
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
         map.put("profilePic", (isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
         map.put("currentStatus", staff.getCurrentStatus());
         map.put("signature", staff.getSignature());
-        Date inactiveFrom = Optional.ofNullable(staff.getInactiveFrom()).isPresent() ? DateConverter.getDate(staff.getInactiveFrom()) : null;
+        Date inactiveFrom = Optional.ofNullable(staff.getInactiveFrom()).isPresent() ? getDate(staff.getInactiveFrom()) : null;
         map.put("inactiveFrom", inactiveFrom);
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
@@ -333,35 +334,6 @@ public class StaffRetrievalService {
         return map;
     }
 
-    /**
-     * Assuming Hub member/staff is not the part of Organization at same time
-     *
-     * @param staff
-     * @param unitId
-     * @param userId
-     * @return
-     * @author mohit
-     */
-    private List<StaffPersonalDetailDTO> filterStaffByRoles(List<StaffPersonalDetailDTO> staff, Long unitId, Long userId) {
-        List<StaffPersonalDetailDTO> staffListByRole = new ArrayList<>();
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        if (staffAtHub != null) {
-            staffListByRole = staff;
-        } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
-            String STAFF_CURRENT_ROLE;
-            if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE = setStaffAccessRole(accessGroupQueryResult);
-                if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
-                    staffListByRole = staff;
-                } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId().equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staffPersonalDetail);
-                }
-            }
-        }
-        return staffListByRole;
-    }
 
     /**
      * Method to set current staff role if present
@@ -421,7 +393,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;

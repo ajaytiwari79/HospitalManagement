@@ -5,12 +5,15 @@ import java.util.List;
 public class OrganizationTypeAndSubTypeDto {
 
 
-
     private Long id;
     private String name;
 
     private List<OrganizationTypeAndSubTypeDto> organizationSubTypes;
     private List<OrganizationServiceDto> organizationServices;
+
+    public OrganizationTypeAndSubTypeDto() {
+        //Default Constructor
+    }
 
     public Long getId() {
         return id;
@@ -43,7 +46,4 @@ public class OrganizationTypeAndSubTypeDto {
     public void setOrganizationServices(List<OrganizationServiceDto> organizationServices) {
         this.organizationServices = organizationServices;
     }
-
-    public OrganizationTypeAndSubTypeDto()
-    {}
 }

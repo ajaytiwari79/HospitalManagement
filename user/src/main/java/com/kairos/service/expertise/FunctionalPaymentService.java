@@ -77,7 +77,6 @@ public class FunctionalPaymentService {
 
     private FunctionalPayment validateAndGetDomainObject(FunctionalPaymentDTO functionalPaymentDTO, Expertise expertise) {
         FunctionalPayment functionalPaymentFromDb = functionalPaymentGraphRepository.getLastFunctionalPaymentOfExpertise(expertise.getId());
-
         Specification<FunctionalPaymentDTO> isGreaterThanStartDateAndToday = new IsGreaterThanStartDate(expertise, exceptionService)
                 .and(new IsGreaterThanToday(exceptionService))
                 .and(new IsFunctionalPaymentAvailable(functionalPaymentFromDb, exceptionService));
@@ -441,6 +440,10 @@ public class FunctionalPaymentService {
 
     private List<FunctionalPaymentMatrixQueryResult> getMatrixFromPayGroupAreaWiseMap(Map<Set<Long>,List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap){
         return payGroupAreaWiseMap.entrySet().stream().map(setListEntry->new FunctionalPaymentMatrixQueryResult(setListEntry.getKey(),setListEntry.getValue())).collect(Collectors.toList());
+    }
+
+    public boolean deleteFunctionalPayment(Long functionalPaymentId){
+        return functionalPaymentGraphRepository.deleteFunctionalPayment(functionalPaymentId);
     }
 
 }
