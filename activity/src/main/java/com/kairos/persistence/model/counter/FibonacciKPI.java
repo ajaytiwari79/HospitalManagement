@@ -25,7 +25,7 @@ public class FibonacciKPI extends Counter{
     private boolean fibonacciKPI;
 
     public FibonacciKPI() {
-        this.setType(CounterType.FIBONACCI);
-        this.setFibonacciKPI(true);
+//        this.setType(CounterType.FIBONACCI);
+//        this.setFibonacciKPI(true);
     }
 }
