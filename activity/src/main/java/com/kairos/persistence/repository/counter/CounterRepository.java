@@ -17,6 +17,7 @@ import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -569,9 +570,5 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
-    public FibonacciKPI findFibonacciKPIById(BigInteger id){
-        Query query = new Query(Criteria.where("deleted").is(false).and("id").is(id));
-        return mongoTemplate.findOne(query, FibonacciKPI.class);
-    }
 
 }
