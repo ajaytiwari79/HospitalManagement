@@ -365,6 +365,7 @@ public class CompanyCreationService {
         unitManagerDTO.setLastName(user.getLastName());
         unitManagerDTO.setCprNumber(user.getCprNumber());
         unitManagerDTO.setEmail(user.getEmail());
+        unitManagerDTO.setUserName(user.getUserName());
     }
     //It checks null as well
 
