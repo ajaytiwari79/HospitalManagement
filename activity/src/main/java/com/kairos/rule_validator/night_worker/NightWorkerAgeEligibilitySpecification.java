@@ -31,7 +31,7 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
 
     @Override
     public void validateRules(StaffDTO staffDTO) {
-
+        //This is override method
     }
 
     @Override
