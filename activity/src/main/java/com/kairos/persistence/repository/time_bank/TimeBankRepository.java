@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -38,5 +39,8 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
 
     @Query("{employmentId:?0,deleted:false,date:{$lte:?1}}")
     List<DailyTimeBankEntry> findAllByEmploymentIdAndStartDate(Long employmentId, Date timeBankDate);
+
+    @Query("{employmentId:?0,deleted:false,date:?1}")
+    DailyTimeBankEntry findByEmploymentAndDate(Long unitPositionId, LocalDate startDate);
 
 }

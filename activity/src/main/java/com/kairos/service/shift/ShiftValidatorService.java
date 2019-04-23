@@ -17,6 +17,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
@@ -759,10 +760,21 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
-        if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
-            shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
+        if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
+           // shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullWeekCalculationType()))) {
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
+            } else {
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
+            }
+
+        }
         else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
-            shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
+            if(TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType()))){
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
+            }else {
+                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
+            }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.WORKING_TYPE);
         if (!shiftExists) {

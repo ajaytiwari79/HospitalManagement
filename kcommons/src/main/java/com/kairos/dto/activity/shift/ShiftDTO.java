@@ -74,6 +74,7 @@ public class ShiftDTO {
     private Set<ShiftEscalationReason> escalationReasons;
     private Long functionId;
 
+
     public ShiftDTO() {
         //default Const
     }
@@ -446,6 +447,7 @@ public class ShiftDTO {
     public void setFunctionId(Long functionId) {
         this.functionId = functionId;
     }
+
 
     @Override
     public String toString() {
