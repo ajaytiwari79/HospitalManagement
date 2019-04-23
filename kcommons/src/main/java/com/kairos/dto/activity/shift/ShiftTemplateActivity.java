@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.shift;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
@@ -16,7 +17,9 @@ import java.util.Set;
 public class ShiftTemplateActivity {
 
     private BigInteger activityId;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
     private int scheduledMinutes;
     private int durationMinutes;
