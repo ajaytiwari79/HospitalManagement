@@ -95,5 +95,5 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
 
-    ActivityDTO findByIdAndChildActivityEligableForStaffingLevelTrue(BigInteger activityId);
+    ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
 }

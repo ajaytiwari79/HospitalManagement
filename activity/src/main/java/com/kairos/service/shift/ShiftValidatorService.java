@@ -576,7 +576,7 @@ public class ShiftValidatorService {
         Activity parentActivity = activityMongoRepository.findByChildActivityId(shiftActivity.getActivityId());
         ActivityDTO activity = null;
         if (isNull(parentActivity)) {
-            activity = activityMongoRepository.findByIdAndChildActivityEligableForStaffingLevelTrue(shiftActivity.getActivityId());
+            activity = activityMongoRepository.findByIdAndChildActivityEligibleForStaffingLevelTrue(shiftActivity.getActivityId());
         }
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             int shiftsCount = 0;

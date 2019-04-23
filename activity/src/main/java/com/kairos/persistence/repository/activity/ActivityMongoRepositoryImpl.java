@@ -698,7 +698,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public ActivityDTO findByIdAndChildActivityEligableForStaffingLevelTrue(BigInteger activityId) {
+    public ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId) {
         String project = "{'$project':{'_id':1,'childActivities':{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.rulesActivityTab.eligibleForStaffingLevel',true]} }} }}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
