@@ -17,6 +17,7 @@ public class PayTableMatrixQueryResult {
 
 
     public PayTableMatrixQueryResult() {
+        //Default Constructor
     }
 
     public Long getPayGroupAreaId() {

@@ -17,7 +17,9 @@ public class Feature extends UserBaseEntity{
     private String name;
     private String description;
 
-    public Feature(){};
+    public Feature(){
+        //Default Constructor
+    }
 
     public String getName() {
         return name;

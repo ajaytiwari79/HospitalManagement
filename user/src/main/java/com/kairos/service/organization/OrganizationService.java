@@ -71,7 +71,6 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.utils.user_context.UserContext;
@@ -92,6 +91,8 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.TEAM;
@@ -272,7 +273,7 @@ public class OrganizationService {
             List<Municipality> municipalities = (zipCode == null) ? Collections.emptyList() : municipalityGraphRepository.getMunicipalitiesByZipCode(zipCode.getId());
             Map<String, Object> generalTabQueryResult = organizationGraphRepository.getGeneralTabInfo(unit.getId());
             HashMap<String, Object> generalTabInfo = new HashMap<>(generalTabQueryResult);
-            generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : DateConverter.getDate((long) generalTabInfo.get("clientSince"))));
+            generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : getDate((long) generalTabInfo.get("clientSince"))));
             cloneMap.put("municipalities", municipalities);
             response.put("generalTabInfo", generalTabInfo);
             response.put("otherData", cloneMap);
@@ -342,7 +343,7 @@ public class OrganizationService {
         unit.setBusinessTypes(businessTypes);
         unit.setIndustryType(industryType);
         unit.setContractType(contractType);
-        unit.setClientSince(DateConverter.parseDate(organizationGeneral.getClientSince()).getTime());
+        unit.setClientSince(parseDate(organizationGeneral.getClientSince()).getTime());
         unit.setKairosHub(organizationGeneral.isKairosHub());
         unit.setKairosStatus(kairosStatus);
         unit.setExternalId(organizationGeneral.getExternalId());

@@ -17,7 +17,7 @@ public class StaffNonPregnancySpecification extends AbstractActivitySpecificatio
 
     @Override
     public void validateRules(StaffDTO staffDTO) {
-
+        //This is override method
     }
 
     @Override

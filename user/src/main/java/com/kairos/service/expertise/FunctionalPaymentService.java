@@ -441,4 +441,8 @@ public class FunctionalPaymentService {
         return payGroupAreaWiseMap.entrySet().stream().map(setListEntry->new FunctionalPaymentMatrixQueryResult(setListEntry.getKey(),setListEntry.getValue())).collect(Collectors.toList());
     }
 
+    public boolean deleteFunctionalPayment(Long functionalPaymentId){
+        return functionalPaymentGraphRepository.deleteFunctionalPayment(functionalPaymentId);
+    }
+
 }

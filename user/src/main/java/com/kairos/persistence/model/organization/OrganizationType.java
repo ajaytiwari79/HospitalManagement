@@ -31,7 +31,7 @@ public class OrganizationType extends UserBaseEntity {
     @Relationship(type = HAS_SUB_TYPE)
     private List<OrganizationType> organizationTypeList;
     @Relationship(type = ORGANIZATION_TYPE_HAS_SERVICES)
-    List<OrganizationService> organizationServiceList;
+    private List<OrganizationService> organizationServiceList;
     @Relationship(type = BELONGS_TO)
     private Country country;
     @Relationship(type = HAS_LEVEL)

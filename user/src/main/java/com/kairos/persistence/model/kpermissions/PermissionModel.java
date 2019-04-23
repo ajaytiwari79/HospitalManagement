@@ -14,6 +14,9 @@ import static org.neo4j.ogm.annotation.Relationship.OUTGOING;
 @NodeEntity
 public class PermissionModel extends UserBaseEntity {
 
+    public PermissionModel() {
+        //Default Constructor
+    }
     @NotBlank(message = "error.name.notnull")
     private String modelName;
 
@@ -37,6 +40,5 @@ public class PermissionModel extends UserBaseEntity {
         this.fields = fields;
     }
 
-    public PermissionModel() {
-    }
+
 }

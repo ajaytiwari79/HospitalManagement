@@ -13,6 +13,7 @@ public class KairosStatusDTO {
     private String description;
 
     public KairosStatusDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

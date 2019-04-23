@@ -16,6 +16,7 @@ public class StaffKpiFilterQueryResult {
     private List<EmploymentQueryResult> employment;
 
     public StaffKpiFilterQueryResult() {
+        //Default Constructor
     }
 
     public Long getId() {

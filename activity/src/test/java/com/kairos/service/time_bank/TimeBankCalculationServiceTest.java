@@ -51,14 +51,13 @@ public class TimeBankCalculationServiceTest {
 
     @Before
     public void init(){
-
-        staffEmploymentDetails = ObjectMapperUtils.JsonStringToObject(getEmploymentDetailJson(),StaffEmploymentDetails.class);
+        staffEmploymentDetails = ObjectMapperUtils.jsonStringToObject(getEmploymentDetailJson(),StaffEmploymentDetails.class);
         interval = new DateTimeInterval(1555718400000l,1555804800000l);
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getShiftJson(),ShiftWithActivityDTO.class);;
         dailyTimeBankEntryMap = new HashMap<>();
         planningPeriodIntervals = newHashSet(new DateTimeInterval(1555286400000l, 1555804800000l));
         dayTypeDTOS = ObjectMapperUtils.JsonStringToList(getDayTypeJson(), DayTypeDTO.class);
-        activity = ObjectMapperUtils.JsonStringToObject(getActivityJson(), Activity.class);
+        activity = ObjectMapperUtils.jsonStringToObject(getActivityJson(), Activity.class);
         shifts = ObjectMapperUtils.JsonStringToList(getShiftJson(), Shift.class);
 
     }

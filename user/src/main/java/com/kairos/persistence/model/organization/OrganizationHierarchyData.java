@@ -17,6 +17,7 @@ public class OrganizationHierarchyData {
     private List<Organization> childUnits;
 
     public OrganizationHierarchyData() {
+        //Default Constructor
     }
 
     public Organization getParent() {

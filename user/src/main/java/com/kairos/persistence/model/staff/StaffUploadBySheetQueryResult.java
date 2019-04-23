@@ -9,10 +9,11 @@ import java.util.List;
  * Created by vipul on 4/12/17.
  */
 public class StaffUploadBySheetQueryResult {
-    List<StaffDTO> staffList = new ArrayList<>();
-    List<StaffDTO> staffErrorList = new ArrayList<>();
+    private List<StaffDTO> staffList = new ArrayList<>();
+    private List<StaffDTO> staffErrorList = new ArrayList<>();
 
     public StaffUploadBySheetQueryResult() {
+        //Default Constructor
     }
 
     public List<StaffDTO> getStaffList() {

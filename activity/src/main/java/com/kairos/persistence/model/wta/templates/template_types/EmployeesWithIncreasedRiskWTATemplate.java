@@ -69,7 +69,7 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-
+        //This is override method
     }
 
     public EmployeesWithIncreasedRiskWTATemplate(String name, boolean disabled, String description, int belowYear, int aboveYear, boolean pregnant) {

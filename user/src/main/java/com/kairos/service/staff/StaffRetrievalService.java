@@ -71,7 +71,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -84,6 +83,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.Day.EVERYDAY;
@@ -211,7 +211,7 @@ public class StaffRetrievalService {
         map.put("familyName", staff.getFamilyName());
         map.put("currentStatus", staff.getCurrentStatus());
         map.put("signature", staff.getSignature());
-        Date inactiveFrom = Optional.ofNullable(staff.getInactiveFrom()).isPresent() ? DateConverter.getDate(staff.getInactiveFrom()) : null;
+        Date inactiveFrom = Optional.ofNullable(staff.getInactiveFrom()).isPresent() ? getDate(staff.getInactiveFrom()) : null;
         map.put("inactiveFrom", inactiveFrom);
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));

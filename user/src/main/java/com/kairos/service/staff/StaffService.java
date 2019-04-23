@@ -68,7 +68,6 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
@@ -101,6 +100,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
@@ -1007,7 +1007,7 @@ public class StaffService {
         staffToUpdate.getUser().setLastName(staffPersonalDetail.getLastName());
         staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
-            staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
+            staffToUpdate.setInactiveFrom(parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
     }
 

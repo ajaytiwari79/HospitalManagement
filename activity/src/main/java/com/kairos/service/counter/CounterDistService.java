@@ -69,8 +69,6 @@ public class CounterDistService extends MongoBaseService {
     @Inject
     private TimeTypeService timeTypeService;
     @Inject
-    private PhaseMongoRepository phaseMongoRepository;
-    @Inject
     private ActivityService activityService;
     @Inject
     private UserIntegrationService userIntegrationService;

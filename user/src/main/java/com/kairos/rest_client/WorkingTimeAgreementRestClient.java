@@ -84,7 +84,7 @@ public class WorkingTimeAgreementRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());
             throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
     }
@@ -110,7 +110,7 @@ public class WorkingTimeAgreementRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
         return null;
     }

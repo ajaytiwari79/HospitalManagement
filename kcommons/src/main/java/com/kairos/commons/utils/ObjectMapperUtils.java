@@ -93,7 +93,7 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    public static <T> T JsonStringToObject(String jsonString,Class<T> valueType){
+    public static <T> T jsonStringToObject(String jsonString, Class<T> valueType){
         try {
             return mapper.readValue(jsonString, valueType);
         } catch (IOException e) {

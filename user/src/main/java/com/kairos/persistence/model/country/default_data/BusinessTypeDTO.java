@@ -13,6 +13,7 @@ public class BusinessTypeDTO {
     private String description;
 
     public BusinessTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

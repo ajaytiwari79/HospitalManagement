@@ -94,6 +94,7 @@ public class GetEmploymentByIdResult {
     private String CostPlace;
 
     public GetEmploymentByIdResult() {
+        //Default Constructor
     }
 
     public String getAge() {

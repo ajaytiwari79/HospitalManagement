@@ -40,6 +40,7 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private Long employmentId;
 
     public CostTimeAgreement() {
+        //Default Constructor
     }
 
 

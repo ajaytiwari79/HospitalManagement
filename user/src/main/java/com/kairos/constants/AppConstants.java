@@ -219,5 +219,10 @@ public class AppConstants {
 
     //country and system langange relation
     public static final String HAS_SYSTEM_LANGUAGE = "HAS_SYSTEM_LANGUAGE";
+    public static final String KAIROS="Kairos";
+    public static final String KAIROS_DENMARK_EMAIL="kairos_denmark@kairos.com";
+    public static final String ULRIK_EMAIL="ulrik@kairos.com";
+    public static final String ULRIK="Ulrik";
+    public static final String AUTHORIZATION = "Authorization";
 
 }

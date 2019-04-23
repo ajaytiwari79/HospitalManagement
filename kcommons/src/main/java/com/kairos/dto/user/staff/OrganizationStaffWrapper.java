@@ -10,6 +10,7 @@ public class OrganizationStaffWrapper {
     private StaffDTO staff;
     private EmploymentDTO employment;
     public OrganizationStaffWrapper() {
+        //Default Constructor
     }
 
     public OrganizationDTO getOrganization() {

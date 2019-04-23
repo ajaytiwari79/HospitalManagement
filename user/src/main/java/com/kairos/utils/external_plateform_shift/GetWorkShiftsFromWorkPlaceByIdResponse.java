@@ -16,6 +16,7 @@ public class GetWorkShiftsFromWorkPlaceByIdResponse {
 
 
     public GetWorkShiftsFromWorkPlaceByIdResponse() {
+        //Default Constructor
     }
 
     //    public GetWorkShiftsFromWorkPlaceByIdResponse(com.kairos.user.domain.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult[] getWorkShiftsFromWorkPlaceByIdResult) {

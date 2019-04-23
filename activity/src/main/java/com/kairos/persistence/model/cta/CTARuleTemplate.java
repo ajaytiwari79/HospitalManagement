@@ -54,7 +54,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
 
 
     public CTARuleTemplate() {
-
+    //Default Constructor
     }
 
     public Long getCountryId() {

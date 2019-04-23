@@ -20,7 +20,6 @@ import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
@@ -39,9 +38,9 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
-
 
 /**
  * Created by prabjot on 24/10/16.
@@ -316,8 +315,8 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> updateStaffSkillLevel(@PathVariable long unitId, @PathVariable long staffId, @PathVariable long skillId,
                                                                      @RequestBody Map<String, Object> skillInfo) throws ParseException {
         Skill.SkillLevel level = Skill.SkillLevel.valueOf((String) skillInfo.get("level"));
-        long startDate = DateConverter.parseDate((String) skillInfo.get("startDate")).getTime();
-        long endDate = DateConverter.parseDate((String) skillInfo.get("endDate")).getTime();
+        long startDate = parseDate((String) skillInfo.get("startDate")).getTime();
+        long endDate = parseDate((String) skillInfo.get("endDate")).getTime();
         boolean status = (boolean) skillInfo.get("status");
         skillService.updateStaffSkillLevel(staffId, skillId, level, startDate, endDate, status, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillInfo);

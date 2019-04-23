@@ -14,6 +14,7 @@ public class LocationTypeDTO {
 
 
     public LocationTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

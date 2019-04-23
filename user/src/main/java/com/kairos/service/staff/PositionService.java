@@ -43,7 +43,6 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.utils.DateConverter;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -61,6 +60,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 
@@ -209,8 +210,8 @@ public class PositionService {
             position.getUnitPermissions().add(unitPermission);
             positionGraphRepository.save(position);
             LOGGER.info(unitPermission.getId() + " Currently created Unit Permission ");
-            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
-            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
+            response.put("startDate", getDate(unitPermission.getStartDate()));
+            response.put("endDate", getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
             staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
 
@@ -444,8 +445,8 @@ public class PositionService {
         if (partialLeaveDTO.getId() != null) {
             partialLeave = partialLeaveGraphRepository.findOne(partialLeaveDTO.getId());
             partialLeave.setAmount(partialLeaveDTO.getAmount());
-            partialLeave.setStartDate(DateConverter.parseDate(partialLeaveDTO.getStartDate()).getTime());
-            partialLeave.setEndDate(DateConverter.parseDate(partialLeaveDTO.getEndDate()).getTime());
+            partialLeave.setStartDate(parseDate(partialLeaveDTO.getStartDate()).getTime());
+            partialLeave.setEndDate(parseDate(partialLeaveDTO.getEndDate()).getTime());
             partialLeave.setEmploymentId(partialLeaveDTO.getEmploymentId());
             partialLeave.setNote(partialLeaveDTO.getNote());
             partialLeave.setLeaveType(partialLeaveDTO.getLeaveType());
@@ -473,8 +474,8 @@ public class PositionService {
 
             partialLeave = new PartialLeave();
             partialLeave.setAmount(partialLeaveDTO.getAmount());
-            partialLeave.setStartDate(DateConverter.parseDate(partialLeaveDTO.getStartDate()).getTime());
-            partialLeave.setEndDate(DateConverter.parseDate(partialLeaveDTO.getEndDate()).getTime());
+            partialLeave.setStartDate(parseDate(partialLeaveDTO.getStartDate()).getTime());
+            partialLeave.setEndDate(parseDate(partialLeaveDTO.getEndDate()).getTime());
             partialLeave.setEmploymentId(partialLeaveDTO.getEmploymentId());
             partialLeave.setNote(partialLeaveDTO.getNote());
             partialLeave.setLeaveType(partialLeaveDTO.getLeaveType());
@@ -523,8 +524,8 @@ public class PositionService {
     private Map<String, Object> parsePartialLeaveObj(PartialLeave partialLeave) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", partialLeave.getId());
-        map.put("startDate", DateConverter.getDate(partialLeave.getStartDate()));
-        map.put("endDate", DateConverter.getDate(partialLeave.getEndDate()));
+        map.put("startDate", getDate(partialLeave.getStartDate()));
+        map.put("endDate", getDate(partialLeave.getEndDate()));
         map.put("leaveType", partialLeave.getLeaveType());
         map.put("amount", partialLeave.getAmount());
         map.put("note", partialLeave.getNote());

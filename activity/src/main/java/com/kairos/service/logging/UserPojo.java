@@ -13,6 +13,11 @@ public class UserPojo {
     private String firstName;
     private String lastName;
 
+    public UserPojo() {
+        //Default Constructor
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -53,8 +58,6 @@ public class UserPojo {
         this.lastName = lastName;
     }
 
-    public UserPojo() {
-    }
 
 
 }

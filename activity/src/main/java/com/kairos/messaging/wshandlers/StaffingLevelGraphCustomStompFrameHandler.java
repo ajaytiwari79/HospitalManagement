@@ -14,6 +14,6 @@ public class StaffingLevelGraphCustomStompFrameHandler implements StompFrameHand
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-
+        //This is override method
     }
 }

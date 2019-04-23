@@ -13,6 +13,7 @@ public class EngineerTypeDTO {
     private String description;
 
     public EngineerTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

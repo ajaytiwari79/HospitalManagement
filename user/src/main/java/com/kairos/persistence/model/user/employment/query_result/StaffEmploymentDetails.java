@@ -44,6 +44,7 @@ public class StaffEmploymentDetails {
     private List<FunctionDTO> appliedFunctions;
 
     public StaffEmploymentDetails() {
+        //Default Constructor
     }
 
     public LocalDate getStartDate() {

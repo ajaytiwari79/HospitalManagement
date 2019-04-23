@@ -15,6 +15,9 @@ public class StaffClientMultipleData {
     private List<Long> selectedStaffId;
 
 
+    public StaffClientMultipleData() {
+        //Default Constructor
+    }
     public List<Long> getRemovedStaffId() {
         return removedStaffId;
     }
@@ -37,8 +40,5 @@ public class StaffClientMultipleData {
 
     public void setSelectedStaffId(List<Long> selectedStaffId) {
         this.selectedStaffId = selectedStaffId;
-    }
-
-    public StaffClientMultipleData() {
     }
 }
