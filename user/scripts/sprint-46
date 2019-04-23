@@ -1,3 +1,11 @@
 //Set Country Id in User
 MATCH (n:User) where n.countryId is null set n.countryId=18712;
 
+// set the username of the the user whose userName is null
+
+
+//Set the isUserNameUpdated field to false.
+MATCH(u:User) where NOT EXISTS(u.isUserNameUpdated)
+SET u.isUserNameUpdated=false return count(u)
+
+//set the userName for the fields whose userName is null
