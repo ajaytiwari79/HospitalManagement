@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +41,9 @@ public class NotificationController {
 
     @RequestMapping(value = "/{notificationId}", method = RequestMethod.POST)
     @ApiOperation("mark notification read")
-    public ResponseEntity<Map<String, Object>> markNotificationRead(@PathVariable Long notificationId) {
-
-        Boolean status = notificationService.markNotificationRead(notificationId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, status);
+    public ResponseEntity<Map<String, Object>> markNotificationRead(@PathVariable BigInteger notificationId) {
+        notificationService.markNotificationRead(notificationId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 
