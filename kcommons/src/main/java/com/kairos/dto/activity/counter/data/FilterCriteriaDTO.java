@@ -6,6 +6,7 @@ import java.util.List;
 public class FilterCriteriaDTO {
     private Long countryId;
     private boolean isCountryAdmin;
+    private boolean management;
     private Long unitId;
     private Long staffId;
     private List<FilterCriteria> filters;
@@ -87,4 +88,11 @@ public class FilterCriteriaDTO {
         this.countryId = countryId;
     }
 
+    public boolean isManagement() {
+        return management;
+    }
+
+    public void setManagement(boolean management) {
+        this.management = management;
+    }
 }

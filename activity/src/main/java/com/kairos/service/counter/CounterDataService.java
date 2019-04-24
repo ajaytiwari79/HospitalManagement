@@ -23,6 +23,7 @@ import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
@@ -111,6 +112,9 @@ public class CounterDataService extends MongoBaseService {
                 Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
                 if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
                     staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
+//                    if(filters.isManagement() && KPIRepresentation.INDIVIDUAL.equals(staffApplicableKPI.getKpiRepresentation())){
+//                        staffFilterBasedCriteria.put(FilterType.STAFF_IDS,Arrays.asList(staffId));
+//                    }
                     staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
                 }
             }
