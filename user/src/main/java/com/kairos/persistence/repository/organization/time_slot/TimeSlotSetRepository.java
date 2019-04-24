@@ -6,8 +6,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TIME_SLOT_SET;

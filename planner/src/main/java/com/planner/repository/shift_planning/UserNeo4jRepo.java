@@ -22,16 +22,14 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
     @Query("Match(unit:Organization) where id(unit)={0} " +
             "Match(staff:Staff)  where id(staff) in {1} with staff,unit " +
             "Optional Match(skill:Skill{isEnabled:true})<-[:" + STAFF_HAS_SKILLS + "]-(staff) " +
-            "Optional Match(unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff) " +
-            //"Optional Match(expertise:Expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) " +
+            "Optional Match(unit)<-[:" + IN_UNIT + "]-(employment:Employment)<-[:" + BELONGS_TO_STAFF + "]-(staff) " +
             "return " +
             "id(staff) as staffId,\n" +
             "staff.firstName+staff.lastName as staffName,\n" +
             "collect({skillId:id(skill),name:skill.name,weight:skill.weight}) as staffSkills,\n" +
-            "id(unitPosition) as unitPositionsId limit 1"
-            // "unitPositionExpertise:expertise"
+            "id(employment) as employmentId limit 1"
     )
-    List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId, List<Long> staffIds);
+    List<StaffQueryResult> getStaffWithSkillsAndEmploymentIds(Long unitId, List<Long> staffIds);
 
     /**
      * this method will return all OrganizationServices and Its SubServices

@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.user.pay_group_area;
 
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import org.springframework.stereotype.Repository;
 
 /**

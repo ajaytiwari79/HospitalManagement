@@ -1,7 +1,6 @@
 package com.planner.appConfig.dbConfig;
 
 import com.kairos.activity.config.mongo_converter.*;
-import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import org.springframework.context.EnvironmentAware;

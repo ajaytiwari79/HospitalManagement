@@ -4,12 +4,8 @@ package com.kairos.persistence.model.user.expertise.Response;
  *
  */
 
-import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.FunctionalPaymentMatrix;
-import com.kairos.persistence.model.user.expertise.SeniorityLevelFunctionsRelationship;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;

@@ -2,10 +2,8 @@ package com.kairos.dto.planner.vrp.vrpPlanning;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 
 import java.util.Set;
 

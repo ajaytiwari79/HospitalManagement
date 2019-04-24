@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @RestController
 @RequestMapping()
@@ -23,19 +22,18 @@ public class FunctionController {
     @Inject
     private FunctionService functionService;
 
-    //===============================================================
     @ApiOperation(value = "")
-    @PostMapping(API_ORGANIZATION_UNIT_URL+"/appliedFunctionsByUnitPositionIds")
-    public ResponseEntity<Map<String, Object>> getUnitPositionIdWithFunctionIdShiftDateMap(@RequestBody Set<Long> unitPositionIds) {
+    @PostMapping(API_ORGANIZATION_UNIT_URL+"/appliedFunctionsByEmploymentIds")
+    public ResponseEntity<Map<String, Object>> getEmploymentIdWithFunctionIdShiftDateMap(@RequestBody Set<Long> employmentIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                functionService.getUnitPositionIdWithFunctionIdShiftDateMap(unitPositionIds));
+                functionService.getEmploymentIdWithFunctionIdShiftDateMap(employmentIds));
     }
 
     @ApiOperation(value = "")
     @PostMapping(API_ORGANIZATION_UNIT_URL+"/updateFunctionOnPhaseRestoration")
-    public ResponseEntity<Map<String, Object>> updateUnitPositionFunctionRelationShipDates(@RequestBody Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap) {
+    public ResponseEntity<Map<String, Object>> updateEmploymentFunctionRelationShipDates(@RequestBody Map<Long, Map<LocalDate, Long>> employmentIdWithShiftDateFunctionIdMap) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                functionService.updateUnitPositionFunctionRelationShipDates(unitPositionIdWithShiftDateFunctionIdMap));
+                functionService.updateEmploymentFunctionRelationShipDates(employmentIdWithShiftDateFunctionIdMap));
     }
     //Functions
 
@@ -83,10 +81,10 @@ public class FunctionController {
 
     }
 
-    @GetMapping(value =API_V1+UNIT_URL +"/unit_position/functions")
+    @GetMapping(value =API_V1+UNIT_URL +"/employment/functions")
     @ApiOperation("find functions")
-    public ResponseEntity<Map<String, Object>> findAppliedFunctionsAtUnitPosition(@PathVariable Long unitId,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.findAppliedFunctionsAtUnitPosition(unitId,startDate,endDate));
+    public ResponseEntity<Map<String, Object>> findAppliedFunctionsAtEmployment(@PathVariable Long unitId,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.findAppliedFunctionsAtEmployment(unitId,startDate,endDate));
     }
 
 }

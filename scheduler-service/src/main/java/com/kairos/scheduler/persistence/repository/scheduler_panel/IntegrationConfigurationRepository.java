@@ -4,8 +4,9 @@ import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSetting
 import com.kairos.scheduler.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
-import java.util.List;
+
 import java.math.BigInteger;
+import java.util.List;
 @Repository
 public interface IntegrationConfigurationRepository extends MongoBaseRepository<IntegrationSettings, BigInteger> {
 

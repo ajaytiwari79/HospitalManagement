@@ -1,12 +1,12 @@
 package com.kairos.planning.domain;
 
-import java.util.*;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
+
+import java.util.*;
 
 @XStreamAlias("Employee")
 @PlanningEntity(difficultyComparatorClass = EmployeeDifficultyComparator.class)

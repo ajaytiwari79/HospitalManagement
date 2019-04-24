@@ -1,12 +1,12 @@
 package com.kairos.service.scheduler;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.utils.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.API_KMD_CARE_URL;
-import static com.kairos.constants.AppConstants.IMPORT_KMD_TIME_SLOTS;
 
 @Service
 public class IntegrationJobsExecutorService {

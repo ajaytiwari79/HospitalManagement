@@ -1,14 +1,11 @@
 package com.kairos.persistence.model.user.resources;
 
-import com.fasterxml.jackson.annotation.*;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 /**

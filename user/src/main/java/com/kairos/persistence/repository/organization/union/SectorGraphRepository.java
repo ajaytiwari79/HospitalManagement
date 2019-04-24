@@ -1,12 +1,11 @@
 package com.kairos.persistence.repository.organization.union;
 
-import java.util.List;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
 

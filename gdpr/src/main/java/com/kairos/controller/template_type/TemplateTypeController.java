@@ -1,7 +1,6 @@
 package com.kairos.controller.template_type;
 
 import com.kairos.dto.gdpr.master_data.TemplateTypeDTO;
-import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -15,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import static com.kairos.constants.ApiConstant.*;
+import static com.kairos.constants.ApiConstant.API_V1;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
 @Api(API_V1)

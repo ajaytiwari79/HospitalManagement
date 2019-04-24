@@ -32,7 +32,7 @@ public class ShiftFilterCriteria {
 
     private void setUnitIds(List unitIds){
         if(unitIds !=null && !unitIds.isEmpty())
-            matchCriteria.and("unitPositionId").in(unitIds);
+            matchCriteria.and("unitId").in(unitIds);
     }
 
     private void setPlanningPeriodIds(List planningPeriodIds){

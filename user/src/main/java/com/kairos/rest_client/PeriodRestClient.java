@@ -1,15 +1,16 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 /**

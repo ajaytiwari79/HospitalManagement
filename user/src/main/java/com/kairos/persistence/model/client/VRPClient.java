@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.client;
 
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;

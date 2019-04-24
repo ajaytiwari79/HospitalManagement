@@ -6,7 +6,6 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
 /**

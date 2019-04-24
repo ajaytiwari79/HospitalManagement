@@ -1,8 +1,8 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobFrequencyType;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;

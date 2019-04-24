@@ -1,7 +1,5 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
-import com.kairos.dto.user.country.day_type.DayType;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 

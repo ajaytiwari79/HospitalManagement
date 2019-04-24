@@ -1,9 +1,5 @@
 package com.kairos.dto.activity.open_shift.priority_group;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public class StaffIncludeFilter {
 
     private boolean allowForFlexPool;
@@ -12,12 +8,6 @@ public class StaffIncludeFilter {
 
     public StaffIncludeFilter() {
         //Default Constructor
-    }
-
-    public StaffIncludeFilter(boolean allowForFlexPool,  Float staffAvailability, Integer distanceFromUnit) {
-        this.allowForFlexPool = allowForFlexPool;
-        this.staffAvailability=staffAvailability;
-        this.distanceFromUnit=distanceFromUnit;
     }
 
     public boolean isAllowForFlexPool() {

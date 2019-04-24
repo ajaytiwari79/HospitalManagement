@@ -1,9 +1,9 @@
 package com.kairos.dto.activity.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
-import com.kairos.enums.DurationType;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;

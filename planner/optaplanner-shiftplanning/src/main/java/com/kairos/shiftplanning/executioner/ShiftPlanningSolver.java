@@ -31,7 +31,9 @@ import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;

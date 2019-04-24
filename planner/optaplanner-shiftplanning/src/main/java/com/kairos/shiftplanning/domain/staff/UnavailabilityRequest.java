@@ -1,8 +1,7 @@
 package com.kairos.shiftplanning.domain.staff;
 
-import org.joda.time.DateTime;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.joda.time.DateTime;
 
 @XStreamAlias("UnavailabilityList")
 public class UnavailabilityRequest {

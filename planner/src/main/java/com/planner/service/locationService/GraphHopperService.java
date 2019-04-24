@@ -1,23 +1,6 @@
 package com.planner.service.locationService;
 
-import java.text.DecimalFormat;
-import java.util.*;
-
-import com.graphhopper.directions.api.client.api.RoutingApi;
-import com.graphhopper.directions.api.client.model.*;
-import com.planner.appConfig.appConfig.AppConfig;
-import com.planner.commonUtil.StaticField;
-import com.planner.domain.location.PlanningLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.graphhopper.directions.api.client.ApiException;
-import com.graphhopper.directions.api.client.api.GeocodingApi;
-import com.graphhopper.directions.api.client.api.MatrixApi;
-import com.kairos.planning.domain.Location;
-import com.planner.domain.location.LocationDistance;
 
 @Service
 public class GraphHopperService {

@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
-
 /**
  * Created by anil on 8/8/17.
  */

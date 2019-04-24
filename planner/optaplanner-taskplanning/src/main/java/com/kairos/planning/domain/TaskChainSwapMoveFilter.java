@@ -1,14 +1,11 @@
 package com.kairos.planning.domain;
 
+import com.kairos.planning.solution.TaskPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
-import org.optaplanner.core.impl.heuristic.selector.move.generic.chained.SubChainChangeMove;
-import org.optaplanner.core.impl.heuristic.selector.move.generic.chained.SubChainReversingChangeMove;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.chained.SubChainReversingSwapMove;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.chained.SubChainSwapMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
-
-import com.kairos.planning.solution.TaskPlanningSolution;
 
 public class TaskChainSwapMoveFilter implements SelectionFilter<TaskPlanningSolution,AbstractMove<TaskPlanningSolution>>{
 

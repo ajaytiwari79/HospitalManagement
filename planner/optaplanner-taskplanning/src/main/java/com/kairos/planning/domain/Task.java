@@ -1,27 +1,22 @@
 package com.kairos.planning.domain;
 
+import com.kairos.planning.utils.JodaTimeConverter;
+import com.kairos.planning.utils.TaskPlanningUtility;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.Minutes;
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.Minutes;
-import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
-import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
-import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.kairos.planning.utils.JodaTimeConverter;
-import com.kairos.planning.utils.TaskPlanningUtility;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 @XStreamAlias("Task")
 @PlanningEntity(difficultyComparatorClass = TaskDifficultyComparator.class)

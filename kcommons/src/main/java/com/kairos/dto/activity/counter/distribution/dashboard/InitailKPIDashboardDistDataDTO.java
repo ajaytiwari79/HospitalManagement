@@ -1,8 +1,5 @@
 package com.kairos.dto.activity.counter.distribution.dashboard;
 
-import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingDTO;
-import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
-
 import java.util.List;
 
 public class InitailKPIDashboardDistDataDTO {

@@ -1,7 +1,6 @@
 package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -11,9 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by oodles on 9/1/17.

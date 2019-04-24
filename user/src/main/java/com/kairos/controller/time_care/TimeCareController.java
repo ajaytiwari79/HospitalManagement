@@ -1,12 +1,11 @@
 package com.kairos.controller.time_care;
 
-import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.TimeCareStaffDTO;
+import com.kairos.persistence.model.time_care.TimeCareSkill;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffCreationService;
-import com.kairos.service.staff.StaffService;
-import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
@@ -32,7 +30,7 @@ public class TimeCareController {
     @Inject
     private StaffCreationService staffCreationService;
     @Inject
-    private UnitPositionService unitPositionService;
+    private EmploymentService employmentService;
 
     @RequestMapping(value = COUNTRY_URL+"/skills",method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> importSkillsFromTimeCare(@PathVariable Long countryId,@RequestBody List<TimeCareSkill> timeCareSkills){
@@ -50,7 +48,7 @@ public class TimeCareController {
     public ResponseEntity<Map<String,Object>> importEmploymentsFromTimeCare(@RequestBody List<TimeCareEmploymentDTO> timeCareEmploymentDTOS,
                                                                             @RequestParam(value = "expertiseId",required = false) Long expertiseId) throws Exception {
 
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true, unitPositionService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS, expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true, employmentService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS, expertiseId));
     }
 
 }

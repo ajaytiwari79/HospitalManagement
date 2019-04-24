@@ -1,8 +1,6 @@
 package com.kairos.dto.activity.cta;
 
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalTime;

@@ -2,8 +2,6 @@ package com.kairos.service.counter;
 
 import org.springframework.data.mongodb.core.query.Criteria;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /*

@@ -2,11 +2,11 @@ package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.shift.Shift;
-import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
+import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 @XStreamAlias("Employee")
 public class Employee {
-    private static Logger log= LoggerFactory.getLogger(Employee.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Employee.class);
     private String id;
     private BigDecimal baseCost;
     transient private WorkingTimeConstraints workingTimeConstraints;
@@ -41,7 +41,7 @@ public class Employee {
     private int workingDaysInWeek;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private Long employmentTypeId;
-    private Long unitPositionId;
+    private Long employmentId;
 
 
     public Employee(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
@@ -193,12 +193,12 @@ public class Employee {
     public Employee() {
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     @Override
@@ -226,7 +226,7 @@ public class Employee {
                 .append(id)
                 .toHashCode();*/
         int hashcode=id.hashCode();
-        //log.info("Employee hashcode:"+id+":"+hashcode);
+        //LOGGER.info("Employee hashcode:"+id+":"+hashcode);
         return hashcode;
     }
     public int checkConstraints(List<Shift> shifts, int index){

@@ -7,7 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
@@ -421,19 +421,19 @@ public class TaskService extends MongoBaseService {
         if (!Optional.ofNullable(staffDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.external-staffid",personExternalId.get());
         }
-        if (!Optional.ofNullable(organizationStaffWrapper.getUnitPosition()).isPresent()) {
-            exceptionService.internalError("error.kairos.unitposition",personExternalId.get());
+        if (!Optional.ofNullable(organizationStaffWrapper.getEmployment()).isPresent()) {
+            exceptionService.internalError("error.kairos.employment",personExternalId.get());
         }
         List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare = timeCareShifts.getGetWorkShiftsFromWorkPlaceByIdResult();
         int sizeOfTimeCareShifts = shiftsFromTimeCare.size();
         int skip = 0;
         if (sizeOfTimeCareShifts > MONOGDB_QUERY_RECORD_LIMIT) {
             do {
-                saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition(), skippedShiftsWhileSave);
+                saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getEmployment(), skippedShiftsWhileSave);
                 skip += MONOGDB_QUERY_RECORD_LIMIT;
             } while (skip <= sizeOfTimeCareShifts);
         } else {
-            saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition(), skippedShiftsWhileSave);
+            saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getEmployment(), skippedShiftsWhileSave);
         }
         return skippedShiftsWhileSave;
     }
@@ -448,7 +448,7 @@ public class TaskService extends MongoBaseService {
         return shift;
     }
 
-    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId,UnitPositionDTO unitPositionDTO , List<String> skippedShiftsWhileSave) {
+    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId, EmploymentDTO employmentDTO, List<String> skippedShiftsWhileSave) {
         List<String> externalIdsOfShifts = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getId()).
                 collect(Collectors.toList());
         List<String> externalIdsOfActivities = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getActivityId()).
@@ -457,11 +457,11 @@ public class TaskService extends MongoBaseService {
         List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(workPlaceId, externalIdsOfActivities);
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
-        StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId(),Collections.emptySet());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
-        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
+        StaffEmploymentDetails staffEmploymentDetails = new StaffEmploymentDetails(employmentDTO.getWorkingDaysInWeek(), employmentDTO.getTotalWeeklyMinutes());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, employmentDTO.getId(),Collections.emptySet());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(),new Date());
+        staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        staffEmploymentDetails.setFullTimeWeeklyMinutes(employmentDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
@@ -471,7 +471,7 @@ public class TaskService extends MongoBaseService {
                 skippedShiftsWhileSave.add(timeCareShift.getId());
             } else {
                 shift.setStaffId(staffId);
-                shift.setUnitPositionId(unitPositionDTO.getId());
+                shift.setEmploymentId(employmentDTO.getId());
                 shiftsToCreate.add(shift);
             }
         }
@@ -483,7 +483,7 @@ public class TaskService extends MongoBaseService {
             Date startDate = shiftsToCreate.get(0).getStartDate();
             Date endDate = shiftsToCreate.get(shiftsToCreate.size()-1).getEndDate();
             timeBankService.updateTimeBankForMultipleShifts(staffAdditionalInfoDTO, startDate,endDate);
-            payOutService.savePayOuts(staffAdditionalInfoDTO.getUnitPosition(), shiftsToCreate,activities,null,staffAdditionalInfoDTO.getDayTypes());
+            payOutService.savePayOuts(staffAdditionalInfoDTO.getEmployment(), shiftsToCreate,activities,null,staffAdditionalInfoDTO.getDayTypes());
         }
     }
 

@@ -38,7 +38,7 @@ public class StaffPersonalDetailDTO {
     protected Gender gender;
     private String city;
     private String province;
-    private Boolean unitPosition;
+    private Boolean employment;
     private Integer age;
     private String privatePhone;
     private LocalDate dateOfBirth;
@@ -216,12 +216,12 @@ public class StaffPersonalDetailDTO {
         this.province = province;
     }
 
-    public Boolean getUnitPosition() {
-        return unitPosition;
+    public Boolean getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(Boolean unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(Boolean employment) {
+        this.employment = employment;
     }
 
     public void setAge(Integer age) {
