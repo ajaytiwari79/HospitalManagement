@@ -461,7 +461,9 @@ public class StaffService {
                 } else {
                    User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
                    if(Optional.ofNullable(user).isPresent()){
-                       userName = createNewUserName(firstName, lastName);
+                       StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "UserName already exist");
+                       staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                       staffErrorList.add(staffDTO);
                    }else {
                        userName = getStringValueOfIndexedCell(row, 19);
                    }
@@ -523,6 +525,7 @@ public class StaffService {
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             user.setUserName(userName);
+                            user.setUserNameUpdated(false);
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 //user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());

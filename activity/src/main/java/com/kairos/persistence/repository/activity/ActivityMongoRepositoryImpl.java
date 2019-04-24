@@ -697,5 +697,21 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.updateMulti(new Query(), update, Activity.class).wasAcknowledged();
     }
 
+    @Override
+    public ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId) {
+        String project = "{'$project':{'_id':1,'childActivities':{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.rulesActivityTab.eligibleForStaffingLevel',true]} }} }}";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
+                lookup("activities", "childActivityIds", "_id", "childActivities"),
+                unwind("childActivities"),
+                match(Criteria.where("childActivities.rulesActivityTab.eligibleForStaffingLevel").is(true)),
+                group("$id")
+                        .addToSet("childActivities").as("childActivities"),
+                new CustomAggregationOperation(Document.parse(project)),
+                project("id", "childActivities")
+                        .and("childActivities._id").as("childActivityIds")
+        );
 
+        return mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class).getUniqueMappedResult();
+    }
 }
