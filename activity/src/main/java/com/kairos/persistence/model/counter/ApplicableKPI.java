@@ -57,6 +57,19 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.frequencyType=frequencyType;
     }
 
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy) {
+        this.activeKpiId = activeKpiId;
+        this.baseKpiId = baseKpiId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+        this.applicableFilter=applicableFilter;
+        this.copy=copy;
+        this.title=title;
+
+    }
+
     public BigInteger getActiveKpiId() {
         return activeKpiId;
     }
