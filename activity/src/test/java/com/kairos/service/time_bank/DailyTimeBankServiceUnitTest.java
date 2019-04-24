@@ -79,24 +79,6 @@ public class DailyTimeBankServiceUnitTest {
     }
 
     @Test
-    public void getIntervalByDateOverviewTimebank(){
-        //TODO Pradeep will fix it. as logic has been changed
-        int year  = 2018;
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
-        DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
-        DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
-        if(startDate.getYear()==new DateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).withTimeAtStartOfDay())){
-            startDate = DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).withTimeAtStartOfDay();
-        }
-        if(startDate.getYear()!=DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()).getYear() && startDate.isAfter(DateUtils.toJodaDateTime(employmentWithCtaDetailsDTO.getEmploymentStartDate()))){
-            startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
-        }
-        if(endDate.isAfter(new DateTime().plusDays(1).withTimeAtStartOfDay()) && endDate.getYear()==new DateTime().getYear()){
-            endDate = new DateTime().withTimeAtStartOfDay();
-        }
-        Interval interval = new Interval(startDate,endDate);
-    }
-    @Test
     public void getWeeksBYMonth(){
         logger.info("week "+new DateTime().dayOfWeek().withMaximumValue());
     }
