@@ -55,8 +55,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.util.stream.Collectors.toList;
 
 
@@ -113,6 +112,9 @@ public class CounterDataService extends MongoBaseService {
                 if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
                     staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
                     staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
+                }if(isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
+                    staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), new HashMap<FilterType, List>(){{put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
+                    }});
                 }
             }
         }

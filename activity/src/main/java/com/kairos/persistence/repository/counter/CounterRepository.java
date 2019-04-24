@@ -129,11 +129,11 @@ public class CounterRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
-                project("title").and("kpi").arrayElementAt(0).as("kpi"),
-                project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
+                project("title","fibonacciKPIConfigs").and("kpi").arrayElementAt(0).as("kpi"),
+                project("title","fibonacciKPIConfigs").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
                         and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
-                        .and("kpi.referenceId").as("referenceId").and("kpi.fibonacciKPIConfigs").as("fibonacciKPIConfigs")
+                        .and("kpi.referenceId").as("referenceId").and("fibonacciKPIConfigs").as("fibonacciKPIConfigs")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();
@@ -148,12 +148,12 @@ public class CounterRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
-                project("title").and("kpi").arrayElementAt(0).as("kpi"),
+                project("title","fibonacciKPIConfigs").and("kpi").arrayElementAt(0).as("kpi"),
                 match(Criteria.where("kpi.fibonacciKPI").is(true)),
-                project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
+                project("title","fibonacciKPIConfigs").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
                         and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
-                        .and("kpi.referenceId").as("referenceId").and("kpi.fibonacciKPIConfigs").as("fibonacciKPIConfigs")
+                        .and("kpi.referenceId").as("referenceId")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();

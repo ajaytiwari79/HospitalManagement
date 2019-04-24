@@ -16,6 +16,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private ConfLevel level;
     private String title;
     private ApplicableFilter applicableFilter;
+    private List<FibonacciKPIConfig> fibonacciKPIConfigs;
     private boolean fibonacciKPI;
     // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
     private boolean copy;
@@ -43,6 +44,20 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.applicableFilter=applicableFilter;
         this.copy=copy;
         this.title=title;
+    }
+
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy,List<FibonacciKPIConfig> fibonacciKPIConfigs) {
+        this.activeKpiId = activeKpiId;
+        this.baseKpiId = baseKpiId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+        this.applicableFilter=applicableFilter;
+        this.copy=copy;
+        this.title=title;
+        this.fibonacciKPIConfigs = fibonacciKPIConfigs;
+        this.fibonacciKPI = true;
     }
 
     public BigInteger getActiveKpiId() {
@@ -123,5 +138,13 @@ public class ApplicableKPI extends MongoBaseEntity {
 
     public void setFibonacciKPI(boolean fibonacciKPI) {
         this.fibonacciKPI = fibonacciKPI;
+    }
+
+    public List<FibonacciKPIConfig> getFibonacciKPIConfigs() {
+        return fibonacciKPIConfigs;
+    }
+
+    public void setFibonacciKPIConfigs(List<FibonacciKPIConfig> fibonacciKPIConfigs) {
+        this.fibonacciKPIConfigs = fibonacciKPIConfigs;
     }
 }

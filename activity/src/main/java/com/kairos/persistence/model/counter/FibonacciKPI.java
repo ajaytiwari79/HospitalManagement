@@ -19,7 +19,7 @@ public class FibonacciKPI extends KPI{
     private String description;
     private Long referenceId;
     private ConfLevel confLevel;
-    private List<FibonacciKPIConfig> fibonacciKPIConfigs;
+
     private boolean fibonacciKPI;
 
     public FibonacciKPI() {
