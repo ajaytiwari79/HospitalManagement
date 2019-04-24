@@ -14,8 +14,11 @@ import javax.validation.constraints.Size;
 import java.math.BigInteger;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.dto.activity.counter.enums.ChartType.BAR;
 import static com.kairos.dto.activity.counter.enums.CounterSize.SIZE_8X2;
+import static com.kairos.enums.FilterType.STAFF_IDS;
+import static com.kairos.enums.FilterType.TIME_INTERVAL;
 
 /**
  * pradeep
@@ -81,7 +84,7 @@ public class FibonacciKPIDTO {
     }
 
     public void setFilterTypes(List<FilterType> filterTypes) {
-        this.filterTypes = filterTypes;
+        this.filterTypes = newArrayList(STAFF_IDS,TIME_INTERVAL);
     }
 
     public List<FilterCriteria> getCriteriaList() {

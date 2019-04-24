@@ -120,7 +120,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
+    public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
         return new TreeSet<>();//getContractualAndPlannedHoursKpiDate(organizationId, filterBasedCriteria).stream().;
     }
 

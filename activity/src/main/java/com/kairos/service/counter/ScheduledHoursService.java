@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ public class ScheduledHoursService implements CounterService {
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, List<LocalDate> filterDates) {
         return new TreeSet<>();
     }
 }

@@ -3,9 +3,13 @@ package com.kairos.persistence.model.counter;
 import com.kairos.enums.kpi.Direction;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigInteger;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * pradeep
@@ -22,14 +26,33 @@ public class FibonacciKPICalculation implements Comparable{
     private int impactWeight;
     private Direction sortingOrder;
 
-    public FibonacciKPICalculation(Long staffId, int value,int fibonacciKpiCount) {
+    public FibonacciKPICalculation(Long staffId, int value) {
         this.staffId = staffId;
         this.value = value;
-        this.fibonacciKpiCount = fibonacciKpiCount;
+    }
+
+    public Integer getValue() {
+        return value;
     }
 
     @Override
     public int compareTo(Object o) {
-        return Comparator.comparingInt(FibonacciKPICalculation::getValue).compare(this,(FibonacciKPICalculation)o);
+        FibonacciKPICalculation fibonacciKPICalculation = (FibonacciKPICalculation)o;
+        return new CompareToBuilder()
+                .append(this.value, fibonacciKPICalculation.value)
+                .append(this.staffId, fibonacciKPICalculation.staffId).toComparison();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if(!(o instanceof FibonacciKPICalculation)) return false;
+        FibonacciKPICalculation that = (FibonacciKPICalculation) o;
+        return new EqualsBuilder().append(value, that.value).append(fibonacciKpiCount, that.fibonacciKpiCount).append(impactWeight, that.impactWeight).append(kpiId, that.kpiId).append(staffId, that.staffId).append(sortingOrder, that.sortingOrder).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(staffId);
     }
 }

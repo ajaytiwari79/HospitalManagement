@@ -135,7 +135,7 @@ public class TimeBankKpiCalculationService implements CounterService {
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
         return new TreeSet<>();//getTimeBankForUnitKpiData(organizationId, filterBasedCriteria, true);
     }
 }

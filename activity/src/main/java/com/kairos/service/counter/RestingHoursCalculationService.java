@@ -108,13 +108,12 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
-        List<Long> staffIds = getLongValue(filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS, new ArrayList<>()));
-        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null)&& isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
+        List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
         Map<Long, Number> staffRestingHours = calculateRestingHours(staffIds, DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1),true);
         Map<Long, Integer> staffAndRestingHoursMap = new HashMap<>(staffRestingHours.size());
         for (Map.Entry<Long, Number> staffRestingHour : staffRestingHours.entrySet()) {
-            staffAndRestingHoursMap.put(staffRestingHour.getKey(),(Integer) staffRestingHour.getValue());
+            staffAndRestingHoursMap.put(staffRestingHour.getKey(), staffRestingHour.getValue().intValue());
         }
         return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
     }

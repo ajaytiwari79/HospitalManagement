@@ -82,13 +82,11 @@ public class PlannedHoursCalculationService implements CounterService {
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
-        List<Long> staffIds = getLongValue(filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS, new ArrayList<>()));
-        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null)&& isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))?KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
-        List<Long> unitIds = newArrayList(organizationId);
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
+        List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
         List<String> shiftActivityStatus = new ArrayList<>();
         Set<BigInteger> timeTypeIds = new HashSet<>();
-        List<CommonKpiDataUnit> basicChartKpiDateUnits = shiftMongoRepository.findShiftsByKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
+        List<CommonKpiDataUnit> basicChartKpiDateUnits = shiftMongoRepository.findShiftsByKpiFilters(staffIds,Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         Map<Long,Integer> staffAndPlannedMinutesMap = new HashMap<>(basicChartKpiDateUnits.size());
         basicChartKpiDateUnits.forEach(kpiData -> {
             staffAndPlannedMinutesMap.put((Long) kpiData.getRefId(),(int)((BasicChartKpiDateUnit)kpiData).getValue());

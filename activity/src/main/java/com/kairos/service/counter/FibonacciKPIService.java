@@ -1,5 +1,7 @@
 package com.kairos.service.counter;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.KPIUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.counter.CounterServiceMapping;
@@ -9,27 +11,34 @@ import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
-import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
-import com.kairos.dto.activity.counter.enums.*;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
+import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getHoursByMinutes;
+import static com.kairos.commons.utils.KPIUtils.getLongValue;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
 
 @Service
 public class FibonacciKPIService implements CounterService{
@@ -50,7 +59,7 @@ public class FibonacciKPIService implements CounterService{
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
-        if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
+        if(confLevel.equals(UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
         fibonacciKPIDTO.setReferenceId(referenceId);
@@ -61,11 +70,31 @@ public class FibonacciKPIService implements CounterService{
         List<ApplicableKPI> applicableKPIs = new ArrayList<>();
         if (ConfLevel.COUNTRY.equals(confLevel) ) {
             applicableKPIs.add(new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), referenceId, null, null, confLevel, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false));
-        } else if (ConfLevel.UNIT.equals(confLevel)) {
+        } else if (UNIT.equals(confLevel)) {
             applicableKPIs.add(new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), null, referenceId, null, confLevel, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false));
         }
+        createFibonacciKPIAtOrganizations(fibonacciKPI,UNIT.equals(confLevel) ? referenceId : null);
         fibonacciKPIRepository.saveEntities(applicableKPIs);
         return fibonacciKPIDTO;
+    }
+
+    private boolean createFibonacciKPIAtOrganizations(FibonacciKPI fibonacciKPI, Long unitId){
+        List<Long> organizationIds = userIntegrationService.getAllOrganizationIds(unitId);
+        List<FibonacciKPI> fibonacciKPIS = new ArrayList<>(organizationIds.size());
+        fibonacciKPI.setId(null);
+        List<ApplicableKPI> applicableKPIs = new ArrayList<>();
+        for (Long organizationId : organizationIds) {
+            FibonacciKPI organizationfibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPI,FibonacciKPI.class);
+            organizationfibonacciKPI.setConfLevel(UNIT);
+            organizationfibonacciKPI.setReferenceId(organizationId);
+            fibonacciKPIS.add(organizationfibonacciKPI);
+            applicableKPIs.add(new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), null, organizationId, null, UNIT, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false));
+        }
+        if(isCollectionNotEmpty(fibonacciKPIS)) {
+            fibonacciKPIRepository.saveEntities(fibonacciKPIS);
+            fibonacciKPIRepository.saveEntities(applicableKPIs);
+        }
+        return true;
     }
 
     public FibonacciKPIDTO updateFibonacciKPI(Long referenceId,FibonacciKPIDTO fibonacciKPIDTO,ConfLevel confLevel){
@@ -76,7 +105,7 @@ public class FibonacciKPIService implements CounterService{
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
-        if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
+        if(confLevel.equals(UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
         fibonacciKPIDTO.setReferenceId(referenceId);
@@ -135,35 +164,45 @@ public class FibonacciKPIService implements CounterService{
         Map<Long,CommonKpiDataUnit> staffAndfibonacciKpiDataMap = (Map<Long,CommonKpiDataUnit>)calculateFibonacciKPImaps[1];
         for (Map.Entry<Long, CommonKpiDataUnit> staffAndFibonacciEntry : staffAndfibonacciKpiDataMap.entrySet()) {
             ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = (ClusteredBarChartKpiDataUnit)staffAndFibonacciEntry.getValue();
-            clusteredBarChartKpiDataUnit.setSubValues(kpiAndstaffDataMap.get(staffAndFibonacciEntry.getKey()));
+            clusteredBarChartKpiDataUnit.setSubValues(new ArrayList(kpiAndstaffDataMap.get(staffAndFibonacciEntry.getKey())){{
+                ClusteredBarChartKpiDataUnit subValue = ObjectMapperUtils.copyPropertiesByMapper(clusteredBarChartKpiDataUnit,ClusteredBarChartKpiDataUnit.class);
+                //subValue.setValue(getHoursByMinutes(subValue.getValue()));
+                add(subValue);
+            }});
         }
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, (List<CommonKpiDataUnit>) staffAndfibonacciKpiDataMap.values(), new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, new ArrayList<>(staffAndfibonacciKpiDataMap.values()), new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder) {
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
         return new TreeSet<>();
     }
 
     private Map[] calculateFibonacciKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi){
+        List<Long> staffIds = getLongValue(filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS, new ArrayList<>()));
+        List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null)&& isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))? KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, newArrayList(organizationId), new ArrayList<>(), organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         Map<BigInteger,FibonacciKPIConfig> fibonacciKPIConfigMap = ((FibonacciKPI)kpi).getFibonacciKPIConfigs().stream().collect(Collectors.toMap(fibonacciKPIConfig -> fibonacciKPIConfig.getKpiId(),v->v));
         List<KPI> counters = counterRepository.getKPIsByIds(new ArrayList<>(fibonacciKPIConfigMap.keySet()));
         Map<Long,CommonKpiDataUnit> staffAndfibonacciKpiDataMap = new HashMap<>();
         Map<Long,List<ClusteredBarChartKpiDataUnit>> kpiAndstaffDataMap = new HashMap<>();
+        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         for (KPI counter : counters) {
-            FibonacciKPIConfig fibonacciKPIConfig = fibonacciKPIConfigMap.get(kpi.getId());
-            TreeSet<FibonacciKPICalculation> kpiCalculation = counterServiceMapping.getService(counter.getType()).getFibonacciCalculatedCounter(filterBasedCriteria,organizationId,fibonacciKPIConfig.getSortingOrder());
+            FibonacciKPIConfig fibonacciKPIConfig = fibonacciKPIConfigMap.get(counter.getId());
+            TreeSet<FibonacciKPICalculation> kpiCalculation = counterServiceMapping.getService(counter.getType()).getFibonacciCalculatedCounter(filterBasedCriteria,organizationId,fibonacciKPIConfig.getSortingOrder(),staffKpiFilterDTOS,filterDates);
             for (FibonacciKPICalculation fibonacciKPICalculation : kpiCalculation) {
                 List<ClusteredBarChartKpiDataUnit> staffKpis = kpiAndstaffDataMap.getOrDefault(fibonacciKPICalculation.getStaffId(),new ArrayList<>());
-                staffKpis.add(new ClusteredBarChartKpiDataUnit(counter.getTitle(),fibonacciKPICalculation.getValue()));
+                staffKpis.add(new ClusteredBarChartKpiDataUnit(counter.getTitle(),getHoursByMinutes(fibonacciKPICalculation.getValue().doubleValue())));
                 ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit;
                 if(staffAndfibonacciKpiDataMap.containsKey(fibonacciKPICalculation.getStaffId())){
                     clusteredBarChartKpiDataUnit = (ClusteredBarChartKpiDataUnit)staffAndfibonacciKpiDataMap.get(fibonacciKPICalculation.getStaffId());
                     clusteredBarChartKpiDataUnit.setValue(clusteredBarChartKpiDataUnit.getValue() + (fibonacciKPICalculation.getValue() * fibonacciKPICalculation.getFibonacciKpiCount()));
                 }else {
-                    clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(kpi.getTitle(),fibonacciKPICalculation.getValue() * fibonacciKPICalculation.getFibonacciKpiCount());
+                    clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(fibonacciKPICalculation.getStaffId()),fibonacciKPICalculation.getValue() * fibonacciKPICalculation.getFibonacciKpiCount());
                     staffAndfibonacciKpiDataMap.put(fibonacciKPICalculation.getStaffId(),clusteredBarChartKpiDataUnit);
                 }
+                kpiAndstaffDataMap.putIfAbsent(fibonacciKPICalculation.getStaffId(),staffKpis);
             }
         }
         return new Map[]{kpiAndstaffDataMap,staffAndfibonacciKpiDataMap};
