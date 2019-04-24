@@ -309,11 +309,12 @@ public class OrganizationActivityService extends MongoBaseService {
 
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
+        generalTab.setTags(null);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        generalActivityTabWithTagDTO.setTags(null);
-        if (!generalDTO.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        if (!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            generalTab.setTags(activity.getTags());
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
         activityService.updateNotesTabOfActivity(generalDTO, activity);

@@ -495,8 +495,10 @@ public class ShiftService extends MongoBaseService {
             //copy old state of activity object
             Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
+            shiftDTO.setShiftType(ShiftType.PRESENCE);
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
+            shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO);
             shift.setPhaseId(phase.getId());
             if (byTAndAView) {
                 shift.setId(shiftDTO.getShiftId());

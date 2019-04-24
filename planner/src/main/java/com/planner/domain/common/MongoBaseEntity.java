@@ -46,4 +46,5 @@ public class MongoBaseEntity {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }

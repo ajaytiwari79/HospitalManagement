@@ -71,7 +71,9 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+            "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName," +
+            "user.userName AS userName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS " +
+            "accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
 
     @Query("MATCH (org:Organization) WHERE id(org)  = {1}" +
