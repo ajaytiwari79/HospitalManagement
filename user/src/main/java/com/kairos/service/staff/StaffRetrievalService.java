@@ -205,7 +205,7 @@ public class StaffRetrievalService {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("isUserNameUpdated",user.isUserNameUpdated());
-        map.put("userName", staff.getUserName());
+        map.put("userName", user.getUserName());
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
         map.put("profilePic", (isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
