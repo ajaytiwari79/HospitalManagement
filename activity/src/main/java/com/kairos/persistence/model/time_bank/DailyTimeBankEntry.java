@@ -31,6 +31,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int deltaAccumulatedTimebankMinutes;
     //It is the sum of scheduledMinutesOfTimeBank + ctaBonusMinutesOfTimeBank
     private int plannedMinutesOfTimebank;
+    private int publishedBalancesMinutes;
 
 
     public DailyTimeBankEntry(Long unitPositionId, Long staffId, LocalDate date) {
@@ -129,6 +130,14 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
 
     public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
         this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    }
+
+    public int getPublishedBalancesMinutes() {
+        return publishedBalancesMinutes;
+    }
+
+    public void setPublishedBalancesMinutes(int publishedBalancesMinutes) {
+        this.publishedBalancesMinutes = publishedBalancesMinutes;
     }
 
     @Override

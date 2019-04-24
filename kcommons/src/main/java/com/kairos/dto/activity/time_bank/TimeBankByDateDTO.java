@@ -10,11 +10,13 @@ public class TimeBankByDateDTO {
 
     private int timeBankChangeMinutes;
     private long accumulatedTimebankMinutes;
+    private long expectedTimebankMinutes;
 
 
-    public TimeBankByDateDTO(int timeBankChangeMinutes, long accumulatedTimebankMinutes) {
+    public TimeBankByDateDTO(int timeBankChangeMinutes, long accumulatedTimebankMinutes,long expectedTimebankMinutes) {
         this.timeBankChangeMinutes = timeBankChangeMinutes;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+        this.expectedTimebankMinutes = expectedTimebankMinutes;
     }
 
     public TimeBankByDateDTO() {
@@ -34,5 +36,13 @@ public class TimeBankByDateDTO {
 
     public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
+
+    public long getExpectedTimebankMinutes() {
+        return expectedTimebankMinutes;
+    }
+
+    public void setExpectedTimebankMinutes(long expectedTimebankMinutes) {
+        this.expectedTimebankMinutes = expectedTimebankMinutes;
     }
 }

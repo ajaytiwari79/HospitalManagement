@@ -388,7 +388,6 @@ public class TimeBankCalculationService {
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
             if(cta.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT) && cta.getCalculationFor().equals(SCHEDULED_HOURS)) {
                 scheduledCTADistributions.add(new CTADistributionDTO(cta.getId(), cta.getName(), ctaDistributionMap.getOrDefault(cta.getName(), 0)));
-
             }
         });
         return scheduledCTADistributions;
@@ -774,7 +773,6 @@ public class TimeBankCalculationService {
                 return StringUtils.capitalize(AppConstants.YEAR) + " " + interval.getStart().getYear();
             case QUATERLY:
                 return StringUtils.capitalize(AppConstants.QUARTER) + " " + getQuaterNumberByDate(interval.getStart());//(interval.getStart().dayOfMonth().withMinimumValue().equals(interval.getStart()) ? interval.getStart().getMonthOfYear() / 3 : (interval.getStart().getMonthOfYear() / 3) + 1);
-            //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
         }
         return "";
     }
@@ -896,7 +894,6 @@ public class TimeBankCalculationService {
                 case QUATERLY:
                     nextEndDay = getQuaterByDate(startDateTime);
                     break;
-                //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
             }
             intervals.add(new Interval(startDateTime, nextEndDay.isAfter(endDateTime) ? endDateTime : nextEndDay));
             startDateTime = nextEndDay;
@@ -1011,11 +1008,11 @@ public class TimeBankCalculationService {
     }
 
     public Map<java.time.LocalDate, TimeBankByDateDTO> getAccumulatedTimebankDTO(Set<DateTimeInterval> planningPeriodIntervals, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate) {
-        long accumulatedTimebank = 0;
         java.time.LocalDate unitPositionStartDate = unitPositionWithCtaDetailsDTO.getStartDate();
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k -> k.getDate(), v -> v));
         Map<java.time.LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = new HashMap<>();
         endDate = isNull(unitPositionWithCtaDetailsDTO.getEndDate()) ? endDate : endDate.isBefore(unitPositionWithCtaDetailsDTO.getEndDate()) ? endDate : unitPositionWithCtaDetailsDTO.getEndDate();
+        long accumulatedTimebank = 0;
         while (unitPositionStartDate.isBefore(endDate) || unitPositionStartDate.equals(endDate)) {
             TimeBankByDateDTO timeBankByDateDTO = new TimeBankByDateDTO();
             int totalTimeBankMinutes;
@@ -1032,7 +1029,7 @@ public class TimeBankCalculationService {
             timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);
             timeBankByDateDTO.setTimeBankChangeMinutes(totalTimeBankMinutes);
             if(unitPositionStartDate.isAfter(startDate) || startDate.equals(unitPositionStartDate)) {
-                localDateTimeBankByDateDTOMap.put(unitPositionStartDate, timeBankByDateDTO);
+                localDateTimeBankByDateDTOMap.put(unitPositionStartDate, new TimeBankByDateDTO(totalTimeBankMinutes,accumulatedTimebank,accumulatedTimebank+totalTimeBankMinutes));
             }
             unitPositionStartDate = unitPositionStartDate.plusDays(1);
         }

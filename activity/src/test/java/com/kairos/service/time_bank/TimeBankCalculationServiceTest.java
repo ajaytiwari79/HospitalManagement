@@ -3,7 +3,10 @@ package com.kairos.service.time_bank;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.time_bank.TimeBankByDateDTO;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
@@ -21,11 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.AppConstants.*;
 
@@ -91,7 +93,6 @@ public class TimeBankCalculationServiceTest {
     @Test
     public void getTimeBankByIntervalForNightShift() {
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getNightShiftJson(), ShiftWithActivityDTO.class);
-        ;
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.getTimeBankByInterval(unitPosition, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
@@ -148,6 +149,15 @@ public class TimeBankCalculationServiceTest {
             }
         }
 
+    }
+
+    @Test
+    public void getAccumulatedTimebank(){
+        /*StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId, null, ORGANIZATION, unitPositionId, new HashSet<>());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeAndEqualsDate(unitPositionId, asDate(endDate));
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = ObjectMapperUtils.jsonStringToObject(getUnitPositionDetailJson(),UnitPositionWithCtaDetailsDTO.class);
+        Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, asDate(startDate), asDate(endDate));
+        Map<LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals, dailyTimeBankEntries, unitPositionWithCtaDetailsDTO, startDate, endDate);*/
     }
 
     private String getUnitPositionDetailJson() {
