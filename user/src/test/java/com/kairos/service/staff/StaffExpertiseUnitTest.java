@@ -94,6 +94,7 @@ public class StaffExpertiseUnitTest {
         staff.setId(1956L);
         User user = new User();
         user.setCprNumber("1103843142");
+        user.setUserName("abc@kairosplanning.com");
         ContactDetail contactDetail = new ContactDetail();
         contactDetail.setId(22071L);
         contactDetail.setPrivatePhone("9876767767");
@@ -190,6 +191,7 @@ public class StaffExpertiseUnitTest {
         when(expertiseGraphRepository.findAllById(expertiseIds)).thenReturn(expertiseList);
         when(userGraphRepository.getUserByStaffId(1956L)).thenReturn(user);
         when(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(1956L)).thenReturn(sectorWiseExpertise);
+        when(staffGraphRepository.save(staff)).thenReturn(staff);
         StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L, staffPersonalDetail, 20123);
         staffPersonalDetail1.setSectorWiseExpertise(sectorWiseExpertise);
         assertEquals(staffPersonalDetail1, staffPersonalDetailResult);
