@@ -765,7 +765,7 @@ public class ShiftService extends MongoBaseService {
         }
         Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, expertiseId);
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
-        List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllShiftsBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
+        List<ShiftDTO> shiftDTOS = shiftMongoRepository.getAllShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
         shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
         return shiftDTOS;
     }

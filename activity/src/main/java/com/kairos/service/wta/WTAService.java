@@ -516,6 +516,7 @@ public class WTAService extends MongoBaseService {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTABySubType(subTypeIds, countryId);
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
         wtaQueryResultDTOS.forEach(w -> {
+            w.setTags(null);
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w, WTAResponseDTO.class);
             WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
             List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();

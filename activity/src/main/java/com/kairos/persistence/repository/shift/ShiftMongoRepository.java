@@ -24,6 +24,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{employmentId:?0,deleted:false,disabled:false,startDate:{$gte:?1,$lte:?2}}", fields = "{ 'startDate' : 1, 'endDate' : 1,'employmentId':1}")
     List<ShiftDTO> findAllShiftBetweenDuration(Long employmentId, Date startDate, Date endDate);
 
+    @Query(value = "{employmentId:?0,staffId:?1,unitId:?4,deleted:false,disabled:false,startDate:{$gte:?2,$lte:?3}}")
+    List<ShiftDTO> getAllShiftBetweenDuration(Long employmentId,Long staffId, Date startDate, Date endDate,Long unitId);
 
     List<Shift> findByExternalIdIn(List<String> externalIds);
 

@@ -758,7 +758,7 @@ public class EmploymentService {
     }
 
     public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds, Organization organization, Long countryId) {
-        List<EmploymentQueryResult> employments = employmentGraphRepository.getEMploymentByIds(employmentIds);
+        List<EmploymentQueryResult> employments = employmentGraphRepository.getEmploymentByIds(employmentIds);
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> employmentDetailsList = new ArrayList<>();
         employments.forEach(employment -> {
             com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetail = convertEmploymentObject(employment);

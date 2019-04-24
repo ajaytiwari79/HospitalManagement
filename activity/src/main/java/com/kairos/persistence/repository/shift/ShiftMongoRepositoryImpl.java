@@ -66,11 +66,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-
                 match(where("unitId").is(unitId).and("employmentId").is(employmentId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId)
                         .and("startDate").gte(startDate).lte(endDate)),
                 sort(Sort.DEFAULT_DIRECTION, "startDate")
-                //graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts")
         );
         AggregationResults<ShiftDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class);
         return result.getMappedResults();
