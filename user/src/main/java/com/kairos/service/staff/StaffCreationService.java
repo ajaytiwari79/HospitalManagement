@@ -293,13 +293,12 @@ public class StaffCreationService {
         userGraphRepository.save(admin);
         Staff adminAsStaff = new Staff();
         adminAsStaff.setGeneralNote("Will manage the platform");
+        user.setUserName(admin.getUserName());
         adminAsStaff.setUser(admin);
         adminAsStaff.setFirstName(admin.getFirstName());
         adminAsStaff.setLastName(admin.getLastName());
         adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail(admin.getEmail());
-        user.setUserName(admin.getUserName());
-        userGraphRepository.save(user);
         staffGraphRepository.save(adminAsStaff);
 
         List<Organization> organizations = organizationGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
