@@ -126,7 +126,7 @@ public class StaffCreationService {
             LOGGER.info("Creating new staff with kmd external id " + payload.getExternalId() + " in unit " + unit.getId());
             staff = new Staff();
         }
-        staff.setUserName(payload.getUserName());
+        //staff.setUserName(payload.getUserName());
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
         staff.setExternalId(payload.getExternalId());
@@ -298,7 +298,6 @@ public class StaffCreationService {
         adminAsStaff.setLastName(admin.getLastName());
         adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail(admin.getEmail());
-        adminAsStaff.setUserName(admin.getEmail());
         staffGraphRepository.save(adminAsStaff);
 
         List<Organization> organizations = organizationGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
@@ -399,6 +398,7 @@ public class StaffCreationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
+        user.setUserName(payload.getUserName());
         staff = createStaffObject(parent, unit, payload);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);

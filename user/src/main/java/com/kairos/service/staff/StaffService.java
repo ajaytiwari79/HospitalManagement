@@ -297,9 +297,14 @@ public class StaffService {
         setStaffDetails(staffToUpdate, staffPersonalDetail);
 
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
-            staffToUpdate.setUserName(staffPersonalDetail.getUserName());
+            User user = userGraphRepository.findUserByUserName("(?i)"+staffPersonalDetail.getUserName());
+            if(!Optional.ofNullable(user).isPresent()){
+               staffToUpdate.getUser().setUserName(staffPersonalDetail.getUserName());
+               staffToUpdate.getUser().setUserNameUpdated(true);
+            }else {
+                exceptionService.duplicateDataException("message.user.userName.already.use");
+            }
         }
-
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
         Staff staff = staffGraphRepository.save(staffToUpdate);
@@ -318,6 +323,7 @@ public class StaffService {
         }
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffPersonalDetail.isPregnant());
+        user.setUserName(staffPersonalDetail.getUserName());
         userGraphRepository.save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
@@ -499,7 +505,6 @@ public class StaffService {
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    staff.setUserName(userName);
                     staff.setFirstName(firstName);
                     staff.setLastName(lastName);
                     staff.setFamilyName(lastName);
@@ -540,6 +545,7 @@ public class StaffService {
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                             user.setAccessToken(defaultPassword);
                         }
+                        user.setUserName(userName);
                         staff.setUser(user);
                     }
                     staffGraphRepository.save(staff);
