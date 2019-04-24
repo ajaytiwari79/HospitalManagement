@@ -293,7 +293,6 @@ public class StaffCreationService {
         userGraphRepository.save(admin);
         Staff adminAsStaff = new Staff();
         adminAsStaff.setGeneralNote("Will manage the platform");
-        admin.setUserName(admin.getUserName());
         adminAsStaff.setUser(admin);
         adminAsStaff.setFirstName(admin.getFirstName());
         adminAsStaff.setLastName(admin.getLastName());
