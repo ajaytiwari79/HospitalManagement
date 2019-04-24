@@ -1,6 +1,6 @@
 package com.kairos.scheduler.persistence.repository.custom_repository;
-import com.kairos.commons.utils.DateUtils;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import com.kairos.scheduler.persistence.model.common.MongoSequence;
 import com.mongodb.BasicDBObject;

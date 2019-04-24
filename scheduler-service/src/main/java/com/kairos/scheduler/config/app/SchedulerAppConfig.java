@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-//import com.planner.appConfig.UserContextInterceptor;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.kairos.scheduler.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.scheduler.utils.user_context.SchedulerUserContextInterceptor;
 import com.kairos.scheduler.utils.user_context.UserContextInterceptor;
@@ -17,7 +15,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-//import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.*;
@@ -32,6 +29,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+//import com.planner.appConfig.UserContextInterceptor;
+//import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 

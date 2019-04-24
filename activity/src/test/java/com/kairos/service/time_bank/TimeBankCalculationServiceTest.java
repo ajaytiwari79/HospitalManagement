@@ -9,7 +9,6 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.junit.Assert;
 import org.junit.Before;

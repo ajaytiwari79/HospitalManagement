@@ -1,9 +1,6 @@
 package com.kairos.planning.domain;
 
 import com.kairos.planning.solution.TaskPlanningSolution;
-import com.kairos.planning.utils.TaskPlanningUtility;
-
-import org.jfree.util.Log;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.ChangeMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;

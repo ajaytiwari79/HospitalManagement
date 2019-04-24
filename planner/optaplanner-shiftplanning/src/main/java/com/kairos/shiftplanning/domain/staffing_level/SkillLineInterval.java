@@ -1,8 +1,8 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
-import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.skill.Skill;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;

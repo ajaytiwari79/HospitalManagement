@@ -2,11 +2,11 @@ package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.shift.Shift;
-import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
+import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;

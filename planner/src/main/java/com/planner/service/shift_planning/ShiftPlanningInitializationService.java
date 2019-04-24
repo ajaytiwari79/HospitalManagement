@@ -3,10 +3,8 @@ package com.planner.service.shift_planning;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.staffing_level.Duration;
-
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
@@ -37,9 +35,7 @@ import java.util.stream.IntStream;
 
 import static com.kairos.enums.constraint.ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH;
 import static com.kairos.enums.constraint.ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF;
-import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.getActivityIndex;
-import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.getTimeIndex;
-import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.printStaffingLevelMatrix;
+import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 
 /**
  * This service will interact with

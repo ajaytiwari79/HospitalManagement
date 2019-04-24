@@ -2,7 +2,6 @@ package com.planner.common.custom_responseEntityExceptionHandler;
 
 import com.planner.common.custum_exceptions.DataNotFoundByIdException;
 import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

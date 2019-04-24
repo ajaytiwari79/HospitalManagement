@@ -1,10 +1,7 @@
 package com.kairos.planning.domain;
 
-import org.joda.time.DateTime;
-
-import com.kairos.planning.utils.JodaTimeConverter;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
+import org.joda.time.DateTime;
 
 @XStreamAlias("UnavailabilityList")
 public class UnavailabilityRequest {
