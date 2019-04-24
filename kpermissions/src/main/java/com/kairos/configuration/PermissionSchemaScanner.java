@@ -1,6 +1,6 @@
 package com.kairos.configuration;
 
-import com.kairos.annotations.PermissionMethod;
+import com.kairos.annotations.PermissionField;
 import com.kairos.annotations.PermissionModel;
 import com.kairos.annotations.PermissionSubModel;
 import org.reflections.Reflections;
@@ -8,7 +8,7 @@ import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -27,20 +27,19 @@ public class PermissionSchemaScanner {
                     .forEach( permissionClass -> {
                         Map<String, Object> modelMetaData= new HashMap<>();
                         Set<Map<String, String>> fields = new HashSet<>();
-                        Arrays.stream(permissionClass.getDeclaredMethods())
-                                .filter(entityMethod -> entityMethod.isAnnotationPresent(PermissionMethod.class))
-                                .forEach(permissionEntityMethod -> {
+                        Arrays.stream(permissionClass.getDeclaredFields())
+                                .filter(entityField -> entityField.isAnnotationPresent(PermissionField.class))
+                                .forEach(permissionEntityField -> {
                                     Map<String, String> fieldsData = new HashMap<>();
-                                    PermissionMethod annotation = permissionEntityMethod.getAnnotation(PermissionMethod.class);
-                                    fieldsData.put(FIELD_NAME,annotation.value());
+                                    PermissionField annotation = permissionEntityField.getAnnotation(PermissionField.class);
+                                    fieldsData.put(FIELD_NAME,permissionEntityField.getName());
                                     fields.add(fieldsData);
                                 });
-                        findSubModelData(permissionClass, fields);
-                        if(!fields.isEmpty()) {
+                        List<Map<String, Object>> subModelData= findSubModelData(permissionClass, fields);
                             modelMetaData.put(MODEL_NAME, permissionClass.getSimpleName());
                             modelMetaData.put(FIELDS, fields);
+                            modelMetaData.put(SUB_MODELS, subModelData);
                             modelData.add(modelMetaData);
-                        }
                     });
             LOGGER.info("model=="+modelData);
 
@@ -50,36 +49,45 @@ public class PermissionSchemaScanner {
         return modelData;
     }
 
-    private void findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
+    private List<Map<String, Object>> findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
+        List<Map<String, Object>> subModelData = new ArrayList<>();
         Arrays.stream(permissionClass.getDeclaredFields())
                 .filter(entityField -> entityField.isAnnotationPresent(PermissionSubModel.class))
                 .forEach(permissionField -> {
+                    Map<String, Object> subModelMetaData= new HashMap<>();
+                    Set<Map<String, String>> subModelFields = new HashSet<>();
                     if (Collection.class.isAssignableFrom(permissionField.getType())) {
                         Type genericFieldType = permissionField.getGenericType();
                         ParameterizedType aType = (ParameterizedType) genericFieldType;
                         Type[] fieldArgTypes = aType.getActualTypeArguments();
                         for (Type fieldArgType : fieldArgTypes) {
                             Class fieldArgClass = (Class) fieldArgType;
-                            for (Method subModelMethod : fieldArgClass.getDeclaredMethods()) {
-                                if (subModelMethod.isAnnotationPresent(PermissionMethod.class)) {
+                            for (Field subModelField : fieldArgClass.getDeclaredFields()) {
+                                if (subModelField.isAnnotationPresent(PermissionField.class)) {
                                     Map<String, String> fieldsData = new HashMap<>();
-                                    PermissionMethod annotation = subModelMethod.getAnnotation(PermissionMethod.class);
-                                    fieldsData.put(FIELD_NAME,annotation.value());
-                                    fields.add(fieldsData);
+                                    PermissionField annotation = subModelField.getAnnotation(PermissionField.class);
+                                    fieldsData.put(FIELD_NAME,subModelField.getName());
+                                    subModelFields.add(fieldsData);
                                 }
                             }
                         }
                     } else {
-                        for (Method subModelMethod : permissionField.getType().getDeclaredMethods()) {
-                            if (subModelMethod.isAnnotationPresent(PermissionMethod.class)) {
+                        for (Field subModelField : permissionField.getType().getDeclaredFields()) {
+                            if (subModelField.isAnnotationPresent(PermissionField.class)) {
                                 Map<String, String> fieldsData = new HashMap<>();
-                                PermissionMethod annotation = subModelMethod.getAnnotation(PermissionMethod.class);
-                                fieldsData.put(FIELD_NAME,annotation.value());
-                                fields.add(fieldsData);
+                                PermissionField annotation = subModelField.getAnnotation(PermissionField.class);
+                                fieldsData.put(FIELD_NAME,subModelField.getName());
+                                subModelFields.add(fieldsData);
                             }
                         }
                     }
+                    if(!subModelFields.isEmpty()){
+                        subModelMetaData.put(MODEL_NAME, permissionField.getName());
+                        subModelMetaData.put(FIELDS, subModelFields);
+                        subModelData.add(subModelMetaData);
+                    }
                 });
+        return subModelData;
     }
 
 }
