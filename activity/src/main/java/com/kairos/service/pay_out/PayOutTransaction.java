@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class PayOutTransaction extends MongoBaseEntity{
 
     private Long staffId;
-    private Long unitPositionId;
+    private Long employmentId;
     private PayOutTrasactionStatus payOutTrasactionStatus;
     private boolean processed;
     private int minutes;
@@ -23,9 +23,9 @@ public class PayOutTransaction extends MongoBaseEntity{
     public PayOutTransaction() {
     }
 
-    public PayOutTransaction(Long staffId, Long unitPositionId, PayOutTrasactionStatus payOutTrasactionStatus, int minutes, LocalDate date) {
+    public PayOutTransaction(Long staffId, Long employmentId, PayOutTrasactionStatus payOutTrasactionStatus, int minutes, LocalDate date) {
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.payOutTrasactionStatus = payOutTrasactionStatus;
         this.minutes = minutes;
         this.date = date;
@@ -47,12 +47,12 @@ public class PayOutTransaction extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public PayOutTrasactionStatus getPayOutTrasactionStatus() {

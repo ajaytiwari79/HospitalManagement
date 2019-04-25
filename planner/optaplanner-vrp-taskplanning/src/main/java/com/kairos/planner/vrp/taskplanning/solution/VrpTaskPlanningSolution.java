@@ -1,8 +1,8 @@
 package com.kairos.planner.vrp.taskplanning.solution;
 
 import com.kairos.planner.vrp.taskplanning.model.*;
-import org.optaplanner.core.api.domain.lookup.LookUpStrategyType;
 import com.kairos.planner.vrp.taskplanning.model.constraint.Constraint;
+import org.optaplanner.core.api.domain.lookup.LookUpStrategyType;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;

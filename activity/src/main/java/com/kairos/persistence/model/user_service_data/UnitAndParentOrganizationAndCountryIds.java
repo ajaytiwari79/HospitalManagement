@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.user_service_data;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 @Deprecated
 public class UnitAndParentOrganizationAndCountryIds extends MongoBaseEntity {

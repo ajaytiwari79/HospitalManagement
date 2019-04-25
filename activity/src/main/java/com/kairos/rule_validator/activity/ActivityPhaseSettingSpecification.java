@@ -1,8 +1,6 @@
 package com.kairos.rule_validator.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
-
-
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityIdsDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -56,7 +54,7 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         activityPerPhaseMap.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
-                if(( staff && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) || (management && !v.isEligibleForManagement() )){
+                if(( staff && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (management && !v.isEligibleForManagement() )){
                     throwException("error.shift.not.authorised.phase");
                 }
             }

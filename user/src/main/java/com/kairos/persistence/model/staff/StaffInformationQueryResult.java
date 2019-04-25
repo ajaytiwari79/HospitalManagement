@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.UnitPositionDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public class StaffInformationQueryResult {
     private String unitName;
     private String timeZone;
     private List<ReasonCodeDTO> reasonCodes;
-    private List<UnitPositionDTO> unitPosition;
+    private List<EmploymentDTO> employment;
 
     public Long getStaffId() {
         return staffId;
@@ -55,11 +55,11 @@ public class StaffInformationQueryResult {
         this.reasonCodes = reasonCodes;
     }
 
-    public List<UnitPositionDTO> getUnitPosition() {
-        return unitPosition;
+    public List<EmploymentDTO> getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(List<UnitPositionDTO> unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(List<EmploymentDTO> employment) {
+        this.employment = employment;
     }
 }

@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

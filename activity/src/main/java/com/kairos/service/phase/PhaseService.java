@@ -4,7 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -37,7 +37,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
 /**
@@ -415,13 +416,13 @@ public class PhaseService extends MongoBaseService {
         if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
         }
-        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
-                : getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
+        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getEmployment(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
+                : getApplicablePlannedType(staffAdditionalInfoDTO.getEmployment(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
     }
 
-    private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
-        if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
-            plannedTypeId = plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+    private BigInteger getApplicablePlannedType(StaffEmploymentDetails staffEmploymentDetails, BigInteger plannedTypeId) {
+        if (Optional.ofNullable(staffEmploymentDetails.getIncludedPlannedTime()).isPresent()) {
+            plannedTypeId = plannedTypeId.equals(staffEmploymentDetails.getExcludedPlannedTime()) ? staffEmploymentDetails.getIncludedPlannedTime() : plannedTypeId;
         }
         return plannedTypeId;
 

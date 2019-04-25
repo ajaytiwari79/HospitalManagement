@@ -28,7 +28,7 @@ public class FunctionDTO {
     private List<Level> organizationLevels;
     private String icon;
     private List<LocalDate> appliedDates;
-    private Long unitPositionId;
+    private Long employmentId;
 
 
 
@@ -135,11 +135,11 @@ public class FunctionDTO {
         this.appliedDates = appliedDates;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

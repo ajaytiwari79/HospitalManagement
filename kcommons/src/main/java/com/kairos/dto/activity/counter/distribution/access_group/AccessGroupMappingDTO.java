@@ -2,7 +2,6 @@ package com.kairos.dto.activity.counter.distribution.access_group;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class AccessGroupMappingDTO {
     private Long accessGroupId;

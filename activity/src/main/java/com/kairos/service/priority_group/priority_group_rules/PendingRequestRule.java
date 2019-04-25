@@ -1,8 +1,8 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -22,18 +22,18 @@ public class PendingRequestRule implements PriorityGroupRuleFilter {
         this.openShiftNotifications = openShiftNotifications;
     }
     @Override
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
         Map<Long,List<OpenShiftNotification>> staffOpenShiftNotificationsMap = openShiftNotifications.stream().collect(groupingBy(OpenShiftNotification::getStaffId));
         int maxPendingRequests = priorityGroupDTO.getStaffExcludeFilter().getNumberOfPendingRequest();
-        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()){
+        for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()){
 
-            Iterator<StaffUnitPositionQueryResult> staffsUnitPositions = entry.getValue().iterator();
-            while(staffsUnitPositions.hasNext()) {
-                StaffUnitPositionQueryResult staffUnitPosition = staffsUnitPositions.next();
-                if(staffOpenShiftNotificationsMap.containsKey(staffUnitPosition.getStaffId())&&
-                        staffOpenShiftNotificationsMap.get(staffUnitPosition.getStaffId()).size()>=maxPendingRequests){
-                    staffsUnitPositions.remove();
+            Iterator<StaffEmploymentQueryResult> staffsEmployments = entry.getValue().iterator();
+            while(staffsEmployments.hasNext()) {
+                StaffEmploymentQueryResult staffEmployment = staffsEmployments.next();
+                if(staffOpenShiftNotificationsMap.containsKey(staffEmployment.getStaffId())&&
+                        staffOpenShiftNotificationsMap.get(staffEmployment.getStaffId()).size()>=maxPendingRequests){
+                    staffsEmployments.remove();
                 }
             }
         }

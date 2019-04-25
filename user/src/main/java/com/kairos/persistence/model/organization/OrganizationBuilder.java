@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.organization;
 
+import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -8,8 +10,6 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.dto.user.organization.CompanyUnitType;
 
 import java.time.ZoneId;
 import java.util.List;

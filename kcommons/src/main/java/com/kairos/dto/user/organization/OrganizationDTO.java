@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.user.organization.address.AddressDTO;
 import com.kairos.enums.OrganizationLevel;
 
-
 import java.util.List;
 
 /**

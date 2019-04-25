@@ -12,12 +12,7 @@ import java.util.List;
 
 public interface CustomTimeBankRepository {
 
-    DailyTimeBankEntry findLastTimeBankByUnitPositionId(Long unitPositionId, Date date);
+    DailyTimeBankEntry findLastTimeBankByEmploymentId(Long employmentId, Date date);
 
-    List<DailyTimeBankEntry> findLastTimeBankByUnitPositionIds(List<Long> unitPositionId, Date date);
-
-    void updateAccumulatedTimeBank(Long unitPositionId,int timeBank);
-
-    List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate);
-    List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdsAndBetweenDates(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentIdAndBetweenDates(Long employmentId, Date startDate, Date endDate);
 }

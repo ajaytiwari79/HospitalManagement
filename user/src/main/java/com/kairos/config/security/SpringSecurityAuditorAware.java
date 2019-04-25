@@ -4,15 +4,12 @@ package com.kairos.config.security;
  *
  */
 
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.util.Optional;
 
 @Component

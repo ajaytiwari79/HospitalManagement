@@ -64,9 +64,11 @@ public class UserDetailService {
                     logger.info("password matched");
                     return user;
                 }
+                logger.info("password  not  matched");
+                return null;
             }
-            logger.info("password  not  matched");
-            return null;
+        logger.info("User not found by username");
+        return null;
         }
     }
 

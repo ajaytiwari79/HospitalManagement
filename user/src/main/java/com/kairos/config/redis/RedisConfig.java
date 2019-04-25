@@ -5,28 +5,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import redis.clients.jedis.JedisPoolConfig;
-/*import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.listener.PatternTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;*/
-
 import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
 /**
  * Created by anil on 10/8/17.
  */
@@ -35,11 +22,11 @@ import java.util.concurrent.CountDownLatch;
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 public class RedisConfig {
 
-  /*  @Value("${spring.redis.hostname}")
+    @Value("${spring.redis.hostname}")
     private String redisHostName;
 
     @Value("${spring.redis.port}")
-    private int redisPort;*/
+    private int redisPort;
 
    /* @Bean
     RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,

@@ -1,7 +1,5 @@
 package com.kairos.dto.user.organization;
 
-import com.kairos.dto.user.organization.address.ZipCode;
-
 public class ZipCodeDTO {
 
     private String name;

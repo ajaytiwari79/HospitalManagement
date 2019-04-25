@@ -3,7 +3,6 @@ package com.kairos.persistence.model.activity.tabs;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.List;
 
 /**

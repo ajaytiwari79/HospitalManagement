@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-
-import static com.kairos.constants.AppConstants.HOURS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**

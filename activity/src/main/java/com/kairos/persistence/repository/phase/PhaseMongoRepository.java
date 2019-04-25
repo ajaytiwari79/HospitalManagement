@@ -1,23 +1,14 @@
 package com.kairos.persistence.repository.phase;
 
 
-import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.activity.phase.PhaseDTO;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 /**
  * Created by vipul on 25/9/17.

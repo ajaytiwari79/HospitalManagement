@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.staff.position;
 
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

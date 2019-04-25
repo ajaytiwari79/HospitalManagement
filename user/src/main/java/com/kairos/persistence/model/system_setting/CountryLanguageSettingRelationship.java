@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.system_setting;
 
-import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import org.neo4j.ogm.annotation.EndNode;

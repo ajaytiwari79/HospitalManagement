@@ -12,9 +12,9 @@ public class StaffQueryResult {
 
     private Long staffId ;
      private String staffName;
-     private Long unitPositionsId;
+     private Long employmentId;
      private HashSet<Map> staffSkills;
-     private List<ExpertiseQueryResult> unitPositionExpertise;
+     private List<ExpertiseQueryResult> employmentExpertise;
 
     public Long getStaffId() {
         return staffId;
@@ -32,13 +32,14 @@ public class StaffQueryResult {
         this.staffName = staffName;
     }
 
-    public Long getStaffUnitPosition() {
-        return unitPositionsId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setStaffUnitPosition(Long staffUnitPositions) {
-        this.unitPositionsId = staffUnitPositions;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
+
 
     public HashSet<Map> getStaffSkills() {
         return staffSkills;
@@ -48,11 +49,11 @@ public class StaffQueryResult {
         this.staffSkills = staffSkills;
     }
 
-    public List<ExpertiseQueryResult> getUnitPositionExpertise() {
-        return unitPositionExpertise;
+    public List<ExpertiseQueryResult> getEmploymentExpertise() {
+        return employmentExpertise;
     }
 
-    public void setUnitPositionExpertise(List<ExpertiseQueryResult> unitPositionExpertise) {
-        this.unitPositionExpertise = unitPositionExpertise;
+    public void setEmploymentExpertise(List<ExpertiseQueryResult> employmentExpertise) {
+        this.employmentExpertise = employmentExpertise;
     }
 }

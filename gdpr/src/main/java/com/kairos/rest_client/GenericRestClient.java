@@ -19,8 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 

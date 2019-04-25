@@ -25,8 +25,12 @@ public class UserContextFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+        //This is Override method
+    }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+        //This is Override method
+    }
 }

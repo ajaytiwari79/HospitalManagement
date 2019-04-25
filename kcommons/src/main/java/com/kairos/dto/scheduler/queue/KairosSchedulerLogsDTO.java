@@ -2,6 +2,7 @@ package com.kairos.dto.scheduler.queue;
 
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
+
 import java.math.BigInteger;
 
 public class KairosSchedulerLogsDTO {

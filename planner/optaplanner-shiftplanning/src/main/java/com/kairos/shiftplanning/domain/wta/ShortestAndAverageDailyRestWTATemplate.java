@@ -2,14 +2,13 @@ package com.kairos.shiftplanning.domain.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
-
 
 import java.util.List;
 

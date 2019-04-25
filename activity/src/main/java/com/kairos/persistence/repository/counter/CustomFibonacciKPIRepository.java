@@ -4,7 +4,6 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public interface CustomFibonacciKPIRepository {
 

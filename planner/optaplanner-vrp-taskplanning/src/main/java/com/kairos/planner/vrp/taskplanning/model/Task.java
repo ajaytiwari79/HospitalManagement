@@ -11,20 +11,11 @@ import org.optaplanner.core.api.domain.variable.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
-import static com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil.getPreviousValidTask;
 
 /**
  * @author pradeep

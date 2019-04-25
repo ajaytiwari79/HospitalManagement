@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.task_type;
-import com.kairos.persistence.model.task.Task;
+
 import com.kairos.persistence.model.task_type.TaskTypeSlaConfig;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

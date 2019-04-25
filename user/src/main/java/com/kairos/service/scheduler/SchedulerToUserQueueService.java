@@ -4,8 +4,8 @@ package com.kairos.service.scheduler;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
+import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.staff.PositionService;
-import com.kairos.service.unit_position.UnitPositionJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     @Inject
     private IntegrationJobsExecutorService integrationJobService;
     @Inject
-    private UnitPositionJobService unitPositionJobService;
+    private EmploymentJobService employmentJobService;
 
     private static Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
 
@@ -37,7 +37,7 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 logger.info("Questionaire nightworker----------------->"+job.getId());
                 break;
             case SENIORITY_LEVEL:
-                unitPositionJobService.updateSeniorityLevelOnJobTrigger(job.getId(),job.getUnitId());
+                employmentJobService.updateSeniorityLevelOnJobTrigger(job.getId(),job.getUnitId());
                 break;
 
             default:

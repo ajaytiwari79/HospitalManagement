@@ -1,6 +1,5 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class LocationsRouteMatrix {

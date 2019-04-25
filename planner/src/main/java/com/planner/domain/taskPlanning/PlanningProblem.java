@@ -1,7 +1,6 @@
 package com.planner.domain.taskPlanning;
 
 import com.planner.domain.common.BaseEntity;
-
 import com.planner.enums.PlanningStatus;
 //import org.springframework.data.cassandra.core.mapping.Table;
 

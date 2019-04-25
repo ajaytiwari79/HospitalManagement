@@ -1,8 +1,8 @@
 package com.kairos.controller.pay_table;
 
-import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
-import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
+import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
+import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
 import com.kairos.service.pay_table.PayTableService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -13,8 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
