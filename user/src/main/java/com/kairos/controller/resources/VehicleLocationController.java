@@ -1,7 +1,6 @@
 package com.kairos.controller.resources;
 
 
-import com.kairos.persistence.model.user.resources.VehicleLocation;
 import com.kairos.persistence.model.user.resources.VehicleLocationDTO;
 import com.kairos.service.resources.VehicleLocationService;
 import com.kairos.utils.response.ResponseHandler;

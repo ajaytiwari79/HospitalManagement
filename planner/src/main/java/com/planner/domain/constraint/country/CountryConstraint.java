@@ -8,7 +8,6 @@ import com.kairos.enums.constraint.ConstraintType;
 import com.planner.domain.constraint.common.Constraint;
 
 import java.math.BigInteger;
-import java.util.Objects;
 
 public class CountryConstraint extends Constraint {
    //~

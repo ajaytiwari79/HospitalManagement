@@ -2,7 +2,6 @@ package com.kairos.dto.activity.phase;
 
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 
 public class PhaseAndActivityTypeWrapper {

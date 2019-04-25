@@ -4,8 +4,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-
 /**
  * Creates below mentioned bootstrap data(if Not Available)
  * 1. User

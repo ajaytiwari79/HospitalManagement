@@ -5,10 +5,8 @@ import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.dto.activity.shift.ShiftTemplateActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
-import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 
 public class IndividualShiftTemplate extends MongoBaseEntity {
     private String name;

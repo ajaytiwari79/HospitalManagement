@@ -1,10 +1,10 @@
 package com.kairos.shiftplanning.constraints.activityConstraint;
 
-import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.wta.ConstraintHandler;
 
-import java.util.*;
+import java.util.List;
 
 import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.isValidForDayType;
 

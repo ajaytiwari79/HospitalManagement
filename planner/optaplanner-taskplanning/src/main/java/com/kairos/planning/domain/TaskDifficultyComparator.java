@@ -1,8 +1,8 @@
 package com.kairos.planning.domain;
 
-import java.util.Comparator;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
+
+import java.util.Comparator;
 
 public class TaskDifficultyComparator implements Comparator<Task>{
 		 @Override

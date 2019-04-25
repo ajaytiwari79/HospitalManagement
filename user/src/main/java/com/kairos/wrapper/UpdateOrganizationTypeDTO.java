@@ -1,9 +1,6 @@
 package com.kairos.wrapper;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

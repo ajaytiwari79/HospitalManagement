@@ -1,14 +1,17 @@
 package com.kairos.shiftplanning.move;
 
-import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalChangeMoveHelper;
+import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPhasePlanningSolution> {

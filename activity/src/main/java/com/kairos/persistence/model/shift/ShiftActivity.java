@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;

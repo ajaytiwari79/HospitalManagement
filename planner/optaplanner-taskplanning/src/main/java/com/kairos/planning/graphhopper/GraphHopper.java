@@ -1,12 +1,5 @@
 package com.kairos.planning.graphhopper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.graphhopper.directions.api.client.ApiException;
 import com.graphhopper.directions.api.client.api.GeocodingApi;
 import com.graphhopper.directions.api.client.api.MatrixApi;
@@ -14,6 +7,12 @@ import com.graphhopper.directions.api.client.model.GeocodingResponse;
 import com.graphhopper.directions.api.client.model.MatrixResponse;
 import com.kairos.planning.domain.Location;
 import com.kairos.planning.domain.LocationInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 //@PropertySource("classpath:taskplanner.properties")
 public class GraphHopper {

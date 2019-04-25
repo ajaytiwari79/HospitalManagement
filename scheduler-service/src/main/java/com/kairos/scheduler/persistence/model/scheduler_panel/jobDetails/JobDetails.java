@@ -1,11 +1,11 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails;
+
 import com.kairos.enums.scheduler.Result;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
 /**
  * Created by Jasgeet on 17/1/17.

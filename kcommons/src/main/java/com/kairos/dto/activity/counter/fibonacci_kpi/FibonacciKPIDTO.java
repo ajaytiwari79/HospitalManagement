@@ -4,8 +4,6 @@ import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.FilterType;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;

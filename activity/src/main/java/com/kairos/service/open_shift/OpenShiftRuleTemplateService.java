@@ -1,6 +1,8 @@
 package com.kairos.service.open_shift;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplate;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateAndPriorityGroupWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
@@ -9,13 +11,14 @@ import com.kairos.persistence.repository.open_shift.OpenShiftRuleTemplateReposit
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

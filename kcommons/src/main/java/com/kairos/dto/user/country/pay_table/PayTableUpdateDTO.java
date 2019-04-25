@@ -3,7 +3,6 @@ package com.kairos.dto.user.country.pay_table;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Created by vipul on 19/3/18.

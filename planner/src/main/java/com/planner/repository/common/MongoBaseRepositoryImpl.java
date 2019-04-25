@@ -7,7 +7,6 @@ import com.planner.domain.common.MongoBaseEntity;
 import com.planner.domain.common.MongoSequence;
 import com.planner.domain.constraint.common.Constraint;
 import com.planner.domain.solverconfig.common.SolverConfig;
-import com.planner.domain.wta.templates.WTABaseRuleTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;

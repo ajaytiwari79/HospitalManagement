@@ -1,9 +1,9 @@
 package com.kairos.utils.external_plateform_shift;
 
-import java.util.List;
-
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
+import java.util.List;
 
 /**
  * Created by oodles on 25/1/17.

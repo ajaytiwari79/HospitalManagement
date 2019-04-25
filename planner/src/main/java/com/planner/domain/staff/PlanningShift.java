@@ -3,9 +3,10 @@ package com.planner.domain.staff;
 import com.planner.domain.common.MongoBaseEntity;
 import com.planner.enums.ShiftType;
 import org.joda.time.DateTime;
-//import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.Date;
+
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 //@Table
 public class PlanningShift extends MongoBaseEntity {

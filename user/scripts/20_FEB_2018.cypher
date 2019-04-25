@@ -1,1 +1,0 @@
-match(s:Staff)-[:HAS_CONTACT_ADDRESS]-(c:ContactAddress) set c.primary=true return s,c

@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.restrcition_freuency;
 
 import com.kairos.persistence.model.restrcition_freuency.RestrictionFrequency;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;

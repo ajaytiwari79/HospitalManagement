@@ -2,7 +2,6 @@ package com.kairos.config.neo4j.converter;
 
 import org.neo4j.ogm.typeconversion.AttributeConverter;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 

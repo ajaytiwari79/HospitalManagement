@@ -1,15 +1,17 @@
 package com.kairos.service.cta;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.Expertise;
-import com.kairos.persistence.model.wta.WTAOrganization;
 import com.kairos.persistence.model.wta.OrganizationType;
+import com.kairos.persistence.model.wta.WTAOrganization;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
@@ -18,8 +20,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.organization.OrganizationBasicDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;

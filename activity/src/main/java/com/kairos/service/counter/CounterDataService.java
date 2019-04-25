@@ -60,6 +60,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static java.util.stream.Collectors.toList;
 
 
+
 @Service
 public class CounterDataService extends MongoBaseService {
     private final static Logger logger = LoggerFactory.getLogger(CounterDataService.class);

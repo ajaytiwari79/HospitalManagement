@@ -14,7 +14,7 @@ import java.util.List;
 @Document(collection = "dailyTimeBankEntries")
 public class DailyTimeBankEntry extends MongoBaseEntity{
 
-    private Long unitPositionId;
+    private Long employmentId;
     private Long staffId;
     //It is Delta timebank
     private int deltaTimeBankMinutes;
@@ -33,8 +33,8 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int plannedMinutesOfTimebank;
 
 
-    public DailyTimeBankEntry(Long unitPositionId, Long staffId, LocalDate date) {
-        this.unitPositionId = unitPositionId;
+    public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.date = date;
     }
@@ -83,12 +83,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.ctaBonusMinutesOfTimeBank = ctaBonusMinutesOfTimeBank;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getStaffId() {
@@ -133,6 +133,6 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
 
     @Override
     public String toString() {
-        return "DailyTimeBankEntry{" + "unitPositionId=" + unitPositionId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
+        return "DailyTimeBankEntry{" + "employmentId=" + employmentId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
     }
 }

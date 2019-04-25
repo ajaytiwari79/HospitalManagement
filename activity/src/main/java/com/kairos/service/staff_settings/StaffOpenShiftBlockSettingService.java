@@ -4,12 +4,12 @@ package com.kairos.service.staff_settings;
  *
  */
 
+import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.persistence.model.staff_settings.StaffOpenShiftBlockSetting;
 import com.kairos.persistence.repository.staff_settings.StaffOpenShiftBlockSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

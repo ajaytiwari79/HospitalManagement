@@ -1,11 +1,8 @@
 package com.kairos.service.shift;
 
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -18,7 +15,7 @@ import static com.kairos.constants.AppConstants.EVERYDAY;
  * CreatedBy vipulpandey on 7/12/18
  **/
 public class ShiftCalculationService {
-    public static void setDayTypeToCTARuleTemplate(StaffUnitPositionDetails staffAdditionalInfoDTO, List<DayTypeDTO> dayTypeDTOS, Map<Long, List<LocalDate>> publicHolidays) {
+    public static void setDayTypeToCTARuleTemplate(StaffEmploymentDetails staffAdditionalInfoDTO, List<DayTypeDTO> dayTypeDTOS, Map<Long, List<LocalDate>> publicHolidays) {
         Map<Long, List<Day>> daytypesMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();

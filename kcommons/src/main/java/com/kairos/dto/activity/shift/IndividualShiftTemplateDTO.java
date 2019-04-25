@@ -1,12 +1,10 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.List;
 
 
 public class IndividualShiftTemplateDTO {

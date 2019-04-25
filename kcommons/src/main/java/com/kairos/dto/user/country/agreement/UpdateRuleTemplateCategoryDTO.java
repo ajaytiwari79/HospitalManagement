@@ -1,10 +1,8 @@
 package com.kairos.dto.user.country.agreement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 

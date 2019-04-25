@@ -1,6 +1,6 @@
 package com.kairos.service.payment_type;
+
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.default_data.PaymentTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -10,27 +10,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by prabjot on 9/1/17.
  */
 @Transactional
 @Service
-public class PaymentTypeService{
+public class PaymentTypeService {
 
     @Inject
-    PaymentTypeGraphRepository paymentTypeGraphRepository;
+    private PaymentTypeGraphRepository paymentTypeGraphRepository;
     @Inject
-    CountryGraphRepository countryGraphRepository;
+    private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
 
     public PaymentTypeDTO createPaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {
-     Country country = countryGraphRepository.findOne(countryId);
+        Country country = countryGraphRepository.findOne(countryId);
         PaymentType paymentType = null;
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);

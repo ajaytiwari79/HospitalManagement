@@ -2,12 +2,12 @@ package com.kairos.controller.auth;
 
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.user.auth.UserDetailsDTO;
+import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
-import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.utils.user_context.UserContext;
 import com.twilio.sdk.TwilioRestException;
@@ -31,7 +31,6 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
-
 
 /**
  * Controller to authenticate User

@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.payroll;
 
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import java.math.BigInteger;

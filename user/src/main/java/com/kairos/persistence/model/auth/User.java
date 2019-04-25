@@ -285,6 +285,16 @@ public class User extends UserBaseEntity {
     }
 
 
+    public User(String cprNumber, String firstName, String lastName, String email, String userName,boolean isUserNameUpdated) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.cprNumber = cprNumber;
+        this.userName = userName;
+        this.isUserNameUpdated = isUserNameUpdated;
+    }
+
+
     public boolean isPasswordUpdated() {
         return isPasswordUpdated;
     }

@@ -1,6 +1,7 @@
 package com.kairos.service.unit_settings;
 
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
@@ -15,8 +16,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

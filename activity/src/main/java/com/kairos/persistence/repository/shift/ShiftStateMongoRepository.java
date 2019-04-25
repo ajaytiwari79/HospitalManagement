@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.shift;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

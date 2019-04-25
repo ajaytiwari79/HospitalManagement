@@ -16,7 +16,7 @@ import java.util.List;
 @Repository
 public interface StaffWTACounterRepository extends MongoBaseRepository<StaffWTACounter,BigInteger> {
 
-    @Query("{unitPositionId:?0,startDate:?1,endDate:?2,userHasStaffRole:?3}")
-    List<StaffWTACounter> getStaffWTACounterByDate(Long unitPositionId,Date startDate,Date endDate,boolean userHasStaffRole);
+    @Query("{employmentId:?0,startDate:?1,endDate:?2,userHasStaffRole:?3}")
+    List<StaffWTACounter> getStaffWTACounterByDate(Long employmentId,Date startDate,Date endDate,boolean userHasStaffRole);
 
 }

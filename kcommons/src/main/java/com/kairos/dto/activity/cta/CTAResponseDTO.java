@@ -22,7 +22,7 @@ public class CTAResponseDTO {
     @NotNull
     private BigInteger id;
     private BigInteger parentId;
-    private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
+    private BigInteger organizationParentId;// cta id of parent organization and this must not be changable
     private String name;
     private String description;
     private ExpertiseResponseDTO expertise;
@@ -36,7 +36,7 @@ public class CTAResponseDTO {
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
-    private Long unitPositionId;
+    private Long employmentId;
     private Boolean disabled;
     private List<TagDTO> tags;
 
@@ -48,7 +48,8 @@ public class CTAResponseDTO {
         this.id = id;
         this.parentId = parentId;
     }
-    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description) {
+
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled, Long employmentId, String description) {
         this.id = id;
         this.name = name;
         this.expertise = expertise;
@@ -56,7 +57,7 @@ public class CTAResponseDTO {
         this.startDate = startDate;
         this.endDate = endDate;
         this.disabled = disabled;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.description=description;
     }
 
@@ -171,12 +172,12 @@ public class CTAResponseDTO {
     }
 
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Boolean getDisabled() {

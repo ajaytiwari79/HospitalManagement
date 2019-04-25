@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.time.LocalDate;

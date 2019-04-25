@@ -25,7 +25,7 @@ public class StaffExcludeFilter {
         //Default Constructor
     }
 
-        public Integer getNumberOfShiftAssigned() {
+    public Integer getNumberOfShiftAssigned() {
         return numberOfShiftAssigned;
     }
 

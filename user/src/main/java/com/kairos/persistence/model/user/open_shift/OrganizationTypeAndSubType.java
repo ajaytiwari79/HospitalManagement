@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.open_shift;
 
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

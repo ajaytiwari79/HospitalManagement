@@ -10,7 +10,7 @@ public class ShiftResponseDTO {
 
 
     private LocalDate currentDate;
-    private Long unitPositionId;
+    private Long employmentId;
     private List<Shift> shifts;
     public ShiftResponseDTO() {
         //DC
@@ -32,11 +32,11 @@ public class ShiftResponseDTO {
         this.shifts = shifts;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

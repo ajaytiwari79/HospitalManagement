@@ -1,7 +1,7 @@
 package com.kairos.dto.activity.wta.version;
 
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 
 import java.util.List;
 

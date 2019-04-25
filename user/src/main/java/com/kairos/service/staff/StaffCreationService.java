@@ -420,7 +420,7 @@ public class StaffCreationService {
             setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
-        staffService.setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId());
+        staffService.setUnitManagerAndPosition(organization, user, staffCreationData.getAccessGroupId());
         return user;
     }
 
@@ -508,6 +508,7 @@ public class StaffCreationService {
     }
 
     public void setBasicDetailsOfUser(User user, StaffCreationDTO staffCreationDTO) {
+        user.setUserNameUpdated(true);
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getUserName());
         user.setFirstName(staffCreationDTO.getFirstName());

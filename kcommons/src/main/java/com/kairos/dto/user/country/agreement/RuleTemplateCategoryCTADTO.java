@@ -1,6 +1,5 @@
 package com.kairos.dto.user.country.agreement;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.enums.RuleTemplateCategoryType;
 

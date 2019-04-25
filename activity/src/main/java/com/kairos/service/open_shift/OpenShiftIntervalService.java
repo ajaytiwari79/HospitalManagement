@@ -1,11 +1,11 @@
 package com.kairos.service.open_shift;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

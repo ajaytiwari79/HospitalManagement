@@ -3,10 +3,6 @@ package com.kairos.shiftplanning.utils;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
-import static org.junit.Assert.*;
-
 public class ShiftConstrutionPhasePlanningUtilityTest {
     @Test
     public void getStaffingLevelSatisfaction() throws Exception {

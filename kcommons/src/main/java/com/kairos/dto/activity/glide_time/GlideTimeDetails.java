@@ -4,10 +4,6 @@ package com.kairos.dto.activity.glide_time;
  *
  */
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
 public class GlideTimeDetails {
     private short before; // storing in minutes
     private short after;  // storing in minutes

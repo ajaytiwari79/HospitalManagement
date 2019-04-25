@@ -23,7 +23,6 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -38,7 +37,10 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.*;
+import com.kairos.service.activity.ActivityPriorityService;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.PlannedTimeTypeService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
@@ -307,11 +309,12 @@ public class OrganizationActivityService extends MongoBaseService {
 
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
+        generalTab.setTags(null);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        generalActivityTabWithTagDTO.setTags(null);
-        if (!generalDTO.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        if (!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            generalTab.setTags(activity.getTags());
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
         activityService.updateNotesTabOfActivity(generalDTO, activity);

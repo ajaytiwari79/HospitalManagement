@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.kpi.Interval;
@@ -8,7 +7,6 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class ApplicableKPI extends MongoBaseEntity {
     private BigInteger activeKpiId;

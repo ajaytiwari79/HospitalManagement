@@ -4,10 +4,8 @@ package com.kairos.service.questionnaire_template;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
-import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
-import com.kairos.persistence.model.data_inventory.asset.Asset;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.enums.gdpr.*;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
@@ -24,9 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Stream;
 
 
 @Service

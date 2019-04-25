@@ -17,7 +17,6 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.country.Country;
@@ -66,14 +65,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
