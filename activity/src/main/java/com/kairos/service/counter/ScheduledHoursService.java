@@ -4,6 +4,7 @@ import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
@@ -50,7 +51,7 @@ public class ScheduledHoursService implements CounterService {
     }
 
     @Override
-    public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
+    public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi,ApplicableKPI applicableKPI) {
         return null;
     }
 
