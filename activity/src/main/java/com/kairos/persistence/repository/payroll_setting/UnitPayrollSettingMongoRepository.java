@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.payroll_setting;
 
-import com.kairos.dto.activity.payroll_setting.UnitPayrollSettingDTO;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;

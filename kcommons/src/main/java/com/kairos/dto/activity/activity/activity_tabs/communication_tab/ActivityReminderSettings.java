@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.activity.activity_tabs.communication_tab;
 
-import com.kairos.enums.DurationType;
-
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Comparator;

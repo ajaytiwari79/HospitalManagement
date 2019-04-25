@@ -7,6 +7,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FIELD;
 import static org.neo4j.ogm.annotation.Relationship.OUTGOING;
 

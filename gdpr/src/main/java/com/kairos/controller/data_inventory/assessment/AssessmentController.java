@@ -2,10 +2,10 @@ package com.kairos.controller.data_inventory.assessment;
 
 
 import com.kairos.dto.gdpr.assessment.AssessmentAnswerDTO;
+import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
-import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
 import java.util.List;
 import java.util.Optional;
 

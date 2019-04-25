@@ -4,9 +4,9 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.persistence.model.user.skill.Skill;
 
 import java.util.List;
 

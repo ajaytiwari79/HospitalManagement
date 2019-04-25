@@ -8,10 +8,8 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import org.joda.time.Interval;
-import org.springframework.data.annotation.Transient;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -22,7 +20,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 
 /*
@@ -45,7 +42,7 @@ public class ShiftWithActivityDTO {
     private long probability;
     private long accumulatedTimeBankInMinutes;
     private String remarks;
-    private Long unitPositionId;
+    private Long employmentId;
     private BigInteger planningPeriodId;
     private Long staffId;
     private Phase phase;
@@ -70,7 +67,7 @@ public class ShiftWithActivityDTO {
     public ShiftWithActivityDTO() {
     }
 
-    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivityDTO> activities, Long staffId, Long unitPositionId, Long unitId) {
+    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivityDTO> activities, Long staffId, Long employmentId, Long unitId) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -88,7 +85,7 @@ public class ShiftWithActivityDTO {
         }else {
             this.activities = new ArrayList<>();
         }
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.unitId = unitId;
     }
@@ -169,8 +166,8 @@ public class ShiftWithActivityDTO {
         this.status = status;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
     public List<ShiftActivityDTO> getActivities() {
@@ -188,8 +185,8 @@ public class ShiftWithActivityDTO {
         }
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public int getMinutes() {

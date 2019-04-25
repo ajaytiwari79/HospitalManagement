@@ -1,7 +1,5 @@
 package com.kairos.persistence.model.payroll_setting;
 
-import com.kairos.dto.activity.payroll_setting.PayrollPeriodDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
@@ -10,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 public class UnitPayrollSetting extends MongoBaseEntity {
     private boolean published;

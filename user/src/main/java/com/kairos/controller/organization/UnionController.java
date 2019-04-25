@@ -18,7 +18,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by vipul on 13/2/18.

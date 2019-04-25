@@ -1,19 +1,20 @@
 package com.kairos.controller.open_shift;
 
+import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.service.open_shift.AutomaticOpenShiftGenerationService;
 import com.kairos.service.open_shift.OpenShiftService;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 

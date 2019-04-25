@@ -1,8 +1,8 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -12,6 +12,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Optional;

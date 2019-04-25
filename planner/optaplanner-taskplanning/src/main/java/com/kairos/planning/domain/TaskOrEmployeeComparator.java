@@ -3,8 +3,6 @@ package com.kairos.planning.domain;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.util.Comparator;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TaskOrEmployeeComparator implements Comparator<TaskOrEmployee>{
 		 @Override

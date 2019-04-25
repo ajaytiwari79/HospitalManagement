@@ -5,8 +5,6 @@ import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kairos.planning.executioner.TaskPlanningSolver;
-
 public class BreakTimeListener implements VariableListener<Task>{
     public static Logger log= LoggerFactory.getLogger(BreakTimeListener.class);
 

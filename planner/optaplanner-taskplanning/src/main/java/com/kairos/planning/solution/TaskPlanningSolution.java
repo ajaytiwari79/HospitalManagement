@@ -1,29 +1,20 @@
 package com.kairos.planning.solution;
 
-import java.util.List;
-
+import com.kairos.planning.domain.*;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
-import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
-//import org.springframework.data.annotation.Id;
-
-import com.kairos.planning.domain.AvailabilityRequest;
-import com.kairos.planning.domain.Citizen;
-import com.kairos.planning.domain.Employee;
-import com.kairos.planning.domain.Location;
-import com.kairos.planning.domain.Skill;
-import com.kairos.planning.domain.Task;
-import com.kairos.planning.domain.TaskType;
-import com.kairos.planning.domain.UnavailabilityRequest;
-import com.kairos.planning.domain.Vehicle;
-//import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.optaplanner.persistence.xstream.api.score.buildin.bendablelong.BendableLongScoreXStreamConverter;
+
+import java.util.List;
+
+//import org.springframework.data.annotation.Id;
+//import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @PlanningSolution
 @XStreamAlias("TaskPlanningSolution")

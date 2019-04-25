@@ -1,9 +1,6 @@
 package com.kairos.dto.user.country.skill;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

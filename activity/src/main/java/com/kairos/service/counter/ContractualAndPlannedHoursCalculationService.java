@@ -14,7 +14,7 @@ import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
-import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -87,13 +87,13 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         Map<Long, Double> staffAndContractualHourMap = new HashMap<>();
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
             Long contractualMinutes = 0l;
-            for (UnitPositionWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getUnitPosition()) {
+            for (EmploymentWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                 int totalWeeklyMinutes = 0;
                 interval = timeBankCalculationService.getIntervalByDateForAdvanceView(positionWithCtaDetailsDTO, interval);
                 if (interval != null) {
                     DateTime startDate = interval.getStart();
                     while (startDate.isBefore(interval.getEnd())) {
-                        contractualMinutes += timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getPositionLines());
+                        contractualMinutes += timeBankCalculationService.getContractualMinutesByDate(planningPeriodIntervals, DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getEmploymentLines());
                         startDate = startDate.plusDays(1);
                     }
                 }

@@ -1,10 +1,10 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;
@@ -63,8 +63,7 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-
-    public CTAWTAAndAccumulatedTimebankWrapper assignWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper assignWTAToEmployment(Long employmentId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
         String baseUrl = getBaseUrl(true);
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> typeReference =
@@ -72,8 +71,8 @@ public class WorkingTimeAgreementRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}/?startDate="+startDate,
-                            HttpMethod.POST, null, typeReference, unitPositionId,wtaId,ctaId);
+                            baseUrl + "/employment/{employmentId}/wta/{wtaId}/cta/{ctaId}/?startDate="+startDate,
+                            HttpMethod.POST, null, typeReference, employmentId,wtaId,ctaId);
 
             RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
@@ -90,7 +89,7 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public WTAResponseDTO updateWTAOfUnitPosition(WTADTO wtadto, boolean unitPositionPublished) {
+    public WTAResponseDTO updateWTAOfEmployment(WTADTO wtadto, boolean employmentPublished) {
         String baseUrl = getBaseUrl(true);
         try {
             HttpEntity<WTADTO> request = new HttpEntity<>(wtadto);
@@ -98,7 +97,7 @@ public class WorkingTimeAgreementRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/wta?unitPositionPublished=" + unitPositionPublished,
+                            baseUrl + "/wta?employmentPublished=" + employmentPublished,
                             HttpMethod.PUT, request, typeReference);
 
             RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
@@ -115,7 +114,4 @@ public class WorkingTimeAgreementRestClient {
         }
         return null;
     }
-
-
-
 }

@@ -7,19 +7,19 @@ public class CTAWTAResponseDTO {
     private String ctaName;
     private BigInteger wtaId;
     private String wtaName;
-    private Long unitPositionId;
+    private Long employmentId;
 
 
     public CTAWTAResponseDTO() {
 
 
     }
-    public CTAWTAResponseDTO(BigInteger ctaId, String ctaName,Long unitPositionId, BigInteger wtaId, String wtaName) {
+    public CTAWTAResponseDTO(BigInteger ctaId, String ctaName, Long employmentId, BigInteger wtaId, String wtaName) {
         this.ctaId = ctaId;
         this.ctaName = ctaName;
         this.wtaId = wtaId;
         this.wtaName = wtaName;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
 
 
     }
@@ -54,12 +54,12 @@ public class CTAWTAResponseDTO {
     public void setWtaName(String wtaName) {
         this.wtaName = wtaName;
     }
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
 }

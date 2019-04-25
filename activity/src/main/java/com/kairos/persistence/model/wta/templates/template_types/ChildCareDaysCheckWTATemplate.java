@@ -20,8 +20,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.CommonConstants.DAYS;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCareDays;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
 
 /**
  * Created by pavan on 23/4/18.

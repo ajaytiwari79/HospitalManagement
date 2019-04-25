@@ -1,8 +1,8 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
 
-import java.time.LocalDateTime;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 public class LocalDateTimeScheduledPanelIdDTO {
     private LocalDateTime dateTime;
     private BigInteger id;

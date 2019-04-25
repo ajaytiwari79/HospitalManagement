@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.wta.templates;
 
-import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -10,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 
 
 /**

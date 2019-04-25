@@ -1,7 +1,6 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;

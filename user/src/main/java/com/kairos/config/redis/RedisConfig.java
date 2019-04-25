@@ -1,5 +1,5 @@
 package com.kairos.config.redis;
-import org.springframework.context.annotation.Bean;
+
 /*import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -8,8 +8,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;*/
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by anil on 10/8/17.

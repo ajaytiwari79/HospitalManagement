@@ -4,7 +4,9 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 * Created By Pradeep singh rajawat
@@ -14,7 +16,7 @@ import java.util.List;
 @Document(collection = "dailyTimeBankEntries")
 public class DailyTimeBankEntry extends MongoBaseEntity{
 
-    private Long unitPositionId;
+    private Long employmentId;
     private Long staffId;
     //It is Delta timebank
     private int deltaTimeBankMinutes;
@@ -31,13 +33,14 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int deltaAccumulatedTimebankMinutes;
     //It is the sum of scheduledMinutesOfTimeBank + ctaBonusMinutesOfTimeBank
     private int plannedMinutesOfTimebank;
-    private int publishedBalancesMinutes;
+    private Map<LocalDate,Integer> publishedBalances;
 
 
-    public DailyTimeBankEntry(Long unitPositionId, Long staffId, LocalDate date) {
-        this.unitPositionId = unitPositionId;
+    public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {
+        this.employmentId = employmentId;
         this.staffId = staffId;
         this.date = date;
+        this.publishedBalances = new HashMap<>();
     }
 
     public List<TimeBankCTADistribution> getTimeBankCTADistributionList() {
@@ -84,12 +87,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.ctaBonusMinutesOfTimeBank = ctaBonusMinutesOfTimeBank;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getStaffId() {
@@ -132,16 +135,16 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 
-    public int getPublishedBalancesMinutes() {
-        return publishedBalancesMinutes;
+    public Map<LocalDate, Integer> getPublishedBalances() {
+        return publishedBalances;
     }
 
-    public void setPublishedBalancesMinutes(int publishedBalancesMinutes) {
-        this.publishedBalancesMinutes = publishedBalancesMinutes;
+    public void setPublishedBalances(Map<LocalDate, Integer> publishedBalances) {
+        this.publishedBalances = publishedBalances;
     }
 
     @Override
     public String toString() {
-        return "DailyTimeBankEntry{" + "unitPositionId=" + unitPositionId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
+        return "DailyTimeBankEntry{" + "employmentId=" + employmentId + ", staffId=" + staffId + ", deltaTimeBankMinutes=" + deltaTimeBankMinutes + ", contractualMinutes=" + contractualMinutes + ", scheduledMinutesOfTimeBank=" + scheduledMinutesOfTimeBank + ", timeBankMinutesWithoutCta=" + timeBankMinutesWithoutCta + ", ctaBonusMinutesOfTimeBank=" + ctaBonusMinutesOfTimeBank + ", date=" + date + ", timeBankCTADistributionList=" + timeBankCTADistributionList + ", deltaAccumulatedTimebankMinutes=" + deltaAccumulatedTimebankMinutes + ", plannedMinutesOfTimebank=" + plannedMinutesOfTimebank + '}';
     }
 }

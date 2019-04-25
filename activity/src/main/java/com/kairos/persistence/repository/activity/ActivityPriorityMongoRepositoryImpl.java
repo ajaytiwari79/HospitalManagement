@@ -3,11 +3,9 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.util.Assert;
 
 import javax.inject.Inject;
 import java.math.BigInteger;

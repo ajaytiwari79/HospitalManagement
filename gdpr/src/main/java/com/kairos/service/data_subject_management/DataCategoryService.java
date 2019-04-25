@@ -2,8 +2,9 @@ package com.kairos.service.data_subject_management;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
-import com.kairos.persistence.model.master_data.data_category_element.*;
-import com.kairos.persistence.repository.master_data.data_category_element.*;
+import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
+import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryRepository;
+import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -13,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service

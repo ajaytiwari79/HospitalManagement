@@ -1,9 +1,8 @@
 package com.kairos.persistence.repository.break_settings;
 
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;

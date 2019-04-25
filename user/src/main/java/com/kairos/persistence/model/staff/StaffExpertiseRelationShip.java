@@ -9,7 +9,6 @@ import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Date;
 

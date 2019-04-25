@@ -1,7 +1,5 @@
 package com.kairos.shiftplanning.domain.staff;
 
-import com.kairos.shiftplanning.domain.wta.*;
-
 public class PrevShiftsInfo {
 
     private long shortestAndAverageDailyRestInfo;//no.of rest min

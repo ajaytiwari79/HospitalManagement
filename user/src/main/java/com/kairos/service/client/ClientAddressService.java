@@ -1,6 +1,7 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.AccessToLocation;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ClientTemporaryAddress;
@@ -22,7 +23,6 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,6 @@ import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
-
 
 /**
  * Created by oodles on 22/5/17.

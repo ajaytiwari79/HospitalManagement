@@ -1,7 +1,7 @@
 package com.kairos.controller.staff_settings;
 
-import com.kairos.service.staff_settings.StaffOpenShiftBlockSettingService;
 import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
+import com.kairos.service.staff_settings.StaffOpenShiftBlockSettingService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

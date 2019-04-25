@@ -1,8 +1,5 @@
 package com.kairos.dto.gdpr.filter;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 
 //@Getter @Setter

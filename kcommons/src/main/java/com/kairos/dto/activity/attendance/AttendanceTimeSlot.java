@@ -11,25 +11,25 @@ public class AttendanceTimeSlot {
     private Long unitId;
     private Long clockInReasonCode;
     private Long clockOutReasonCode;
-    private Long unitPositionId;
+    private Long employmentId;
     private BigInteger shiftId;
     private boolean systemGeneratedClockOut;
 
     public AttendanceTimeSlot() {
     }
 
-    public AttendanceTimeSlot(LocalDateTime from, Long clockInReasonCode, Long unitPositionId,Long unitId) {
+    public AttendanceTimeSlot(LocalDateTime from, Long clockInReasonCode, Long employmentId, Long unitId) {
         this.from = from;
         this.clockInReasonCode = clockInReasonCode;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.unitId=unitId;
     }
 
-    public AttendanceTimeSlot(LocalDateTime from, Long unitId, Long clockInReasonCode, Long unitPositionId, BigInteger shiftId) {
+    public AttendanceTimeSlot(LocalDateTime from, Long unitId, Long clockInReasonCode, Long employmentId, BigInteger shiftId) {
         this.from = from;
         this.unitId = unitId;
         this.clockInReasonCode = clockInReasonCode;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.shiftId = shiftId;
     }
 
@@ -65,12 +65,12 @@ public class AttendanceTimeSlot {
         this.clockOutReasonCode = clockOutReasonCode;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getUnitId() {

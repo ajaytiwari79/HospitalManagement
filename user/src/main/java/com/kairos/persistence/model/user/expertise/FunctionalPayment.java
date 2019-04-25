@@ -1,11 +1,9 @@
 package com.kairos.persistence.model.user.expertise;
 
-import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_FOR_EXPERTISE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.FUNCTIONAL_PAYMENT_MATRIX;
-import static com.kairos.persistence.model.constants.RelationshipConstants.VERSION_OF;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @NodeEntity
 public class FunctionalPayment extends UserBaseEntity {

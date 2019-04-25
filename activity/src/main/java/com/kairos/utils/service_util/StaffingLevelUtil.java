@@ -3,13 +3,11 @@ package com.kairos.utils.service_util;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
-import org.springframework.beans.BeanUtils;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 
 import java.math.BigInteger;
 import java.time.LocalTime;

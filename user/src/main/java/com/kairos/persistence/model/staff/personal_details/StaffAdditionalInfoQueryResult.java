@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
-import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.ZoneId;
@@ -24,7 +24,7 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffUnitPositionDetails unitPosition;
+    private StaffEmploymentDetails employments;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
@@ -138,12 +138,12 @@ public class StaffAdditionalInfoQueryResult {
         this.unitId = unitId;
     }
 
-    public StaffUnitPositionDetails getUnitPosition() {
-        return unitPosition;
+    public StaffEmploymentDetails getEmployments() {
+        return employments;
     }
 
-    public void setUnitPosition(StaffUnitPositionDetails unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployments(StaffEmploymentDetails employments) {
+        this.employments = employments;
     }
 
     public Date getOrganizationNightStartTimeFrom() {

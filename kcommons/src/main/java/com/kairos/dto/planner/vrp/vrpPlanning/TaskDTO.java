@@ -3,7 +3,6 @@ package com.kairos.dto.planner.vrp.vrpPlanning;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Set;
 
