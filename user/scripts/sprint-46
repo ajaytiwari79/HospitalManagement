@@ -25,3 +25,4 @@ MATCH(fg:FilterGroup)
 WITH fg,FILTER(x IN fg.filterTypes WHERE x <> "UNIT_POSITION") as filteredList
 set fg.filterTypes=filteredList
 return fg
+

@@ -1,0 +1,29 @@
+1. // TO set unit permission of Admin
+Match (e:Employment) WHERE e.name="working as country admin"   WITH e
+MATCH (o:Organization) WHERE o.organizationLevel="COUNTRY" WITH  o,e
+MATCH (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN" WITH o,e,ag
+CREATE (u:UnitPermission{startDate:timestamp()}) WITH o,e,u,ag
+CREATE unique (u)-[:HAS_ACCESS_GROUP]->(ag) WITH o,e,u
+CREATE UNIQUE (e)-[:HAS_UNIT_PERMISSIONS]->(u)-[:APPLICABLE_IN_UNIT]->(o)return e,o;
+
+
+2.  // TO CREATE FILTER GROUP ( Filter settings for Self Rostering and Staff Module)
+CREATE (fg:FilterGroup{filterTypes:["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS","ENGINEER_TYPE", "EXPERTISE"],deleted:false}) WITH fg
+MATCH (ap:AccessPage) WHERE ap.moduleId in ["module_7","module_12"] WITH fg,ap
+CREATE UNIQUE (ap)-[:APPLICABLE_FOR]-(fg) return ap,fg;
+
+
+
+2.// To create Shift Planning Time slot set for previous organization
+
+Match(o:Organization{isEnable:true})-[:HAS_TIME_SLOT_SET]-(tss:TimeSlotSet)
+where tss.timeSlotType IS NULL
+set tss.timeSlotType='TASK_PLANNING'
+with DISTINCT o
+MATCH(ts:TimeSlot) where ts.name='Day'
+MATCH(ts1:TimeSlot) where ts1.name='Night'
+MATCH(ts2:TimeSlot) where ts2.name='Evening'
+create (o)-[:HAS_TIME_SLOT_SET]->(tss:TimeSlotSet{defaultSet: true,deleted: false,name:'Time slot 1',timeSlotMode: 'STANDARD',timeSlotType: 'SHIFT_PLANNING',startDate: 1524459660876})
+CREATE(tss)-[:HAS_TIME_SLOT{endHour: 17,lastModificationDate: 1524459660876,deleted: false,startHour: 7,shiftStartTime: true,creationDate: 1524459660876,startMinute: 0,endMinute: 0}]->(ts)
+CREATE(tss)-[:HAS_TIME_SLOT{endHour: 23,lastModificationDate: 1524459660876,deleted: false,startHour: 17,shiftStartTime: true,creationDate: 1524459660876,startMinute: 0,endMinute: 0}]->(ts1)
+CREATE(tss)-[:HAS_TIME_SLOT{endHour: 5,lastModificationDate: 1524459660876,deleted: false,startHour: 23,shiftStartTime: true,creationDate: 1524459660876,startMinute: 0,endMinute: 0}]->(ts2)

@@ -1,0 +1,11 @@
+// To delete linking of access page with access group of Country Admin
+Match (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN"
+Match (ag)-[r:HAS_ACCESS_OF_TABS]-(ap:AccessPage) DELETE r;
+
+// To linking of all access pages with access group of Country Admin
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+Match (ap:AccessPage)
+CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
+
+// TO DELETE all customized relations
+Match (up:UnitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]-(ap:AccessPage) delete r;
