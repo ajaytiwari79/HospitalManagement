@@ -1,0 +1,13 @@
+//This for set default value for calculate Scheduled hour
+//Jira task KP-2836
+Match(ctaRuleTemplate:CTARuleTemplate) set ctaRuleTemplate.calculateScheduledHours = false;
+
+//KP-2000 query for setting inactiveFrom to null in staff
+Match(s:Staff) where s.inactiveFrom=0 set s.inactiveFrom= null;
+//KP-2000 query for setting employed Since as null in staff
+Match(s:Staff) where s.employedSince=0 set s.employedSince= null;
+//KP-2777 query for setting staffFunctions to null
+Match(ctaRuleTemplate:CTARuleTemplate) set ctaRuleTemplate.staffFunctions = null
+//KP-2000
+Match(o:Organization) where o.clientSince=0
+set o.clientSince =null;

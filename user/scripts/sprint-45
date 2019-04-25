@@ -1,0 +1,22 @@
+MATCH(ag:AccessGroup) where ag.name="AG_COUNTRY_ADMIN"
+SET ag.name='SUPER_ADMIN';
+
+
+
+MATCH(systemSetting:AccessPage{moduleId:"module_11"})
+MATCH(tabsHierarchy:AccessPage{moduleId:"tab_119"})<-[r:SUB_PAGE]-(countryTab:AccessPage{moduleId:"module_4"})
+delete r
+CREATE UNIQUE(tabsHierarchy)<-[r1:SUB_PAGE]-(systemSetting)
+// 09 april unit position field update
+MATCH (n:Employment) SET n.mainEmployment=
+CASE
+WHEN n.mainEmployment=true
+THEN 'MAIN'
+when n.mainEmployment =false
+THEN 'SECONDARY'
+END
+RETURN n
+
+MATCH (n:Employment) set n.employmentSubType=n.mainEmployment
+remove n.mainEmployment
+RETURN n
