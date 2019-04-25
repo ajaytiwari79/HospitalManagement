@@ -2,12 +2,13 @@ package com.kairos.dto.planner.solverconfig.country;
 
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 
+import java.util.List;
+
 public class CountrySolverConfigDTO extends SolverConfigDTO{
 
 
     private Long countryId;
-    private Long organizationServiceId;
-    private Long organizationSubServiceId;
+    private List<Long> organizationSubServiceIds;
 
     public Long getCountryId() {
         return countryId;
@@ -17,19 +18,11 @@ public class CountrySolverConfigDTO extends SolverConfigDTO{
         this.countryId = countryId;
     }
 
-    public Long getOrganizationServiceId() {
-        return organizationServiceId;
+    public List<Long> getOrganizationSubServiceIds() {
+        return organizationSubServiceIds;
     }
 
-    public void setOrganizationServiceId(Long organizationServiceId) {
-        this.organizationServiceId = organizationServiceId;
-    }
-
-    public Long getOrganizationSubServiceId() {
-        return organizationSubServiceId;
-    }
-
-    public void setOrganizationSubServiceId(Long organizationSubServiceId) {
-        this.organizationSubServiceId = organizationSubServiceId;
+    public void setOrganizationSubServiceIds(List<Long> organizationSubServiceIds) {
+        this.organizationSubServiceIds = organizationSubServiceIds;
     }
 }
