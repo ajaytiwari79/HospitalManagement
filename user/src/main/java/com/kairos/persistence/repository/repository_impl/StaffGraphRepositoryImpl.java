@@ -88,7 +88,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,\n" +
                 "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) as employmentLines,employment,staff,org "+
                 "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,employmentLines:employmentLines } as employment,staff,org\n" +
-                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,id(org) as unitId,org.name as unitName,collect(employment) as employments");
+                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,id(org) as unitId,org.name as unitName,collect(employment) as employment");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
 
