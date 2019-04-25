@@ -1,9 +1,12 @@
 package com.kairos.controller.kpermissions;
 
+import com.kairos.dto.ValidateRequestBodyList;
 import com.kairos.dto.kpermissions.ModelDTO;
+import com.kairos.dto.kpermissions.PermissionDTO;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +39,16 @@ public class PermissionController {
     public ResponseEntity getFLPSchema()  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema());
+
+    }
+
+
+    @RequestMapping(value = "/create_permission",method = RequestMethod.POST)
+    public ResponseEntity createFieldPermissions(@Valid @RequestBody ValidateRequestBodyList<PermissionDTO> permissionDTO)  {
+        if (CollectionUtils.isEmpty(permissionDTO.getRequestBody())) {
+            return ResponseHandler.generateResponseDTO(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO.getRequestBody()));
 
     }
 

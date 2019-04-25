@@ -17,4 +17,8 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<Permissi
 
     @Query(value = "MATCH (m:PermissionModel)-[:HAS_SUB_MODEL]-(sm:PermissionModel)-[:HAS_FIELD]-(f:PermissionField) where m.id = {0} return  sm as model, collect(f.fieldName) as fields, f.modelName as modelName")
     List<Map<String, Object>> getPermissionSubModelWithFields(Long permissionModelId);
+
+    @Query(value = "MATCH (permissionModel:PermissionModel)-[:HAS_SUB_MODEL]-(permissionSubModel:PermissionModel) WHERE id(permissionModel)={1} AND id(permissionSubModel)={0} return  permissionSubModel")
+    PermissionModel getPermissionSubModelByIdAndPermissionModelId(Long subPermissionModelId, Long permissionModelId);
+
 }
