@@ -1,5 +1,6 @@
 package com.kairos.config.security;
 
+import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserOauth2Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -18,6 +19,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 import static com.kairos.constants.AppConstants.*;
 
 
@@ -28,6 +32,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserOauth2Service userDetailsService;
+
     
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,11 +54,9 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
+    public CustomAuthenticationProvider authenticationProvider() {
+        return new CustomAuthenticationProvider(userDetailsService,passwordEncoder());
+
     }
 
     /*

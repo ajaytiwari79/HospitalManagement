@@ -1,5 +1,6 @@
 package com.kairos.config.security;
 
+import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -20,14 +21,21 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
 @EnableAuthorizationServer
 public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Inject
+    private RedisService redisService;
     @Autowired
-    UserService userService;
+    private HttpServletRequest request;
+    @Autowired
+    private UserService userService;
 
     private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
 
@@ -42,7 +50,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
-        DefaultTokenServices defaultTokenServices =new  CustomDefaultTokenServices(userService);
+        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService,request);
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
         defaultTokenServices.setTokenStore(jwtTokenStore);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
@@ -58,18 +66,18 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         clients.inMemory()
                 .withClient("kairos")
                 .secret("$2a$10$CA3JnlNGZpRIqvBe904d1eOBjoJXX0rLatl7kMQL9mGPyGVm6xYj.")
-                .authorizedGrantTypes("refresh_token","password","client_credentials")
+                .authorizedGrantTypes("refresh_token", "password", "client_credentials")
                 .scopes("webclient", "mobileclient")
-     			.and()
-     					.withClient("activity-service")
-     					.secret("task")
-     					.authorizedGrantTypes("client_credentials", "refresh_token")
-     					.scopes("server")
-     			.and()
-     					.withClient("user-service")
-     					.secret("user")
-     					.authorizedGrantTypes("client_credentials", "refresh_token")
-     					.scopes("server");
+                .and()
+                .withClient("activity-service")
+                .secret("task")
+                .authorizedGrantTypes("client_credentials", "refresh_token")
+                .scopes("server")
+                .and()
+                .withClient("user-service")
+                .secret("user")
+                .authorizedGrantTypes("client_credentials", "refresh_token")
+                .scopes("server");
 
 
     }
@@ -78,7 +86,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
-     JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
+        JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
         //anilm2 use commented code if certificate not install
         converter.setSigningKey("123456");
         /*try{
