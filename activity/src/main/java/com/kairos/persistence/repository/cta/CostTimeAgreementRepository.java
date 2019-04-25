@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.cta;
 
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -21,8 +20,6 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query("{countryId:?0,_id:?1,deleted:false,disabled:false}")
     CostTimeAgreement findCTAByCountryAndIdAndDeleted(Long countryId, BigInteger ctaId, Boolean deleted);
 
-    @Query("{countryId:?0,deleted:false,disabled:false}")
-    List<CTAResponseDTO> findCTAByCountryId(Long countryId);
 
     @Query(value = "{'organization._id':?0, name:?1, deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInOrganization(Long organizationId, String name);

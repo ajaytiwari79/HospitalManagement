@@ -2,16 +2,14 @@ package com.kairos.persistence.model.country.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.dto.user.country.tag.TagDTO;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * Created by prerna on 10/11/17.
@@ -30,8 +28,14 @@ public class Tag extends UserBaseEntity {
 
     private boolean countryTag;
 
-    Tag(){}
-    
+    public Tag(){}
+
+    public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
+        this.name = name;
+        this.masterDataType = masterDataType;
+        this.countryTag = countryTag;
+    }
+
     public String getName() {
         return name;
     }

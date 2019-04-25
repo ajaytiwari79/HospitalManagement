@@ -74,6 +74,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             ruleTemplateCategory = new RuleTemplateCategory();
             ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCategory);
             ruleTemplateCategory.setCountryId(country.getId());
+            ruleTemplateCategory.setTags(ruleTemplateCategoryDTO.getTags());
             save(ruleTemplateCategory);
             if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.WTA)) {
                 ruleTemplateAndCategoryDTO = updateCategoryToWTATemplates(ruleTemplateCategory, ruleTemplateCategoryDTO);
@@ -109,15 +110,15 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         ruleTemplateCategoryDTO.setId(ruleTemplateCategory.getId());
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates);
         List<TagDTO> tagDTOS = tagMongoRepository.findAllTagsByIdIn(ruleTemplateCategoryDTO.getTags());
-        RuleTemplateCategoryDTO ruleTemplateCatg = new RuleTemplateCategoryDTO();
-        ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCatg);
+        ruleTemplateCategoryDTO.setTags(null);
+        RuleTemplateCategoryDTO ruleTemplateCatg = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplateCategoryDTO, RuleTemplateCategoryDTO.class);
         ruleTemplateCatg.setTags(tagDTOS);
         wtaBaseRuleTemplateDTOS.forEach(wtaBaseRuleTemplateDTO -> wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCatg));
         return new RuleTemplateAndCategoryResponseDTO(ruleTemplateCategoryDTO, wtaBaseRuleTemplateDTOS);
     }
 
 
-    public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
+    public List<RuleTemplateCategory> getRulesTemplateCategory(Long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         CountryDTO country = userIntegrationService.getCountryById(countryId);
         if (country == null) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
@@ -140,7 +141,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             excpExceptionService.actionNotPermittedException("message.ruletemplatecategory.delete", templateCategoryId);
         }
-        if(RuleTemplateCategoryType.WTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType())){
+        if (RuleTemplateCategoryType.WTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType())) {
             List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
             wtaBaseRuleTemplates.forEach(rt -> {
@@ -149,11 +150,11 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             if (!wtaBaseRuleTemplates.isEmpty()) {
                 save(wtaBaseRuleTemplates);
             }
-        }else {
-           List<CTARuleTemplate> ctaRuleTemplates =  ctaRuleTemplateRepository.findAllByCategoryId(ruleTemplateCategory.getId());
+        } else {
+            List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByCategoryId(ruleTemplateCategory.getId());
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
             ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId()));
-            if(!ctaRuleTemplates.isEmpty()){
+            if (!ctaRuleTemplates.isEmpty()) {
                 save(ctaRuleTemplates);
             }
         }
@@ -181,12 +182,13 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
+        ruleTemplateCategoryObj.setTags(ruleTemplateCategoryDTO.getTags());
         save(ruleTemplateCategoryObj);
         RuleTemplateAndCategoryResponseDTO ruleTemplateAndCategoryResponseDTO;
         if (ruleTemplateCategoryObj.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.WTA)) {
-            ruleTemplateAndCategoryResponseDTO =  updateWTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
+            ruleTemplateAndCategoryResponseDTO = updateWTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
         } else {
-            ruleTemplateAndCategoryResponseDTO =  updateCTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
+            ruleTemplateAndCategoryResponseDTO = updateCTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
         }
         ruleTemplateAndCategoryResponseDTO.setCategory(null);
         return ruleTemplateAndCategoryResponseDTO;
@@ -216,9 +218,10 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
-        RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findById(templateCategoryId).get();
+        RuleTemplateCategory ruleTemplateCategoryObj = ruleTemplateCategoryMongoRepository.findOne(templateCategoryId);
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
+        ruleTemplateCategoryObj.setTags(ruleTemplateCategory.getTags());
         save(ruleTemplateCategoryObj);
         ruleTemplateCategory.setId(ruleTemplateCategoryObj.getId());
         return ruleTemplateCategory;

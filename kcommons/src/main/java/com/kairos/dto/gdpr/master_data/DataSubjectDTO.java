@@ -1,6 +1,9 @@
 package com.kairos.dto.gdpr.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -8,6 +11,9 @@ import javax.validation.constraints.Pattern;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class DataSubjectDTO {
 
 
@@ -22,19 +28,4 @@ public class DataSubjectDTO {
     @NotEmpty(message = "error.message.datacategory.notNull")
     protected Set<Long> dataCategories;
 
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-
-    public void setName(String name) { this.name = name; }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public Set<Long> getDataCategories() { return dataCategories; }
-
-    public void setDataCategories(Set<Long> dataCategories) { this.dataCategories = dataCategories; }
 }

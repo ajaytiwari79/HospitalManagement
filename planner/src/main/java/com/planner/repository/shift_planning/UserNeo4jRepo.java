@@ -22,16 +22,14 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
     @Query("Match(unit:Organization) where id(unit)={0} " +
             "Match(staff:Staff)  where id(staff) in {1} with staff,unit " +
             "Optional Match(skill:Skill{isEnabled:true})<-[:" + STAFF_HAS_SKILLS + "]-(staff) " +
-            "Optional Match(unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff) " +
-            //"Optional Match(expertise:Expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) " +
+            "Optional Match(unit)<-[:" + IN_UNIT + "]-(employment:Employment)<-[:" + BELONGS_TO_STAFF + "]-(staff) " +
             "return " +
             "id(staff) as staffId,\n" +
             "staff.firstName+staff.lastName as staffName,\n" +
             "collect({skillId:id(skill),name:skill.name,weight:skill.weight}) as staffSkills,\n" +
-            "id(unitPosition) as unitPositionsId limit 1"
-            // "unitPositionExpertise:expertise"
+            "id(employment) as employmentId limit 1"
     )
-    List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId, List<Long> staffIds);
+    List<StaffQueryResult> getStaffWithSkillsAndEmploymentIds(Long unitId, List<Long> staffIds);
 
     /**
      * this method will return all OrganizationServices and Its SubServices
@@ -41,9 +39,9 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
      * @return
      */
     @Query("Match(c:Country) where id(c)={0} with c " +
-            "Optional Match (os:OrganizationService)<-[:" + HAS_ORGANIZATION_SERVICES + "]-(c) " +
-            "Optional Match (osSub:OrganizationService)<-[:" + ORGANIZATION_SUB_SERVICE + "]-(os) " +
-            "return id(os) as id,os.name as name,collect({id:id(osSub),name:osSub.name}) as organizationSubServices")
+            "Match (os:OrganizationService)<-[:" + HAS_ORGANIZATION_SERVICES + "]-(c) " +
+            "Match (osSub:OrganizationService)<-[:" + ORGANIZATION_SUB_SERVICE + "]-(os) " +
+            "return id(os) as id,os.name as name,CASE WHEN osSub IS NULL THEN [] ELSE collect({id:id(osSub),name:osSub.name}) END as organizationSubServices")
     List<OrganizationServiceQueryResult> getAllOrganizationServices(Long countryId);
 
     @Query("Match(os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService)<-[:"+PROVIDE_SERVICE+"]-(o:Organization) where id(os)={0} AND id(ossub)={1} return id(o)")

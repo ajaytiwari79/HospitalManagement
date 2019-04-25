@@ -34,8 +34,18 @@ public class ClusteredBarChartKpiDataUnit extends CommonKpiDataUnit {
         this.subValues = subValues;
     }
 
+    public ClusteredBarChartKpiDataUnit(String label,double value, List<ClusteredBarChartKpiDataUnit> subValues,Long refId) {
+        super(label,refId);
+        this.value = value;
+        this.subValues = subValues;
+    }
+
     public double getValue() {
         return value;
+    }
+
+    public Number getNumberValue() {
+        return new Double(value);
     }
 
     public void setValue(double value) {

@@ -3,32 +3,18 @@ package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.BasicRiskDTO;
-import com.kairos.dto.gdpr.Staff;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
-
-    //property may add in future
-   // @NotNull(message = "error.message.risk.due.date")
-    //private LocalDate dueDate;
-    //private Staff riskOwner;
 
     private Long organizationId;
     private boolean reminderActive;
     private int daysToReminderBefore;
 
-    public boolean isReminderActive() { return reminderActive; }
-
-    public void setReminderActive(boolean reminderActive) { this.reminderActive = reminderActive; }
-
-    public int getDaysToReminderBefore() { return daysToReminderBefore; }
-
-    public void setDaysToReminderBefore(int daysToReminderBefore) { this.daysToReminderBefore = daysToReminderBefore; }
-
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId;}
 }

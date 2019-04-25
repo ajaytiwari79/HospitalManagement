@@ -1,11 +1,9 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class ApplicableKPI extends MongoBaseEntity {
     private BigInteger activeKpiId;
@@ -16,11 +14,12 @@ public class ApplicableKPI extends MongoBaseEntity {
     private ConfLevel level;
     private String title;
     private ApplicableFilter applicableFilter;
+    private boolean fibonacciKPI;
     // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
     private boolean copy;
 
     public ApplicableKPI() {
-
+        //Default Constructor
     }
 
     public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
@@ -114,5 +113,13 @@ public class ApplicableKPI extends MongoBaseEntity {
 
     public void setCopy(boolean copy) {
         this.copy = copy;
+    }
+
+    public boolean isFibonacciKPI() {
+        return fibonacciKPI;
+    }
+
+    public void setFibonacciKPI(boolean fibonacciKPI) {
+        this.fibonacciKPI = fibonacciKPI;
     }
 }

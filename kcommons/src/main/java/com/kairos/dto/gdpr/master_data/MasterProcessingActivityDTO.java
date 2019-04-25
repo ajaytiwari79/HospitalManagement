@@ -5,6 +5,9 @@ import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -16,6 +19,9 @@ import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class MasterProcessingActivityDTO {
 
     private Long id;
@@ -45,59 +51,6 @@ public class MasterProcessingActivityDTO {
     private Set<SubServiceCategoryDTO> organizationSubServices=new HashSet<>();
 
     private List<MasterProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<MasterProcessingActivityDTO> getSubProcessingActivities() {
-        return subProcessingActivities;
-    }
-
-   public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Set<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypes; }
-
-    public void setOrganizationTypes(Set<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
-
-    public Set<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
-
-    public void setOrganizationSubTypes(Set<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
-
-    public Set<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
-
-    public void setOrganizationServices(Set<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
-
-    public Set<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
-
-    public void setOrganizationSubServices(Set<SubServiceCategoryDTO> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
-
-    public MasterProcessingActivityDTO()
-    {
-
-    }
 }
 
 

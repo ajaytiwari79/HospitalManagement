@@ -23,20 +23,20 @@ public class PlanningProblemController {
     @ApiOperation("Create PlanningProblem")
     public ResponseEntity<Map<String, Object>> createPlanningProblem(@RequestBody PlanningProblemDTO planningProblemDTO) {
         planningProblemService.createPlanningProblem(planningProblemDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     
     @GetMapping(value = "/{planningProblemDTOId}")
     @ApiOperation("Get PlanningProblem")
     public ResponseEntity<Map<String, Object>> getPlanningProblem(@PathVariable String planningProblemDTOId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,planningProblemService.getPlanningProblem(planningProblemDTOId));
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,planningProblemService.getPlanningProblem(planningProblemDTOId));
     }
 
     @GetMapping
     @ApiOperation("GetAll PlanningProblem")
     public ResponseEntity<Map<String, Object>> getAllPlanningProblem() {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,planningProblemService.getAllPlanningProblem());
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,planningProblemService.getAllPlanningProblem());
     }
 
     /**
@@ -48,14 +48,14 @@ public class PlanningProblemController {
     @ApiOperation("Update PlanningProblem")
     public ResponseEntity<Map<String, Object>> updatePlanningProblem(@RequestBody PlanningProblemDTO planningProblemDTO) {
         planningProblemService.updatePlanningProblem(planningProblemDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     @DeleteMapping("/{planningProblemDTOId}")
     @ApiOperation("Delete PlanningProblem")
     public ResponseEntity<Map<String, Object>> deletePlanningProblem(@PathVariable String planningProblemDTOId) {
         planningProblemService.deletePlanningProblem(planningProblemDTOId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
     //=====================================================================
@@ -63,6 +63,6 @@ public class PlanningProblemController {
     @PostMapping("/create_default_planningProblem")
     @ApiOperation("Create Default PlanningProblem")
     public ResponseEntity<Map<String, Object>> createDefaultPlanningProblem() {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.CREATED,planningProblemService.createDefaultPlanningProblem());
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,planningProblemService.createDefaultPlanningProblem());
     }
 }

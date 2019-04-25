@@ -3,11 +3,9 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.util.Assert;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -35,7 +33,7 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
     @Override
     public boolean existsByNameAndCountryIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long countryId){
-        Criteria criteria = Criteria.where("countryId").is(countryId).and("deleted").is(false).orOperator(Criteria.where("colorCode").is(colorCode),Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
+        Criteria criteria = Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
         }
@@ -44,7 +42,7 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
     @Override
     public boolean existsByNameAndOrganizationIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long organizationId){
-        Criteria criteria = Criteria.where("organizationId").is(organizationId).and("deleted").is(false).orOperator(Criteria.where("colorCode").is(colorCode),Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
+        Criteria criteria = Criteria.where("organizationId").is(organizationId).and("deleted").is(false).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
         }

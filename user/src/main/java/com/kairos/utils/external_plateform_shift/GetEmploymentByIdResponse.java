@@ -14,6 +14,7 @@ public class GetEmploymentByIdResponse {
     private List<GetEmploymentByIdResult> GetEmploymentByIdResult;
 
     public GetEmploymentByIdResponse() {
+        //Default Constructor
     }
 
     public List<GetEmploymentByIdResult> getGetEmploymentByIdResult() {

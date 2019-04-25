@@ -1,33 +1,33 @@
 package com.kairos.service.open_shift;
 
 import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.open_shift.OpenShiftAction;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftActivityWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.open_shift.Order;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -39,9 +39,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION_MESSAGE;
+import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
 
 @Service
 @Transactional
@@ -139,23 +139,6 @@ public class OpenShiftService extends MongoBaseService {
     }
 
 
-    public List<OpenShiftResponseDTO> getOpenshiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
-
-        List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(unitId, orderId);
-        List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
-        openShifts.forEach(openShift -> {
-            OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
-            BeanUtils.copyProperties(openShift, openShiftResponseDTO, openShift.getStartDate().toString(), openShift.getEndDate().toString());
-            openShiftResponseDTO.setFromTime(DateUtils.asLocalTime(openShift.getStartDate()));
-            openShiftResponseDTO.setToTime(DateUtils.asLocalTime(openShift.getEndDate()));
-            openShiftResponseDTO.setStartDate(DateUtils.asLocalDate(openShift.getStartDate()));
-            openShiftResponseDTO.setEndDate(DateUtils.asLocalDate(openShift.getEndDate()));
-            openShiftResponseDTOS.add(openShiftResponseDTO);
-        });
-
-        return openShiftResponseDTOS;
-    }
-
     public OpenShiftAction pickOpenShiftByStaff(long unitId, BigInteger openShiftId, long staffId, String action) {
         OpenShiftAction openShiftAction = null;
         OpenShift openShift = openShiftMongoRepository.findByIdAndUnitIdAndDeletedFalse(openShiftId, unitId);
@@ -187,7 +170,7 @@ public class OpenShiftService extends MongoBaseService {
         return openShiftAction;
     }
 
-    List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
+    public List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
         List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndOrderId(unitId, orderId);
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {
@@ -210,9 +193,9 @@ public class OpenShiftService extends MongoBaseService {
         Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
-            Long unitPositionId = userIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
-            UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId,startDate,endDate);
-            data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
+            Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
+            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(employmentId,startDate,endDate);
+            data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), employmentWithCtaDetailsDTO);
         }
 
         List<OpenShift> similarShifts = openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate, endDate);
@@ -257,19 +240,19 @@ public class OpenShiftService extends MongoBaseService {
     }
 
     private boolean assignShiftToStaff(OpenShift openShift, Long unitId, List<Long> staffIds, Order order) {
-        List<StaffUnitPositionDetails> unitPositionDetails = userIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
-        unitPositionDetails.forEach(unitPositionDetail -> {
-            if (!Optional.ofNullable(unitPositionDetail.getId()).isPresent() || openShift.getNoOfPersonRequired()<1 ||
-                    openShift.getAssignedStaff().contains(unitPositionDetail.getStaffId()) ) {
+        List<StaffEmploymentDetails> employmentDetails = userIntegrationService.getStaffIdAndEmployment(unitId, staffIds, order.getExpertiseId());
+        employmentDetails.forEach(employmentDetail -> {
+            if (!Optional.ofNullable(employmentDetail.getId()).isPresent() || openShift.getNoOfPersonRequired()<1 ||
+                    openShift.getAssignedStaff().contains(employmentDetail.getStaffId()) ) {
                 return;
             }
             ShiftActivityDTO shiftActivity = new ShiftActivityDTO("",openShift.getStartDate(),openShift.getEndDate(),openShift.getActivityId(),null);
-            ShiftDTO shiftDTO = new ShiftDTO(Arrays.asList(shiftActivity), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId());
+            ShiftDTO shiftDTO = new ShiftDTO(Arrays.asList(shiftActivity), unitId, employmentDetail.getStaffId(), employmentDetail.getId());
             shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
             shiftDTO.setParentOpenShiftId(openShift.getId());
             shiftService.createShift(unitId, shiftDTO, "Organization");
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired() - 1);
-            openShift.getAssignedStaff().add(unitPositionDetail.getStaffId());
+            openShift.getAssignedStaff().add(employmentDetail.getStaffId());
         });
         save(openShift);
         return true;

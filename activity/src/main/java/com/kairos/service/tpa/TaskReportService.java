@@ -1,7 +1,7 @@
 package com.kairos.service.tpa;
+
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.persistence.model.task.TaskReport;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.external_plateform_shift.TaskReportWrapper;
@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 @Transactional
 public class TaskReportService extends MongoBaseService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(TaskReportService.class);
 
 
     @Inject
@@ -32,8 +32,6 @@ public class TaskReportService extends MongoBaseService {
 
     @Inject
     private MailService mailService;
-    @Inject
-    MongoSequenceRepository mongoSequenceRepository;
 
 
 
@@ -57,9 +55,9 @@ public class TaskReportService extends MongoBaseService {
         int rowCounter = 2;
         for (TaskReportWrapper wrapper: payLoad) {
 
-            logger.info("Loop Counter: "+i);
-            logger.info("Row Counter: "+rowCounter);
-            logger.info("Staff-> "+wrapper.getStaffName()+" Number of reports: "+wrapper.getTaskReports().size());
+            LOGGER.info("Loop Counter: "+i);
+            LOGGER.info("Row Counter: "+rowCounter);
+            LOGGER.info("Staff-> "+wrapper.getStaffName()+" Number of reports: "+wrapper.getTaskReports().size());
             staffRow = sheet.createRow(rowCounter);
             staffRow.createCell(0).setCellValue(wrapper.getStaffName());
             rowCounter++;
@@ -78,7 +76,7 @@ public class TaskReportService extends MongoBaseService {
             headerRow.setRowStyle(headerRowStyle);
             rowCounter++;
             for (TaskReport report: wrapper.getTaskReports()) {
-                logger.info("Row counter :"+rowCounter);
+                LOGGER.info("Row counter :"+rowCounter);
                 XSSFRow dataRow = sheet.createRow(rowCounter);
                 XSSFCell updateDate =dataRow.createCell(0);
                 XSSFCell previousFromCell = dataRow.createCell(1);
@@ -111,7 +109,7 @@ public class TaskReportService extends MongoBaseService {
         try {
             FileOutputStream fileOut = new FileOutputStream(file);
             workbook.write(fileOut);
-            logger.info("Sending file as attachment: "+file.getAbsolutePath());
+            LOGGER.info("Sending file as attachment: "+file.getAbsolutePath());
             // If Mail Sent
             if (file.exists()){
                 return file;
@@ -152,7 +150,7 @@ public class TaskReportService extends MongoBaseService {
 /*
 
     public void generateCitizenList(long unitId){
-        logger.debug("generating data");
+        LOGGER.debug("generating data");
         String excelFileName= "citizens.xlsx";
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFFont headerRowFont = workbook.createFont();
@@ -178,8 +176,8 @@ public class TaskReportService extends MongoBaseService {
         XSSFRow citizenRow ;
         for (Map<String,Object> citizen:organizationGraphRepository.getClientsOfOrganizationForReport(unitId) ) {
             Map cd = (Map)citizen.get("Client");
-            logger.info("Loop Counter: "+i);
-            logger.info("Row Counter: "+cd.toString());
+            LOGGER.info("Loop Counter: "+i);
+            LOGGER.info("Row Counter: "+cd.toString());
             citizenRow =  sheet.createRow(i);
             citizenRow.createCell(0).setCellValue(cd.get("id").toString());
             citizenRow.createCell(1).setCellValue(cd.get("cprNumber").toString());
@@ -190,10 +188,10 @@ public class TaskReportService extends MongoBaseService {
         try {
             FileOutputStream fileOut = new FileOutputStream(file);
             workbook.write(fileOut);
-            logger.info("Sending file as attachment: "+file.getAbsolutePath());
+            LOGGER.info("Sending file as attachment: "+file.getAbsolutePath());
 
             if (file.exists()){
-                logger.debug("file createad");
+                LOGGER.debug("file createad");
             }
 
         } catch (FileNotFoundException e) {
@@ -206,7 +204,7 @@ public class TaskReportService extends MongoBaseService {
 */
 
     /*public void generateStaffList(long unitId){
-        logger.debug("generating data");
+        LOGGER.debug("generating data");
         String excelFileName= "staff"+unitId+".xlsx";
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFFont headerRowFont = workbook.createFont();
@@ -231,8 +229,8 @@ public class TaskReportService extends MongoBaseService {
         XSSFRow citizenRow ;
         for (Map<String,Object> citizen:staffService.getStaffWithBasicInfo(unitId)) {
             Map cd = (Map)citizen.get("data");
-            logger.info("Loop Counter: "+i);
-            logger.info("Row Counter: "+cd.toString());
+            LOGGER.info("Loop Counter: "+i);
+            LOGGER.info("Row Counter: "+cd.toString());
             citizenRow =  sheet.createRow(i);
             citizenRow.createCell(0).setCellValue(cd.get("id").toString());
             citizenRow.createCell(1).setCellValue(cd.get("firstName").toString());
@@ -242,10 +240,10 @@ public class TaskReportService extends MongoBaseService {
         try {
             FileOutputStream fileOut = new FileOutputStream(file);
             workbook.write(fileOut);
-            logger.info("Sending file as attachment: "+file.getAbsolutePath());
+            LOGGER.info("Sending file as attachment: "+file.getAbsolutePath());
 
             if (file.exists()){
-                logger.debug("file createad");
+                LOGGER.debug("file createad");
             }
 
         } catch (FileNotFoundException e) {

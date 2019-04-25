@@ -17,20 +17,20 @@ public class SickSettings extends MongoBaseEntity {
     private BigInteger activityId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Long unitPositionId;   // This is required to find user shifts based on unitPosition Id
+    private Long employmentId;   // This is required to find user shifts based on employment Id
 
 
     public SickSettings() {
         //
     }
 
-    public SickSettings(Long staffId, Long unitId, Long userId, BigInteger activityId, LocalDate startDate,Long unitPositionId) {
+    public SickSettings(Long staffId, Long unitId, Long userId, BigInteger activityId, LocalDate startDate,Long employmentId) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.userId = userId;
         this.activityId = activityId;
         this.startDate = startDate;
-        this.unitPositionId=unitPositionId;
+        this.employmentId = employmentId;
     }
 
     public Long getStaffId() {
@@ -81,11 +81,11 @@ public class SickSettings extends MongoBaseEntity {
         this.endDate = endDate;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

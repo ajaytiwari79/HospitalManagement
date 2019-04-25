@@ -1,7 +1,7 @@
 package com.kairos.dto.user.staff.staff;
 
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.UnitPositionDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -14,7 +14,7 @@ public class StaffResultDTO {
     private String unitName;
     private String timeZone;
     private List<ReasonCodeDTO> reasonCodes;
-    private List<UnitPositionDTO> unitPosition;
+    private List<EmploymentDTO> employment;
     private Set<BigInteger> allowedTimeTypesForSick;  // added by vipul for
     public Long getStaffId() {
         return staffId;
@@ -68,11 +68,11 @@ public class StaffResultDTO {
         this.allowedTimeTypesForSick = allowedTimeTypesForSick;
     }
 
-    public List<UnitPositionDTO> getUnitPosition() {
-        return unitPosition;
+    public List<EmploymentDTO> getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(List<UnitPositionDTO> unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(List<EmploymentDTO> employment) {
+        this.employment = employment;
     }
 }

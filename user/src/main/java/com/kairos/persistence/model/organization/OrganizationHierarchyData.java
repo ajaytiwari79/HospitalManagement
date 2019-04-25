@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.organization;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -18,6 +17,7 @@ public class OrganizationHierarchyData {
     private List<Organization> childUnits;
 
     public OrganizationHierarchyData() {
+        //Default Constructor
     }
 
     public Organization getParent() {

@@ -14,9 +14,6 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RelationshipEntity(type = RelationshipConstants.HAS_ACCESS_GROUP)
 public class CountryAccessGroupRelationship extends UserBaseEntity{
 

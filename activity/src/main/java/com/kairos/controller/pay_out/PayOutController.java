@@ -30,8 +30,8 @@ public class PayOutController {
     }
 
     @PostMapping(value = "/request_payout/staff/{staffId}")
-    public ResponseEntity<Map<String, Object>> requestPayOut(@PathVariable Long staffId,@RequestParam Long unitPositionId,@RequestParam int amount) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.requestPayOut(staffId,unitPositionId,amount));
+    public ResponseEntity<Map<String, Object>> requestPayOut(@PathVariable Long staffId,@RequestParam Long employmentId,@RequestParam int amount) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.requestPayOut(staffId,employmentId,amount));
     }
 
 

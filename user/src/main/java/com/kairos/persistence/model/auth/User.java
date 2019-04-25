@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -15,16 +14,12 @@ import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedS
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.Date;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -79,11 +74,24 @@ public class User extends UserBaseEntity {
     private Boolean hubMember;
 
 
+    public boolean isUserNameUpdated() {
+        return isUserNameUpdated;
+    }
+
+    public void setUserNameUpdated(boolean userNameUpdated) {
+        isUserNameUpdated = userNameUpdated;
+    }
+
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
     @Relationship(type = SELECTED_LANGUAGE)
     private SystemLanguage userLanguage;
+
+    //define, first time UserName updated or not
+    private boolean isUserNameUpdated;
+
+    private Long countryId;
 
     public int getOtp() {
         return otp;
@@ -189,11 +197,6 @@ public class User extends UserBaseEntity {
         this.forgotTokenRequestTime = forgotTokenRequestTime;
     }
 
-    /**
-     * getAccessToken
-     *
-     * @return
-     */
     public String getAccessToken() {
         return accessToken;
     }
@@ -206,11 +209,6 @@ public class User extends UserBaseEntity {
         this.lastSelectedOrganizationId = lastSelectedOrganizationId;
     }
 
-    /**
-     * setAccessToken
-     *
-     * @param accessToken
-     */
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
@@ -223,11 +221,6 @@ public class User extends UserBaseEntity {
         this.forgotPasswordToken = forgotPasswordToken;
     }
 
-    /**
-     * getUserName
-     *
-     * @return
-     */
     public String getUserName() {
         if (userName != null) {
             userName.toLowerCase();
@@ -236,106 +229,26 @@ public class User extends UserBaseEntity {
 
     }
 
-    /**
-     * setUserName
-     *
-     * @param userName
-     */
     public void setUserName(String userName) {
         if (userName != null)
             this.userName = userName.toLowerCase();
     }
 
-
-    /**
-     * getEmail
-     *
-     * @return
-     */
     public String getEmail() {
         return email;
     }
 
-    /**
-     * setEmail
-     *
-     * @param email
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * getPassword
-     *
-     * @return
-     */
     public String getPassword() {
         return password;
     }
 
-    /**
-     * setPassword
-     *
-     * @param password
-     */
     public void setPassword(String password) {
         this.password = password;
     }
-
-
-    public int getAge() {
-        int age = 0;
-        if (cprNumber == null) {
-            return this.age;
-
-        }
-        if (cprNumber.length() == 9) {
-            cprNumber = "0" + cprNumber;
-        }
-        //System.out.print("\n CPR: ----"+cprNumber+"---\n");
-        if (cprNumber != null) {
-            Integer year = Integer.valueOf(cprNumber.substring(4, 6));
-            Integer month = Integer.valueOf(cprNumber.substring(2, 4));
-            Integer day = Integer.valueOf(cprNumber.substring(0, 2));
-            Integer century = Integer.parseInt(cprNumber.substring(6, 7));
-
-            if (century >= 0 && century <= 3) {
-                century = 1900;
-            }
-            if (century == 4) {
-                if (year <= 36) {
-                    century = 2000;
-                } else {
-                    century = 1900;
-                }
-            }
-            if (century >= 5 && century <= 8) {
-                if (year <= 57) {
-                    century = 2000;
-                }
-                if (year >= 58 && year <= 99) {
-                    century = 1800;
-                }
-            }
-            if (century == 9) {
-                if (year <= 36) {
-                    century = 2000;
-                } else {
-                    century = 1900;
-                }
-            }
-            year = century + year;
-            LocalDate today = LocalDate.now();
-            LocalDate birthday = LocalDate.of(year, month, day);
-            // Calculating age in yeas from DOB
-            Period period = Period.between(birthday, today);
-            age = period.getYears();
-            this.age = age;
-        }
-        return this.age;
-    }
-
 
     public void setAge(int age) {
         this.age = age;
@@ -356,64 +269,12 @@ public class User extends UserBaseEntity {
     public User() {
     }
 
-    /**
-     * User Constructor
-     *
-     * @param userName
-     * @param password
-     */
-    public User(String userName, String password) {
-        this.firstName = userName;
-        this.password = password;
-    }
-
-    public User(String userName, String password, ContactDetail contactDetail, ContactAddress contactAddress) {
-        this.userName = userName;
-        this.password = password;
-        this.homeAddress = contactAddress;
-        this.contactDetail = contactDetail;
-    }
-
-    /**
-     * @param firstName
-     * @param lastName
-     * @param cprNumber
-     * @param dateOfBirth
-     * @Use while uploading multiple client in batch
-     */
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
     }
-
-    /**
-     * User Constructor
-     *
-     * @param name
-     * @param userName
-     * @param email
-     * @param password
-     * @param age
-     */
-    public User(String name, String userName, String email, String password, int age, Profile profile) {
-        this.firstName = name;
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.age = age;
-        this.profile = profile;
-    }
-
-    public User(String name, String userName, String email, String password, int age) {
-        this.firstName = name;
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.age = age;
-    }
-
 
     public User(String cprNumber, String firstName, String lastName, String email, String userName) {
         this.firstName = firstName;
@@ -423,24 +284,16 @@ public class User extends UserBaseEntity {
         this.userName = userName;
     }
 
-    /**
-     * Constructor for User with CountryList
-     *
-     * @param name
-     * @param userName
-     * @param email
-     * @param password
-     * @param age
-     * @param countryList
-     */
-    public User(String name, String userName, String email, String password, int age, List<Country> countryList) {
-        this.firstName = name;
-        this.userName = userName;
+
+    public User(String cprNumber, String firstName, String lastName, String email, String userName,boolean isUserNameUpdated) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
-        this.password = password;
-        this.age = age;
-        this.countryList = countryList;
+        this.cprNumber = cprNumber;
+        this.userName = userName;
+        this.isUserNameUpdated = isUserNameUpdated;
     }
+
 
     public boolean isPasswordUpdated() {
         return isPasswordUpdated;
@@ -450,23 +303,6 @@ public class User extends UserBaseEntity {
         isPasswordUpdated = passwordUpdated;
     }
 
-    @Override
-    public String toString() {
-        return "{User={" +
-                "cprNumber='" + cprNumber + '\'' +
-                ", userName='" + userName + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", email='" + email + '\'' +
-                ", age=" + age +
-                ", accessToken='" + accessToken + '\'' +
-                ", otp=" + otp +
-                ", isPasswordUpdated=" + isPasswordUpdated +
-                '}' +
-                '}';
-    }
 
     public Boolean getHubMember() {
         return hubMember;
@@ -520,5 +356,80 @@ public class User extends UserBaseEntity {
 
     public String getFullName(){
         return this.firstName+" "+this.lastName;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public int getAge() {
+        int age = 0;
+        if (cprNumber == null) {
+            return this.age;
+
+        }
+        if (cprNumber.length() == 9) {
+            cprNumber = "0" + cprNumber;
+        }
+            Integer year = Integer.valueOf(cprNumber.substring(4, 6));
+            Integer month = Integer.valueOf(cprNumber.substring(2, 4));
+            Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+            Integer century = Integer.parseInt(cprNumber.substring(6, 7));
+
+            if (century >= 0 && century <= 3) {
+                century = 1900;
+            }
+            if (century == 4) {
+                if (year <= 36) {
+                    century = 2000;
+                } else {
+                    century = 1900;
+                }
+            }
+            if (century >= 5 && century <= 8) {
+                if (year <= 57) {
+                    century = 2000;
+                }
+                if (year >= 58 && year <= 99) {
+                    century = 1800;
+                }
+            }
+            if (century == 9) {
+                if (year <= 36) {
+                    century = 2000;
+                } else {
+                    century = 1900;
+                }
+            }
+            year = century + year;
+            LocalDate today = LocalDate.now();
+            LocalDate birthday = LocalDate.of(year, month, day);
+            // Calculating age in yeas from DOB
+            Period period = Period.between(birthday, today);
+            age = period.getYears();
+            this.age = age;
+        return this.age;
+    }
+
+    @Override
+    public String toString() {
+        return "{User={" +
+                "cprNumber='" + cprNumber + '\'' +
+                ", userName='" + userName + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", gender=" + gender +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                ", accessToken='" + accessToken + '\'' +
+                ", otp=" + otp +
+                ", isPasswordUpdated=" + isPasswordUpdated +
+                '}' +
+                '}';
     }
 }

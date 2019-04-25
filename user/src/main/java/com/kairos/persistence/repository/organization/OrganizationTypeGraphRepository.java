@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
+import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

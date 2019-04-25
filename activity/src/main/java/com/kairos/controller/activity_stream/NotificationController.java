@@ -1,4 +1,5 @@
 package com.kairos.controller.activity_stream;
+
 import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.service.activity_stream.NotificationService;
 import com.kairos.utils.response.ResponseHandler;
@@ -12,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_NOTIFICATION_URL;
+
 
 /**
  * Created by oodles on 2/2/17.
@@ -40,11 +42,8 @@ public class NotificationController {
 
     @RequestMapping(value = "/{notificationId}", method = RequestMethod.POST)
     @ApiOperation("mark notification read")
-    public ResponseEntity<Map<String, Object>> markNotificationRead(@PathVariable Long notificationId) {
-
-        Boolean status = notificationService.markNotificationRead(notificationId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, status);
+    public ResponseEntity<Map<String, Object>> markNotificationRead(@PathVariable BigInteger notificationId) {
+        notificationService.markNotificationRead(notificationId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
-
-
 }

@@ -47,7 +47,7 @@ public class UserAuthentication implements Authentication {
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
+        //this is overridden method
     }
 
     @Override

@@ -16,8 +16,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 
-import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
-
 @Component
 public class PlannerRestClient {
     private static final Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);

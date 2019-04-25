@@ -20,11 +20,9 @@ import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -39,12 +37,13 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityPriorityService;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
@@ -68,6 +67,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -122,6 +122,10 @@ public class OrganizationActivityService extends MongoBaseService {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private ActivityPriorityService activityPriorityService;
+    @Inject
+    private OpenShiftRuleTemplateService openShiftRuleTemplateService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -260,11 +264,19 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
+        activityCopied.setActivityPriorityId(activity.getActivityPriorityId());
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
 
     public ActivityTabsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
+       boolean isPartOfTeam = timeTypeMongoRepository.existsByIdAndPartOfTeam(generalDTO.getTimeTypeId(),true);
+        if(!isPartOfTeam){
+        boolean isActivityPresent= userIntegrationService.verifyingIsActivityAlreadyAssigned(generalDTO.getActivityId(),unitId);
+        if(isActivityPresent){
+            exceptionService.actionNotPermittedException("message.activity.timeType.already.in.team");
+        }
+        }
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
@@ -297,11 +309,12 @@ public class OrganizationActivityService extends MongoBaseService {
 
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
+        generalTab.setTags(null);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        generalActivityTabWithTagDTO.setTags(null);
-        if (!generalDTO.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        if (!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            generalTab.setTags(activity.getTags());
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
         activityService.updateNotesTabOfActivity(generalDTO, activity);
@@ -458,15 +471,18 @@ public class OrganizationActivityService extends MongoBaseService {
                     activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
                 }
                 save(activityCopiedList);
-                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
+                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
                 wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
                 updateCompositeActivitiesIds(activityCopiedList);
             }
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
             timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         }
+        activityPriorityService.createActivityPriorityForNewOrganization(unitId,orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId,orgTypeAndSubTypeDTO);
+
         return true;
     }
 
@@ -493,24 +509,18 @@ public class OrganizationActivityService extends MongoBaseService {
                     compositeActivityIterator.remove();
                 }
             }
+            List<BigInteger> copyChildActivtiies=new CopyOnWriteArrayList<>(activity.getChildActivityIds());
+            for (BigInteger childActivityId : copyChildActivtiies) {
+                if (activityIdMap.containsKey(childActivityId)) {
+                    activity.getChildActivityIds().add(activityIdMap.get(childActivityId));
+                }
+                activity.getChildActivityIds().remove(childActivityId);
+            }
         }
         save(activities);
     }
 
 
-    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<ActivityWrapper> activities) {
-        List<String> invalidActivities = ActivityUtil.verifyCompositeActivities(breakAllowed, activities);
-        if (invalidActivities.size() != 0) {
-            List<String> errorMessages = new ArrayList<>(invalidActivities);
-            if (breakAllowed) {
-                exceptionService.actionNotPermittedException("activities.not.support.break", errorMessages);
-            }
-            if (!breakAllowed) {
-                exceptionService.actionNotPermittedException("activities.support.break", errorMessages);
-            }
-
-        }
-    }
 
     /**
      *
@@ -518,26 +528,27 @@ public class OrganizationActivityService extends MongoBaseService {
      * @param parentActivity
      * @Desc this method is being used to validate the cases of allowed activities
      */
-    public void verifyTeamActivity(List<ActivityWrapper> activities, Activity parentActivity) {
-        if(parentActivity.getRulesActivityTab().isEligibleForStaffingLevel() && activities.stream().anyMatch(k->!k.getActivity().getRulesActivityTab().isEligibleForStaffingLevel())){
-            exceptionService.actionNotPermittedException("message.child_activities.not_support.staffing_level");
-        }
+    public void verifyChildActivity(List<ActivityDTO> activities, Activity parentActivity) {
         TimeType timeType=timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
-        if(timeType.isPartOfTeam()) {
-                if (activityMongoRepository.existsByActivityIdInCompositeActivities(parentActivity.getId())) {
+        if(!timeType.isAllowChildActivities()) {
+            exceptionService.actionNotPermittedException("message.activity.setting.enable", parentActivity.getName());
+
+        }
+                if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
                     exceptionService.actionNotPermittedException("message.activity.being_used_as_child", parentActivity.getName());
                 }
-                List<Activity> activityList = activityMongoRepository.findByActivityIdInCompositeActivities(parentActivity.getId(), activities.stream().map(k -> k.getActivity().getId()).collect(Collectors.toList()));
+
+                List<Activity> activityList = activityMongoRepository.findByActivityIdInChildActivities(parentActivity.getId(), activities.stream().map(k -> k.getId()).collect(Collectors.toList()));
                 if (isCollectionNotEmpty(activityList)) {
                     List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
                     exceptionService.actionNotPermittedException("message.activity.being_used_as_child", activityNames);
                 }
-                activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getActivity().getCompositeActivities())).collect(Collectors.toList());
+                activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).collect(Collectors.toList());
                 if (isCollectionNotEmpty(activities)) {
-                    List<String> activityNames = activities.stream().map(k -> k.getActivity().getName()).collect(Collectors.toList());
+                    List<String> activityNames = activities.stream().map(k -> k.getName()).collect(Collectors.toList());
                     exceptionService.actionNotPermittedException("message.activity.being_used_as_parent", activityNames);
                 }
-        }
+
     }
 
     public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId,Long staffId,List<ActivityWithCompositeDTO> staffPersonalizedActivities){

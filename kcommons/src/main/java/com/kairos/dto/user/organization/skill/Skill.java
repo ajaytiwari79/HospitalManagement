@@ -1,12 +1,8 @@
 package com.kairos.dto.user.organization.skill;
 
+import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * Skill Domain extends UserBaseEntity

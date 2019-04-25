@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.task_type;
 
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.wrapper.EscalatedTasksWrapper;
-import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
 import com.kairos.wrapper.TaskCountWithAssignedUnit;
 import com.kairos.wrapper.TaskWrapper;
-import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
+import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 

@@ -15,19 +15,18 @@ import java.util.Map;
 public class WebSocketHeaderInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        boolean handshaked = true;
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
             if(httpServletRequest.getHeader("Authorization")==null){
-                return handshaked;
+                return false;
             }
         }
-        return handshaked;
+        return true;
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-
+        //This is override method
     }
 }

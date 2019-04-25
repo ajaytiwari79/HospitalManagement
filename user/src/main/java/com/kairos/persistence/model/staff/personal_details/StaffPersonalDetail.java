@@ -6,11 +6,9 @@ import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -55,6 +53,7 @@ public class StaffPersonalDetail {
     private AddressDTO primaryAddress;
     private AddressDTO secondaryAddress;
     private Set<Long> teamIdsOfStaff;
+    private String userName;
 
     public StaffPersonalDetail() {
         //Default Constructor
@@ -299,6 +298,14 @@ public class StaffPersonalDetail {
 
     public void setTeamIdsOfStaff(Set<Long> teamIdsOfStaff) {
         this.teamIdsOfStaff = teamIdsOfStaff;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Override

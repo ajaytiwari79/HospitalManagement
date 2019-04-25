@@ -5,10 +5,10 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
+import com.kairos.enums.Employment;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.enums.UnitPosition;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
@@ -39,7 +39,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
+import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
 
 /**
  * Created by prerna on 1/5/18.
@@ -97,7 +98,7 @@ public class StaffFilterService {
             }
             organization = organization.isParentOrganization() ? organization : organizationService.fetchParentOrganization(unitId);
         }
-        Long countryId = organizationGraphRepository.getCountryId(organization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notExist");
         }
@@ -130,8 +131,8 @@ public class StaffFilterService {
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
-            case UNIT_POSITION: {
-                return dtoToQueryesultConverter(UnitPosition.getListOfUnitPositionForFilters(), objectMapper);
+            case EMPLOYMENT: {
+                return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             }
 
             default:

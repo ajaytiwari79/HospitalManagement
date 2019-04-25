@@ -1,5 +1,11 @@
 package com.kairos.service.client;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.planner.vrp.PreferedTimeWindowDTO;
+import com.kairos.dto.planner.vrp.TaskAddress;
+import com.kairos.dto.planner.vrp.VRPClientDTO;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.persistence.model.client.PreferedTimeWindow;
 import com.kairos.persistence.model.client.VRPClient;
 import com.kairos.persistence.model.organization.Organization;
@@ -9,12 +15,6 @@ import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.rest_client.TomTomRestClient;
 import com.kairos.service.excel.ExcelService;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
-import com.kairos.dto.planner.vrp.PreferedTimeWindowDTO;
-import com.kairos.dto.planner.vrp.TaskAddress;
-import com.kairos.dto.planner.vrp.VRPClientDTO;
-import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;

@@ -3,23 +3,26 @@ package com.planner.service.solverconfiguration;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.planner.component.exception.ExceptionService;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.unit.UnitSolverConfig;
+import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.enums.TimeTypeEnum.*;
 
 @Service
 public class UnitSolverConfigService {
@@ -31,13 +34,15 @@ public class UnitSolverConfigService {
     private UserNeo4jRepo userNeo4jRepo;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private CountrySolverConfigService countrySolverConfigService;
+    @Inject private PlanningProblemRepository planningProblemRepository;
 
 
     //===================================================================================
     public UnitSolverConfigDTO createUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
         if (preValidateUnitSolverConfigDTO(unitSolverConfigDTO, true)) {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
-            solverConfigRepository.saveObject(unitSolverConfig);
+            solverConfigRepository.saveEntity(unitSolverConfig);
             unitSolverConfigDTO.setId(unitSolverConfig.getId());
         }
         return unitSolverConfigDTO;
@@ -50,7 +55,7 @@ public class UnitSolverConfigService {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             unitSolverConfig.setParentSolverConfigId(unitSolverConfigDTO.getId());
             unitSolverConfig.setId(null);//Unset Id
-            solverConfigRepository.saveObject(unitSolverConfig);
+            solverConfigRepository.saveEntity(unitSolverConfig);
             unitSolverConfigDTO.setId(unitSolverConfig.getId());
         }
         return unitSolverConfigDTO;
@@ -70,7 +75,7 @@ public class UnitSolverConfigService {
         boolean nameExists = solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), unitSolverConfigDTO.getId(), false, unitSolverConfigDTO.getUnitId());
         if (solverConfigOptional.isPresent() && !nameExists) {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
-            solverConfigRepository.saveObject(unitSolverConfig);
+            solverConfigRepository.saveEntity(unitSolverConfig);
         }
         return unitSolverConfigDTO;
     }
@@ -87,11 +92,13 @@ public class UnitSolverConfigService {
 
     /*==============================Country Default Data==================================*/
     public DefaultDataDTO getDefaultData(Long unitId) {
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
                 //get All Phases
                 .setPhaseDTOSBuilder(getAllPhases(unitId))
                 //getAllPlanningPeriod
-                .setPlanningPeriodDTOSBuilder(getAllPlanningPeriods(unitId));
+                .setPlanningPeriodBuilder(getAllPlanningPeriods(unitId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
+                .setConstraintTypesBuilder(countrySolverConfigService.getConstraintTypes()).setPlanningProblemsBuilder(planningProblemDTOS);
 
 
         return defaultDataDTO;

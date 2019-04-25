@@ -1,7 +1,7 @@
 package com.kairos.rule_validator.night_worker;
 
-import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -31,7 +31,7 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
 
     @Override
     public void validateRules(StaffDTO staffDTO) {
-
+        //This is override method
     }
 
     @Override

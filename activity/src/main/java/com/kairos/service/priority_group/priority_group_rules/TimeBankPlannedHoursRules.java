@@ -2,7 +2,7 @@ package com.kairos.service.priority_group.priority_group_rules;
 
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -13,21 +13,21 @@ import java.util.Optional;
 public class TimeBankPlannedHoursRules implements PriorityGroupRuleFilter{
 
 
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO){
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO){
 
-        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+        for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
 
-            while(staffUnitPositionIterator.hasNext()) {
+            while(staffEmploymentIterator.hasNext()) {
 
-                StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
+                StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
                 if((Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()).isPresent()&&
-                        staffUnitPositionQueryResult.getAccumulatedTimeBank()<priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank())||
+                        staffEmploymentQueryResult.getAccumulatedTimeBank()<priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank())||
                         (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime()).isPresent()&&
-                        staffUnitPositionQueryResult.getPlannedHoursWeek()>priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime())||
+                        staffEmploymentQueryResult.getPlannedHoursWeek()>priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime())||
                 (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek()).isPresent()&&
-                        staffUnitPositionQueryResult.getDeltaWeeklytimeBank()>priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek())) {
-                  //  staffUnitPositionIterator.remove();
+                        staffEmploymentQueryResult.getDeltaWeeklytimeBank()>priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek())) {
+                  //  staffEmploymentIterator.remove();
                 }
 
 

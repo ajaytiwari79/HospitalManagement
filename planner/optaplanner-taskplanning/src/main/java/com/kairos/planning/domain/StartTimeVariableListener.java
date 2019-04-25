@@ -2,7 +2,6 @@ package com.kairos.planning.domain;
 
 import com.kairos.planning.executioner.TaskPlanningSolver;
 import com.kairos.planning.solution.TaskPlanningSolution;
-import com.kairos.planning.utils.JodaTimeUtil;
 import com.kairos.planning.utils.TaskPlanningUtility;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;

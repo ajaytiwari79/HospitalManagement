@@ -7,6 +7,9 @@ import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -42,6 +45,9 @@ import java.util.List;
                         " left join processing_activity PPA on PA.processing_activity_id = PPA.id" +
                         " where AST.organization_id = ?1 and AST.deleted = false and PA.id is not null")
 })
+@Getter
+@Setter
+@NoArgsConstructor
 public class Asset extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -72,7 +78,7 @@ public class Asset extends BaseEntity {
     @OneToOne
     private AssetType subAssetType;
     private Integer dataRetentionPeriod;
-    @NotNull(message = "Status can't be empty")
+    @NotNull(message = "error.message.status.notnull")
     private boolean active=true;
     private boolean suggested;
     private AssetAssessor assetAssessor;
@@ -93,130 +99,6 @@ public class Asset extends BaseEntity {
         this.description = description;
         this.active = active;
     }
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-
-    public Asset() {
-    }
-
-    public Asset(Long id ) {
-        this.id = id;
-    }
-
-
-
-    public boolean isSuggested() { return suggested; }
-
-    public void setSuggested(boolean suggested) { this.suggested = suggested; }
-
-    public AssetAssessor getAssetAssessor() { return assetAssessor; }
-
-    public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
-
-    public boolean isActive() { return active; }
-
-    public void setActive(boolean active) { this.active = active; }
-
-    public String getName() { return name; }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getCountryId() { return countryId; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
-
-    public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
-
-    public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
-
-    public String getHostingLocation() { return hostingLocation; }
-
-    public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
-    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
-
-    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
-
-    public Staff getAssetOwner() { return assetOwner; }
-
-    public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
-
-    public List<StorageFormat> getStorageFormats() {
-        return storageFormats;
-    }
-
-    public void setStorageFormats(List<StorageFormat> storageFormats) {
-        this.storageFormats = storageFormats;
-    }
-
-    public List<OrganizationalSecurityMeasure> getOrgSecurityMeasures() {
-        return orgSecurityMeasures;
-    }
-
-    public void setOrgSecurityMeasures(List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
-        this.orgSecurityMeasures = orgSecurityMeasures;
-    }
-
-    public List<TechnicalSecurityMeasure> getTechnicalSecurityMeasures() {
-        return technicalSecurityMeasures;
-    }
-
-    public void setTechnicalSecurityMeasures(List<TechnicalSecurityMeasure> technicalSecurityMeasures) {
-        this.technicalSecurityMeasures = technicalSecurityMeasures;
-    }
-
-    public HostingProvider getHostingProvider() {
-        return hostingProvider;
-    }
-
-    public void setHostingProvider(HostingProvider hostingProvider) {
-        this.hostingProvider = hostingProvider;
-    }
-
-    public HostingType getHostingType() {
-        return hostingType;
-    }
-
-    public void setHostingType(HostingType hostingType) {
-        this.hostingType = hostingType;
-    }
-
-    public DataDisposal getDataDisposal() {
-        return dataDisposal;
-    }
-
-    public void setDataDisposal(DataDisposal dataDisposal) {
-        this.dataDisposal = dataDisposal;
-    }
-
-    public AssetType getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(AssetType assetType) {
-        this.assetType = assetType;
-    }
-
-    public AssetType getSubAssetType() {
-        return subAssetType;
-    }
-
-    public void setSubAssetType(AssetType subAssetType) {
-        this.subAssetType = subAssetType;
-    }
-
-
 }
 
 

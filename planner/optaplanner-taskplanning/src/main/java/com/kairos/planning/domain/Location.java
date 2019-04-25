@@ -1,8 +1,8 @@
 package com.kairos.planning.domain;
 
-import java.util.List;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import java.util.List;
 
 @XStreamAlias("Location")
 public class Location {

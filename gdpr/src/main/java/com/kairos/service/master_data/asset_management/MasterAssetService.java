@@ -107,16 +107,16 @@ public class MasterAssetService {
             assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
         }
 
-        if (Optional.ofNullable(masterAssetDTO.getAssetSubType()).isPresent()) {
-            if (masterAssetDTO.getAssetSubType().getId() != null) {
-                Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getAssetSubType().getId())).findAny();
+        if (Optional.ofNullable(masterAssetDTO.getSubAssetType()).isPresent()) {
+            if (masterAssetDTO.getSubAssetType().getId() != null) {
+                Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getSubAssetType().getId())).findAny();
                 if (subAssetTypeObj.isPresent()) {
                     subAssetType = subAssetTypeObj.get();
                 } else {
-                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", masterAssetDTO.getAssetSubType().getId());
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", masterAssetDTO.getSubAssetType().getId());
                 }
             } else {
-                subAssetType = new AssetType(masterAssetDTO.getAssetSubType().getName(), countryId, SuggestedDataStatus.APPROVED);
+                subAssetType = new AssetType(masterAssetDTO.getSubAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
                 subAssetType.setSubAssetType(true);
             }
             masterAsset.setSubAssetType(subAssetType);

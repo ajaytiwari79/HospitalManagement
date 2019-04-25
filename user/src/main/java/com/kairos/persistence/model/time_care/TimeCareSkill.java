@@ -2,7 +2,6 @@ package com.kairos.persistence.model.time_care;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import io.swagger.models.auth.In;
 
 /**
  * Created by prabjot on 16/1/18.

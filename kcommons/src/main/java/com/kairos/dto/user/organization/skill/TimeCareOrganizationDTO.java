@@ -1,9 +1,9 @@
 package com.kairos.dto.user.organization.skill;
 
 
-import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.organization.AbsenceTypes;
 import com.kairos.dto.user.organization.OrganizationContactAddress;
+import com.kairos.dto.user.staff.staff.Staff;
 
 /**
  * Created by prabjot on 30/8/17.

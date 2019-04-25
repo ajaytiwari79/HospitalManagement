@@ -5,7 +5,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -13,6 +12,7 @@ import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGrap
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,8 +71,7 @@ public class DayTypeService {
     }
 
     public List<DayType> getAllDayTypeForUnit(long unitId) {
-        Organization parentOrganization=organizationService.fetchParentOrganization(unitId);
-        Long countryId=organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return getAllDayTypeByCountryId(countryId);
     }
 

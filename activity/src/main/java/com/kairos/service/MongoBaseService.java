@@ -1,9 +1,10 @@
 package com.kairos.service;
+
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
@@ -26,12 +28,12 @@ import java.util.Set;
 public class MongoBaseService {
 
     @Inject
-    MongoSequenceRepository mongoSequenceRepository;
+    protected MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
-    MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
     @Inject
-    DB database;
+    protected DB database;
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 

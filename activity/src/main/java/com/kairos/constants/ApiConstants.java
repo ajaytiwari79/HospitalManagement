@@ -35,12 +35,12 @@ public final class ApiConstants {
     public static final String ORG_TYPE = "/org_type";
     //RestClientURL
     public static final String CTA_BASIC_INFO = "/cta_basic_info";
-    public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
+    public static final String GET_EMPLOYMENT = "/employment/{employmentId}";
     public static final String GET_REASONCODE = "/reason_codes";
-    public static final String REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/remove_functions";
-    public static final String RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/restore_functions";
-    public static final String UNIT_POSITION_UNIT_POSITION_ID_REMOVE_FUNCTION_ON_DELETE_SHIFT
-            = "/unit_position/{unitPositionId}/remove_function_on_delete_shift";
+    public static final String REMOVE_FUNCTIONS_BY_EMPLOYMENT_ID = "/employment/{employmentId}/remove_functions";
+    public static final String RESTORE_FUNCTIONS_BY_EMPLOYMENT_ID = "/employment/{employmentId}/restore_functions";
+    public static final String APPLY_FUNCTION="/employment/{employmentId}/applyFunction";
+    public static final String REMOVE_FUNCTION_FROM_EMPLOYMENT_ON_DELETE_SHIFT = "/employment/{employmentId}/remove_function_on_delete_shift";
     public static final String STAFF_USER_ACCESS_GROUP = "/staff/user/accessgroup";
     public static final String USER_STAFF_ID = "/user/staffId";
     public static final String STAFF_DETAILS = "/staff/details";
@@ -51,16 +51,16 @@ public final class ApiConstants {
     public static final String USER_USERID_STAFFS = "/user/{userId}/staffs";
     public static final String DAY_TYPES_AND_EMPLOYEMENT_TYPES = "/day_types_and_employment_types";
     public static final String STAFF_ACCESS_ROLES = "/staff/access_roles";
-    public static final String STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/staff_and_unit_positions";
+    public static final String STAFF_AND_EMPLOYMENTS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/staff_and_employments";
     public static final String STAFF_EMAILS = "/staff/emails";
-    public static final String UNIT_POSITIONS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/unitPositions";
+    public static final String EMPLOYMENTS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/employments";
     public static final String EMPLOYEMENT_TYPE_AND_EXPERTISE = "/employment_type_and_expertise";
     public static final String STAFF_ACCESS_GROUPS = "/staff/access_groups";
     public static final String USER_WITH_ID_UNIT_SICK_SETTINGS = "/user/{userId}/unit_sick_settings";
     public static final String SICK_SETTINGS_DEFAULT = "/sick_settings/default";
     public static final String STAFFS_ACCESS_GROUPS = "/staffs/access_groups";
     public static final String COUNTRY_ID = "/countryId";
-    public static final String STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID = "/staff/{staffId}/expertise/{expertiseId}/unitPositionId";
+    public static final String STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID = "/staff/{staffId}/expertise/{expertiseId}/employmentId";
     public static final String ACCESS_GROUPS_BY_PARENT = "/access_groups_by_parent";
 
     public static final String STAFF_PRIORTY_GROUP ="/staff/priority_group";
@@ -77,7 +77,7 @@ public final class ApiConstants {
     public static final String SKILLS ="/skills";
     public static final String STAFF_WITH_STAFF_ID="/staff/{staffId}";
     public static final String STAFF_UNIT_WISE="/staff/unitwise";
-    public static final String UNIT_POSITION_EXPERTISE="/unit_position/expertise";
+    public static final String EMPLOYMENT_EXPERTISE ="/employment/expertise";
     public static final String STAFF_GET_STAFF_INFO="/staff/getStaffInfo";
     public static final String STAFF_GET_STAFF_BY_UNIT="/staff/get_Staff_By_Unit";
     public static final String UNIT_MANAGER_IDS_UNIT_ID="/unit_manager_ids/{unitId}";
@@ -90,7 +90,7 @@ public final class ApiConstants {
     public static final String ACCESS_ROLE_AND_REASON_CODE = "/current_user/access_role_and_reason_codes";
     public static final String TIME_SLOT_URL="/time_slot/{timeSlotId}";
     public static final String CURRENT_TIME_SLOTS="/current/time_slots";
-    public static final String GET_CTA_BY_UNIT_POSITION_ID="/getCTAbyUnitPosition/{unitPositionId}";
+    public static final String GET_CTA_BY_EMPLOYMENT_ID ="/cta_by_employment/{employmentId}";
     public static final String WTA_RULE_INFO="/WTARelatedInfo";
     public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO="/getWtaTemplateDefaultDataInfo";
     public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID=GET_WTA_TEMPLATE_DEFAULT_DATA_INFO+"ByUnitId";
@@ -135,18 +135,18 @@ public final class ApiConstants {
     public static final String SHOW_COUNTRY_TAGS = "/show_country_tags";
     public static final String TEAM_ORGANIZATION_ID = "/team/organizationId";
     public static final String COUNTRY_GLIDE_TIME_SETTINGS ="/country/{countryId}/glide_time";
-    public static final String APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS="/appliedFunctionsByUnitPositionIds";
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION="/updateFunctionOnPhaseRestoration";
-    public static final String GET_FUNCTIONS_OF_UNIT_POSITION=STAFF_WITH_STAFF_ID+"/unit_position/{unitPositionId}/functions";
+    public static final String GET_FUNCTIONS_OF_EMPLOYMENT =STAFF_WITH_STAFF_ID+"/employment/{employmentId}/functions";
+    public static final String FUNCTIONS_OF_EMPLOYMENT ="/employment/functions";
     public static final String UNIT_TIMEZONE="/time_zone";
     public static final String UNITS_TIMEZONE="units_time_zone";
     public static final String GET_ORGANIZATION_IDS = "/get_organization_ids";
     public static final String GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE ="/holiday_day_type_reason_code";
 
-    public static final String STAFF_EMPLOYMENT_BY_UNIT_POSITION_ID=STAFF_URL+"/staff_employment_by_unit_position/{unitPositionId}";
+    public static final String STAFF_EMPLOYMENT_BY_EMPLOYMENT_ID =STAFF_URL+"/staff_employment/{employmentId}";
 
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
-    public static final String GET_UNIT_BY_UNIT_POSITION= GET_UNIT_POSITION+"/get_unit";
+    public static final String GET_UNIT_BY_EMPLOYMENT = GET_EMPLOYMENT+"/get_unit";
 
     // /staff_by_employment_type
     public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";
@@ -160,6 +160,9 @@ public final class ApiConstants {
     public static final String TEAM_ACTIVITIES="/staff/{staffId}/team_activities";
 
 
+    public static final String FIBONACCI = "/fibonacci";
 
+
+    public static final String IS_ACTIVITY_ASSIGNED= "/team/is_activity_assigned";
 
 }

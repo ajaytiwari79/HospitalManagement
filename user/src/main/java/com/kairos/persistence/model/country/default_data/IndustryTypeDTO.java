@@ -13,6 +13,7 @@ public class IndustryTypeDTO {
     private String description;
 
     public IndustryTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

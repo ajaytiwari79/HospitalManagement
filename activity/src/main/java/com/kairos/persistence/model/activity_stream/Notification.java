@@ -20,6 +20,7 @@ public class Notification extends MongoBaseEntity {
     private Long  organizationId;
 
     public Notification() {
+        //Default Constructor
     }
 
     public String getName() {

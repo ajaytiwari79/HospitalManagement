@@ -1,8 +1,7 @@
 package com.kairos.persistence.repository.user.auth;
 
-import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.model.auth.TabPermission;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -73,7 +71,9 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+            "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName," +
+            "user.userName AS userName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS " +
+            "accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
 
     @Query("MATCH (org:Organization) WHERE id(org)  = {1}" +
@@ -102,4 +102,11 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={0} OR user.email=~{1} ) RETURN user")
     User findUserByCprNumberOrEmail(String cprNumber, String email);
+
+    @Query("MATCH (user:User) WHERE user.userName=~{0}  RETURN user ")
+    User findUserByUserName(String userName);
+
+    @Query("MATCH (user:User) WHERE user.userName=~{0} " +
+            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
+    User findUserByUserNameInAnyOrganization(String userName);
 }

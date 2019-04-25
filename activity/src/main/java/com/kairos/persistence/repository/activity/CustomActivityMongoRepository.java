@@ -2,16 +2,14 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
-import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
-import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
-import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
+import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -28,6 +26,10 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);
 
+    List<ActivityTagDTO> findAllowChildActivityByCountryId(long countryId);
+
+    ActivityWithCompositeDTO findActivityByActivityId(BigInteger activityId);
+
     List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId);
 
     List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId);
@@ -37,6 +39,8 @@ public interface CustomActivityMongoRepository {
     List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId);
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
+
+    List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
 
@@ -77,11 +81,17 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<ActivityWrapper> findActivityAndTimeTypeByActivityIds(Set<BigInteger> activityIds);
+    List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds);
 
-    boolean existsByActivityIdInCompositeActivities(BigInteger activityId);
+    List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds);
+
+    boolean existsByActivityIdInChildActivities(BigInteger activityId);
 
     boolean unassignExpertiseFromActivitiesByExpertiesId(Long expertiseId);
 
-    List<Activity> findByActivityIdInCompositeActivities(BigInteger activityId,List<BigInteger> allowedActivityIds);
+    boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId);
+
+    List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
+
+    ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
 }

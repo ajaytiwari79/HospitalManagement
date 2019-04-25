@@ -2,17 +2,16 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.constants.AppConstants;
+import com.kairos.commons.utils.TimeInterval;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.TimeInterval;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotEmpty;
@@ -21,10 +20,10 @@ import java.math.BigInteger;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DAYS;
-import static com.kairos.service.shift.ShiftValidatorService.*;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -40,8 +39,8 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private Set<BigInteger> timeTypeIds = new HashSet<>();
+    private Set<BigInteger> plannedTimeIds = new HashSet<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -71,20 +70,20 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.recommendedValue = recommendedValue;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
+    public Set<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
         this.timeTypeIds = timeTypeIds;
     }
 
 
-    public List<BigInteger> getPlannedTimeIds() {
+    public Set<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 

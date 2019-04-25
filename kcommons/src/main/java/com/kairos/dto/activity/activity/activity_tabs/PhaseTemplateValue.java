@@ -1,10 +1,10 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import com.kairos.enums.shift.ShiftStatus;
-
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by pavan on 7/2/18.

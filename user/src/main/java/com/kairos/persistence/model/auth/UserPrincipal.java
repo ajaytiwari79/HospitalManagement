@@ -1,15 +1,12 @@
 package com.kairos.persistence.model.auth;
 
 import com.kairos.config.security.CurrentUserDetails;
-import com.kairos.persistence.model.country.Country;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class UserPrincipal implements UserDetails, Authentication {
     private static final long serialVersionUID = 1L;
@@ -74,8 +71,7 @@ public class UserPrincipal implements UserDetails, Authentication {
                 this.user.firstName, this.user.getLastName(), this.user.getEmail(), this.user.isPasswordUpdated());
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
-        Optional<Country> country = Optional.ofNullable(this.user.getCountryList()).map(countryList -> countryList.get(0));
-        country.ifPresent(c -> details.setCountryId(c.getId()));
+        details.setCountryId(this.getUser().getCountryId());
         return details;
     }
 

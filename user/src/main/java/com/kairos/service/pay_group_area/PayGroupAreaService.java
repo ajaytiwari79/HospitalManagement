@@ -1,6 +1,5 @@
 package com.kairos.service.pay_group_area;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
@@ -25,7 +24,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 
 

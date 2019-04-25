@@ -5,28 +5,48 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
-import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
+import com.kairos.dto.activity.counter.configuration.KPIFilterDefaultDataDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
+import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.counter.ApplicableFilter;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.TabKPIConf;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -36,13 +56,13 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static java.util.stream.Collectors.toList;
+
 
 
 @Service
-public class CounterDataService {
+public class CounterDataService extends MongoBaseService {
     private final static Logger logger = LoggerFactory.getLogger(CounterDataService.class);
-    @Inject
-    private VRPPlanningService vrpPlanningService;
     @Inject
     private TaskService taskService;
     @Inject
@@ -59,269 +79,19 @@ public class CounterDataService {
     private ExecutorService executorService;
     @Inject
     private TimeBankRepository timeBankRepository;
+    @Inject
+    private ActivityService activityService;
+    @Inject
+    private TimeTypeService timeTypeService;
+    @Inject
+    private CounterDistService counterDistService;
 
     //FIXME: DO NOT REMOVE will be uncommented once representation model confirmed.
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId) {
-//        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
-//        List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
-//        Set<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toSet());
-//        Map<String, EmployeeDTO> employeeDataIdMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(employee -> employee.getId(), employee->employee));
-//
-//        if(shiftIds == null || shiftIds.isEmpty()){
-//            exceptionService.dataNotFoundByIdException("error.kpi.vrp.shift.availability", shiftIds);
-//        }
-//        List<Shift> shifts = shiftService.getAllShiftByIds(new ArrayList<>(shiftIds));
         ArrayList<KPI> kpiList = new ArrayList<>();
-        //kpiList
-//        kpiList.add(getTaskUnplannedKPI(vrpTaskPlanningDTO, tasks));
-//        kpiList.add(getTaskUnplannedHoursKPI(vrpTaskPlanningDTO));
-//        kpiList.add(getTasksPerStaff(vrpTaskPlanningDTO, tasks, employeeDataIdMap));
-//        kpiList.add(getTotalTaskTimeVsWorkingTime(vrpTaskPlanningDTO, shifts));
-//        kpiList.add(getRoadTimePercentKPI(vrpTaskPlanningDTO, shifts));
-//        kpiList.add(getCompletedTaskWithinTimeWindowKPI(vrpTaskPlanningDTO, shifts, tasks));
-//        kpiList.add(getPercentOfBreaksIn11and13KPI(vrpTaskPlanningDTO));
-//        kpiList.add(getFlexiTimePercentKPI(vrpTaskPlanningDTO,shifts));
-//        kpiList.add(getFlexiTimeTaskPercentKPI(vrpTaskPlanningDTO, shifts, tasks));
-//        kpiList.add(getTotalKMsDrivenByStaff(vrpTaskPlanningDTO, employeeDataIdMap));
-//        kpiList.add(getTotalTaskEfficiencyKPI(vrpTaskPlanningDTO, tasks));
         return kpiList;
     }
 
-
-    //KPI for Task Unplanned
-//    public KPI getTaskUnplannedKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<VRPTaskDTO> tasks){
-//        List<Long> escalatedInstallationNumber = vrpTaskPlanningDTO.getEscalatedTaskList().parallelStream().map(task -> task.getInstallationNumber()).collect(toList());
-//        if(escalatedInstallationNumber.size() == 0){
-//            return prepareTaskUnplannedKPI(0, tasks.size());
-//        }
-//        List<VRPTaskDTO> escalatedtasks = tasks.stream().filter(task -> escalatedInstallationNumber.contains(task.getInstallationNumber())).collect(toList());;
-//        return prepareTaskUnplannedKPI(escalatedtasks.size(), tasks.size());
-//    }
-//
-//    private KPI prepareTaskUnplannedKPI(long tasksUnplanned, long totalTasks){
-//        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Task", new ArrayList());
-//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("Planned", null, decimalSpecification(totalTasks-tasksUnplanned)));
-//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("UnPlanned", null, decimalSpecification(tasksUnplanned)));
-//        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.PIE, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, false,null);
-//        kpi.setId(new BigInteger("1"));
-//        return kpi;
-//    }
-//
-//    //Tasks Unplanned Hours KPI
-//    public KPI getTaskUnplannedHoursKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO){
-//        double unplannedTaskMinutes = vrpTaskPlanningDTO.getEscalatedTaskList().parallelStream().mapToDouble(task -> task.getDuration()).sum();
-//        double plannedTaskMinutes = vrpTaskPlanningDTO.getTasks().parallelStream().mapToDouble(task -> task.getDuration()).sum();
-//        return prepareTaskUnplannedHours(unplannedTaskMinutes, plannedTaskMinutes);
-//    }
-//
-//    private KPI prepareTaskUnplannedHours(double unplannedMinutes, double plannedMinutes){
-//        BaseChart baseChart = new PieChart(RepresentationUnit.DECIMAL, "Hours", new ArrayList());
-//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("Planned Task", null, decimalSpecification(plannedMinutes/60.0)));
-//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("UnPlanned Task", null, decimalSpecification(unplannedMinutes/60.0)));
-//        KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, false,null);
-//        kpi.setId(new BigInteger("2"));
-//        return kpi;
-//    }
-//
-//    //KPI Task Per Staff
-//    //TODO: staffIds to be replaced with staff name.
-//    public KPI getTasksPerStaff(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<VRPTaskDTO> tasks, Map<String, EmployeeDTO> employeeDataIdMap){
-//        Map<String, Long> staffTaskCountMap = new HashMap<>();
-//
-//        Map<Long, List<VRPTaskDTO>> installationNumberTaskMap =tasks.stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber, toList()));
-//        vrpTaskPlanningDTO.getTasks().stream().collect(Collectors.groupingBy(TaskDTO::getStaffId, toList()))
-//                .forEach((staffId, taskList) -> {
-//                    long taskCount = taskList.stream().mapToLong(taskDTO -> (installationNumberTaskMap.get(taskDTO.getInstallationNumber())!=null)?installationNumberTaskMap.get(taskDTO.getInstallationNumber()).size():0).sum();
-//                    EmployeeDTO employee = employeeDataIdMap.get(String.valueOf(staffId));
-//                    staffTaskCountMap.put((employee != null)?employee.getName():"NA", taskCount);
-//                });
-//        return prepareTasksPerStaffKPI(staffTaskCountMap);
-//    }
-//
-//    private KPI prepareTasksPerStaffKPI(Map<String, Long> staffTaskData){
-//        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Tasks", new ArrayList());
-//        staffTaskData.forEach((staffName, taskCount) -> {
-//            ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit(staffName, null, decimalSpecification(taskCount)));
-//        });
-//        KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, false, null);
-//        kpi.setId(new BigInteger("3"));
-//        return kpi;
-//    }
-//
-//    //getting total working time
-//    //excluding break times and driving time for totalTaskTime
-//    public KPI getTotalTaskTimeVsWorkingTime(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
-//        double workingTimeMinutes = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60);
-//        double totalTaskTimeMinutes = vrpTaskPlanningDTO.getTasks().parallelStream().mapToLong(task -> task.getDuration()).sum();
-//        return prepareTaskTimeVsWorkingTime(workingTimeMinutes, totalTaskTimeMinutes);
-//    }
-//
-//    private KPI prepareTaskTimeVsWorkingTime(double workingTime, double totalTaskTime){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(totalTaskTime*100.0/workingTime), RepresentationUnit.PERCENT, "Hours");
-//        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_TASK_TIME_PERCENT, false,null);
-//        kpi.setId(new BigInteger("4"));
-//        return kpi;
-//    }
-//
-//    //KPI: ROAD_TIME_PERCENT
-//    public KPI getRoadTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
-//        double workingTimeMinutes = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60);
-//        double totalRoadTimeMinutes=vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> !task.isBreakTime()).mapToLong(task -> task.getDuration()).sum();
-//        double roadTimePercent = totalRoadTimeMinutes*100.0/workingTimeMinutes;
-//        return prepareRoadTimePercentKPI(roadTimePercent);
-//    }
-//
-//    private KPI prepareRoadTimePercentKPI(double roadTimePercent){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(roadTimePercent), RepresentationUnit.PERCENT, "Hours");
-//        KPI kpi = new KPI(CounterType.ROAD_TIME_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.ROAD_TIME_PERCENT, false,null);
-//        kpi.setId(new BigInteger("5"));
-//        return kpi;
-//    }
-//
-//    //KPI: Total tasks Completed
-//    public KPI getCompletedTaskWithinTimeWindowKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts, List<VRPTaskDTO> tasks){
-//        Map<String, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(shift-> shift.getId().toString(), shift-> shift));
-//        Map<Long, List<VRPTaskDTO>> installationNumberTaskMap =tasks.stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber, toList()));
-//        List<VRPTaskDTO> completedTasks= new ArrayList<>();
-//        vrpTaskPlanningDTO.getTasks().forEach(task -> {
-//            Shift shift = shiftMap.get(task.getShiftId());
-//            if(shift.getStartDate().getTime()<=task.getPlannedStartTime().toInstant(ZoneOffset.UTC).toEpochMilli()
-//                    && shift.getEndDate().getTime()>=task.getPlannedEndTime().toInstant(ZoneOffset.UTC).toEpochMilli()){
-//                completedTasks.addAll(installationNumberTaskMap.get(task.getInstallationNumber()));
-//            }
-//        });
-//        return prepareCompletedTaskWithinTimeWindow(completedTasks.size());
-//    }
-//
-//    private KPI prepareCompletedTaskWithinTimeWindow(long completedTasksCount){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(completedTasksCount), RepresentationUnit.NUMBER, "Tasks");
-//        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHIN_TIME.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_COMPLETED_WITHIN_TIME, false,null);
-//        kpi.setId(new BigInteger("6"));
-//        return kpi;
-//    }
-//
-//    //KPI:Percent of breaks
-//
-//    public KPI getPercentOfBreaksIn11and13KPI(VrpTaskPlanningDTO vrpTaskPlanningDTO) {
-//        List<TaskDTO> allBreaks = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> task.isBreakTime()).collect(toList());
-//        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY);
-//        List<TaskDTO> validBreaks = allBreaks.stream().filter(task -> (days.contains(task.getPlannedStartTime().getDayOfWeek()) && task.getPlannedStartTime().getHour() >=11 && task.getPlannedEndTime().getHour() <=13)).collect(toList());
-//        double validBreakPercentage = validBreaks.size()*100.0/allBreaks.size();
-//        return preparePercentOfBreaksIn11and13KPI(validBreakPercentage);
-//    }
-//
-//    private KPI preparePercentOfBreaksIn11and13KPI(double validBreakPercentage){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(validBreakPercentage), RepresentationUnit.PERCENT, "Breaks");
-//        KPI kpi = new KPI(CounterType.VALID_BREAK_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.VALID_BREAK_PERCENT, false,null);
-//        kpi.setId(new BigInteger("7"));
-//        return kpi;
-//    }
-//
-//    //KPI:Flexi Time Time Percent
-//    public KPI getFlexiTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
-//        long baseShiftWorkingTime = shifts.stream().mapToLong(baseShift -> Long.sum(baseShift.getEndDate().getTime(), -baseShift.getStartDate().getTime())).sum();
-//        Map<String, Shift> shiftsIdMap = shifts.parallelStream().collect(Collectors.toMap(shift -> shift.getId().toString(), shift-> shift));
-//        long flexiWorkingTime = vrpTaskPlanningDTO.getShifts().parallelStream().mapToLong(
-//                plannedShift -> ((plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime())>=0)
-//                        ?(plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime())
-//                        :0)
-//                .sum();
-//        double flexiTimePercent = flexiWorkingTime*100.0/baseShiftWorkingTime;
-//        return prepareFlexiTimePercentKPI(flexiTimePercent);
-//    }
-//
-//    private KPI prepareFlexiTimePercentKPI(double flexiTimePercent){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(flexiTimePercent), RepresentationUnit.PERCENT, "Hours");
-//        KPI kpi = new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, false,null);
-//        kpi.setId(new BigInteger("8"));
-//        return kpi;
-//    }
-//
-//    //KPI: flexi time tasks
-//    public KPI getFlexiTimeTaskPercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts, List<VRPTaskDTO> taskDTOs){
-//        Map<Long, List<VRPTaskDTO>> installationNumberTaskMap = taskDTOs.stream().collect(Collectors.groupingBy(task -> task.getInstallationNumber(), Collectors.toList()));
-//        Map<String, Shift> shiftIdMap = shifts.parallelStream().collect(Collectors.toMap(shift->shift.getId().toString(), shift->shift));
-//        List<TaskDTO> eligibleTaskGroups = vrpTaskPlanningDTO.getTasks().parallelStream().filter(task ->  shiftIdMap.get(task.getShiftId())!=null && task.getPlannedEndTime().toInstant(ZoneOffset.UTC).toEpochMilli() > shiftIdMap.get(task.getShiftId()).getEndDate().getTime()).collect(toList());
-//        List<Long> taskCounts = new ArrayList<>();
-//        eligibleTaskGroups.parallelStream().forEach(taskGroup -> {
-//            long shiftEndTime = shiftIdMap.get(taskGroup.getShiftId()).getEndDate().getTime();
-//            long taskDurationWithinShift = shiftEndTime - taskGroup.getPlannedStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
-//            long taskCount = 0;
-//            if(taskDurationWithinShift <= 0){
-//                taskCount = installationNumberTaskMap.get(taskGroup.getInstallationNumber()).size();
-//            }else {
-//                List<VRPTaskDTO> tasks = installationNumberTaskMap.get(taskGroup.getInstallationNumber()).stream().sorted(new Comparator<VRPTaskDTO>() {
-//                    @Override
-//                    public int compare(VRPTaskDTO o1, VRPTaskDTO o2) {
-//                        return o2.getDuration() - o1.getDuration();
-//                    }
-//                }).collect(toList());
-//                long availableDuration = taskDurationWithinShift;
-//                for(VRPTaskDTO task : tasks){
-//                    availableDuration-=task.getDuration();
-//                    taskCount = (availableDuration>=0)?taskCount:++taskCount;
-//                }
-//            }
-//            taskCounts.add(taskCount);
-//        });
-//        long totalFlexiTaskCount = taskCounts.stream().mapToLong(t->t).sum();
-//        double totalFlexiTaskCountPercent = totalFlexiTaskCount*100.0/taskDTOs.size();
-//        return prepareFlexiTimeTaskPercent(totalFlexiTaskCountPercent);
-//    }
-//
-//    private KPI prepareFlexiTimeTaskPercent(double flexiTimeTaskPercent){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(flexiTimeTaskPercent), RepresentationUnit.PERCENT, "Tasks");
-//        KPI kpi = new KPI(CounterType.FLEXI_TIME_TASK_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, false,null);
-//        kpi.setId(new BigInteger("9"));
-//        return kpi;
-//    }
-//
-//    //KPI: total KM driven by per staff
-//    public KPI getTotalKMsDrivenByStaff(VrpTaskPlanningDTO vrpTaskPlanningDTO, Map<String, EmployeeDTO> employeeDTOMap){
-//        Map<String, Double> staffAndKMsData = new HashedMap();
-//        vrpTaskPlanningDTO.getDrivingTimeList().stream().collect(Collectors.groupingBy(task -> task.getStaffId(), Collectors.toList())).forEach((staffId, drivingTimeList) -> {
-//            EmployeeDTO employee = employeeDTOMap.get(String.valueOf(staffId));
-//            staffAndKMsData.put((employee != null)?employee.getName():"NA", drivingTimeList.stream().mapToDouble(e -> e.getDrivingDistance()).sum()/1000.0);
-//        });
-//        return prepareTotalKMDrivenByStaff(staffAndKMsData);
-//    }
-//
-//    private KPI prepareTotalKMDrivenByStaff(Map<String, Double> staffAndKMDetails){
-//        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "KMs", new ArrayList());
-//        staffAndKMDetails.forEach((staffName, kmDriven) -> {
-//            ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit(staffName, null, decimalSpecification(kmDriven)));
-//        });
-//        KPI kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_KM_DRIVEN_PER_STAFF, false,null);
-//        kpi.setId(new BigInteger("10"));
-//        return kpi;
-//    }
-//
-//    //KPI: task Efficiency
-//    public KPI getTotalTaskEfficiencyKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<VRPTaskDTO> tasks){
-//        long totalTaskDuration = tasks.parallelStream().mapToLong(task -> task.getDuration()).sum();
-//        long totalPlannedTaskDuration = vrpTaskPlanningDTO.getTasks().stream().mapToLong(task -> task.getDuration()).sum();
-//        double efficiency = totalTaskDuration*1.0/totalPlannedTaskDuration;
-//        return prepareTaskEfficiencyKPI(efficiency);
-//    }
-//
-//    public KPI prepareTaskEfficiencyKPI(double efficiency){
-//        BaseChart baseChart = new SingleNumberChart(decimalSpecification(efficiency), RepresentationUnit.DECIMAL, "Tasks");
-//        KPI kpi = new KPI(CounterType.TASK_EFFICIENCY.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_EFFICIENCY, false,null);
-//        kpi.setId(new BigInteger("11"));
-//        return kpi;
-//    }
-//
-//    //KPI: Yellow Time Percent:
-//    //public KPI
-//
-//    private double decimalSpecification(double value){
-//        return Math.round(value*100)/100.0;
-//    }
-//
-//    //TODO: scope in future, for collecting counters common separately
-//    public void getCounterMetadataForVRP(){//list of KPIs
-//
-//    }
 
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
@@ -330,11 +100,9 @@ public class CounterDataService {
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
         if (filters.getFilters() != null && isCollectionNotEmpty(filters.getFilters())) {
-            filters.getFilters().forEach(filter -> {
-                filterBasedCriteria.put(filter.getType(), filter.getValues());
-            });
+            filters.getFilters().forEach(filter -> filterBasedCriteria.put(filter.getType(), filter.getValues()));
         } else {
-            List<ApplicableKPI> staffApplicableKPIS = new ArrayList<>();
+            List<ApplicableKPI> staffApplicableKPIS;
             if (filters.isCountryAdmin()) {
                 staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
             } else {
@@ -343,9 +111,7 @@ public class CounterDataService {
             for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
                 Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
                 if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
-                    staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> {
-                        staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues());
-                    });
+                    staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
                     staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
                 }
             }
@@ -366,23 +132,244 @@ public class CounterDataService {
             }
         }
 
-//      TODO: to be used with counter data processing.
-//        List<Future<CommonRepresentationData>> counterResults = new ArrayList<>();  //will be used for counter data collections.
-//        Map<BigInteger, Counter> counterMap = new HashedMap();
-//        for(BigInteger counterId : filters.getCounterIds()){
-//            Callable<CommonRepresentationData> data = () ->{
-//                return counterServiceMapping.getService(kpiMap.get(counterId).getType()).getCalculatedCounter(filterBasedCriteria, countryId, counterMap.get(counterId));
-//            };
-//            Future<CommonRepresentationData> responseData = executorService.submit(data);
-//            counterResults.add(responseData);
-//        }
 
-        return kpisData.stream().collect(Collectors.toMap(kpiData -> kpiData.getCounterId(), kpiData -> kpiData));
+        return kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData));
     }
 
-//    public Map<Long,Long> calculatePlannedHour(Set<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
-//        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
-//        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
-//        return staffPlannedHours;
-//    }
+    //kpi default data and copy and save filter
+    public KPIDTO getDefaultFilterDataOfKpi(String tabId, BigInteger kpiId, Long refId, ConfLevel level) {
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        List<ApplicableKPI> applicableKPIS;
+        if (!accessGroupPermissionCounterDTO.isManagement()) {
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            level = ConfLevel.STAFF;
+            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, accessGroupPermissionCounterDTO.getStaffId());
+        } else {
+            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
+        }
+        if (applicableKPIS.isEmpty()) {
+            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+        }
+        List<FilterCriteria> criteriaList = new ArrayList<>();
+        KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
+        DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
+        getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
+        kpi.setDefaultFilters(criteriaList);
+        kpi.setTitle(applicableKPIS.get(0).getTitle());
+        if (isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
+            kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
+        }
+        return kpi;
+    }
+
+    private void getSelectedFilterDefaultData(ConfLevel level, List<FilterCriteria> criteriaList, KPIDTO kpi, DefaultKpiDataDTO defaultKpiDataDTO) {
+        if (kpi.getFilterTypes().contains(FilterType.EMPLOYMENT_TYPE)) {
+            getEmploymentTypeDefaultData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.TIME_SLOT)) {
+            getTimeSlotDefaultData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.DAY_TYPE)) {
+            getDayTypeDefaultData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.UNIT_IDS) && ConfLevel.UNIT.equals(level)) {
+            getUnitIdsDefaultData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.STAFF_IDS) && ConfLevel.UNIT.equals(level)) {
+            getStaffDefaultData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {
+            getDayOfWeekDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.TIME_TYPE)) {
+            getTimeTypesDefaultData(criteriaList, defaultKpiDataDTO);
+        }
+        List<Long> unitIds = defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(OrganizationCommonDTO::getId).collect(toList());
+        if (kpi.getFilterTypes().contains(FilterType.PHASE)) {
+            getPhaseDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.TIME_INTERVAL)) {
+            criteriaList.add(new FilterCriteria(FilterType.TIME_INTERVAL.value, FilterType.TIME_INTERVAL, new ArrayList<>()));
+        }
+        if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_IDS)) {
+            getActivityDefaultData(criteriaList, unitIds);
+        }
+    }
+
+    private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {
+        List<ActivityDTO> activityDTOS = activityService.findAllActivityByDeletedFalseAndUnitId(unitIds);
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        activityDTOS.forEach(activityDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(activityDTO.getId().longValue(), activityDTO.getName(), activityDTO.getUnitId())));
+        criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_IDS.value, FilterType.ACTIVITY_IDS, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getPhaseDefaultData(List<FilterCriteria> criteriaList) {
+        List<PhaseDefaultName> phases = Arrays.asList(PhaseDefaultName.values());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        phases.forEach(phase -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(phase.toString(), phase.toString())));
+        criteriaList.add(new FilterCriteria(FilterType.PHASE.value, FilterType.PHASE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getTimeTypesDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<TimeType> timeTypes = timeTypeService.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        timeTypes.forEach(timeType -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeType.getId().longValue(), timeType.getLabel())));
+        criteriaList.add(new FilterCriteria(FilterType.TIME_TYPE.value, FilterType.TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getDayOfWeekDefaultData(List<FilterCriteria> criteriaList) {
+        List<DayOfWeek> dayOfWeeks = Arrays.asList(DayOfWeek.values());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        dayOfWeeks.forEach(dayOfWeek -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayOfWeek.toString(), dayOfWeek.toString())));
+        criteriaList.add(new FilterCriteria(FilterType.DAYS_OF_WEEK.value, FilterType.DAYS_OF_WEEK, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getActivityStatusDefaultData(List<FilterCriteria> criteriaList) {
+        List<ShiftStatus> activityStatus = Arrays.asList(ShiftStatus.values());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        activityStatus.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
+        criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.value, FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getStaffDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getStaffKpiFilterDTOs().forEach(staffKpiFilterDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(staffKpiFilterDTO.getId(), staffKpiFilterDTO.getFullName(), staffKpiFilterDTO.getUnitIds())));
+        criteriaList.add(new FilterCriteria(FilterType.STAFF_IDS.value, FilterType.STAFF_IDS, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getUnitIdsDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getOrganizationCommonDTOS().forEach(organizationCommonDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(organizationCommonDTO.getId(), organizationCommonDTO.getName())));
+        criteriaList.add(new FilterCriteria(FilterType.UNIT_IDS.value, FilterType.UNIT_IDS, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getDayTypeDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getDayTypeDTOS().forEach(dayTypeDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayTypeDTO.getId(), dayTypeDTO.getName())));
+        criteriaList.add(new FilterCriteria(FilterType.DAY_TYPE.value, FilterType.DAY_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getTimeSlotDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getTimeSlotDTOS().forEach(timeSlotDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeSlotDTO.getId(), timeSlotDTO.getName())));
+        criteriaList.add(new FilterCriteria(FilterType.TIME_SLOT.value, FilterType.TIME_SLOT, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getEmploymentTypeDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getEmploymentTypeKpiDTOS().forEach(employmentTypeKpiDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(employmentTypeKpiDTO.getId(), employmentTypeKpiDTO.getName())));
+        criteriaList.add(new FilterCriteria(FilterType.EMPLOYMENT_TYPE.value, FilterType.EMPLOYMENT_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    public TabKPIDTO saveKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        if (!accessGroupPermissionCounterDTO.isManagement()) {
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            level = ConfLevel.STAFF;
+            refId = accessGroupPermissionCounterDTO.getStaffId();
+        }
+        List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
+        if (applicableKPIS.isEmpty()) {
+            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+        }
+        KPI kpi = counterRepository.getKPIByid(kpiId);
+        if (!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
+        if (!applicableKPIS.get(0).getTitle().equals(counterDTO.getTitle()) && Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
+            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+        }
+        kpi.setCalculationFormula(counterDTO.getCalculationFormula());
+        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), true));
+        List<ApplicableKPI> updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF), ConfLevel.COUNTRY.equals(level) ? null : refId);
+        for (ApplicableKPI applicableKPI : updateApplicableKPI) {
+            applicableKPI.setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), false));
+            if (applicableKPI.getTitle().equals(applicableKPIS.get(0).getTitle())) {
+                applicableKPI.setTitle(counterDTO.getTitle().trim());
+            }
+        }
+        applicableKPIS.get(0).setTitle(counterDTO.getTitle());
+        applicableKPIS.addAll(updateApplicableKPI);
+        save(applicableKPIS);
+        save(kpi);
+        kpi.setTitle(counterDTO.getTitle());
+        return getTabKpiData(kpi, counterDTO, accessGroupPermissionCounterDTO);
+    }
+
+    public TabKPIDTO copyKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
+        boolean copy = (isNotNull(tabId) ? true : false);
+        TabKPIConf tabKPIConf = null;
+        List<ApplicableKPI> applicableKPIS;
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        if (!accessGroupPermissionCounterDTO.isManagement()) {
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            level = ConfLevel.STAFF;
+            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, accessGroupPermissionCounterDTO.getStaffId());
+        } else {
+            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
+        }
+        if (applicableKPIS.isEmpty()) {
+            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+        }
+        KPI kpi = counterRepository.getKPIByid(kpiId);
+        if (!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            exceptionService.actionNotPermittedException("message.kpi.permission");
+        }
+        if (Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
+            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+        }
+        KPI copyKpi = ObjectMapperUtils.copyPropertiesByMapper(kpi, KPI.class);
+        copyKpi.setId(null);
+        copyKpi.setTitle(counterDTO.getTitle());
+        copyKpi.setCalculationFormula(counterDTO.getCalculationFormula());
+        copyKpi.setFilterTypes(counterDTO.getSelectedFilters().stream().map(FilterCriteria::getType).collect(toList()));
+        save(copyKpi);
+        List<ApplicableKPI> applicableKPIs = new ArrayList<>();
+        if (ConfLevel.COUNTRY.equals(level) || accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), refId, null, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+        } else if (ConfLevel.UNIT.equals(level)) {
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+        } else if (isNotNull(tabId) && ConfLevel.STAFF.equals(level)) {
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+            tabKPIConf = new TabKPIConf(tabId, copyKpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), level, new KPIPosition(0, 0), KPIValidity.BASIC, LocationType.FIX, counterDistService.calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX));
+            save(tabKPIConf);
+        }
+        applicableKPIS.addAll(applicableKPIs);
+        save(applicableKPIS);
+        TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
+        tabKPIDTO.setId((isNotNull(tabKPIConf)) ? tabKPIConf.getId() : null);
+        return tabKPIDTO;
+    }
+
+    public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
+        TabKPIDTO tabKPIDTO = new TabKPIDTO();
+        KPI kpi = counterRepository.getKPIByid(kpiId);
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
+        filterCriteria.setKpiIds(Arrays.asList(kpiId));
+        refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, null);
+        tabKPIDTO.setData(data.get(kpiId));
+        return tabKPIDTO;
+    }
+
+    private TabKPIDTO getTabKpiData(KPI copyKpi, CounterDTO counterDTO, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
+        TabKPIDTO tabKPIDTO = new TabKPIDTO();
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
+        tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
+        tabKPIDTO.setData(data.get(copyKpi.getId()));
+        return tabKPIDTO;
+    }
+
+
 }

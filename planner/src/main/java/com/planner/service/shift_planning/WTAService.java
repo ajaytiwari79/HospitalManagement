@@ -3,7 +3,7 @@ package com.planner.service.shift_planning;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -23,41 +23,41 @@ public class WTAService {
 /*****************************************************************************************************/
     /**
      * @param longWorkingTimeAgreementMap
-     * @param unitPositionId
+     * @param employmentId
      * @return
      */
 //TODO might be in ShiftPlanningInitializationService
-    public Map<LocalDate, WorkingTimeAgreement> getLocalDateWTAMapByunitPositionId(Map<Long, Map<LocalDate, WorkingTimeAgreement>> longWorkingTimeAgreementMap, Long unitPositionId) {
+    public Map<LocalDate, WorkingTimeAgreement> getLocalDateWTAMapByEmploymentId(Map<Long, Map<LocalDate, WorkingTimeAgreement>> longWorkingTimeAgreementMap, Long employmentId) {
         Map<LocalDate, WorkingTimeAgreement> applicableLocalDateWTAPerStaff=new HashMap<>();
-        if (!longWorkingTimeAgreementMap.containsKey(unitPositionId)){}
-        return longWorkingTimeAgreementMap.get(unitPositionId);
+        if (!longWorkingTimeAgreementMap.containsKey(employmentId)){}
+        return longWorkingTimeAgreementMap.get(employmentId);
 
     }
 
     /**
      * <ul>
-     * <li>This method will bind each unitPositionId with its Map containing all related [WTA/s datewise].</li>
-     * <li>This may happen that there always exist some WTA(either List or single) for particular unitPositionId but not applicable
+     * <li>This method will bind each employmentId with its Map containing all related [WTA/s datewise].</li>
+     * <li>This may happen that there always exist some WTA(either List or single) for particular employmentId but not applicable
      * in this{@param fromPlanningDate},{@param toPlanningDate} range(All WTA's) hence might be empty
      * so we need to skip this staff for further planning</li>
      * </ul>
-     * @param unitPositionIds
+     * @param employmentIds
      * @param fromPlanningDate
      * @param toPlanningDate
      * @return
      */
-    public Map<Long, Map<LocalDate, WorkingTimeAgreement>> getunitPositionIdWithLocalDateWTAMap(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
-        Map<Long, Map<LocalDate, WorkingTimeAgreement>> unitPositionIdWithLocalDateWTAMap = new HashMap<>();
-        List<WorkingTimeAgreement> workingTimeAgreement = activityMongoService.getWTARuleTemplateByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
-        //Group WTA with unitPosition
+    public Map<Long, Map<LocalDate, WorkingTimeAgreement>> getEmploymentIdWithLocalDateWTAMap(List<Long> employmentIds, Date fromPlanningDate, Date toPlanningDate) {
+        Map<Long, Map<LocalDate, WorkingTimeAgreement>> employmentIdWithLocalDateWTAMap = new HashMap<>();
+        List<WorkingTimeAgreement> workingTimeAgreement = activityMongoService.getWTARuleTemplateByEmploymentIds(employmentIds, fromPlanningDate, toPlanningDate);
+        //Group WTA with employment
         if (workingTimeAgreement.size() > 0) {
-            Map<Long, List<WorkingTimeAgreement>> unitPositionIdWTAMap = workingTimeAgreement.stream().collect(Collectors.groupingBy(wta -> wta.getUnitPositionId(), Collectors.toList()));
-            unitPositionIdWTAMap.forEach((unitPositionId, groupedWTAList) -> {
+            Map<Long, List<WorkingTimeAgreement>> employmentIdWTAMap = workingTimeAgreement.stream().collect(Collectors.groupingBy(wta -> wta.getEmploymentId(), Collectors.toList()));
+            employmentIdWTAMap.forEach((employmentId, groupedWTAList) -> {
                 Map<LocalDate, WorkingTimeAgreement> localDateWTAMap = filterOverlapedWTA(groupedWTAList, getApplicableIntervals(fromPlanningDate, toPlanningDate), toPlanningDate);
-                unitPositionIdWithLocalDateWTAMap.put(unitPositionId, localDateWTAMap);
+                employmentIdWithLocalDateWTAMap.put(employmentId, localDateWTAMap);
             });
         }
-        return unitPositionIdWithLocalDateWTAMap;
+        return employmentIdWithLocalDateWTAMap;
     }
 /*************************************************************************************************/
     /**

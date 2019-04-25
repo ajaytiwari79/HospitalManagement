@@ -20,7 +20,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**

@@ -7,13 +7,15 @@ import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pavan on 8/2/18.
@@ -35,9 +37,10 @@ public class ActivityWithCompositeDTO {
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
     private boolean allowChildActivities;
+    private boolean applicableForChildActivities;
     private Long staffId;
     private BigInteger activityId;
-    private Long unitPositionId;
+    private Long employmentId;
     private Long unitId;
     private Short shortestTime;
     private Short longestTime;
@@ -48,10 +51,18 @@ public class ActivityWithCompositeDTO {
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
     private List<Long> dayTypeIds= new ArrayList<>();
+    private Set<BigInteger> childActivityIds=new HashSet<>();
+    private Set<BigInteger> availableChildActivityIds =new HashSet<>();
+    private BigInteger parentActivityId;
 
 
     public ActivityWithCompositeDTO() {
         //Default Constructor
+    }
+
+    public ActivityWithCompositeDTO(List<CompositeActivityDTO> compositeActivities, Set<BigInteger> childActivityIds) {
+        this.compositeActivities = compositeActivities;
+        this.childActivityIds = childActivityIds;
     }
 
     public TimeCalculationActivityDTO getTimeCalculationActivityTab() {
@@ -200,12 +211,12 @@ public class ActivityWithCompositeDTO {
         this.activityId = activityId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getUnitId() {
@@ -254,5 +265,37 @@ public class ActivityWithCompositeDTO {
 
     public void setDayTypeIds(List<Long> dayTypeIds) {
         this.dayTypeIds = dayTypeIds;
+    }
+
+    public Set<BigInteger> getChildActivityIds() {
+        return childActivityIds;
+    }
+
+    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
+        this.childActivityIds = childActivityIds;
+    }
+
+    public Set<BigInteger> getAvailableChildActivityIds() {
+        return availableChildActivityIds;
+    }
+
+    public void setAvailableChildActivityIds(Set<BigInteger> availableChildActivityIds) {
+        this.availableChildActivityIds = availableChildActivityIds;
+    }
+
+    public boolean isApplicableForChildActivities() {
+        return applicableForChildActivities;
+    }
+
+    public void setApplicableForChildActivities(boolean applicableForChildActivities) {
+        this.applicableForChildActivities = applicableForChildActivities;
+    }
+
+    public BigInteger getParentActivityId() {
+        return parentActivityId;
+    }
+
+    public void setParentActivityId(BigInteger parentActivityId) {
+        this.parentActivityId = parentActivityId;
     }
 }

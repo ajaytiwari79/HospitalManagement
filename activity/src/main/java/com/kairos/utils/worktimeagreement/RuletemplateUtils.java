@@ -1,6 +1,5 @@
 package com.kairos.utils.worktimeagreement;
 
-import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.YEARS;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -232,7 +230,7 @@ public class RuletemplateUtils {
         return false;
     }
 
-    public static boolean isValidShift(BigInteger phaseId,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds) {
+    public static boolean isValidShift(BigInteger phaseId,ShiftWithActivityDTO shift, List<PhaseTemplateValue> phaseTemplateValues, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
         boolean valid = false;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
@@ -467,7 +465,7 @@ public class RuletemplateUtils {
 
     public static void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
-        staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
+        staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
             List<LocalDate> publicHolidays = new ArrayList<>();
             for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {

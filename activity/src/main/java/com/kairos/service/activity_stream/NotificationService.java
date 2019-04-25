@@ -2,16 +2,18 @@ package com.kairos.service.activity_stream;
 
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.response.RequestComponent;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.activity_stream.NotificationMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.constants.AppConstants.ABSENCE_PLANNING;
 import static com.kairos.constants.AppConstants.REQUEST_TO_CREATE_NEW_UTILITY;
@@ -37,13 +39,12 @@ public class NotificationService {
     }
 
 
-    public Boolean markNotificationRead(Long notificationId){
-        Notification notification =null;// notificationGraphRepository.findById(notificationId);
-        if(notification != null) {
-            notification.setRead(true);
-            notificationMongoRepository.save(notification);
-            return true;
-        }else return false;
+    public void markNotificationRead(BigInteger notificationId){
+        Optional<Notification> notification = notificationMongoRepository.findById(notificationId);
+        if(notification.isPresent()) {
+            notification.get().setRead(true);
+            notificationMongoRepository.save(notification.get());
+        }
 
     }
 

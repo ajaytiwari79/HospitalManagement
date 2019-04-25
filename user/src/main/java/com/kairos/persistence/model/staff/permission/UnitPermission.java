@@ -31,6 +31,7 @@ public class UnitPermission extends UserBaseEntity {
 
 
     public UnitPermission() {
+        //Default Constructor
     }
 
     public String getPlace() {

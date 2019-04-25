@@ -70,7 +70,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false,false));
     }
 
     @ApiOperation("delete a Shift of a staff")
@@ -165,14 +165,14 @@ public class ShiftController {
     @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
-                                                                    @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
+                                                                    @RequestParam(value = "employmentId", required = false) Long employmentId,
                                                                     @RequestParam(value = "startDate")
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                                     @RequestParam(value = "staffId", required = false) Long staffId,
                                                                     @RequestParam(value = "expertiseId", required = false) Long expertiseId,
                                                                     @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId, viewType, shiftFilterParam, expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId));
     }
 
     @ApiOperation("Update planning period id in Shifts")

@@ -27,6 +27,8 @@ public class FunctionDTO {
     private List<Organization> unions;
     private List<Level> organizationLevels;
     private String icon;
+    private List<LocalDate> appliedDates;
+    private Long employmentId;
 
 
 
@@ -123,5 +125,21 @@ public class FunctionDTO {
 
     public void setAmountEditableAtUnit(boolean amountEditableAtUnit) {
         this.amountEditableAtUnit = amountEditableAtUnit;
+    }
+
+    public List<LocalDate> getAppliedDates() {
+        return appliedDates;
+    }
+
+    public void setAppliedDates(List<LocalDate> appliedDates) {
+        this.appliedDates = appliedDates;
+    }
+
+    public Long getEmploymentId() {
+        return employmentId;
+    }
+
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

@@ -7,8 +7,14 @@ import com.kairos.persistence.model.embeddables.OrganizationSubType;
 import com.kairos.persistence.model.embeddables.OrganizationType;
 import com.kairos.persistence.model.embeddables.ServiceCategory;
 import com.kairos.persistence.model.embeddables.SubServiceCategory;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
@@ -16,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class MasterAsset extends BaseEntity {
 
 
@@ -57,77 +66,4 @@ public class MasterAsset extends BaseEntity {
 
     }
 
-    public void setName(String name) { this.name = name; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
-
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
-
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
-
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
-
-    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
-
-    public LocalDate getSuggestedDate() {
-        return suggestedDate;
-    }
-
-    public SuggestedDataStatus getSuggestedDataStatus() {
-        return suggestedDataStatus;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public List<ServiceCategory> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public List<SubServiceCategory> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public AssetType getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(AssetType assetType) {
-        this.assetType = assetType;
-    }
-
-    public AssetType getSubAssetType() {
-        return subAssetType;
-    }
-
-    public void setSubAssetType(AssetType subAssetType) {
-        this.subAssetType = subAssetType;
-    }
-
-
-    public MasterAsset() {
-    }
 }

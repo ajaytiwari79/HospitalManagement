@@ -2,8 +2,8 @@ package com.kairos.persistence.model.country.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.pay_table.PayTableResponse;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 
 import java.util.List;
 

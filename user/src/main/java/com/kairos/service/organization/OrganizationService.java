@@ -26,13 +26,13 @@ import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -71,9 +71,9 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
-import com.kairos.utils.DateConverter;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -91,6 +91,8 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.TEAM;
@@ -271,7 +273,7 @@ public class OrganizationService {
             List<Municipality> municipalities = (zipCode == null) ? Collections.emptyList() : municipalityGraphRepository.getMunicipalitiesByZipCode(zipCode.getId());
             Map<String, Object> generalTabQueryResult = organizationGraphRepository.getGeneralTabInfo(unit.getId());
             HashMap<String, Object> generalTabInfo = new HashMap<>(generalTabQueryResult);
-            generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : DateConverter.getDate((long) generalTabInfo.get("clientSince"))));
+            generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : getDate((long) generalTabInfo.get("clientSince"))));
             cloneMap.put("municipalities", municipalities);
             response.put("generalTabInfo", generalTabInfo);
             response.put("otherData", cloneMap);
@@ -341,7 +343,7 @@ public class OrganizationService {
         unit.setBusinessTypes(businessTypes);
         unit.setIndustryType(industryType);
         unit.setContractType(contractType);
-        unit.setClientSince(DateConverter.parseDate(organizationGeneral.getClientSince()).getTime());
+        unit.setClientSince(parseDate(organizationGeneral.getClientSince()).getTime());
         unit.setKairosHub(organizationGeneral.isKairosHub());
         unit.setKairosStatus(kairosStatus);
         unit.setExternalId(organizationGeneral.getExternalId());
@@ -640,7 +642,7 @@ public class OrganizationService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
-        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
@@ -674,14 +676,12 @@ public class OrganizationService {
     }
 
     public List<DayType> getDayType(Long unitId, Date date) {
-        Organization parentOrganization = fetchParentOrganization(unitId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
     public List<DayType> getAllDayTypeofOrganization(Long organizationId) {
-        Organization parentOrganization = fetchParentOrganization(organizationId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getAllDayTypeByCountryId(countryId);
     }
 
@@ -821,7 +821,7 @@ public class OrganizationService {
     }
 
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId) {
-        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        Long countryId = UserContext.getUserDetails().getCountryId();
         OrderAndActivityDTO orderAndActivityDTO = activityIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
         OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
@@ -987,8 +987,7 @@ public class OrganizationService {
     }
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
-        Organization parentOrganization = fetchParentOrganization(unitId);
-        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        Long countryId = UserContext.getUserDetails().getCountryId();
         if(countryId == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }

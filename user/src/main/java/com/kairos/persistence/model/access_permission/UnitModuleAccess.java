@@ -13,6 +13,7 @@ public class UnitModuleAccess {
     private List<Long> accessibleModules;
 
     public UnitModuleAccess() {
+        //Default Constructor
     }
 
     public Long getUnitId() {

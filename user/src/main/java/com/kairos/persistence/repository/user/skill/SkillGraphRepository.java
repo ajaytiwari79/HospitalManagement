@@ -2,9 +2,8 @@ package com.kairos.persistence.repository.user.skill;
 
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -68,18 +67,11 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true}) return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
     List<Map<String,Object>> getSkillsForTaskType();
 
-    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2} return r is not null")
-    boolean updateVisitourIdOfSkillInOrganization(long unitId, long skillId, String visitourId);
+    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.customName={2} return r is not null")
+    boolean updateSkillOfOrganizationWithCustomName(long unitId, long skillId, String customName);
 
-    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2}, r.customName={3} return r is not null")
-    boolean updateSkillOfOrganizationWithCustomName(long unitId, long skillId, String visitourId, String customName);
-
-    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2}, r.customName=skill.name return r is not null")
-    boolean updateSkillOfOrganization(long unitId, long skillId, String visitourId);
-
-    @Query("Match (team:Team)-[r:"+TEAM_HAS_SKILLS+"]->(skill:Skill) where id (team)={0} AND id(skill)={1} with r\n" +
-            "set r.visitourId={2} return r is not null")
-    boolean updateVisitourIdOfSkillInTeam(long unitId, long skillId, String visitourId);
+    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set  r.customName=skill.name return r is not null")
+    boolean updateSkillOfOrganization(long unitId, long skillId);
 
     @Query("Match (skill:Skill)-[r:"+HAS_TAG+"]-(tag:Tag{countryTag:true}) WHERE id(skill) = {0} DELETE r ")
     void removeAllCountryTags(long skillId);
@@ -87,6 +79,7 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag) WHERE id(org)={0} with tag \n"+
             "Match (skill:Skill)-[skillTagRel:"+HAS_TAG+"]-(tag) WHERE id(skill) = {1} DELETE  skillTagRel ")
     void removeAllOrganizationTags(long orgId, long skillId);
+
 
 
     List<Skill> findSkillByNameIn(List<String> skillNames);

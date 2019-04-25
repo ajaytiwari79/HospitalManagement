@@ -3,10 +3,16 @@ package com.kairos.response.dto.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProcessingActivityRiskResponseDTO {
 
     private Long id;
@@ -21,27 +27,4 @@ public class ProcessingActivityRiskResponseDTO {
         this.mainParent = mainParent;
         this.risks = risks;
     }
-
-    public ProcessingActivityRiskResponseDTO() {
-    }
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public Boolean getMainParent() { return mainParent; }
-
-    public void setMainParent(Boolean mainParent) { this.mainParent = mainParent; }
-
-    public List<ProcessingActivityRiskResponseDTO> getProcessingActivities() { return processingActivities; }
-
-    public void setProcessingActivities(List<ProcessingActivityRiskResponseDTO> processingActivities) { this.processingActivities = processingActivities; }
-
-    public String getName() { return name; }
-
-    public void setName(String name) { this.name = name; }
-
-    public List<RiskBasicResponseDTO> getRisks() { return risks; }
-
-    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 }

@@ -27,6 +27,6 @@ public class WebSocketHeaderInterceptor implements HandshakeInterceptor {
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-
+            //this is overridden method
     }
 }

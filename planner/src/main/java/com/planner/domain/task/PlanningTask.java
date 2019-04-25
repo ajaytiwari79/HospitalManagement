@@ -2,10 +2,11 @@ package com.planner.domain.task;
 
 import com.planner.domain.common.BaseEntity;
 import com.planner.enums.TaskStatus;
-//import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.Date;
 import java.util.List;
+
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 //@Table
 public class PlanningTask extends BaseEntity {

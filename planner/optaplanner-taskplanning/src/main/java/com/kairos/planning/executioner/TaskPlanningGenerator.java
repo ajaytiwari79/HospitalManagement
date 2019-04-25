@@ -1,21 +1,13 @@
 package com.kairos.planning.executioner;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.kairos.planning.domain.Affinity;
-import com.kairos.planning.domain.AvailabilityRequest;
-import com.kairos.planning.domain.Citizen;
-import com.kairos.planning.domain.Employee;
-import com.kairos.planning.domain.Location;
-import com.kairos.planning.domain.Skill;
-import com.kairos.planning.domain.Task;
-import com.kairos.planning.domain.TaskType;
-import com.kairos.planning.domain.Vehicle;
+import com.kairos.planning.domain.*;
 import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.planning.utils.JodaTimeConverter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskPlanningGenerator {
     private static final String DATA_UNPLANNED_TASK3_XML = "data/unplannedTask3.xml";

@@ -15,6 +15,7 @@ public class GetAllActivitiesResponse {
     private List<Activity> GetAllActivitiesResult;
 
     public GetAllActivitiesResponse() {
+        //Default Constructor
     }
 
     public List<Activity> getGetAllActivitiesResult() {

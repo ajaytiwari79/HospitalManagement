@@ -15,8 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.util.List;
 
-import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Component
 public class PlannedTimeTypeRestClient {

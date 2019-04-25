@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.List;
-
 /**
  * Created by Jasgeet on 5/10/17.
  */

@@ -22,7 +22,7 @@ public class OrganizationUnionRelationship {
     private Long dateOfSeparation;
 
     public OrganizationUnionRelationship() {
-
+        //Default Constructor
     }
 
     public Organization getOrganization() {

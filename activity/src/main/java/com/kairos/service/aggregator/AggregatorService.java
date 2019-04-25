@@ -1,7 +1,12 @@
 package com.kairos.service.aggregator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.client_exception.ClientExceptionCount;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.client.ClientExceptionCountWrapper;
+import com.kairos.dto.user.client.ClientOrganizationIds;
+import com.kairos.dto.user.staff.client.ClientAggregatorDTO;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
@@ -14,27 +19,19 @@ import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRe
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.SchedulerRestClient;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
 import com.kairos.service.planner.RandomDateGeneratorService;
 import com.kairos.service.task_type.TaskDynamicReportService;
-import com.kairos.dto.user.client.Client;
-import com.kairos.dto.user.client.ClientExceptionCountWrapper;
-import com.kairos.dto.user.client.ClientOrganizationIds;
-import com.kairos.dto.user.staff.client.ClientAggregatorDTO;
 import com.kairos.utils.ApplicationUtil;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.functional_interface.PerformCalculation;
 import org.bson.Document;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -53,7 +50,8 @@ import java.util.stream.Collectors;
 import static com.kairos.constants.AppConstants.CITIZEN_ID;
 import static com.kairos.persistence.model.constants.TaskConstants.MONOGDB_QUERY_RECORD_LIMIT;
 import static java.time.ZoneId.systemDefault;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 
 /**
  * Created by oodles on 7/7/17.
@@ -62,14 +60,12 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Service
 public class AggregatorService extends MongoBaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AggregatorService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AggregatorService.class);
 
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
-    @Inject
-    private MongoTemplate mongoTemplate;
     @Inject
     private TaskDynamicReportService taskDynamicReportService;
     @Inject
@@ -98,10 +94,10 @@ public class AggregatorService extends MongoBaseService {
    // @Scheduled(initialDelay = 100000, fixedDelay = 4000000)
     public void aggregator() {
         //Please don't change the sequence
-        logger.info("Aggregator Job Starts on time---> " + DateUtils.getDate());
+        LOGGER.info("Aggregator Job Starts on time---> " + DateUtils.getDate());
         try {
             List<Long> organizations = schedulerRestClient.getAllOrganizationIds();
-            logger.info("Aggregator Job Starts on time---> " + userIntegrationService.getCitizenIdsByUnitIds(organizations));
+            LOGGER.info("Aggregator Job Starts on time---> " + userIntegrationService.getCitizenIdsByUnitIds(organizations));
             for (Long organizationId : organizations) {
                 aggregatorOneWeek(organizationId);
                 aggregatorTwoWeek(organizationId);
@@ -110,9 +106,9 @@ public class AggregatorService extends MongoBaseService {
                 sendDynamicReports(organizationId);
 
             }
-            logger.info("Aggregator Job Ends on time---> " + DateUtils.getDate());
+            LOGGER.info("Aggregator Job Ends on time---> " + DateUtils.getDate());
         } catch (Exception e) {
-            logger.warn("Exception while aggregating Citizen data {} ", e);
+            LOGGER.warn("Exception while aggregating Citizen data {} ", e);
         }
 
 
@@ -123,7 +119,7 @@ public class AggregatorService extends MongoBaseService {
 
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(0, 7, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
-            logger.debug("taskIds map for one week: " + map);
+            LOGGER.debug("taskIds map for one week: " + map);
             List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
             Long  citizenId = Long.valueOf(map.get("_id").toString());
 
@@ -199,7 +195,7 @@ public class AggregatorService extends MongoBaseService {
     private void aggregatorTwoWeek(Long organizationId) {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(7, 14, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
-            logger.debug("taskIds map for two week: " + map);
+            LOGGER.debug("taskIds map for two week: " + map);
             List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
             Long  citizenId = Long.valueOf(map.get("_id").toString());
 
@@ -255,7 +251,7 @@ public class AggregatorService extends MongoBaseService {
     private void aggregatorThreeWeek(Long organizationId) {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(14, 21, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
-            logger.debug("taskIds map for three weeks: " + map);
+            LOGGER.debug("taskIds map for three weeks: " + map);
             List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
             Long  citizenId = Long.valueOf(map.get("_id").toString());
 
@@ -303,7 +299,7 @@ public class AggregatorService extends MongoBaseService {
     private void aggregatorFourWeek(Long organizationId) {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(21, 28, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
-            logger.debug("taskIds map for four week: " + map);
+            LOGGER.debug("taskIds map for four week: " + map);
             List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
             Long  citizenId = Long.valueOf(map.get("_id").toString());
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
@@ -409,7 +405,7 @@ public class AggregatorService extends MongoBaseService {
                 match(criteria),
                 new CustomAggregationOperation(groupObject)
         );
-        logger.debug("Task Aggregator Query: " + aggregation.toString());
+        LOGGER.debug("Task Aggregator Query: " + aggregation.toString());
 
         // Result
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
@@ -423,7 +419,7 @@ public class AggregatorService extends MongoBaseService {
     }
 
     private void sendDynamicReports(Long organizationId) {
-        logger.info("creating citizen count and pushing to frontend");
+        LOGGER.info("creating citizen count and pushing to frontend");
         List<ClientAggregator> citizenDataGroupByUnit = getCitizenDynamicData(organizationId);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("citizenDataList", citizenDataGroupByUnit);
@@ -436,7 +432,7 @@ public class AggregatorService extends MongoBaseService {
 
     @Scheduled(cron = "0 30 0 * * ?")
     public void updateExceptionCount() {
-        logger.debug("Cron job running for calculate exception count");
+        LOGGER.debug("Cron job running for calculate exception count");
         LocalDate localDate = (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY)) ? LocalDate.now() : DateUtils.getDateForPreviousDay(LocalDate.now(), DayOfWeek.MONDAY);
         LocalDate fourWeekLater = localDate.plusDays(28);
         Date monday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -484,7 +480,7 @@ public class AggregatorService extends MongoBaseService {
     @Scheduled(cron = "0 10 0 * * ?")
     public void updateUnhandledTask() {
         long startTime = System.currentTimeMillis();
-        logger.info("Cron job starts to calculate unhndled tasks of citizen");
+        LOGGER.info("Cron job starts to calculate unhndled tasks of citizen");
         LocalDate localDate = (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY)) ? LocalDate.now() : DateUtils.getDateForPreviousDay(LocalDate.now(), DayOfWeek.MONDAY);
         LocalDate fourWeekLater = localDate.plusDays(28);
         Date monday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -522,7 +518,7 @@ public class AggregatorService extends MongoBaseService {
             }
         }
         save(citizenAggregators);
-        logger.debug("Cron job finished after:: " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.debug("Cron job finished after:: " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     private void updateTaskCount(UnhandledTaskCount unhandledTaskCount, Task task, FourWeekFrequency fourWeekFrequency, PerformCalculation performCalculation) {

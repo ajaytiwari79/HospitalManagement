@@ -13,10 +13,11 @@ import java.util.List;
 public class UnionServiceWrapper {
     private List<UnionQueryResult> unions;
     private List<Object> services;
-    List<Level> organizationLevels;
+    private List<Level> organizationLevels;
     private List<SectorDTO> sectors;
 
     public UnionServiceWrapper() {
+        //Default Constructor
     }
 
     public List<Level> getOrganizationLevels() {

@@ -1,13 +1,14 @@
 package com.kairos.persistence.model.shift;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.shift.Shift;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,13 +17,13 @@ import java.util.Set;
  * @date - 30/8/18
  */
 @Document
-public class ShiftViolatedRules extends MongoBaseEntity{
+public class ShiftViolatedRules extends MongoBaseEntity {
 
     //TODO We need proper discussion it should be per phase
     private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
-    private Set<ShiftEscalationReason> escalationReasons;
+    private Set<ShiftEscalationReason> escalationReasons ;
 
     public ShiftViolatedRules() {
     }
@@ -60,6 +61,10 @@ public class ShiftViolatedRules extends MongoBaseEntity{
     }
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
-        this.escalationReasons = escalationReasons;
+        if (ObjectUtils.isCollectionEmpty(escalationReasons)) {
+            this.escalationReasons = new HashSet<>();
+        } else
+
+            this.escalationReasons = escalationReasons;
     }
 }

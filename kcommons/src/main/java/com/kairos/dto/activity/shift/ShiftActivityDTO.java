@@ -2,7 +2,7 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
+import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
@@ -51,13 +51,15 @@ public class ShiftActivityDTO {
     private Long allowedBreakDurationInMinute;
 
     private int timeBankCtaBonusMinutes;
-    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
+    private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
-    private int plannedMinutes;
+    private int plannedMinutesOfTimebank;
     private String startLocation; // this is for the location from where activity will gets starts
     private String endLocation;   // this is for the location from where activity will gets ends
+    private int scheduledMinutesOfTimebank;
+    private int scheduledMinutesOfPayout;
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
         this.activityId = activityId;
@@ -321,20 +323,20 @@ public class ShiftActivityDTO {
         this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
     }
 
-    public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
+    public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
         return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>(0));
     }
 
-    public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
+    public void setTimeBankCTADistributions(List<TimeBankDistributionDTO> timeBankCTADistributions) {
         this.timeBankCTADistributions = timeBankCTADistributions;
     }
 
-    public int getPlannedMinutes() {
-        return plannedMinutes;
+    public int getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
     }
 
-    public void setPlannedMinutes(int plannedMinutes) {
-        this.plannedMinutes = plannedMinutes;
+    public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 
     @JsonIgnore
@@ -361,5 +363,21 @@ public class ShiftActivityDTO {
 
     public void setEndLocation(String endLocation) {
         this.endLocation = endLocation;
+    }
+
+    public int getScheduledMinutesOfTimebank() {
+        return scheduledMinutesOfTimebank;
+    }
+
+    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
+        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
+    }
+
+    public int getScheduledMinutesOfPayout() {
+        return scheduledMinutesOfPayout;
+    }
+
+    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
+        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
     }
 }

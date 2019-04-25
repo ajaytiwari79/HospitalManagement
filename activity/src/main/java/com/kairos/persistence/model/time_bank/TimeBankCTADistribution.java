@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.time_bank;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -19,6 +18,13 @@ public class TimeBankCTADistribution {
         this.ctaRuleTemplateId = ctaRuleTemplateId;
     }
 
+
+    public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId,LocalDate ctaDate) {
+        this.ctaName = ctaName;
+        this.minutes = minutes;
+        this.ctaRuleTemplateId = ctaRuleTemplateId;
+        this.ctaDate = ctaDate;
+    }
 
 
 
@@ -73,5 +79,9 @@ public class TimeBankCTADistribution {
                 .append(ctaRuleTemplateId, that.ctaRuleTemplateId)
                 .isEquals();
     }
-    
+
+    @Override
+    public String toString() {
+        return "TimeBankCTADistribution{" + "ctaName='" + ctaName + '\'' + ", minutes=" + minutes + ", ctaRuleTemplateId=" + ctaRuleTemplateId + '}';
+    }
 }

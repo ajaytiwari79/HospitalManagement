@@ -3,7 +3,6 @@ package com.kairos.service.shift;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -18,9 +17,9 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.UserRestClientForScheduler;
 import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
 import com.kairos.service.MongoBaseService;
@@ -135,7 +134,9 @@ public class ShiftReminderService extends MongoBaseService {
         Map<String,Object> templateParam = new HashMap<>();
         templateParam.put("receiverName",staffDTO.getFullName());
         templateParam.put("description", description);
-        templateParam.put("imageResourceName",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
+        if(StringUtils.isNotBlank(staffDTO.getProfilePic())) {
+               templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
+        }
         mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getEmail());
 
 

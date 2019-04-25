@@ -1,7 +1,8 @@
 package com.planner.repository.solver_config;
 
-import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 /**
  * @author pradeep
@@ -37,5 +38,18 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
             AggregationResults<SolverConfigDTO> result = mongoTemplate.aggregate(aggregation, SolverConfig.class, SolverConfigDTO.class);
             return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
         }
+
+    public List<SolverConfigDTO> getAllSolverConfigWithConstraints(boolean checkForCountry, Long countryOrUnitId){
+        String applicableIdField = checkForCountry ? "countryId" : "unitId";
+        Criteria criteria=Criteria.where("deleted").ne(true).and(applicableIdField).is(countryOrUnitId);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("constraint", "constraintIds", "_id", "constraints"));
+        Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
+        AggregationResults<SolverConfigDTO> result = mongoTemplate.aggregate(aggregation, SolverConfig.class, className);
+        return result.getMappedResults();
+    }
+
+
 
 }

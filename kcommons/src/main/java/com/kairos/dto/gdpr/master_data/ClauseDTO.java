@@ -2,6 +2,8 @@ package com.kairos.dto.gdpr.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -10,6 +12,8 @@ import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseDTO {
 
@@ -31,27 +35,4 @@ public class ClauseDTO {
     public ClauseDTO() {
     }
 
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getTitle() { return title; }
-
-    public void setTitle(String title) { this.title = title; }
-
-    public List<ClauseTagDTO> getTags() { return tags; }
-
-    public void setTags(List<ClauseTagDTO> tags) { this.tags = tags; }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public List<Long> getTemplateTypes() {
-        return templateTypes;
-    }
-
-    public void setTemplateTypes(List<Long> templateTypes) {
-        this.templateTypes = templateTypes;
-    }
-}
+  }

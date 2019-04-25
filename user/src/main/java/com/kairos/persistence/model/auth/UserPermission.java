@@ -1,8 +1,5 @@
 package com.kairos.persistence.model.auth;
 
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-
-import java.util.List;
 import java.util.Set;
 
 /**

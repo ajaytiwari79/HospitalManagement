@@ -1,7 +1,19 @@
 package com.kairos.service.external_citizen_import;
 
-import com.kairos.dto.activity.task.order.OrderGrant;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.task.order.OrderGrant;
+import com.kairos.dto.user.organization.ImportTimeSlotListDTO;
+import com.kairos.dto.user.patient.CurrentElements;
+import com.kairos.dto.user.patient.PatientGrant;
+import com.kairos.dto.user.patient.PatientRelative;
+import com.kairos.dto.user.patient.PatientWrapper;
+import com.kairos.dto.user.staff.AvailableContacts;
+import com.kairos.dto.user.staff.ColumnResource;
+import com.kairos.dto.user.staff.ImportShiftDTO;
+import com.kairos.dto.user.staff.RelativeContacts;
+import com.kairos.dto.user.staff.client.CitizenSupplier;
+import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
@@ -28,19 +40,6 @@ import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.system_setting.SystemLanguageService;
-import com.kairos.dto.user.organization.ImportTimeSlotListDTO;
-import com.kairos.dto.user.patient.CurrentElements;
-import com.kairos.dto.user.patient.PatientGrant;
-import com.kairos.dto.user.patient.PatientRelative;
-import com.kairos.dto.user.patient.PatientWrapper;
-import com.kairos.dto.user.staff.AvailableContacts;
-import com.kairos.dto.user.staff.ColumnResource;
-import com.kairos.dto.user.staff.ImportShiftDTO;
-import com.kairos.dto.user.staff.RelativeContacts;
-import com.kairos.dto.user.staff.client.CitizenSupplier;
-import com.kairos.dto.user.staff.staff.StaffDTO;
-import com.kairos.dto.user.visitation.RepetitionType;
-import com.kairos.utils.JsonUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -61,7 +60,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.jsonStringToObject;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+
 
 
 /**
@@ -158,7 +159,7 @@ public class CitizenService {
                 for (int k = 0; k < patients.length(); k++) {
                     String patientUrl = patients.getJSONObject(k).getJSONObject("_links").getJSONObject("self").getString("href");
                     ResponseEntity<String> patientResponse = loginTemplate.exchange(patientUrl, HttpMethod.GET, headersElements, String.class);
-                    PatientWrapper patientWrapper = JsonUtils.toObject(patientResponse.getBody().toString(), PatientWrapper.class);
+                    PatientWrapper patientWrapper = jsonStringToObject(patientResponse.getBody().toString(), PatientWrapper.class);
                     //   if(Integer.valueOf(patientWrapper.getId()) != 7) continue;
                     clientService.createCitizenFromExternalService(patientWrapper, organization.getId());
                 }
@@ -294,7 +295,7 @@ public class CitizenService {
             for (int gC = 0; gC < grantOrderChildren.length(); gC++) {
                 int grantOrderId = grantOrderChildren.getJSONObject(gC).getInt("grantId");
                 ResponseEntity<String> grantOrderResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_ORDER_GRANTS + grantOrderId, HttpMethod.GET, headersElements, String.class);
-                OrderGrant grantOrderObject = JsonUtils.toObject(grantOrderResponse.getBody(), OrderGrant.class);
+                OrderGrant grantOrderObject = jsonStringToObject(grantOrderResponse.getBody(), OrderGrant.class);
                 getGrantObject(grantOrderObject.getOriginatorId(), loginTemplate, headersElements, organization, client, service, subService);
 
             }
@@ -336,7 +337,7 @@ public class CitizenService {
         Map<String, Object> grantObject = new HashMap<>();
         logger.info("grant url----------> " + AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId);
         ResponseEntity<String> grantResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId, HttpMethod.GET, headersElements, String.class);
-        PatientGrant patientGrant = JsonUtils.toObject(grantResponse.getBody(), PatientGrant.class);
+        PatientGrant patientGrant = jsonStringToObject(grantResponse.getBody(), PatientGrant.class);
         List<CurrentElements> currentElementsList = patientGrant.getCurrentElements();
         for (CurrentElements currentElements : currentElementsList) {
             switch (currentElements.getType()) {
@@ -452,7 +453,7 @@ public class CitizenService {
                 client = clientGraphRepository.findByKmdNexusExternalId(map.get("kmdNexusExternalId").toString());
                 logger.info("client-------------> "+client);
                 ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_RELATIVE_CONTACT, map.get("kmdNexusExternalId").toString()), HttpMethod.GET, headersElements, String.class);
-                AvailableContacts availableContacts = JsonUtils.toObject(responseEntity.getBody(), AvailableContacts.class);
+                AvailableContacts availableContacts = jsonStringToObject(responseEntity.getBody(), AvailableContacts.class);
                 if (availableContacts.getRelativeContacts().size() == 0) {
                     //Client nextToKin = client.getNextToKin();
                 }
@@ -460,7 +461,7 @@ public class CitizenService {
                     String relativeContactUrl = relativeContacts.get_links().getSelf().getHref();
                     ResponseEntity<String> relativeContactResponse = loginTemplate.exchange(relativeContactUrl, HttpMethod.GET, headersElements, String.class);
                     Organization organization = organizationGraphRepository.findByName(AppConstants.KMD_NEXUS_ORGANIZATION);
-                    PatientRelative patientRelative = JsonUtils.toObject(relativeContactResponse.getBody(), PatientRelative.class);
+                    PatientRelative patientRelative = jsonStringToObject(relativeContactResponse.getBody(), PatientRelative.class);
                     clientService.addClientRelativeDetailsFromExternalService(patientRelative, client, organization.getId());
                 }
             }
@@ -491,13 +492,13 @@ public class CitizenService {
         HttpEntity<String> headersElements = new HttpEntity<String>(headers);
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
-        ColumnResource columnResource = JsonUtils.toObject(jsonObject.get("columnResource").toString(), ColumnResource.class);
+        ColumnResource columnResource = jsonStringToObject(jsonObject.get("columnResource").toString(), ColumnResource.class);
         for(ImportShiftDTO shift : columnResource.getShifts()){
             String staffExternalId = shift.getEventResource().getResourceId();
             staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:")+13);
             logger.info("Staff External Id----> "+staffExternalId);
             ResponseEntity<String> staffResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_STAFFS_DETAILS, staffExternalId), HttpMethod.GET, headersElements, String.class);
-            StaffDTO staffDTO = JsonUtils.toObject(staffResponseEntity.getBody(), StaffDTO.class);
+            StaffDTO staffDTO = jsonStringToObject(staffResponseEntity.getBody(), StaffDTO.class);
             Staff staff = createStaffFromKMD(unitId, staffDTO);
             taskServiceRestClient.createTaskFromKMD(staff.getId(),shift,unitId);
             //anil m2 move this method in task micro service
@@ -583,7 +584,7 @@ public class CitizenService {
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray(responseEntity.getBody());
         jsonObject.put("kmdTimeSlotDTOList", jsonArray);
-        ImportTimeSlotListDTO importTimeSlotListDTO = JsonUtils.toObject(jsonObject.toString(), ImportTimeSlotListDTO.class);
+        ImportTimeSlotListDTO importTimeSlotListDTO = jsonStringToObject(jsonObject.toString(), ImportTimeSlotListDTO.class);
         Organization unit = organizationGraphRepository.findOne(unitId);
         importTimeSlotListDTO.getImportTimeSlotDTOList().forEach(kmdTimeSlotDTO -> {
             //timeSlotService.importTimeSlotsFromKMD( unit,  kmdTimeSlotDTO);

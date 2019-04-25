@@ -1,9 +1,9 @@
 package com.kairos.controller.task;
 
 import com.kairos.constants.ApiConstants;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.service.task_type.TaskDemandService;
-import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -101,7 +101,7 @@ public class TaskDemandController {
      */
     @RequestMapping(value ="/organization/{organizationId}/service/{serviceId}",method = RequestMethod.POST)
     @ApiOperation("getOrganizationClientsInfo")
-    public ResponseEntity<Map<String, Object>> createTaskDemandsOfKMD(@PathVariable  Long serviceId,@RequestBody Map<String, Object> grantObject) throws CloneNotSupportedException {
+    public ResponseEntity<Map<String, Object>> createTaskDemandsOfKMD(@PathVariable  Long serviceId,@RequestBody Map<String, Object> grantObject) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 taskDemandService.createGrants(grantObject,serviceId));
     }

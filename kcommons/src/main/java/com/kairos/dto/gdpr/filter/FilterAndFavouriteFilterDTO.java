@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr.filter;
 
 import java.util.List;
 
+//@Getter @Setter
 public class FilterAndFavouriteFilterDTO {
 
 

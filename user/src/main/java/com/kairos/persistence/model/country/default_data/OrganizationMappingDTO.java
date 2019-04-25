@@ -2,8 +2,8 @@ package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
 import java.util.List;

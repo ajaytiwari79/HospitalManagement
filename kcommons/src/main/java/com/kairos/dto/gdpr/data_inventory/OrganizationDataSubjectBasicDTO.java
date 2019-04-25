@@ -2,14 +2,19 @@ package com.kairos.dto.gdpr.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class OrganizationDataSubjectBasicDTO {
 
 
@@ -19,32 +24,9 @@ public class OrganizationDataSubjectBasicDTO {
     @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotEmpty(message = "Data Category  can't be  empty")
-    @NotNull(message = "Data category  can't be  null")
+    @NotBlank(message = "error.message.datacategory.notNull")
     private Set<BigInteger> dataCategories;
 
 
-    public BigInteger getId() {
-        return id;
-    }
 
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name.trim();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<BigInteger> getDataCategories() {
-        return dataCategories;
-    }
-
-    public void setDataCategories(Set<BigInteger> dataCategories) {
-        this.dataCategories = dataCategories;
-    }
 }

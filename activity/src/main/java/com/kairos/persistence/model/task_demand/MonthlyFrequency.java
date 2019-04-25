@@ -15,7 +15,9 @@ public class MonthlyFrequency {
     protected WeekOfMonth weekOfMonth;
     protected int      weekdayCount;
 
-    public MonthlyFrequency(){}
+    public MonthlyFrequency(){
+        //Default Constructor
+    }
 
     public int getMonthFrequency() {
         return monthFrequency;

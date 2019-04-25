@@ -3,13 +3,18 @@ package com.kairos.service.questionnaire_template;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDTO;
 import com.kairos.enums.gdpr.*;
-import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
-import com.kairos.persistence.model.questionnaire_template.*;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
-import com.kairos.persistence.repository.questionnaire_template.*;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -19,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -123,20 +130,43 @@ public class QuestionnaireSectionService {
         if (!Optional.ofNullable(templateType).isPresent()) {
             exceptionService.invalidRequestException("message.invalid.request", " Attribute name is incorrect");
         }
-        switch (templateType) {
-            case ASSET_TYPE:
-                if (!Optional.ofNullable(AssetAttributeName.valueOf(attributeName).value).isPresent()) {
-                    exceptionService.invalidRequestException("Attribute not found for Asset ");
-                }
-                break;
-            case PROCESSING_ACTIVITY:
-                if (!Optional.ofNullable(ProcessingActivityAttributeName.valueOf(attributeName).value).isPresent()) {
-                    exceptionService.invalidRequestException("Attribute not found for Asset ");
-                }
-                break;
+        try {
+            Class aClass = null;
+            switch (templateType) {
+                case ASSET_TYPE:
+                    if (!Optional.ofNullable(AssetAttributeName.valueOf(attributeName).value).isPresent()) {
+                        exceptionService.invalidRequestException("Attribute not found for Asset ");
+                    }
+                    aClass = Asset.class.getDeclaredField(AssetAttributeName.valueOf(attributeName).value).getType();
+                    break;
+                case PROCESSING_ACTIVITY:
+                    if (!Optional.ofNullable(ProcessingActivityAttributeName.valueOf(attributeName).value).isPresent()) {
+                        exceptionService.invalidRequestException("Attribute not found for Asset ");
+                    }
+                    aClass = ProcessingActivity.class.getDeclaredField(ProcessingActivityAttributeName.valueOf(attributeName).value).getType();
+                    break;
+            }
+            boolean isQuestionTypeValid=false;
+            if (List.class.equals(aClass) && question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+                isQuestionTypeValid=true;
+            } else if ((String.class.equals(aClass) || Integer.class.equals(aClass)) && question.getQuestionType().equals(QuestionType.TEXTBOX)) {
+                isQuestionTypeValid=true;
+            } else if (Boolean.class.equals(aClass) && question.getQuestionType().equals(QuestionType.YES_NO_MAYBE)) {
+                isQuestionTypeValid=true;
+            } else if (QuestionType.SELECT_BOX.equals(question.getQuestionType())){
+                isQuestionTypeValid=true;
+            }
+            if (!isQuestionTypeValid)
+            {
+                exceptionService.illegalArgumentException("message.invalid.question.type.selected",attributeName);
+            }
+        } catch (NoSuchFieldException e) {
+            LOGGER.debug("No such field Exception error in method addAttributeNameToQuestion");
+            exceptionService.unsupportedOperationException("message.invalid.request");
         }
         question.setAttributeName(attributeName);
     }
+
 
     public boolean deleteQuestionnaireSectionFromTemplate(boolean isOrganizationId, Long referenceId, Long templateId, Long questionnaireSectionId) {
         if (isOrganizationId) {
@@ -192,8 +222,8 @@ public class QuestionnaireSectionService {
                 exceptionService.duplicateDataException("duplicate.questionnaire.template.assetType.defaultTemplate");
             }
         } else {
-            if (Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
-                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetSubType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
+            if (Optional.ofNullable(questionnaireTemplate.getSubAssetType()).isPresent()) {
+                previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getSubAssetType().getId(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
                 }
@@ -210,8 +240,8 @@ public class QuestionnaireSectionService {
         QuestionnaireTemplate previousTemplate = null;
         switch (questionnaireTemplate.getRiskAssociatedEntity()) {
             case ASSET_TYPE:
-                if (Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent()) {
-                    previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetSubType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED);
+                if (Optional.ofNullable(questionnaireTemplate.getSubAssetType()).isPresent()) {
+                    previousTemplate = questionnaireTemplateRepository.findTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeIdTemplateTypeAndStatus(unitId, questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getSubAssetType().getId(), QuestionnaireTemplateType.RISK, QuestionnaireTemplateStatus.PUBLISHED);
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
                     }

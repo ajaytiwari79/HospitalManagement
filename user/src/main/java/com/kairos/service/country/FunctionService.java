@@ -1,18 +1,19 @@
 package com.kairos.service.country;
 
-import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
-import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationshipQueryResult;
+import com.kairos.persistence.model.user.employment.Employment;
+import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
+import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationshipQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
-import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
+import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class FunctionService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
+    private EmploymentFunctionRelationshipRepository employmentFunctionRelationshipRepository;
 
 
     public com.kairos.persistence.model.country.functions.FunctionDTO createFunction(Long countryId, FunctionDTO functionDTO) {
@@ -137,18 +138,18 @@ public class FunctionService {
     }
 
     //====================================================================================
-    public Map<Long, Map<Long, Set<LocalDate>>> getUnitPositionIdWithFunctionIdShiftDateMap(Set<Long> unitPositionIds) {
-        Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithFunctionIdAndLocalDateMap = new HashMap<>();
-        if (!unitPositionIds.isEmpty()) {
-            List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationships = unitPositionFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByUnitPositionId(unitPositionIds);
-            if (!unitPositionFunctionRelationships.isEmpty()) {
-                for (UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationship : unitPositionFunctionRelationships) {
+    public Map<Long, Map<Long, Set<LocalDate>>> getEmploymentIdWithFunctionIdShiftDateMap(Set<Long> employmentIds) {
+        Map<Long, Map<Long, Set<LocalDate>>> employmentWithFunctionIdAndLocalDateMap = new HashMap<>();
+        if (!employmentIds.isEmpty()) {
+            List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationships = employmentFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByEmploymentIds(employmentIds);
+            if (!employmentFunctionRelationships.isEmpty()) {
+                for (EmploymentFunctionRelationshipQueryResult employmentFunctionRelationship : employmentFunctionRelationships) {
                     Map<Long, Set<LocalDate>> functionIdWithAppliedDates = new HashMap<>();
-                    functionIdWithAppliedDates.put(unitPositionFunctionRelationship.getFunction().getId(), unitPositionFunctionRelationship.getAppliedDates());
-                    unitPositionWithFunctionIdAndLocalDateMap.put(unitPositionFunctionRelationship.getUnitPosition().getId(), functionIdWithAppliedDates);
+                    functionIdWithAppliedDates.put(employmentFunctionRelationship.getFunction().getId(), employmentFunctionRelationship.getAppliedDates());
+                    employmentWithFunctionIdAndLocalDateMap.put(employmentFunctionRelationship.getEmployment().getId(), functionIdWithAppliedDates);
                 }
             }
-            return unitPositionWithFunctionIdAndLocalDateMap;
+            return employmentWithFunctionIdAndLocalDateMap;
         } else {
             //TODO throw exception
         }
@@ -158,45 +159,64 @@ public class FunctionService {
     //=================================================================================
 
     /**
-     * Assuming one function per Date per unitPosition
-     * @param unitPositionIdWithShiftDateFunctionIdMap
+     * Assuming one function per Date per employment
+     *
+     * @param employmentIdWithShiftDateFunctionIdMap
      * @return
      */
-    public boolean updateUnitPositionFunctionRelationShipDates(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap) {
+    public boolean updateEmploymentFunctionRelationShipDates(Map<Long, Map<LocalDate, Long>> employmentIdWithShiftDateFunctionIdMap) {
         boolean result = false;
-        List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults = unitPositionFunctionRelationshipRepository.getApplicableFunctionsWithRelationShipIByUnitPositionId(unitPositionIdWithShiftDateFunctionIdMap.keySet());
-        List<UnitPositionFunctionRelationship> updatedUnitPositionFunctionRelationshipList = new ArrayList<>();
-        if (!unitPositionFunctionRelationshipQueryResults.isEmpty()) {
-            for (UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult : unitPositionFunctionRelationshipQueryResults) {
-                UnitPositionFunctionRelationship unitPositionFunctionRelationship = new UnitPositionFunctionRelationship();
-                unitPositionFunctionRelationship.setId(unitPositionFunctionRelationshipQueryResult.getId());
-                Function existingFunction = unitPositionFunctionRelationshipQueryResult.getFunction();
-                UnitPosition existingUnitPosition = unitPositionFunctionRelationshipQueryResult.getUnitPosition();
-                unitPositionFunctionRelationship.setFunction(existingFunction);
-                unitPositionFunctionRelationship.setUnitPosition(existingUnitPosition);
-                Set<LocalDate> existingAppliedDates = unitPositionFunctionRelationshipQueryResult.getAppliedDates();
-                Map<LocalDate, Long> localDateFunctionIdMap = unitPositionIdWithShiftDateFunctionIdMap.get(existingUnitPosition.getId());
+        List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationshipQueryResults = employmentFunctionRelationshipRepository.getApplicableFunctionsWithRelationShipIByEmploymentId(employmentIdWithShiftDateFunctionIdMap.keySet());
+        List<EmploymentFunctionRelationship> updatedEmploymentFunctionRelationshipList = new ArrayList<>();
+        if (!employmentFunctionRelationshipQueryResults.isEmpty()) {
+            for (EmploymentFunctionRelationshipQueryResult employmentFunctionRelationshipQueryResult : employmentFunctionRelationshipQueryResults) {
+                EmploymentFunctionRelationship employmentFunctionRelationship = new EmploymentFunctionRelationship();
+                employmentFunctionRelationship.setId(employmentFunctionRelationshipQueryResult.getId());
+                Function existingFunction = employmentFunctionRelationshipQueryResult.getFunction();
+                Employment existingEmployment = employmentFunctionRelationshipQueryResult.getEmployment();
+                employmentFunctionRelationship.setFunction(existingFunction);
+                employmentFunctionRelationship.setEmployment(existingEmployment);
+                Set<LocalDate> existingAppliedDates = employmentFunctionRelationshipQueryResult.getAppliedDates();
+                Map<LocalDate, Long> localDateFunctionIdMap = employmentIdWithShiftDateFunctionIdMap.get(existingEmployment.getId());
                 Set<LocalDate> datesToBeAdded = localDateFunctionIdMap.keySet().stream().filter(date -> existingFunction.getId().equals(localDateFunctionIdMap.get(date))).collect(Collectors.toSet());
-                Set<LocalDate> datesToBeRemoved = localDateFunctionIdMap.keySet().stream().filter(date -> ((localDateFunctionIdMap.get(date)==null) && existingAppliedDates.contains(date))).collect(Collectors.toSet());
+                Set<LocalDate> datesToBeRemoved = localDateFunctionIdMap.keySet().stream().filter(date -> ((localDateFunctionIdMap.get(date) == null) && existingAppliedDates.contains(date))).collect(Collectors.toSet());
                 if (!datesToBeAdded.isEmpty() || !datesToBeRemoved.isEmpty()) {
                     existingAppliedDates.addAll(datesToBeAdded);
                     existingAppliedDates.removeAll(datesToBeRemoved);
                 }
-                unitPositionFunctionRelationship.setDate(existingAppliedDates);
-                updatedUnitPositionFunctionRelationshipList.add(unitPositionFunctionRelationship);
+                employmentFunctionRelationship.setDate(existingAppliedDates);
+                updatedEmploymentFunctionRelationshipList.add(employmentFunctionRelationship);
             }
-            unitPositionFunctionRelationshipRepository.saveAll(updatedUnitPositionFunctionRelationshipList);
+            employmentFunctionRelationshipRepository.saveAll(updatedEmploymentFunctionRelationshipList);
             result = true;
         }
         return result;
     }
+
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
-        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
 
         return functionGraphRepository.findFunctionsByCountry(countryId);
+    }
+
+    public Map<LocalDate, List<FunctionDTO>> findAppliedFunctionsAtEmployment(Long unitId, String startDate, String endDate) {
+        List<EmploymentQueryResult> employmentQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(functionGraphRepository.findAppliedFunctionsAtEmpployment(unitId, startDate, endDate), EmploymentQueryResult.class);
+        Map<LocalDate, List<FunctionDTO>> dateWiseFunctionMap = new HashMap<>();
+        for (EmploymentQueryResult employmentQueryResult : employmentQueryResults) {
+            for (com.kairos.persistence.model.country.functions.FunctionDTO appliedFunctionDTO : employmentQueryResult.getAppliedFunctions()) {
+                for (LocalDate localDate : appliedFunctionDTO.getAppliedDates()) {
+                    FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
+                    functionDTO.setEmploymentId(employmentQueryResult.getId());
+                    List<FunctionDTO> functionDTOS = dateWiseFunctionMap.getOrDefault(localDate, new ArrayList<>());
+                    functionDTOS.add(functionDTO);
+                    dateWiseFunctionMap.put(localDate, functionDTOS);
+                }
+            }
+        }
+        return dateWiseFunctionMap;
     }
 }

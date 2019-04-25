@@ -1,5 +1,8 @@
 package com.kairos.service.task_type;
 
+import com.kairos.dto.user.organization.Shifts;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
 import com.kairos.persistence.model.task_demand.MonthlyFrequency;
@@ -9,16 +12,12 @@ import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.repository.client_aggregator.ClientAggregatorMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionTypeMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.dto.user.organization.Shifts;
-import com.kairos.dto.user.staff.client.ClientFilterDTO;
-import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.utils.JsonUtils;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;
@@ -28,7 +27,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -52,17 +50,15 @@ public class TaskDemandService extends MongoBaseService {
 
 
     @Inject
-    TaskTypeMongoRepository taskTypeMongoRepository;
+    private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
-    TaskDemandMongoRepository taskDemandMongoRepository;
+    private TaskDemandMongoRepository taskDemandMongoRepository;
 
-    @Inject
-    MongoTemplate mongoTemplate;
 //    @Inject
 //    com.kairos.user.service.services.organization.OrganizationService organizationService;
 
     @Inject
-    TaskService taskService;
+    private TaskService taskService;
 
     @Inject
     private CustomTimeScaleService customTimeScaleService;
@@ -71,20 +67,18 @@ public class TaskDemandService extends MongoBaseService {
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
 
-    @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
 
     @Autowired
-     TaskTypeService taskTypeService;
+    private TaskTypeService taskTypeService;
 
     @Autowired
-    UserIntegrationService userIntegrationService;
+    private UserIntegrationService userIntegrationService;
 
     @Autowired
-    CustomTaskTypeRepositoryImpl customTaskTypeRepository;
+    private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
 
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(TaskDemandService.class);
 
     public TaskDemand createTaskDemand(Map<String, Object> reqData) throws ParseException {
         TaskType taskType = taskTypeMongoRepository.findById((BigInteger) reqData.get("taskTypeId")).get();
@@ -163,7 +157,7 @@ public class TaskDemandService extends MongoBaseService {
                 new CustomAggregationOperation(matchTimeSlotObj),
                 new CustomAggregationOperation(groupCitizenIdObj)
         );
-        logger.info("Citizen by TimeSlot query :: "+agg.toString());
+        LOGGER.info("Citizen by TimeSlot query :: "+agg.toString());
         AggregationResults<Map> result =
                 mongoTemplate.aggregate(agg, TaskDemand.class, Map.class);
         List<Map> data = result.getMappedResults();
@@ -192,7 +186,7 @@ public class TaskDemandService extends MongoBaseService {
                 new CustomAggregationOperation(unwindAllValueObj),
                 new CustomAggregationOperation(groupCitizenIdObj)
         );
-        //logger.info("TimeSlot  list query query :: "+agg.toString());
+        //LOGGER.info("TimeSlot  list query query :: "+agg.toString());
         AggregationResults<Map> result =
                 mongoTemplate.aggregate(agg, TaskDemand.class, Map.class);
         List<Map> data = result.getMappedResults();
@@ -308,7 +302,7 @@ public class TaskDemandService extends MongoBaseService {
               //  Map<String, Object> clientMap = (Map<String, Object>) map.get("Client");
                 Long clientId = Long.parseLong(map.get("id")+"");;
                 List<Long> timeSlotIdSets =getListOfTimeSlotIdByCitizenAndUnit(clientId, organizationId);
-                //logger.debug("TimeSlotId   " + timeSlotIdSets);
+                //LOGGER.debug("TimeSlotId   " + timeSlotIdSets);
                 Map<String, Object> clientUpdatedMap = new HashMap<>();
                 map.forEach((String, Object) -> clientUpdatedMap.put(String, Object));
                 clientUpdatedMap.put("timeSlots", timeSlotIdSets);
@@ -332,7 +326,7 @@ public class TaskDemandService extends MongoBaseService {
                 clientUpdatedMap.put("noOfExceptions", countExceptions( clientId));
                 clientUpdatedMap.put("sumOfVisitationHoursAndTasks", clientAggregatorMongoRepository.findVisitationHoursAndTasksByCitizenIdIn( clientId, organizationId));
                 //  clientUpdatedMap.put("noOfUnHandlesExceptions", countUnhandledExceptions(organizationId, clientId));
-                //logger.debug(" ClientMap " + clientMap);
+                //LOGGER.debug(" ClientMap " + clientMap);
 
                 clientList.add(clientUpdatedMap);
             }
@@ -369,7 +363,7 @@ public class TaskDemandService extends MongoBaseService {
 
 
     private List<Long> getClientServicesIds(Long clientId, long orgId) {
-        logger.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
+        LOGGER.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
         List<Long> serviceList = new ArrayList<>();
         List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         return serviceList;
@@ -437,7 +431,7 @@ public class TaskDemandService extends MongoBaseService {
 
 
 
-   public TaskDemand createGrants(Map<String, Object> grantObject,Long subServiceId) throws CloneNotSupportedException {
+   public TaskDemand createGrants(Map<String, Object> grantObject,Long subServiceId) {
        JSONObject grantJson = new JSONObject(grantObject);
        TaskType taskType = null;
         Integer weekDayCount=0;
@@ -612,13 +606,13 @@ public class TaskDemandService extends MongoBaseService {
 
         if (!taskDemand.getWeekendVisits().isEmpty() && taskDemand.getWeekendFrequency() != null) {
 
-            logger.info("taskDemand.getWeekendVisits()  " + taskDemand.getWeekendVisits());
+            LOGGER.info("taskDemand.getWeekendVisits()  " + taskDemand.getWeekendVisits());
             for (TaskDemandVisit taskDemandVisit : taskDemand.getWeekendVisits()) {
                 taskDemandVisit.setId(mongoSequenceRepository.nextSequence(TaskDemand.class.getSimpleName()));
             }
         }
         if (!taskDemand.getWeekdayVisits().isEmpty() && taskDemand.getWeekdayFrequency() != null) {
-            logger.info("taskDemand.getWeekdayVisits()  " + taskDemand.getWeekdayVisits());
+            LOGGER.info("taskDemand.getWeekdayVisits()  " + taskDemand.getWeekdayVisits());
             for (TaskDemandVisit taskDemandVisit : taskDemand.getWeekdayVisits()) {
                 taskDemandVisit.setId(mongoSequenceRepository.nextSequence(TaskDemand.class.getSimpleName()));
             }

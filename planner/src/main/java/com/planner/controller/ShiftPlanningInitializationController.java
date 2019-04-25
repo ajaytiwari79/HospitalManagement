@@ -7,12 +7,12 @@ import com.planner.service.shift_planning.CTAService;
 import com.planner.service.shift_planning.ShiftPlanningInitializationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +35,7 @@ public class ShiftPlanningInitializationController {
      */
 
     ResponseEntity<Map<String, Object>> getActivities() {
-        return null;//ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, shiftPlanningInitializationService.getActivities(2567L, new Date(1530383400000l), new Date(1532975400000l)));
+        return null;//ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.OK, shiftPlanningInitializationService.getActivities(2567L, new Date(1530383400000l), new Date(1532975400000l)));
     }
 
     /**
@@ -48,18 +48,6 @@ public class ShiftPlanningInitializationController {
         Long[] staffIds = {34246L, 27075L, 27079L, 34251L, 34246L, 34272L};
         shiftPlanningInitializationService.initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
 
-        return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.FOUND);
+        return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.OK);
     }
-
-    /*@RequestMapping("/getWTA")
-    ResponseEntity<Map<String, Object>> getWTA() {
-        Long[] unitPositionIds = {35682L,35681L};
-        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds));
-    }
-
-    @RequestMapping("/getShifts")
-    ResponseEntity<Map<String, Object>> getShifts() {
-        Long[] unitPositionIds = {35682L,35681L};
-        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getAllShiftsByUnitPositionIds(unitPositionIds, new Date(1530383400000l), new Date(1532975400000l)));
-    }*/
 }

@@ -16,6 +16,8 @@ import java.util.Set;
 
 public interface CustomCostTimeAgreementRepository {
 
+    List<CTAResponseDTO> findCTAByCountryId(Long countryId);
+
     CTAResponseDTO getOneCtaById(BigInteger ctaId);
 
     CostTimeAgreement getCTAByIdAndOrganizationSubTypeAndCountryId(Long organizationSubTypeId, Long countryId, BigInteger ctaId);
@@ -31,22 +33,22 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getVersionsCTA(List<Long> upIds);
 
-    List<CTAResponseDTO> getParentCTAByUpIds(List<Long> unitPositionIds);
+    List<CTAResponseDTO> getParentCTAByUpIds(List<Long> employmentIds);
 
-    List<CTAResponseDTO> getCTAByUpIds(Set<Long> unitPositionIds);
+    List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds);
 
-    CTAResponseDTO getCTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
+    CTAResponseDTO getCTAByEmploymentIdAndDate(Long employmentId, Date date);
 
-    List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
+    List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> employmentIds, Date date);
 
-    List<CTAResponseDTO> getCTAByUnitPositionIdsAndDate(List<Long> unitPositionIds, Date startDate,Date endDate);
+    List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate);
 
-    CostTimeAgreement getCTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
+    CostTimeAgreement getCTABasicByEmploymentAndDate(Long employmentId, Date date);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
-    void setEndDateToCTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
+    void setEndDateToCTAOfEmployment(Long employmentId, LocalDate endDate);
 
-    List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId, Date startDate, Date endDate);
+    List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
 
-    boolean ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger ctaId,Long unitPositionId,Date startDate,Date endDate);
+    boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate);
 }

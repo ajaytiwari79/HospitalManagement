@@ -7,7 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
@@ -64,7 +64,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.index.Index;
@@ -108,7 +107,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Service
 public class TaskService extends MongoBaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
 
     @Inject
     private TaskMongoRepository taskMongoRepository;
@@ -116,8 +115,6 @@ public class TaskService extends MongoBaseService {
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
     private TaskDemandMongoRepository taskDemandMongoRepository;
-    @Inject
-    private MongoTemplate mongoTemplate;
     @Inject
     private TaskTypeService taskTypeService;
     @Inject
@@ -143,7 +140,7 @@ public class TaskService extends MongoBaseService {
     private PhaseService phaseService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
-        logger.info("Fetching tasks for ClientId: " + clientId);
+        LOGGER.info("Fetching tasks for ClientId: " + clientId);
         List response = new ArrayList();
 
         String matchStaffId = " {'$match':{'citizenId' :" + clientId + " , 'unitId': " + orgId + " }  }";
@@ -161,7 +158,7 @@ public class TaskService extends MongoBaseService {
                 new CustomAggregationOperation(unwindObj),
                 new CustomAggregationOperation(groupObject)
         );
-        logger.info("Query: " + aggregation.toString());
+        LOGGER.info("Query: " + aggregation.toString());
         // Result
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, TaskDemand.class, Map.class);
         // Mapped Result
@@ -169,16 +166,16 @@ public class TaskService extends MongoBaseService {
         if (mappedResult == null) {
             return null;
         }
-        logger.debug("mappedResult: " + mappedResult.size());
+        LOGGER.debug("mappedResult: " + mappedResult.size());
         for (Map<String, Object> map : mappedResult) {
-            logger.info("Data: " + map);
+            LOGGER.info("Data: " + map);
             response = (List) map.get("taskTypesList");
         }
         return Optional.ofNullable(response).orElse(Collections.emptyList());
     }
 
     public List<Object> getTaskByServiceId(Long clientId, Long serviceId, Long unitId) {
-        logger.info("Fetching tasks for Service: " + serviceId);
+        LOGGER.info("Fetching tasks for Service: " + serviceId);
         List<Long> serviceIds = new ArrayList<>();
         List<Object> response = new ArrayList<>();
         serviceIds.add(serviceId);
@@ -205,8 +202,8 @@ public class TaskService extends MongoBaseService {
         Document matchUnitObj = Document.parse(matchUnit);
         Document sortObj = Document.parse(sort);
 
-        logger.debug("Match Client: " + matchClientObj.toString());
-        logger.debug("Match Unit: " + matchUnitObj.toString());
+        LOGGER.debug("Match Client: " + matchClientObj.toString());
+        LOGGER.debug("Match Unit: " + matchUnitObj.toString());
         // Aggregate from DbObjects
         Aggregation aggregation = newAggregation(
 
@@ -218,14 +215,14 @@ public class TaskService extends MongoBaseService {
                 limit(5 * 10),
                 new CustomAggregationOperation(groupObject)
         );
-        logger.info("Query: " + aggregation.toString());
+        LOGGER.info("Query: " + aggregation.toString());
         // Result
         mongoTemplate.indexOps(Task.class).
                 ensureIndex(new Index().on("taskTypeId", Sort.Direction.ASC));
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, TaskType.class, Map.class);
         // Mapped Result
         List<Map> mappedResult = finalResult.getMappedResults();
-        logger.info("Preparing response..");
+        LOGGER.info("Preparing response..");
         for (Map data : mappedResult) {
             List<Task> taskList = (List<Task>) data.get("taskl");
             if (taskList != null) {
@@ -291,7 +288,7 @@ public class TaskService extends MongoBaseService {
             if (task == null) task = new Task();
             if (isTaskTypeAnonymous == false) {
                 task.setTaskTypeId(new BigInteger(data.get("taskTypeId") + ""));
-                logger.debug("taskTypeId--object Id---> " + data.get("taskTypeId"));
+                LOGGER.debug("taskTypeId--object Id---> " + data.get("taskTypeId"));
             } else {
                 Long taskTypeAnonymousId = Long.valueOf(String.valueOf(data.get("taskTypeAnonymousId")));
                 task.setTaskTypeAnonymousId(taskTypeAnonymousId);
@@ -424,19 +421,19 @@ public class TaskService extends MongoBaseService {
         if (!Optional.ofNullable(staffDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.external-staffid",personExternalId.get());
         }
-        if (!Optional.ofNullable(organizationStaffWrapper.getUnitPosition()).isPresent()) {
-            exceptionService.internalError("error.kairos.unitposition",personExternalId.get());
+        if (!Optional.ofNullable(organizationStaffWrapper.getEmployment()).isPresent()) {
+            exceptionService.internalError("error.kairos.employment",personExternalId.get());
         }
         List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare = timeCareShifts.getGetWorkShiftsFromWorkPlaceByIdResult();
         int sizeOfTimeCareShifts = shiftsFromTimeCare.size();
         int skip = 0;
         if (sizeOfTimeCareShifts > MONOGDB_QUERY_RECORD_LIMIT) {
             do {
-                saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition(), skippedShiftsWhileSave);
+                saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getEmployment(), skippedShiftsWhileSave);
                 skip += MONOGDB_QUERY_RECORD_LIMIT;
             } while (skip <= sizeOfTimeCareShifts);
         } else {
-            saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition(), skippedShiftsWhileSave);
+            saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getEmployment(), skippedShiftsWhileSave);
         }
         return skippedShiftsWhileSave;
     }
@@ -451,7 +448,7 @@ public class TaskService extends MongoBaseService {
         return shift;
     }
 
-    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId,UnitPositionDTO unitPositionDTO , List<String> skippedShiftsWhileSave) {
+    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId, EmploymentDTO employmentDTO, List<String> skippedShiftsWhileSave) {
         List<String> externalIdsOfShifts = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getId()).
                 collect(Collectors.toList());
         List<String> externalIdsOfActivities = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getActivityId()).
@@ -460,11 +457,11 @@ public class TaskService extends MongoBaseService {
         List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(workPlaceId, externalIdsOfActivities);
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
-        StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId(),Collections.emptySet());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
-        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
+        StaffEmploymentDetails staffEmploymentDetails = new StaffEmploymentDetails(employmentDTO.getWorkingDaysInWeek(), employmentDTO.getTotalWeeklyMinutes());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, employmentDTO.getId(),Collections.emptySet());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(),new Date());
+        staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        staffEmploymentDetails.setFullTimeWeeklyMinutes(employmentDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
@@ -474,7 +471,7 @@ public class TaskService extends MongoBaseService {
                 skippedShiftsWhileSave.add(timeCareShift.getId());
             } else {
                 shift.setStaffId(staffId);
-                shift.setUnitPositionId(unitPositionDTO.getId());
+                shift.setEmploymentId(employmentDTO.getId());
                 shiftsToCreate.add(shift);
             }
         }
@@ -486,18 +483,18 @@ public class TaskService extends MongoBaseService {
             Date startDate = shiftsToCreate.get(0).getStartDate();
             Date endDate = shiftsToCreate.get(shiftsToCreate.size()-1).getEndDate();
             timeBankService.updateTimeBankForMultipleShifts(staffAdditionalInfoDTO, startDate,endDate);
-            payOutService.savePayOuts(staffAdditionalInfoDTO.getUnitPosition(), shiftsToCreate,activities,null,staffAdditionalInfoDTO.getDayTypes());
+            payOutService.savePayOuts(staffAdditionalInfoDTO.getEmployment(), shiftsToCreate,activities,null,staffAdditionalInfoDTO.getDayTypes());
         }
     }
 
 
     public void syncFourthWeekTasks(LocalDateTime startDate) {
-        logger.info("SyncFourthWeekTasks Job starting at" + LocalDateTime.now());
+        LOGGER.info("SyncFourthWeekTasks Job starting at" + LocalDateTime.now());
         LocalDateTime localDateFrom = startDate;
         LocalDateTime localDateTo = localDateFrom.plusDays(1);
         for (int i = 1; i <= 7; i++) {
-            logger.debug("LocalDateFrom " + localDateFrom);
-            logger.debug("LocalDateTo   " + localDateTo);
+            LOGGER.debug("LocalDateFrom " + localDateFrom);
+            LOGGER.debug("LocalDateTo   " + localDateTo);
             Date fromDate = Date.from(localDateFrom.atZone(ZoneId.systemDefault()).toInstant());
             Date toDate = Date.from(localDateTo.atZone(ZoneId.systemDefault()).toInstant());
             Criteria criteria = Criteria.where("visitourId").exists(false).orOperator(Criteria.where("visitourId").is(null));
@@ -516,7 +513,7 @@ public class TaskService extends MongoBaseService {
                     new CustomAggregationOperation(unwindObj),
                     new CustomAggregationOperation(groupObject)
             );
-            logger.debug("SyncFourthWeekTasks Job  Query: " + aggregation.toString());
+            LOGGER.debug("SyncFourthWeekTasks Job  Query: " + aggregation.toString());
             AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
             List<Map> taskListWithUnitIdGroup = finalResult.getMappedResults();
             for (Map<String, Object> map : taskListWithUnitIdGroup) {
@@ -529,7 +526,7 @@ public class TaskService extends MongoBaseService {
                         Task task = mapper.convertValue(object, Task.class);
                         tasksToSync.add(task);
                     }
-                    logger.debug("tasksToSync: size " + tasksToSync.size());
+                    LOGGER.debug("tasksToSync: size " + tasksToSync.size());
                     if (tasksToSync.size() > 0) {
                         //taskConverterService.createFlsCallFromTasks(tasksToSync, flsCredentials);
 
@@ -541,7 +538,7 @@ public class TaskService extends MongoBaseService {
                         //scheduler.optmizeSchedule(openCall, datePayload, flsCredentials);
                     }
                 } else {
-                    logger.info("FLS Credentials Missing for Unit Id " + map.get("_id"));
+                    LOGGER.info("FLS Credentials Missing for Unit Id " + map.get("_id"));
                 }
             }
             localDateFrom = localDateFrom.plusDays(1);
@@ -614,7 +611,7 @@ public class TaskService extends MongoBaseService {
         List<Map<String, Object>> mapList = new ArrayList<>();
         for (TaskDemand demand : taskDemands) {
             List<Task> tasks = getTasksByDemandId(demand.getId() + "");
-            logger.info("Number of Tasks in this demand " + tasks.size());
+            LOGGER.info("Number of Tasks in this demand " + tasks.size());
             for (Task task : tasks) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", task.getId());
@@ -694,7 +691,7 @@ public class TaskService extends MongoBaseService {
     public void updateTaskDuration(Task task, boolean reduction, Integer percentageDuration) {
         LocalDateTime timeTo = LocalDateTime.ofInstant(task.getTimeTo().toInstant(), ZoneId.systemDefault());
         int minutes = task.getDuration() * percentageDuration / 100;
-        logger.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
+        LOGGER.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
         if (reduction) {
             if (task.getDuration() - minutes <= 0) {
                 exceptionService.internalError("error.task.duration");
@@ -795,10 +792,10 @@ public class TaskService extends MongoBaseService {
             taskMetaData.put("endAddress", -1);
             createTaskFromTimeCare(taskMetaData, AppConstants.REQUEST_FROM_KMD);
         } catch (ParseException exception) {
-            logger.warn("Exception Occur while saving shifts from KMD----> " + exception.getMessage());
+            LOGGER.warn("Exception Occur while saving shifts from KMD----> " + exception.getMessage());
 
         } catch (Exception e) {
-            logger.warn("Exception Occur while saving shifts from KMD----> " + e.getMessage());
+            LOGGER.warn("Exception Occur while saving shifts from KMD----> " + e.getMessage());
         }
     }
 
@@ -820,12 +817,12 @@ public class TaskService extends MongoBaseService {
         loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        logger.info("Auth token--------> " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+        LOGGER.info("Auth token--------> " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         Map map = new HashMap<String, String>();
         map.put("Content-Type", "application/json");
         //   headers.setAll(map);
         HttpEntity<String> headersElements = new HttpEntity<String>(headers);
-        logger.info("headers------headersElements-----> " + headersElements);
+        LOGGER.info("headers------headersElements-----> " + headersElements);
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         JSONArray jsonArray = jsonObject.getJSONArray("eventResources");
@@ -859,7 +856,7 @@ public class TaskService extends MongoBaseService {
                         Task task = tasksMergingService.mergeTasksWithIds(taskIds, taskDemand.getUnitId(), taskDemand.getCitizenId(), AppConstants.MERGED_TASK_NAME, false, uniqueID, taskAddress, null, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null);
                         task.setAssignedStaffIds(staffIds);
                     } catch (CloneNotSupportedException exception) {
-                        logger.warn("Exception occurs while merging Imported KMD Tasks----> " + exception.getMessage());
+                        LOGGER.warn("Exception occurs while merging Imported KMD Tasks----> " + exception.getMessage());
                     }
                 }
             }

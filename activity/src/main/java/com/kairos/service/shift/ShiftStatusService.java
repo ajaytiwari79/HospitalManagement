@@ -33,7 +33,6 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static com.kairos.enums.shift.ShiftStatus.*;
-import static com.kairos.enums.shift.ShiftStatus.VALIDATE;
 
 @Service
 public class ShiftStatusService {

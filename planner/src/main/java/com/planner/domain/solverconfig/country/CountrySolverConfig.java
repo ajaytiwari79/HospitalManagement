@@ -2,8 +2,6 @@ package com.planner.domain.solverconfig.country;
 
 import com.planner.domain.solverconfig.common.SolverConfig;
 
-import java.math.BigInteger;
-
 
 public class CountrySolverConfig extends SolverConfig{
 

@@ -3,16 +3,14 @@ package com.kairos.rest_client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import io.netty.handler.codec.http.HttpConstants;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -29,7 +27,7 @@ public class TomTomRestClient {
     @Inject
     private EnvConfig envConfig;
 
-    public Map getfromTomtom(Map<String,String> requestParam) {
+    public Map getfromTomtom(Map<String,String> requestParam) throws IOException {
         HttpClient httpclient = HttpClients.createDefault();
         Map tomTomResponse = null;
         try {
@@ -43,6 +41,8 @@ public class TomTomRestClient {
             }
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
+        }finally {
+            ((CloseableHttpClient) httpclient).close();
         }
         return tomTomResponse;
     }

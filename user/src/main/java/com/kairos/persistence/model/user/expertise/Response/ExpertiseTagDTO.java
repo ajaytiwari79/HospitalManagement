@@ -17,6 +17,10 @@ public class ExpertiseTagDTO {
     private String description;
     private List<TagDTO> tags;
 
+    public ExpertiseTagDTO(){
+        //Default Constructor
+    }
+
     public Long getId() {
         return id;
     }
@@ -48,6 +52,4 @@ public class ExpertiseTagDTO {
     public void setTags(List<TagDTO> tags) {
         this.tags = tags;
     }
-
-    public ExpertiseTagDTO(){};
 }

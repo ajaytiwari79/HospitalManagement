@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by oodles on 9/1/17.
@@ -73,6 +71,6 @@ public class LocationTypeService {
         } else {
             exceptionService.dataNotFoundByIdException("error.LocationType.notfound");
         }
-        return true;
+        return false;
     }
 }

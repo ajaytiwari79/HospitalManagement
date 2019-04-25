@@ -10,7 +10,7 @@ import java.util.Objects;
 public class StaffActivitySetting extends MongoBaseEntity {
     private Long staffId;
     private BigInteger activityId;
-    private Long unitPositionId;
+    private Long employmentId;
     private Long unitId;
     private Short shortestTime;
     private Short longestTime;
@@ -26,12 +26,12 @@ public class StaffActivitySetting extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public StaffActivitySetting(Long staffId, BigInteger activityId, Long unitPositionId, Long unitId,
+    public StaffActivitySetting(Long staffId, BigInteger activityId, Long employmentId, Long unitId,
                                 Short shortestTime, Short longestTime, Integer minLength, Integer maxThisActivityPerShift,
-                                boolean eligibleForMove,LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,List<Long> dayTypeIds) {
+                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<Long> dayTypeIds) {
         this.staffId = staffId;
         this.activityId = activityId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.unitId = unitId;
         this.shortestTime = shortestTime;
         this.longestTime = longestTime;
@@ -60,12 +60,12 @@ public class StaffActivitySetting extends MongoBaseEntity {
         this.activityId = activityId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getUnitId() {

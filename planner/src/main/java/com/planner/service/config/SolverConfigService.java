@@ -33,7 +33,7 @@ public class SolverConfigService {
 
     public void addSolverConfig(Long unitId, SolverConfigWTADTO solverConfigWTADTO){
         SolverConfig solverConfig= new SolverConfig(solverConfigWTADTO.getTemplateTypes(),120,unitId);
-        solverConfigRepository.save(solverConfig);
+        solverConfigRepository.saveEntity(solverConfig);
     }
 
     */
@@ -198,7 +198,7 @@ public class SolverConfigService {
         solverConfig.setPhase(PlanningType.valueOf(solverConfigDTO.getPhase()));
         solverConfig.setParentSolverConfigId(solverConfigDTO.getOptaPlannerId());
         solverConfig.setTemplate(solverConfigDTO.isTemplate());
-        solverConfig = solverConfigRepository.save(solverConfig);
+        solverConfig = solverConfigRepository.saveEntity(solverConfig);
         List<Constraint> constraint = new ArrayList<>();
         for (ConstraintDTO constrainDto:solverConfigDTO.getConstraintDTOList()) {
             Constraint constraint = new Constraint();
@@ -274,7 +274,7 @@ public class SolverConfigService {
             rule.setRuleCondition(ruleDto.getRuleCondition());
             rule.setOutputValues(ruleDto.getOutputValues());
             rule.setRuleName(ruleDto.getRuleName());
-            rule = solverConfigRepository.save(rule);
+            rule = solverConfigRepository.saveEntity(rule);
             rules.add(rule);
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -294,7 +294,7 @@ public class SolverConfigService {
         solverConfig.setHard(solverConfigDTO.getHardLevel());
         solverConfig.setMedium(solverConfigDTO.getMediumLevel());
         solverConfig.setSoft(solverConfigDTO.getSoftLevel());
-        solverConfig = solverConfigRepository.save(solverConfig);
+        solverConfig = solverConfigRepository.saveEntity(solverConfig);
         for (ConstraintDTO contraintDto:solverConfigDTO.getConstraintDTOList()) {
             Constraint constraint = new Constraint();
             constraint.setDynamicRuleValue(contraintDto.getDynamicRuleValues());
@@ -318,7 +318,7 @@ public class SolverConfigService {
             rule = solverConfigRepository.findById(contraintDto.getRuleId(),Rule.class);
             if(rule!=null){
                 constraint.setRuleId(rule.getId());
-                solverConfigRepository.save(constraint);
+                solverConfigRepository.saveEntity(constraint);
             }else {
                 solverConfigRepository.deleteById(solverConfig.getId(),SolverConfig.class);
             }

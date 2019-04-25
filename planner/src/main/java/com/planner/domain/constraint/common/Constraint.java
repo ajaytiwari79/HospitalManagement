@@ -1,8 +1,9 @@
 package com.planner.domain.constraint.common;
 
+import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.enums.constraint.ConstraintLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.constraint.ConstraintLevel;
 import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,9 +11,6 @@ import java.math.BigInteger;
 
 @Document(collection="constraint")
 public class Constraint extends MongoBaseEntity{
-
-    //~
-    protected BigInteger id;
     protected String name;
     protected String description;
     protected ConstraintType constraintType;
@@ -22,8 +20,10 @@ public class Constraint extends MongoBaseEntity{
     protected BigInteger planningProblemId;
     protected BigInteger parentConstraintId;//copiedFrom
 
-    //=================================================
-    public Constraint(){}
+
+    public Constraint(){
+        //Default Constructor
+    }
 
     public Constraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentConstraintId) {
         this.id = id;
@@ -37,14 +37,6 @@ public class Constraint extends MongoBaseEntity{
         this.parentConstraintId = parentConstraintId;
     }
 
-    // =================================================
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -109,4 +101,10 @@ public class Constraint extends MongoBaseEntity{
     public void setParentConstraintId(BigInteger parentConstraintId) {
         this.parentConstraintId = parentConstraintId;
     }
+
+    public boolean isEqualsWithSpecificField(ConstraintDTO constraintDTO) {
+        return constraintType.equals(constraintDTO.getConstraintType()) && constraintSubType.equals(constraintDTO.getConstraintSubType()) && constraintLevel.equals(constraintDTO.getConstraintLevel()) && penalty==penalty;
+    }
+
+
 }

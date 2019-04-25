@@ -2,30 +2,25 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.TimeInterval;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.TimeInterval;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-
-import static com.kairos.constants.CommonConstants.DAYS;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
-import static com.kairos.service.shift.ShiftValidatorService.*;
 
 
 /**
@@ -37,8 +32,8 @@ import static com.kairos.service.shift.ShiftValidatorService.*;
 public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private Set<BigInteger> plannedTimeIds = new HashSet<>();
+    private Set<BigInteger> timeTypeIds = new HashSet<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
     @Positive(message = "message.ruleTemplate.interval.notNull")
@@ -71,19 +66,19 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public List<BigInteger> getPlannedTimeIds() {
+    public Set<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
+    public Set<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
         this.timeTypeIds = timeTypeIds;
     }
 

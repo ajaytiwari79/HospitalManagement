@@ -1,23 +1,21 @@
     package com.kairos.controller.organization;
 
     import com.kairos.persistence.model.organization.team.TeamDTO;
-import com.kairos.service.organization.TeamService;
-import com.kairos.utils.response.ResponseHandler;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+    import com.kairos.service.organization.TeamService;
+    import com.kairos.utils.response.ResponseHandler;
+    import io.swagger.annotations.ApiOperation;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.validation.annotation.Validated;
+    import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
+    import javax.inject.Inject;
     import java.math.BigInteger;
     import java.text.ParseException;
-    import java.util.List;
     import java.util.Map;
     import java.util.Set;
 
     import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-    import static com.kairos.constants.ApiConstants.UNIT_URL;
     import static com.kairos.constants.AppConstants.TEAM;
 
     /**
@@ -181,4 +179,13 @@ import javax.inject.Inject;
         public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO) throws ParseException {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeamGeneralDetails(unitId, teamDTO));
         }
+
+        @GetMapping("/team/is_activity_assigned")
+        @ApiOperation("verify is activity assign to any team")
+        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> isActivityAssignedToTeam(@RequestParam BigInteger activityId) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.isActivityAssignedToTeam(activityId));
+        }
+
     }

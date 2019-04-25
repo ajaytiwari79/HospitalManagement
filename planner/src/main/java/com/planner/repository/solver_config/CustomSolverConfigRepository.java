@@ -3,6 +3,7 @@ package com.planner.repository.solver_config;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * @author pradeep
@@ -12,4 +13,6 @@ import java.math.BigInteger;
 public interface CustomSolverConfigRepository {
 
     SolverConfigDTO getSolverConfigWithConstraints(BigInteger solverConfigId);
+
+    List<SolverConfigDTO> getAllSolverConfigWithConstraints(boolean checkForCountry, Long countryOrUnitId);
 }

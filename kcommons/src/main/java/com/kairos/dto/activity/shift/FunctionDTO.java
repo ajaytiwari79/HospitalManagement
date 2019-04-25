@@ -23,6 +23,8 @@ public class FunctionDTO {
     private List<Long> unionIds;
     private List<Long> organizationLevelIds;
     private String icon;
+    private List<LocalDate> appliedDates;
+    private Long employmentId;
 
     public FunctionDTO() {
         //Default Constructor
@@ -96,5 +98,21 @@ public class FunctionDTO {
 
     public void setIcon(String icon) {
         this.icon = StringUtils.trim(icon);
+    }
+
+    public List<LocalDate> getAppliedDates() {
+        return appliedDates;
+    }
+
+    public void setAppliedDates(List<LocalDate> appliedDates) {
+        this.appliedDates = appliedDates;
+    }
+
+    public Long getEmploymentId() {
+        return employmentId;
+    }
+
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 }

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -94,9 +93,19 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    public static <T> T JsonStringToObject(String jsonString,Class<T> valueType){
+    public static <T> T jsonStringToObject(String jsonString, Class<T> valueType){
         try {
             return mapper.readValue(jsonString, valueType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static <T extends Object,E extends Object> List<E> JsonStringToList(String json, Class className) {
+        try {
+            return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(
+                    List.class, className));
         } catch (IOException e) {
             e.printStackTrace();
         }

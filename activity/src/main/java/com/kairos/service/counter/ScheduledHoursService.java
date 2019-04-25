@@ -53,4 +53,9 @@ public class ScheduledHoursService implements CounterService {
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
         return null;
     }
+
+    @Override
+    public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+        return null;
+    }
 }

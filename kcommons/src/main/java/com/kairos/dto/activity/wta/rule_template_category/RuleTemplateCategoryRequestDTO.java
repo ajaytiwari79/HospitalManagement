@@ -35,7 +35,7 @@ public class RuleTemplateCategoryRequestDTO {
     private boolean deleted;
     private List<BigInteger> ruleTemplateIds;
 
-    private List<Long> tags = new ArrayList<>();
+    private List<BigInteger> tags = new ArrayList<>();
 
 
     public RuleTemplateCategoryRequestDTO(String name, String description, boolean deleted) {
@@ -141,12 +141,8 @@ public class RuleTemplateCategoryRequestDTO {
         this.country = country;
     }
 
-    public List<Long> getTags() {
-        return tags;
-    }
+    public List<BigInteger> getTags() { return tags; }
 
-    public void setTags(List<Long> tags) {
-        this.tags = tags;
-    }
+    public void setTags(List<BigInteger> tags) { this.tags = tags; }
 }
 

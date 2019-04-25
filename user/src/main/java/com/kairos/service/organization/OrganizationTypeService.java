@@ -1,16 +1,16 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
+import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import org.slf4j.Logger;
@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 public class OrganizationTypeService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
-    OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
-    CountryGraphRepository countryGraphRepository;
+    private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
 

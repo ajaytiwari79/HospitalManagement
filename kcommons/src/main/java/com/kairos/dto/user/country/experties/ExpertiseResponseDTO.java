@@ -32,7 +32,6 @@ public class ExpertiseResponseDTO {
     private Integer numberOfWorkingDaysInWeek;
 
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
-    private List<Long> tags;
     private Boolean published;
     private Boolean editable;
     private BreakPaymentSetting breakPaymentSetting;
@@ -130,14 +129,6 @@ public class ExpertiseResponseDTO {
 
     public void setSeniorityLevels(List<SeniorityLevelDTO> seniorityLevels) {
         this.seniorityLevels = seniorityLevels;
-    }
-
-    public List<Long> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Long> tags) {
-        this.tags = tags;
     }
 
     public Boolean getPublished() {

@@ -1,13 +1,8 @@
 package com.kairos.persistence.model.period;
 
-import com.kairos.persistence.model.phase.Phase;
-
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by prerna on 6/4/18.

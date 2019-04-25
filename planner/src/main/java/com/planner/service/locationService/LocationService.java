@@ -6,7 +6,6 @@ import com.planner.domain.location.LocationDistance;
 import com.planner.domain.location.PlanningLocation;
 import com.planner.repository.locationRepository.LocationRepository;
 import com.planner.repository.locationRepository.PlanningLocationRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +33,8 @@ public class LocationService {
         planningLocationRepository.saveAll(planningLocations);
     }
 
-    public void save(PlanningLocation planningLocation) {
-        planningLocationRepository.save(planningLocation);
+    public void saveEntity(PlanningLocation planningLocation) {
+        planningLocationRepository.saveEntity(planningLocation);
     }
 
     public PlanningLocation findOne(String id) {
@@ -62,7 +61,7 @@ public class LocationService {
         /*if(locationDTO.getAddress().getZip()!=null){
             planningLocation.setZip(locationDTO.getAddress().getZip());
         }*/
-        planningLocation = (PlanningLocation) planningLocationRepository.save(planningLocation);
+        planningLocation = (PlanningLocation) planningLocationRepository.saveEntity(planningLocation);
         return planningLocation;
     }
 
@@ -133,7 +132,7 @@ public class LocationService {
         planningLocation1.setLongitude(planningLocation.getLongitude());
         planningLocation1.setStreet(planningLocation.getStreet());
         planningLocation1.setZip(planningLocation.getZip());
-        planningLocationRepository.save(planningLocation1);
+        planningLocationRepository.saveEntity(planningLocation1);
     }
 
     public void updateList(List<PlanningLocation> planningLocations){

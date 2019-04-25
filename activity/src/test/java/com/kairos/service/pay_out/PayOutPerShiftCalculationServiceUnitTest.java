@@ -1,5 +1,6 @@
 package com.kairos.service.pay_out;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.kairos.commons.utils.DateTimeInterval;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,11 +55,11 @@ public class PayOutPerShiftCalculationServiceUnitTest {
     @Test
     public void calculatePayOut(){
         /*when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
-        PayOutPerShift payOut = new PayOutPerShift(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
-        Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
-        Assert.assertEquals(payOut.getScheduledMin(),1020);
+        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
+        PayOutPerShift payOut = new PayOutPerShift(employmentWithCtaDetailsDTO.getEmploymentId(), employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+        payOutCalculationService.calculateAndUpdatePayOut(interval, employmentWithCtaDetailsDTO,shifts, payOut);
+        Assert.assertEquals(payOut.getTotalPayOutMinutes(),1130);
+        Assert.assertEquals(payOut.getScheduledMinutes(),1020);
         Assert.assertEquals(payOut.getContractualMin(),300);*/
     }
 

@@ -1,6 +1,5 @@
 package com.kairos.service.activity;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
@@ -20,9 +19,7 @@ import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
-import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -41,10 +38,8 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
@@ -89,10 +84,8 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
-import static com.kairos.constants.AppConstants.FULL_WEEK;
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.activity.ActivityUtil.*;
 
 /**
@@ -134,8 +127,6 @@ public class ActivityService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private CounterRepository counterRepository;
-    @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
     @Inject
     private GlideTimeSettingsService glideTimeSettingsService;
     @Inject
@@ -193,7 +184,7 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-        List<ActivityTagDTO> activityTagDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId), ActivityTagDTO.class);
+        List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByCountry(countryId);
         //In Country Module any Activity can be copied
         activityTagDTOS.forEach(activityTagDTO -> {
             activityTagDTO.setActivityCanBeCopied(true);
@@ -202,6 +193,20 @@ public class ActivityService extends MongoBaseService {
         response.put("activities", activityTagDTOS);
         response.put("activityCategories", acivitityCategories);
         return response;
+    }
+
+    public Set<BigInteger> checkActivityAllowForChildActivities(List<ActivityTagDTO> activities, ActivityWithCompositeDTO activityWithCompositeDTO){
+        Set<BigInteger> allowChildActivityIds=new HashSet<>();
+        Set<BigInteger> childActivitiesIds=activities.stream().flatMap(activityTagDTO -> activityTagDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
+        for (ActivityTagDTO activity : activities) {
+            if(!childActivitiesIds.contains(activity.getId()) && !activity.getId().equals(activityWithCompositeDTO.getId()) && isCollectionEmpty(activity.getChildActivityIds())){
+                allowChildActivityIds.add(activity.getId());
+            }
+        }
+        if(childActivitiesIds.contains(activityWithCompositeDTO.getId())){
+            activityWithCompositeDTO.setApplicableForChildActivities(false);
+        }
+        return allowChildActivityIds;
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
@@ -276,10 +281,12 @@ public class ActivityService extends MongoBaseService {
         activity.setDescription(generalTab.getDescription());
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
-        if (!generalDTO.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        if (!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            generalTab.setTags(activity.getTags());
         }
         updateBalanceSettingTab(generalDTO, activity);
         updateNotesTabOfActivity(generalDTO, activity);
@@ -360,19 +367,34 @@ public class ActivityService extends MongoBaseService {
         activity.getGeneralActivityTab().setCategoryId(category.getId());
     }
 
-    public ActivityTabsWrapper updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO) {
+    public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO ,boolean availableAllowActivity) {
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
         ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", timeCalculationActivityDTO.getActivityId());
         }
-        activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
-        if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
-            timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO,availableAllowActivity);
+        if(!timeCalculationActivityDTO.isAvailableAllowActivity()) {
+            activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
+            if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
+                timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+            }
+            save(activity);
         }
-        save(activity);
-        return new ActivityTabsWrapper(timeCalculationActivityTab);
+        return timeCalculationActivityDTO;
+    }
+
+    private TimeCalculationActivityDTO verifyAndDeleteCompositeActivity(TimeCalculationActivityDTO timeCalculationActivityDTO ,boolean availableAllowActivity){
+            if (timeCalculationActivityDTO.getMethodForCalculatingTime().equals(FULL_WEEK) || timeCalculationActivityDTO.getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
+                boolean availableAllowActivities = activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
+                    if(availableAllowActivities && availableAllowActivity){
+                        activityMongoRepository.unassignCompositeActivityFromActivitiesByactivityId(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
+                    }else if(availableAllowActivities) {
+                        timeCalculationActivityDTO.setAvailableAllowActivity(true);
+                    }
+                }
+        return timeCalculationActivityDTO;
     }
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
@@ -381,12 +403,10 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
-        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIds(compositeShiftIds);
+        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(compositeShiftIds);
         if (activityMatched.size() != compositeShiftIds.size()) {
-            exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
+            exceptionService.illegalArgumentException("message.activity.notallow");
         }
-        organizationActivityService.verifyBreakAllowedOfActivities(activity.getRulesActivityTab().isBreakAllowed(), activityMatched);
-        organizationActivityService.verifyTeamActivity(activityMatched, activity);
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.setCompositeActivities(compositeActivities);
@@ -411,6 +431,23 @@ public class ActivityService extends MongoBaseService {
         }
     }
 
+    public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
+        Activity activity = activityMongoRepository.findById(activityId).orElse(null);
+        if (activity == null) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+        }
+        List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
+        if (activityMatched.size() != childActivitiesIds.size()) {
+            exceptionService.illegalArgumentException("message.mismatched-ids");
+        }
+        organizationActivityService.verifyChildActivity(activityMatched, activity);
+        activity.setChildActivityIds(childActivitiesIds);
+        //updateCompositeActivity(activityList, activity, compositeActivities);
+        save(activity);
+        return childActivitiesIds;
+    }
+
+
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -419,16 +456,34 @@ public class ActivityService extends MongoBaseService {
         return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
     }
 
-    public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
-        Optional<Activity> activity = activityMongoRepository.findById(activityId);
-        if (!activity.isPresent()) {
+
+    public ActivityWithCompositeDTO getCompositeAndChildActivityOfCountryActivity(BigInteger activityId,Long countryId){
+        ActivityWithCompositeDTO  activity=getCompositeShiftTabOfActivity(activityId);
+        List<ActivityTagDTO> activityTagDTO=activityMongoRepository.findAllowChildActivityByCountryId(countryId);
+        activity.setAvailableChildActivityIds(checkActivityAllowForChildActivities(activityTagDTO,activity));
+        return activity;
+    }
+
+
+    public ActivityWithCompositeDTO getCompositeAndChildActivityOfUnitActivity(BigInteger activityId,Long unitId){
+        ActivityWithCompositeDTO  activity=getCompositeShiftTabOfActivity(activityId);
+        List<ActivityTagDTO> activityTagDTO = activityMongoRepository.findAllowChildActivityByUnitIdAndDeleted(unitId, false);
+        activity.setAvailableChildActivityIds(checkActivityAllowForChildActivities(activityTagDTO,activity));
+        return activity;
+    }
+
+
+    public ActivityWithCompositeDTO getCompositeShiftTabOfActivity(BigInteger activityId) {
+        ActivityWithCompositeDTO  activity=activityMongoRepository.findActivityByActivityId(activityId);
+        if (isNull(activity)) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        List<CompositeActivityDTO> compositeActivities = new ArrayList<>();
-        if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()) {
+        List<CompositeActivityDTO> compositeActivities;
+        if (Optional.ofNullable(activity.getCompositeActivities()).isPresent() && !activity.getCompositeActivities().isEmpty()) {
             compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
+            activity.setCompositeActivities(compositeActivities);
         }
-        return compositeActivities;
+        return activity;
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
@@ -454,11 +509,6 @@ public class ActivityService extends MongoBaseService {
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
-        }
-        if (activity.getRulesActivityTab().isBreakAllowed() != rulesActivityDTO.isBreakAllowed()) {
-            if (isCollectionNotEmpty(activity.getCompositeActivities()) || activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(rulesActivityDTO.getActivityId())) {
-                exceptionService.actionNotPermittedException("error.activity.being.used", activity.getName());
-            }
         }
         if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
             if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
@@ -836,7 +886,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.activity.published", activityId);
         }
         if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null) {
-            exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null", activity.getName());
+            exceptionService.actionNotPermittedException("message.activity.timeType.absent", activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);
@@ -862,10 +912,11 @@ public class ActivityService extends MongoBaseService {
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
-        activityCopied.setState(ActivityStateEnum.PUBLISHED);
+        activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
+        activityDTO.setActivityCanBeCopied(true);
         return activityDTO;
     }
 
@@ -894,8 +945,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByUnitId(unitId, false);
-        return activityTypeList;
+        return activityMongoRepository.findAllActivityByUnitId(unitId, false);
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {

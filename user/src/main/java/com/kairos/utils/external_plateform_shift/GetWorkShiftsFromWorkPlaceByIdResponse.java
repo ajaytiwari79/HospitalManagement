@@ -1,9 +1,9 @@
 package com.kairos.utils.external_plateform_shift;
 
-import java.util.List;
-
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
+import java.util.List;
 
 /**
  * Created by oodles on 14/12/16.
@@ -16,6 +16,7 @@ public class GetWorkShiftsFromWorkPlaceByIdResponse {
 
 
     public GetWorkShiftsFromWorkPlaceByIdResponse() {
+        //Default Constructor
     }
 
     //    public GetWorkShiftsFromWorkPlaceByIdResponse(com.kairos.user.domain.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult[] getWorkShiftsFromWorkPlaceByIdResult) {

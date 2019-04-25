@@ -1,12 +1,13 @@
 package com.kairos.persistence.repository.organization;
+
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
-import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import org.springframework.data.neo4j.annotation.Query;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -180,9 +181,9 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (team:Team),(skill:Skill) WHERE id (team)={0} AND id(skill)={1} with team,skill\n" +
             "Merge (team)-[r:"+TEAM_HAS_SKILLS+"]->(skill)\n" +
-            "ON CREATE SET r.visitourId={2},r.creationDate={3},r.lastModificationDate={4},r.isEnabled={5}\n" +
-            "ON MATCH SET r.visitourId={2},r.lastModificationDate={3},r.isEnabled={5} ")
-    void addSkillInTeam(long teamId, long skillId, String visitourId, long creationDate, long lastModificationDate, boolean isEnabled);
+            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3},r.isEnabled={4}\n" +
+            "ON MATCH SET r.lastModificationDate={2},r.isEnabled={4} ")
+    void addSkillInTeam(long teamId, long skillId, long creationDate, long lastModificationDate, boolean isEnabled);
 
     @Query("MATCH (organization:Organization)-[:"+ HAS_TEAMS +"]->(team:Team) WHERE id(organization)={0} RETURN team")
     List<Team> getTeamsByOrganization(long organizationId);
@@ -211,4 +212,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "UNWIND activityIds AS activities\n" +
             "RETURN DISTINCT activities")
     List<BigInteger> getTeamActivitiesOfStaff(Long staffId);
+
+    @Query("MATCH(team:Team{deleted:false}) WHERE ANY(activity IN team.activityIds WHERE activity=toString({0})) " +
+            "RETURN count(team)>0")
+    boolean activityExistInTeamByActivityId(BigInteger activityId);
 }

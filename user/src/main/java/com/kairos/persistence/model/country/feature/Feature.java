@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by prerna on 4/12/17.
@@ -18,7 +17,9 @@ public class Feature extends UserBaseEntity{
     private String name;
     private String description;
 
-    public Feature(){};
+    public Feature(){
+        //Default Constructor
+    }
 
     public String getName() {
         return name;

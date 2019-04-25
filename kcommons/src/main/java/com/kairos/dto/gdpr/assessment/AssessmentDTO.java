@@ -5,6 +5,9 @@ import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -15,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter @Setter @NoArgsConstructor
 public class AssessmentDTO {
 
     private Long id;
@@ -40,61 +44,5 @@ public class AssessmentDTO {
     private Integer relativeDeadlineDuration;
     @NotNull(message = "message.durationType.null")
     private DurationType relativeDeadlineType;
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name.trim(); }
-
-    public void setName(String name) { this.name = name; }
-
-    public LocalDate getEndDate() { return endDate; }
-
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
-
-    public String getComment() { return comment.trim(); }
-
-    public void setComment(String comment) { this.comment = comment; }
-
-    public List<Staff> getAssigneeList() { return assigneeList; }
-
-    public void setAssigneeList(List<Staff> assigneeList) { this.assigneeList = assigneeList; }
-
-    public Staff getApprover() { return approver; }
-
-    public void setApprover(Staff approver) { this.approver = approver; }
-
-    public LocalDate getAssessmentLaunchedDate() { return assessmentLaunchedDate; }
-
-    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
-
-    public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
-
-    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
-
-    public boolean isRiskAssessment() { return isRiskAssessment; }
-
-    public void setRiskAssessment(boolean riskAssessment) { this.isRiskAssessment = riskAssessment; }
-
-    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
-
-    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
-
-    public LocalDate getStartDate() { return startDate; }
-
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
-
-    public Integer getRelativeDeadlineDuration() { return relativeDeadlineDuration; }
-
-    public void setRelativeDeadlineDuration(Integer relativeDeadlineDuration) { this.relativeDeadlineDuration = relativeDeadlineDuration; }
-
-    public DurationType getRelativeDeadlineType() {
-        return relativeDeadlineType;
-    }
-
-    public void setRelativeDeadlineType(DurationType relativeDeadlineType) {
-        this.relativeDeadlineType = relativeDeadlineType;
-    }
 
 }

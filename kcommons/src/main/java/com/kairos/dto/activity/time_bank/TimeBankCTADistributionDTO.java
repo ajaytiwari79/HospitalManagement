@@ -2,71 +2,47 @@ package com.kairos.dto.activity.time_bank;
 
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
 public class TimeBankCTADistributionDTO {
 
     //cta ruletemplate based distributions
-    private List<CTADistributionDTO> children;
-    private long minutes;
-    private String ctaName;
-    private BigInteger ctaRuleTemplateId;
-    private LocalDate ctaDate;
+    private List<CTADistributionDTO> scheduledCTADistributions;
+    private CTARuletemplateBonus ctaRuletemplateBonus;
+    private long plannedMinutesOfTimebank;
+
+
 
     public TimeBankCTADistributionDTO() {
     }
 
-    public TimeBankCTADistributionDTO(String ctaName, int minutes, BigInteger ctaRuleTemplateId,LocalDate ctaDate) {
-        this.ctaName = ctaName;
-        this.minutes = minutes;
-        this.ctaRuleTemplateId = ctaRuleTemplateId;
-        this.ctaDate = ctaDate;
+    public TimeBankCTADistributionDTO(List<CTADistributionDTO> scheduledCTADistributions,CTARuletemplateBonus ctaRuletemplateBonus,long plannedMinutesOfTimebank) {
+        this.scheduledCTADistributions = scheduledCTADistributions;
+        this.ctaRuletemplateBonus = ctaRuletemplateBonus;
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 
-    public TimeBankCTADistributionDTO(List<CTADistributionDTO> children, long minutes) {
-        this.children = children;
-        this.minutes = minutes;
+    public CTARuletemplateBonus getCtaRuletemplateBonus() {
+        return ctaRuletemplateBonus;
     }
 
-    public LocalDate getCtaDate() {
-        return ctaDate;
+    public void setCtaRuletemplateBonus(CTARuletemplateBonus ctaRuletemplateBonus) {
+        this.ctaRuletemplateBonus = ctaRuletemplateBonus;
     }
 
-    public void setCtaDate(LocalDate ctaDate) {
-        this.ctaDate = ctaDate;
+    public List<CTADistributionDTO> getScheduledCTADistributions() {
+        return scheduledCTADistributions;
     }
 
-    public String getCtaName() {
-        return ctaName;
+    public void setScheduledCTADistributions(List<CTADistributionDTO> scheduledCTADistributions) {
+        this.scheduledCTADistributions = scheduledCTADistributions;
     }
 
-    public void setCtaName(String ctaName) {
-        this.ctaName = ctaName;
+    public long getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
     }
 
-    public BigInteger getCtaRuleTemplateId() {
-        return ctaRuleTemplateId;
-    }
-
-    public void setCtaRuleTemplateId(BigInteger ctaRuleTemplateId) {
-        this.ctaRuleTemplateId = ctaRuleTemplateId;
-    }
-
-    public long getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(long minutes) {
-        this.minutes = minutes;
-    }
-
-    public List<CTADistributionDTO> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<CTADistributionDTO> children) {
-        this.children = children;
+    public void setPlannedMinutesOfTimebank(long plannedMinutesOfTimebank) {
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
     }
 }

@@ -19,6 +19,10 @@ public class OrganizationRelationship{
 
     private String childLevelName;
 
+    public OrganizationRelationship() {
+        //Default Constructor
+    }
+
 
     public Organization getParentOrganization() {
         return parentOrganization;
@@ -42,9 +46,5 @@ public class OrganizationRelationship{
 
     public void setChildLevelName(String childLevelName) {
         this.childLevelName = childLevelName;
-    }
-
-
-    public OrganizationRelationship() {
     }
 }

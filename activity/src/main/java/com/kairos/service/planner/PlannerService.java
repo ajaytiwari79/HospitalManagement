@@ -62,7 +62,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -82,6 +81,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MERGED_TASK_NAME;
@@ -98,7 +98,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Transactional
 public class PlannerService extends MongoBaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlannerService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlannerService.class);
     @Inject
     private RandomDateGeneratorService randomDateGeneratorService;
     @Inject
@@ -125,9 +125,7 @@ public class PlannerService extends MongoBaseService {
     @Inject
     private EnvConfig envConfig;
     @Inject
-    CustomTimeScaleService customTimeScaleService;
-    @Inject
-    private MongoTemplate mongoTemplate;
+    private CustomTimeScaleService customTimeScaleService;
     @Inject
     private ExceptionService exceptionService;
 
@@ -321,7 +319,7 @@ public class PlannerService extends MongoBaseService {
 
 */
         citizenPlanningMap.putAll(clientAddressInfo);
-        logger.info("Execution Time :(PlannerService:getCitizenPlanning) " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.info("Execution Time :(PlannerService:getCitizenPlanning) " + (System.currentTimeMillis() - startTime) + " ms");
         return citizenPlanningMap;
     }
 
@@ -348,7 +346,7 @@ public class PlannerService extends MongoBaseService {
             }
         }
 
-        logger.info("Citizen is --->" + citizenId);
+        LOGGER.info("Citizen is --->" + citizenId);
         //anil m2 implements rest client
         TaskDemandVisitWrapper taskDemandInfo = userIntegrationService.
                 getClientDetailsForTaskDemandVisit(new TaskDemandRequestWrapper(citizenId, taskDemand.getUnitId(),
@@ -362,7 +360,7 @@ public class PlannerService extends MongoBaseService {
 
         TaskAddress taskAddress = taskDemandInfo.getTaskAddress();
 
-        logger.info("taskDemandVisit getId " + taskDemandVisit.getId());
+        LOGGER.info("taskDemandVisit getId " + taskDemandVisit.getId());
 
         Map<String, Object> timeSlotMap = taskDemandInfo.getTimeSlotMap();
 
@@ -392,7 +390,7 @@ public class PlannerService extends MongoBaseService {
                         }
                     }
                 } else {
-                    logger.info("intervalWeeks " + intervalWeeks);
+                    LOGGER.info("intervalWeeks " + intervalWeeks);
                     exceptionService.internalError("error.task.demand.date.startandend");
                 }
                 randomDates = randomDateGeneratorService.getRandomDates(numOfWeeks, visitCount, createTaskFrom, isWeekend, taskDemandEndDate, publicHolidayList, skipTaskOnPublicHoliday);
@@ -420,13 +418,13 @@ public class PlannerService extends MongoBaseService {
             }
         }
 
-        logger.debug("Total tasksToSave   :: " + tasksToSave.size());
-        logger.debug("Total tasksToReturn :: " + tasksToReturn.size());
+        LOGGER.debug("Total tasksToSave   :: " + tasksToSave.size());
+        LOGGER.debug("Total tasksToReturn :: " + tasksToReturn.size());
         return tasksToReturn;
     }
 
     private void createMultipleTask(List<Task> multiMenTasks, int staffCount) throws CloneNotSupportedException {
-        logger.debug("creating multimen task now ");
+        LOGGER.debug("creating multimen task now ");
         List<Task> multiMenRelatedTasks = new ArrayList<>();
         Task relatedTask;
         for (Task multiMenTask : multiMenTasks) {
@@ -440,7 +438,7 @@ public class PlannerService extends MongoBaseService {
         }
 
         taskService.save(multiMenTasks);
-        logger.info("total multimen task created = " + multiMenRelatedTasks.size());
+        LOGGER.info("total multimen task created = " + multiMenRelatedTasks.size());
         taskService.save(multiMenRelatedTasks);
 
     }
@@ -500,7 +498,7 @@ public class PlannerService extends MongoBaseService {
                                 if(slaPerDayInfo!=null && slaPerDayInfo.get(TaskTypeEnum.TaskTypeSlaDay.PUBLIC_HOLIDAY.toString())!=null){
                                     slaStartDuration = slaPerDayInfo.get(TaskTypeEnum.TaskTypeSlaDay.PUBLIC_HOLIDAY.toString());
                                 }
-                                logger.info("slaStartDuration >>>>> "+slaStartDuration);
+                                LOGGER.info("slaStartDuration >>>>> "+slaStartDuration);
                             }
                             task = createTask(citizen, randomDate, taskStartBoundary, taskEndBoundary, taskType, taskDemand, weekendTaskDemandVisit, preferredStaff, forbiddenStaff, differentTimeSlotMap, null, taskAddress, slaStartDuration);
                             tasksToSave.add(task);
@@ -658,7 +656,7 @@ public class PlannerService extends MongoBaseService {
 
     public Map createTaskFromDemandTimeSlot(long unitId, long citizenId, Map<String, Object> requestPayload) throws ParseException, CloneNotSupportedException {
 
-        logger.info("createTaskFromDemandTimeSlot" + requestPayload);
+        LOGGER.info("createTaskFromDemandTimeSlot" + requestPayload);
         long methodExecutionStartTime = System.currentTimeMillis();
 
         DateFormat dateISOFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -695,7 +693,7 @@ public class PlannerService extends MongoBaseService {
             taskDemandService.save(taskDemand);
         }
         List<TaskGanttDTO> responseList = taskService.customizeTaskData(taskList);
-        logger.info("Execution Time :(Planner Service: createTaskFromDemandTimeSlot ) " + (System.currentTimeMillis() - methodExecutionStartTime) + " ms");
+        LOGGER.info("Execution Time :(Planner Service: createTaskFromDemandTimeSlot ) " + (System.currentTimeMillis() - methodExecutionStartTime) + " ms");
         Map returnData = new HashMap();
         returnData.put("taskList", responseList);
         returnData.put("taskDemandList", getCitizenPlanning(unitId, citizenId, false, null));
@@ -705,7 +703,7 @@ public class PlannerService extends MongoBaseService {
 
     public List<TaskGanttDTO> generateIndividualTask(long unitId, long citizenId, List<List<Map<String, Object>>> taskData) throws ParseException, CloneNotSupportedException {
 
-        //logger.info("taskData " + taskData);
+        //LOGGER.info("taskData " + taskData);
 
         TaskDemandVisitWrapper taskDemandInfo = userIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId, unitId);
@@ -720,11 +718,11 @@ public class PlannerService extends MongoBaseService {
 
         for (List<Map<String, Object>> taskList : taskData) {
             if (taskList.size() > 1) { //we need to merge tasks,if multiple tasks found in list
-                //logger.info("taskList.size() " + taskList.size());
+                //LOGGER.info("taskList.size() " + taskList.size());
                 taskIdsToMerge = new ArrayList<>();
             }
             for (Map<String, Object> taskMap : taskList) {
-                //logger.info("taskMap " + taskMap);
+                //LOGGER.info("taskMap " + taskMap);
                 TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger((String) taskMap.get("taskTypeId")));
 
                 SimpleDateFormat executionDateFormat = new SimpleDateFormat(ONLY_DATE);
@@ -980,7 +978,7 @@ public class PlannerService extends MongoBaseService {
         tasksToReturn.addAll(nonEditableTasks);
         List<TaskGanttDTO> responseList = taskService.customizeTaskData(tasksToReturn);
 
-        logger.info("Execution Time :(PlannerService:prePlanningTaskUpdate) " + (System.currentTimeMillis() - startTime) + "  ms.");
+        LOGGER.info("Execution Time :(PlannerService:prePlanningTaskUpdate) " + (System.currentTimeMillis() - startTime) + "  ms.");
         return responseList;
     }
 
@@ -1184,13 +1182,13 @@ public class PlannerService extends MongoBaseService {
                 new CustomAggregationOperation(groupObject),
                 sort(Sort.Direction.DESC, "dateFrom")
         );
-        logger.debug("Merge Repetitions Query: " + aggregation.toString());
+        LOGGER.debug("Merge Repetitions Query: " + aggregation.toString());
 
         // Result
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
 
         List<Map> taskIdsGroupByDate = finalResult.getMappedResults();
-        logger.debug("taskIdsGroupByDate: " + taskIdsGroupByDate);
+        LOGGER.debug("taskIdsGroupByDate: " + taskIdsGroupByDate);
 
         String uniqueID = UUID.randomUUID().toString();
         uniqueID = uniqueID.substring(0, uniqueID.indexOf("-"));
@@ -1204,7 +1202,7 @@ public class PlannerService extends MongoBaseService {
         for (Map map : taskIdsGroupByDate) {
 
             List<String> taskIds = (List<String>) map.get("taskIds");
-            logger.debug("taskIds: " + taskIds);
+            LOGGER.debug("taskIds: " + taskIds);
 
             Task mergedTask = mergeTasksWithIds(taskIds, unitId, citizenId, mainTaskName,
                     isActualPlanningScreen, uniqueID, taskAddress, loggedInUser, preferredStaffIds, forbiddenStaffIds, flsCredentials);
@@ -1508,7 +1506,7 @@ public class PlannerService extends MongoBaseService {
         List<Task> tasksToReturn = new ArrayList<>();
         List<Task> tasksToCreate = new ArrayList<>();
         List<Task> tasksToDelete = new ArrayList<>();
-        logger.debug("tasksData payload <><><><><><><><>" + tasksData);
+        LOGGER.debug("tasksData payload <><><><><><><><>" + tasksData);
         String mainTaskId = tasksData.get("mainTaskId").toString();
         Task mainTask = taskMongoRepository.findOne(new BigInteger(mainTaskId));
 
@@ -1579,7 +1577,7 @@ public class PlannerService extends MongoBaseService {
        /* if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {
-            logger.info("NO Tasks Available");
+            LOGGER.info("NO Tasks Available");
         }*/
 
         /*for (Task task : tasksToDelete) {
@@ -1591,7 +1589,7 @@ public class PlannerService extends MongoBaseService {
         }*/
 
         List<TaskGanttDTO> responseList = customizeTaskData(tasksToReturn);
-        logger.info("Execution Time :(PlannerService:Un-mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.info("Execution Time :(PlannerService:Un-mergeMultipleTasks) " + (System.currentTimeMillis() - startTime) + " ms");
         return responseList;
     }
 
@@ -1643,11 +1641,11 @@ public class PlannerService extends MongoBaseService {
         Map<String, Object> response = new HashMap<>();
         List<Object> clientList = new ArrayList<>();
 
-        logger.debug("Finding citizen with Id: " + organizationId);
+        LOGGER.debug("Finding citizen with Id: " + organizationId);
         OrganizationClientWrapper organizationClientWrapper = userIntegrationService.getOrganizationClients(organizationId);
         //List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + FORWARD_SLASH);
         List<Map<String, Object>> mapList = organizationClientWrapper.getClientList();
-        logger.debug("CitizenList Size: " + mapList.size());
+        LOGGER.debug("CitizenList Size: " + mapList.size());
         Long staffId = organizationClientWrapper.getStaffId();
 
         Map<String, Object> responseFromTask = taskDemandService.getOrganizationClientsWithPlanning(organizationId, staffId, mapList);
@@ -1674,13 +1672,13 @@ public class PlannerService extends MongoBaseService {
         List<Object> clientList = new ArrayList<>();
         OrganizationClientWrapper organizationClientWrapper = userIntegrationService.
                 getClientsByIds(citizenIds);
-        logger.info("Finding citizen with Id: " + citizenIds);
+        LOGGER.info("Finding citizen with Id: " + citizenIds);
         //List<Map<String, Object>> mapList = organizationGraphRepository.getClientsByClintIdList(citizenId);
         List<Map<String, Object>> mapList = organizationClientWrapper.getClientList();
-        logger.info("CitizenList Size: " + mapList.size());
+        LOGGER.info("CitizenList Size: " + mapList.size());
 
         if (mapList != null) {
-            logger.info("Adding Citizen ");
+            LOGGER.info("Adding Citizen ");
             for (Map<String, Object> map : mapList) {
                 clientList.add(map.get("Client"));
             }
@@ -1750,7 +1748,7 @@ public class PlannerService extends MongoBaseService {
 
         // to update status of task demands
         if (!taskDemands.isEmpty()) taskDemandService.save(taskDemands);
-        logger.info("total time of PlannerService:autoGenerateTasks()" + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.info("total time of PlannerService:autoGenerateTasks()" + (System.currentTimeMillis() - startTime) + " ms");
         userIntegrationService.updateAutoGenerateTaskSettings(unitId);
         return customizeTaskData(tasksToReturn);
     }
@@ -1767,7 +1765,7 @@ public class PlannerService extends MongoBaseService {
         }
 
         if (unit.isOneTimeSyncPerformed()) {
-            logger.debug("One time sync already performed on this organization");
+            LOGGER.debug("One time sync already performed on this organization");
             return false;
         }
 
@@ -1776,18 +1774,18 @@ public class PlannerService extends MongoBaseService {
         Date dateFrom = Date.from(upcomingMonday.atStartOfDay().atZone(systemDefault()).toInstant());
         Date dateTo = Date.from(fourWeekLater.atStartOfDay().atZone(systemDefault()).toInstant());
 
-        logger.debug("DATE FROM -->" + dateFrom);
+        LOGGER.debug("DATE FROM -->" + dateFrom);
 
         List<Task> tasks = taskMongoRepository.getTaskBetweenDatesForUnit(unitId, dateFrom, dateTo);
-        logger.info("No of tasks to sync " + tasks.size());
+        LOGGER.info("No of tasks to sync " + tasks.size());
         Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
         /*if (tasks.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         } else {
-            logger.debug("NO Tasks Available");
+            LOGGER.debug("NO Tasks Available");
         }*/
         userIntegrationService.setOneTimeSyncPerformed(unitId);
-        logger.debug("Total time taken by one time sync::" + (System.currentTimeMillis() - startTime) + "   ms");
+        LOGGER.debug("Total time taken by one time sync::" + (System.currentTimeMillis() - startTime) + "   ms");
         return true;
     }
 
@@ -1857,7 +1855,7 @@ public class PlannerService extends MongoBaseService {
     private void updateTaskDuration(Task task, boolean reduction, Integer percentageDuration) {
         LocalDateTime timeTo = LocalDateTime.ofInstant(task.getTimeTo().toInstant(), ZoneId.systemDefault());
         int minutes = task.getDuration() * percentageDuration / 100;
-        logger.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
+        LOGGER.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
         if (reduction) {
             if (task.getDuration() - minutes <= 0) {
                 exceptionService.internalError("error.task.duration");
@@ -1943,7 +1941,7 @@ public class PlannerService extends MongoBaseService {
                 taskMongoRepository.deleteTasksAfterDate(citizenId, deathDateInDateFormat);
                 break;
             default:
-                logger.error("Invalid health status");
+                LOGGER.error("Invalid health status");
                 return;
         }
         //TODO FLS service disabled
@@ -1955,7 +1953,7 @@ public class PlannerService extends MongoBaseService {
         do {
             List<Task> tasks = taskMongoRepository.getCitizenTasksGroupByUnitIds(citizenId,deathDateInDateFormat,
                     new PageRequest(startPosition,MONOGDB_QUERY_RECORD_LIMIT,sort));
-            logger.info("Number of tasks to delete " + tasks.size());
+            LOGGER.info("Number of tasks to delete " + tasks.size());
             startPosition += MONOGDB_QUERY_RECORD_LIMIT;
             deleteTasksFromVisitour(tasks,flsCredentailsForUnits);
         } while (startPosition<totalTasksToDelete);*/
@@ -1978,7 +1976,7 @@ public class PlannerService extends MongoBaseService {
                         deleteTask = false;
                     }
                 } else {
-                    logger.debug("No Visitour Id: task.getId " + task.getId() + " vtid " + task.getVisitourId());
+                    LOGGER.debug("No Visitour Id: task.getId " + task.getId() + " vtid " + task.getVisitourId());
                 }
                 if (deleteTask) {
                     task.setTaskStatus(CANCELLED);
@@ -1990,7 +1988,7 @@ public class PlannerService extends MongoBaseService {
             taskService.save(taskList);
             return true;
         } else {
-            logger.info("No Tasks to Delete " + taskList);
+            LOGGER.info("No Tasks to Delete " + taskList);
             return false;
         }
     }

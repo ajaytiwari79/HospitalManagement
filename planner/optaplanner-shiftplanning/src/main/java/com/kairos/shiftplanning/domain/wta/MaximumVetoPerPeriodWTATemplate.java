@@ -2,10 +2,7 @@ package com.kairos.shiftplanning.domain.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.shiftplanning.domain.ShiftConstrutionPhase;
-import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
-
-import java.util.List;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 
 
 /**
@@ -61,8 +58,4 @@ public class MaximumVetoPerPeriodWTATemplate implements ConstraintHandler {
     public MaximumVetoPerPeriodWTATemplate() {
     }
 
-    public int checkConsTraints(List<ShiftConstrutionPhase> shifts, ShiftConstrutionPhase shift){
-        //TODO we can't consider from now it will comes in absence planner @Sachin
-        return 0;
-    }
 }

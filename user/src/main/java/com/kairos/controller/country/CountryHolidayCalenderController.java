@@ -2,7 +2,7 @@ package com.kairos.controller.country;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
-import com.kairos.service.google_calender.GoogleCalenderService;
+import com.kairos.service.google_calender.CountryCalenderService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +33,7 @@ public class CountryHolidayCalenderController {
     CountryService countryService;
 
     @Inject
-    private GoogleCalenderService googleCalenderService;
+    private CountryCalenderService countryCalenderService;
 
 
 
@@ -64,7 +64,7 @@ public class CountryHolidayCalenderController {
 //    @RequestMapping(value = "/holiday/fetch",method = RequestMethod.GET)
 //    @ApiOperation("Get all CountryHolidayCalenderController holiday All")
 //    ResponseEntity<Map<String, Object>> triggerGoogleCalenderService(@PathVariable Long countryId) throws IOException, ClassNotFoundException {
-//        return ResponseHandler.generateResponse(HttpStatus.OK,true,googleCalenderService.authorize());
+//        return ResponseHandler.generateResponse(HttpStatus.OK,true,countryCalenderService.authorize());
 //    }
 
 

@@ -2,10 +2,7 @@ package com.kairos.shiftplanning.domain.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.shiftplanning.domain.ShiftConstrutionPhase;
-import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
-
-import java.util.List;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 
 
 /**
@@ -107,8 +104,5 @@ public class MaximumSeniorDaysInYearWTATemplate implements ConstraintHandler {
     public MaximumSeniorDaysInYearWTATemplate() {
     }
 
-    public boolean checkConsTraints(List<ShiftConstrutionPhase> shifts, ShiftConstrutionPhase shift){
-        return false;
-    }
 
 }

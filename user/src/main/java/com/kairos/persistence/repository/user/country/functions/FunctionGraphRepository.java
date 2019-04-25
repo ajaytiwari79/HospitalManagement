@@ -3,11 +3,11 @@ package com.kairos.persistence.repository.user.country.functions;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +56,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
     @Query("MATCH (unit:Organization) where id(unit)={3} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
-            "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
+            "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
             "WHERE  date(functionalPayment.startDate)<=DATE({1}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({1}))\n" +
             "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
             " MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]-(payGroupArea) \n" +
@@ -68,11 +68,19 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
     @Query("MATCH (unit:Organization) where id(unit)={0} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={1} \n" +
-            "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
+            "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
             "WHERE  DATE(functionalPayment.startDate)<=DATE({3}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({3}))\n" +
             "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
             "with slf,fpm  MATCH(slf)-[rel:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) WHERE ID(function) IN {4} \n" +
             " MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]-(payGroupArea) \n" +
             "RETURN distinct function as function,rel.amount as amount,rel.amountEditableAtUnit as amountEditableAtUnit")
     List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId, Long expertiseId, Long seniorityLevelId, String selectedDate, List<Long> functions);
+
+    @Query("MATCH(o:Organization)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(o)={0} AND " +
+            "({2} IS NULL AND (employment.endDate IS NULL OR date(employment.endDate) > DATE({1})))\n" +
+            "OR \n" +
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < date(employment.endDate) OR DATE({2})>date(employment.startDate)))\n" +
+            "WITH employment,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions\n" +
+            " RETURN  id(employment) as id , appliedFunctions as appliedFunctions")
+    List<EmploymentQueryResult> findAppliedFunctionsAtEmpployment(Long unitId, String startDate, String endDate);
 }

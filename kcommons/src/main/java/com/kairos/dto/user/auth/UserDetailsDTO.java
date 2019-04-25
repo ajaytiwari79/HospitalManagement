@@ -102,5 +102,4 @@ public class UserDetailsDTO {
     }
 
     private Long languageId;
-
 }

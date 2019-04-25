@@ -19,9 +19,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by vipul on 30/8/17.
@@ -44,8 +42,8 @@ public class ShiftDTO {
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     private Long staffId;
     @Range(min = 0)
-    @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
-    private Long unitPositionId;
+    @NotNull(message = "error.ShiftDTO.employmentId.notnull")
+    private Long employmentId;
     @NotNull(message = "message.shift.shiftDate")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
@@ -68,12 +66,14 @@ public class ShiftDTO {
     private int timeBankCtaBonusMinutes;
     private int deltaTimeBankMinutes;
     private long accumulatedTimeBankMinutes;
-    private int plannedMinutes;
+    private int plannedMinutesOfTimebank;
     private boolean multipleActivity;
     private BigInteger planningPeriodId;
     private BigInteger phaseId;
     private int restingMinutes;
     private Set<ShiftEscalationReason> escalationReasons;
+    private Long functionId;
+
 
     public ShiftDTO() {
         //default Const
@@ -87,18 +87,18 @@ public class ShiftDTO {
        this.staffId = staffId;
    }
 
-    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
+    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
     }
 
-    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,Date startDate,Date endDate) {
+    public ShiftDTO(List<ShiftActivityDTO> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId, Date startDate, Date endDate) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -324,35 +324,16 @@ public class ShiftDTO {
         this.endDate = endDate;
     }
 
-    /*public ShiftQueryResult getQueryResults(){
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setStatus(this.status);
-        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
-        return shiftQueryResult;
-    }*/
-
-
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getAllowedBreakDurationInMinute() {
@@ -419,12 +400,12 @@ public class ShiftDTO {
         this.accumulatedTimeBankMinutes = accumulatedTimeBankMinutes;
     }
 
-    public int getPlannedMinutes() {
-        return plannedMinutes;
+    public int getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
     }
 
-    public void setPlannedMinutes(int plannedMinutes) {
-        this.plannedMinutes = plannedMinutes;
+    public void setPlannedMinutesOfTimebank(int plannedMinutes) {
+        this.plannedMinutesOfTimebank = plannedMinutes;
     }
 
     public BigInteger getPlanningPeriodId() {
@@ -458,6 +439,15 @@ public class ShiftDTO {
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
         this.escalationReasons = isNullOrElse(escalationReasons,new HashSet<>());
     }
+
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
+    }
+
 
     @Override
     public String toString() {

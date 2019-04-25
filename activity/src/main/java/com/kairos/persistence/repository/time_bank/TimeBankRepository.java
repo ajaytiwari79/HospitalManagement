@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /*
 * Created By Pradeep singh rajawat
@@ -20,30 +19,28 @@ import java.util.Set;
 @Repository
 public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEntry,BigInteger> ,CustomTimeBankRepository{
 
+    @Query("{employmentId:?0,deleted:false,date:{$gte:?1 , $lte:?2}}")
+    List<DailyTimeBankEntry> findAllByEmploymentAndDate(Long employmentId, Date startDate, Date endDate);
 
+    @Query(value = "{employmentId:{$in:?0},deleted:false,date:{$gte:?1 , $lt:?2}}")
+    List<DailyTimeBankEntry> findAllDailyTimeBankByIdsAndBetweenDates(List<Long> employmentIds, Date startDate, Date endDate);
 
-    @Query("{unitPositionId:?0,deleted:false,date:{$gte:?1 , $lte:?2}}")
-    List<DailyTimeBankEntry> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
+    @Query("{employmentId:?0,deleted:false,date:{$lt:?1}}")
+    List<DailyTimeBankEntry> findAllByEmploymentIdAndBeforeDate(Long employmentId, Date timeBankDate);
 
-    @Query(value = "{unitPositionId:{$in:?0},deleted:false,date:{$gte:?1 , $lt:?2}}")
-    List<DailyTimeBankEntry> findAllDailyTimeBankByIdsAndBetweenDates(List<Long> unitPositionIds, Date startDate, Date endDate);
+    @Query("{employmentId:{$in:?0},deleted:false,date:{ $lte:?1}}")
+    List<DailyTimeBankEntry> findAllByEmploymentIdsAndBeforDate(List<Long> employmentIds, Date endDate);
 
-    @Query("{unitPositionId:?0,deleted:false,date:{$lt:?1}}")
-    List<DailyTimeBankEntry> findAllByUnitPositionAndBeforeDate(Long unitPositionId, Date timeBankDate);
-
-    @Query("{unitPositionId:{$in:?0},deleted:false,date:{ $lte:?1}}")
-    List<DailyTimeBankEntry> findAllByUnitPositionsAndBeforDate(List<Long> unitPositionIds, Date endDate);
-
-    @Query(value = "{unitPositionId:{$in:?0},deleted:false,date:{$gte:?1 , $lt:?2}}",delete = true)
-    void deleteDailyTimeBank(List<Long> unitPositionIds, Date startDate, Date endDate);
-
-    @Query("{unitPositionId:?0,deleted:false,date:?1}")
-    DailyTimeBankEntry findByUnitPositionAndDate(Long unitPositionId, LocalDate startDate);
+    @Query(value = "{employmentId:{$in:?0},deleted:false,date:{$gte:?1 , $lt:?2}}",delete = true)
+    void deleteDailyTimeBank(List<Long> employmentIds, Date startDate, Date endDate);
 
     @Query("{deleted:false}")
     List<DailyTimeBankEntry> findAllAndDeletedFalse();
 
-    @Query("{unitPositionId:?0,deleted:false,date:{$lte:?1}}")
-    List<DailyTimeBankEntry> findAllByUnitPositionAndBeforeAndEqualsDate(Long unitPositionId, Date timeBankDate);
+    @Query("{employmentId:?0,deleted:false,date:{$lte:?1}}")
+    List<DailyTimeBankEntry> findAllByEmploymentIdAndStartDate(Long employmentId, Date timeBankDate);
+
+    @Query("{employmentId:?0,deleted:false,date:?1}")
+    DailyTimeBankEntry findByEmploymentAndDate(Long employmentId, LocalDate startDate);
 
 }

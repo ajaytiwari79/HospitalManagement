@@ -9,7 +9,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +51,27 @@ public class ActivityPriorityService {
         return activityPriorityDTO;
     }
 
+    public boolean createActivityPriorityForNewOrganization(Long unitId,Long countryId){
+        List<ActivityPriorityDTO> activityPriorityDTOs = activityPriorityMongoRepository.findAllCountryId(countryId);
+        List<ActivityPriority> activityPrioritiesOfOrganization = new ArrayList<>(activityPriorityDTOs.size());
+        for (ActivityPriorityDTO activityPriorityDTO : activityPriorityDTOs) {
+            ActivityPriority organizationActivityPriority = copyActivityPriorityToOrganization(unitId, ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO,ActivityPriority.class));
+            activityPrioritiesOfOrganization.add(organizationActivityPriority);
+        }
+        if(isCollectionNotEmpty(activityPrioritiesOfOrganization)) {
+            activityPriorityMongoRepository.saveEntities(activityPrioritiesOfOrganization);
+        }
+        return true;
+    }
 
+    private ActivityPriority copyActivityPriorityToOrganization(Long unitId, ActivityPriority activityPriority) {
+        ActivityPriority organizationActivityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriority,ActivityPriority.class);
+        organizationActivityPriority.setId(null);
+        organizationActivityPriority.setCountryId(null);
+        organizationActivityPriority.setSequence(activityPriority.getSequence());
+        organizationActivityPriority.setOrganizationId(unitId);
+        return organizationActivityPriority;
+    }
 
     private boolean createActivityPriorityAtOrganizations(ActivityPriority activityPriority,Long unitId){
         List<Long> organizationIds = userIntegrationService.getAllOrganizationIds(unitId);
@@ -60,11 +79,8 @@ public class ActivityPriorityService {
         Map<Long,Integer> activityPrioritiesMap = activityPriorities.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v.getSequence()));
         List<ActivityPriority> activityPrioritiesOfOrganization = new ArrayList<>(organizationIds.size());
         for (Long organizationId : organizationIds) {
-            ActivityPriority organizationActivityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriority,ActivityPriority.class);
-            activityPriority.setId(null);
-            activityPriority.setCountryId(null);
-            activityPriority.setSequence(activityPrioritiesMap.getOrDefault(organizationId,0)+1);
-            organizationActivityPriority.setOrganizationId(organizationId);
+            ActivityPriority organizationActivityPriority =copyActivityPriorityToOrganization(organizationId,activityPriority);
+            organizationActivityPriority.setSequence(activityPrioritiesMap.getOrDefault(organizationId,0)+1);
             activityPrioritiesOfOrganization.add(organizationActivityPriority);
         }
         if(isCollectionNotEmpty(activityPrioritiesOfOrganization)) {
@@ -107,11 +123,11 @@ public class ActivityPriorityService {
             exceptionService.actionNotPermittedException("error.name.duplicate", activityPriorityDTO.getName());
         }
         ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityDTO.getId());
-        if(activityPriority.getSequence()!=activityPriorityDTO.getSequence()){
+        if(activityPriority.getSequence()<activityPriorityDTO.getSequence()){
             activityPriorityMongoRepository.updateSequenceOfActivityPriorityOnCountry(activityPriorityDTO.getSequence(),activityPriority.getSequence(),countryId);
         }
         activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO,ActivityPriority.class);
-        activityPriority.setOrganizationId(countryId);
+        activityPriority.setCountryId(countryId);
         activityPriorityMongoRepository.save(activityPriority);
         return activityPriorityDTO;
     }
@@ -122,7 +138,7 @@ public class ActivityPriorityService {
             exceptionService.actionNotPermittedException("error.name.duplicate", activityPriorityDTO.getName());
         }
         int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtOrganization(unitId);
-        if(activityPriorityCount!=activityPriorityDTO.getSequence()){
+        if(activityPriorityCount<activityPriorityDTO.getSequence()){
             exceptionService.actionNotPermittedException("message.activity.priority.sequence");
         }
         ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityDTO.getId());
@@ -145,13 +161,17 @@ public class ActivityPriorityService {
         activityPriority.setDeleted(true);
         activityPriorityMongoRepository.save(activityPriority);
         List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndCountryId(activityPriority.getSequence(),countryId,new Sort(Sort.Direction.ASC, "sequence"));
+        updateSequence(activityPriority, activityPriorities);
+        activityPriorityMongoRepository.saveAll(activityPriorities);
+        return true;
+    }
+
+    private void updateSequence(ActivityPriority activityPriority, List<ActivityPriority> activityPriorities) {
         int sequence = activityPriority.getSequence();
         for (ActivityPriority priority : activityPriorities) {
             priority.setSequence(sequence);
             sequence++;
         }
-        activityPriorityMongoRepository.saveAll(activityPriorities);
-        return true;
     }
 
     public boolean deleteActivityPriorityFromOrganization(BigInteger activityPriorityId,Long organizationId){
@@ -163,11 +183,7 @@ public class ActivityPriorityService {
         activityPriority.setDeleted(true);
         activityPriorityMongoRepository.save(activityPriority);
         List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndOrganizationId(activityPriority.getSequence(),organizationId,new Sort(Sort.Direction.ASC, "sequence"));
-        int sequence = activityPriority.getSequence();
-        for (ActivityPriority priority : activityPriorities) {
-            priority.setSequence(sequence);
-            sequence++;
-        }
+        updateSequence(activityPriority, activityPriorities);
         activityPriorityMongoRepository.saveAll(activityPriorities);
         return true;
     }

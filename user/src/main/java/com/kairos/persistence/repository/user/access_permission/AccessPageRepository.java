@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
