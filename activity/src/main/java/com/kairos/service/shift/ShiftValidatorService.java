@@ -22,6 +22,7 @@ import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
+import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -76,6 +77,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
@@ -455,7 +457,7 @@ public class ShiftValidatorService {
                             }
                         }
                     } else {
-                        exceptionService.actionNotPermittedException("message.staffingLevel.activity",activity.getName());
+                        exceptionService.actionNotPermittedException("message.staffingLevel.activity", activity.getName());
                     }
 
                 }
@@ -518,7 +520,7 @@ public class ShiftValidatorService {
             if (CollectionUtils.isEmpty(staffingLevels)) {
                 exceptionService.actionNotPermittedException("message.staffingLevel.absent");
             }
-            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(shiftStartDate, shiftEndDate, shift.getUnitId(),shift.getId());
+            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(shiftStartDate, shiftEndDate, shift.getUnitId(), shift.getId());
             List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             StaffingLevel staffingLevel = staffingLevels.get(0);
             for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -762,18 +764,17 @@ public class ShiftValidatorService {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
         if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
-           // shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
+            // shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
             if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullWeekCalculationType()))) {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
             } else {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
             }
 
-        }
-        else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
-            if(TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType()))){
+        } else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType()))) {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
-            }else {
+            } else {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
             }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
@@ -849,6 +850,32 @@ public class ShiftValidatorService {
         if (absenceShiftExists) {
             exceptionService.actionNotPermittedException("message.shift.overlap.with.full_day");
         }
+    }
+
+    public void escalationCorrectionInShift(ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, boolean deleteShift) {
+        Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+        List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByStaffId(shiftDTO.getStaffId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
+
+        if (isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())) {
+            shiftViolatedRulesMap.get(shiftDTO.getId()).getEscalationReasons().remove(ShiftEscalationReason.WORK_TIME_AGREEMENT);
+            if (isCollectionEmpty(shiftViolatedRulesMap.get(shiftDTO.getId()).getEscalationReasons())) {
+                shiftDTO.getEscalationFreeShiftIds().add(shiftDTO.getId());
+            }
+        }
+        if (deleteShift) {
+            overLappedShifts.forEach(overLappedShift -> {
+                if (shiftMongoRepository.shiftOverLapped(shiftDTO.getStaffId(), overLappedShift.getStartDate(), overLappedShift.getEndDate())) {
+                    shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().remove(ShiftEscalationReason.SHIFT_OVERLAPPING);
+                    if (isCollectionEmpty(shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons())) {
+                        shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
+                    }
+                }
+            });
+        }
+
+
     }
 
 

@@ -14,17 +14,12 @@ public class ShiftWithViolatedInfoDTO {
     private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
 
     public ShiftWithViolatedInfoDTO() {
-    }
-
-    public ShiftWithViolatedInfoDTO(List<ShiftDTO> shifts, ViolatedRulesDTO violatedRules) {
-        this.shifts = shifts;
-        this.violatedRules = violatedRules;
+        //Default Constructor
     }
 
 
     public ShiftWithViolatedInfoDTO(ViolatedRulesDTO violatedRules) {
         this.violatedRules = violatedRules;
-
     }
 
 
