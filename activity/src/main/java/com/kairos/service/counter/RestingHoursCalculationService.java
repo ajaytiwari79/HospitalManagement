@@ -13,7 +13,10 @@ import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.Interval;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -97,16 +100,108 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     @Override
-    public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
+    public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getRestingHoursKpiData(filterBasedCriteria, organizationId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
-    public Map<Long,Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+    public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
         return new HashMap<>();//getRestingHoursKpiData(filterBasedCriteria, organizationId, true, false);
     }
 
+    private List<DateTimeInterval> getDateTimeIntervals(ApplicableKPI applicableKPI) {
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
+        LocalDate currentDate = DateUtils.getCurrentLocalDate();
+        switch (applicableKPI.getInterval()) {
+            case LAST:
+                for (int i = 0; i < applicableKPI.getValue(); i++) {
+                    currentDate = getNextDateTimeIntervalByDate(currentDate, applicableKPI.getFrequencyType(), dateTimeIntervals);
+                }
+                break;
+            case CURRENT:
+                currentDate = getCurrentDateTimeIntervalByDate(currentDate, applicableKPI.getFrequencyType(), dateTimeIntervals);
+                break;
+            case NEXT:
+                for (int i = 0; i < applicableKPI.getValue(); i++) {
+                    currentDate = getLastDateTimeIntervalByDate(currentDate, applicableKPI.getFrequencyType(), dateTimeIntervals);
+                }
+                break;
+            default:
+                break;
+        }
+
+        return null;
+    }
+
+    private LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+        LocalDate currentDate = date;
+        LocalDate nextDate = date;
+        dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
+        return nextDate;
+    }
+
+    private LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+        LocalDate currentDate = date;
+        LocalDate nextDate = date;
+        dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
+        return nextDate;
+    }
+
+    private LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+        LocalDate currentDate = date;
+        LocalDate nextDate = date;
+        dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
+        return nextDate;
+    }
+
+    private LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType){
+        switch (durationType){
+            case DAYS:
+                break;
+            case MONTHS:
+                break;
+            case WEEKS:
+                break;
+            case YEAR:
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    private LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType){
+        switch (durationType){
+            case DAYS:
+                break;
+            case MONTHS:
+                break;
+            case WEEKS:
+                break;
+            case YEAR:
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    private LocalDate getCurrentLocaDateByDurationType(LocalDate date, DurationType durationType){
+        switch (durationType){
+            case DAYS:
+                break;
+            case MONTHS:
+                break;
+            case WEEKS:
+                break;
+            case YEAR:
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
 }
 
 
