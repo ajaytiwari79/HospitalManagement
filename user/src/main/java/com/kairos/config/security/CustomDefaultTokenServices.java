@@ -12,6 +12,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,18 +27,20 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
     private UserService userService;
     private RedisService redisService;
     private HttpServletRequest request;
+    private TokenStore tokenStore;
 
     public CustomDefaultTokenServices() {
         //default
     }
 
-    public CustomDefaultTokenServices(UserService userService, RedisService redisService,HttpServletRequest request) {
+    public CustomDefaultTokenServices(UserService userService, RedisService redisService, HttpServletRequest request) {
         this.userService = userService;
-        this.redisService=redisService;
-        this.request=request;
+        this.redisService = redisService;
+        this.request = request;
     }
 
     private static final Logger log = LoggerFactory.getLogger(CustomDefaultTokenServices.class);
+
 
     @Transactional
     @Override
@@ -49,7 +53,7 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         userDetails.put("details", userDetailsMap);
         authentication.setDetails(userDetails);
         OAuth2AccessToken accessToken = super.createAccessToken(authentication);
-       // authentication.getOAuth2Request().
+        // authentication.getOAuth2Request().
 
         saveTokenInRedisServer(user, accessToken.toString());
         return accessToken;
@@ -60,4 +64,12 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
     }
 
 
+    public void setTokenStore(TokenStore tokenStore) {
+        super.setTokenStore(tokenStore);
+        this.tokenStore = tokenStore;
+    }
+
+    public TokenStore getTokenStore() {
+        return tokenStore;
+    }
 }

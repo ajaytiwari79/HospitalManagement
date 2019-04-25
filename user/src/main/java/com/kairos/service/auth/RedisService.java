@@ -45,7 +45,12 @@ public class RedisService {
 
     }
 
-    public boolean expireTokenOfUserWhileLogout(String userName, String clientId) {
+    public boolean checkIfUserExistInRedis(String userName) {
+        return valueOperations.opsForValue().get(userName)!=null;
+
+    }
+
+    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String clientId) {
         boolean tokenRemoved = false;
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {

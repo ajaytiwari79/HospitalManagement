@@ -14,10 +14,12 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +42,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     private final int ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 12 hours. But we changed it to 30 days(for testing)
 
     @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints.authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter())
                 .tokenServices(customTokenServices());
     }
@@ -48,8 +50,8 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
-        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService,request);
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
+        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService, request);
         defaultTokenServices.setTokenStore(jwtTokenStore);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
         defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
@@ -101,11 +103,29 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
     @Override
     public void configure(final AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
+
         oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
         oauthServer.passwordEncoder(passwordEncoder());
+
     }
+    @Bean
+    public OAuth2AuthenticationProcessingFilter getBasicAuthenticationFilter() throws Exception {
+        CustomOAuthProcessingFilter oAuthProcessingFilter = new CustomOAuthProcessingFilter(new JwtTokenStore(this.jwtAccessTokenConverter()),redisService,authenticationManager);
+        oAuthProcessingFilter.setTokenStore(new JwtTokenStore(this.jwtAccessTokenConverter()));
+        oAuthProcessingFilter.setRedisService(redisService);
+        oAuthProcessingFilter.setAuthenticationManager(authenticationManager);
+        return oAuthProcessingFilter;
+    }
+
 
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+   /* private BasicAuthenticationFilter getBasicAuthenticationFilter() throws Exception {
+        CustomOAuthProcessingFilter oAuthProcessingFilter = new CustomOAuthProcessingFilter(authenticationManager);
+        oAuthProcessingFilter.setTokenStore(new JwtTokenStore(this.jwtAccessTokenConverter()));
+        oAuthProcessingFilter.setRedisService(redisService);
+        return oAuthProcessingFilter;
+    }*/
 }

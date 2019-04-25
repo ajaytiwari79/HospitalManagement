@@ -28,6 +28,32 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
         this.passwordEncoder = passwordEncoder;
     }
 
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        if (!Optional.ofNullable(authentication.getCredentials()).isPresent()) {
+            throw new BadCredentialsException("Enter valid password");
+        }
+        String userName = String.valueOf(authentication.getPrincipal());
+        if (userName == null) {
+
+        }
+        System.err.println("Custom providerzxc>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
+        UserDetails user = retrieveUser(userName, (UsernamePasswordAuthenticationToken) authentication);
+        additionalAuthenticationChecks(user,(UsernamePasswordAuthenticationToken) authentication);
+        return  createSuccessAuthentication((Object)user,authentication,user);
+    }
+
+    @Override
+    protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
+                principal, authentication.getCredentials(),
+                authoritiesMapper.mapAuthorities(user.getAuthorities()));
+        result.setDetails(authentication.getDetails());
+        return result;
+
+    }
+
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         if (authentication.getCredentials() == null) {
@@ -65,32 +91,6 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
         } catch (Exception ex) {
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex);
         }
-    }
-
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (!Optional.ofNullable(authentication.getCredentials()).isPresent()) {
-            throw new BadCredentialsException("Enter valid password");
-        }
-        String userName = String.valueOf(authentication.getPrincipal());
-        if (userName == null) {
-
-        }
-        System.err.println("Custom providerzxc>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
-        UserDetails user = retrieveUser(userName, (UsernamePasswordAuthenticationToken) authentication);
-        additionalAuthenticationChecks(user,(UsernamePasswordAuthenticationToken) authentication);
-        Object principalAsObject=user;
-        return  createSuccessAuthentication(principalAsObject,authentication,user);
-    }
-
-    @Override
-    protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
-        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
-                principal, authentication.getCredentials(),
-                authoritiesMapper.mapAuthorities(user.getAuthorities()));
-        result.setDetails(authentication.getDetails());
-        return result;
-
     }
 
 

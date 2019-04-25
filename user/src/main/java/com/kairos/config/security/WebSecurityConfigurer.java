@@ -4,6 +4,7 @@ import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserOauth2Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -18,6 +19,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +37,12 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserOauth2Service userDetailsService;
+    @Inject
+    private RedisService redisService;
+    @Inject
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
 
-    
+
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -55,16 +64,16 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Bean
     public CustomAuthenticationProvider authenticationProvider() {
-        return new CustomAuthenticationProvider(userDetailsService,passwordEncoder());
+        return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
 
     }
 
     /*
-	 * @see org.springframework.security.config.annotation.web.configuration.
-	 * WebSecurityConfigurerAdapter#configure(org.springframework.security.
-	 * config.annotation.web.builders.HttpSecurity) This method is where the
-	 * actual URL-based security is set up.
-	 */
+     * @see org.springframework.security.config.annotation.web.configuration.
+     * WebSecurityConfigurerAdapter#configure(org.springframework.security.
+     * config.annotation.web.builders.HttpSecurity) This method is where the
+     * actual URL-based security is set up.
+     */
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -96,17 +105,19 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-    	 http
-                  .csrf().disable()
-                  .anonymous().disable()
-                  .sessionManagement()
-                  .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                   .and()
-                  .authorizeRequests()
-                  .antMatchers("/oauth/*").permitAll()
-                   .antMatchers(HttpMethod.OPTIONS).permitAll()
-                   .anyRequest().authenticated()
-                   .and()
-                 .formLogin();
+        http
+                .csrf().disable()
+                .anonymous().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/oauth/*").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin();
     }
+
+
 }
+
