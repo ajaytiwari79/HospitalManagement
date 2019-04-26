@@ -715,7 +715,7 @@ public class StaffService {
         positionGraphRepository.save(position);
     }
 
-    public void setUnitManagerAndPosition(Organization organization, User user, Long accessGroupId) {
+    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Position position = new Position();
         position.setStaff(staff);
@@ -1047,31 +1047,5 @@ public class StaffService {
             }
         }
         return newUserName;
-    }
-
-
-    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
-        Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-        Position position = new Position();
-        position.setStaff(staff);
-        staff.setUser(user);
-        position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
-        position.setStaff(staff);
-        position.setStartDateMillis(DateUtils.getCurrentDateMillis());
-        organization.getPositions().add(position);
-        organizationGraphRepository.save(organization);
-        if (accessGroupId != null) {
-            UnitPermission unitPermission = new UnitPermission();
-            unitPermission.setOrganization(organization);
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-            if (Optional.ofNullable(accessGroup).isPresent()) {
-                unitPermission.setAccessGroup(accessGroup);
-            }
-            position.getUnitPermissions().add(unitPermission);
-        }
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
-        positionGraphRepository.save(position);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), organization.getId());
-
     }
 }
