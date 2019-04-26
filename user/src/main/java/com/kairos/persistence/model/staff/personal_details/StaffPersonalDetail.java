@@ -311,7 +311,7 @@ public class StaffPersonalDetail {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName = StringUtils.trim(userName);
     }
 
     public boolean isUserNameUpdated() {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotBlank;
@@ -161,7 +162,7 @@ public class StaffCreationDTO {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName = StringUtils.trim(userName);
     }
 
     public Long getExternalId() {
