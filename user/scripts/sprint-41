@@ -1,0 +1,7 @@
+
+//To set existing millis as localdatetime
+MATCH (n) where exists(n.creationDate)
+set n.creationDate=toString(localdatetime({datetime:datetime({epochmillis:n.creationDate})}));
+
+MATCH (n) where exists(n.lastModificationDate)
+set n.lastModificationDate=toString(localdatetime({datetime:datetime({epochmillis:n.lastModificationDate})}));

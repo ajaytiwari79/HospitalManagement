@@ -1,30 +1,20 @@
 package com.kairos.dto.kpermissions;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class ModelDTO {
 
     private String modelName;
 
     private List<FieldDTO> fields = new ArrayList<>();
 
-    public List<FieldDTO> getFields() {
-        return fields;
-    }
-
-    public void setFields(List<FieldDTO> fields) {
-        this.fields = fields;
-    }
-
-    public String getModelName() {
-        return modelName;
-    }
-
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
-    public ModelDTO() {
-    }
+    List<ModelDTO> subModels = new ArrayList<>();
 }
