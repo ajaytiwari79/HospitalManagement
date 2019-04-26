@@ -53,7 +53,7 @@ public class CounterRepository {
     @Inject
     private MongoTemplate mongoTemplate;
 
-    private String getRefQueryField(ConfLevel level) {
+    public static String getRefQueryField(ConfLevel level) {
         switch (level) {
             case UNIT:
                 return "unitId";

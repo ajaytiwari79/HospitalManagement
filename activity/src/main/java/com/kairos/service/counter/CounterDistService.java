@@ -407,7 +407,8 @@ public class CounterDistService extends MongoBaseService {
                 if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                     applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                 }
-                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
+                ApplicableKPI applicableKPI = kpiIdAndApplicableKpi.get(kpiId);
+                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, staffId, ConfLevel.STAFF, applicableFilter, applicableKPI.getTitle(), false,applicableKPI.getFibonacciKPIConfigs()));
                 staffIdKpiMap.get(staffId).put(kpiId, kpiId);
             }
         }));
@@ -532,7 +533,8 @@ public class CounterDistService extends MongoBaseService {
                 if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                     applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                 }
-                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false));
+                ApplicableKPI applicableKPI = kpiIdAndApplicableKpi.get(kpiId);
+                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, applicableKPI.getTitle(), false,applicableKPI.getFibonacciKPIConfigs()));
                 unitIdKpiMap.get(unitId).put(kpiId, kpiId);
             }
         }));

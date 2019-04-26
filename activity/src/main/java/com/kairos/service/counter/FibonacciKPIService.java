@@ -14,6 +14,7 @@ import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -105,11 +106,14 @@ public class FibonacciKPIService implements CounterService{
         return kpidtos;
     }
 
-    public FibonacciKPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId){
-        FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findFibonacciKPIById(fibonacciKPIId);
-        FibonacciKPIDTO fibonacciKPIDTO = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPI,FibonacciKPIDTO.class);
-        fibonacciKPIDTO.setFibonacciKPI(true);
-        return fibonacciKPIDTO;
+    public KPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId,Long referenceId,ConfLevel confLevel){
+        KPIDTO kpidto = fibonacciKPIRepository.getOneByfibonacciId(fibonacciKPIId,referenceId,confLevel);
+        if(confLevel.equals(UNIT)){
+            List<FibonacciKPIConfig> fibonacciKPIConfigs = getFibonacciKPIConfig(ObjectMapperUtils.copyPropertiesOfListByMapper(kpidto.getFibonacciKPIConfigs(),FibonacciKPIConfig.class),referenceId);
+            kpidto.setFibonacciKPIConfigs(ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIConfigs, FibonacciKPIConfigDTO.class));
+        }
+        kpidto.setFibonacciKPI(true);
+        return kpidto;
     }
 
     public boolean deleteFibonacciKPI(BigInteger fibonacciKPIId){
@@ -187,7 +191,7 @@ public class FibonacciKPIService implements CounterService{
         for (ApplicableKPI applicableKPI : applicableKPIS) {
             updatedFibonacciKPIConfigs.add(fibonacciKPIConfigMap.get(applicableKPI.getActiveKpiId()));
         }
-        return fibonacciKPIConfigs;
+        return updatedFibonacciKPIConfigs;
     }
 
 }

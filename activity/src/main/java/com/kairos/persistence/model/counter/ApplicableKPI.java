@@ -6,6 +6,8 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 public class ApplicableKPI extends MongoBaseEntity {
     private BigInteger activeKpiId;
     private BigInteger baseKpiId;
@@ -16,7 +18,6 @@ public class ApplicableKPI extends MongoBaseEntity {
     private String title;
     private ApplicableFilter applicableFilter;
     private List<FibonacciKPIConfig> fibonacciKPIConfigs;
-    private boolean fibonacciKPI;
     // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
     private boolean copy;
 
@@ -56,7 +57,6 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.copy=copy;
         this.title=title;
         this.fibonacciKPIConfigs = fibonacciKPIConfigs;
-        this.fibonacciKPI = true;
     }
 
     public BigInteger getActiveKpiId() {
@@ -132,11 +132,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     }
 
     public boolean isFibonacciKPI() {
-        return fibonacciKPI;
-    }
-
-    public void setFibonacciKPI(boolean fibonacciKPI) {
-        this.fibonacciKPI = fibonacciKPI;
+        return isCollectionNotEmpty(fibonacciKPIConfigs);
     }
 
     public List<FibonacciKPIConfig> getFibonacciKPIConfigs() {

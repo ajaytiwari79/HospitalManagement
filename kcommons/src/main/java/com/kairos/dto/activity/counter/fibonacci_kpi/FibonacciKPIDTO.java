@@ -38,9 +38,9 @@ public class FibonacciKPIDTO {
     @Size(min = 2,message = "message.fibonacci.kpi.count")
     private List<FibonacciKPIConfigDTO> fibonacciKPIConfigs;
     private BigInteger categoryId;
-    private boolean fibonacciKPI;
     private List<KPIDTO> kpiCounters;
 
+    public FibonacciKPIDTO() { }
     public BigInteger getId() {
         return id;
     }
@@ -109,13 +109,6 @@ public class FibonacciKPIDTO {
         this.categoryId = categoryId;
     }
 
-    public boolean isFibonacciKPI() {
-        return fibonacciKPI;
-    }
-
-    public void setFibonacciKPI(boolean fibonacciKPI) {
-        this.fibonacciKPI = fibonacciKPI;
-    }
 
     public List<KPIDTO> getKpiCounters() {
         return kpiCounters;
@@ -129,7 +122,5 @@ public class FibonacciKPIDTO {
         this.title = title.trim();
     }
 
-    public FibonacciKPIDTO() {
-        this.fibonacciKPI = true;
-    }
+
 }
