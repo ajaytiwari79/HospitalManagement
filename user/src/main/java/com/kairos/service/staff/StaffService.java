@@ -1055,5 +1055,23 @@ public class StaffService {
         Position position = new Position();
         position.setStaff(staff);
         staff.setUser(user);
+        position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+        position.setStaff(staff);
+        position.setStartDateMillis(DateUtils.getCurrentDateMillis());
+        organization.getPositions().add(position);
+        organizationGraphRepository.save(organization);
+        if (accessGroupId != null) {
+            UnitPermission unitPermission = new UnitPermission();
+            unitPermission.setOrganization(organization);
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                unitPermission.setAccessGroup(accessGroup);
+            }
+            position.getUnitPermissions().add(unitPermission);
+        }
+        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
+        positionGraphRepository.save(position);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), organization.getId());
+
     }
 }
