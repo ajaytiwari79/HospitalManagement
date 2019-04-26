@@ -1,0 +1,13 @@
+
+//To delete priviously created FilterGroup
+MATCH (fg:FilterGroup{deleted:false})-[:APPLICABLE_FOR]-(ap:AccessPage) WHERE ap.moduleId in ["module_7","module_12"] DETACH delete fg
+
+//To create ["module_7"] specific filters
+CREATE (fg:FilterGroup{filterTypes:["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS","ENGINEER_TYPE", "EXPERTISE"],deleted:false}) WITH fg
+MATCH (ap:AccessPage) WHERE ap.moduleId in ["module_7"] WITH fg,ap
+CREATE UNIQUE (ap)-[:APPLICABLE_FOR]-(fg) return ap,fg;
+
+//To create ["module_12"] specific filters
+CREATE (fg:FilterGroup{filterTypes:["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS","ENGINEER_TYPE", "EXPERTISE","UNIT_POSITION"],deleted:false}) WITH fg
+MATCH (ap:AccessPage) WHERE ap.moduleId in ["module_12"] WITH fg,ap
+CREATE UNIQUE (ap)-[:APPLICABLE_FOR]-(fg) return ap,fg;

@@ -59,7 +59,7 @@ public class CountrySolverConfigService {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             solverConfigRepository.saveEntity(countrySolverConfig);
             //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
-            copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfigDTO.getOrganizationServiceId(), countrySolverConfigDTO.getOrganizationSubServiceId(), countrySolverConfig);
+            copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
             countrySolverConfigDTO.setId(countrySolverConfig.getId());
         }
         return countrySolverConfigDTO;
@@ -72,12 +72,10 @@ public class CountrySolverConfigService {
      * we need just to find all unitId/s associated with all{OrganizationSubServices}.
      * Then for corresponding unitId/s create this same {@link CountrySolverConfig}
      *
-     * @param organizationServiceId
-     * @param organizationSubServiceId
      * @param countrySolverConfig
      */
-    private void copyUnitSolverConfigByOrganizationServiceAndSubService(Long organizationServiceId, Long organizationSubServiceId, CountrySolverConfig countrySolverConfig) {
-        List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationServiceAndSubServiceId(organizationServiceId, organizationSubServiceId);
+    private void copyUnitSolverConfigByOrganizationServiceAndSubService(CountrySolverConfig countrySolverConfig) {
+        List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
         if (!applicableUnitIdForSolverConfig.isEmpty()) {
             for (Long unitId : applicableUnitIdForSolverConfig) {
@@ -119,7 +117,7 @@ public class CountrySolverConfigService {
             countrySolverConfig.setParentSolverConfigId(countrySolverConfigDTO.getId());
             solverConfigRepository.saveEntity(countrySolverConfig);
             //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
-            copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfigDTO.getOrganizationServiceId(), countrySolverConfigDTO.getOrganizationSubServiceId(), countrySolverConfig);
+            copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
             countrySolverConfigDTO.setId(countrySolverConfig.getId());
         }
         return countrySolverConfigDTO;
@@ -241,24 +239,19 @@ public class CountrySolverConfigService {
      * @return
      */
     private boolean preValidateCountrySolverConfigDTO(CountrySolverConfigDTO countrySolverConfigDTO) {
-        String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countrySolverConfigDTO.getCountryId(), countrySolverConfigDTO.getOrganizationServiceId(), countrySolverConfigDTO.getOrganizationSubServiceId());
+        //TODO pradeep please update this method
+        /*String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countrySolverConfigDTO.getCountryId(), countrySolverConfigDTO.getOrganizationSubServiceIds());
 
         if ("countryNotExists".equals(result)) {
 
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countrySolverConfigDTO.getCountryId());
         } else if (solverConfigRepository.isNameExistsById(countrySolverConfigDTO.getName(), countrySolverConfigDTO.getId(), true, countrySolverConfigDTO.getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
-        } else if ("organizationServiceNotExists".equals(result)) {
-
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "OrganizationService", countrySolverConfigDTO.getOrganizationServiceId());
-        } else if ("organizationSubServiceNotExists".equals(result)) {
-
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "OrganizationSubService", countrySolverConfigDTO.getOrganizationSubServiceId());
         } else if ("relationShipNotValid".equals(result)) {
 
             exceptionService.relationShipNotValidException("message.relationship.notValid");
         }
-
+*/
         return true;
     }
 
