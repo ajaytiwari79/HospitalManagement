@@ -1,3 +1,8 @@
 //Set Country Id in User
 MATCH (n:User) where n.countryId is null set n.countryId=18712;
 
+
+// Set userNameUpdated true for old user
+MATCH(u:User) where NOT EXISTs(u.userNameUpdated)
+SET u.userNameUpdated=TRUE return count(u)
+
