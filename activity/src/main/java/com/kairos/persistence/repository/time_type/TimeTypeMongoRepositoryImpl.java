@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.time_type;
 
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -12,7 +10,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 

@@ -4,7 +4,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**

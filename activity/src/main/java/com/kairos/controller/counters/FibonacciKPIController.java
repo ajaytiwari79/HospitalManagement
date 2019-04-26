@@ -8,16 +8,14 @@ import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstants.*;
-import static com.kairos.constants.ApiConstants.API_V1;
+
 
 /**
  * pradeep
@@ -31,7 +29,7 @@ public class FibonacciKPIController {
     @Inject private FibonacciKPIService fibonacciKPIService;
 
     @PostMapping(value = COUNTRY_URL+FIBONACCI)
-    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtCountry(@PathVariable Long countryId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.createFibonacciKPI(countryId,fibonacciKPIDTO, ConfLevel.COUNTRY));
     }
 
@@ -61,7 +59,7 @@ public class FibonacciKPIController {
     }
 
     @PostMapping(value = UNIT_URL+FIBONACCI)
-    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody FibonacciKPIDTO fibonacciKPIDTO){
+    public ResponseEntity<ResponseDTO<Object>> createFibonacciKPIAtUnit(@PathVariable Long unitId, @RequestBody @Valid FibonacciKPIDTO fibonacciKPIDTO){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.createFibonacciKPI(unitId,fibonacciKPIDTO, ConfLevel.UNIT));
     }
 

@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.counter;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.FibonacciKPI;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;

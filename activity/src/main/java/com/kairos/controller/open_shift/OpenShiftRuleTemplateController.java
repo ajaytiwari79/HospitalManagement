@@ -1,8 +1,8 @@
 package com.kairos.controller.open_shift;
 
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
-import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

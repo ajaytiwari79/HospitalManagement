@@ -1,6 +1,5 @@
 package com.kairos.planning.domain;
 
-import com.kairos.planning.executioner.TaskPlanningSolver;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

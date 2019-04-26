@@ -3,7 +3,6 @@ package com.kairos.service.phase;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.commons.utils.DateUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by vipul on 8/2/18.

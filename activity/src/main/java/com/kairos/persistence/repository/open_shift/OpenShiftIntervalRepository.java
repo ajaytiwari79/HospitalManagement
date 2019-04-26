@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.open_shift;
 
+import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

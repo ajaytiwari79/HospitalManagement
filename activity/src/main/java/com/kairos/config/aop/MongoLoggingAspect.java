@@ -1,12 +1,9 @@
 package com.kairos.config.aop;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
 
 /**
  * Created by neuron on 29/11/16.

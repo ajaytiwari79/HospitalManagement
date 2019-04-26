@@ -1,11 +1,10 @@
 package com.kairos.planning.config;
 
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.kairos.planning.solution.TaskPlanningSolution;
 import org.optaplanner.core.impl.phase.custom.AbstractCustomPhaseCommand;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
-import com.kairos.planning.solution.TaskPlanningSolution;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomPhase extends AbstractCustomPhaseCommand<TaskPlanningSolution>{
 

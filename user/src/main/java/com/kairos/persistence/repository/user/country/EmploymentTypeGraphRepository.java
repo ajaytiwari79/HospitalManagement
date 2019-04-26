@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;

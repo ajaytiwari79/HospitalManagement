@@ -5,8 +5,6 @@ import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.FilterType;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -52,7 +50,7 @@ public class FibonacciKPIDTO {
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public String getDescription() {

@@ -6,22 +6,24 @@ import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlann
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
 import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
-import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;

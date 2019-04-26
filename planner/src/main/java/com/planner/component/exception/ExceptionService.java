@@ -6,7 +6,6 @@ import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
 import com.planner.common.custum_exceptions.RelationShipNotValidException;
 import com.planner.component.locale.LocaleService;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 

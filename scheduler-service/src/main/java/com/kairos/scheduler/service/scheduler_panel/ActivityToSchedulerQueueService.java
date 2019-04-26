@@ -34,7 +34,8 @@ public class ActivityToSchedulerQueueService implements JobQueueHandler {
             case DELETE:
                 schedulerPanelService.deleteJobBySubTypeAndEntityId(schedulerPanelDTO);
                 break;
-
+            default:
+                break;
         }
     }
 }

@@ -23,7 +23,7 @@ import java.util.*;
 @Transactional
 public class SickConfigurationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SickConfigurationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SickConfigurationService.class);
 
     @Inject
     private SickConfigurationRepository sickConfigurationRepository;

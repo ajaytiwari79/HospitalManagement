@@ -3,7 +3,6 @@ package com.kairos.persistence.model.wta;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -36,7 +35,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private OrganizationType organizationSubType;
 
-    private Long unitPositionId;
+    private Long employmentId;
 
     private Long countryId;
 
@@ -63,12 +62,12 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {

@@ -1,5 +1,6 @@
 package com.kairos.planning.domain;
 
+import com.kairos.planning.solution.TaskPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.chained.SubChainChangeMove;
@@ -7,8 +8,6 @@ import org.optaplanner.core.impl.heuristic.selector.move.generic.chained.SubChai
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.kairos.planning.solution.TaskPlanningSolution;
 
 public class TaskChainChangeMoveFilter implements SelectionFilter<TaskPlanningSolution,AbstractMove<TaskPlanningSolution>>{
 	Logger log= LoggerFactory.getLogger(TaskChainChangeMoveFilter.class);

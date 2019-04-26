@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.kairos.persistence.model.organization.Organization;
 
-
 import java.io.IOException;
 
 /**

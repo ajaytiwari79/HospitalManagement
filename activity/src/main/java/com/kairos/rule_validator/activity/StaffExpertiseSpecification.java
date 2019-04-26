@@ -1,8 +1,8 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.dto.user.staff.StaffDTO;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;

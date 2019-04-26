@@ -10,7 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_MUNICIPALITY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LEVEL;
 
 /**
  * Created by prabjot on 21/12/17.

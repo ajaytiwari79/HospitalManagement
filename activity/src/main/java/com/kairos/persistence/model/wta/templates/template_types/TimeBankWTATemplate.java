@@ -10,7 +10,6 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.util.Objects;
 
-
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 

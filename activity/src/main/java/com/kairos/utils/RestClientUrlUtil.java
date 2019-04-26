@@ -1,6 +1,5 @@
 package com.kairos.utils;
 
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.utils.user_context.UserContext;

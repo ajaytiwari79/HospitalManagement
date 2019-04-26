@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.unit_settings;
 
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

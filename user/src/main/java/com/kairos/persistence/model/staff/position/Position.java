@@ -3,8 +3,8 @@ package com.kairos.persistence.model.staff.position;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 

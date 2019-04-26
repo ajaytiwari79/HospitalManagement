@@ -1,15 +1,15 @@
 package com.kairos.persistence.repository.user.client;
 
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.query_results.*;
 import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
-import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.country.default_data.CitizenStatus;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

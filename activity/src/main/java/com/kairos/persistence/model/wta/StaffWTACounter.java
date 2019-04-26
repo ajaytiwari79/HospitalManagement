@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 /**
  * @author pradeep
@@ -18,18 +17,18 @@ public class StaffWTACounter extends MongoBaseEntity{
     private LocalDate endDate;
     private BigInteger ruleTemplateId;
     private String ruleTemplateName;
-    private Long unitPositionId;
+    private Long employmentId;
     private Long unitId;
     private int count;
     private boolean userHasStaffRole;
 
 
-    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId,String ruleTemplateName, Long unitPositionId, Long unitId,boolean userHasStaffRole) {
+    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId, String ruleTemplateName, Long employmentId, Long unitId, boolean userHasStaffRole) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.ruleTemplateId = ruleTemplateId;
         this.ruleTemplateName = ruleTemplateName;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.unitId = unitId;
         this.userHasStaffRole = userHasStaffRole;
 
@@ -79,12 +78,12 @@ public class StaffWTACounter extends MongoBaseEntity{
         this.ruleTemplateId = ruleTemplateId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getUnitId() {

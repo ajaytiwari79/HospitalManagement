@@ -1,7 +1,6 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;

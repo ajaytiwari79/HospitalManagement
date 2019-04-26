@@ -9,14 +9,11 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
-import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
-import com.kairos.persistence.model.user.unit_position.query_result.PositionCtaWtaQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -33,7 +30,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
 
 @Service
@@ -108,35 +106,27 @@ public class ActivityIntegrationService {
         genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/" + staffId, queryParams);
     }
 
-    public List<CTAWTAResponseDTO> copyWTACTA(List<UnitPositionIdDTO> unitPositionIdDTOS) {
 
-
-        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(unitPositionIdDTOS, null, false, IntegrationOperation.CREATE, "copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTAWTAResponseDTO>>>() {
-        });
-
-        return ctawtaResponseDTOS;
-    }
-
-    public void updateTimeBank(Long unitPositionId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void updateTimeBank(Long employmentId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         BasicNameValuePair startDate = new BasicNameValuePair("shiftStartDate", shiftStartDate.toString());
-        BasicNameValuePair unitPosition = new BasicNameValuePair("unitPositionId", unitPositionId + "");
+        BasicNameValuePair employment = new BasicNameValuePair("employmentId", employmentId + "");
         List<NameValuePair> param = new ArrayList<>();
-        param.add(unitPosition);
+        param.add(employment);
         param.add(startDate);
         genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
-    public void updateTimeBankOnUnitPositionUpdation(BigInteger collectiveTimeAgreementId,Long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        BasicNameValuePair startDate = new BasicNameValuePair("unitPositionLineStartDate", unitPositionLineStartDate.toString());
-        BasicNameValuePair endDate = new BasicNameValuePair("unitPositionLineEndDate", unitPositionLineEndDate!=null?unitPositionLineEndDate.toString():null);
+    public void updateTimeBankOnEmploymentUpdation(BigInteger collectiveTimeAgreementId, Long employmentId, LocalDate employmentLineStartDate, LocalDate employmentLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        BasicNameValuePair startDate = new BasicNameValuePair("employmentLineStartDate", employmentLineStartDate.toString());
+        BasicNameValuePair endDate = new BasicNameValuePair("employmentLineEndDate", employmentLineEndDate!=null?employmentLineEndDate.toString():null);
         BasicNameValuePair ctaId = new BasicNameValuePair("ctaId", collectiveTimeAgreementId.toString());
         List<NameValuePair> param = new ArrayList<>();
         param.add(startDate);
         param.add(endDate);
         param.add(ctaId);
-        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/{unitPositionId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        },unitPositionId);
+        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/employment/{employmentId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        },employmentId);
     }
 
     public void createTimeTypes(Long countryId){
@@ -144,8 +134,8 @@ public class ActivityIntegrationService {
         });
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByUnitPosition(Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap, Long unitId){
-        return genericRestClient.publishRequest(positionLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
+    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAAndAccumulatedTimebankByEmployment(Map<Long, List<EmploymentLinesQueryResult>> employmentLinesMap, Long unitId){
+        return genericRestClient.publishRequest(employmentLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
     }
 
     public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAByExpertiseAndDate(Long expertiseId, Long unitId,LocalDate selectedDate){

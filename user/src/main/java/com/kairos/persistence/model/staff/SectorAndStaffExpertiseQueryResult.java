@@ -4,7 +4,6 @@ package com.kairos.persistence.model.staff;
  *
  */
 
-import com.kairos.persistence.model.organization.union.Sector;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class SectorAndStaffExpertiseQueryResult {
     private Long id;
     private String name;
     private List<StaffExpertiseQueryResult> expertiseWithExperience;
-    private boolean unitPositionExists;
+    private boolean employmentExists;
 
     public SectorAndStaffExpertiseQueryResult() {
         //Default Constructor
@@ -44,11 +43,11 @@ public class SectorAndStaffExpertiseQueryResult {
         this.expertiseWithExperience = expertiseWithExperience;
     }
 
-    public boolean isUnitPositionExists() {
-        return unitPositionExists;
+    public boolean isEmploymentExists() {
+        return employmentExists;
     }
 
-    public void setUnitPositionExists(boolean unitPositionExists) {
-        this.unitPositionExists = unitPositionExists;
+    public void setEmploymentExists(boolean employmentExists) {
+        this.employmentExists = employmentExists;
     }
 }

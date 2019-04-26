@@ -2,11 +2,9 @@ package com.kairos.dto.user.country.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.user.country.pay_table.DateRange;
-import com.kairos.dto.user.country.pay_table.FutureDate;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Objects;
 
 
 /**

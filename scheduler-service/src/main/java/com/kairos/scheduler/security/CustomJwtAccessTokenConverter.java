@@ -1,7 +1,6 @@
 package com.kairos.scheduler.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-;
 import com.kairos.scheduler.utils.user_context.CurrentUserDetails;
 import com.kairos.scheduler.utils.user_context.UserContext;
 import org.slf4j.Logger;
@@ -11,6 +10,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 
 import java.util.HashMap;
 import java.util.Map;
+
+;
 
 public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
     private static final Logger log = LoggerFactory.getLogger(CustomJwtAccessTokenConverter.class);

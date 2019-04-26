@@ -1,16 +1,15 @@
 package com.kairos.shiftplanning.domain.staff;
 
-import java.util.Objects;
-import java.util.Random;
-
+import com.kairos.shiftplanning.utils.JodaTimeConverter;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kairos.shiftplanning.utils.JodaTimeConverter;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
+import java.util.Objects;
+import java.util.Random;
 
 @XStreamAlias("Availability")
 public class AvailabilityRequest {

@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.staff;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import io.swagger.models.auth.In;
 
 /**
  * Created by prabjot on 24/1/18.

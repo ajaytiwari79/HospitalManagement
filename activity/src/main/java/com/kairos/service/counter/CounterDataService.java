@@ -26,7 +26,6 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.ApplicableFilter;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
@@ -57,6 +56,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.util.stream.Collectors.toList;
+
 
 
 @Service
