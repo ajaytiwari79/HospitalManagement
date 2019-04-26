@@ -190,6 +190,10 @@ public class WorkTimeAgreementBalancesCalculationService {
             activityName = activity.getName();
             timetypeColor = timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor();
             while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
+                if (startDate.isBefore(vetoAndStopBricksWTATemplate.getValidationStartDate())) {
+                    startDate = startDate.plusDays(1);
+                    continue;
+                }
                 if (!containsInInterval(intervalBalances, startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByNumberOfWeeks(asDate(startDate), vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate(), planningPeriodEndDate);
                     float scheduledActivityCount = 0;
