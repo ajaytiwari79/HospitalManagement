@@ -29,6 +29,7 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
     }
 
 
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (!Optional.ofNullable(authentication.getCredentials()).isPresent()) {

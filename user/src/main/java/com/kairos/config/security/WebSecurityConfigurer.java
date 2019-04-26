@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.inject.Inject;
@@ -31,7 +32,7 @@ import static com.kairos.constants.AppConstants.*;
 
 
 @Configuration
-@EnableWebSecurity()
+@EnableWebSecurity(debug = true)
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
@@ -113,10 +114,20 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/oauth/*").permitAll()
+                .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin();
     }
+
+
+   /* @Bean
+    public FilterRegistrationBean registration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean(getBasicAuthenticationFilter());
+        registration.setEnabled(true);
+        return registration;
+    }
+*/
 
 
 }

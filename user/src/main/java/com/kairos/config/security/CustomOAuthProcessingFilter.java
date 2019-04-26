@@ -4,6 +4,8 @@ import com.kairos.service.auth.RedisService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -37,18 +39,19 @@ public class CustomOAuthProcessingFilter extends OAuth2AuthenticationProcessingF
     private AuthenticationManager authenticationManager;
 
 
-    public CustomOAuthProcessingFilter(TokenStore tokenStore, RedisService redisService, AuthenticationManager authenticationManager) {
-        this.tokenStore = tokenStore;
-        this.redisService = redisService;
-        this.authenticationManager = authenticationManager;
+    /*public CustomOAuthProcessingFilter(AuthenticationManager authenticationManager) {
+        super(authenticationManager);
     }
-
+*/
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
         final HttpServletRequest request=(HttpServletRequest)req;
         final HttpServletResponse response=(HttpServletResponse)res;
-        try {
+
+  /*  @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    */ try {
             Authentication authentication = tokenExtractor.extract(request);
             if (authentication == null) {
                 if (isAuthenticated()) {
@@ -115,6 +118,11 @@ public class CustomOAuthProcessingFilter extends OAuth2AuthenticationProcessingF
     }
 
 
+    @Override
+    public void afterPropertiesSet() {
+
+    }
+
     private void removeTokenFromRedis(String userName, String clientIp) {
         redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp);
     }
@@ -127,8 +135,5 @@ public class CustomOAuthProcessingFilter extends OAuth2AuthenticationProcessingF
         this.redisService = redisService;
     }
 
-    @Override
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
+
 }
