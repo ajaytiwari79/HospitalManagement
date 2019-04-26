@@ -474,7 +474,6 @@ public class StaffService {
                         StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "UserName already exist");
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                         staffErrorList.add(staffDTO);
-                        continue;
                     } else {
                         userName = getStringValueOfIndexedCell(row, 19);
                     }
