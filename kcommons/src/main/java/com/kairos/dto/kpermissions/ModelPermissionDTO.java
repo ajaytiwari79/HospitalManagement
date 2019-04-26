@@ -20,12 +20,12 @@ public class ModelPermissionDTO {
     Long permissionModelId;
 
     @Valid
-    @NotEmpty(message = "message.permission.actions.id.null")
+    @NotEmpty(message = "message.permission.field.permissions.null")
     List<FieldPermissionDTO> fieldPermissions= new ArrayList<>();
 
     @Valid
     List<ModelPermissionDTO> subModelPermissions= new ArrayList<>();
 
-    @NotBlank(message = "message.permission.id.null")
+    @NotBlank(message = "message.model.permission.id.null")
     String modelPermission;
 }

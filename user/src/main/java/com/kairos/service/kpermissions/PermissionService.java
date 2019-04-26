@@ -72,9 +72,8 @@ public class PermissionService {
                     }
                 });
                 permissionModel.setPermissionSubModel(isSubModel);
-                List<ModelDTO> subModels = modelDTO.getSubModels();
-                if(!subModels.isEmpty()){
-                    permissionModel.getSubModels().addAll(buildPermissionModelData(subModels, permissionModel.getSubModels(), true));
+                if(!modelDTO.getSubModels().isEmpty()){
+                    permissionModel.getSubModels().addAll(buildPermissionModelData(modelDTO.getSubModels(), permissionModel.getSubModels(), true));
                 }
                     permissionModels.add(permissionModel);
             }else{

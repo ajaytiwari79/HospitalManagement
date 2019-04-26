@@ -62,24 +62,17 @@ public class PermissionSchemaScanner {
                         Type[] fieldArgTypes = aType.getActualTypeArguments();
                         for (Type fieldArgType : fieldArgTypes) {
                             Class fieldArgClass = (Class) fieldArgType;
+                            getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(),subModelFields);
                             for (Field subModelField : fieldArgClass.getDeclaredFields()) {
                                 if (subModelField.isAnnotationPresent(PermissionField.class)) {
                                     Map<String, String> fieldsData = new HashMap<>();
-                                    PermissionField annotation = subModelField.getAnnotation(PermissionField.class);
                                     fieldsData.put(FIELD_NAME,subModelField.getName());
                                     subModelFields.add(fieldsData);
                                 }
                             }
                         }
                     } else {
-                        for (Field subModelField : permissionField.getType().getDeclaredFields()) {
-                            if (subModelField.isAnnotationPresent(PermissionField.class)) {
-                                Map<String, String> fieldsData = new HashMap<>();
-                                PermissionField annotation = subModelField.getAnnotation(PermissionField.class);
-                                fieldsData.put(FIELD_NAME,subModelField.getName());
-                                subModelFields.add(fieldsData);
-                            }
-                        }
+                        getFieldsOFModelAndSubModel(permissionField.getType().getDeclaredFields(),subModelFields);
                     }
                     if(!subModelFields.isEmpty()){
                         subModelMetaData.put(MODEL_NAME, permissionField.getName());
@@ -89,5 +82,15 @@ public class PermissionSchemaScanner {
                 });
         return subModelData;
     }
+
+            private void getFieldsOFModelAndSubModel(Field[] fields, Set<Map<String, String>> subModelFields){
+                for (Field field : fields) {
+                    if (field.isAnnotationPresent(PermissionField.class)) {
+                        Map<String, String> fieldsData = new HashMap<>();
+                        fieldsData.put(FIELD_NAME,field.getName());
+                        subModelFields.add(fieldsData);
+                    }
+                }
+            }
 
 }
