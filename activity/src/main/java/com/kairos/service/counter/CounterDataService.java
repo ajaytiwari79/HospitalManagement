@@ -137,7 +137,7 @@ public class CounterDataService extends MongoBaseService {
             Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
             if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
                 staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
-                if(!filters.isManagement() && KPIRepresentation.INDIVIDUAL.equals(staffApplicableKPI.getKpiRepresentation())){
+                if(!filters.isManagement() && KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
                     staffFilterBasedCriteria.put(FilterType.STAFF_IDS, Arrays.asList(staffId.intValue()));
                 }
                 staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
