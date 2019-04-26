@@ -20,7 +20,6 @@ import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -37,7 +36,6 @@ import java.util.regex.Pattern;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -697,5 +695,21 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.updateMulti(new Query(), update, Activity.class).wasAcknowledged();
     }
 
+    @Override
+    public ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId) {
+        String project = "{'$project':{'_id':1,'childActivities':{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.rulesActivityTab.eligibleForStaffingLevel',true]} }} }}";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
+                lookup("activities", "childActivityIds", "_id", "childActivities"),
+                unwind("childActivities"),
+                match(Criteria.where("childActivities.rulesActivityTab.eligibleForStaffingLevel").is(true)),
+                group("$id")
+                        .addToSet("childActivities").as("childActivities"),
+                new CustomAggregationOperation(Document.parse(project)),
+                project("id", "childActivities")
+                        .and("childActivities._id").as("childActivityIds")
+        );
 
+        return mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class).getUniqueMappedResult();
+    }
 }

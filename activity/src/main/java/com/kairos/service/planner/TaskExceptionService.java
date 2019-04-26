@@ -1,32 +1,31 @@
 package com.kairos.service.planner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.task.BulkUpdateTaskDTO;
 import com.kairos.dto.activity.task.TaskActiveUpdationDTO;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.activity.task.TaskRestrictionDto;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.restrcition_freuency.RestrictionFrequency;
 import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.model.task.TaskStatus;
 import com.kairos.persistence.model.task.UnhandledTaskCount;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;
 import com.kairos.persistence.repository.client_aggregator.ClientAggregatorMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.rule_validator.TaskSpecification;
+import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.restrcition_freuency.RestrictionFrequencyService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.rule_validator.TaskSpecification;
-import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import org.slf4j.Logger;
@@ -49,14 +48,13 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.DateUtils.ISO_FORMAT;
+import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.EXCLUDED_EMPLOYEES;
 import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.PREFERRED_EMPLOYEES;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
-import static com.kairos.commons.utils.DateUtils.ISO_FORMAT;
-import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static java.time.ZoneId.systemDefault;
 
 /**

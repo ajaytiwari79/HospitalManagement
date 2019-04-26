@@ -62,19 +62,6 @@ public class PlannerRestClient {
     }
     public static <T>String getURI(PlannerUrl plannerUrl,Object... pathParams){
         String uri=null;
-        /*if(t instanceof StaffingLevelDTO){
-            uri= "staffing_level/";
-        }else if(t instanceof ActivityNoTabsDTO){
-            uri= "activity/";
-        }else if(t instanceof ArrayList && ((List)t).get(0) instanceof StaffingLevelDTO){
-            uri= "staffing_level/multiple";
-        }
-        else if(t instanceof ArrayList && ((List)t).get(0) instanceof ActivityNoTabsDTO){
-            uri= "activity/multiple";
-        }
-        else if(t instanceof WTAResponseDTO){
-            uri= String.format("staff/%s/unitposition/%s/wta",pathParams);
-        }*/
         switch (plannerUrl){
             case GET_VRP_SOLUTION:uri = String.format("/vrp/%s",pathParams);
                 break;

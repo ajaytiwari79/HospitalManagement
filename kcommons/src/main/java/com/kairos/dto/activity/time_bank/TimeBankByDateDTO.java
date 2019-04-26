@@ -11,12 +11,6 @@ public class TimeBankByDateDTO {
     private int timeBankChangeMinutes;
     private long accumulatedTimebankMinutes;
 
-
-    public TimeBankByDateDTO(int timeBankChangeMinutes, long accumulatedTimebankMinutes) {
-        this.timeBankChangeMinutes = timeBankChangeMinutes;
-        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
-    }
-
     public TimeBankByDateDTO() {
     }
 

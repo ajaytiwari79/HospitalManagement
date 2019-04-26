@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.Date;
-
 /**
  * Created by vipul on 12/3/18.
  */

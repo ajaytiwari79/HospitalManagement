@@ -6,11 +6,11 @@ import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
+import com.kairos.service.employment.EmploymentCTAWTAService;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
-import com.kairos.service.unit_position.UnitPositionCTAWTAService;
-import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +24,6 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -39,14 +38,14 @@ public class ExpertiseController {
     @Inject
     private ExpertiseService expertiseService;
     @Inject
-    private UnitPositionService unitPositionService;
+    private EmploymentService employmentService;
     @Inject
     private LocaleService localeService;
     @Inject
     private FunctionalPaymentService functionalPaymentService;
     @Inject
     ExpertiseUnitService expertiseUnitService;
-    @Inject private  UnitPositionCTAWTAService unitPositionCTAWTAService;
+    @Inject private EmploymentCTAWTAService employmentCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
     @PutMapping(value = "/expertise/staff/{staffId}")
@@ -82,7 +81,7 @@ public class ExpertiseController {
     @RequestMapping(value =  UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
                                                                   @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,unitPositionCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
     }
 
     @ApiOperation(value = "Get Available expertise")
@@ -107,7 +106,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "Update Age range in Expertise")
     @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
-    public ResponseEntity<Map<String, Object>> updateUnitPosition(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
+    public ResponseEntity<Map<String, Object>> updateAgeRangeInExpertise(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO, wtaType));
     }
 

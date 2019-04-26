@@ -523,22 +523,26 @@ public class UserService {
 
     public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
-        if (!ObjectUtils.isNotNull(user)) {
+        if (ObjectUtils.isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
         }
-        if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
-            user.setUserNameUpdated(true);
-        } else {
+         else {
+            if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
+                user.setUserNameUpdated(true);
+                userGraphRepository.save(user);
+                return true;
+            }
             User userNameAlreadyExist = userGraphRepository.findUserByUserName("(?i)" + userDetailsDTO.getUserName());
-            if (!ObjectUtils.isNotNull(userNameAlreadyExist)) {
+            if (ObjectUtils.isNotNull(userNameAlreadyExist)) {
                 LOGGER.error("This userName is already in use " + userDetailsDTO.getUserName());
                 exceptionService.dataNotFoundByIdException("message.user.userName.already.use", userDetailsDTO.getUserName());
             }
             user.setUserNameUpdated(true);
             user.setUserName(userDetailsDTO.getUserName());
+            userGraphRepository.save(user);
+            return true;
         }
-        userGraphRepository.save(user);
-        return true;
+         return false;
     }
 }

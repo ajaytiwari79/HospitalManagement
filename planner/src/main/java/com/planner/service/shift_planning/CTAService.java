@@ -21,41 +21,41 @@ public class CTAService {
 /*****************************************************************************************************/
     /**
      * @param longCTAResponseDTOMap
-     * @param unitPositionId
+     * @param employmentId
      * @return
      */
 //TODO might be in ShiftPlanningInitializationService
-    public Map<LocalDate, CTAResponseDTO> getLocalDateCTAMapByunitPositionId(Map<Long, Map<LocalDate, CTAResponseDTO>> longCTAResponseDTOMap, Long unitPositionId) {
+    public Map<LocalDate, CTAResponseDTO> getLocalDateCTAMapByEmploymentId(Map<Long, Map<LocalDate, CTAResponseDTO>> longCTAResponseDTOMap, Long employmentId) {
         Map<LocalDate, CTAResponseDTO> applicableLocalDateCTAPerStaff=new HashMap<>();
-        if (!longCTAResponseDTOMap.containsKey(unitPositionId)){}
-            return longCTAResponseDTOMap.get(unitPositionId);
+        if (!longCTAResponseDTOMap.containsKey(employmentId)){}
+            return longCTAResponseDTOMap.get(employmentId);
 
     }
 
     /**
      * <ul>
-     * <li>This method will bind each unitPositionId with its Map containing all related [CTA/s datewise].</li>
-     * <li>This may happen that there always exist some CTA(either List or single) for particular unitPositionId but not applicable
+     * <li>This method will bind each employmentId with its Map containing all related [CTA/s datewise].</li>
+     * <li>This may happen that there always exist some CTA(either List or single) for particular employmentId but not applicable
      * in this{@param fromPlanningDate},{@param toPlanningDate} range(All CTA's) hence might be empty
      * so we need to skip this staff for further planning</li>
      * </ul>
-     * @param unitPositionIds
+     * @param employmentIds
      * @param fromPlanningDate
      * @param toPlanningDate
      * @return
      */
-    public Map<Long, Map<LocalDate, CTAResponseDTO>> getunitPositionIdWithLocalDateCTAMap(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
-        Map<Long, Map<LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = new HashMap<>();
-        List<CTAResponseDTO> ctaResponseDTOS = activityMongoService.getCTARuleTemplateByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
-        //Group CTA with unitPosition
+    public Map<Long, Map<LocalDate, CTAResponseDTO>> getEmploymentIdWithLocalDateCTAMap(List<Long> employmentIds, Date fromPlanningDate, Date toPlanningDate) {
+        Map<Long, Map<LocalDate, CTAResponseDTO>> employmentIdWithLocalDateCTAMap = new HashMap<>();
+        List<CTAResponseDTO> ctaResponseDTOS = activityMongoService.getCTARuleTemplateByEmploymentIds(employmentIds, fromPlanningDate, toPlanningDate);
+        //Group CTA with employment
         if (ctaResponseDTOS.size() > 0) {
-            Map<Long, List<CTAResponseDTO>> unitPositionIdCTAMap = ctaResponseDTOS.stream().collect(Collectors.groupingBy(cta -> cta.getUnitPositionId(), Collectors.toList()));
-            unitPositionIdCTAMap.forEach((unitPositionId, groupedCTAList) -> {
+            Map<Long, List<CTAResponseDTO>> employmentIdCTAMap = ctaResponseDTOS.stream().collect(Collectors.groupingBy(cta -> cta.getEmploymentId(), Collectors.toList()));
+            employmentIdCTAMap.forEach((employmentId, groupedCTAList) -> {
                 Map<LocalDate, CTAResponseDTO> localDateCTAMap = filterOverlapedCTA(groupedCTAList, getApplicableIntervals(fromPlanningDate, toPlanningDate), toPlanningDate);
-                unitPositionIdWithLocalDateCTAMap.put(unitPositionId, localDateCTAMap);
+                employmentIdWithLocalDateCTAMap.put(employmentId, localDateCTAMap);
             });
         }
-        return unitPositionIdWithLocalDateCTAMap;
+        return employmentIdWithLocalDateCTAMap;
     }
 /*************************************************************************************************/
     /**

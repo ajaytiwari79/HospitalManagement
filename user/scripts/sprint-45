@@ -8,15 +8,15 @@ MATCH(tabsHierarchy:AccessPage{moduleId:"tab_119"})<-[r:SUB_PAGE]-(countryTab:Ac
 delete r
 CREATE UNIQUE(tabsHierarchy)<-[r1:SUB_PAGE]-(systemSetting)
 // 09 april unit position field update
-MATCH (n:UnitPosition) SET n.mainUnitPosition=
+MATCH (n:Employment) SET n.mainEmployment=
 CASE
-WHEN n.mainUnitPosition=true
+WHEN n.mainEmployment=true
 THEN 'MAIN'
-when n.mainUnitPosition =false
+when n.mainEmployment =false
 THEN 'SECONDARY'
 END
 RETURN n
 
-MATCH (n:UnitPosition) set n.employmentSubType=n.mainUnitPosition
-remove n.mainUnitPosition
+MATCH (n:Employment) set n.employmentSubType=n.mainEmployment
+remove n.mainEmployment
 RETURN n

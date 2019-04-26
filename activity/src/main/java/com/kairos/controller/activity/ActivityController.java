@@ -5,12 +5,8 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.TimeTypeService;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.dto.activity.activity.activity_tabs.RulesActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.SkillActivityDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -40,9 +36,6 @@ public class ActivityController {
 
     @Inject
     private ActivityService activityService;
-    @Inject private TimeTypeService timeTypeService;
-    @Inject
-    private UserIntegrationService userIntegrationService;
 
 
     @ApiOperation("Create Activity")

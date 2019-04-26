@@ -2,9 +2,8 @@ package com.kairos.persistence.model.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.RuleTemplateCategoryType;
-
+import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;

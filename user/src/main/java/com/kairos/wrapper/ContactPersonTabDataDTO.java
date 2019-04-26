@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class ContactPersonTabDataDTO {
 
-    List<OrganizationServiceQueryResult> organizationServices;
-    List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
-    List<ClientMinimumDTO> peopleHouseHolds;
-    List<ClientContactPersonStructuredData> contactPersonDataList;
+    private List<OrganizationServiceQueryResult> organizationServices;
+    private List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
+    private List<ClientMinimumDTO> peopleHouseHolds;
+    private List<ClientContactPersonStructuredData> contactPersonDataList;
 
     public List<OrganizationServiceQueryResult> getOrganizationServices() {
         return organizationServices;

@@ -3,7 +3,6 @@ package com.kairos.service.template_type;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
-
 import com.kairos.dto.gdpr.master_data.TemplateTypeDTO;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
@@ -13,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
-
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service

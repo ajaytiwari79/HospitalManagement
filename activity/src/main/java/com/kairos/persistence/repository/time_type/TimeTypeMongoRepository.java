@@ -4,7 +4,6 @@ package com.kairos.persistence.repository.time_type;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.enums.TimeTypes;
-import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;

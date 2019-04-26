@@ -3,7 +3,6 @@ package com.kairos.service.scheduler;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
-import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -16,12 +15,9 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.constants.ApiConstants.CREATE_SCHEDULER_PANEL;
-import static com.kairos.constants.ApiConstants.DELETE_SCHEDULER_PANEL;
-import static com.kairos.constants.ApiConstants.UPDATE_SCHEDULER_PANEL;
+import static com.kairos.constants.ApiConstants.*;
 
 @Service
 public class UserToSchedulerQueueService {

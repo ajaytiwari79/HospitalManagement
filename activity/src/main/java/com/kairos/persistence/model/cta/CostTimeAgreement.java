@@ -37,23 +37,19 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private LocalDate endDate;
     private List<BigInteger> tags;
     private boolean disabled;
-    private Long unitPositionId;
+    private Long employmentId;
 
     public CostTimeAgreement() {
         //Default Constructor
     }
 
 
-    public List<BigInteger> getTags() { return tags; }
-
-    public void setTags(List<BigInteger> tags) { this.tags = tags; }
-
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public WTAOrganization getOrganization() {
@@ -177,6 +173,14 @@ public class CostTimeAgreement extends MongoBaseEntity {
 
     public void setOrganizationParentId(BigInteger organizationParentId) {
         this.organizationParentId = organizationParentId;
+    }
+
+    public List<BigInteger> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<BigInteger> tags) {
+        this.tags = tags;
     }
 
     @Override

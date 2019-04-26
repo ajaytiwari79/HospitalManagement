@@ -1,5 +1,7 @@
 package com.kairos.service.country.equipment;
 
+import com.kairos.dto.user.equipment.EquipmentDTO;
+import com.kairos.dto.user.equipment.VehicleEquipmentDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
@@ -13,8 +15,6 @@ import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.dto.user.equipment.EquipmentDTO;
-import com.kairos.dto.user.equipment.VehicleEquipmentDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

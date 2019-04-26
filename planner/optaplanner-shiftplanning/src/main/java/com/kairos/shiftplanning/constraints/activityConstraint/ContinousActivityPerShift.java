@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.constraints.activityConstraint;
 
-import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 
 public class ContinousActivityPerShift {
 

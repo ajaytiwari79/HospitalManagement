@@ -21,10 +21,10 @@ import java.util.Map;
 public class SkillCategoryService {
 
     @Inject
-    SkillCategoryGraphRepository skillCategoryGraphRepository;
+    private SkillCategoryGraphRepository skillCategoryGraphRepository;
 
     @Inject
-    CountryGraphRepository countryGraphRepository;
+    private CountryGraphRepository countryGraphRepository;
 
     @Inject
     private ExceptionService exceptionService;

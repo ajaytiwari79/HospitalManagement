@@ -2,9 +2,6 @@ package com.kairos.dto.planner.constarints.country;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 
-import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
-
 public class CountryConstraintDTO extends ConstraintDTO {
     //~
     //@NotBlank

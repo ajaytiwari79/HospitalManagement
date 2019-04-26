@@ -2,7 +2,6 @@ package com.kairos.persistence.model.user.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.feature.Feature;
 import org.neo4j.ogm.annotation.NodeEntity;

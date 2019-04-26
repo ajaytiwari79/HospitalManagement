@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group;
 
 import com.kairos.dto.activity.open_shift.FibonacciCounter;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -16,24 +16,24 @@ public class FibonacciCounterApply {
     }
 
 
-    public List<FibonacciCounter> calculateFibonacciCounter(List<StaffUnitPositionQueryResult> staffsUnitPositions,Map<Long,Integer> assignedOpenShiftMap) {
+    public List<FibonacciCounter> calculateFibonacciCounter(List<StaffEmploymentQueryResult> staffsEmployments, Map<Long,Integer> assignedOpenShiftMap) {
 
         List<FibonacciCounter> fibonacciCounters = new ArrayList<FibonacciCounter>();
 
-        Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = staffsUnitPositions.iterator();
-        while(staffUnitPositionIterator.hasNext()) {
-            StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-            FibonacciCounter fibonacciCounter = new FibonacciCounter(staffUnitPositionQueryResult.getStaffId(),staffUnitPositionQueryResult.getAccumulatedTimeBank(),
-                    Optional.ofNullable(assignedOpenShiftMap.get(staffUnitPositionQueryResult.getUnitPositionId())).isPresent()?
-                            assignedOpenShiftMap.get(staffUnitPositionQueryResult.getUnitPositionId()):0);
+        Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = staffsEmployments.iterator();
+        while(staffEmploymentIterator.hasNext()) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
+            FibonacciCounter fibonacciCounter = new FibonacciCounter(staffEmploymentQueryResult.getStaffId(), staffEmploymentQueryResult.getAccumulatedTimeBank(),
+                    Optional.ofNullable(assignedOpenShiftMap.get(staffEmploymentQueryResult.getEmploymentId())).isPresent()?
+                            assignedOpenShiftMap.get(staffEmploymentQueryResult.getEmploymentId()):0);
             fibonacciCounters.add(fibonacciCounter);
         }
         return fibonacciCounters;
     }
 
-    public List<FibonacciCounter> findBestCandidates(ImpactWeight impactWeight,List<StaffUnitPositionQueryResult> staffsUnitPositions,Map<Long,Integer> assignedOpenShiftMap) {
+    public List<FibonacciCounter> findBestCandidates(ImpactWeight impactWeight, List<StaffEmploymentQueryResult> staffsEmployments, Map<Long,Integer> assignedOpenShiftMap) {
 
-        List<FibonacciCounter> fibonacciCounters = calculateFibonacciCounter(staffsUnitPositions,assignedOpenShiftMap);
+        List<FibonacciCounter> fibonacciCounters = calculateFibonacciCounter(staffsEmployments,assignedOpenShiftMap);
         fibonacciCounters.sort((FibonacciCounter f1,FibonacciCounter f2)->f1.getTimeBank()-f2.getTimeBank());
 
                 int i = 0;

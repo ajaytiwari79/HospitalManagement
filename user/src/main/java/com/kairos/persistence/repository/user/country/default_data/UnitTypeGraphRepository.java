@@ -10,9 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_Of_MODULE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface UnitTypeGraphRepository extends Neo4jBaseRepository<UnitType, Long> {

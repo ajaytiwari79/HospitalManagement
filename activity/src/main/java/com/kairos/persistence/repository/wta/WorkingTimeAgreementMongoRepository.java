@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by pawanmandhan on 27/7/17.
@@ -22,9 +21,6 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query("{countryId:?0,id:?1,deleted:false}")
     WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);
 
-    @Query("{_id:{$in:?0}, deleted:false}")
-    List<WorkingTimeAgreement> findAllByIdsInAndDeletedFalse(Set<BigInteger> ids);
-
     @Query(value = "{name:?2,deleted:false,disabled:false,'organizationType._id':?0,'organizationSubType._id':?1}",exists = true)
     boolean isWTAExistWithSameOrgTypeAndSubType(Long orgType,Long orgSubType, String name);
 
@@ -37,8 +33,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query(value = "{organization:{$exists:true},deleted:false}")
     List<WorkingTimeAgreement> findWTAofOrganization();
 
-    @Query(value = "{unitPositionId:{$exists:true},deleted:false}")
-    List<WorkingTimeAgreement> findWTAofUnitPositions();
+    @Query(value = "{employmentId:{$exists:true},deleted:false}")
+    List<WorkingTimeAgreement> findWTAOfEmployments();
 
 
 }

@@ -1,16 +1,14 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.service.AsynchronousService;
-import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.integration.GdprIntegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CompanyDefaultDataService {
-    private static final Logger logger = LoggerFactory.getLogger(CompanyDefaultDataService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyDefaultDataService.class);
     @Inject
     private TimeSlotService timeSlotService;
     @Inject

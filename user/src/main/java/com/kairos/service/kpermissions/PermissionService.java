@@ -1,14 +1,13 @@
 package com.kairos.service.kpermissions;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.kpermissions.FieldPermissionDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
+import com.kairos.dto.kpermissions.ModelPermissionDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
 import com.kairos.enums.kpermissions.FieldLevelPermissions;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.kpermissions.AccessGroupPermissionFieldRelationshipType;
-import com.kairos.persistence.model.kpermissions.AccessGroupPermissionModelRelationshipType;
-import com.kairos.persistence.model.kpermissions.PermissionField;
-import com.kairos.persistence.model.kpermissions.PermissionModel;
+import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionFieldRelationshipGraphRepository;
 import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionModelRelationshipGraphRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
@@ -95,35 +94,39 @@ public class PermissionService {
     }
 
     public List<PermissionDTO> createPermissions(List<PermissionDTO> permissionDTOList){
-        List<AccessGroupPermissionFieldRelationshipType> accessGroupPermissionFieldRelationshipTypes = new ArrayList<>();
-        List<AccessGroupPermissionModelRelationshipType> accessGroupPermissionModelRelationshipTypes = new ArrayList<>();
         permissionDTOList.forEach(permissionDTO -> {
             List<AccessGroup> accessGroups = accessGroupRepository.findAllById(permissionDTO.getAccessGroupIds());
-            permissionDTO.getModelPermissions().forEach(modelPermissionDTO -> {
-                modelPermissionDTO.getFieldPermissions().forEach(fieldPermissionDTO -> {
-                    PermissionField permissionField = permissionFieldRepository.getPermissionFieldByIdAndPermissionModelId(modelPermissionDTO.getPermissionModelId(), fieldPermissionDTO.getFieldId());
-                    if(permissionField == null){
-                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.permission.field", fieldPermissionDTO.getFieldId());
-                    }else{
-                        accessGroups.forEach(accessGroup -> {
-                            accessGroupPermissionFieldRelationshipTypes.add(new AccessGroupPermissionFieldRelationshipType(permissionField, accessGroup, FieldLevelPermissions.getByValue(fieldPermissionDTO.getFieldPermission())));
-                        });
-                    }
-                });
-                modelPermissionDTO.getSubModelPermissions().forEach(subModelPermissionDTO -> {
-                    PermissionModel permissionModel = permissionModelRepository.getPermissionSubModelByIdAndPermissionModelId(subModelPermissionDTO.getPermissionModelId(),modelPermissionDTO.getPermissionModelId());
-                    if(permissionModel == null){
-                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.permission.sub.model", subModelPermissionDTO.getPermissionModelId());
-                    }else{
-                        accessGroups.forEach(accessGroup -> {
-                            accessGroupPermissionModelRelationshipTypes.add(new AccessGroupPermissionModelRelationshipType(permissionModel,accessGroup,FieldLevelPermissions.getByValue(subModelPermissionDTO.getFieldPermission())));
-                        });
-                    }
-                });
-            });
+            linkAccessGroupToSubModelAndPermissionFields(permissionDTO.getModelPermissions(), accessGroups);
+        });
+        return permissionDTOList;
+    }
+
+
+    public void linkAccessGroupToSubModelAndPermissionFields(List<ModelPermissionDTO> modelPermissionDTOS, List<AccessGroup> accessGroups){
+        List<AccessGroupPermissionFieldRelationshipType> accessGroupPermissionFieldRelationshipTypes = new ArrayList<>();
+        List<AccessGroupPermissionModelRelationshipType> accessGroupPermissionModelRelationshipTypes = new ArrayList<>();
+        modelPermissionDTOS.forEach(modelPermissionDTO -> {
+            PermissionModel permissionModel = null;
+            for(FieldPermissionDTO fieldPermissionDTO : modelPermissionDTO.getFieldPermissions()){
+                PermissionFieldQueryResult permissionFieldQueryResult= permissionFieldRepository.getPermissionFieldByIdAndPermissionModelId(modelPermissionDTO.getPermissionModelId(), fieldPermissionDTO.getFieldId());
+                permissionModel= permissionFieldQueryResult.getPermissionModel();
+                PermissionField permissionField=permissionFieldQueryResult.getPermissionField();
+                if(permissionField == null){
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.permission.field", fieldPermissionDTO.getFieldId());
+                }else{
+                    accessGroups.forEach(accessGroup -> {
+                        accessGroupPermissionFieldRelationshipTypes.add(new AccessGroupPermissionFieldRelationshipType(permissionField, accessGroup, FieldLevelPermissions.getByValue(fieldPermissionDTO.getFieldPermission())));
+                    });
+                }
+            }
+            for(AccessGroup accessGroup : accessGroups){
+                accessGroupPermissionModelRelationshipTypes.add(new AccessGroupPermissionModelRelationshipType(permissionModel,accessGroup,FieldLevelPermissions.getByValue(modelPermissionDTO.getModelPermission())));
+            }
+            if(!modelPermissionDTO.getSubModelPermissions().isEmpty()){
+                linkAccessGroupToSubModelAndPermissionFields(modelPermissionDTO.getSubModelPermissions(), accessGroups);
+            }
         });
         accessGroupPermissionFieldRelationshipGraphRepository.saveAll(accessGroupPermissionFieldRelationshipTypes);
         accessGroupPermissionModelRelationshipGraphRepository.saveAll(accessGroupPermissionModelRelationshipTypes);
-        return permissionDTOList;
     }
 }

@@ -13,8 +13,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.*;
+import java.util.Objects;
 
 /*
  * Do not implement equals or hashcode

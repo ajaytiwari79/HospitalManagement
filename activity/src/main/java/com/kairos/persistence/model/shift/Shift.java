@@ -48,8 +48,8 @@ public class Shift extends MongoBaseEntity {
     private List<ShiftActivity> activities;
     //time care id
     private String externalId;
-    @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
-    private Long unitPositionId;
+    @NotNull(message = "error.ShiftDTO.employmentId.notnull")
+    private Long employmentId;
     private BigInteger parentOpenShiftId;
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
@@ -77,15 +77,15 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Shift(Date startDate, Date endDate, Long unitPositionId,@NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
+    public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.activities = shiftActivities;
     }
 
     public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,@NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities,@NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long unitPositionId) {
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,@NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities,@NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long employmentId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -99,16 +99,16 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
         this.staffId = staffId;
         this.unitId = unitId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
 
     }
     // This is used in absance shift
-    public Shift(Date startDate, Date endDate,@NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId,@NotEmpty(message = "message.shift.activity.empty")List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
+    public Shift(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty")List<ShiftActivity> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
         this.activities = activities;
-        this.unitPositionId=unitPositionId;
+        this.employmentId = employmentId;
         this.unitId=unitId;
         this.sickShift=true;
         this.phaseId=phaseId;
@@ -116,7 +116,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId,Long staffUserId,ShiftType shiftType) {
+    public Shift(Date startDate, Date endDate, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long employmentId, BigInteger parentOpenShiftId, BigInteger copiedFromShiftId, BigInteger phaseId, BigInteger planningPeriodId, Long staffUserId, ShiftType shiftType) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
@@ -124,7 +124,7 @@ public class Shift extends MongoBaseEntity {
         this.staffId = staffId;
         this.unitId = unitId;
         this.externalId = externalId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.parentOpenShiftId = parentOpenShiftId;
         this.copiedFromShiftId = copiedFromShiftId;
         this.scheduledMinutes = scheduledMinutes;
@@ -290,12 +290,12 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public BigInteger getParentOpenShiftId() {

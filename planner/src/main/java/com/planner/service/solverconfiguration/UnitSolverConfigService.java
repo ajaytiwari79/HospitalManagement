@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.enums.TimeTypeEnum.*;
-import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 
 @Service
 public class UnitSolverConfigService {

@@ -1,5 +1,5 @@
 
-match(u:UnitPosition) set u.published=true, u.editable=true,u.history=false;
+match(u:Employment) set u.published=true, u.editable=true,u.history=false;
 =======
 // TO set Country admin's Role as MANAGEMENT
 Match (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN" set ag.role="MANAGEMENT";

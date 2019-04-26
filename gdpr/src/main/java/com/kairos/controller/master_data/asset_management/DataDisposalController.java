@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

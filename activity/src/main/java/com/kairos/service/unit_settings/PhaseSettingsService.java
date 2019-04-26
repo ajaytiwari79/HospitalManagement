@@ -1,12 +1,12 @@
 package com.kairos.service.unit_settings;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 

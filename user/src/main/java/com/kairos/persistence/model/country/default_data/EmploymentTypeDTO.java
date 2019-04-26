@@ -25,7 +25,7 @@ public class EmploymentTypeDTO {
     private Set<EmploymentCategory> employmentCategories;
     private PaidOutFrequencyEnum paymentFrequency;
     //Added By Pavan
-    private boolean editableAtUnitPosition;
+    private boolean editableAtEmployment;
     private Short weeklyMinutes;
 
     public EmploymentTypeDTO() {
@@ -96,12 +96,12 @@ public class EmploymentTypeDTO {
         this.paymentFrequency = paymentFrequency;
     }
 
-    public boolean isEditableAtUnitPosition() {
-        return editableAtUnitPosition;
+    public boolean isEditableAtEmployment() {
+        return editableAtEmployment;
     }
 
-    public void setEditableAtUnitPosition(boolean editableAtUnitPosition) {
-        this.editableAtUnitPosition = editableAtUnitPosition;
+    public void setEditableAtEmployment(boolean editableAtEmployment) {
+        this.editableAtEmployment = editableAtEmployment;
     }
 
     public Short getWeeklyMinutes() {

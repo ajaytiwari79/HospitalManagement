@@ -1,8 +1,6 @@
 package com.kairos.dto.activity.shift;
 
-import com.kairos.dto.activity.attendance.AttendanceTimeSlot;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
 import java.util.List;
 

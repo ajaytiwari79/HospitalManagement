@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
-import com.kairos.dto.activity.task_type.OrgTaskTypeAggregateResult;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.task_type.OrgTaskTypeAggregateResult;
 import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
 import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
@@ -21,8 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Component
 public class TaskDemandRestClient {

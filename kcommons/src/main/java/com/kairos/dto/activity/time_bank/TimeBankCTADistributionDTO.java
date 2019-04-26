@@ -2,8 +2,6 @@ package com.kairos.dto.activity.time_bank;
 
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
 public class TimeBankCTADistributionDTO {

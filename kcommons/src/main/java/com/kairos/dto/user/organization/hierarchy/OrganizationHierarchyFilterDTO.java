@@ -1,6 +1,5 @@
 package com.kairos.dto.user.organization.hierarchy;
 
-import java.util.List;
 import java.util.Set;
 
 public class OrganizationHierarchyFilterDTO {

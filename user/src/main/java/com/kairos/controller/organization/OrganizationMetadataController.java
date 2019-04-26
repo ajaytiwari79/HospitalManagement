@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.LOCAL_AREA_TAG_URL;
-import static com.kairos.constants.ApiConstants.ORG_PAYMENT_SETTING;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**

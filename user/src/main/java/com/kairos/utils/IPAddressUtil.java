@@ -14,21 +14,21 @@ import java.util.Enumeration;
  */
 public class IPAddressUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(IPAddressUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IPAddressUtil.class);
 
     public static String getIPAddress(HttpServletRequest httpServletRequest){
 
         String ipAddress ="";
         try{
             ipAddress = httpServletRequest.getHeader("X-FORWARDED-FOR");
-            logger.debug("IP Address using X-FORWARDED-FOR " + ipAddress);
+            LOGGER.debug("IP Address using X-FORWARDED-FOR " + ipAddress);
 
             if (ipAddress == null || ipAddress.equals("")) {
                 ipAddress = httpServletRequest.getRemoteAddr();
-                logger.debug("IP Address using getRemoteAddr "+ ipAddress);
+                LOGGER.debug("IP Address using getRemoteAddr "+ ipAddress);
             }
         }catch (Exception ex){
-            logger.error("ex "+ex);
+            LOGGER.error("ex "+ex);
         }
 
         if(ipAddress == ""  || ipAddress.contains(":") || ipAddress.contains("127.0.")){
@@ -48,7 +48,7 @@ public class IPAddressUtil {
                     }
                 }
             }
-            logger.debug("IP Address using NetworkInterface "+ ipAddress);
+            LOGGER.debug("IP Address using NetworkInterface "+ ipAddress);
         }
         return ipAddress;
     }

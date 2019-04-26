@@ -4,7 +4,6 @@ import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 //variable listeners have order. make sure it's last or dont use properties that are in listners after its order.
 //Note that ASV is called after this listener not before so getShift() would be stale.

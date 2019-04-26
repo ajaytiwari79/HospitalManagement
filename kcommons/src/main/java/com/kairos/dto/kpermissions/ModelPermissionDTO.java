@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,12 +21,11 @@ public class ModelPermissionDTO {
 
     @Valid
     @NotEmpty(message = "message.permission.actions.id.null")
-    List<FieldPermissionDTO> fieldPermissions;
+    List<FieldPermissionDTO> fieldPermissions= new ArrayList<>();
 
     @Valid
-    @NotEmpty(message = "message.permission.actions.id.null")
-    List<ModelPermissionDTO> subModelPermissions;
+    List<ModelPermissionDTO> subModelPermissions= new ArrayList<>();
 
     @NotBlank(message = "message.permission.id.null")
-    String fieldPermission;
+    String modelPermission;
 }

@@ -1,7 +1,6 @@
 package com.kairos.rule_validator.activity;
 
 import com.kairos.rule_validator.Specification;
-import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 
 import java.util.Collections;
 import java.util.List;

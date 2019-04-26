@@ -1,11 +1,7 @@
 package com.kairos.dto.activity.shift;
 
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
-
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author pradeep

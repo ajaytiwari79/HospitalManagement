@@ -1,12 +1,12 @@
 package com.kairos.wrapper.phase;
-import com.kairos.dto.activity.shift.ShiftTemplateDTO;
+
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
-
 
 import java.time.LocalDate;
 import java.util.ArrayList;

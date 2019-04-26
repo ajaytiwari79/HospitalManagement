@@ -1,32 +1,24 @@
 package com.kairos.controller.country;
 
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.default_data.*;
-import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
-import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.country.*;
+import com.kairos.service.country.CountryHolidayCalenderService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.expertise.ExpertiseService;
-import com.kairos.service.language.LanguageLevelService;
-import com.kairos.service.language.LanguageService;
-import com.kairos.service.organization.*;
-import com.kairos.service.payment_type.PaymentTypeService;
+import com.kairos.service.organization.CompanyCreationService;
+import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
-import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import io.swagger.annotations.Api;
@@ -43,7 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @RequestMapping(API_V1)
 @Api(API_V1)

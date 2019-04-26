@@ -1,6 +1,6 @@
 package com.kairos.service.tpa_services;
+
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +17,6 @@ import java.util.Map;
 @Service
 @Transactional
 public class IntegrationConfigurationService {
-
-    @Inject
-    CountryGraphRepository countryGraphRepository;
 
     @Inject
     IntegrationConfigurationGraphRepository integrationConfigurationGraphRepository;

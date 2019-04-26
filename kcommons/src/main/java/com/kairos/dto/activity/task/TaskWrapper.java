@@ -1,7 +1,7 @@
 package com.kairos.dto.activity.task;
 
-import com.kairos.enums.Status;
 import com.kairos.dto.planner.vrp.TaskAddress;
+import com.kairos.enums.Status;
 
 import java.util.Date;
 
