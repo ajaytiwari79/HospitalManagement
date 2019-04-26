@@ -1,0 +1,4 @@
+// To set existing type
+
+MATCH(r:ReasonCode) WHERE r.reasonCodeType='ABSENCE'
+SET r.reasonCodeType='TIME_TYPE'

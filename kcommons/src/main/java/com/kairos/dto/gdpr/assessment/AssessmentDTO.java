@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -39,7 +40,9 @@ public class AssessmentDTO {
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
+    @Min(value = 1,message = "message.relativeDeadLine.value.invalid")
     private Integer relativeDeadlineDuration;
+    @NotNull(message = "message.durationType.null")
     private DurationType relativeDeadlineType;
 
 }
