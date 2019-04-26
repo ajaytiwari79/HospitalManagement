@@ -46,9 +46,9 @@ public class RestingHoursCalculationService implements CounterService {
     @Inject
     private UserIntegrationService userIntegrationService;
 
-    public double getTotalRestingHours(List<Shift> shifts, long initTs, long endTs) {
+    public double getTotalRestingHours(List<Shift> shifts, LocalDate startDate, LocalDate endDate) {
         //all shifts should be sorted on startDate
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(initTs, endTs);
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
         long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
         for (Shift shift : shifts) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
@@ -59,26 +59,15 @@ public class RestingHoursCalculationService implements CounterService {
         return DateUtils.getHoursFromTotalMilliSeconds(totalrestingMinutes);
     }
 
-    public Map<Long, Double> calculateRestingHours(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate,ApplicableKPI applicableKPI) {
-        Map<Long, Double> staffRestingHours = new HashMap<>();
-        Map<DateTimeInterval,List<Shift>> dateTimeIntervalListMap=new HashMap<>();
+    public Map<Object, Double> calculateRestingHours(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate,ApplicableKPI applicableKPI) {
+        Map<DateTimeInterval,List<Shift>> dateTimeIntervalListMap = new HashMap<>();
         List<DateTimeInterval> dateTimeIntervals=getDateTimeIntervals(applicableKPI);
         dateTimeIntervals.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
-        Map<Long, List<Shift>> staffShiftMapping=new HashMap<>();
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate())));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval,shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
-
-        //staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
-
-        staffIds.forEach(staffId -> {
-            if (staffId != null) {
-                Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate), DateUtils.getLongFromLocalDateimeTime(endDate));
-                staffRestingHours.put(staffId, restingHours);
-            }
-        });
-        return staffRestingHours;
+        return calculateDataByKpiRepresentation(dateTimeIntervalListMap,dateTimeIntervals);
     }
 
     private List<CommonKpiDataUnit> getRestingHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, boolean averageDay, boolean kpi,ApplicableKPI applicableKPI) {
@@ -91,11 +80,11 @@ public class RestingHoursCalculationService implements CounterService {
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1),applicableKPI);
-        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
+        Map<Object, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1),applicableKPI);
+        //Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
-        for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {
-            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
+        for (Map.Entry<Object, Double> entry : staffRestingHours.entrySet()) {
+            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), Arrays.asList(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue() * multiplicationFactor))));
         }
         return kpiDataUnits;
     }
@@ -116,6 +105,16 @@ public class RestingHoursCalculationService implements CounterService {
     @Override
     public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
         return new HashMap<>();//getRestingHoursKpiData(filterBasedCriteria, organizationId, true, false);
+    }
+
+    private Map<Object, Double> calculateDataByKpiRepresentation(Map<DateTimeInterval,List<Shift>> dateTimeIntervalListMap,List<DateTimeInterval> dateTimeIntervals){
+//        Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
+        Map<Object, Double> staffRestingHours = new HashMap<>();
+        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+            Double restingHours = getTotalRestingHours(dateTimeIntervalListMap.getOrDefault(dateTimeInterval, new ArrayList<>()), DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate()), DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate()));
+            staffRestingHours.put(dateTimeInterval, restingHours);
+        }
+        return staffRestingHours;
     }
 
     private List<DateTimeInterval> getDateTimeIntervals(ApplicableKPI applicableKPI) {
@@ -150,7 +149,7 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     private LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
-        LocalDate currentDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate currentDate = getFirstDayOfCurrentDurationType(date,durationType);
         LocalDate nextDate = getCurrentLocaDateByDurationType(date,durationType);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
         return nextDate.plusDays(1);
@@ -160,7 +159,7 @@ public class RestingHoursCalculationService implements CounterService {
         LocalDate currentDate = date;
         LocalDate nextDate = getPriviousLocaDateByDurationType(date,durationType);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
-        return nextDate.plusDays(1);
+        return nextDate.minusDays(1);
     }
 
     private LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType){
@@ -215,6 +214,26 @@ public class RestingHoursCalculationService implements CounterService {
                 break;
             case YEAR:
                 date=date.with(TemporalAdjusters.lastDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    private LocalDate getFirstDayOfCurrentDurationType(LocalDate date, DurationType durationType){
+        switch (durationType){
+            case DAYS:
+                date=date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                break;
+            case MONTHS:
+                date=date.with(TemporalAdjusters.firstDayOfMonth());
+                break;
+            case WEEKS:
+                date=date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                date=date.with(TemporalAdjusters.firstDayOfYear());
                 break;
             default:
                 break;
