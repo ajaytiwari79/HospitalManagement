@@ -90,7 +90,7 @@ public class RedisConfig {
         poolConfig.setMaxTotal(env.getRedisMaxConn());
         poolConfig.setMinIdle(env.getRedisMinIdleConn());
         poolConfig.setMaxIdle(env.getRedisMaxIdleConn());*/
-        JedisConnectionFactory factory = new JedisConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
+        JedisConnectionFactory factory = new JedisConnectionFactory(new RedisStandaloneConfiguration(redisHostName,redisPort));
         return factory;
     }
 
