@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
@@ -99,7 +100,7 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject
     private RedisService redisService;
-    private TokenExtractor tokenExtractor=new BearerTokenExtractor();
+    private TokenExtractor tokenExtractor = new BearerTokenExtractor();
     @Inject
     private TokenStore tokenStore;
 
@@ -238,8 +239,10 @@ public class UserService {
             } else {
                 redisService.removeUserTokenFromRedisByClientIpAddress(oAuth2Authentication.getUserAuthentication().getName(), request.getRemoteAddr());
             }
+            tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
+            SecurityContextHolder.clearContext();
         } else {
-            exceptionService.internalServerError("c");
+            exceptionService.internalServerError("message.authentication.null");
         }
         return logoutSuccessfull;
 

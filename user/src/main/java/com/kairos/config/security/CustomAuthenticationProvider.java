@@ -1,7 +1,5 @@
 package com.kairos.config.security;
 
-import com.kairos.service.auth.RedisService;
-import com.kairos.service.exception.ExceptionService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

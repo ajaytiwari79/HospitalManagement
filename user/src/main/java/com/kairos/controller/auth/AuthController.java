@@ -1,6 +1,5 @@
 package com.kairos.controller.auth;
 
-import com.kairos.constants.CommonConstants;
 import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;

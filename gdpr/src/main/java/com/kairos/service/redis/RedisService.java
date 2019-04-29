@@ -1,4 +1,4 @@
-package com.kairos.service.auth;
+package com.kairos.service.redis;
 
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -7,7 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 

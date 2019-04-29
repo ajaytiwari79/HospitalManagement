@@ -5,12 +5,9 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
-import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
@@ -97,13 +94,16 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
             exceptionService.invalidTokenException("message.authentication.loadAuthentication.null");
         } else if (token.isExpired()) {
             authentication = tokenStore.readAuthentication(accessToken);
-            removeTokenFromRedis(authentication.getUserAuthentication().getName(), request.getRemoteAddr());
+            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), request.getRemoteAddr());
+            if (!tokenRemoved) {
+                exceptionService.internalError("unable to removed expired token from redis");
+            }
             tokenStore.readAccessToken(accessToken);
-           exceptionService.invalidTokenException("message.token.expire",token);
+            exceptionService.invalidTokenException("message.token.expire", token);
         }
         authentication = tokenStore.readAuthentication(accessToken);
         if (authentication == null) {
-           exceptionService.invalidTokenException("message.token.expired",token);
+            exceptionService.invalidTokenException("message.token.expired", token);
         }
         return authentication;
     }
@@ -115,8 +115,8 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
         // no need to define
     }
 
-    private void removeTokenFromRedis(String userName, String clientIp) {
-        redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp);
+    private boolean removeTokenFromRedis(String userName, String clientIp) {
+        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp);
     }
 
 }

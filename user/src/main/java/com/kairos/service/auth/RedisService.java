@@ -4,7 +4,6 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -46,7 +45,7 @@ public class RedisService {
     }
 
     public boolean checkIfUserExistInRedis(String userName) {
-        return valueOperations.opsForValue().get(userName)!=null;
+        return valueOperations.opsForValue().get(userName) != null;
 
     }
 
@@ -55,9 +54,13 @@ public class RedisService {
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
             userTokensFromDifferentMachine.remove(clientId);
+            if (Integer.valueOf(userTokensFromDifferentMachine.size()).equals(1))
+                valueOperations.delete(userName);
+            else
+                valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
             tokenRemoved = true;
         } else {
-            exceptionService.internalServerError("user token not found ");
+            exceptionService.internalServerError("message.user.notFoundInRedis");
         }
         return tokenRemoved;
     }
