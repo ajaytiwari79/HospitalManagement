@@ -2,6 +2,7 @@ package com.kairos.config.security;
 
 import com.kairos.service.auth.RedisService;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -9,6 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -22,8 +24,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Inject
     private RedisService redisService;
-    @Inject
-    private JwtAccessTokenConverter jwtAccessTokenConverter;
     @Inject
     private ExceptionService exceptionService;
 
@@ -46,7 +46,19 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     }
 
     public OAuth2AuthenticationProcessingFilter getAuthenticationFilter() {
-        return new CustomOAuthAuthenticationProcessingFilter(new JwtTokenStore(jwtAccessTokenConverter), redisService, exceptionService);
+        return new CustomOAuthAuthenticationProcessingFilter(tokenStore(), redisService, exceptionService);
+    }
+
+    @Bean
+    public TokenStore tokenStore() {
+        return new JwtTokenStore(accessTokenConverter());
+    }
+
+    @Bean
+    public JwtAccessTokenConverter accessTokenConverter() {
+        JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
+        converter.setSigningKey("123456");
+        return converter;
     }
 
 }

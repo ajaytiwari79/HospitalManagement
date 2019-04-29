@@ -43,6 +43,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
 import org.springframework.security.oauth2.provider.authentication.TokenExtractor;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
@@ -98,7 +99,8 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject
     private RedisService redisService;
-    private TokenExtractor tokenExtractor;
+    private TokenExtractor tokenExtractor=new BearerTokenExtractor();
+    @Inject
     private TokenStore tokenStore;
 
     /**
