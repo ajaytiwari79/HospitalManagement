@@ -3,8 +3,10 @@ package com.kairos.persistence.repository.period;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -317,6 +319,20 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 project().and("startDate").as("startDate").and("endDate").as("endDate")
         );
         AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
+        return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
+    }
+
+    @Override
+    public PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(LocalDate.now())),
+                lookup("phases","currentPhaseId","_id","phase"),
+                project("unitId","endDate").and("phase").arrayElementAt(0).as("phase"),
+                match(Criteria.where("phase.phaseEnum").is(PhaseDefaultName.REQUEST)),
+                group("unitId").first("endDate").as("endDate")
+
+        );
+        AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriod.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
     }
 

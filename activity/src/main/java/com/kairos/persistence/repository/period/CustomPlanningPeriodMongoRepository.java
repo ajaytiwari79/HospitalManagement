@@ -33,4 +33,5 @@ public interface CustomPlanningPeriodMongoRepository {
     List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
     List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate);
     List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
+    PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId);
 }

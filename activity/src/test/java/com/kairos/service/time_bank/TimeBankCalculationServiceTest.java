@@ -23,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -30,8 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.PACKAGE_NAME;
 
@@ -189,10 +189,10 @@ public class TimeBankCalculationServiceTest {
                     final Object oldValue = arg0.canonicalGet(dailyTimeBankEntry2);
                     final Object newValue = arg0.canonicalGet(dailyTimeBankEntry);
                     String properteyName = arg0.getPropertyName();
-                    if(isNull(arg0.getValueType().getPackage()) || arg0.getValueType().getPackage().getName().equals(PACKAGE_NAME)) {
+                    if(isNotNull(properteyName) && isValid(arg0) || isValidPa(arg0)) {
                         if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/")) {
-                            result.put("new" + path, newValue);
-                            result.put("old" + path, oldValue);
+                            result.put("new_" + path, newValue);
+                            result.put("old_" + path, oldValue);
                         }
                         if((oldValue == null || newValue == null)) {
                             result.put("new" + path, newValue);
@@ -209,6 +209,41 @@ public class TimeBankCalculationServiceTest {
         LOGGER.info("test {}",result);
     }
 
+    boolean isValid(DiffNode arg0){
+        Set<String> strings = newHashSet("int","long");
+        return strings.contains(arg0.getValueType().getName()) && isNotNull(arg0.getParentNode()) && !arg0.getParentNode().getValueType().getPackage().getName().contains("java.time");
+    }
+
+    boolean isValidPa(DiffNode arg0){
+        LOGGER.debug("property {}",arg0.getPropertyName());
+        return isNotNull(arg0.getValueType().getPackage()) && isNotNull(arg0.getParentNode().getValueType().getPackage()) && !arg0.getParentNode().getValueType().getPackage().getName().contains("java.time");
+    }
+
+    @Test
+    public void updateMessageProperties() {
+        File file = new File("/media/pradeep/bak/kairos/kairos-user/planner/src/main/resources/messages/messages.properties");
+        File file2 = new File("/media/pradeep/bak/test.txt");
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file2);
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            bufferedReader.lines().forEach(string->{
+                if(!string.contains("#") && !string.isEmpty()){
+                    String key = string.substring(0,string.indexOf("="));
+                    try {
+                        bufferedWriter.write("    public static final String "+key.replace(".","_").replace("-","_").toUpperCase()+" = "+'"'+key+'"'+";");
+                        bufferedWriter.newLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(key);
+                }
+            });
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private String getNightShiftJson() {
         return "[ {\n" +
