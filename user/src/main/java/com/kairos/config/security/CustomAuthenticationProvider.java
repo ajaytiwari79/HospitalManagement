@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.Optional;
 
 public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
@@ -29,7 +30,6 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
     }
 
 
-
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (!Optional.ofNullable(authentication.getCredentials()).isPresent()) {
@@ -37,12 +37,12 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
         }
         String userName = String.valueOf(authentication.getPrincipal());
         if (userName == null) {
-
+            throw new UsernameNotFoundException("User not found");
         }
-        System.err.println("Custom providerzxc>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
         UserDetails user = retrieveUser(userName, (UsernamePasswordAuthenticationToken) authentication);
-        additionalAuthenticationChecks(user,(UsernamePasswordAuthenticationToken) authentication);
-        return  createSuccessAuthentication((Object)user,authentication,user);
+        additionalAuthenticationChecks(user, (UsernamePasswordAuthenticationToken) authentication);
+        //create success authentication method set authentication true and call creat token method of default custom token service
+        return createSuccessAuthentication((Object) user, authentication, user);
     }
 
     @Override
@@ -64,7 +64,6 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
                     "AbstractUserDetailsAuthenticationProvider.badCredentials",
                     "Bad credentials"));
         }
-
         String presentedPassword = authentication.getCredentials().toString();
 
         if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
@@ -79,10 +78,10 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         try {
-            UserDetails loadedUser = this.getUserDetailsService().loadUserByUsername(username);
+            UserDetails loadedUser = userDetailsService.loadUserByUsername(username);
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
-                        "UserDetailsService returned null, which is an interface contract violation");
+                        "UserDetailsService service null");
             }
             return loadedUser;
         } catch (UsernameNotFoundException ex) {
@@ -92,26 +91,5 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
         } catch (Exception ex) {
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex);
         }
-    }
-
-
-
-
-
-
-    public UserDetailsService getUserDetailsService() {
-        return userDetailsService;
-    }
-
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
-    public PasswordEncoder getPasswordEncoder() {
-        return passwordEncoder;
-    }
-
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
     }
 }

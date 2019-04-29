@@ -1,6 +1,7 @@
 package com.kairos.config.security;
 
 import com.kairos.service.auth.RedisService;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,14 +17,15 @@ import javax.inject.Inject;
 
 @EnableResourceServer
 @Configuration
-public class ResourceServerConfig extends ResourceServerConfigurerAdapter
-{
+public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 
     @Inject
     private RedisService redisService;
     @Inject
     private JwtAccessTokenConverter jwtAccessTokenConverter;
+    @Inject
+    private ExceptionService exceptionService;
 
 
     @Override
@@ -40,14 +42,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter
                 .antMatchers("/resources/**", "/configuration/ui", "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs", "/webjars/**").permitAll()
                 .antMatchers("/actuator/**", "/api/v1/legal").permitAll()
                 .antMatchers("/**").authenticated()
-                .and().addFilterBefore(getBasicAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
+                .and().addFilterBefore(getAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
     }
 
-    public OAuth2AuthenticationProcessingFilter getBasicAuthenticationFilter()  {
-        CustomOAuthProcessingFilter oAuthProcessingFilter = new CustomOAuthProcessingFilter();
-        oAuthProcessingFilter.setRedisService(redisService);
-        oAuthProcessingFilter.setTokenStore(new JwtTokenStore(jwtAccessTokenConverter));
-        return oAuthProcessingFilter;
+    public OAuth2AuthenticationProcessingFilter getAuthenticationFilter() {
+        return new CustomOAuthAuthenticationProcessingFilter(new JwtTokenStore(jwtAccessTokenConverter), redisService, exceptionService);
     }
 
 }

@@ -123,7 +123,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
    /* @Bean
     public FilterRegistrationBean registration() {
-        FilterRegistrationBean registration = new FilterRegistrationBean(getBasicAuthenticationFilter());
+        FilterRegistrationBean registration = new FilterRegistrationBean(getAuthenticationFilter());
         registration.setEnabled(true);
         return registration;
     }

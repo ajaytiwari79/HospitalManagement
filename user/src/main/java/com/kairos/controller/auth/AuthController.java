@@ -24,6 +24,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,9 +63,9 @@ public class AuthController {
     @ApiOperation(value = "Authenticate User")
     ResponseEntity<Map<String, Object>> checkUser(@RequestBody User user) {
 
-        logger.info("user info is {}",user);
+        logger.info("user info is {}", user);
 
-        Map<String,Object> response = userService.authenticateUser(user);
+        Map<String, Object> response = userService.authenticateUser(user);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, response);
         }
@@ -74,16 +76,16 @@ public class AuthController {
     @RequestMapping(value = "/forgot", method = RequestMethod.POST)
     @ApiOperation(value = "forgot password")
     ResponseEntity<Map<String, Object>> forgotPassword(@RequestParam("email") String email) {
-        logger.info("user info is {}",email);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.forgotPassword(email));
+        logger.info("user info is {}", email);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.forgotPassword(email));
 
     }
 
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
     @ApiOperation(value = "reset password")
-    ResponseEntity<Map<String, Object>> resetPassword(@RequestParam("token") String token,@RequestBody PasswordUpdateDTO passwordUpdateDTO ) {
-        logger.info("user info is {}",token);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.resetPassword(token,passwordUpdateDTO));
+    ResponseEntity<Map<String, Object>> resetPassword(@RequestParam("token") String token, @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
+        logger.info("user info is {}", token);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.resetPassword(token, passwordUpdateDTO));
 
     }
 
@@ -120,7 +122,7 @@ public class AuthController {
 
     @RequestMapping(value = "/login/otp", method = RequestMethod.POST)
     @ApiOperation(value = "send otp")
-    public ResponseEntity<Map<String, Object>> sendOtp(@RequestBody Map<String,Object> loginDetails) throws TwilioRestException {
+    public ResponseEntity<Map<String, Object>> sendOtp(@RequestBody Map<String, Object> loginDetails) throws TwilioRestException {
         String email = (String) loginDetails.get("email");
 
         if (userService.sendOtp(email)) {
@@ -136,11 +138,11 @@ public class AuthController {
         String otp = (String) otpDetail.get("verificationCode");
 
         int verificationCode = 0;
-        if(otp != null && !otp.isEmpty()){
+        if (otp != null && !otp.isEmpty()) {
             verificationCode = Integer.parseInt(otp);
         }
         String email = (String) otpDetail.get("email");
-        Map<String,Object> response =  userService.verifyOtp(verificationCode,email);
+        Map<String, Object> response = userService.verifyOtp(verificationCode, email);
 
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, Collections.emptyMap());
@@ -152,14 +154,12 @@ public class AuthController {
      * Calls tokenService to delete access token and logout user.
      * /logout is mapped in logoutRequestMatcher as logout URL
      *
-     * @param accessToken
      * @return
      */
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @ApiOperation(value = "logout User from System")
-    ResponseEntity<Map<String, Object>> logoutUser(@RequestHeader(value = CommonConstants.AUTH_TOKEN) String accessToken) {
-        logger.info("Removing token  " + accessToken + "\n");
-        if (userService.removeToken(accessToken)) {
+    ResponseEntity<Map<String, Object>> logoutUser(HttpServletRequest request, HttpServletResponse response, @RequestParam boolean logoutFromAllMachine) {
+        if (userService.logoutUserFromSystem(logoutFromAllMachine, request)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, false);
@@ -172,19 +172,19 @@ public class AuthController {
 
     /* @PreAuthorize("@customPermissionEvaluator.isAuthorized(#organizationId,#tabId,#httpServletRequest)")*/
     @RequestMapping(value = "/user/password", method = RequestMethod.PUT)
-    ResponseEntity<Map<String,Object>> updatePassword(@Valid @RequestBody FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO){
+    ResponseEntity<Map<String, Object>> updatePassword(@Valid @RequestBody FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updatePassword(firstTimePasswordUpdateDTO));
     }
 
 
-    @RequestMapping(value =  UNIT_URL+"/user/permissions", method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long unitId){
+    @RequestMapping(value = UNIT_URL + "/user/permissions", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getPermissions(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(unitId));
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
 
     @PreAuthorize("hasPermission()")
-    @RequestMapping(value = { "/user/{unitId}" }, produces = "application/json")
+    @RequestMapping(value = {"/user/{unitId}"}, produces = "application/json")
     public Map<String, Object> user(OAuth2Authentication user) {
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("authorities", AuthorityUtils.authorityListToSet(user.getUserAuthentication().getAuthorities()));
@@ -198,7 +198,7 @@ public class AuthController {
 
     /* @PreAuthorize("@customPermissionEvaluator.isAuthorized(#organizationId,#tabId,#httpServletRequest)")*/
     @PutMapping(value = "/update_user_name")
-    ResponseEntity<Map<String,Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO){
+    ResponseEntity<Map<String, Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailsDTO));
     }
 }
