@@ -1,5 +1,9 @@
 package com.kairos.dto.activity.counter.data;
 
+import com.kairos.enums.DurationType;
+import com.kairos.enums.kpi.Interval;
+import com.kairos.enums.kpi.KPIRepresentation;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -12,6 +16,11 @@ public class FilterCriteriaDTO {
     private List<FilterCriteria> filters;
     private List<BigInteger> kpiIds;
     private List<BigInteger> counterIds;
+    private DurationType frequencyType;
+    // frequency value
+    private int value;
+    private Interval interval;
+
 
     public FilterCriteriaDTO() {
     }
@@ -94,5 +103,29 @@ public class FilterCriteriaDTO {
 
     public void setManagement(boolean management) {
         this.management = management;
+    }
+
+    public DurationType getFrequencyType() {
+        return frequencyType;
+    }
+
+    public void setFrequencyType(DurationType frequencyType) {
+        this.frequencyType = frequencyType;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Interval interval) {
+        this.interval = interval;
     }
 }

@@ -56,6 +56,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static java.util.stream.Collectors.toList;
 
@@ -139,6 +140,11 @@ public class CounterDataService extends MongoBaseService {
                 staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
                 if(!filters.isManagement() && KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
                     staffFilterBasedCriteria.put(FilterType.STAFF_IDS, Arrays.asList(staffId.intValue()));
+                }
+                if(isNotNull(filters.getFrequencyType())){
+                    staffApplicableKPI.setInterval(filters.getInterval());
+                    staffApplicableKPI.setValue(filters.getValue());
+                    staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
                 }
                 staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
             }
@@ -378,6 +384,10 @@ public class CounterDataService extends MongoBaseService {
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, null);
         tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
+    }
+
+    public TabKPIDTO getKpiDataByInterval(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
+        return getKpiPreviewWithFilter(kpiId,refId,filterCriteria,level);
     }
 
     private TabKPIDTO getTabKpiData(KPI copyKpi, CounterDTO counterDTO, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
