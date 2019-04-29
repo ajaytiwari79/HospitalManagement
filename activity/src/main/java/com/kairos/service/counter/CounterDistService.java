@@ -235,6 +235,7 @@ public class CounterDistService extends MongoBaseService {
         filters.setUnitId(unitId);
         filters.setCountryId(countryId);
         filters.setCountryAdmin(accessGroupPermissionCounterDTO.isCountryAdmin());
+        filters.setManagement(accessGroupPermissionCounterDTO.isManagement());
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filters, unitId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
