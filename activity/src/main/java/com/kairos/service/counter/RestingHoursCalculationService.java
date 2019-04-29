@@ -13,7 +13,6 @@ import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -27,13 +26,12 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
+import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @Service
@@ -60,11 +58,9 @@ public class RestingHoursCalculationService implements CounterService {
         return DateUtils.getHoursFromTotalMilliSeconds(totalrestingMinutes);
     }
 
-    public Map<Object, Double> calculateRestingHours(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate, ApplicableKPI applicableKPI) {
+    public Map<Object, Double> calculateRestingHours(List<Long> staffIds, List<LocalDate> filterDates, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals) {
         Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap = new HashMap<>();
-        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI);
-        dateTimeIntervals.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
-        staffIds = new ArrayList<>();
+        staffIds=new ArrayList<>();
         staffIds.add(920l);
         staffIds.add(975l);
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
@@ -79,12 +75,17 @@ public class RestingHoursCalculationService implements CounterService {
         double multiplicationFactor = 1;
         //FIXME: fixed time interval TO BE REMOVED ONCE FILTERS IMPLEMENTED PROPERLY
         List staffIds = (filterBasedCriteria.get(FilterType.STAFF_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
-        List<LocalDate> filterDates = filterBasedCriteria.get(FilterType.TIME_INTERVAL) != null && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL)) ? KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL)) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
+        List<LocalDate> filterDates=new ArrayList<>();
+        if(isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))){
+            filterDates= KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL));
+        }
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
+        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(),applicableKPI.getValue(),applicableKPI.getFrequencyType(),filterDates);
+        dateTimeIntervals.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate().toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Object, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1), applicableKPI);
+        Map<Object, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()),filterDates, applicableKPI,dateTimeIntervals);
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         getKpiDataUnits(multiplicationFactor, staffRestingHours, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
         return kpiDataUnits;
@@ -120,7 +121,7 @@ public class RestingHoursCalculationService implements CounterService {
 
     @Override
     public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
-        return new HashMap<>();//getRestingHoursKpiData(filterBasedCriteria, organizationId, true, false);
+        return new HashMap<>();
     }
 
     private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, KPIRepresentation kpiRepresentation, List<Shift> shifts) {
@@ -135,10 +136,13 @@ public class RestingHoursCalculationService implements CounterService {
                 }
                 break;
             case REPRESENT_TOTAL_DATA:
+                staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
                 for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-                    restingHours += getTotalRestingHours(dateTimeIntervalListMap.getOrDefault(dateTimeInterval, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
+                    for (Long staffId : staffIds) {
+                        restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
+                    }
                 }
-                staffRestingHours.put(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()), restingHours);
+                staffRestingHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), restingHours);
                 break;
             case REPRESENT_PER_INTERVAL:
                 Map<DateTimeInterval, Map<Long, List<Shift>>> dateTimeIntervalListMap1 = new HashedMap();
@@ -149,139 +153,17 @@ public class RestingHoursCalculationService implements CounterService {
                     for (Long staffId : staffIds) {
                         restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
                     }
-                    staffRestingHours.put(dateTimeInterval, restingHours);
+                    staffRestingHours.put(getDateTimeintervalString(dateTimeInterval), restingHours);
                 }
                 break;
             default:
                 break;
         }
-
         return staffRestingHours;
     }
 
-    private List<DateTimeInterval> getDateTimeIntervals(ApplicableKPI applicableKPI) {
-        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
-        LocalDate currentDate = DateUtils.getCurrentLocalDate();
-        switch (applicableKPI.getInterval()) {
-            case LAST:
-                for (int i = 0; i < applicableKPI.getValue(); i++) {
-                    currentDate = getLastDateTimeIntervalByDate(currentDate, applicableKPI.getFrequencyType(), dateTimeIntervals);
-                }
-                break;
-            case CURRENT:
-                getCurrentDateTimeIntervalByDate(currentDate, applicableKPI.getFrequencyType(), dateTimeIntervals);
-                break;
-            case NEXT:
-                for (int i = 0; i < applicableKPI.getValue(); i++) {
-                    currentDate = getNextDateTimeIntervalByDate(currentDate, applicableKPI.getFrequencyType(), dateTimeIntervals);
-                }
-                break;
-            default:
-                break;
-        }
 
-        return dateTimeIntervals;
-    }
 
-    private LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
-        LocalDate currentDate = date;
-        LocalDate nextDate = getNextLocaDateByDurationType(date, durationType);
-        dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
-        return nextDate;
-    }
-
-    private LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
-        LocalDate currentDate = getFirstLocalDateByDurationType(date, durationType);
-        LocalDate nextDate = getLastLocaDateByDurationType(date, durationType);
-        dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
-        return nextDate;
-    }
-
-    private LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
-        LocalDate currentDate = date;
-        LocalDate nextDate = getPriviousLocaDateByDurationType(date, durationType);
-        dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
-        return nextDate;
-    }
-
-    private LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
-        switch (durationType) {
-            case DAYS:
-                date = date.plusDays(1);
-                break;
-            case MONTHS:
-                date = date.plusMonths(1);
-                break;
-            case WEEKS:
-                date = date.plusWeeks(1);
-                break;
-            case YEAR:
-                date = date.plusYears(1);
-                break;
-            default:
-                break;
-        }
-        return date;
-    }
-
-    private LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType) {
-        switch (durationType) {
-            case DAYS:
-                date = date.minusDays(1);
-                break;
-            case MONTHS:
-                date = date.minusMonths(1);
-                break;
-            case WEEKS:
-                date = date.minusWeeks(1);
-                break;
-            case YEAR:
-                date = date.minusYears(1);
-                break;
-            default:
-                break;
-        }
-        return date;
-    }
-
-    private LocalDate getLastLocaDateByDurationType(LocalDate date, DurationType durationType) {
-        switch (durationType) {
-            case DAYS:
-                date = date.plusDays(1);
-                break;
-            case MONTHS:
-                date = date.with(TemporalAdjusters.lastDayOfMonth());
-                break;
-            case WEEKS:
-                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
-                break;
-            case YEAR:
-                date = date.with(TemporalAdjusters.lastDayOfYear());
-                break;
-            default:
-                break;
-        }
-        return date;
-    }
-
-    private LocalDate getFirstLocalDateByDurationType(LocalDate date, DurationType durationType) {
-        switch (durationType) {
-            case DAYS:
-                break;
-            case MONTHS:
-                date = date.with(TemporalAdjusters.firstDayOfMonth());
-                break;
-            case WEEKS:
-                date = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                break;
-            case YEAR:
-                date = date.with(TemporalAdjusters.firstDayOfYear());
-                break;
-            default:
-                break;
-        }
-        return date;
-    }
 }
 
 

@@ -104,6 +104,7 @@ public class CounterDataService extends MongoBaseService {
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
         if (filters.getFilters() != null && isCollectionNotEmpty(filters.getFilters())) {
             filters.getFilters().forEach(filter -> filterBasedCriteria.put(filter.getType(), filter.getValues()));
+            kpiIdAndApplicableKPIMap.put(kpis.get(0).getId(),new ApplicableKPI(filters.getKpiRepresentation(),filters.getValue(),filters.getInterval(),filters.getFrequencyType()));
         } else {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
         }
@@ -145,6 +146,9 @@ public class CounterDataService extends MongoBaseService {
                     staffApplicableKPI.setInterval(filters.getInterval());
                     staffApplicableKPI.setValue(filters.getValue());
                     staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
+                }
+                if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
+                    staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
                 }
                 staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
             }
@@ -394,7 +398,7 @@ public class CounterDataService extends MongoBaseService {
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
         tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
-        Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin(),counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(copyKpi.getId()));
         return tabKPIDTO;
     }
