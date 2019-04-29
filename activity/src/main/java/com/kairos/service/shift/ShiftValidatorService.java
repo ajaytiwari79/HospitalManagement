@@ -862,14 +862,7 @@ public class ShiftValidatorService {
             List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
             Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
             if (deleteShift) {
-                overLappedShifts.forEach(overLappedShift -> {
-                    if (shiftMongoRepository.shiftOverLapped(shiftDTO.getStaffId(), overLappedShift.getStartDate(), overLappedShift.getEndDate(), shiftDTO.getId())) {
-                        if (!shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
-                            shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
-                            shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
-                        }
-                    }
-                });
+                removeOverLappedEscalation(shiftDTO, overLappedShifts, shiftViolatedRulesMap);
 
             } else {
                 if (workingTypeShift && isCollectionEmpty(overLappedShifts) && !wtaEscalationExists) {
@@ -885,6 +878,17 @@ public class ShiftValidatorService {
                 }
             }
             shiftViolatedRulesMongoRepository.saveAll(shiftViolatedRulesMap.values());
+    }
+
+    private void removeOverLappedEscalation(ShiftDTO shiftDTO, List<Shift> overLappedShifts, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap) {
+        overLappedShifts.forEach(overLappedShift -> {
+            if (shiftMongoRepository.shiftOverLapped(shiftDTO.getStaffId(), overLappedShift.getStartDate(), overLappedShift.getEndDate(), shiftDTO.getId())) {
+                if (!shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
+                    shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
+                    shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
+                }
+            }
+        });
     }
 
     public Set<BigInteger> getEscalationFreeShifts(List<BigInteger> shiftIds){
