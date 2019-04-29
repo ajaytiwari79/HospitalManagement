@@ -4,7 +4,6 @@ package com.kairos.controller.counters;
  *
  */
 
-import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.utils.response.ResponseHandler;
@@ -18,9 +17,9 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
+import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
 
 @RestController
 @RequestMapping(API_V1)
@@ -29,24 +28,45 @@ public class KPISetController {
     @Inject
     private KPISetService kpiSetService;
 
-    @PostMapping(COUNTRY_URL+"/kpi_set")
+    @PostMapping(COUNTRY_URL+KPI_SET)
     public ResponseEntity<Map<String, Object>> createKPISet(@PathVariable Long countryId,@RequestBody @Valid  KPISetDTO kpiSetDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISet(countryId,kpiSetDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISet(countryId,kpiSetDTO,COUNTRY));
     }
 
-    @PutMapping(COUNTRY_URL+"/kpi_set")
-    public ResponseEntity<Map<String, Object>> updateKPISet(@RequestBody @Valid  KPISetDTO kpiSetDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.updateKPISet(kpiSetDTO));
+    @PutMapping(COUNTRY_URL+KPI_SET)
+    public ResponseEntity<Map<String, Object>> updateKPISet(@PathVariable Long countryId,@RequestBody @Valid  KPISetDTO kpiSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.updateKPISet(countryId,kpiSetDTO,COUNTRY));
     }
 
-    @DeleteMapping(COUNTRY_URL+"/kpi_set")
+    @GetMapping(COUNTRY_URL+KPI_SET)
+    public ResponseEntity<Map<String, Object>> getAllKPISetByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getAllKPISetByReferenceId(countryId));
+    }
+
+    @PostMapping(UNIT_URL+KPI_SET)
+    public ResponseEntity<Map<String, Object>> createKPISetAtUnit(@PathVariable Long unitId,@RequestBody @Valid  KPISetDTO kpiSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISet(unitId,kpiSetDTO,UNIT));
+    }
+
+    @PutMapping(UNIT_URL+KPI_SET)
+    public ResponseEntity<Map<String, Object>> updateKPISetAtUnit(@PathVariable Long unitId,@RequestBody @Valid  KPISetDTO kpiSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.updateKPISet(unitId,kpiSetDTO,UNIT));
+    }
+
+
+    @GetMapping(UNIT_URL+KPI_SET)
+    public ResponseEntity<Map<String, Object>> getAllKPISetByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getAllKPISetByReferenceId(unitId));
+    }
+
+    @DeleteMapping(KPI_SET+"/{kpiSetId}")
     public ResponseEntity<Map<String, Object>> deleteKPISet(@PathVariable BigInteger kpiSetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.deleteKPISet(kpiSetId));
     }
 
-    @DeleteMapping(COUNTRY_URL+"/kpi_set")
-    public ResponseEntity<Map<String, Object>> getAllKPISetByCountryId(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getAllKPISetByCountryId(countryId));
+    @GetMapping(KPI_SET+"/{kpiSetId}")
+    public ResponseEntity<Map<String, Object>> getKPISetById(@PathVariable BigInteger kpiSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.findById(kpiSetId));
     }
 
 

@@ -4,6 +4,7 @@ package com.kairos.dto.activity.counter.kpi_set;
  *
  */
 
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,10 @@ import java.util.Set;
 @NoArgsConstructor
 public class KPISetDTO {
     private BigInteger id;
+    private String name;
     private Set<BigInteger> kpiIds;
     private TimeTypeEnum timeType;
     private BigInteger phaseId;
-    private Long countryId;
-    private Long unitId;
+    private Long referenceId;
+    private ConfLevel confLevel;
 }

@@ -78,6 +78,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{disabled:false,deleted:false,unitId:?0}")
     List<Shift> findAllByUnitId(Long unitId);
 
-    @Query(value = "{staffId:?0,deleted:false,'_id':{'$ne':?3}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists=false)
+    @Query(value = "{staffId:?0,deleted:false,'_id':{'$ne':?3}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists=true)
     boolean shiftOverLapped(Long staffId, Date startDate, Date endDate,BigInteger shiftId);
 }

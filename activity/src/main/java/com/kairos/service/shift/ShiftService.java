@@ -454,6 +454,8 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
         }
+        Date currentShiftStartDate=shift.getStartDate();
+        Date currentShiftEndDate=shift.getEndDate();
         if(!byTAndAView){
             shiftValidatorService.validateStatusOfShiftActivity(shift);
         }
@@ -550,7 +552,7 @@ public class ShiftService extends MongoBaseService {
             shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
-        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false);
+        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,currentShiftStartDate,currentShiftEndDate);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -664,7 +666,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setId(shiftId);
         shiftDTO.setStartDate(shift.getStartDate());
         shiftDTO.setEndDate(shift.getEndDate());
-        shiftValidatorService.escalationCorrectionInShift(shiftDTO,new ShiftWithViolatedInfoDTO(),true);
+        shiftValidatorService.escalationCorrectionInShift(shiftDTO,new ShiftWithViolatedInfoDTO(),true,shift.getStartDate(),shift.getEndDate());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift,false);
         payOutService.deletePayOut(shift.getId());
