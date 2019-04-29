@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -23,14 +24,14 @@ public class CountrySolverConfigController {
 
     @PostMapping
     @ApiOperation("Create Country Solver Config")
-    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
         ;
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.createCountrySolverConfig(countryId,countrySolverConfigDTO));
     }
 
     @PostMapping (value = "/copy")
     @ApiOperation("Copy Country Solver Config")
-    public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
         ;
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.copyCountrySolverConfig(countryId,countrySolverConfigDTO));
     }
@@ -44,7 +45,7 @@ public class CountrySolverConfigController {
 
     @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("Update Country Solver Configration")
-    public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
         ;
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.updateCountrySolverConfig(countryId,countrySolverConfigDTO));
     }

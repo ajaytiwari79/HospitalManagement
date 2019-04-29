@@ -105,8 +105,8 @@ public class ProcessingActivityService {
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
         }
-        if (!processingActivityDTO.getDataSubjectSet().isEmpty()) {
-            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectSet()));
+        if (!processingActivityDTO.getDataSubjectList().isEmpty()) {
+            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectList()));
         }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
@@ -115,14 +115,15 @@ public class ProcessingActivityService {
 
 
     private List<RelatedDataSubject> createRelatedDataProcessingActivity(List<RelatedDataSubjectDTO> relatedDataSubjects) {
-        List<RelatedDataSubject> dataSubjects = new ArrayList<>();
-        relatedDataSubjects.forEach(dataSubject -> {
-            RelatedDataSubject relatedDataSubject = new RelatedDataSubject(dataSubject.getId(), dataSubject.getName());
-            List<RelatedDataCategory> dataCategories = new ArrayList<>();
-            dataSubject.getDataCategories().forEach(dataCategory -> dataCategories.add(new RelatedDataCategory(dataCategory.getId(), dataCategory.getName(), ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategory.getDataElements(), RelatedDataElements.class))));
-            relatedDataSubject.setDataCategories(dataCategories);
-            dataSubjects.add(relatedDataSubject);
-        });
+        List<RelatedDataSubject> dataSubjects = relatedDataSubjects.stream().map(dataSubjectDTO ->
+                new RelatedDataSubject(dataSubjectDTO.getId(), dataSubjectDTO.getName(),
+                        dataSubjectDTO.getDataCategories().stream().map(dataCategoryDTO ->
+                                new RelatedDataCategory(dataCategoryDTO.getId(), dataCategoryDTO.getName(),
+                                        dataCategoryDTO.getDataElements().stream().map(relatedDataElementsDTO ->
+                                                new RelatedDataElements(relatedDataElementsDTO.getId(), relatedDataElementsDTO.getName(), relatedDataElementsDTO.getRelativeDeadlineDuration(), relatedDataElementsDTO.getRelativeDeadlineType())).collect(Collectors.toList()
+                                        ))
+                        ).collect(Collectors.toList()))
+        ).collect(Collectors.toList());
         return relatedDataSubjectRepository.saveAll(dataSubjects);
     }
 
@@ -288,7 +289,7 @@ public class ProcessingActivityService {
             processingActivityResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
         }
         if (CollectionUtils.isNotEmpty(processingActivity.getAssets())) {
-            processingActivityResponseDTO.setAssets(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getAssets(), AssetBasicResponseDTO.class));
+            processingActivityResponseDTO.setAssets(processingActivity.getAssets().stream().map(asset -> new AssetBasicResponseDTO(asset.getId(), asset.getName(), asset.getDescription(), asset.getHostingLocation(), asset.getManagingDepartment(), asset.isActive())).collect(Collectors.toList()));
         }
         processingActivityResponseDTO.setDataSubjects(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class));
         if (CollectionUtils.isNotEmpty(processingActivity.getSubProcessingActivities())) {

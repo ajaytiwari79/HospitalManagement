@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.ParameterizedTypeReference;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import java.util.Map;
 public class PermissionSchemaProcessor  implements BeanPostProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionSchemaProcessor.class);
 
-    @Inject
     private UserRestClient userRestClient;
 
     private String userServiceUrl;

@@ -19,11 +19,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @NoArgsConstructor
 @AllArgsConstructor
 @RelationshipEntity(type = HAS_PERMISSION)
-public class AccessGroupPermissionFieldRelationshipType extends UserBaseEntity {
+public class AccessGroupPermissionModelRelationshipType extends UserBaseEntity {
 
 
     @StartNode
-    private PermissionField permissionField;
+    private PermissionModel permissionModel;
 
     @EndNode
     private AccessGroup accessGroup;

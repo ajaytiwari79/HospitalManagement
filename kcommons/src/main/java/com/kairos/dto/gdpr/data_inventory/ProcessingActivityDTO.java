@@ -44,7 +44,8 @@ public class ProcessingActivityDTO {
     private Set<Long> processingLegalBasis;
     @Valid
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
-    private List<RelatedDataSubjectDTO> dataSubjectSet=new ArrayList<>();
+    @Valid
+    private List<RelatedDataSubjectDTO> dataSubjectList =new ArrayList<>();
     private Long responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -60,4 +61,11 @@ public class ProcessingActivityDTO {
     private List<OrganizationLevelRiskDTO> risks = new ArrayList<>();
 
 
+    public void setName(String name) {
+        this.name = name.trim();
+    }
+
+    public void setDescription(String description) {
+        this.description = description.trim();
+    }
 }

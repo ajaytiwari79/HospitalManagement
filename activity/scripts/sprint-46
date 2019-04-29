@@ -20,3 +20,4 @@ db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employme
 
 db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
+db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )

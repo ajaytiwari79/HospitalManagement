@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,8 @@ public class RelatedDataSubjectDTO {
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
 
+    @Valid
+    @NotEmpty
     private List<RelatedDataCategoryDTO> dataCategories = new ArrayList<>();
 
 }

@@ -61,6 +61,14 @@ public class DefaultDataDTO {
         this.timeTypeEnums = timeTypeEnums;
     }
 
+    public List<PlanningProblemDTO> getPlanningProblems() {
+        return planningProblems;
+    }
+
+    public void setPlanningProblems(List<PlanningProblemDTO> planningProblems) {
+        this.planningProblems = planningProblems;
+    }
+
     public DefaultDataDTO setPlanningProblemsBuilder(List<PlanningProblemDTO> planningProblems) {
         this.planningProblems = planningProblems;
         return this;
