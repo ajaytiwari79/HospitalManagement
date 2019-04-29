@@ -212,7 +212,6 @@ public class ShiftService extends MongoBaseService {
             mainShift.setActivities(breakActivities);
         }
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
-        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false,functionId);
@@ -551,6 +550,7 @@ public class ShiftService extends MongoBaseService {
             shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -592,12 +592,13 @@ public class ShiftService extends MongoBaseService {
         } else {
             shifts = shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, asDate(startDate), asDate(endDate), unitId);
         }
+        //Set<BigInteger> escalationFreeShiftIds= shiftValidatorService.getEscalationFreeShifts(shifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()));
         addReasonCode(shifts, reasonCodeDTOS);
         for (ShiftDTO shift : shifts) {
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
-                //activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutes() + activity.getTimeBankCtaBonusMinutes());
             }
+            //shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId()));
         }
         UserAccessRoleDTO userAccessRoleDTO;
         if (isNotNull(staffAdditionalInfoDTO)) {
@@ -660,6 +661,9 @@ public class ShiftService extends MongoBaseService {
 
         }
         shiftMongoRepository.save(shift);
+        shiftDTO.setId(shiftId);
+        shiftDTO.setStartDate(shift.getStartDate());
+        shiftDTO.setEndDate(shift.getEndDate());
         shiftValidatorService.escalationCorrectionInShift(shiftDTO,new ShiftWithViolatedInfoDTO(),true);
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift,false);
@@ -718,6 +722,8 @@ public class ShiftService extends MongoBaseService {
             List<ShiftDTO> shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue(), userAccessRoleDTO);
             assignedShifts.addAll(shiftDTOS);
         }
+        //Set<BigInteger> escalationFreeShiftIds=shiftValidatorService.getEscalationFreeShifts(assignedShifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()));
+        //assignedShifts.forEach(shift->shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId())));
         List<OpenShift> openShifts = userAccessRoleDTO.getManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) :
                 openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
         ButtonConfig buttonConfig = null;
@@ -773,6 +779,7 @@ public class ShiftService extends MongoBaseService {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
         List<ShiftDTO> shiftDTOS = shiftMongoRepository.getAllShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
         shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
+
         return shiftDTOS;
     }
 

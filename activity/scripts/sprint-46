@@ -19,3 +19,4 @@ db.staffWTACounter.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'
 db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
 db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+

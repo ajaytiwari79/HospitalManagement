@@ -74,6 +74,7 @@ public class ShiftDTO {
     private Set<ShiftEscalationReason> escalationReasons;
     private Long functionId;
     private Set<BigInteger> escalationFreeShiftIds;
+    private boolean escalationResolved;
 
 
     public ShiftDTO() {
@@ -455,6 +456,14 @@ public class ShiftDTO {
 
     public void setEscalationFreeShiftIds(Set<BigInteger> escalationFreeShiftIds) {
         this.escalationFreeShiftIds = escalationFreeShiftIds;
+    }
+
+    public boolean isEscalationResolved() {
+        return escalationResolved;
+    }
+
+    public void setEscalationResolved(boolean escalationResolved) {
+        this.escalationResolved = escalationResolved;
     }
 
     @Override
