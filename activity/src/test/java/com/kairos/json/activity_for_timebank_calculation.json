@@ -1,0 +1,19 @@
+{
+  "deleted" : false,
+  "tags" : [ ],
+  "state" : "DRAFT",
+  "timeCalculationActivityTab" : {
+    "methodForCalculatingTime" : "ENTERED_TIMES",
+    "fullDayCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
+    "fullWeekCalculationType" : "WEEKLY_HOURS_TYPE",
+    "fixedTimeValue" : 150,
+    "multiplyWith" : true,
+    "multiplyWithValue" : 1.0,
+    "historyDuration" : 0,
+    "defaultStartTime" : [ 7, 0 ],
+    "dayTypes" : [ ]
+  },
+  "compositeActivities" : [ ],
+  "childActivityIds" : [ ],
+  "parentActivity" : true
+}
