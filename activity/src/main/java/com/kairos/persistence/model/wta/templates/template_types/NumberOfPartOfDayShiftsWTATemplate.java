@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
@@ -132,7 +133,11 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
                 for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
                     Set<BigInteger> shiftIds = getShiftIdsByInterval(dateTimeInterval, shifts, timeIntervals);
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shiftIds.size()+1);
+                    int totalCountOfShifts = shiftIds.size();
+                    if(isNull(infoWrapper.getShift().getId())){
+                        totalCountOfShifts+=1;
+                    }
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalCountOfShifts);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                             limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
                     if(!isValid){

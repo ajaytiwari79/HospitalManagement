@@ -25,3 +25,10 @@ MATCH(fg:FilterGroup)
 WITH fg,FILTER(x IN fg.filterTypes WHERE x <> "UNIT_POSITION") as filteredList
 set fg.filterTypes=filteredList
 return fg;
+
+
+// Set userNameUpdated true for old user
+MATCH(u:User) where NOT EXISTs(u.userNameUpdated)
+SET u.userNameUpdated=TRUE return count(u)
+
+
