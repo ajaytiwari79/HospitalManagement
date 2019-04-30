@@ -2,6 +2,8 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.PermissionField;
+import com.kairos.annotations.PermissionSubModel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -25,13 +27,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Staff extends UserBaseEntity {
-
+    @PermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
     //address tab
+    @PermissionSubModel
     @Relationship(type = HAS_CONTACT_ADDRESS)
     private ContactAddress contactAddress;
 
+    @PermissionSubModel
     @Relationship(type = SECONDARY_CONTACT_ADDRESS)
     private ContactAddress secondaryContactAddress;
 
@@ -45,30 +49,44 @@ public class Staff extends UserBaseEntity {
 
     private String generalNote;
     private String reqFromPerson;
+    @PermissionField
     private String cardNumber;
     private boolean copyKariosMailToLogin;
+    @PermissionField
     private String sendNotificationBy;
     private String profilePic;
+    @PermissionField
     private String email;
+    @PermissionField
     private String badgeNumber;
+    @PermissionField
     private String userName;
 
     //time care external id`
+    @PermissionField
     private Long externalId;
 
     //monaco id
     private String manacoId;
 
     //personal info
+    @PermissionField
     private String firstName;
+    @PermissionField
     private String lastName;
+    @PermissionField
     private String familyName;
+    @PermissionField
     private String signature;
+    @PermissionField
     private String password;
     private String nationalInsuranceNumber;
+    @PermissionField
     private StaffStatusEnum currentStatus;
+    @PermissionField
     private Long inactiveFrom;
     private long organizationId;
+    @PermissionField
     private Language language;
     // Visitour Speed Profile
     private Integer speedPercent;

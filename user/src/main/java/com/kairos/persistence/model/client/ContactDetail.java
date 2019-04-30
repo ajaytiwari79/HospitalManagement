@@ -2,6 +2,7 @@ package com.kairos.persistence.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.PermissionField;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -16,16 +17,24 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDetail extends UserBaseEntity {
 
-
+    @PermissionField
     private String workEmail;
+    @PermissionField
     private String privateEmail;
+    @PermissionField
     private String workPhone;
+    @PermissionField
     private String landLinePhone;
+    @PermissionField
     private String privatePhone;
+    @PermissionField
     private String mobilePhone;
+    @PermissionField
     private String facebookAccount;
     private String messenger;
+    @PermissionField
     private String twitterAccount;
+    @PermissionField
     private String linkedInAccount;
     private boolean hidePrivatePhone;
     private boolean hideLandlinePhone;
