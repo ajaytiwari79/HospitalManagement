@@ -139,6 +139,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             List<Long> unitIds = Arrays.asList(organizationId);
             Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
             for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
+                //TODO Refactor Tag assignment in WTA
                 ctaResponseDTO.setTags(null);
                 CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
                 // Set activity Ids according to unit activity Ids
