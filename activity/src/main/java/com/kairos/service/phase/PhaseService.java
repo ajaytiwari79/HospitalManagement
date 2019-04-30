@@ -47,7 +47,7 @@ import static com.kairos.enums.phase.PhaseType.ACTUAL;
 @Service
 @Transactional
 public class PhaseService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhaseService.class);
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
@@ -156,7 +156,7 @@ public class PhaseService extends MongoBaseService {
     public Phase createPhaseInCountry(Long countryId, PhaseDTO phaseDTO) {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
-            logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+            LOGGER.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
             exceptionService.dataNotFoundByIdException("message.country.phase.sequence", phaseDTO.getCountryId());
         }
         Phase phase = buildPhaseForCountry(phaseDTO);
@@ -198,7 +198,7 @@ public class PhaseService extends MongoBaseService {
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            logger.info("Phase not found in country " + phaseId);
+            LOGGER.info("Phase not found in country " + phaseId);
             exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
         }
         phase.setDeleted(true);
@@ -210,14 +210,14 @@ public class PhaseService extends MongoBaseService {
     public Phase updatePhases(Long countryId, BigInteger phaseId, PhaseDTO phaseDTO) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            logger.info("Phase not found in country " + phaseId);
+            LOGGER.info("Phase not found in country " + phaseId);
             exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
 
         }
         if (phase.getSequence() != phaseDTO.getSequence()) {
             long phaseInUse = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
             if (phaseInUse > 0) {
-                logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+                LOGGER.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
                 exceptionService.duplicateDataException("message.country.phase.sequence", phaseDTO.getCountryId());
             }
         }

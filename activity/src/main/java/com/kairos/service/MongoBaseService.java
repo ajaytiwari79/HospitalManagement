@@ -38,6 +38,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
+    @Deprecated
     public <T extends MongoBaseEntity> T save(@Valid T entity){
 
         Assert.notNull(entity, "Entity must not be null!");
@@ -68,6 +69,7 @@ public class MongoBaseService {
         return entity;
     }
 
+    @Deprecated
     public <T extends MongoBaseEntity> List<T> save(@Valid List<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
@@ -163,6 +165,7 @@ public class MongoBaseService {
         }
     }
 
+    @Deprecated
     public <T extends MongoBaseEntity> Set<T> save(@Valid Set<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");

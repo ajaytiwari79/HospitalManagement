@@ -7,7 +7,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

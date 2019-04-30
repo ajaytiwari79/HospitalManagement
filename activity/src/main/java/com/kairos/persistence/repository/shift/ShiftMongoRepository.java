@@ -78,6 +78,4 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{disabled:false,deleted:false,unitId:?0}")
     List<Shift> findAllByUnitId(Long unitId);
 
-    @Query(value = "{unitId:?0,deleted:false,disabled:false,startDate:{$gte:?1,$lte:?2}}")
-    List<ShiftDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate);
 }

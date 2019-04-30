@@ -10,7 +10,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import de.danielbechler.diff.ObjectDifferBuilder;
 import de.danielbechler.diff.node.DiffNode;
 import de.danielbechler.diff.node.Visit;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.CommonConstants.PACKAGE_NAME;
+import static com.kairos.utils.FileReaderUtil.getFileDataAsString;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TimeBankCalculationServiceTest {
@@ -172,6 +172,8 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void diffChecker(){
+       // String json = getFileDataAsString("shift.json");
+
         DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(153l,179l,LocalDate.now());
         DailyTimeBankEntry dailyTimeBankEntry2 = new DailyTimeBankEntry(253l,179l,LocalDate.of(2019,12,15));
 
