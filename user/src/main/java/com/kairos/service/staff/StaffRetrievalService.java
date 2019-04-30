@@ -670,7 +670,7 @@ public class StaffRetrievalService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(organization.getId()), TimeSlotType.SHIFT_PLANNING);
-        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds);
+        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds, organization, countryId);
         Map<Long, StaffEmploymentDetails> employmentDetailsMap = employmentDetails.stream().collect(Collectors.toMap(StaffEmploymentDetails::getStaffId, v -> v));
@@ -680,7 +680,7 @@ public class StaffRetrievalService {
         List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
                 new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
         ).collect(Collectors.toList());
-
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organization.getId());
         // TODO incorrect we dont need to set in all staff
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
             staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
@@ -691,6 +691,7 @@ public class StaffRetrievalService {
             if (Optional.ofNullable(employmentDetailsMap.get(staffAdditionalInfoDTO.getId())).isPresent()) {
                 staffAdditionalInfoDTO.setEmployment((employmentDetailsMap.get(staffAdditionalInfoDTO.getId())));
             }
+            staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         });
         return staffAdditionalInfoDTOS;
     }

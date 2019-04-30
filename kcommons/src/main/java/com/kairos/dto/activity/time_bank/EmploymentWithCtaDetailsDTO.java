@@ -30,6 +30,7 @@ public class EmploymentWithCtaDetailsDTO {
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
+    private Long unitId;
 
 
     public EmploymentWithCtaDetailsDTO(Long id) {
@@ -48,7 +49,7 @@ public class EmploymentWithCtaDetailsDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public EmploymentWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> employmentLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+    public EmploymentWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> employmentLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate,Long unitId) {
         this.id = id;
         this.totalWeeklyHours = totalWeeklyHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -59,6 +60,7 @@ public class EmploymentWithCtaDetailsDTO {
         this.employmentLines = employmentLines;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
         this.accumulatedTimebankDate = accumulatedTimebankDate;
+        this.unitId = unitId;
     }
 
     public List<EmploymentLinesDTO> getEmploymentLines() {
@@ -192,5 +194,13 @@ public class EmploymentWithCtaDetailsDTO {
 
     public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

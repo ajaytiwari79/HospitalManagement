@@ -170,7 +170,7 @@ public class UserIntegrationService {
         });
 
         if (value == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notFound");
+            exceptionService.dataNotFoundByIdException("message.staff.notFound.byUser");
         }
         return value;
     }
