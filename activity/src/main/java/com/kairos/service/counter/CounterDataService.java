@@ -147,9 +147,9 @@ public class CounterDataService extends MongoBaseService {
                     staffApplicableKPI.setValue(filters.getValue());
                     staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
                 }
-                if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
-                    staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
-                }
+//                if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
+//                    staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
+//                }
                 staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
             }
             kpiIdAndApplicableKPIMap.put(staffApplicableKPI.getActiveKpiId(),staffApplicableKPI);
@@ -380,18 +380,23 @@ public class CounterDataService extends MongoBaseService {
     }
 
     public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO=null;
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         KPI kpi = counterRepository.getKPIByid(kpiId);
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
         filterCriteria.setKpiIds(Arrays.asList(kpiId));
         refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
-        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, null);
+        if(ConfLevel.STAFF.equals(level)){
+            accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        }
+        Long staffId=isNotNull(accessGroupPermissionCounterDTO) ? accessGroupPermissionCounterDTO.getStaffId() :null;
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, staffId);
         tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
     }
 
     public TabKPIDTO getKpiDataByInterval(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
-        return getKpiPreviewWithFilter(kpiId,refId,filterCriteria,level);
+        return getKpiPreviewWithFilter(kpiId,refId,filterCriteria,ConfLevel.STAFF);
     }
 
     private TabKPIDTO getTabKpiData(KPI copyKpi, CounterDTO counterDTO, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
