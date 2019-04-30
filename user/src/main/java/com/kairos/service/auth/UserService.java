@@ -237,7 +237,7 @@ public class UserService {
             if (logoutFromAllMachine) {
                 redisService.invalidateAllTokenOfUser(oAuth2Authentication.getUserAuthentication().getName());
             } else {
-                redisService.removeUserTokenFromRedisByClientIpAddress(oAuth2Authentication.getUserAuthentication().getName(), request.getRemoteAddr(),(String) authentication.getPrincipal());
+                redisService.removeUserTokenFromRedisByClientIpAddress(oAuth2Authentication.getUserAuthentication().getName(),(String) authentication.getPrincipal());
             }
             tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
             SecurityContextHolder.clearContext();

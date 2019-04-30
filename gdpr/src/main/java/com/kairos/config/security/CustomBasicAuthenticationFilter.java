@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
-import com.kairos.service.redis.RedisService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.redis.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -40,7 +40,6 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
     private ExceptionService exceptionService;
     private AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
     private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
-    private final boolean debug=true;
 
 
 
@@ -65,7 +64,7 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
                 throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.null"));
 
             } else {
-                Authentication authResult = authentication(authentication, request);
+                Authentication authResult = authentication(authentication);
                 SecurityContextHolder.getContext().setAuthentication(authResult);
             }
         } catch (OAuth2Exception failed) {
@@ -92,14 +91,14 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
     }
 
 
-    private Authentication authentication(Authentication authentication, HttpServletRequest request) {
+    private Authentication authentication(Authentication authentication) {
 
         String token = (String) authentication.getPrincipal();
-        OAuth2Authentication auth = loadAuthentication(token, request);
+        OAuth2Authentication auth = loadAuthentication(token);
         if (auth == null) {
             throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
         } else {
-            if (!redisService.verifyTokenInRedisServer(auth.getName(),request.getRemoteAddr(),token)) {
+            if (!redisService.verifyTokenInRedisServer(auth.getName(),token)) {
                 throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
             }
         }
@@ -109,14 +108,14 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
     }
 
 
-    private OAuth2Authentication loadAuthentication(String accessToken, HttpServletRequest request) {
+    private OAuth2Authentication loadAuthentication(String accessToken) {
         OAuth2Authentication authentication;
         OAuth2AccessToken token = tokenStore.readAccessToken(accessToken);
         if (token == null) {
             throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
         } else if (token.isExpired()) {
             authentication = tokenStore.readAuthentication(accessToken);
-            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), request.getRemoteAddr(),accessToken);
+            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), accessToken);
             if (!tokenRemoved) {
                 throw new InvalidTokenException(exceptionService.convertMessage("unable to removed expired token from redis"));
             }
@@ -143,8 +142,8 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
         public void publishAuthenticationSuccess(Authentication authentication) {
         }
     }
-    private boolean removeTokenFromRedis(String userName, String clientIp,String accessToken) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp,accessToken);
+    private boolean removeTokenFromRedis(String userName,String accessToken) {
+        return redisService.removeUserTokenFromRedisByClientIpAddress(userName,accessToken);
     }
 
 }

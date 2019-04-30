@@ -23,17 +23,15 @@ import java.util.Map;
 public class CustomDefaultTokenServices extends DefaultTokenServices {
     private UserService userService;
     private RedisService redisService;
-    private HttpServletRequest request;
     private TokenStore tokenStore;
 
     public CustomDefaultTokenServices() {
         //default
     }
 
-    public CustomDefaultTokenServices(UserService userService, RedisService redisService, HttpServletRequest request) {
+    public CustomDefaultTokenServices(UserService userService, RedisService redisService) {
         this.userService = userService;
         this.redisService = redisService;
-        this.request = request;
     }
 
     private static final Logger log = LoggerFactory.getLogger(CustomDefaultTokenServices.class);
@@ -50,14 +48,12 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         userDetails.put("details", userDetailsMap);
         authentication.setDetails(userDetails);
         OAuth2AccessToken accessToken = super.createAccessToken(authentication);
-        // authentication.getOAuth2Request().
-
         saveTokenInRedisServer(user, accessToken.toString());
         return accessToken;
     }
 
     private void saveTokenInRedisServer(UserPrincipal userPrincipal, String accessToken) {
-        redisService.saveTokenInRedis(userPrincipal.getUsername(), accessToken, request.getRemoteAddr());
+        redisService.saveTokenInRedis(userPrincipal.getUsername(), accessToken);
     }
 
 

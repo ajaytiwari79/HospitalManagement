@@ -31,8 +31,6 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Inject
     private RedisService redisService;
     @Autowired
-    private HttpServletRequest request;
-    @Autowired
     private UserService userService;
 
     private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
@@ -49,7 +47,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
-        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService, request);
+        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService);
         defaultTokenServices.setTokenStore(jwtTokenStore);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
         defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);

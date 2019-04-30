@@ -31,20 +31,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class CustomOAuthAuthenticationProcessingFilter extends OAuth2AuthenticationProcessingFilter {
+public class CustomBasicAuthenticationProcessingFilter extends OAuth2AuthenticationProcessingFilter {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CustomOAuthAuthenticationProcessingFilter.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(CustomBasicAuthenticationProcessingFilter.class);
     private TokenExtractor tokenExtractor = new BearerTokenExtractor();
     private TokenStore tokenStore;
     private RedisService redisService;
     private ExceptionService exceptionService;
     private AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
     private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
-    private final boolean debug=true;
 
 
 
-    public CustomOAuthAuthenticationProcessingFilter(TokenStore tokenStore, RedisService redisService, ExceptionService exceptionService) {
+    public CustomBasicAuthenticationProcessingFilter(TokenStore tokenStore, RedisService redisService, ExceptionService exceptionService) {
         this.tokenStore = tokenStore;
         this.redisService = redisService;
         this.exceptionService = exceptionService;
@@ -65,7 +64,7 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
                 throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.null"));
 
             } else {
-                Authentication authResult = authentication(authentication, request);
+                Authentication authResult = authentication(authentication);
                 SecurityContextHolder.getContext().setAuthentication(authResult);
             }
         } catch (OAuth2Exception failed) {
@@ -92,14 +91,14 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
     }
 
 
-    private Authentication authentication(Authentication authentication, HttpServletRequest request) {
+    private Authentication authentication(Authentication authentication) {
 
         String token = (String) authentication.getPrincipal();
-        OAuth2Authentication auth = loadAuthentication(token, request);
+        OAuth2Authentication auth = loadAuthentication(token);
         if (auth == null) {
             throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
         } else {
-            if (!redisService.verifyTokenInRedisServer(auth.getName(),request.getRemoteAddr(),token)) {
+            if (!redisService.verifyTokenInRedisServer(auth.getName(),token)) {
                 throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
             }
         }
@@ -109,18 +108,17 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
     }
 
 
-    private OAuth2Authentication loadAuthentication(String accessToken, HttpServletRequest request) {
+    private OAuth2Authentication loadAuthentication(String accessToken) {
         OAuth2Authentication authentication;
         OAuth2AccessToken token = tokenStore.readAccessToken(accessToken);
         if (token == null) {
             throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
         } else if (token.isExpired()) {
             authentication = tokenStore.readAuthentication(accessToken);
-            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), request.getRemoteAddr(),accessToken);
+            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), accessToken);
             if (!tokenRemoved) {
                 throw new InvalidTokenException(exceptionService.convertMessage("unable to removed expired token from redis"));
             }
-            tokenStore.readAccessToken(accessToken);
             throw new InvalidTokenException(exceptionService.convertMessage("message.token.expire"));
         }
         authentication = tokenStore.readAuthentication(accessToken);
@@ -144,8 +142,7 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
         public void publishAuthenticationSuccess(Authentication authentication) {
         }
     }
-    private boolean removeTokenFromRedis(String userName, String clientIp,String accessToken) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp,accessToken);
+    private boolean removeTokenFromRedis(String userName,String accessToken) {
+        return redisService.removeUserTokenFromRedisByClientIpAddress(userName,accessToken);
     }
-
 }
