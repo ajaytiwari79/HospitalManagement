@@ -228,7 +228,7 @@ public class UserService {
         return true;
     }
 
-    public boolean logoutUserFromSystem(boolean logoutFromAllMachine, HttpServletRequest request) {
+    public boolean logout(boolean logoutFromAllMachine, HttpServletRequest request) {
         boolean logoutSuccessfull = false;
         Authentication authentication = tokenExtractor.extract(request);
         if (authentication != null) {
@@ -237,7 +237,7 @@ public class UserService {
             if (logoutFromAllMachine) {
                 redisService.invalidateAllTokenOfUser(oAuth2Authentication.getUserAuthentication().getName());
             } else {
-                redisService.removeUserTokenFromRedisByClientIpAddress(oAuth2Authentication.getUserAuthentication().getName(), request.getRemoteAddr());
+                redisService.removeUserTokenFromRedisByClientIpAddress(oAuth2Authentication.getUserAuthentication().getName(), request.getRemoteAddr(),(String) authentication.getPrincipal());
             }
             tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
             SecurityContextHolder.clearContext();

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ public class RedisService {
 
     }
 
+
     public void invalidateAllTokenOfUser(String userName) {
         boolean tokenDeleted = valueOperations.delete(userName);
         if (!tokenDeleted) {
@@ -44,25 +46,37 @@ public class RedisService {
 
     }
 
-    public boolean checkIfUserExistInRedis(String userName) {
-        return valueOperations.opsForValue().get(userName) != null;
-
+    public boolean verifyTokenInRedisServer(String userName, String clientId, String accessToken) {
+        Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
+        boolean validToken = false;
+        if (userTokensFromDifferentMachine != null) {
+            String userAccessToken = userTokensFromDifferentMachine.get(clientId);
+            if (accessToken.equalsIgnoreCase(userAccessToken)) {
+                validToken = true;
+            }
+        }
+        return validToken;
     }
 
-    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String clientId) {
+    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String clientId, String accessToken) {
         boolean tokenRemoved = false;
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
-            userTokensFromDifferentMachine.remove(clientId);
             if (Integer.valueOf(userTokensFromDifferentMachine.size()).equals(1))
                 valueOperations.delete(userName);
-            else
+            else {
+                if (!userTokensFromDifferentMachine.get(clientId).equalsIgnoreCase(accessToken)) {
+                    exceptionService.internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
+                }
+                userTokensFromDifferentMachine.remove(clientId);
                 valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
+            }
             tokenRemoved = true;
         } else {
             exceptionService.internalServerError("message.user.notFoundInRedis");
         }
         return tokenRemoved;
     }
+
 
 }

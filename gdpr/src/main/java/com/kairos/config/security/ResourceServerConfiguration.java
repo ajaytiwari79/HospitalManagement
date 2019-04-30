@@ -41,7 +41,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     }
 
     public OAuth2AuthenticationProcessingFilter getAuthenticationFilter() {
-        return new CustomOAuthAuthenticationProcessingFilter(tokenStore(), redisService, exceptionService);
+        return new CustomBasicAuthenticationFilter(tokenStore(), redisService, exceptionService);
     }
 
 

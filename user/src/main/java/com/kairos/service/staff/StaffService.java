@@ -60,6 +60,7 @@ import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -186,6 +187,8 @@ public class StaffService {
     private TeamGraphRepository teamGraphRepository;
     @Inject
     private StaffCreationService staffCreationService;
+    @Inject
+    private RedisService redisService;
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -212,12 +215,14 @@ public class StaffService {
         return true;
     }
 
+    @Transactional
     public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
         User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
         if (passwordEncoder.matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            redisService.invalidateAllTokenOfUser(user.getUserName());
             userGraphRepository.save(user);
         } else {
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
@@ -225,12 +230,14 @@ public class StaffService {
         return true;
     }
 
+    @Transactional
     public boolean updatePasswordByManagement(Long staffId, PasswordUpdateByAdminDTO passwordUpdateDTO) {
         Staff staff = staffGraphRepository.findByStaffId(staffId);
         if (staff != null) {
             User userForStaff = staff.getUser();
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            redisService.invalidateAllTokenOfUser(userForStaff.getUserName());
             userGraphRepository.save(userForStaff);
         } else {
             exceptionService.dataNotMatchedException("message.staff.notfound");

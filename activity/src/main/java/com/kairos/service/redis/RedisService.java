@@ -22,19 +22,34 @@ public class RedisService {
     private ExceptionService exceptionService;
 
 
-    public boolean checkIfUserExistInRedis(String userName) {
-        return valueOperations.opsForValue().get(userName)!=null;
-
+    public boolean verifyTokenInRedisServer(String userName, String clientId, String accessToken) {
+        Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
+        boolean validToken = false;
+        if (userTokensFromDifferentMachine != null) {
+            String userAccessToken = userTokensFromDifferentMachine.get(clientId);
+            if (accessToken.equalsIgnoreCase(userAccessToken)) {
+                validToken = true;
+            }
+        }
+        return validToken;
     }
 
-    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String clientId) {
+    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String clientId, String accessToken) {
         boolean tokenRemoved = false;
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
-            userTokensFromDifferentMachine.remove(clientId);
+            if (Integer.valueOf(userTokensFromDifferentMachine.size()).equals(1))
+                valueOperations.delete(userName);
+            else {
+                if (!userTokensFromDifferentMachine.get(clientId).equalsIgnoreCase(accessToken)) {
+                    exceptionService.internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
+                }
+                userTokensFromDifferentMachine.remove(clientId);
+                valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
+            }
             tokenRemoved = true;
         } else {
-            exceptionService.internalServerError("user token not found ");
+            exceptionService.internalServerError("message.user.notFoundInRedis");
         }
         return tokenRemoved;
     }

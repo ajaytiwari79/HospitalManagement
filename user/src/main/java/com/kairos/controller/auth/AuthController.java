@@ -158,7 +158,7 @@ public class AuthController {
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @ApiOperation(value = "logout User from System")
     ResponseEntity<Map<String, Object>> logoutUser(HttpServletRequest request, HttpServletResponse response, @RequestBody boolean logoutFromAllMachine) {
-        if (userService.logoutUserFromSystem(logoutFromAllMachine, request)) {
+        if (userService.logout(logoutFromAllMachine, request)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, false);

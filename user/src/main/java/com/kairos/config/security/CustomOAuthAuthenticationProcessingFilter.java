@@ -5,15 +5,23 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
 import org.springframework.security.oauth2.provider.authentication.TokenExtractor;
+import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -31,6 +39,11 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
     private TokenStore tokenStore;
     private RedisService redisService;
     private ExceptionService exceptionService;
+    private AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
+    private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
+    private final boolean debug=true;
+
+
 
     public CustomOAuthAuthenticationProcessingFilter(TokenStore tokenStore, RedisService redisService, ExceptionService exceptionService) {
         this.tokenStore = tokenStore;
@@ -50,14 +63,24 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
                     SecurityContextHolder.clearContext();
                     LOGGER.info("Clearing Security context holder Authentication is null");
                 }
-                exceptionService.internalServerError("message.authentication.null");
+                throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.null"));
 
             } else {
                 Authentication authResult = authentication(authentication, request);
                 SecurityContextHolder.getContext().setAuthentication(authResult);
             }
         } catch (OAuth2Exception failed) {
-            exceptionService.internalServerError("invalid request");
+            SecurityContextHolder.clearContext();
+
+                LOGGER.debug("Authentication request failed: " + failed);
+
+            eventPublisher.publishAuthenticationFailure(new BadCredentialsException(failed.getMessage(), failed),
+                    new PreAuthenticatedAuthenticationToken("access-token", "N/A"));
+
+            authenticationEntryPoint.commence(request, response,
+                    new InsufficientAuthenticationException(failed.getMessage(), failed));
+
+            return;
         }
         chain.doFilter(request, response);
     }
@@ -75,10 +98,10 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
         String token = (String) authentication.getPrincipal();
         OAuth2Authentication auth = loadAuthentication(token, request);
         if (auth == null) {
-            exceptionService.invalidTokenException("message.authentication.loadAuthentication.null");
+            throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
         } else {
-            if (!redisService.checkIfUserExistInRedis(auth.getName())) {
-                exceptionService.userNotFoundInRedis("message.user.notFoundInRedis");
+            if (!redisService.verifyTokenInRedisServer(auth.getName(),request.getRemoteAddr(),token)) {
+                throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
             }
         }
         auth.setDetails(authentication.getDetails());
@@ -91,19 +114,18 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
         OAuth2Authentication authentication;
         OAuth2AccessToken token = tokenStore.readAccessToken(accessToken);
         if (token == null) {
-            exceptionService.invalidTokenException("message.authentication.loadAuthentication.null");
+            throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
         } else if (token.isExpired()) {
             authentication = tokenStore.readAuthentication(accessToken);
-            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), request.getRemoteAddr());
+            boolean tokenRemoved = removeTokenFromRedis(authentication.getUserAuthentication().getName(), request.getRemoteAddr() , accessToken);
             if (!tokenRemoved) {
-                exceptionService.internalError("unable to removed expired token from redis");
+                throw new InvalidTokenException(exceptionService.convertMessage("unable to removed expired token from redis"));
             }
-            tokenStore.readAccessToken(accessToken);
-            exceptionService.invalidTokenException("message.token.expire", token);
+            throw new InvalidTokenException(exceptionService.convertMessage("message.token.expire"));
         }
         authentication = tokenStore.readAuthentication(accessToken);
         if (authentication == null) {
-            exceptionService.invalidTokenException("message.token.expired", token);
+            throw new InvalidTokenException(exceptionService.convertMessage("message.token.expired"));
         }
         return authentication;
     }
@@ -115,8 +137,15 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
         // no need to define
     }
 
-    private boolean removeTokenFromRedis(String userName, String clientIp) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp);
+    private static final class NullEventPublisher implements AuthenticationEventPublisher {
+        public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+        }
+
+        public void publishAuthenticationSuccess(Authentication authentication) {
+        }
+    }
+    private boolean removeTokenFromRedis(String userName, String clientIp,String accessToken) {
+        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, clientIp,accessToken);
     }
 
 }
