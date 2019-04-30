@@ -34,6 +34,7 @@ public class KPISetService {
         kpiSetDTO.setConfLevel(confLevel);
         KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
+        kpiSetDTO.setId(kpiSet.getId());
         return kpiSetDTO;
     }
 
