@@ -38,17 +38,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
 
-    public UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
-        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
-        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
-                and("startDate").gte(startDate).and("endDate").lte(endDate));
-        Update update = new Update();
-        update.set("deleted", true);
-        update.set("active", false);
-        return mongoTemplate.updateMulti(query, update, PlanningPeriod.class);
-    }
-
     public PlanningPeriod getFirstPlanningPeriod(Long unitId) {
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true));
         query.with(Sort.by(Sort.Direction.ASC, "startDate"));
@@ -180,53 +169,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                                 Criteria.where("endDate").gte(startDate).gte(endDate)
                         ));
         return mongoTemplate.findOne(query, PlanningPeriod.class);
-    }
-
-    public boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, int sequence) {
-
-        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
-        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
-                        .orOperator(
-                                Criteria.where("startDate").gte(startDate).lte(endDate),
-                                Criteria.where("endDate").gte(startDate).lte(endDate)
-                        )),
-                lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
-                match(Criteria.where("current_phase_data.sequence").ne(sequence)), count().as("countOfPhasesWithOtherSequence")
-        );
-
-        AggregationResults<Map> result =
-                mongoTemplate.aggregate(aggregation, "planningPeriod", Map.class);
-        Map resultData = result.getUniqueMappedResult();
-        if (Optional.ofNullable(resultData).isPresent()) {
-            return (Integer) result.getUniqueMappedResult().get("countOfPhasesWithOtherSequence") > 0;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
-
-        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
-        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
-                        .orOperator(
-                                Criteria.where("startDate").gte(startDate).lte(endDate),
-                                Criteria.where("endDate").gte(startDate).lte(endDate),
-                                Criteria.where("startDate").gte(startDate).and("endDate").lte(endDate)
-                        )), count().as("countOfPhases")
-        );
-
-        AggregationResults<Map> result =
-                mongoTemplate.aggregate(aggregation, "planningPeriod", Map.class);
-        Map resultData = result.getUniqueMappedResult();
-        if (Optional.ofNullable(resultData).isPresent()) {
-            return (Integer) result.getUniqueMappedResult().get("countOfPhases") > 0;
-        } else {
-            return false;
-        }
     }
 
     public List<PlanningPeriod> getPlanningPeriodToFlipPhases(Long unitId, Date date) {
