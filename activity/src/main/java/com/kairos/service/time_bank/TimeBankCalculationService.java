@@ -1115,7 +1115,7 @@ public class TimeBankCalculationService {
         return phaseService.getPhasesByDates(unitId,localDateTimes).entrySet().stream().collect(Collectors.toMap(k->asLocalDate(k.getKey()),v->v.getValue().getPhaseEnum()));
     }
 
-    public DailyTimeBankEntry updatePublishedBalances(DailyTimeBankEntry dailyTimeBankEntry, List<EmploymentLinesDTO> employmentLines, Long unitId, int deltaAccumulatedTimebankMinutes) {
+    public void updatePublishedBalances(DailyTimeBankEntry dailyTimeBankEntry, List<EmploymentLinesDTO> employmentLines, Long unitId, int deltaAccumulatedTimebankMinutes) {
         DailyTimeBankEntry todayDailyTimeBankEntry = timeBankRepository.findByEmploymentAndDate(dailyTimeBankEntry.getEmploymentId(), java.time.LocalDate.now());
         if(isNull(todayDailyTimeBankEntry)) {
             PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOneByUnitIdAndDate(unitId, getDate());
@@ -1126,7 +1126,7 @@ public class TimeBankCalculationService {
             todayDailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         }
         todayDailyTimeBankEntry.getPublishedBalances().put(dailyTimeBankEntry.getDate(), deltaAccumulatedTimebankMinutes);
-        return timeBankRepository.save(todayDailyTimeBankEntry);
+        timeBankRepository.save(todayDailyTimeBankEntry);
     }
 
     public Long calculateActualTimebank(Set<DateTimeInterval> dateTimeIntervals, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate endDate, java.time.LocalDate employmentStartDate) {

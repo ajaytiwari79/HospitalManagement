@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class TimeBankCalculationServiceTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeBankCalculationServiceTest.class);
 
     @InjectMocks
+    @Spy
     private TimeBankCalculationService timeBankCalculationService;
     @Mock
     private TimeBankRepository timeBankRepository;
@@ -87,8 +89,8 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void getTimeBankByInterval() {
-        /*TimeBankCalculationService listWithData = mock(TimeBankCalculationService.class, Mockito.RETURNS_DEEP_STUBS);
-        when(listWithData.updatePublishedBalances(new DailyTimeBankEntry(),staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getUnitId(),new DailyTimeBankEntry().getDeltaAccumulatedTimebankMinutes())).thenReturn(null);
+        doNothing().when(timeBankCalculationService).updatePublishedBalances(new DailyTimeBankEntry(),staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getUnitId(),new DailyTimeBankEntry().getDeltaAccumulatedTimebankMinutes());
+        //when(timeBankCalculationService.updatePublishedBalances(new DailyTimeBankEntry(),staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getUnitId(),new DailyTimeBankEntry().getDeltaAccumulatedTimebankMinutes())).thenReturn(new DailyTimeBankEntry());
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
@@ -109,13 +111,13 @@ public class TimeBankCalculationServiceTest {
         Assert.assertEquals(dailyTimeBankEntry.getCtaBonusMinutesOfTimeBank(), 1392);
         Assert.assertEquals(dailyTimeBankEntry.getDeltaTimeBankMinutes(), 1392);
         Assert.assertEquals(dailyTimeBankEntry.getPlannedMinutesOfTimebank(), 1392);
-        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);*/
+        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);
     }
 
 
     @Test
     public void getTimeBankByIntervalForNightShift() {
-        /*shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
+        shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
@@ -136,7 +138,7 @@ public class TimeBankCalculationServiceTest {
         Assert.assertEquals(dailyTimeBankEntry.getCtaBonusMinutesOfTimeBank(), 1381);
         Assert.assertEquals(dailyTimeBankEntry.getDeltaTimeBankMinutes(), 1381);
         Assert.assertEquals(dailyTimeBankEntry.getPlannedMinutesOfTimebank(), 1381);
-        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);*/
+        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);
     }
 
 
