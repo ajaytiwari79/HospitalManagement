@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,6 +30,9 @@ public class RedisConfig {
 
     @Value("${spring.redis.port}")
     private int redisPort;
+
+    @Value("${spring.redis.password}")
+    private String password;
 
    /* @Bean
     RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
@@ -92,7 +96,9 @@ public class RedisConfig {
         poolConfig.setMaxTotal(env.getRedisMaxConn());
         poolConfig.setMinIdle(env.getRedisMinIdleConn());
         poolConfig.setMaxIdle(env.getRedisMaxIdleConn());*/
-        JedisConnectionFactory factory = new JedisConnectionFactory(new RedisStandaloneConfiguration(redisHostName, redisPort));
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+        standaloneConfiguration.setPassword(RedisPassword.of(password));
+        JedisConnectionFactory factory = new JedisConnectionFactory(standaloneConfiguration);
         return factory;
     }
 
