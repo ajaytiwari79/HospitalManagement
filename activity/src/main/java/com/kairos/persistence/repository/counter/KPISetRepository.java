@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger> {
+public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>,CustomKPISetRepository {
 
     List<KPISetDTO> findAllByReferenceIdAndDeletedFalse(Long countryId);
 

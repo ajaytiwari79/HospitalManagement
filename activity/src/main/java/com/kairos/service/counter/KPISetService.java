@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -77,6 +78,6 @@ public class KPISetService {
     }
 
     public void copyKPISets(Long unitId,List<Long> orgSubTypeIds,Long countryId){
-        //List<KPISet> kpiSetList=kpiSetRepository.findAllByCountryIdAndDeletedFalse();
+        List<KPISet> kpiSetList=kpiSetRepository.findAllByCountryIdAndDeletedFalse(Arrays.asList(14037l),18712l);
     }
 }

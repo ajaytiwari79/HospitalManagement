@@ -20,7 +20,7 @@ import java.util.Set;
 public class KPISetDTO {
     private BigInteger id;
     private String name;
-    @NotNullOrEmpty(message = "message.kpi.absent")
+    //@NotNullOrEmpty(message = "message.kpi.absent")
     private Set<BigInteger> kpiIds;
     @NotNull(message = "time_type.absent")
     private TimeTypeEnum timeType;
