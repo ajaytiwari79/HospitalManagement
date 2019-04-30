@@ -19,11 +19,8 @@ public interface CustomPlanningPeriodMongoRepository {
     List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId);
     List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate dateLiesInPeriod);
-    UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod getFirstPlanningPeriod(Long unitId);
     PlanningPeriod getLastPlanningPeriod(Long unitId);
-    boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startDate, LocalDate endDate, int sequence);
-    boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod findLastPlaningPeriodEndDate(Long unitId);
     List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName);
     List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startDate, LocalDate endDate);
@@ -31,6 +28,7 @@ public interface CustomPlanningPeriodMongoRepository {
     Phase getCurrentPhaseByDateUsingPlanningPeriod(Long unitId, LocalDate date);
     PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId);
     List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
-    List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate);
+    List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate, Date requestedEndDate);
     List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
+    PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId);
 }
