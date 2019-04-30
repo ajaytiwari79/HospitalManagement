@@ -111,6 +111,7 @@ public class WidgetService {
             dashboardWidget.setTimeTypeIds(dashBoardWidgetDTO.getTimeTypeIds());
             dashboardWidget.setWidgetFilterTypes(dashBoardWidgetDTO.getWidgetFilterTypes());
         }
+        widgetMongoRepository.save(dashboardWidget);
         return dashBoardWidgetDTO;
     }
 
