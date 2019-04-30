@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /*
 * Created By Pradeep singh rajawat
@@ -136,7 +137,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     }
 
     public Map<LocalDate, Integer> getPublishedBalances() {
-        return publishedBalances;
+        return publishedBalances= Optional.ofNullable(publishedBalances).orElse(new HashMap<>());
     }
 
     public void setPublishedBalances(Map<LocalDate, Integer> publishedBalances) {
