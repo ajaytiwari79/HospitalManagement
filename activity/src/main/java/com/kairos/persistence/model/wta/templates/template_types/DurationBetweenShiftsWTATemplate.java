@@ -107,24 +107,14 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
             shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.asZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())) || shift1.getEndDate().equals(infoWrapper.getShift().getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
             if (!shifts.isEmpty()) {
-                ShiftWithActivityDTO previousShift = shifts.get(shifts.size() - 1);
-                boolean isFullDayOrFullWeekActivity =
-                        isFullDayOrFullWeekActivity(previousShift.getActivities().get(0).getActivity());
-                ZonedDateTime prevShiftEnd =
-                        DateUtils.asZoneDateTime(isFullDayOrFullWeekActivity ?
-                                getEndOfDay(previousShift.getEndDate()) : previousShift.getEndDate());
+                ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(shifts.get(shifts.size() - 1).getEndDate());
                 timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
                 if(isValid){
                     shifts = (List<ShiftWithActivityDTO>) infoWrapper.getShifts().stream().filter(shift1 -> infoWrapper.getShift().getEndDate().before(shift1.getStartDate()) || shift1.getStartDate().equals(infoWrapper.getShift().getEndDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
                     if(!shifts.isEmpty()){
-                        ShiftWithActivityDTO nextShift = shifts.get(0);
-                        isFullDayOrFullWeekActivity =
-                                isFullDayOrFullWeekActivity(nextShift.getActivities().get(0).getActivity());
-                        ZonedDateTime prevShiftstart =
-                                DateUtils.asZoneDateTime(isFullDayOrFullWeekActivity ? getStartOfDay(nextShift.getStartDate()) :
-                                        nextShift.getStartDate());
+                        ZonedDateTime prevShiftstart = DateUtils.asZoneDateTime(shifts.get(0).getStartDate());
                         timefromPrevShift = (int)new DateTimeInterval(DateUtils.asZoneDateTime(infoWrapper.getShift().getEndDate()), prevShiftstart).getMinutes();
                         limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                         isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
@@ -144,9 +134,4 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 Objects.equals(timeTypeIds, durationBetweenShiftsWTATemplate.timeTypeIds) &&
                 minMaxSetting == durationBetweenShiftsWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,durationBetweenShiftsWTATemplate.phaseTemplateValues));
     }
-
-    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO){
-        return activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK) || activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION);
-    }
-
 }
