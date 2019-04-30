@@ -41,11 +41,7 @@ public class RedisService {
 
 
     public void invalidateAllTokenOfUser(String userName) {
-        boolean tokenDeleted = valueOperations.delete(userName);
-        if (!tokenDeleted) {
-            exceptionService.internalServerError("Unable to delete all tokens for user " + userName);
-        }
-
+        valueOperations.delete(userName);
     }
 
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
@@ -60,11 +56,11 @@ public class RedisService {
         return validToken;
     }
 
-    public boolean removeUserTokenFromRedisByClientIpAddress(String userName,  String accessToken) {
+    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String accessToken) {
         boolean tokenRemoved = false;
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
-            String tokenKey=getTokenKey(accessToken);
+            String tokenKey = getTokenKey(accessToken);
             if (Integer.valueOf(userTokensFromDifferentMachine.size()).equals(1))
                 valueOperations.delete(userName);
             else {

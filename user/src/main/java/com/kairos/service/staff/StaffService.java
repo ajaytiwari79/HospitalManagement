@@ -248,6 +248,7 @@ public class StaffService {
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
@@ -260,9 +261,13 @@ public class StaffService {
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
         }
+        //todo we might create a job to inactive user from particular date
+        if (StaffStatusEnum.INACTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
+            redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
+        }
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
-        if(!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
+        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
             exceptionService.actionNotPermittedException("message.employment.expertise.notchanged");
         }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
@@ -928,7 +933,7 @@ public class StaffService {
     public StaffEmploymentDetails getEmploymentOfStaff(long staffId, long unitId) {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentOfStaff(staffId, unitId);
         StaffEmploymentDetails employmentDetails = null;
-        if(Optional.ofNullable(employment).isPresent()) {
+        if (Optional.ofNullable(employment).isPresent()) {
             employmentDetails = convertEmploymentObject(employment);
             employmentDetails.setUnitId(unitId);
             List<EmploymentLinesQueryResult> data = employmentGraphRepository.findFunctionalHourlyCost(Collections.singletonList(employment.getId()));
