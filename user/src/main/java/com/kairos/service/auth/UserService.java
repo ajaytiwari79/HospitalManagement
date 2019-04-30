@@ -193,7 +193,7 @@ public class UserService {
         userGraphRepository.save(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
-        map.put("isUserNameUpdated", currentUser.isUserNameUpdated());
+        map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
         return map;
 

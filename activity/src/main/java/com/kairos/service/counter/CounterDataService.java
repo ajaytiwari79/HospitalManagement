@@ -62,7 +62,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class CounterDataService extends MongoBaseService {
-    private final static Logger logger = LoggerFactory.getLogger(CounterDataService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CounterDataService.class);
     @Inject
     private TaskService taskService;
     @Inject

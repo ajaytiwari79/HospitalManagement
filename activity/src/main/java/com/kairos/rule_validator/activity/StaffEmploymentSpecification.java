@@ -7,7 +7,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.shift.ShiftValidatorService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 
 import java.util.Collections;
 import java.util.List;

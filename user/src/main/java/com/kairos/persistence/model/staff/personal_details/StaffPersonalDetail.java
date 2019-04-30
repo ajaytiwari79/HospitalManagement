@@ -6,12 +6,15 @@ import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 
 /**
  * Created by prabjot on 10/1/17.
@@ -53,7 +56,9 @@ public class StaffPersonalDetail {
     private AddressDTO primaryAddress;
     private AddressDTO secondaryAddress;
     private Set<Long> teamIdsOfStaff;
+    @NotBlank(message = "error.Staff.userName.notnull")
     private String userName;
+    private boolean userNameUpdated;
 
     public StaffPersonalDetail() {
         //Default Constructor
@@ -305,7 +310,15 @@ public class StaffPersonalDetail {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName = StringUtils.trim(userName);
+    }
+
+    public boolean isUserNameUpdated() {
+        return userNameUpdated;
+    }
+
+    public void setUserNameUpdated(boolean userNameUpdated) {
+        this.userNameUpdated = userNameUpdated;
     }
 
     @Override
@@ -330,5 +343,14 @@ public class StaffPersonalDetail {
 
         return Objects.hash(id, firstName, contactDetail, currentStatus, expertiseIds, expertiseWithExperience, cprNumber, familyName, gender, sectorWiseExpertise);
     }
+
+    @AssertTrue(message = "Please provide a valid user name")
+    public boolean isValid() {
+        if(StringUtils.isBlank(userName) || StringUtils.containsWhitespace(userName.trim())){
+            return false;
+        }
+        return true;
+    }
+
 
 }
