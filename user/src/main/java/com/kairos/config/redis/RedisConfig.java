@@ -6,14 +6,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
+
 import java.net.UnknownHostException;
 import java.util.Map;
+
 /**
  * Created by anil on 10/8/17.
  */
@@ -27,6 +30,9 @@ public class RedisConfig {
 
     @Value("${spring.redis.port}")
     private int redisPort;
+
+    @Value("${spring.redis.password}")
+    private String password;
 
    /* @Bean
     RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
@@ -70,8 +76,8 @@ public class RedisConfig {
 
 
     @Bean
-    public RedisTemplate<String, Map<String,String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Map<String,String>> template = new RedisTemplate<>();
+    public RedisTemplate<String, Map<String, String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Map<String, String>> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());
@@ -90,7 +96,9 @@ public class RedisConfig {
         poolConfig.setMaxTotal(env.getRedisMaxConn());
         poolConfig.setMinIdle(env.getRedisMinIdleConn());
         poolConfig.setMaxIdle(env.getRedisMaxIdleConn());*/
-        JedisConnectionFactory factory = new JedisConnectionFactory(new RedisStandaloneConfiguration(redisHostName,redisPort));
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+        standaloneConfiguration.setPassword(RedisPassword.of(password));
+        JedisConnectionFactory factory = new JedisConnectionFactory(standaloneConfiguration);
         return factory;
     }
 
