@@ -853,7 +853,7 @@ public class ShiftValidatorService {
         }
     }
 
-    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, boolean deleteShift,Date oldShiftStartDate,Date oldShiftEndDate) {
+    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, boolean deleteShift,Date oldShiftStartDate,Date oldShiftEndDate,boolean escalated) {
             Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
             ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
             boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
@@ -870,7 +870,7 @@ public class ShiftValidatorService {
                     shiftViolatedRulesMap.get(shiftDTO.getId()).setEscalationResolved(true);
                 } else {
                     overLappedShifts.forEach(overLappedShift -> {
-                        if (!shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
+                        if (!shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT) && !escalated) {
                             shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
                             shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
                         }
