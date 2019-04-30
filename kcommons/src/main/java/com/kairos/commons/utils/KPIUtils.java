@@ -59,7 +59,7 @@ public class KPIUtils {
             default:
                 break;
         }
-
+        dateTimeIntervals.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
         return dateTimeIntervals;
     }
 

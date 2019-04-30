@@ -380,17 +380,13 @@ public class CounterDataService extends MongoBaseService {
     }
 
     public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO=null;
+        AccessGroupPermissionCounterDTO     accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         KPI kpi = counterRepository.getKPIByid(kpiId);
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
         filterCriteria.setKpiIds(Arrays.asList(kpiId));
         refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
-        if(ConfLevel.STAFF.equals(level)){
-            accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
-        }
-        Long staffId=isNotNull(accessGroupPermissionCounterDTO) ? accessGroupPermissionCounterDTO.getStaffId() :null;
-        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, staffId);
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
     }
