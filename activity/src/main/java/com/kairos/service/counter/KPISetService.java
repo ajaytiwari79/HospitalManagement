@@ -30,7 +30,7 @@ public class KPISetService {
     private ExceptionService exceptionService;
 
     public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO,ConfLevel confLevel) {
-        verifyUnitOrCountry(referenceId,confLevel);
+        verifyUnitOrCountry(referenceId,confLevel,kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
         KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
@@ -40,7 +40,7 @@ public class KPISetService {
     }
 
     public KPISetDTO updateKPISet(Long referenceId,KPISetDTO kpiSetDTO,ConfLevel confLevel) {
-        verifyUnitOrCountry(referenceId,confLevel);
+        verifyUnitOrCountry(referenceId,confLevel,kpiSetDTO);
         KPISet  kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetRepository.findOne(kpiSetDTO.getId()), KPISet.class);
         if(isNull(kpiSet)){
             exceptionService.dataNotFoundByIdException("message.dataNotFound","KPISet",kpiSetDTO.getId());
@@ -68,12 +68,16 @@ public class KPISetService {
         return kpiSetRepository.findOneById(kpiSetId);
     }
 
-    private void verifyUnitOrCountry(Long referenceId,ConfLevel confLevel){
+    private void verifyUnitOrCountry(Long referenceId,ConfLevel confLevel,KPISetDTO kpiSetDTO){
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
         if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
             exceptionService.dataNotFoundByIdException("message.organization.id");
+        }
+        boolean existByName = kpiSetRepository.existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(kpiSetDTO.getName().trim(),referenceId,kpiSetDTO.getId());
+        if(existByName){
+            exceptionService.duplicateDataException("error.kpi.name.duplicate");
         }
     }
 

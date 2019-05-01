@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Set;
@@ -19,12 +20,18 @@ import java.util.Set;
 @NoArgsConstructor
 public class KPISetDTO {
     private BigInteger id;
+    @NotNullOrEmpty(message = "error.name.notnull")
     private String name;
-    //@NotNullOrEmpty(message = "message.kpi.absent")
+    @NotNullOrEmpty(message = "message.kpi.absent")
     private Set<BigInteger> kpiIds;
-    @NotNull(message = "time_type.absent")
+    @NotNull(message = "message.time_type.absent")
     private TimeTypeEnum timeType;
+    @NotNull(message = "message.phase.absent")
     private BigInteger phaseId;
     private Long referenceId;
     private ConfLevel confLevel;
+
+    public String getName() {
+        return name.trim();
+    }
 }

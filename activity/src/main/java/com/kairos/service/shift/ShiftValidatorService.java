@@ -859,18 +859,15 @@ public class ShiftValidatorService {
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
-        List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
+        List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
-
-
         overLappedShifts.forEach(overLappedShift -> {
-            if (!shiftOverLappedWithOther(overLappedShift) && !shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)/* && !escalationCheckNotRequired*/) {
+            if (!shiftOverLappedWithOther(overLappedShift) && !shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
                 shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
                 shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
             }
         });
-
 
         shiftViolatedRulesMongoRepository.saveAll(shiftViolatedRulesMap.values());
         return shiftDTO;

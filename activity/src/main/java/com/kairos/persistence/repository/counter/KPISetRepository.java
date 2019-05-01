@@ -20,4 +20,6 @@ public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>
 
     @Query("{'deleted':false,'_id':?0}")
     KPISetDTO findOneById(BigInteger kpiSetId);
+
+    boolean existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(String name, Long referenceId, BigInteger id);
 }
