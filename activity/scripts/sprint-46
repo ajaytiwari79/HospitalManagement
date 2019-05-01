@@ -21,3 +21,10 @@ db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employme
 db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
 db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+
+// To drop old db entries
+db.staffActivitySetting.drop();
+
+// Unique constraints on staffId and activityId
+db.staffActivitySetting.createIndex( { staffId:1,activityId:1 }, { unique: true } )
