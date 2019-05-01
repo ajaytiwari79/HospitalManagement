@@ -40,6 +40,7 @@ public class CommonsExceptionUtil {
     public void duplicateDataException(String message, Object... params) {
         throw new DuplicateDataException(convertMessage(message, params));
     }
+
     public void internalError(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
     }
@@ -48,13 +49,15 @@ public class CommonsExceptionUtil {
         throw new IllegalArgumentException(convertMessage(message, params));
     }
 
-    public void dataNotMatchedException(String message,Object... params) {
+    public void dataNotMatchedException(String message, Object... params) {
         throw new DataNotMatchedException(convertMessage(message, params));
     }
-    public void unsupportedOperationException(String message,Object... params) {
+
+    public void unsupportedOperationException(String message, Object... params) {
         throw new UnsupportedOperationException(convertMessage(message, params));
     }
-    public void runtimeException(String message,Object... params) {
+
+    public void runtimeException(String message, Object... params) {
         throw new RuntimeException(convertMessage(message, params));
     }
 
@@ -62,5 +65,12 @@ public class CommonsExceptionUtil {
         throw new InternalError(convertMessage(message, params));
     }
 
+    public void invalidTokenException(String message, Object... params) {
+        throw new InternalError(convertMessage(message, params));
+    }
+
+    public void userNotFoundInRedis(String message, Object... params) {
+        throw new InternalError(convertMessage(message, params));
+    }
 
 }
