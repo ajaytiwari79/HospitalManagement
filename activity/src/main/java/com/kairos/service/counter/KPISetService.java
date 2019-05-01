@@ -8,17 +8,26 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.persistence.model.counter.KPISet;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.KPISetRepository;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Service
@@ -33,6 +42,8 @@ public class KPISetService {
     private FibonacciKPIService fibonacciKPIService;
     @Inject
     private CounterRepository counterRepository;
+    @Inject
+    private PhaseMongoRepository phaseMongoRepository;
 
     public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
@@ -100,6 +111,22 @@ public class KPISetService {
     }
 
     public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
-        List<KPISet> kpiSetList = kpiSetRepository.findAllByCountryIdAndDeletedFalse(Arrays.asList(14037l), 18712l);
+        List<KPISet> kpiSets = kpiSetRepository.findAllByCountryIdAndDeletedFalse(orgSubTypeIds, countryId);
+        List<Phase> unitPhaseList=phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        Map<BigInteger,Phase> unitPhaseMap=unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId,Function.identity()));
+        List<KPISet> unitKPISets=new ArrayList<>();
+        kpiSets.forEach(kpiSet -> {
+            KPISet unitKPISet=new KPISet();
+            unitKPISet.setId(null);
+            unitKPISet.setName(kpiSet.getName());
+            unitKPISet.setPhaseId(unitPhaseMap.get(kpiSet.getPhaseId()).getId());
+            unitKPISet.setReferenceId(unitId);
+            unitKPISet.setConfLevel(ConfLevel.UNIT);
+            unitKPISet.setKpiIds(kpiSet.getKpiIds());
+            unitKPISets.add(unitKPISet);
+        });
+        if(isCollectionNotEmpty(unitKPISets)){
+            kpiSetRepository.saveEntities(unitKPISets);
+        }
     }
 }

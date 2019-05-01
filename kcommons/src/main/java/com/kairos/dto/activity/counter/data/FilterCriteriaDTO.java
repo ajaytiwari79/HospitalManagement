@@ -5,6 +5,7 @@ import com.kairos.enums.kpi.Interval;
 import com.kairos.enums.kpi.KPIRepresentation;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 public class FilterCriteriaDTO {
@@ -19,17 +20,22 @@ public class FilterCriteriaDTO {
     private DurationType frequencyType;
     // frequency value
     private int value;
+    private KPIRepresentation kpiRepresentation;
     private Interval interval;
-
-
+//    private LocalDate startDate;
+//    private LocalDate endDate;
     public FilterCriteriaDTO() {
     }
 
-    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
+    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin,KPIRepresentation kpiRepresentation,Interval interval,int value,DurationType frequencyType) {
         this.filters = filters;
         this.kpiIds = kpiIds;
         this.countryId=countryId;
         this.isCountryAdmin=isCountryAdmin;
+        this.value=value;
+        this.frequencyType=frequencyType;
+        this.kpiRepresentation=kpiRepresentation;
+        this.interval=interval;
     }
 
     public FilterCriteriaDTO(Long unitId, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
@@ -127,5 +133,14 @@ public class FilterCriteriaDTO {
 
     public void setInterval(Interval interval) {
         this.interval = interval;
+    }
+
+
+    public KPIRepresentation getKpiRepresentation() {
+        return kpiRepresentation;
+    }
+
+    public void setKpiRepresentation(KPIRepresentation kpiRepresentation) {
+        this.kpiRepresentation = kpiRepresentation;
     }
 }

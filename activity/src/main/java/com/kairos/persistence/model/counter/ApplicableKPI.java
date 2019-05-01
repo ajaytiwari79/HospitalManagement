@@ -55,6 +55,12 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.frequencyType=frequencyType;
     }
 
+    public  ApplicableKPI(KPIRepresentation  kpiRepresentation,int value,Interval interval,DurationType frequencyType){
+        this.kpiRepresentation=kpiRepresentation;
+        this.value=value;
+        this.interval=interval;
+        this.frequencyType=frequencyType;
+    }
     public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy) {
         this.activeKpiId = activeKpiId;
         this.baseKpiId = baseKpiId;

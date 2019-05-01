@@ -755,4 +755,87 @@ public  class DateUtils {
         DateTime dateTime = new DateTime(date);
         return dateTime.toDate();
     }
+
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                date = date.plusDays(1);
+                break;
+            case MONTHS:
+                date = date.plusMonths(1);
+                break;
+            case WEEKS:
+                date = date.plusWeeks(1);
+                break;
+            case YEAR:
+                date = date.plusYears(1);
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                date = date.minusDays(1);
+                break;
+            case MONTHS:
+                date = date.minusMonths(1);
+                break;
+            case WEEKS:
+                date = date.minusWeeks(1);
+                break;
+            case YEAR:
+                date = date.minusYears(1);
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static LocalDate getLastLocaDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                date = date.plusDays(1);
+                break;
+            case MONTHS:
+                date = date.with(TemporalAdjusters.lastDayOfMonth());
+                break;
+            case WEEKS:
+                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                date = date.with(TemporalAdjusters.lastDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static LocalDate getFirstLocalDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                break;
+            case MONTHS:
+                date = date.with(TemporalAdjusters.firstDayOfMonth());
+                break;
+            case WEEKS:
+                date = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                date = date.with(TemporalAdjusters.firstDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
+        return dateTimeInterval.getStartLocalDate()+" - "+dateTimeInterval.getEndLocalDate();
+    }
 }

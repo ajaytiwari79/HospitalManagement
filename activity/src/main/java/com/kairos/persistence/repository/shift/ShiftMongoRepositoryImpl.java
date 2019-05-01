@@ -397,7 +397,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
+    public List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
         Criteria criteria = where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").gte(startDate).lte(endDate);
         List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
@@ -411,11 +411,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(unwind("activity"));
             aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
-        aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByForPlannedHours())));
-        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
+        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
+//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<BasicChartKpiDateUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, BasicChartKpiDateUnit.class);
-        return result.getMappedResults().stream().map(a -> (CommonKpiDataUnit) a).collect(Collectors.toList());
+        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
+        return result.getMappedResults();
     }
 
     @Override
@@ -511,8 +511,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     private String groupByForPlannedHours() {
-        return "{'$group':{'_id':'$staffId' \n" +
-                "'plannedHours':{ '$sum': {'$add':['$activities.timeBankCtaBonusMinutes','$activities.scheduledMinutes']}}}}";
+        return "{'$group':{'_id':'$staffId'}}";
     }
 
     private String groupByShiftAndActivity() {
