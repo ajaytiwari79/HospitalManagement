@@ -482,7 +482,7 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities, phase, staffAdditionalInfoDTO.getUserAccessRoleDTO());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
-        boolean againEscalated=false;
+        boolean escalationCheckNotRequired=false;
         ActivityWrapper absenceActivityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(), activityWrapperMap);
         if (isNotNull(absenceActivityWrapper)) {
             boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
@@ -534,7 +534,7 @@ public class ShiftService extends MongoBaseService {
                 if (shiftOverlappedWithNonWorkingType){
                     shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING));
                     shiftViolatedRules.setEscalationResolved(false);
-                    againEscalated=true;
+                    escalationCheckNotRequired=true;
                 }
                 shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
                 shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
@@ -559,7 +559,7 @@ public class ShiftService extends MongoBaseService {
             shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
-        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,currentShiftStartDate,currentShiftEndDate,againEscalated);
+        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,currentShiftStartDate,currentShiftEndDate,escalationCheckNotRequired);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -731,8 +731,6 @@ public class ShiftService extends MongoBaseService {
             List<ShiftDTO> shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue(), userAccessRoleDTO);
             assignedShifts.addAll(shiftDTOS);
         }
-        //Set<BigInteger> escalationFreeShiftIds=shiftValidatorService.getEscalationFreeShifts(assignedShifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()));
-        //assignedShifts.forEach(shift->shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId())));
         List<OpenShift> openShifts = userAccessRoleDTO.getManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) :
                 openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
         ButtonConfig buttonConfig = null;
@@ -787,9 +785,7 @@ public class ShiftService extends MongoBaseService {
         Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, expertiseId);
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
         List<ShiftDTO> shiftDTOS = shiftMongoRepository.getAllShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
-        shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
-
-        return shiftDTOS;
+        return wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
     }
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ShiftDTO shiftDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Phase phase) {

@@ -33,7 +33,7 @@ public class KPISetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISet(countryId,kpiSetDTO,COUNTRY));
     }
 
-    @PutMapping(COUNTRY_URL+KPI_SET+"{kpiSetId}")
+    @PutMapping(COUNTRY_URL+KPI_SET+"/{kpiSetId}")
     public ResponseEntity<Map<String, Object>> updateKPISet(@PathVariable Long countryId,@PathVariable BigInteger kpiSetId ,@RequestBody @Valid  KPISetDTO kpiSetDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.updateKPISet(countryId,kpiSetDTO,COUNTRY));
     }
@@ -48,7 +48,7 @@ public class KPISetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISet(unitId,kpiSetDTO,UNIT));
     }
 
-    @PutMapping(UNIT_URL+KPI_SET+"{kpiSetId}")
+    @PutMapping(UNIT_URL+KPI_SET+"/{kpiSetId}")
     public ResponseEntity<Map<String, Object>> updateKPISetAtUnit(@PathVariable Long unitId,@PathVariable BigInteger kpiSetId,@RequestBody @Valid  KPISetDTO kpiSetDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.updateKPISet(unitId,kpiSetDTO,UNIT));
     }

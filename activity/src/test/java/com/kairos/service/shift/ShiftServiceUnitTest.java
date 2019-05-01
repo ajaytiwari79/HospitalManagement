@@ -232,13 +232,42 @@ public class ShiftServiceUnitTest {
         when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
-        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,startDate,endDate);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,startDate,endDate,false);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));
 
 
         assertTrue(result.getEscalationFreeShiftIds().containsAll(escalationFreeShiftIds));
+    }
+
+
+    @Test
+    public void escalationShouldNotResolveFromShifts(){
+        ShiftDTO shiftDTO=ObjectMapperUtils.jsonStringToObject(getShiftDTOJSON(),ShiftDTO.class);
+        Shift shift=ObjectMapperUtils.jsonStringToObject(getShiftDTOJSON(),Shift.class);
+        Date updatedStartDate=DateUtils.parseDate("2019-05-12T04:00:00.000Z");
+        Date updatedEndDate=DateUtils.parseDate("2019-05-12T09:00:00.000Z");
+        Date startDate = shiftDTO.getStartDate();
+        Date endDate = shiftDTO.getEndDate();
+        ActivityWrapper activityWrapper=ObjectMapperUtils.jsonStringToObject(getActivityDetailsJson(),ActivityWrapper.class);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO=ObjectMapperUtils.jsonStringToObject(getShiftViolation(),ShiftWithViolatedInfoDTO.class);
+        List<ShiftViolatedRules> shiftViolatedRules=ObjectMapperUtils.JsonStringToList(getListOfShiftViolationRules(),ShiftViolatedRules.class);
+        List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
+        when(shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId())).thenReturn(true);
+        when(shiftMongoRepository.findOne(shiftDTO.getId())).thenReturn(shift);
+        when(activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId())).thenReturn(activityWrapper);
+        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()))).thenReturn(shiftViolatedRules);
+        when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
+        shiftDTO.setStartDate(updatedStartDate);
+        shiftDTO.setEndDate(updatedEndDate);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,startDate,endDate,false);
+        List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
+        escalationFreeShiftIds.add(new BigInteger("2636"));
+        escalationFreeShiftIds.add(new BigInteger("2637"));
+
+
+        assertTrue(!result.getEscalationFreeShiftIds().containsAll(escalationFreeShiftIds));
     }
 
     private String getShiftDTOJSON(){
