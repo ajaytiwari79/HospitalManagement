@@ -73,6 +73,8 @@ public class ShiftDTO {
     protected int restingMinutes;
     protected Set<ShiftEscalationReason> escalationReasons;
     protected Long functionId;
+    private Set<BigInteger> escalationFreeShiftIds;
+    private boolean escalationResolved;
 
 
     public ShiftDTO() {
@@ -448,6 +450,21 @@ public class ShiftDTO {
         this.functionId = functionId;
     }
 
+    public Set<BigInteger> getEscalationFreeShiftIds() {
+        return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
+    }
+
+    public void setEscalationFreeShiftIds(Set<BigInteger> escalationFreeShiftIds) {
+        this.escalationFreeShiftIds = escalationFreeShiftIds;
+    }
+
+    public boolean isEscalationResolved() {
+        return escalationResolved;
+    }
+
+    public void setEscalationResolved(boolean escalationResolved) {
+        this.escalationResolved = escalationResolved;
+    }
 
     @Override
     public String toString() {

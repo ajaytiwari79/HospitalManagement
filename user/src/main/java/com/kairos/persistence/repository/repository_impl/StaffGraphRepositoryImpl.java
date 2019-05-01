@@ -59,7 +59,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     @Override
     public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds,boolean parentOrganization) {
-        Map<String, Object> queryParameters = new HashMap();
+        Map<String, Object> queryParameters = new HashMap<>();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
         if(CollectionUtils.isNotEmpty(unitIds)){

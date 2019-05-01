@@ -192,7 +192,7 @@ public class StaffCreationService {
         }
     }
 
-    public void createEmployment(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
+    public void createPosition(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if(!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
@@ -404,7 +404,7 @@ public class StaffCreationService {
         staff.setUser(user);
         staffService.addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
+        createPosition(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
         return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge(
 
@@ -460,7 +460,7 @@ public class StaffCreationService {
             boolean isEmploymentExist = (staff.getId()) != null;
             staff.setUser(user);
             staffGraphRepository.save(staff);
-            createEmployment(organization, organization, staff, payload.getAccessGroupId(), null, isEmploymentExist);
+            createPosition(organization, organization, staff, payload.getAccessGroupId(), null, isEmploymentExist);
         }
         return true;
     }

@@ -33,7 +33,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findShiftBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
 
     @Query(value = "{staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
-    List<Shift> findShiftBetweenDurationBystaffId(Long staffId, Date startDate, Date endDate);
+    List<Shift> findShiftBetweenDurationByStaffId(Long staffId, Date startDate, Date endDate);
 
     @Query("{'deleted':false,'unitId':?2, 'disabled':false, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, Long unitId);
@@ -77,5 +77,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{disabled:false,deleted:false,unitId:?0}")
     List<Shift> findAllByUnitId(Long unitId);
+
+    @Query(value = "{employmentId:?0,deleted:false,'_id':{'$ne':?3}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists=true)
+    boolean shiftOverLapped(Long employmentId, Date startDate, Date endDate,BigInteger shiftId);
 
 }
