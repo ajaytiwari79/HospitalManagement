@@ -14,8 +14,6 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -28,7 +26,6 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.Interval;
@@ -48,7 +45,6 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
 import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
 public class TimeBankKpiCalculationService implements CounterService {
@@ -119,7 +115,7 @@ public class TimeBankKpiCalculationService implements CounterService {
         List<Long> staffIds = filterBasedCriteria.containsKey(FilterType.STAFF_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
         List<LocalDate> filterDates = new ArrayList<>();
         if (isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))) {
-            filterDates = KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL));
+            filterDates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
         }
         List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
@@ -157,59 +153,58 @@ public class TimeBankKpiCalculationService implements CounterService {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap = new HashedMap();
         Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.groupingBy(k -> k.getUnitId(), Collectors.toList()));
         Map<Long, Set<DateTimeInterval>> planningPeriodIntervel = getPlanningPeriodIntervals(unitIds, dateTimeIntervals.get(0).getStartDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate(), phaseIds);
-        Map<Long,List<DailyTimeBankEntry>>  longListMap=new HashMap<>();
         List<DailyTimeBankEntry> employmentAndDailyTimeBank = getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId())).collect(Collectors.toList()), dateTimeIntervals.get(0).getStartLocalDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate(), daysOfWeek);
         switch (kpiRepresentation) {
             case REPRESENT_PER_STAFF:
-                Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-                Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-                Map<Long,List<DailyTimeBankEntry>> dateTimeIntervalListMap2 = getDailyTimeBankEntryByStaffId(staffIds,employmentAndDailyTimeBank);
-                for (Long staffId :staffIds) {
-                    longListMap =dateTimeIntervalListMap2.getOrDefault(staffId,new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
-                        Long totalTimeBankOfUnit = 0l;
-                            StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
-                            for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                                List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
-                                int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(staffKpiFilterDTO.getUnitId()), new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-                                int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getDeltaTimeBankMinutes()).sum();
-                                int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
-                                logger.info(staffKpiFilterDTO.getFirstName() + "  " + totalTimeBank);
-                                totalTimeBankOfUnit += totalTimeBank;
-                    }
-                    objectListMap.put(staffId,Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(staffId), null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit))));
-                }
+                objectListMap= getTimebankPerStaff(staffIds, dateTimeIntervals, staffKpiFilterDTOS, objectListMap, planningPeriodIntervel, employmentAndDailyTimeBank);
                 break;
             case REPRESENT_TOTAL_DATA:
-                  longListMap=employmentAndDailyTimeBank.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
-                for (Long unitId : unitIds) {
-                    Long totalTimeBankOfUnit = 0l;
-                    String unitName = (!unitAndStaffKpiFilterMap.get(unitId).isEmpty()) ? unitAndStaffKpiFilterMap.get(unitId).get(0).getUnitName() : "";
-                    for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
-                        for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                            List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
-                            int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId), new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-                            int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getDeltaTimeBankMinutes()).sum();
-                            int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
-                            logger.info(staffKpiFilterDTO.getFirstName() + "  " + totalTimeBank);
-                            totalTimeBankOfUnit += totalTimeBank;
-                        }
-                    }
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(unitName, null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit)));
-                }
-                objectListMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())),subClusteredBarValue );
+                objectListMap = getTotalTimeBankOfUnits(dateTimeIntervals, unitIds, subClusteredBarValue, objectListMap, unitAndStaffKpiFilterMap, planningPeriodIntervel, employmentAndDailyTimeBank);
                 break;
             case REPRESENT_PER_INTERVAL :
-                getData(dateTimeIntervals, unitIds, subClusteredBarValue, objectListMap, unitAndStaffKpiFilterMap, planningPeriodIntervel, employmentAndDailyTimeBank);
+                objectListMap = getTimeBankByInterval(dateTimeIntervals, unitIds, subClusteredBarValue, objectListMap, unitAndStaffKpiFilterMap, planningPeriodIntervel, employmentAndDailyTimeBank);
                 break;
             default:
-                getData(dateTimeIntervals, unitIds, subClusteredBarValue, objectListMap, unitAndStaffKpiFilterMap, planningPeriodIntervel, employmentAndDailyTimeBank);
+                getTimeBankByInterval(dateTimeIntervals, unitIds, subClusteredBarValue, objectListMap, unitAndStaffKpiFilterMap, planningPeriodIntervel, employmentAndDailyTimeBank);
                 break;
         }
         return objectListMap;
 
     }
 
-    private void getData(List<DateTimeInterval> dateTimeIntervals, List<Long> unitIds, List<ClusteredBarChartKpiDataUnit> subClusteredBarValue, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTimebankPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank) {
+        Map<Long, List<DailyTimeBankEntry>> longListMap;
+        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
+        Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        Map<Long,List<DailyTimeBankEntry>> dateTimeIntervalListMap2 = getDailyTimeBankEntryByStaffId(staffIds,employmentAndDailyTimeBank);
+        for (Long staffId :staffIds) {
+            longListMap =dateTimeIntervalListMap2.getOrDefault(staffId,new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
+                Long totalTimeBankOfUnit = 0l;
+                    StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
+                    DateTimeInterval dateTimeInterval=new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate()));
+            totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, longListMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalTimeBankOfUnit, staffKpiFilterDTO);
+            objectListMap.put(staffId, Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(staffId), null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit))));
+        }
+        return objectListMap;
+    }
+
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalTimeBankOfUnits(List<DateTimeInterval> dateTimeIntervals, List<Long> unitIds, List<ClusteredBarChartKpiDataUnit> subClusteredBarValue, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank) {
+        Map<Long, List<DailyTimeBankEntry>> longListMap;
+        longListMap=employmentAndDailyTimeBank.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
+        for (Long unitId : unitIds) {
+            Long totalTimeBankOfUnit = 0l;
+            String unitName = (!unitAndStaffKpiFilterMap.get(unitId).isEmpty()) ? unitAndStaffKpiFilterMap.get(unitId).get(0).getUnitName() : "";
+            for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
+                DateTimeInterval dateTimeInterval=new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate()));
+                totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
+            }
+            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(unitName, null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit)));
+        }
+        objectListMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())),subClusteredBarValue );
+        return objectListMap;
+    }
+
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTimeBankByInterval(List<DateTimeInterval> dateTimeIntervals, List<Long> unitIds, List<ClusteredBarChartKpiDataUnit> subClusteredBarValue, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank) {
         Map<Long, List<DailyTimeBankEntry>> longListMap;
         Map<DateTimeInterval,List<DailyTimeBankEntry>> dateTimeIntervalListMap1 = getDailyTimeBankEntryByInterval(employmentAndDailyTimeBank,dateTimeIntervals);
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
@@ -219,20 +214,26 @@ public class TimeBankKpiCalculationService implements CounterService {
                 String unitName = (isCollectionNotEmpty(unitAndStaffKpiFilterMap.get(unitId))) ? unitAndStaffKpiFilterMap.get(unitId).get(0).getUnitName() : "";
                 if(isCollectionNotEmpty(unitAndStaffKpiFilterMap.get(unitId))){
                 for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
-                    for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                        List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
-                        int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId), new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-                        int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getDeltaTimeBankMinutes()).sum();
-                        int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
-                        logger.info(staffKpiFilterDTO.getFirstName() + "  " + totalTimeBank);
-                        totalTimeBankOfUnit += totalTimeBank;
-                    }
+                    totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
                 }
                 }
                 subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(unitName, null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit)));
             }
             objectListMap.put(getDateTimeintervalString(dateTimeInterval), subClusteredBarValue);
         }
+        return objectListMap;
+    }
+
+    private Long getTotalTimeBank(Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, Map<Long, List<DailyTimeBankEntry>> longListMap, DateTimeInterval dateTimeInterval, Long unitId, Long totalTimeBankOfUnit, StaffKpiFilterDTO staffKpiFilterDTO) {
+        for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
+            List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
+            int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId), new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
+            int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getDeltaTimeBankMinutes()).sum();
+            int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
+            logger.info(staffKpiFilterDTO.getFirstName() + "  " + totalTimeBank);
+            totalTimeBankOfUnit += totalTimeBank;
+        }
+        return totalTimeBankOfUnit;
     }
 
     private void getKpiDataUnits(Map<Object, List<ClusteredBarChartKpiDataUnit>> staffRestingHours, List<CommonKpiDataUnit> kpiDataUnits, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {

@@ -58,11 +58,8 @@ public class RestingHoursCalculationService implements CounterService {
         return DateUtils.getHoursFromTotalMilliSeconds(totalrestingMinutes);
     }
 
-    public Map<Object, Double> calculateRestingHours(List<Long> staffIds, List<LocalDate> filterDates, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals) {
+    public Map<Object, Double> calculateRestingHours(List<Long> staffIds, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals) {
         Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap = new HashMap<>();
-        staffIds=new ArrayList<>();
-        staffIds.add(920l);
-        staffIds.add(975l);
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
@@ -75,17 +72,17 @@ public class RestingHoursCalculationService implements CounterService {
         double multiplicationFactor = 1;
         //FIXME: fixed time interval TO BE REMOVED ONCE FILTERS IMPLEMENTED PROPERLY
         List staffIds = (filterBasedCriteria.get(FilterType.STAFF_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
-        List<LocalDate> filterDates=new ArrayList<>();
-        if(isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))){
-            filterDates= KPIUtils.getLocalDate(filterBasedCriteria.get(FilterType.TIME_INTERVAL));
+        List<LocalDate> filterDates = new ArrayList<>();
+        if (isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))) {
+            filterDates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
         }
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
-        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(),applicableKPI.getValue(),applicableKPI.getFrequencyType(),filterDates);
-        dateTimeIntervals.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate().toString());
+        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Object, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()),filterDates, applicableKPI,dateTimeIntervals);
+        staffIds=staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
+        Map<Object, Double> staffRestingHours = calculateRestingHours(staffIds, applicableKPI, dateTimeIntervals);
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         getKpiDataUnits(multiplicationFactor, staffRestingHours, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
         return kpiDataUnits;
@@ -129,39 +126,58 @@ public class RestingHoursCalculationService implements CounterService {
         Double restingHours = 0d;
         switch (kpiRepresentation) {
             case REPRESENT_PER_STAFF:
-                Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
-                for (Long staffId : staffIds) {
-                    restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate()), DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()));
-                    staffRestingHours.put(staffId, restingHours);
-                }
+                staffRestingHours = getStaffRestingHoursByRepresentPerStaff(staffIds, dateTimeIntervals, shifts, staffRestingHours);
                 break;
             case REPRESENT_TOTAL_DATA:
-                staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
-                for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-                    for (Long staffId : staffIds) {
-                        restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
-                    }
-                }
-                staffRestingHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), restingHours);
+                staffRestingHours = getStaffRestingHoursByRepresentTotalData(staffIds, dateTimeIntervals, shifts, staffRestingHours, restingHours);
                 break;
             case REPRESENT_PER_INTERVAL:
-                Map<DateTimeInterval, Map<Long, List<Shift>>> dateTimeIntervalListMap1 = new HashedMap();
-                dateTimeIntervalListMap.keySet().stream().forEach(dateTimeInterval -> dateTimeIntervalListMap1.put(dateTimeInterval, dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()))));
-                for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-                    restingHours = 0d;
-                    staffShiftMapping = dateTimeIntervalListMap1.get(dateTimeInterval);
-                    for (Long staffId : staffIds) {
-                        restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
-                    }
-                    staffRestingHours.put(getDateTimeintervalString(dateTimeInterval), restingHours);
-                }
+                staffRestingHours = getStaffRestingHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals, staffRestingHours);
                 break;
             default:
+                getStaffRestingHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals, staffRestingHours);
                 break;
         }
         return staffRestingHours;
     }
 
+    private Map<Object, Double> getStaffRestingHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Map<Object, Double> staffRestingHours, Double restingHours) {
+        Map<Long, List<Shift>> staffShiftMapping;
+        staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
+        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+            for (Long staffId : staffIds) {
+                restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
+            }
+        }
+        staffRestingHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), restingHours);
+        return staffRestingHours;
+    }
+
+    private Map<Object, Double> getStaffRestingHoursByRepresentPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Map<Object, Double> staffRestingHours) {
+        Double restingHours;
+        Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
+        for (Long staffId : staffIds) {
+            restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate()), DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()));
+            staffRestingHours.put(staffId, restingHours);
+        }
+        return staffRestingHours;
+    }
+
+    private Map<Object, Double> getStaffRestingHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, Map<Object, Double> staffRestingHours) {
+        Double restingHours;
+        Map<Long, List<Shift>> staffShiftMapping;
+        Map<DateTimeInterval, Map<Long, List<Shift>>> dateTimeIntervalListMap1 = new HashedMap();
+        dateTimeIntervalListMap.keySet().stream().forEach(dateTimeInterval -> dateTimeIntervalListMap1.put(dateTimeInterval, dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()))));
+        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+            restingHours = 0d;
+            staffShiftMapping = dateTimeIntervalListMap1.get(dateTimeInterval);
+            for (Long staffId : staffIds) {
+                restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
+            }
+            staffRestingHours.put(getDateTimeintervalString(dateTimeInterval), restingHours);
+        }
+        return staffRestingHours;
+    }
 
 
 }
