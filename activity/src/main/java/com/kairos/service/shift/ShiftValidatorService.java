@@ -604,7 +604,7 @@ public class ShiftValidatorService {
                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                 }
 
-                if (isNotNull(parentActivity)) {
+                if (isNotNull(parentActivity) && checkOverStaffing) {
                     applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().forEach(staffingLevelActivityObj ->
                             {
                                 if (staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()) {

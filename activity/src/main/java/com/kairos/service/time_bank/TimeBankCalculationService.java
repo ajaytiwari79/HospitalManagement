@@ -97,7 +97,7 @@ public class TimeBankCalculationService {
 
     public DailyTimeBankEntry calculateDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS, boolean validatedByPlanner) {
         boolean anyShiftPublish = false;
-        int contractualMinutes = getContractualMinutesByDate(planningPeriodIntervals, DateUtils.asLocalDate(shifts.get(0).getStartDate()), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
+        int contractualMinutes = getContractualMinutesByDate(planningPeriodIntervals, dateTimeInterval.getStartLocalDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
         if(isCollectionNotEmpty(shifts)) {
             int totalDailyPlannedMinutes = 0;
             int scheduledMinutesOfTimeBank = 0;
@@ -1115,7 +1115,7 @@ public class TimeBankCalculationService {
         return phaseService.getPhasesByDates(unitId,localDateTimes).entrySet().stream().collect(Collectors.toMap(k->asLocalDate(k.getKey()),v->v.getValue().getPhaseEnum()));
     }
 
-    public DailyTimeBankEntry updatePublishedBalances(DailyTimeBankEntry dailyTimeBankEntry, List<EmploymentLinesDTO> employmentLines, Long unitId, int deltaAccumulatedTimebankMinutes) {
+    public void updatePublishedBalances(DailyTimeBankEntry dailyTimeBankEntry, List<EmploymentLinesDTO> employmentLines, Long unitId, int deltaAccumulatedTimebankMinutes) {
         DailyTimeBankEntry todayDailyTimeBankEntry = timeBankRepository.findByEmploymentAndDate(dailyTimeBankEntry.getEmploymentId(), java.time.LocalDate.now());
         if(isNull(todayDailyTimeBankEntry)) {
             PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOneByUnitIdAndDate(unitId, getDate());
@@ -1126,7 +1126,7 @@ public class TimeBankCalculationService {
             todayDailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         }
         todayDailyTimeBankEntry.getPublishedBalances().put(dailyTimeBankEntry.getDate(), deltaAccumulatedTimebankMinutes);
-        return timeBankRepository.save(todayDailyTimeBankEntry);
+        timeBankRepository.save(todayDailyTimeBankEntry);
     }
 
     public Long calculateActualTimebank(Set<DateTimeInterval> dateTimeIntervals, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate endDate, java.time.LocalDate employmentStartDate) {
@@ -1138,12 +1138,18 @@ public class TimeBankCalculationService {
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                actualTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
+                //TODO please remove this if else after complete KP-7067
+                if(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() == 0 && validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
+                    int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
+                    actualTimebank += deltaTimeBankMinutes;
+                }else {
+                    actualTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
+                }
             } else if(validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
                 int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
-                actualTimebank+=deltaTimeBankMinutes;
+                actualTimebank += deltaTimeBankMinutes;
             }
-            LOGGER.debug("actual timebank {} till date {} phase {}",actualTimebank,employmentStartDate,datePhaseDefaultNameMap.get(employmentStartDate));
+            LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return actualTimebank;

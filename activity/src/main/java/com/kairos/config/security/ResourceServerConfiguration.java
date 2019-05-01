@@ -21,6 +21,9 @@ import javax.inject.Inject;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.API_CREATE_KMD_TASK_DEMAND;
 
+/**
+ *  created by @bobby sharma
+ */
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
