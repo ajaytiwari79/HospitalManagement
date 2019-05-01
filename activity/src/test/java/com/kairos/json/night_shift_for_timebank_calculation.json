@@ -1,0 +1,332 @@
+[ {
+  "id" : 2581,
+  "startDate" : 1555781400000,
+  "endDate" : 1555810200000,
+  "bid" : 0,
+  "pId" : 0,
+  "amount" : 0,
+  "probability" : 0,
+  "unitId" : 825,
+  "staffId" : 413,
+  "employmentId" : 18373,
+  "activities" : [ {
+    "status" : [ ],
+    "message" : null,
+    "success" : false,
+    "activity" : {
+      "id" : 268,
+      "name" : "Pleje ATA",
+      "expertises" : [ 795 ],
+      "description" : "Productive - nursing home",
+      "unitId" : 825,
+      "employmentTypes" : [ 20604, 14045, 14046 ],
+      "generalActivityTab" : {
+        "activityId" : null,
+        "name" : "Pleje ATA",
+        "code" : null,
+        "printoutSymbol" : null,
+        "categoryName" : null,
+        "categoryId" : 6,
+        "colorPresent" : true,
+        "backgroundColor" : "",
+        "description" : "Productive - nursing home",
+        "shortName" : "Pleje",
+        "eligibleForUse" : true,
+        "ultraShortName" : "Pleje",
+        "startDate" : "2018-01-01",
+        "endDate" : null,
+        "originalIconName" : null,
+        "modifiedIconName" : null,
+        "tags" : [ ],
+        "addTimeTo" : null,
+        "timeTypeId" : null,
+        "onCallTimePresent" : false,
+        "negativeDayBalancePresent" : null,
+        "timeType" : null,
+        "content" : null,
+        "originalDocumentName" : null,
+        "modifiedDocumentName" : null,
+        "active" : true
+      },
+      "timeCalculationActivityTab" : {
+        "activityId" : null,
+        "methodForCalculatingTime" : "ENTERED_TIMES",
+        "fullDayCalculationType" : null,
+        "fullWeekCalculationType" : null,
+        "allowBreakReduction" : null,
+        "fixedTimeValue" : 0,
+        "methodForCalculatingTimeInMonths" : null,
+        "balanceType" : null,
+        "multiplyWith" : true,
+        "multiplyWithValue" : 1.0,
+        "multiplyByVacationFactor" : null,
+        "multiplyByFinalSchedule" : null,
+        "breakTemplates" : null,
+        "dayTypes" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+        "fullWeekStart" : null,
+        "fullWeekEnd" : null,
+        "historyDuration" : 0,
+        "defaultStartTime" : [ 7, 0 ],
+        "availableAllowActivity" : false
+      },
+      "rulesActivityTab" : {
+        "activityId" : null,
+        "eligibleForFinalSchedule" : false,
+        "eligibleForDraftSchedule" : false,
+        "eligibleForRequest" : false,
+        "lockLengthPresent" : false,
+        "eligibleToBeForced" : false,
+        "dayTypes" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+        "eligibleForStaffingLevel" : true,
+        "breakAllowed" : false,
+        "approvalAllowed" : false,
+        "cutOffStartFrom" : "1970-01-01",
+        "cutOffIntervalUnit" : null,
+        "cutOffdayValue" : null,
+        "cutOffIntervals" : [ ],
+        "cutOffBalances" : null,
+        "earliestStartTime" : [ 6, 0 ],
+        "latestStartTime" : null,
+        "shortestTime" : null,
+        "longestTime" : null,
+        "eligibleForCopy" : false,
+        "plannedTimeInAdvance" : {
+          "value" : 0,
+          "type" : "DAYS"
+        },
+        "maximumEndTime" : null,
+        "allowedAutoAbsence" : false,
+        "recurrenceDays" : 0,
+        "recurrenceTimes" : 0,
+        "pqlSettings" : {
+          "approvalTimeInAdvance" : {
+            "value" : null,
+            "type" : null
+          },
+          "approvalPercentageWithoutMovement" : null,
+          "approvalWithMovement" : {
+            "approvalPercentage" : null,
+            "approvalTime" : null
+          },
+          "appreciable" : {
+            "approvalPercentage" : null,
+            "approvalTime" : null
+          },
+          "acceptable" : {
+            "approvalPercentage" : null,
+            "approvalTime" : null
+          },
+          "critical" : {
+            "approvalPercentage" : null,
+            "approvalTime" : null
+          }
+        },
+        "reasonCodeRequired" : false,
+        "reasonCodeRequiredState" : null
+      },
+      "compositeActivities" : [ ],
+      "balanceSettingsActivityTab" : {
+        "activityId" : null,
+        "addTimeTo" : null,
+        "timeTypeId" : 17,
+        "timeType" : null,
+        "onCallTimePresent" : false,
+        "negativeDayBalancePresent" : false
+      },
+      "parentId" : 99,
+      "phaseSettingsActivityTab" : {
+        "activityId" : 268,
+        "phaseTemplateValues" : [ {
+          "phaseId" : 105,
+          "name" : "Request",
+          "description" : "Request phase",
+          "eligibleEmploymentTypes" : [ 14045, 20604, 14046 ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : true,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "STAFF", "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ {
+            "shiftStatus" : "PUBLISH",
+            "accessGroupIds" : [ 750 ]
+          }, {
+            "shiftStatus" : "UNPUBLISH",
+            "accessGroupIds" : [ 750 ]
+          } ]
+        }, {
+          "phaseId" : 106,
+          "name" : "Puzzle",
+          "description" : "Puzzle phase",
+          "eligibleEmploymentTypes" : [ 14045, 20604, 14046 ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : true,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "STAFF", "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ ]
+        }, {
+          "phaseId" : 107,
+          "name" : "Construction",
+          "description" : "Construction phase",
+          "eligibleEmploymentTypes" : [ ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : false,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ ]
+        }, {
+          "phaseId" : 108,
+          "name" : "Draft",
+          "description" : "Draft phase",
+          "eligibleEmploymentTypes" : [ 14045, 14046, 20604 ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : false,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ {
+            "shiftStatus" : "PUBLISH",
+            "accessGroupIds" : [ 750 ]
+          }, {
+            "shiftStatus" : "UNPUBLISH",
+            "accessGroupIds" : [ 750 ]
+          } ]
+        }, {
+          "phaseId" : 109,
+          "name" : "Tentative",
+          "description" : "TENTATIVE PHASE",
+          "eligibleEmploymentTypes" : [ 14045, 14046, 20604 ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : false,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ ]
+        }, {
+          "phaseId" : 110,
+          "name" : "Realtime",
+          "description" : "REALTIME PHASE",
+          "eligibleEmploymentTypes" : [ 14045 ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : false,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ ]
+        }, {
+          "phaseId" : 111,
+          "name" : "Time & Attendance",
+          "description" : "TIME & ATTENDANCE PHASE",
+          "eligibleEmploymentTypes" : [ 14045 ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : false,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ ]
+        }, {
+          "phaseId" : 112,
+          "name" : "Payroll",
+          "description" : "PAYROLL PHASE",
+          "eligibleEmploymentTypes" : [ ],
+          "eligibleForManagement" : true,
+          "staffCanDelete" : false,
+          "managementCanDelete" : true,
+          "staffCanSell" : false,
+          "managementCanSell" : false,
+          "sequence" : 0,
+          "allowedSettings" : {
+            "canEdit" : [ "MANAGEMENT" ]
+          },
+          "activityShiftStatusSettings" : [ ]
+        } ]
+      },
+      "skillActivityTab" : {
+        "activityId" : null,
+        "activitySkills" : [ ],
+        "activitySkillIds" : [ ]
+      },
+      "activityCanBeCopied" : false,
+      "tags" : [ ],
+      "allowChildActivities" : false,
+      "parentActivity" : false
+    },
+    "activityId" : 268,
+    "startDate" : 1555781400000,
+    "endDate" : 1555810200000,
+    "scheduledMinutes" : 480,
+    "durationMinutes" : 480,
+    "activityName" : "Pleje ATA",
+    "bid" : 0,
+    "reasonCodeId" : null,
+    "absenceReasonCodeId" : null,
+    "remarks" : "",
+    "id" : 5224,
+    "timeType" : null,
+    "backgroundColor" : null,
+    "haltBreak" : false,
+    "plannedTimeId" : 2,
+    "breakShift" : false,
+    "breakReplaced" : false,
+    "reasonCode" : null,
+    "allowedBreakDurationInMinute" : null,
+    "timeBankCtaBonusMinutes" : 0,
+    "timeBankCTADistributions" : [ ],
+    "location" : null,
+    "description" : null,
+    "wtaRuleViolations" : null,
+    "plannedMinutesOfTimebank" : 0,
+    "startLocation" : null,
+    "endLocation" : null,
+    "scheduledMinutesOfTimebank" : 0,
+    "scheduledMinutesOfPayout" : 0,
+    "secondLevelType" : null,
+    "secondLevelTimeTypeId" : null,
+    "thirdLevelTimeTypeId" : null,
+    "fourthLevelTimeTypeId" : null,
+    "pid" : 0
+  } ],
+  "scheduledMinutes" : 480,
+  "durationMinutes" : 480,
+  "editable" : false,
+  "functionDeleted" : false,
+  "timeBankCtaBonusMinutes" : 0,
+  "deltaTimeBankMinutes" : 0,
+  "accumulatedTimeBankMinutes" : 0,
+  "plannedMinutesOfTimebank" : 0,
+  "multipleActivity" : false,
+  "phaseId" : 105,
+  "restingMinutes" : 0,
+  "bonusTimeBank" : 0,
+  "accumulatedTimeBankInMinutes" : 0,
+  "minutes" : 480
+} ]

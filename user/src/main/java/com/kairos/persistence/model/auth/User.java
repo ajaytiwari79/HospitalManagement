@@ -73,15 +73,6 @@ public class User extends UserBaseEntity {
     @Transient
     private Boolean hubMember;
 
-
-    public boolean isUserNameUpdated() {
-        return isUserNameUpdated;
-    }
-
-    public void setUserNameUpdated(boolean userNameUpdated) {
-        isUserNameUpdated = userNameUpdated;
-    }
-
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
@@ -89,9 +80,10 @@ public class User extends UserBaseEntity {
     private SystemLanguage userLanguage;
 
     //define, first time UserName updated or not
-    private boolean isUserNameUpdated;
+    private boolean userNameUpdated;
 
     private Long countryId;
+
 
     public int getOtp() {
         return otp;
@@ -291,7 +283,7 @@ public class User extends UserBaseEntity {
         this.email = email;
         this.cprNumber = cprNumber;
         this.userName = userName;
-        this.isUserNameUpdated = isUserNameUpdated;
+        this.userNameUpdated = isUserNameUpdated;
     }
 
 
@@ -413,6 +405,14 @@ public class User extends UserBaseEntity {
             age = period.getYears();
             this.age = age;
         return this.age;
+    }
+
+    public boolean isUserNameUpdated() {
+        return userNameUpdated;
+    }
+
+    public void setUserNameUpdated(boolean isUserNameUpdated) {
+        this.userNameUpdated = isUserNameUpdated;
     }
 
     @Override

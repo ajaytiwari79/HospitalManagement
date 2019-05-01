@@ -61,7 +61,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -300,6 +300,7 @@ public class ShiftValidatorService {
         PlanningPeriod lastPlanningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(staffAdditionalInfoDTO.getUnitId());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, lastPlanningPeriod.getEndDate());
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
+        shifts = updateFullDayAndFullWeekActivityShift(shifts);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, sc -> sc.getCount()));
         Date endTimeOfInterval = DateUtils.getStartOfTheDay(DateUtils.asDate(DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1)));
@@ -311,6 +312,7 @@ public class ShiftValidatorService {
         int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
         return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(), totalTimeBank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate());
     }
 
@@ -326,6 +328,7 @@ public class ShiftValidatorService {
         } else {
             shifts = newCreatedShiftWithActivityDTOs;
         }
+        shifts = updateFullDayAndFullWeekActivityShift(shifts);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(staffEmploymentDetails.getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, sc -> sc.getCount()));
         Date endTimeOfInterval = DateUtils.getStartOfTheDay(DateUtils.asDate(DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1)));
@@ -340,7 +343,7 @@ public class ShiftValidatorService {
         int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-
+        shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
         return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, planningPeriod.getCurrentPhaseId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, dataWrapper.getUser(), totalTimeBank, activityWrapperMap, dataWrapper.getStaffAge(), dataWrapper.getSeniorAndChildCareDays().getChildCareDays(), dataWrapper.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate());
     }
 
@@ -765,7 +768,6 @@ public class ShiftValidatorService {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
         if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
-            // shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
             if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullWeekCalculationType()))) {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
             } else {
@@ -790,9 +792,9 @@ public class ShiftValidatorService {
         if (shiftExists) {
             exceptionService.invalidRequestException("message.shift.date.startandend", shiftDTO.getStartDate(), shiftDTO.getEndDate());
         }
-
         return shiftOverlappedWithNonWorkingType;
     }
+
 
     public boolean deleteDuplicateEntryOfShiftViolatedInfo() {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAll();
@@ -853,7 +855,7 @@ public class ShiftValidatorService {
         }
     }
 
-    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, boolean deleteShift, Date oldShiftStartDate, Date oldShiftEndDate, boolean escalationCheckNotRequired) {
+    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO,  Date oldShiftStartDate, Date oldShiftEndDate) {
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
@@ -874,15 +876,6 @@ public class ShiftValidatorService {
         return shiftDTO;
     }
 
-    private void removeOverLappedEscalation(ShiftDTO shiftDTO, List<Shift> overLappedShifts, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap) {
-        overLappedShifts.forEach(overLappedShift -> {
-            if (!shiftOverLappedWithOther(overLappedShift) && !shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
-                shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
-                shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
-            }
-        });
-    }
-
     public Set<BigInteger> getEscalationFreeShifts(List<BigInteger> shiftIds) {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
         List<ShiftViolatedRules> escalationFreeViolatedRules = shiftViolatedRules.stream().filter(k -> k.isEscalationResolved()).collect(Collectors.toList());
@@ -891,6 +884,24 @@ public class ShiftValidatorService {
 
     private boolean shiftOverLappedWithOther(Shift shift) {
         return shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId());
+    }
+
+    private List<ShiftWithActivityDTO> updateFullDayAndFullWeekActivityShift(List<ShiftWithActivityDTO> shifts){
+        for (ShiftWithActivityDTO shift : shifts) {
+            if(isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())){
+                Date startDate = getStartOfDay(shift.getStartDate());
+                Date endDate = getMidNightOfDay(shift.getEndDate());
+                shift.getActivities().get(0).setStartDate(startDate);
+                shift.getActivities().get(0).setEndDate(endDate);
+                shift.setStartDate(startDate);
+                shift.setEndDate(endDate);
+            }
+        }
+        return shifts;
+    }
+
+    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO){
+        return activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK) || activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION);
     }
 
 

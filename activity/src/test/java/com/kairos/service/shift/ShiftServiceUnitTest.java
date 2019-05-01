@@ -173,7 +173,7 @@ public class ShiftServiceUnitTest {
         activity1.setScheduledMinutes(360);
         activity1.setScheduledMinutes(360);
         activity1.setActivityName("12 Bronze");
-        activity1.setpId(0);
+        activity1.setPId(0);
         activity1.setBid(0);
         activity1.setRemarks("");
         activity1.setTimeType("WORKING_TYPE");
@@ -232,7 +232,7 @@ public class ShiftServiceUnitTest {
         when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
-        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,startDate,endDate,false);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));
@@ -261,7 +261,7 @@ public class ShiftServiceUnitTest {
         when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
-        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,startDate,endDate,false);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));

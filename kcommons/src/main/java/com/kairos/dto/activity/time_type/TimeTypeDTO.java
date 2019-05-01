@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class TimeTypeDTO {
     private BigInteger id;
     private String timeTypes;
@@ -26,6 +30,7 @@ public class TimeTypeDTO {
     private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
     private boolean partOfTeam;
     private boolean allowChildActivities;
+    private List<TimeTypeDTO> parent = new ArrayList<>();
 
     public TimeTypeDTO() {
     }
@@ -55,100 +60,5 @@ public class TimeTypeDTO {
         this.allowChildActivities = allowChildActivities;
     }
 
-    public TimeTypeEnum getSecondLevelType() {
-        return secondLevelType;
-    }
 
-    public void setSecondLevelType(TimeTypeEnum secondLevelType) {
-        this.secondLevelType = secondLevelType;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    public List<TimeTypeDTO> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<TimeTypeDTO> children) {
-        this.children = children;
-    }
-
-    public BigInteger getUpperLevelTimeTypeId() {
-        return upperLevelTimeTypeId;
-    }
-
-    public void setUpperLevelTimeTypeId(BigInteger upperLevelTimeTypeId) {
-        this.upperLevelTimeTypeId = upperLevelTimeTypeId;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public String getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(String timeTypes) {
-        this.timeTypes = timeTypes;
-    }
-
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(String backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
-
-    public Set<OrganizationHierarchy> getActivityCanBeCopiedForOrganizationHierarchy() {
-        return activityCanBeCopiedForOrganizationHierarchy;
-    }
-
-    public void setActivityCanBeCopiedForOrganizationHierarchy(Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
-        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
-    }
-
-    public boolean isPartOfTeam() {
-        return partOfTeam;
-    }
-
-    public void setPartOfTeam(boolean partOfTeam) {
-        this.partOfTeam = partOfTeam;
-    }
-
-    public boolean isAllowChildActivities() {
-        return allowChildActivities;
-    }
-
-    public void setAllowChildActivities(boolean allowChildActivities) {
-        this.allowChildActivities = allowChildActivities;
-    }
 }

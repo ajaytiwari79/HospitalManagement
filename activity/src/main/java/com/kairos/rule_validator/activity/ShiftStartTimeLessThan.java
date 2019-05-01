@@ -4,7 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.service.shift.ShiftValidatorService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 
 import java.time.Duration;
 import java.util.ArrayList;

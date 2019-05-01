@@ -45,7 +45,7 @@ public class WTARuleTemplateCalculationService {
     @Inject
     private ShiftValidatorService shiftValidatorService;
 
-    public List<ShiftDTO> updateRestingTimeInShifts(List<ShiftDTO> shifts, UserAccessRoleDTO userAccessRole) {
+    public <T extends ShiftDTO> List<T> updateRestingTimeInShifts(List<T> shifts, UserAccessRoleDTO userAccessRole) {
         if (isCollectionNotEmpty(shifts)) {
             if (!(shifts instanceof ArrayList)) {
                 shifts = new ArrayList<>(shifts);
