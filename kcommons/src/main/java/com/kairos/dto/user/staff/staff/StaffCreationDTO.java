@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -16,11 +18,11 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffCreationDTO {
-    @NotNull(message = "error.staff.firstname.notnull")
+    @NotBlank(message = "error.staff.firstname.notnull")
     private String firstName;
-    @NotNull(message = "error.staff.lastname.notnull")
+    @NotBlank(message = "error.staff.lastname.notnull")
     private String lastName;
-    @NotNull(message = "error.staff.cprNumber.notnull")
+    @NotBlank(message = "error.staff.cprNumber.notnull")
     private String cprNumber;
     private String familyName;
     private String workPhone;
@@ -32,6 +34,7 @@ public class StaffCreationDTO {
     private Date inactiveFrom;
     private String privatePhone;
     private String workEmail;
+    @NotBlank(message = "error.staff.userName.notnull")
     private String userName;
     private Long externalId;
 
@@ -159,7 +162,7 @@ public class StaffCreationDTO {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName = StringUtils.trim(userName);
     }
 
     public Long getExternalId() {

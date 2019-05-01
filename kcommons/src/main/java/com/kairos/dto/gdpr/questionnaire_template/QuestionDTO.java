@@ -3,63 +3,38 @@ package com.kairos.dto.gdpr.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class QuestionDTO {
 
     private Long id;
 
-    @NotBlank(message = "Question title  can't be  empty")
+    @NotBlank(message = "error.message.question.title.notNull")
     private String question;
 
-    @NotBlank(message = "Description  can't be  Empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     private boolean required;
 
-    @NotNull(message = "Question type Must be Text ,Yes no May")
+    @NotNull(message = "error.message.questionType.name.notnull")
     private QuestionType questionType;
 
     private String attributeName;
 
     private boolean notSureAllowed;
 
-    public String getAttributeName() { return attributeName; }
-
-    public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
 
     public String getQuestion() { return question.trim(); }
 
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public QuestionType getQuestionType() { return questionType; }
-
-    public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
-
-    public boolean isRequired() { return required; }
-
-    public void setRequired(boolean required) { this.required = required; }
-
-    public boolean isNotSureAllowed() { return notSureAllowed; }
-
-    public void setNotSureAllowed(boolean notSureAllowed) { this.notSureAllowed = notSureAllowed; }
 
 }

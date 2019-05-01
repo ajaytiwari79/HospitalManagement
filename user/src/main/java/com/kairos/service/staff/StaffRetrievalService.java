@@ -5,12 +5,12 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -204,6 +204,8 @@ public class StaffRetrievalService {
     private Map<String, Object> retrievePersonalInfo(Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
+        map.put("userNameUpdated",user.isUserNameUpdated());
+        map.put("userName", user.getUserName());
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
         map.put("profilePic", (isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
@@ -300,7 +302,7 @@ public class StaffRetrievalService {
             staffAccessGroupQueryResult = new StaffAccessGroupQueryResult();
             isSuperAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.SUPER_ADMIN);
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-            staffAccessGroupQueryResult.setCountryId(organizationGraphRepository.getCountryId(parentOrganization.getId()));
+            staffAccessGroupQueryResult.setCountryId(UserContext.getUserDetails().getCountryId());
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
@@ -333,35 +335,6 @@ public class StaffRetrievalService {
         return map;
     }
 
-    /**
-     * Assuming Hub member/staff is not the part of Organization at same time
-     *
-     * @param staff
-     * @param unitId
-     * @param userId
-     * @return
-     * @author mohit
-     */
-    private List<StaffPersonalDetailDTO> filterStaffByRoles(List<StaffPersonalDetailDTO> staff, Long unitId, Long userId) {
-        List<StaffPersonalDetailDTO> staffListByRole = new ArrayList<>();
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        if (staffAtHub != null) {
-            staffListByRole = staff;
-        } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
-            String STAFF_CURRENT_ROLE;
-            if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE = setStaffAccessRole(accessGroupQueryResult);
-                if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
-                    staffListByRole = staff;
-                } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId().equals(accessGroupQueryResult.getStaffId())).findFirst().get();
-                    staffListByRole.add(staffPersonalDetail);
-                }
-            }
-        }
-        return staffListByRole;
-    }
 
     /**
      * Method to set current staff role if present
@@ -421,7 +394,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
@@ -685,7 +657,7 @@ public class StaffRetrievalService {
             exceptionService.dataNotFoundByIdException("message.unitposition.id.notexist", unitPositionId);
         }
         UserAccessRoleDTO userAccessRole = accessGroupService.findUserAccessRole(unitId);
-        List<AppliedFunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionDetails.getAppliedFunctions(), AppliedFunctionDTO.class);
+        List<FunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionDetails.getAppliedFunctions(), FunctionDTO.class);
         unitPositionDetails.setAppliedFunctions(appliedFunctionDTOS);
         List<ReasonCodeResponseDTO> reasonCodeQueryResults = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE);
         List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeQueryResults, ReasonCodeDTO.class);

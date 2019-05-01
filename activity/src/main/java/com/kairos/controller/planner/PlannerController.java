@@ -10,7 +10,6 @@ import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.planner.TasksMergingService;
-import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.visitator.VisitatorService;
 import com.kairos.utils.response.ResponseHandler;
@@ -57,7 +56,6 @@ public class PlannerController {
     VisitatorService visitatorService;
     @Autowired
     TaskService taskService;
-    @Inject private VRPPlanningService vrpPlanningService;
 
     @ApiOperation("Get Citizen planner data")
     @RequestMapping(value = "/citizen/{citizenId}", method = RequestMethod.GET)
@@ -305,43 +303,6 @@ public class PlannerController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, plannerService.getCitizenListByTimeSlotIds(timeSlotIds, unitId));
 
     }
-
-    @PostMapping(value = "/{solverConfigId}")
-    @ApiOperation("submit solver config to planner")
-    public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId,@RequestBody SolverConfigDTO solverConfigDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId,solverConfigDTO));
-    }
-
-    @PostMapping(value = "/resubmit")
-    @ApiOperation("resubmit solver config to planner")
-    public ResponseEntity<Map<String, Object>> resubmitToPlanner(@PathVariable Long unitId,@RequestBody SolverConfigDTO solverConfigDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.resubmitToPlanner(unitId,solverConfigDTO));
-    }
-
-    @DeleteMapping(value = "/{solverConfigId}")
-    @ApiOperation("stop solver config")
-    public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.stopToPlannerBySolverConfig(unitId,solverConfigId));
-    }
-
-    @GetMapping(value = "/{solverConfigId}")
-    @ApiOperation("get solution of solver config by date")
-    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfigByDate(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId,@RequestParam(value = "date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfigByDate(unitId,solverConfigId,date));
-    }
-
-    @GetMapping(value = "/solution_by_week/{solverConfigId}")
-    @ApiOperation("get solution of solver config")
-    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId));
-    }
-
-    @PostMapping(value = "/vrp_completed/{solverConfigId}")
-    @ApiOperation("update solver config")
-    public ResponseEntity<Map<String, Object>> planningCompleted(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.planningCompleted(unitId,solverConfigId));
-    }
-
 
 
 }

@@ -1,8 +1,12 @@
 package com.kairos.persistence.model.clause;
 
+import com.kairos.annotations.PermissionModel;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -13,7 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@PermissionModel
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class MasterClause extends Clause {
 
     private Long countryId;
@@ -44,57 +52,4 @@ public class MasterClause extends Clause {
         this.organizationSubTypes=organizationSubTypes;
         this.organizationSubServices=organizationSubServices;
     }
-
-    public MasterClause(){
-
-    }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<ServiceCategory> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<SubServiceCategory> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
-
-    public List<AccountType> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(List<AccountType> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
 }

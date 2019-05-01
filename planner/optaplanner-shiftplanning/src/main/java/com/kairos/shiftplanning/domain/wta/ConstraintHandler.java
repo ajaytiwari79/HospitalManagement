@@ -1,13 +1,10 @@
 package com.kairos.shiftplanning.domain.wta;
 
-import com.kairos.shiftplanning.domain.Shift;
-import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public interface ConstraintHandler {
     //int checkConstraints(List<Shift> shifts);

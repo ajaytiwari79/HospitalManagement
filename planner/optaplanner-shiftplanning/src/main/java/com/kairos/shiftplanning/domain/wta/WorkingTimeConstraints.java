@@ -1,7 +1,6 @@
 package com.kairos.shiftplanning.domain.wta;
 
-import com.kairos.shiftplanning.domain.Shift;
-import com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIterator;
+import com.kairos.shiftplanning.domain.shift.Shift;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;

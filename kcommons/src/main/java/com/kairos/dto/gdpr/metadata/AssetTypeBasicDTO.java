@@ -1,15 +1,20 @@
 package com.kairos.dto.gdpr.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class AssetTypeBasicDTO {
 
     private Long id;
@@ -22,23 +27,6 @@ public class AssetTypeBasicDTO {
     private Boolean subAssetType;
 
 
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
     public String getName() { return name.trim(); }
 
-    public void setName(String name) { this.name = name; }
-
-    public List<AssetTypeBasicDTO> getSubAssetTypes() { return subAssetTypes; }
-
-    public void setSubAssetTypes(List<AssetTypeBasicDTO> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
-
-    public Boolean getSubAssetType() {
-        return subAssetType;
-    }
-
-    public void setSubAssetType(Boolean subAssetType) {
-        this.subAssetType = subAssetType;
-    }
 }

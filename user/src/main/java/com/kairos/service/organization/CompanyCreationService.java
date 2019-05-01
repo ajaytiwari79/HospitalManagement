@@ -300,10 +300,14 @@ public class CompanyCreationService {
             if(user != null) {
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
+                user.setUserName(unitManagerDTO.getUserName());
+                user.setUserNameUpdated(true);
                 userGraphRepository.save(user);
             } else {
                 if(unitManagerDTO.getCprNumber() != null) {
-                    StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getCprNumber(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
+                    StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(),
+                            unitManagerDTO.getLastName(), unitManagerDTO.getCprNumber(), null,
+                            unitManagerDTO.getEmail(), null, unitManagerDTO.getUserName(), null, unitManagerDTO.getAccessGroupId());
                     staffCreationService.createUnitManagerForNewOrganization(organization, unitManagerData);
                 }
 
@@ -319,12 +323,14 @@ public class CompanyCreationService {
                 if(anotherUserExistBySameEmailOrCPR != 0) {
                     exceptionService.duplicateDataException("message.cprNumberEmail.notNull");
                 }
+
                 user.setEmail(unitManagerDTO.getEmail());
-                user.setUserName(unitManagerDTO.getEmail());
+                user.setUserName(unitManagerDTO.getUserName());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
+                user.setUserNameUpdated(true);
                 userGraphRepository.save(user);
                 if(unitManagerDTO.getAccessGroupId() != null) {
                     setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
@@ -340,7 +346,9 @@ public class CompanyCreationService {
                         userGraphRepository.save(user);
                         setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
-                        user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+                        user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(),
+                                unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName()
+                                ,true);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
                     userGraphRepository.save(user);
@@ -357,6 +365,7 @@ public class CompanyCreationService {
         unitManagerDTO.setLastName(user.getLastName());
         unitManagerDTO.setCprNumber(user.getCprNumber());
         unitManagerDTO.setEmail(user.getEmail());
+        unitManagerDTO.setUserName(user.getUserName());
     }
     //It checks null as well
 

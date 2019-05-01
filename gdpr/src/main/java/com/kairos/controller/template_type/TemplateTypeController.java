@@ -32,7 +32,7 @@ class TemplateTypeController {
      * @param templateData
      * @return list
      * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
-     * @author vikash patwal
+     * @author
      */
 
     @ApiOperation(value = "create new Template type")
@@ -51,7 +51,7 @@ class TemplateTypeController {
      * @param templateType
      * @return TemplateType
      * @description this template is used for update template type by id.
-     * @author vikash patwal
+     * @author
      */
     @ApiOperation(value = "update template")
     @PutMapping(value = COUNTRY_URL+"/template/{id}")
@@ -68,7 +68,7 @@ class TemplateTypeController {
      * @param countryId
      * @param id
      * @description this template is used for delete template by id.
-     * @author vikash patwal
+     * @author
      * @returne Boolean
      */
     @ApiOperation(value = "delete template by id")
@@ -85,7 +85,7 @@ class TemplateTypeController {
      * @param countryId
      * @return List<TemplateType>
      * @description this template is used for get all template type
-     * @author vikash patwal
+     * @author
      */
     @ApiOperation(value = "All Template Type type ")
     @GetMapping(value = COUNTRY_URL+"/template")

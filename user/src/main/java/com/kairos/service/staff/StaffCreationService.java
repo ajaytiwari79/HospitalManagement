@@ -42,6 +42,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,6 +126,7 @@ public class StaffCreationService {
             LOGGER.info("Creating new staff with kmd external id " + payload.getExternalId() + " in unit " + unit.getId());
             staff = new Staff();
         }
+        //staff.setUserName(payload.getUserName());
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
         staff.setExternalId(payload.getExternalId());
@@ -296,7 +298,6 @@ public class StaffCreationService {
         adminAsStaff.setLastName(admin.getLastName());
         adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail(admin.getEmail());
-        adminAsStaff.setUserName(admin.getEmail());
         staffGraphRepository.save(adminAsStaff);
 
         List<Organization> organizations = organizationGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
@@ -387,11 +388,17 @@ public class StaffCreationService {
             exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
 
         }
+        User userWithExistingUserName = userGraphRepository.findUserByUserName("(?i)" +payload.getUserName());
+        if(Optional.ofNullable(userWithExistingUserName).isPresent()){
+            exceptionService.duplicateDataException("message.staff.userName.alreadyexist");
+        }
+
         setBasicDetailsOfUser(user, payload);
         // Set default language of User
-        Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId);
+        Long countryId = UserContext.getUserDetails().getCountryId();
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
+        user.setUserName(payload.getUserName());
         staff = createStaffObject(parent, unit, payload);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
@@ -399,7 +406,9 @@ public class StaffCreationService {
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
-        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
+        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge(
+
+        ));
     }
 
     public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
@@ -499,8 +508,9 @@ public class StaffCreationService {
     }
 
     public void setBasicDetailsOfUser(User user, StaffCreationDTO staffCreationDTO) {
+        user.setUserNameUpdated(true);
         user.setEmail(staffCreationDTO.getPrivateEmail());
-        user.setUserName(staffCreationDTO.getPrivateEmail());
+        user.setUserName(staffCreationDTO.getUserName());
         user.setFirstName(staffCreationDTO.getFirstName());
         user.setLastName(staffCreationDTO.getLastName());
         user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent() ? new BCryptPasswordEncoder().encode(user.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH) : null);

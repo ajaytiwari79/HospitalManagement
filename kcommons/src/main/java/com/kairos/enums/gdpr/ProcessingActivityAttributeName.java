@@ -2,10 +2,10 @@ package com.kairos.enums.gdpr;
 
 public enum ProcessingActivityAttributeName {
 
-NAME("Name"),DESCRIPTION("Description"),PROCESSING_PURPOSES("Processing Purpose"),DATA_SOURCES("Data Source"),
-    TRANSFER_METHOD("Transfer method"),ACCESSOR_PARTY("Accessor Parties"),PROCESSING_LEGAL_BASIS("Processing Legal Basis"),RESPONSIBILITY_TYPE("Responsibility Type"),CONTROLLER_CONTACT_INFO("Controller Contact Info")
-    ,DPO_CONTACT_INFO("DPO Contact Info"),JOINT_CONTROLLER_CONTACT_INFO("Joint Controller Info"),MIN_DATA_SUBJECT_VOLUME("Minimum Data Subject Volume"),
-    MAX_DATA_SUBJECT_VOLUME("Max Data Subject Volume"),DATA_RETENTION_PERIOD("Data Retention Period");
+NAME("name"),DESCRIPTION("description"),PROCESSING_PURPOSES("processingPurposes"),DATA_SOURCES("dataSources"),
+    TRANSFER_METHOD("transferMethods"),ACCESSOR_PARTY("accessorParties"),PROCESSING_LEGAL_BASIS("processingLegalBasis"),RESPONSIBILITY_TYPE("responsibilityType"),CONTROLLER_CONTACT_INFO("controllerContactInfo")
+    ,DPO_CONTACT_INFO("dpoContactInfo"),JOINT_CONTROLLER_CONTACT_INFO("jointControllerContactInfo"),MIN_DATA_SUBJECT_VOLUME("minDataSubjectVolume"),
+    MAX_DATA_SUBJECT_VOLUME("maxDataSubjectVolume"),DATA_RETENTION_PERIOD("dataRetentionPeriod"),ASSETS("assets");
 
     public String value;
     ProcessingActivityAttributeName(String value) {

@@ -108,7 +108,7 @@ public class TimeBankKpiCalculationService implements CounterService {
                 for (UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO : staffKpiFilterDTO.getUnitPosition()) {
                     List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionAndDailyTimeBank.getOrDefault(unitPositionWithCtaDetailsDTO.getId(), new ArrayList<>());
                     int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId), new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)), DateUtils.getLongFromLocalDate(filterDates.get(1))), unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-                    int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getTotalTimeBankMin()).sum();
+                    int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getDeltaTimeBankMinutes()).sum();
                     int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
                     logger.info(staffKpiFilterDTO.getFirstName() + "  " + totalTimeBank);
                     totalTimeBankOfUnit += totalTimeBank;
@@ -130,5 +130,10 @@ public class TimeBankKpiCalculationService implements CounterService {
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getTimeBankForUnitKpiData(organizationId, filterBasedCriteria, false);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+    }
+
+    @Override
+    public Map<Long,Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
+        return new HashMap<>();//getTimeBankForUnitKpiData(organizationId, filterBasedCriteria, true);
     }
 }

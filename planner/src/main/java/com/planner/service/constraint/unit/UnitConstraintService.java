@@ -34,7 +34,7 @@ public class UnitConstraintService {
     public UnitConstraintDTO createUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         if (preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
-            constraintsRepository.saveObject(unitConstraint);
+            constraintsRepository.saveEntity(unitConstraint);
             unitConstraintDTO.setId(unitConstraint.getId());
         }
         return unitConstraintDTO;
@@ -48,7 +48,7 @@ public class UnitConstraintService {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
             unitConstraint.setParentConstraintId(unitConstraintDTO.getId());
             unitConstraint.setId(null);//Unset Id
-            constraintsRepository.saveObject(unitConstraint);
+            constraintsRepository.saveEntity(unitConstraint);
             unitConstraintDTO.setId(unitConstraint.getId());
         }
         return unitConstraintDTO;
@@ -65,7 +65,7 @@ public class UnitConstraintService {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
         if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, false)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
-            constraintsRepository.saveObject(unitConstraint);
+            constraintsRepository.saveEntity(unitConstraint);
         }
     }
 

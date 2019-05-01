@@ -129,7 +129,8 @@ public class CounterRepository {
                 lookup("counter", "activeKpiId", "_id", "kpi"),
                 project("title").and("kpi").arrayElementAt(0).as("kpi"),
                 project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
-                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter")
+                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
+                        and("kpi.fibonacciKPI").as("fibonacciKPI")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();
@@ -568,5 +569,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
+    public FibonacciKPI findFibonacciKPIById(BigInteger id){
+        Query query = new Query(Criteria.where("deleted").is(false).and("id").is(id));
+        return mongoTemplate.findOne(query, FibonacciKPI.class);
+    }
 
 }

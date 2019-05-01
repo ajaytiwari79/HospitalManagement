@@ -3,12 +3,19 @@ package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProcessingLegalBasis extends BaseEntity {
 
 
@@ -20,43 +27,8 @@ public class ProcessingLegalBasis extends BaseEntity {
     private LocalDate suggestedDate;
     private Long organizationId;
 
-    public Long getOrganizationId() { return organizationId; }
-
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
-
-    public LocalDate getSuggestedDate() { return suggestedDate; }
-
-    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
-
-    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
-
-    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
     public String getName() {
         return name.trim();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty")String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
-        this.name = name;
-        this.countryId = countryId;
-        this.suggestedDataStatus = suggestedDataStatus;
-    }
-
-    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, Long organizationId) {
-        this.name = name;
-        this.organizationId = organizationId;
     }
 
     public ProcessingLegalBasis(Long countryId, @NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
@@ -67,10 +39,5 @@ public class ProcessingLegalBasis extends BaseEntity {
     public ProcessingLegalBasis(String name) {
         this.name = name;
     }
-    public ProcessingLegalBasis() {
-    }
 
-    public ProcessingLegalBasis(Long id ) {
-        this.id = id;
-    }
 }

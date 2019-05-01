@@ -1,5 +1,6 @@
 package com.kairos.commons.service.mail;
 
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.sendgrid.*;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,7 @@ public class MailService {
     private JavaMailSender javaMailSender;
     @Inject
     private TemplateEngine templateEngine;
+    @Inject private EnvConfigCommon envConfigCommon;
 
     /***
      *
@@ -131,13 +133,11 @@ public class MailService {
     }
 
     private Content getContent(String templateName,Map<String,Object> templateParam,String body){
-        Content content = null;
+        Content content = new Content(PLAIN_CONTENT_TYPE,body);
         if(StringUtils.isNotBlank(templateName)){
             final Context context = getContext(templateParam);
             body = templateEngine.process(templateName, context);
             content = new Content(HTML_CONTENT_TYPE,body);
-        }else {
-            content = new Content(PLAIN_CONTENT_TYPE,body);
         }
         return content;
     }
@@ -146,6 +146,10 @@ public class MailService {
         Context context = new Context(Locale.ENGLISH);
         if(isMapNotEmpty(templateParam)){
             context.setVariables(templateParam);
+            context.setVariable("kairosLogo",envConfigCommon.getServerHost() + FORWARD_SLASH + envConfigCommon.getImagesPath()+KAIROS_LOGO);
+            if(!templateParam.containsKey("receiverImage")){
+                context.setVariable("receiverImage",envConfigCommon.getServerHost() + FORWARD_SLASH + envConfigCommon.getImagesPath()+USER_DEFAULT_IMAGE);
+            }
         }
         return context;
     }
@@ -157,6 +161,21 @@ public class MailService {
             sb.append(n);
         }
         return sb;
+    }
+
+
+    //Todo Please don't use this method for sending any Custom exception
+    public void sendMailToBackendOnException(Exception ex){
+       //TODO commented below as we using free account for of send grid which limits 100 emails per day
+        /* if(envConfigCommon.getCurrentProfile().equals(PRODUCTION) || envConfigCommon.getCurrentProfile().equals(QA)){
+            StringBuffer body = new StringBuffer("");
+            for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
+                if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
+                    body.append(stackTraceElement.toString()).append(" ").append(System.getProperty("line.separator")).append(" ");
+                }
+            }
+            sendMailWithSendGrid(null,null,body.toString(),"Exception in Activity | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
+        }*/
     }
 
 }

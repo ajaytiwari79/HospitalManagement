@@ -58,6 +58,11 @@ public class Shift extends MongoBaseEntity {
     private Long staffUserId;
     private ShiftType shiftType;
     private int timeBankCtaBonusMinutes;
+    private int plannedMinutesOfTimebank;
+    private int payoutCtaBonusMinutes;
+    private int plannedMinutesOfPayout;
+    private int scheduledMinutesOfTimebank;
+    private int scheduledMinutesOfPayout;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -354,6 +359,46 @@ public class Shift extends MongoBaseEntity {
         this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
     }
 
+    public int getPlannedMinutesOfTimebank() {
+        return plannedMinutesOfTimebank;
+    }
+
+    public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
+        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    }
+
+    public int getPlannedMinutesOfPayout() {
+        return plannedMinutesOfPayout;
+    }
+
+    public void setPlannedMinutesOfPayout(int plannedMinutesOfPayout) {
+        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
+    }
+
+    public int getPayoutCtaBonusMinutes() {
+        return payoutCtaBonusMinutes;
+    }
+
+    public void setPayoutCtaBonusMinutes(int payoutCtaBonusMinutes) {
+        this.payoutCtaBonusMinutes = payoutCtaBonusMinutes;
+    }
+
+    public int getScheduledMinutesOfTimebank() {
+        return scheduledMinutesOfTimebank;
+    }
+
+    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
+        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
+    }
+
+    public int getScheduledMinutesOfPayout() {
+        return scheduledMinutesOfPayout;
+    }
+
+    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
+        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
+    }
+
     @Override
     public String toString() {
         return "Shift{" +
@@ -372,5 +417,4 @@ public class Shift extends MongoBaseEntity {
                 ", unitId=" + unitId +
                 '}';
     }
-
 }

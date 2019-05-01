@@ -2,6 +2,7 @@ package com.kairos.dto.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,8 +17,9 @@ public class UnitManagerDTO {
     private String lastName;
     private String email;
     private String accessGroupName;
+    private String userName;
 
-    public UnitManagerDTO(){
+    public UnitManagerDTO() {
         // default constructor
     }
 
@@ -59,6 +61,14 @@ public class UnitManagerDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = StringUtils.trim(userName);
     }
 
     public String getAccessGroupName() {

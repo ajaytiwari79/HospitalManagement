@@ -63,4 +63,6 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     List<TimeType> findAllByDeletedFalseAndCountryIdAndTimeType(Long countryId, String timeType);
 
     boolean existsByIdAndCountryIdAndDeletedFalse(BigInteger id, Long countryId);
+
+    boolean existsByIdAndPartOfTeam(BigInteger id, boolean partOfTeam);
 }

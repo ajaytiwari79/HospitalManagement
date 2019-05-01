@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +45,11 @@ public class ActivityTagDTO {
     private ActivityStateEnum state;
     private List<CompositeShiftActivityDTO> compositeActivities;
     private BigInteger activityPriorityId;
+    private boolean allowChildActivities;
+    private boolean applicableForChildActivities;
+    private Set<BigInteger> childActivityIds=new HashSet<>();
+    // for filter FullDay and Full week activity
+    private String methodForCalculatingTime;
 
     public ActivityTagDTO() {
         //default constructor
@@ -227,6 +233,38 @@ public class ActivityTagDTO {
 
     public void setActivityPriorityId(BigInteger activityPriorityId) {
         this.activityPriorityId = activityPriorityId;
+    }
+
+    public boolean isAllowChildActivities() {
+        return allowChildActivities;
+    }
+
+    public void setAllowChildActivities(boolean allowChildActivities) {
+        this.allowChildActivities = allowChildActivities;
+    }
+
+    public Set<BigInteger> getChildActivityIds() {
+        return childActivityIds;
+    }
+
+    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
+        this.childActivityIds = childActivityIds;
+    }
+
+    public boolean isApplicableForChildActivities() {
+        return applicableForChildActivities;
+    }
+
+    public void setApplicableForChildActivities(boolean applicableForChildActivities) {
+        this.applicableForChildActivities = applicableForChildActivities;
+    }
+
+    public String getMethodForCalculatingTime() {
+        return methodForCalculatingTime;
+    }
+
+    public void setMethodForCalculatingTime(String methodForCalculatingTime) {
+        this.methodForCalculatingTime = methodForCalculatingTime;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

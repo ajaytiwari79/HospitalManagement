@@ -25,14 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-/**
- * This class will be loaded by {@link org.springframework.data.mongodb.repository.config.EnableMongoRepositories}
- * which is configured in planner Main class
- * as an instance of Proxy class into every {@Repository} annotated interface
- *
- * @param <T>
- * @param <ID>
- */
 public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 
     private final MongoOperations mongoOperations;
@@ -114,7 +106,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
      * @return sequenceNumber
      * @description This method in used to generate mongodb sequence
      * by our own Application , not by(default Mongo ObjectId)
-     * during all types of save operations
+     * during all types of saveEntity operations
      */
     public BigInteger nextSequence(String sequenceName,Integer sequenceSize) {
         //adding sequence postfix into class name
@@ -134,12 +126,12 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     }
 
 
-    //======================save single object=========================
-    public <T extends MongoBaseEntity> T saveObject(T entity) {
+
+    public <T extends MongoBaseEntity> T saveEntity(T entity) {
         Assert.notNull(entity, "Entity must not be null!");
         //Get class name for sequence class
         String className = entity.getClass().getSimpleName();
-        //By Pass, to save both type of solverConfig in same Collection
+        //By Pass, to saveEntity both type of solverConfig in same Collection
         if (entity instanceof SolverConfig) className = SolverConfig.class.getSimpleName();
         if(entity instanceof Constraint) className = Constraint.class.getSimpleName();
         //Set Id if entity don't have Id
@@ -152,13 +144,13 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         return entity;
     }
 
-    //==========================save List of objects=======================
-    public <T extends MongoBaseEntity> List<T> saveObjectList(List<T> objects){
+    //==========================saveEntity List of objects=======================
+    public <T extends MongoBaseEntity> List<T> saveList(List<T> objects){
         Assert.notEmpty(objects,"List Can't be empty or null");
         //Get class name for sequence class
         String collectionName = mongoOperations.getCollectionName(objects.get(0).getClass());
         String className = objects.get(0).getClass().getSimpleName();
-        //By Pass, to save both type of classes in same Collection
+        //By Pass, to saveEntity both type of classes in same Collection
         if (objects.get(0) instanceof SolverConfig) className = SolverConfig.class.getSimpleName();
         if(objects.get(0) instanceof Constraint) className = Constraint.class.getSimpleName();
 

@@ -2,15 +2,19 @@ package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class BasicRiskDTO {
 
     protected Long id;
@@ -45,28 +49,8 @@ public class BasicRiskDTO {
 
     public String getName() { return name.trim(); }
 
-    public void setName(String name) { this.name = name; }
-
     public String getDescription() { return description.trim(); }
-
-    public void setDescription(String description) { this.description = description; }
 
     public String getRiskRecommendation() { return riskRecommendation.trim(); }
 
-    public void setRiskRecommendation(String riskRecommendation) { this.riskRecommendation = riskRecommendation; }
-
-    public RiskSeverity getRiskLevel() { return riskLevel; }
-
-    public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public BasicRiskDTO() {
-    }
 }

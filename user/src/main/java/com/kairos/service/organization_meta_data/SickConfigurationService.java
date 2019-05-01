@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.default_data.SickConfiguration;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.default_data.SickConfigurationRepository;
 import com.kairos.service.country.TimeTypeRestClient;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class SickConfigurationService {
     }
 
     public Map<String, Object> getSickSettingsAndDefaultDataOfUnit(Long unitId) {
-        List<TimeTypeDTO> timeTypes = timeTypeRestClient.getAllTimeTypes(organizationGraphRepository.getCountryId(unitId));
+        List<TimeTypeDTO> timeTypes = timeTypeRestClient.getAllTimeTypes(UserContext.getUserDetails().getCountryId());
         Map<String, Object> response = new HashMap<>();
         response.put("timeTypes", timeTypes);
         response.put("selectedTimeTypeIds", getSickSettingsOfUnit(unitId));

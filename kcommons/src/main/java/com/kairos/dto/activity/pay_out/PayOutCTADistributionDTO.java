@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.pay_out;
 
+import com.kairos.dto.activity.time_bank.CTARuletemplateBonus;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 
 import java.util.List;
@@ -7,29 +8,40 @@ import java.util.List;
 public class PayOutCTADistributionDTO {
 
     //cta ruletemplate based distributions
-    private long minutes;
-    private List<CTADistributionDTO> children;
+    private List<CTADistributionDTO> scheduledCTADistributions;
+    private CTARuletemplateBonus ctaRuletemplateBonus;
+    private long plannedMinutesOfPayout;
+
     public PayOutCTADistributionDTO() {
     }
 
-    public long getMinutes() {
-        return minutes;
+    public PayOutCTADistributionDTO(List<CTADistributionDTO> scheduledCTADistributions,CTARuletemplateBonus ctaRuletemplateBonus,long plannedMinutesOfPayout) {
+        this.scheduledCTADistributions = scheduledCTADistributions;
+        this.ctaRuletemplateBonus = ctaRuletemplateBonus;
+        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
     }
 
-    public void setMinutes(long minutes) {
-        this.minutes = minutes;
+    public List<CTADistributionDTO> getScheduledCTADistributions() {
+        return scheduledCTADistributions;
     }
 
-    public List<CTADistributionDTO> getChildren() {
-        return children;
+    public void setScheduledCTADistributions(List<CTADistributionDTO> scheduledCTADistributions) {
+        this.scheduledCTADistributions = scheduledCTADistributions;
     }
 
-    public void setChildren(List<CTADistributionDTO> children) {
-        this.children = children;
+    public CTARuletemplateBonus getCtaRuletemplateBonus() {
+        return ctaRuletemplateBonus;
     }
 
-    public PayOutCTADistributionDTO(long minutes, List<CTADistributionDTO> children) {
-        this.minutes = minutes;
-        this.children = children;
+    public void setCtaRuletemplateBonus(CTARuletemplateBonus ctaRuletemplateBonus) {
+        this.ctaRuletemplateBonus = ctaRuletemplateBonus;
+    }
+
+    public long getPlannedMinutesOfPayout() {
+        return plannedMinutesOfPayout;
+    }
+
+    public void setPlannedMinutesOfPayout(long plannedMinutesOfPayout) {
+        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
     }
 }

@@ -2,12 +2,12 @@
 <solver>
  <!-- <environmentMode>FULL_ASSERT</environmentMode>-->
   <solutionClass>com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution</solutionClass>
-  <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
-  <entityClass>com.kairos.shiftplanning.domain.ShiftBreak</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.shift.ShiftBreak</entityClass>
 
-    <!--<entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
-    <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>-->
-    <!--<entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>-->
+    <!--<entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
+    <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImplass>-->
+    <!--<entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>-->
   <!--
   Intervals on assigned back to null will not reduce shift length if they are in mid of shift and hence causing score corruption, which is fine
   <environmentMode>FULL_ASSERT</environmentMode>-->
@@ -20,7 +20,7 @@
     <constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="breaksSelector">
-                <entityClass>com.kairos.shiftplanning.domain.ShiftBreak</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.shift.ShiftBreak</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="breaksSelector"/>
@@ -33,7 +33,7 @@
     <constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="indirectActivitySelector">
-                <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="indirectActivitySelector"/>
@@ -48,27 +48,27 @@
 
     <unionMoveSelector>
         <!--<moveIteratorFactory>
-            <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ShiftBreakChangeMoveIteratorFactory</moveIteratorFactoryClass>
+            <moveIteratorFactoryClass>ShiftBreakChangeMoveIteratorFactory</moveIteratorFactoryClass>
         </moveIteratorFactory>-->
         <changeMoveSelector>
             <entitySelector>
-                <entityClass>com.kairos.shiftplanning.domain.ShiftBreak</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.shift.ShiftBreak</entityClass>
             </entitySelector>
             <selectedCountLimit>1000</selectedCountLimit>
             <valueSelector>
                 <variableName>startTime</variableName>
             </valueSelector>
-            <filterClass>com.kairos.shiftplanning.domain.move.ShiftBreakMoveFilter</filterClass>
+            <filterClass>com.kairos.shiftplanning.move.ShiftBreakMoveFilter</filterClass>
         </changeMoveSelector>
         <changeMoveSelector>
             <entitySelector>
-                <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+                <entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>
             </entitySelector>
             <selectedCountLimit>1000</selectedCountLimit>
             <valueSelector>
                 <variableName>startTime</variableName>
             </valueSelector>
-            <filterClass>com.kairos.shiftplanning.domain.move.IndirectActivityMoveFilter</filterClass>
+            <filterClass>com.kairos.shiftplanning.move.IndirectActivityMoveFilter</filterClass>
         </changeMoveSelector>
     </unionMoveSelector>
         <acceptor>
