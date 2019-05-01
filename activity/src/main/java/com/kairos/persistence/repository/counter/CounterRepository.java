@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.AppConstants.DELETED;
+import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /*
@@ -567,6 +569,12 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         Criteria matchCriteria = Criteria.where("deleted").is(false).and("unitId").is(unitId).and("staffId").in(staffIds).and("level").is(level);
         Query query = new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+    }
+
+    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds){
+        Criteria matchCriteria = Criteria.where("activeKpiId").in(kpiIds).and("kpiRepresentation").is(INDIVIDUAL_STAFF).and(DELETED).is(false);
+        Query query = new Query(matchCriteria);
+        return mongoTemplate.find(query,ApplicableKPI.class).size()==kpiIds.size();
     }
 
 

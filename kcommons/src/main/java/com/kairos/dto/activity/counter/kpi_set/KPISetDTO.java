@@ -22,7 +22,7 @@ public class KPISetDTO {
     private BigInteger id;
     @NotNullOrEmpty(message = "error.name.notnull")
     private String name;
-    @NotNullOrEmpty(message = "message.kpi.absent")
+    @NotEmpty(message = "message.kpi.absent")
     private Set<BigInteger> kpiIds;
     @NotNull(message = "message.time_type.absent")
     private TimeTypeEnum timeType;

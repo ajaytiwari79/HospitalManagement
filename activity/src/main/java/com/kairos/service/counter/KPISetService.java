@@ -8,6 +8,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.persistence.model.counter.KPISet;
+import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.KPISetRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
@@ -28,9 +29,13 @@ public class KPISetService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private FibonacciKPIService fibonacciKPIService;
+    @Inject
+    private CounterRepository counterRepository;
 
-    public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO,ConfLevel confLevel) {
-        verifyUnitOrCountry(referenceId,confLevel,kpiSetDTO);
+    public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
+        verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
         KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
@@ -39,11 +44,11 @@ public class KPISetService {
         return kpiSetDTO;
     }
 
-    public KPISetDTO updateKPISet(Long referenceId,KPISetDTO kpiSetDTO,ConfLevel confLevel) {
-        verifyUnitOrCountry(referenceId,confLevel,kpiSetDTO);
-        KPISet  kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetRepository.findOne(kpiSetDTO.getId()), KPISet.class);
-        if(isNull(kpiSet)){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","KPISet",kpiSetDTO.getId());
+    public KPISetDTO updateKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
+        verifyDetails(referenceId, confLevel, kpiSetDTO);
+        KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetRepository.findOne(kpiSetDTO.getId()), KPISet.class);
+        if (isNull(kpiSet)) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "KPISet", kpiSetDTO.getId());
         }
         kpiSetRepository.save(kpiSet);
         return kpiSetDTO;
@@ -51,8 +56,8 @@ public class KPISetService {
 
     public boolean deleteKPISet(BigInteger kpiSetId) {
         KPISet kpiSet = kpiSetRepository.findOne(kpiSetId);
-        if(isNull(kpiSet)){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","KPISet",kpiSetId);
+        if (isNull(kpiSet)) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "KPISet", kpiSetId);
             return false;
         }
         kpiSet.setDeleted(true);
@@ -68,20 +73,33 @@ public class KPISetService {
         return kpiSetRepository.findOneById(kpiSetId);
     }
 
-    private void verifyUnitOrCountry(Long referenceId,ConfLevel confLevel,KPISetDTO kpiSetDTO){
-        if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
+    private void verifyDetails(Long referenceId, ConfLevel confLevel, KPISetDTO kpiSetDTO) {
+        if (confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
-        if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
+        if (confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
-        boolean existByName = kpiSetRepository.existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(kpiSetDTO.getName().trim(),referenceId,kpiSetDTO.getId());
-        if(existByName){
+        boolean existByName = kpiSetRepository.existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(kpiSetDTO.getName().trim(), referenceId, kpiSetDTO.getId());
+        if (existByName) {
             exceptionService.duplicateDataException("error.kpi.name.duplicate");
         }
+        boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalse(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType());
+        if (existsByPhaseAndTimeType) {
+            exceptionService.duplicateDataException("A set is already exists in this phase of " + kpiSetDTO.getTimeType());
+        }
+        boolean fibonacciKPIExists = fibonacciKPIService.fibonacciKPIExists(kpiSetDTO.getKpiIds());
+        if (fibonacciKPIExists) {
+            exceptionService.actionNotPermittedException("You can't add fibonacci KPI");
+        }
+        boolean kpisBelongsToIndividual=counterRepository.allKPIsBelongsToIndividualType(kpiSetDTO.getKpiIds());
+        if(!kpisBelongsToIndividual){
+            exceptionService.actionNotPermittedException("All KPI should belongs to Individual Type");
+        }
+
     }
 
-    public void copyKPISets(Long unitId,List<Long> orgSubTypeIds,Long countryId){
-        List<KPISet> kpiSetList=kpiSetRepository.findAllByCountryIdAndDeletedFalse(Arrays.asList(14037l),18712l);
+    public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
+        List<KPISet> kpiSetList = kpiSetRepository.findAllByCountryIdAndDeletedFalse(Arrays.asList(14037l), 18712l);
     }
 }

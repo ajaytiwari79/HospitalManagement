@@ -5,6 +5,7 @@ package com.kairos.persistence.repository.counter;
  */
 
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.counter.KPISet;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -22,4 +23,6 @@ public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>
     KPISetDTO findOneById(BigInteger kpiSetId);
 
     boolean existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(String name, Long referenceId, BigInteger id);
+
+    boolean existsByPhaseIdAndTimeTypeAndDeletedFalse(BigInteger phaseId, TimeTypeEnum timeType);
 }
