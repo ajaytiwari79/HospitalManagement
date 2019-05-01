@@ -64,13 +64,13 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
                 throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.null"));
 
             } else {
-                Authentication authResult = authentication(authentication);
+                Authentication authResult = getAuthentication(authentication);
                 SecurityContextHolder.getContext().setAuthentication(authResult);
             }
         } catch (OAuth2Exception failed) {
             SecurityContextHolder.clearContext();
 
-            LOGGER.debug("Authentication request failed: " + failed);
+            LOGGER.debug("Authentication request failed: " ,failed);
 
             eventPublisher.publishAuthenticationFailure(new BadCredentialsException(failed.getMessage(), failed),
                     new PreAuthenticatedAuthenticationToken("access-token", "N/A"));
@@ -91,7 +91,7 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
     }
 
 
-    private Authentication authentication(Authentication authentication) {
+    private Authentication getAuthentication(Authentication authentication) {
 
         String token = (String) authentication.getPrincipal();
         OAuth2Authentication auth = loadAuthentication(token);

@@ -64,7 +64,7 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
                 throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.null"));
 
             } else {
-                Authentication authResult = authentication(authentication);
+                Authentication authResult = getAuthentication(authentication);
                 SecurityContextHolder.getContext().setAuthentication(authResult);
             }
         } catch (OAuth2Exception failed) {
@@ -91,7 +91,7 @@ public class CustomOAuthAuthenticationProcessingFilter extends OAuth2Authenticat
     }
 
 
-    private Authentication authentication(Authentication authentication) {
+    private Authentication getAuthentication(Authentication authentication) {
 
         String token = (String) authentication.getPrincipal();
         OAuth2Authentication auth = loadAuthentication(token);
