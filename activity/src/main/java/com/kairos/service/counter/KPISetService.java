@@ -14,17 +14,14 @@ import com.kairos.persistence.repository.counter.KPISetRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.phase.PhaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -95,13 +92,9 @@ public class KPISetService {
         if (existByName) {
             exceptionService.duplicateDataException("error.kpi.name.duplicate");
         }
-        boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalse(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType());
+        boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType());
         if (existsByPhaseAndTimeType) {
             exceptionService.duplicateDataException("A set is already exists in this phase of " + kpiSetDTO.getTimeType());
-        }
-        boolean fibonacciKPIExists = fibonacciKPIService.fibonacciKPIExists(kpiSetDTO.getKpiIds());
-        if (fibonacciKPIExists) {
-            exceptionService.actionNotPermittedException("You can't add fibonacci KPI");
         }
         boolean kpisBelongsToIndividual=counterRepository.allKPIsBelongsToIndividualType(kpiSetDTO.getKpiIds());
         if(!kpisBelongsToIndividual){

@@ -14,9 +14,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static com.kairos.constants.AppConstants.DELETED;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.unwind;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class KPISetRepositoryImpl implements CustomKPISetRepository{
     @Inject
@@ -27,8 +25,11 @@ public class KPISetRepositoryImpl implements CustomKPISetRepository{
         Aggregation aggregation=Aggregation.newAggregation(
                 match(criteria),
                 unwind("kpiIds",true),
-                lookup("orgTypeKPIEntry","kpiIds","_id","orgTypeKPIEntry"),
-                match(Criteria.where("orgTypeKPIEntry.orgTypeId").in(orgSubTypeIds))
+                lookup("orgTypeKPIEntry","kpiIds","kpiId","orgTypeKPIEntry"),
+                match(Criteria.where("orgTypeKPIEntry.orgTypeId").in(orgSubTypeIds)),
+                group("id", "name","kpiIds","timeType","phaseId","referenceId","confLevel").addToSet("orgTypeKPIEntry.kpiId").as("kpiIds"),
+                project().and("kpiIds").as("kpiIds").and("name").as("name").and("timeType").as("timeType")
+                        .and("phaseId").as("phaseId").and("referenceId").as("referenceId").and("confLevel").as("confLevel")
         );
         AggregationResults<KPISet> result = mongoTemplate.aggregate(aggregation, KPISet.class, KPISet.class);
         return result.getMappedResults();
