@@ -19,7 +19,9 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 
 import javax.inject.Inject;
 
-
+/**
+ * created by @bobby sharma
+ */
 @EnableWebSecurity
 @Configuration
 @EnableResourceServer
