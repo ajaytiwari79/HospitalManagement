@@ -31,6 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * created by @bobby sharma
+ */
 public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcessingFilter {
 
     private static Logger LOGGER = LoggerFactory.getLogger(CustomBasicAuthenticationFilter.class);
