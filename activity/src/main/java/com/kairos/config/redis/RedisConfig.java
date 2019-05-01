@@ -34,46 +34,6 @@ public class RedisConfig {
     @Value("${spring.redis.password}")
     private String password;
 
-   /* @Bean
-    RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
-                                            MessageListenerAdapter listenerAdapter) {
-
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new PatternTopic("chat"));
-        return container;
-    }
-    @Bean
-    MessageListenerAdapter listenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
-    }
-
-    @Bean
-    Receiver receiver(CountDownLatch latch) {
-        return new Receiver(latch);
-    }
-
-    @Bean
-
-    CountDownLatch latch() {
-        return new CountDownLatch(1);
-    }
-
-    @Bean
-    StringRedisTemplate template(RedisConnectionFactory connectionFactory) {
-        return new StringRedisTemplate(connectionFactory);
-    }
-
-
-
-    @Bean
-    JedisPool jedisPool(){
-        return new JedisPool(new JedisPoolConfig(),"http://localhost:6379");
-    }
-
-
-*/
-
 
     @Bean
     public RedisTemplate<String, Map<String,String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
@@ -92,14 +52,10 @@ public class RedisConfig {
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setTestOnBorrow(true);
-        poolConfig.setTestOnReturn(true);/*
-        poolConfig.setMaxTotal(env.getRedisMaxConn());
-        poolConfig.setMinIdle(env.getRedisMinIdleConn());
-        poolConfig.setMaxIdle(env.getRedisMaxIdleConn());*/
+        poolConfig.setTestOnReturn(true);
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
         standaloneConfiguration.setPassword(RedisPassword.of(password));
-        JedisConnectionFactory factory = new JedisConnectionFactory(standaloneConfiguration);
-        return factory;
+        return new JedisConnectionFactory(standaloneConfiguration);
     }
 
 }
