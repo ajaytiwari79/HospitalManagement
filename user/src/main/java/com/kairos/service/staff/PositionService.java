@@ -40,6 +40,7 @@ import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.auth.RedisService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -111,10 +112,12 @@ public class PositionService {
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject
+    private RedisService redisService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PositionService.class);
 
-    public Map<String, Object> savePositionDetail(long unitId, long staffId, StaffPositionDetail staffPositionDetail){
+    public Map<String, Object> savePositionDetail(long unitId, long staffId, StaffPositionDetail staffPositionDetail) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
@@ -556,7 +559,7 @@ public class PositionService {
 
             accessGroupRepository.createAccessGroupUnitRelation(orgIds, position.getAccessGroupIdOnPositionEnd());
             AccessGroup accessGroupDB = accessGroupRepository.findById(position.getAccessGroupIdOnPositionEnd()).get();
-            for (int currentElement = 0; currentElement< expiredPositionsQueryResult.getOrganizations().size(); currentElement++) {
+            for (int currentElement = 0; currentElement < expiredPositionsQueryResult.getOrganizations().size(); currentElement++) {
                 unitPermission = unitPermissions.get(currentElement);
                 if (!Optional.ofNullable(unitPermission).isPresent()) {
                     unitPermission = new UnitPermission();
@@ -655,8 +658,9 @@ public class PositionService {
             List<Long> positionIds = Stream.of(positionId).collect(Collectors.toList());
 
             moveToReadOnlyAccessGroup(positionIds);
-            Long staffId = positionGraphRepository.findStaffByPositionId(positionId);
-            activityIntegrationService.deleteShiftsAndOpenShift(unitId, staffId, positionEndDate);
+            Staff staff = positionGraphRepository.findStaffByPositionId(positionId);
+            activityIntegrationService.deleteShiftsAndOpenShift(unitId, staff.getId(), positionEndDate);
+            redisService.invalidateAllTokenOfUser(staff.getUser().getUserName());
         } catch (Exception ex) {
             log = ex.getMessage();
             result = Result.ERROR;
@@ -669,7 +673,7 @@ public class PositionService {
 
 
     public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long employmentId) {
-        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), employmentId,employmentDTO.getEmploymentSubType());
+        EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), employmentId, employmentDTO.getEmploymentSubType());
         if (employmentQueryResult != null) {
             if (employmentQueryResult.getEndDate() == null) {
                 exceptionService.actionNotPermittedException("message.main_employment.exists", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());
