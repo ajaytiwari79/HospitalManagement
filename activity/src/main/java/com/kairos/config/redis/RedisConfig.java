@@ -48,12 +48,12 @@ public class RedisConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public RedisConnectionFactory redisConnectionFactory() throws UnknownHostException {
+    public RedisConnectionFactory redisConnectionFactory() {
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
-        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName,redisPort);
         standaloneConfiguration.setPassword(RedisPassword.of(password));
         return new JedisConnectionFactory(standaloneConfiguration);
     }
