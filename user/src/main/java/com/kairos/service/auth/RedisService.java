@@ -56,7 +56,7 @@ public class RedisService {
         return validToken;
     }
 
-    public boolean removeUserTokenFromRedisByClientIpAddress(String userName, String accessToken) {
+    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName, String accessToken) {
         boolean tokenRemoved = false;
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {

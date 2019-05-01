@@ -157,8 +157,9 @@ public class AuthController {
      */
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @ApiOperation(value = "logout User from System")
-    ResponseEntity<Map<String, Object>> logoutUser(HttpServletRequest request, HttpServletResponse response, @RequestBody boolean logoutFromAllMachine) {
-        if (userService.logout(logoutFromAllMachine, request)) {
+    ResponseEntity<Map<String, Object>> logoutUser(HttpServletRequest request) {
+       // add boolean argument in request boay or param to logout user from different machine
+        if (userService.logout(false, request)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, false);

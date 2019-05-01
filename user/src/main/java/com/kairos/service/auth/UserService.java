@@ -232,15 +232,15 @@ public class UserService {
         boolean logoutSuccessfull = false;
         Authentication authentication = tokenExtractor.extract(request);
         if (authentication != null) {
-            logoutSuccessfull = true;
             OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication((String) authentication.getPrincipal());
             if (logoutFromAllMachine) {
                 redisService.invalidateAllTokenOfUser(oAuth2Authentication.getUserAuthentication().getName());
             } else {
-                redisService.removeUserTokenFromRedisByClientIpAddress(oAuth2Authentication.getUserAuthentication().getName(),(String) authentication.getPrincipal());
+                redisService.removeUserTokenFromRedisByUserNameAndToken(oAuth2Authentication.getUserAuthentication().getName(),(String) authentication.getPrincipal());
             }
             tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
             SecurityContextHolder.clearContext();
+            logoutSuccessfull = true;
         } else {
             exceptionService.internalServerError("message.authentication.null");
         }

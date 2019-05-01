@@ -93,7 +93,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/api/v1/login");
         web.ignoring().antMatchers("/api/v1/create_permission_schema");
         web.ignoring().antMatchers("/api/v1/forgot");
-        web.ignoring().antMatchers("/api/v1/reset");
+        web.ignoring().antMatchers("/api/v1/reset","/api/v1/logout");
 
     }
 
