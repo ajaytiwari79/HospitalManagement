@@ -232,7 +232,7 @@ public class ShiftServiceUnitTest {
         when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
-        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,startDate,endDate,false);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));

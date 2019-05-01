@@ -459,7 +459,6 @@ public class ShiftService extends MongoBaseService {
         }
         Date currentShiftStartDate=shift.getStartDate();
         Date currentShiftEndDate=shift.getEndDate();
-        boolean againEscalated=false;
         if(!byTAndAView){
             shiftValidatorService.validateStatusOfShiftActivity(shift);
         }
@@ -534,7 +533,6 @@ public class ShiftService extends MongoBaseService {
                 if (shiftOverlappedWithNonWorkingType){
                     shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING));
                     shiftViolatedRules.setEscalationResolved(false);
-                    againEscalated=true;
                 }
                 shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
                 shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
@@ -559,7 +557,7 @@ public class ShiftService extends MongoBaseService {
             shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
-        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shiftWithViolatedInfoDTO,false,currentShiftStartDate,currentShiftEndDate,againEscalated);
+        shiftValidatorService.escalationCorrectionInShift(shiftDTO,currentShiftStartDate,currentShiftEndDate);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -601,13 +599,11 @@ public class ShiftService extends MongoBaseService {
         } else {
             shifts = shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, asDate(startDate), asDate(endDate), unitId);
         }
-        //Set<BigInteger> escalationFreeShiftIds= shiftValidatorService.getEscalationFreeShifts(shifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()));
         addReasonCode(shifts, reasonCodeDTOS);
         for (ShiftDTO shift : shifts) {
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
             }
-            //shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId()));
         }
         UserAccessRoleDTO userAccessRoleDTO;
         if (isNotNull(staffAdditionalInfoDTO)) {
@@ -673,7 +669,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setId(shiftId);
         shiftDTO.setStartDate(shift.getStartDate());
         shiftDTO.setEndDate(shift.getEndDate());
-        shiftValidatorService.escalationCorrectionInShift(shiftDTO,new ShiftWithViolatedInfoDTO(),true,shift.getStartDate(),shift.getEndDate(),false);
+        shiftValidatorService.escalationCorrectionInShift(shiftDTO,shift.getStartDate(),shift.getEndDate());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift,false);
         payOutService.deletePayOut(shift.getId());

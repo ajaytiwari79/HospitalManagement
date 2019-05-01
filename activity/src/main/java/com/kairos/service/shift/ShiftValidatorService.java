@@ -855,43 +855,22 @@ public class ShiftValidatorService {
         }
     }
 
-    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, boolean deleteShift,Date oldShiftStartDate,Date oldShiftEndDate,boolean escalated) {
-            Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
-            ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
-            boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
-            boolean wtaEscalationExists = isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
-        List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
-            List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
-            Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
-            if (deleteShift) {
-                removeOverLappedEscalation(shiftDTO, overLappedShifts, shiftViolatedRulesMap);
-
-            } else {
-                if (workingTypeShift && isCollectionEmpty(overLappedShifts) && !wtaEscalationExists) {
-                    shiftDTO.getEscalationFreeShiftIds().add(shiftDTO.getId());
-                    shiftViolatedRulesMap.get(shiftDTO.getId()).setEscalationResolved(true);
-                } else {
-                    overLappedShifts.forEach(overLappedShift -> {
-                        if (!shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT) && !escalated) {
-                            shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
-                            shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
-                        }
-                    });
-                }
-            }
-            shiftViolatedRulesMongoRepository.saveAll(shiftViolatedRulesMap.values());
-            return shiftDTO;
-    }
-
-    private void removeOverLappedEscalation(ShiftDTO shiftDTO, List<Shift> overLappedShifts, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap) {
+    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO,  Date oldShiftStartDate, Date oldShiftEndDate) {
+        Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+        ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
+        boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
+        List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
         overLappedShifts.forEach(overLappedShift -> {
-            if (!shiftMongoRepository.shiftOverLapped(shiftDTO.getStaffId(), overLappedShift.getStartDate(), overLappedShift.getEndDate(), shiftDTO.getId())) {
-                if (!shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
-                    shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
-                    shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
-                }
+            if (!shiftOverLappedWithOther(overLappedShift) && !shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
+                shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
+                shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
             }
         });
+
+        shiftViolatedRulesMongoRepository.saveAll(shiftViolatedRulesMap.values());
+        return shiftDTO;
     }
 
     public Set<BigInteger> getEscalationFreeShifts(List<BigInteger> shiftIds) {
@@ -899,6 +878,11 @@ public class ShiftValidatorService {
         List<ShiftViolatedRules> escalationFreeViolatedRules = shiftViolatedRules.stream().filter(k -> k.isEscalationResolved()).collect(Collectors.toList());
         return escalationFreeViolatedRules.stream().map(k -> k.getShiftId()).collect(Collectors.toSet());
     }
+
+    private boolean shiftOverLappedWithOther(Shift shift) {
+        return shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId());
+    }
+
     private List<ShiftWithActivityDTO> updateFullDayAndFullWeekActivityShift(List<ShiftWithActivityDTO> shifts){
         for (ShiftWithActivityDTO shift : shifts) {
             if(isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())){
