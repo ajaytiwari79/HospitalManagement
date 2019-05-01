@@ -223,7 +223,6 @@ public class ShiftServiceUnitTest {
         Date startDate = shiftDTO.getStartDate();
         Date endDate = shiftDTO.getEndDate();
         ActivityWrapper activityWrapper=ObjectMapperUtils.jsonStringToObject(getActivityDetailsJson(),ActivityWrapper.class);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO=ObjectMapperUtils.jsonStringToObject(getShiftViolation(),ShiftWithViolatedInfoDTO.class);
         List<ShiftViolatedRules> shiftViolatedRules=ObjectMapperUtils.JsonStringToList(getListOfShiftViolationRules(),ShiftViolatedRules.class);
         List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
         when(shiftMongoRepository.findOne(shiftDTO.getId())).thenReturn(shift);
