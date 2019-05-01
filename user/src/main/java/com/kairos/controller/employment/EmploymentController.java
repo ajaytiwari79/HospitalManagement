@@ -52,7 +52,7 @@ public class EmploymentController {
     }
 
     /*
-     * @auth vipul
+     * @redis vipul
      * used to get all employments of organization n by organization and staff Id
      * */
     @ApiOperation(value = "Get all employment by organization and staff")
