@@ -1,8 +1,6 @@
 package com.kairos.service.redis;
 
 import com.kairos.service.exception.ExceptionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +11,6 @@ import java.util.Optional;
 @Service
 public class RedisService {
 
-    private static Logger logger = LoggerFactory.getLogger(RedisService.class);
 
     @Inject
     private RedisTemplate<String, Map<String, String>> valueOperations;

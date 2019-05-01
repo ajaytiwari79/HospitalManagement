@@ -12,7 +12,7 @@ import java.util.List;
 public class AppConfig implements IAppConfig{
 
 
-    @Value("${kairos.redis.Token}")
+    @Value("${kairos.auth.Token}")
     private String kairosAuth;
 
     @Value("${kairos.local.url}")

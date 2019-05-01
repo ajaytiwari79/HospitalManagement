@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEn
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -40,7 +41,6 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
     private ExceptionService exceptionService;
     private AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
     private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
-
 
 
     public CustomBasicAuthenticationFilter(TokenStore tokenStore, RedisService redisService, ExceptionService exceptionService) {
@@ -95,12 +95,8 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
 
         String token = (String) authentication.getPrincipal();
         OAuth2Authentication auth = loadAuthentication(token);
-        if (auth == null) {
-            throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
-        } else {
-            if (!redisService.verifyTokenInRedisServer(auth.getName(),token)) {
-                throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
-            }
+        if (!redisService.verifyTokenInRedisServer(auth.getName(), token)) {
+            throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
         }
         auth.setDetails(authentication.getDetails());
         auth.setAuthenticated(true);
@@ -137,13 +133,16 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
 
     private static final class NullEventPublisher implements AuthenticationEventPublisher {
         public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+        // method publish expection message
         }
 
         public void publishAuthenticationSuccess(Authentication authentication) {
+        // default method need to publish success authentication
         }
     }
-    private boolean removeTokenFromRedis(String userName,String accessToken) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName,accessToken);
+
+    private boolean removeTokenFromRedis(String userName, String accessToken) {
+        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, accessToken);
     }
 
 }

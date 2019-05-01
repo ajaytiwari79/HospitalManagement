@@ -42,7 +42,6 @@ public class CustomBasicAuthenticationProcessingFilter extends OAuth2Authenticat
     private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
 
 
-
     public CustomBasicAuthenticationProcessingFilter(TokenStore tokenStore, RedisService redisService, ExceptionService exceptionService) {
         this.tokenStore = tokenStore;
         this.redisService = redisService;
@@ -95,12 +94,9 @@ public class CustomBasicAuthenticationProcessingFilter extends OAuth2Authenticat
 
         String token = (String) authentication.getPrincipal();
         OAuth2Authentication auth = loadAuthentication(token);
-        if (auth == null) {
-            throw new InvalidTokenException(exceptionService.convertMessage("message.authentication.loadAuthentication.null"));
-        } else {
-            if (!redisService.verifyTokenInRedisServer(auth.getName(),token)) {
-                throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
-            }
+
+        if (!redisService.verifyTokenInRedisServer(auth.getName(), token)) {
+            throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
         }
         auth.setDetails(authentication.getDetails());
         auth.setAuthenticated(true);
@@ -137,12 +133,16 @@ public class CustomBasicAuthenticationProcessingFilter extends OAuth2Authenticat
 
     private static final class NullEventPublisher implements AuthenticationEventPublisher {
         public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+            // method publish expection message
+
         }
 
         public void publishAuthenticationSuccess(Authentication authentication) {
+            // default method need to publish success authentication
         }
     }
-    private boolean removeTokenFromRedis(String userName,String accessToken) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName,accessToken);
+
+    private boolean removeTokenFromRedis(String userName, String accessToken) {
+        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, accessToken);
     }
 }
