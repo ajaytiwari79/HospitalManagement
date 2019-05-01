@@ -653,7 +653,7 @@ public  class DateUtils {
         minutes = seconds / 60;
         hours = minutes / 60;
         minutes = minutes % 60;
-        return new Double(hours+"."+minutes);
+        return new Double(Math.abs(hours)+"."+Math.abs(minutes));
     }
 
     public static Double getHoursByMinutes(double totalMinutes){

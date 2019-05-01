@@ -208,7 +208,7 @@ public class CounterDistService extends MongoBaseService {
         return level.value + validity.value + type.value;
     }
 
-    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters) {
+    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters,Long staffId) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         if (!accessGroupPermissionCounterDTO.isCountryAdmin() && CollectionUtils.isEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds())) {
             exceptionService.actionNotPermittedException("message.staff.invalid.unit");
@@ -236,6 +236,7 @@ public class CounterDistService extends MongoBaseService {
         filters.setCountryId(countryId);
         filters.setCountryAdmin(accessGroupPermissionCounterDTO.isCountryAdmin());
         filters.setManagement(accessGroupPermissionCounterDTO.isManagement());
+        filters.setStaffId(accessGroupPermissionCounterDTO.isManagement()?staffId:accessGroupPermissionCounterDTO.getStaffId());
         Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filters, unitId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
