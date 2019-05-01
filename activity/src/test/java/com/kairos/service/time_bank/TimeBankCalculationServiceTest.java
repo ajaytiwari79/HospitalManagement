@@ -71,6 +71,11 @@ public class TimeBankCalculationServiceTest {
 
     DailyTimeBankEntry todayDailyTimeBankEntry;
 
+    static{
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
+    }
+
     @Before
     public void init(){
         staffEmploymentDetails = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(EMPLOYMENT_DETAILS),StaffEmploymentDetails.class);
