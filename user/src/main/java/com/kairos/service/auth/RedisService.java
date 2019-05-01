@@ -67,7 +67,7 @@ public class RedisService {
                 if (!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
                     exceptionService.internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
                 }
-                userTokensFromDifferentMachine.remove(accessToken);
+                userTokensFromDifferentMachine.remove(tokenKey);
                 valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
             }
             tokenRemoved = true;
