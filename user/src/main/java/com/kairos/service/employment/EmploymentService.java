@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
@@ -146,7 +147,8 @@ public class EmploymentService {
     private AsynchronousService asynchronousService;
     @Inject
     private EmploymentLineFunctionRelationShipGraphRepository employmentLineFunctionRelationRepository;
-
+    @Inject
+    private EnvConfig envConfig;
 
 
     public PositionWrapper createEmployment(Long id, String type, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
@@ -912,7 +914,7 @@ public class EmploymentService {
         Organization organization = organizationService.getOrganizationDetail(unitId, ORGANIZATION);
         Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
         // TODO MIght We dont need these details I(vipul) will verify and remove
-        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds);
+        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffEmploymentDetails.class);
         List<StaffEmploymentDetails> staffData = employmentGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
         Map<Long, StaffEmploymentDetails> staffEmploymentDetailsMap = staffData.stream().collect(Collectors.toMap(StaffEmploymentDetails::getStaffId, Function.identity()));

@@ -60,6 +60,7 @@ import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -186,6 +187,8 @@ public class StaffService {
     private TeamGraphRepository teamGraphRepository;
     @Inject
     private StaffCreationService staffCreationService;
+    @Inject
+    private RedisService redisService;
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -212,12 +215,14 @@ public class StaffService {
         return true;
     }
 
+    @Transactional
     public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
         User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
         if (passwordEncoder.matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            redisService.invalidateAllTokenOfUser(user.getUserName());
             userGraphRepository.save(user);
         } else {
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
@@ -225,12 +230,14 @@ public class StaffService {
         return true;
     }
 
+    @Transactional
     public boolean updatePasswordByManagement(Long staffId, PasswordUpdateByAdminDTO passwordUpdateDTO) {
         Staff staff = staffGraphRepository.findByStaffId(staffId);
         if (staff != null) {
             User userForStaff = staff.getUser();
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             userForStaff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            redisService.invalidateAllTokenOfUser(userForStaff.getUserName());
             userGraphRepository.save(userForStaff);
         } else {
             exceptionService.dataNotMatchedException("message.staff.notfound");
@@ -241,6 +248,7 @@ public class StaffService {
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
@@ -253,9 +261,13 @@ public class StaffService {
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
         }
+        //todo we might create a job to inactive user from particular date
+        if (StaffStatusEnum.INACTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
+            redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
+        }
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
-        if(!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
+        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
             exceptionService.actionNotPermittedException("message.employment.expertise.notchanged");
         }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
@@ -293,7 +305,16 @@ public class StaffService {
         setStaffDetails(staffToUpdate, staffPersonalDetail);
 
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
-            staffToUpdate.setUserName(staffPersonalDetail.getUserName());
+            if (!staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
+                User user = userGraphRepository.findUserByUserName("(?i)" + staffPersonalDetail.getUserName());
+                if (!Optional.ofNullable(user).isPresent()) {
+                    staffToUpdate.getUser().setUserName(staffPersonalDetail.getUserName());
+                    staffToUpdate.getUser().setUserNameUpdated(true);
+                    staffPersonalDetail.setUserNameUpdated(true);
+                } else {
+                    exceptionService.duplicateDataException("message.user.userName.already.use");
+                }
+            }
         }
 
         //saving addresses of staff
@@ -314,6 +335,7 @@ public class StaffService {
         }
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffPersonalDetail.isPregnant());
+        user.setUserName(staffPersonalDetail.getUserName());
         userGraphRepository.save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
@@ -459,17 +481,15 @@ public class StaffService {
                     userName = createNewUserName(firstName, lastName);
 
                 } else {
-                   User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
-                   if(Optional.ofNullable(user).isPresent()){
-                       StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "UserName already exist");
-                       staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
-                       staffErrorList.add(staffDTO);
-                   }else {
-                       userName = getStringValueOfIndexedCell(row, 19);
-                   }
-
+                    User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
+                    if (Optional.ofNullable(user).isPresent()) {
+                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "UserName already exist");
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                        staffErrorList.add(staffDTO);
+                    } else {
+                        userName = getStringValueOfIndexedCell(row, 19);
+                    }
                 }
-
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                 if (isCollectionNotEmpty(missingMandatoryFields) || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
                     StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Missing field(s) : " + StringUtils.join(missingMandatoryFields, ", "));
@@ -495,7 +515,6 @@ public class StaffService {
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    staff.setUserName(userName);
                     staff.setFirstName(firstName);
                     staff.setLastName(lastName);
                     staff.setFamilyName(lastName);
@@ -511,10 +530,7 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isCollectionEmpty(missingMandatoryFields)) {
-                        user = userGraphRepository.findByEmail("(?i)"+privateEmail);
-                        if (ObjectUtils.isNotNull(user)) {
-                            user = userGraphRepository.findUserByCprNumber(cprAsLong.toString());
-                        }
+                        user = userGraphRepository.findByEmail("(?i)" + privateEmail);
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
@@ -525,7 +541,8 @@ public class StaffService {
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             user.setUserName(userName);
-                            user.setUserNameUpdated(false);
+                            boolean userNameUpdated = !(String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).trim().isEmpty());
+                            user.setUserNameUpdated(userNameUpdated);
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 //user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
@@ -536,6 +553,7 @@ public class StaffService {
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                             user.setAccessToken(defaultPassword);
                         }
+                        user.setUserName(userName);
                         staff.setUser(user);
                     }
                     staffGraphRepository.save(staff);
@@ -544,7 +562,7 @@ public class StaffService {
                     staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
                     staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        staffCreationService.createEmployment(parent, unit, staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
+                        staffCreationService.createPosition(parent, unit, staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
                     }
                 }
             }
@@ -915,7 +933,7 @@ public class StaffService {
     public StaffEmploymentDetails getEmploymentOfStaff(long staffId, long unitId) {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentOfStaff(staffId, unitId);
         StaffEmploymentDetails employmentDetails = null;
-        if(Optional.ofNullable(employment).isPresent()) {
+        if (Optional.ofNullable(employment).isPresent()) {
             employmentDetails = convertEmploymentObject(employment);
             employmentDetails.setUnitId(unitId);
             List<EmploymentLinesQueryResult> data = employmentGraphRepository.findFunctionalHourlyCost(Collections.singletonList(employment.getId()));
@@ -1023,7 +1041,7 @@ public class StaffService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
-        staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(), unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()));
+        staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(), unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()));
         return staffEmploymentTypeWrapper;
     }
 

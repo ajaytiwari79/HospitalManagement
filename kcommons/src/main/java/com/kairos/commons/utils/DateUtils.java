@@ -75,6 +75,13 @@ public  class DateUtils {
         return localDateTimeToDate(startOfDay);
     }
 
+    public static Date getMidNightOfDay(Date date) {
+        LocalDateTime localDateTime = dateToLocalDateTime(date).plusDays(1);
+        LocalDateTime startOfDay = localDateTime.with(LocalTime.MIDNIGHT);
+
+        return localDateTimeToDate(startOfDay);
+    }
+
     public static Date addTimeInDate(Date date, int hour, int minute, int second) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         LocalDateTime startOfDay = localDateTime.with(LocalTime.of(hour, minute, second));

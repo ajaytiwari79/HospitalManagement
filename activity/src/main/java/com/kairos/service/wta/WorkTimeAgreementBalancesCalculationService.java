@@ -26,7 +26,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

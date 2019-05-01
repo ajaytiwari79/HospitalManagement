@@ -4,20 +4,27 @@
 
 
 // Queries related to changes from UnitPosition to employment
-db.costTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.costTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
-db.payOutPerShift.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.payOutPerShift.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
-db.shifts.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.shifts.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
-db.staffActivitySetting.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.staffActivitySetting.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
-db.dailyTimeBankEntries.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.dailyTimeBankEntries.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
-db.staffWTACounter.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.staffWTACounter.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
-db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
 db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
 db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+
+// To drop old db entries
+db.staffActivitySetting.drop();
+
+// Unique constraints on staffId and activityId
+db.staffActivitySetting.createIndex( { staffId:1,activityId:1 }, { unique: true } )

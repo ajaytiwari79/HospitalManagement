@@ -11,7 +11,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -82,6 +82,8 @@ public interface CustomShiftMongoRepository {
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
 
     boolean absenceShiftExistsByDate(Long unitId,Date startDate,Date endDate,Long staffId);
+
+    List<ShiftWithActivityDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate);
 
 
 }

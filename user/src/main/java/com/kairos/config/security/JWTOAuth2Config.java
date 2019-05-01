@@ -1,5 +1,6 @@
 package com.kairos.config.security;
 
+import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,21 +19,26 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
 @EnableAuthorizationServer
 public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Inject
+    private RedisService redisService;
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
 
     private final int ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 12 hours. But we changed it to 30 days(for testing)
 
     @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints.authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter())
                 .tokenServices(customTokenServices());
     }
@@ -40,8 +46,8 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
-        DefaultTokenServices defaultTokenServices =new  CustomDefaultTokenServices(userService);
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
+        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService);
         defaultTokenServices.setTokenStore(jwtTokenStore);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
         defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
@@ -56,18 +62,18 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         clients.inMemory()
                 .withClient("kairos")
                 .secret("$2a$10$CA3JnlNGZpRIqvBe904d1eOBjoJXX0rLatl7kMQL9mGPyGVm6xYj.")
-                .authorizedGrantTypes("refresh_token","password","client_credentials")
+                .authorizedGrantTypes("refresh_token", "password", "client_credentials")
                 .scopes("webclient", "mobileclient")
-     			.and()
-     					.withClient("activity-service")
-     					.secret("task")
-     					.authorizedGrantTypes("client_credentials", "refresh_token")
-     					.scopes("server")
-     			.and()
-     					.withClient("user-service")
-     					.secret("user")
-     					.authorizedGrantTypes("client_credentials", "refresh_token")
-     					.scopes("server");
+                .and()
+                .withClient("activity-service")
+                .secret("task")
+                .authorizedGrantTypes("client_credentials", "refresh_token")
+                .scopes("server")
+                .and()
+                .withClient("user-service")
+                .secret("user")
+                .authorizedGrantTypes("client_credentials", "refresh_token")
+                .scopes("server");
 
 
     }
@@ -76,7 +82,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
-     JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
+        JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
         //anilm2 use commented code if certificate not install
         converter.setSigningKey("123456");
         /*try{
@@ -97,7 +103,14 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         oauthServer.passwordEncoder(passwordEncoder());
     }
 
+
+
+
+
+
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 }

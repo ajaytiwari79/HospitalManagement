@@ -15,6 +15,7 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -25,8 +26,6 @@ import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -219,7 +218,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, KPIRepresentation kpiRepresentation, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap,List<ShiftWithActivityDTO> shifts){
-        Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap = new HashedMap();
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap;
         switch (kpiRepresentation) {
             case REPRESENT_PER_STAFF:
                 objectListMap= getTotalHoursOfTimeSlotByStaff(staffIds,shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap);

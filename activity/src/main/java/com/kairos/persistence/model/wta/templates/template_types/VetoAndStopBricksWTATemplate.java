@@ -7,7 +7,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 

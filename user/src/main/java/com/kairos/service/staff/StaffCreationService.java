@@ -126,7 +126,7 @@ public class StaffCreationService {
             LOGGER.info("Creating new staff with kmd external id " + payload.getExternalId() + " in unit " + unit.getId());
             staff = new Staff();
         }
-        staff.setUserName(payload.getUserName());
+        //staff.setUserName(payload.getUserName());
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
         staff.setExternalId(payload.getExternalId());
@@ -192,7 +192,7 @@ public class StaffCreationService {
         }
     }
 
-    public void createEmployment(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
+    public void createPosition(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if(!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
@@ -298,7 +298,6 @@ public class StaffCreationService {
         adminAsStaff.setLastName(admin.getLastName());
         adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail(admin.getEmail());
-        adminAsStaff.setUserName(admin.getEmail());
         staffGraphRepository.save(adminAsStaff);
 
         List<Organization> organizations = organizationGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
@@ -399,12 +398,13 @@ public class StaffCreationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
+        user.setUserName(payload.getUserName());
         staff = createStaffObject(parent, unit, payload);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
         staffService.addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
+        createPosition(parent, unit, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), isEmploymentExist);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
         return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge(
 
@@ -460,7 +460,7 @@ public class StaffCreationService {
             boolean isEmploymentExist = (staff.getId()) != null;
             staff.setUser(user);
             staffGraphRepository.save(staff);
-            createEmployment(organization, organization, staff, payload.getAccessGroupId(), null, isEmploymentExist);
+            createPosition(organization, organization, staff, payload.getAccessGroupId(), null, isEmploymentExist);
         }
         return true;
     }
