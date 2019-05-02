@@ -34,7 +34,7 @@ import java.time.LocalDate;
 @ComponentScan(basePackages = "com.planner")
 @EnableAsync
 @EnableScheduling
-@SpringBootApplication(exclude = {RedisConfig.class, RedisService.class})
+@SpringBootApplication
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableNeo4jRepositories(basePackages ={"com.planner.repository"})
