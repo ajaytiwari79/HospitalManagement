@@ -31,8 +31,8 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int redisPort;
 
-    @Value("${spring.redis.password}")
-    private String password;
+    @Value("${spring.redis.passcode}")
+    private String passcode;
 
 
     @Bean
@@ -54,7 +54,7 @@ public class RedisConfig {
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName,redisPort);
-        standaloneConfiguration.setPassword(RedisPassword.of(password));
+        standaloneConfiguration.setPassword(RedisPassword.of(passcode));
         return new JedisConnectionFactory(standaloneConfiguration);
     }
 
