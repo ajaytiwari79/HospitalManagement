@@ -90,15 +90,15 @@ public class KPISetService {
         }
         boolean existByName = kpiSetRepository.existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(kpiSetDTO.getName().trim(), referenceId, kpiSetDTO.getId());
         if (existByName) {
-            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+            exceptionService.duplicateDataException("message.kpi_set.name.duplicate");
         }
         boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType(),kpiSetDTO.getId());
         if (existsByPhaseAndTimeType) {
-            exceptionService.duplicateDataException("A set is already exists in this phase of " + kpiSetDTO.getTimeType());
+            exceptionService.duplicateDataException("message.kpi_set.exist.phase_and_time_type");
         }
         boolean kpisBelongsToIndividual=counterRepository.allKPIsBelongsToIndividualType(kpiSetDTO.getKpiIds(),confLevel,referenceId);
         if(!kpisBelongsToIndividual){
-            exceptionService.actionNotPermittedException("All KPI should belongs to Individual Type");
+            exceptionService.actionNotPermittedException("message.kpi_set.belongs_to.individual");
         }
 
     }
