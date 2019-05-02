@@ -38,9 +38,9 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
      * @param countryId
      * @return
      */
-    @Query("Match(c:Country) where id(c)={0} with c " +
-            "Match (os:OrganizationService)<-[:" + HAS_ORGANIZATION_SERVICES + "]-(c) " +
-            "Match (osSub:OrganizationService)<-[:" + ORGANIZATION_SUB_SERVICE + "]-(os) " +
+    @Query("Match(c:Country{deleted:false}) where id(c)={0} with c " +
+            "Match (os:OrganizationService{deleted:false})<-[:" + HAS_ORGANIZATION_SERVICES + "]-(c) " +
+            "Match (osSub:OrganizationService{deleted:false})<-[:" + ORGANIZATION_SUB_SERVICE + "]-(os) " +
             "return id(os) as id,os.name as name,CASE WHEN osSub IS NULL THEN [] ELSE collect({id:id(osSub),name:osSub.name}) END as organizationSubServices")
     List<OrganizationServiceQueryResult> getAllOrganizationServices(Long countryId);
 
