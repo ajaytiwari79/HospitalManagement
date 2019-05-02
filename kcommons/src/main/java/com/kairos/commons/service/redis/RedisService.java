@@ -61,7 +61,7 @@ public class RedisService extends CommonsExceptionUtil {
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
             String tokenKey=getTokenKey(accessToken);
-            if (Integer.valueOf(userTokensFromDifferentMachine.size()).equals(1))
+            if (userTokensFromDifferentMachine.size()==1)
                 valueOperations.delete(userName);
             else {
                 if (!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
