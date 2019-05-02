@@ -84,6 +84,8 @@ dependencies {
     compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'
 
     compile group: 'com.twilio.sdk', name: 'twilio-java-sdk', version: '6.3.0'
+    compile('org.springframework.data:spring-data-redis:2.0.3.RELEASE')
+    compile('redis.clients:jedis:2.9.0')
 
 
     compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'

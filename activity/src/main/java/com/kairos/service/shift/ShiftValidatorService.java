@@ -416,7 +416,7 @@ public class ShiftValidatorService {
                                 || (rankOfExisting.getRank() > rankOfReplaced.getRank() && BALANCED.equals(staffingLevelForReplacedActivity))
                                 || (BALANCED.equals(staffingLevelForReplacedActivity) && BALANCED.equals(staffingLevelForExistingActivity))
                                 || (staffingLevelForReplacedActivity == null && rankOfExisting.getRank() > rankOfReplaced.getRank())
-                                ) {
+                        ) {
                             logger.info("shift can be replaced");
                         } else {
                             exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
@@ -524,7 +524,7 @@ public class ShiftValidatorService {
             if (CollectionUtils.isEmpty(staffingLevels)) {
                 exceptionService.actionNotPermittedException("message.staffingLevel.absent");
             }
-            List<Shift> shifts =  checkOverStaffing ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(shiftStartDate, shiftEndDate, shift.getUnitId(), shift.getId()) : shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
+            List<Shift> shifts = checkOverStaffing ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(shiftStartDate, shiftEndDate, shift.getUnitId(), shift.getId()) : shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
             List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             StaffingLevel staffingLevel = staffingLevels.get(0);
             for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -584,7 +584,9 @@ public class ShiftValidatorService {
         }
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
             int shiftsCount = 0;
-            Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
+            Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream()
+                    .filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId()))
+                    .findFirst();
             if (staffingLevelActivity.isPresent()) {
                 ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getFrom());
                 ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getTo());
@@ -604,11 +606,14 @@ public class ShiftValidatorService {
                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                 }
 
-                if (isNotNull(parentActivity) && checkOverStaffing) {
+                if (isNotNull(parentActivity)) {
                     applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().forEach(staffingLevelActivityObj ->
                             {
-                                if (staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()) {
+
+                                if (checkOverStaffing && staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()) {
                                     exceptionService.actionNotPermittedException("message.shift.overStaffing");
+                                } else if (!checkOverStaffing && staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() <= staffingLevelActivityObj.getMinNoOfStaff()) {
+                                    exceptionService.actionNotPermittedException("message.shift.underStaffing");
                                 }
                             }
                     );
@@ -855,7 +860,7 @@ public class ShiftValidatorService {
         }
     }
 
-    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO,  Date oldShiftStartDate, Date oldShiftEndDate) {
+    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, Date oldShiftStartDate, Date oldShiftEndDate) {
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
@@ -883,9 +888,9 @@ public class ShiftValidatorService {
         return shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId());
     }
 
-    private List<ShiftWithActivityDTO> updateFullDayAndFullWeekActivityShift(List<ShiftWithActivityDTO> shifts){
+    private List<ShiftWithActivityDTO> updateFullDayAndFullWeekActivityShift(List<ShiftWithActivityDTO> shifts) {
         for (ShiftWithActivityDTO shift : shifts) {
-            if(isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())){
+            if (isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())) {
                 Date startDate = getStartOfDay(shift.getStartDate());
                 Date endDate = getMidNightOfDay(shift.getEndDate());
                 shift.getActivities().get(0).setStartDate(startDate);
@@ -897,7 +902,7 @@ public class ShiftValidatorService {
         return shifts;
     }
 
-    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO){
+    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
         return activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK) || activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION);
     }
 
