@@ -203,7 +203,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                         and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod)),
                 lookup("phases", "currentPhaseId", "_id", "phase"),
-                project("phase._id", "phase.name")
+                project().and("phase").arrayElementAt(0).as("phase"),
+                project("phase._id", "phase.name","phase.phaseEnum")
         );
         AggregationResults<Phase> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, Phase.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
