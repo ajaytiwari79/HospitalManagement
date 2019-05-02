@@ -61,6 +61,7 @@ public class AbsenceShiftService {
     @Inject private TimeBankService timeBankService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
+    @Inject private ShiftStatusService shiftStatusService;
 
     public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean shiftOverlappedWithNonWorkingType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
@@ -203,11 +204,7 @@ public class AbsenceShiftService {
             }
             shift.setPlanningPeriodId(planningPeriodByShift.get().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
-            if(isNull(shift.getId()) && validPhaseForPublishingShift.contains(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()).getPhaseEnum())){
-                for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
-                }
-            }
+            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());
