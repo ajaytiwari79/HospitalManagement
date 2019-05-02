@@ -2,6 +2,7 @@ package com.kairos.persistence.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.HousingType;
@@ -22,19 +23,19 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class ContactAddress extends UserBaseEntity{
-
+    @KPermissionField
     private String street;
-
+    @KPermissionField
     private int floorNumber;
-
+    @KPermissionField
     private String houseNumber;
-
+    @KPermissionField
     private String city;
-
+    @KPermissionField
     private String regionCode;
 
     private String regionName;
-
+    @KPermissionField
     private String province;
 
     @Relationship(type = TYPE_OF_HOUSING)
@@ -50,6 +51,7 @@ public class ContactAddress extends UserBaseEntity{
 
     private long endDate;
 
+    @KPermissionField
     private String country;
 
     private boolean privateAddress;
@@ -64,8 +66,10 @@ public class ContactAddress extends UserBaseEntity{
         return isAddressProtected;
     }
 
+    @KPermissionField
     private boolean isAddressProtected;
 
+    @KPermissionField
     private String streetUrl;
 
     private boolean isEnabled = true;
@@ -77,13 +81,14 @@ public class ContactAddress extends UserBaseEntity{
 
     @Relationship(type = CURRENCY)
     private Currency currency;
-
+    @KPermissionField
     @Relationship(type = ZIP_CODE)
     private ZipCode zipCode;
 
     @Relationship(type = ADDRESS_ACCESS_DEAILS)
     private AccessToLocation accessToLocation;
 
+    @KPermissionField
     @Relationship(type = MUNICIPALITY)
     private Municipality municipality;
 

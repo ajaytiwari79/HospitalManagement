@@ -97,7 +97,7 @@ public class TimeBankCalculationService {
 
     public DailyTimeBankEntry calculateDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS, boolean validatedByPlanner) {
         boolean anyShiftPublish = false;
-        int contractualMinutes = getContractualMinutesByDate(planningPeriodIntervals, DateUtils.asLocalDate(shifts.get(0).getStartDate()), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
+        int contractualMinutes = getContractualMinutesByDate(planningPeriodIntervals, dateTimeInterval.getStartLocalDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
         if(isCollectionNotEmpty(shifts)) {
             int totalDailyPlannedMinutes = 0;
             int scheduledMinutesOfTimeBank = 0;

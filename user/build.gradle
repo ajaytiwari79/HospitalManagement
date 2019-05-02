@@ -60,8 +60,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile('org.springframework.boot:spring-boot-starter-security')
-
-
+    
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')

@@ -72,7 +72,7 @@ public class PhaseService extends MongoBaseService {
                 phases.add(phase);
             }
             if (!phases.isEmpty()) {
-                save(phases);
+                phaseMongoRepository.saveEntities(phases);
             }
         }
         return phases;

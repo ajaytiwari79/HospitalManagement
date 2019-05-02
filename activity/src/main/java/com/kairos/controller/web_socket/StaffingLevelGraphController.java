@@ -27,7 +27,7 @@ import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
 public class StaffingLevelGraphController {
-    Logger logger = LoggerFactory.getLogger(StaffingLevelGraphController.class);
+    private static final Logger logger = LoggerFactory.getLogger(StaffingLevelGraphController.class);
 
     @Autowired
     private StaffingLevelService staffingLevelService;

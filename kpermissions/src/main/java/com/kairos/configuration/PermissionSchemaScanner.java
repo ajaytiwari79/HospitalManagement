@@ -1,8 +1,8 @@
 package com.kairos.configuration;
 
-import com.kairos.annotations.PermissionField;
-import com.kairos.annotations.PermissionModel;
-import com.kairos.annotations.PermissionSubModel;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionModel;
+import com.kairos.annotations.KPermissionSubModel;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
@@ -23,15 +23,15 @@ public class PermissionSchemaScanner {
         List<Map<String, Object>> modelData = new ArrayList<>();
         try {
             Reflections reflections = new Reflections(ClasspathHelper.forPackage(domainPackagePath));
-            reflections.getTypesAnnotatedWith(PermissionModel.class).stream()
+            reflections.getTypesAnnotatedWith(KPermissionModel.class).stream()
                     .forEach( permissionClass -> {
                         Map<String, Object> modelMetaData= new HashMap<>();
                         Set<Map<String, String>> fields = new HashSet<>();
                         Arrays.stream(permissionClass.getDeclaredFields())
-                                .filter(entityField -> entityField.isAnnotationPresent(PermissionField.class))
+                                .filter(entityField -> entityField.isAnnotationPresent(KPermissionField.class))
                                 .forEach(permissionEntityField -> {
                                     Map<String, String> fieldsData = new HashMap<>();
-                                    PermissionField annotation = permissionEntityField.getAnnotation(PermissionField.class);
+                                    KPermissionField annotation = permissionEntityField.getAnnotation(KPermissionField.class);
                                     fieldsData.put(FIELD_NAME,permissionEntityField.getName());
                                     fields.add(fieldsData);
                                 });
@@ -52,7 +52,7 @@ public class PermissionSchemaScanner {
     private List<Map<String, Object>> findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
         List<Map<String, Object>> subModelData = new ArrayList<>();
         Arrays.stream(permissionClass.getDeclaredFields())
-                .filter(entityField -> entityField.isAnnotationPresent(PermissionSubModel.class))
+                .filter(entityField -> entityField.isAnnotationPresent(KPermissionSubModel.class))
                 .forEach(permissionField -> {
                     Map<String, Object> subModelMetaData= new HashMap<>();
                     Set<Map<String, String>> subModelFields = new HashSet<>();
@@ -64,7 +64,7 @@ public class PermissionSchemaScanner {
                             Class fieldArgClass = (Class) fieldArgType;
                             getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(),subModelFields);
                             for (Field subModelField : fieldArgClass.getDeclaredFields()) {
-                                if (subModelField.isAnnotationPresent(PermissionField.class)) {
+                                if (subModelField.isAnnotationPresent(KPermissionField.class)) {
                                     Map<String, String> fieldsData = new HashMap<>();
                                     fieldsData.put(FIELD_NAME,subModelField.getName());
                                     subModelFields.add(fieldsData);
@@ -85,7 +85,7 @@ public class PermissionSchemaScanner {
 
             private void getFieldsOFModelAndSubModel(Field[] fields, Set<Map<String, String>> subModelFields){
                 for (Field field : fields) {
-                    if (field.isAnnotationPresent(PermissionField.class)) {
+                    if (field.isAnnotationPresent(KPermissionField.class)) {
                         Map<String, String> fieldsData = new HashMap<>();
                         fieldsData.put(FIELD_NAME,field.getName());
                         subModelFields.add(fieldsData);

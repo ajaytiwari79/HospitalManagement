@@ -7,10 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface PermissionField {
-
-    public boolean enabled() default true;
-    //public String value();
+@Target(ElementType.TYPE)
+public @interface KPermissionModel {
 
 }

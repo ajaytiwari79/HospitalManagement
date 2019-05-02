@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public interface FibonacciKPIRepository extends MongoBaseRepository<FibonacciKPI, BigInteger> ,CustomFibonacciKPIRepository{
 
@@ -16,4 +17,6 @@ public interface FibonacciKPIRepository extends MongoBaseRepository<FibonacciKPI
 
     @Query("{deleted:false,referenceId:?0,confLevel:?1}")
     List<FibonacciKPIDTO> findAllFibonacciKPIByCountryId(Long referenceId, ConfLevel confLevel);
+
+    boolean existsByIdIn(Set<BigInteger> kpiIds);
 }

@@ -4,6 +4,8 @@ import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.FilterType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -15,8 +17,8 @@ import java.util.List;
  * pradeep
  * 10/4/19
  */
-//@Setter
-//@Getter
+@Setter
+@Getter
 public class FibonacciKPIDTO {
 
     private BigInteger id;
@@ -33,92 +35,4 @@ public class FibonacciKPIDTO {
     private BigInteger categoryId;
     private boolean fibonacciKPI;
     private List<KPIDTO> kpiCounters;
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getReferenceId() {
-        return referenceId;
-    }
-
-    public void setReferenceId(Long referenceId) {
-        this.referenceId = referenceId;
-    }
-
-    public ConfLevel getConfLevel() {
-        return confLevel;
-    }
-
-    public void setConfLevel(ConfLevel confLevel) {
-        this.confLevel = confLevel;
-    }
-
-    public List<FilterType> getFilterTypes() {
-        return filterTypes;
-    }
-
-    public void setFilterTypes(List<FilterType> filterTypes) {
-        this.filterTypes = filterTypes;
-    }
-
-    public List<FilterCriteria> getCriteriaList() {
-        return criteriaList;
-    }
-
-    public void setCriteriaList(List<FilterCriteria> criteriaList) {
-        this.criteriaList = criteriaList;
-    }
-
-    public List<FibonacciKPIConfigDTO> getFibonacciKPIConfigs() {
-        return fibonacciKPIConfigs;
-    }
-
-    public void setFibonacciKPIConfigs(List<FibonacciKPIConfigDTO> fibonacciKPIConfigs) {
-        this.fibonacciKPIConfigs = fibonacciKPIConfigs;
-    }
-
-    public BigInteger getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(BigInteger categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public boolean isFibonacciKPI() {
-        return fibonacciKPI;
-    }
-
-    public void setFibonacciKPI(boolean fibonacciKPI) {
-        this.fibonacciKPI = fibonacciKPI;
-    }
-
-    public List<KPIDTO> getKpiCounters() {
-        return kpiCounters;
-    }
-
-    public void setKpiCounters(List<KPIDTO> kpiCounters) {
-        this.kpiCounters = kpiCounters;
-    }
-
-    public void setTitle(String title) {
-        this.title = title.trim();
-    }
 }

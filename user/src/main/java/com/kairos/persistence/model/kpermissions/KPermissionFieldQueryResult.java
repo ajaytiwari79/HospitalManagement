@@ -9,8 +9,8 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @Setter
 @NoArgsConstructor
 @QueryResult
-public class PermissionFieldQueryResult {
-    private PermissionField permissionField;
-    private PermissionModel permissionModel;
+public class KPermissionFieldQueryResult {
+    private KPermissionField KPermissionField;
+    private KPermissionModel KPermissionModel;
 
 }

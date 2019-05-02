@@ -5,6 +5,9 @@ package com.kairos.dto.activity.counter.configuration;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.enums.DurationType;
+import com.kairos.enums.kpi.Interval;
+import com.kairos.enums.kpi.KPIRepresentation;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
@@ -26,6 +29,11 @@ public class CounterDTO {
     //selected filer by staff
     private List<FilterCriteria> selectedFilters;
     private Set<ModuleType> supportedModuleTypes;
+    private KPIRepresentation kpiRepresentation;
+    private DurationType frequencyType;
+    // frequency value
+    private int value;
+    private Interval interval;
 
     public CounterDTO() {
         //Default Constructor
@@ -110,5 +118,38 @@ public class CounterDTO {
 
     public void setCalculationFormula(String calculationFormula) {
         this.calculationFormula = calculationFormula;
+    }
+
+    public DurationType getFrequencyType() {
+        return frequencyType;
+    }
+
+    public void setFrequencyType(DurationType frequencyType) {
+        this.frequencyType = frequencyType;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Interval interval) {
+        this.interval = interval;
+    }
+
+    public KPIRepresentation getKpiRepresentation() {
+
+        return kpiRepresentation;
+    }
+
+    public void setKpiRepresentation(KPIRepresentation kpiRepresentation) {
+        this.kpiRepresentation = kpiRepresentation;
     }
 }

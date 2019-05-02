@@ -34,7 +34,6 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
         log.info("setting user details into authencation {}",details);
         authentication.setDetails(details);
         UserContext.setUserDetails(details);
-
         return authentication;
     }
 }

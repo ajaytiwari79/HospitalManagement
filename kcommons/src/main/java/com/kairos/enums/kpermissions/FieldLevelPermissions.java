@@ -4,7 +4,8 @@ public enum FieldLevelPermissions {
     READ("Read"),
     WRITE("Write"),
     HIDE("Hide"),
-    DELETE("Delete");
+    DELETE("Delete"),
+    MASK("Mask");
 
     private final String value;
 
