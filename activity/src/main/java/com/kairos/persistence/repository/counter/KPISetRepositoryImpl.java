@@ -28,7 +28,7 @@ public class KPISetRepositoryImpl implements CustomKPISetRepository{
                 lookup("orgTypeKPIEntry","kpiIds","kpiId","orgTypeKPIEntry"),
                 match(Criteria.where("orgTypeKPIEntry.orgTypeId").in(orgSubTypeIds)),
                 group("id", "name","kpiIds","timeType","phaseId","referenceId","confLevel").addToSet("orgTypeKPIEntry.kpiId").as("kpiIds"),
-                project().and("kpiIds").as("kpiIds").and("name").as("name").and("timeType").as("timeType")
+                project().and("kpiIds").arrayElementAt(0).as("kpiIds").and("name").as("name").and("timeType").as("timeType")
                         .and("phaseId").as("phaseId").and("referenceId").as("referenceId").and("confLevel").as("confLevel")
         );
         AggregationResults<KPISet> result = mongoTemplate.aggregate(aggregation, KPISet.class, KPISet.class);

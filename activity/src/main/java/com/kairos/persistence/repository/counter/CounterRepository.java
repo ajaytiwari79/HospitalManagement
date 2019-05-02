@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.DELETED;
+import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
 import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -93,7 +94,7 @@ public class CounterRepository {
     }
 
     //removal of counters
-    public void removeAll(String fieldName, List values, Class claz , ConfLevel level ) {
+    public void removeAll(String fieldName, List values, Class claz, ConfLevel level) {
         Query query = new Query(Criteria.where("deleted").is(false).and("level").is(level).and(fieldName).in(values));
         mongoTemplate.remove(query, claz);
     }
@@ -201,7 +202,7 @@ public class CounterRepository {
 
 
     public List<CategoryKPIMappingDTO> getKPIsMappingForCategoriesForStaff(Set<BigInteger> kpiIds, Long refId, ConfLevel level) {
-        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        String queryField = (COUNTRY.equals(level)) ? "countryId" : "unitId";
         Aggregation ag = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and(queryField).is(refId).and("level").is(level)),
                 lookup("categoryKPIConf", "_id", "categoryId", "category"),
@@ -228,11 +229,11 @@ public class CounterRepository {
 
     public List<TabKPIDTO> getTabKPIIdsByTabIds(String tabId, Long refId, Long countryId, ConfLevel level) {
         Criteria criteria = null;
-        if (ConfLevel.COUNTRY.equals(level)) {
+        if (COUNTRY.equals(level)) {
             criteria = Criteria.where("deleted").is(false).and("tabId").is(tabId).and("countryId").is(refId).and("level").is(level);
         } else {
             criteria = Criteria.where("deleted").is(false).and("tabId").is(tabId).orOperator(Criteria.where("countryId").is(countryId).and("level")
-                    .is(ConfLevel.COUNTRY).and("kpiValidity").in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("unitId").is(refId).and("level").is(level));
+                    .is(COUNTRY).and("kpiValidity").in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("unitId").is(refId).and("level").is(level));
         }
         Aggregation aggregation = Aggregation.newAggregation(match(criteria),
                 lookup("counter", "kpiId", "_id", "kpis"),
@@ -262,11 +263,11 @@ public class CounterRepository {
 
     public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffIdPriority(String tabId, List<BigInteger> kpiIds, Long staffId, Long countryId, Long unitId, ConfLevel level) {
         Criteria criteria = Criteria.where("deleted").is(false).and("tabId").is(tabId).orOperator(Criteria.where("unitId").is(unitId).and("level").is(ConfLevel.UNIT).
-                and("kpiValidity").in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("countryId").is(countryId).and("level").is(ConfLevel.COUNTRY).and("kpiValidity").
+                and("kpiValidity").in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("countryId").is(countryId).and("level").is(COUNTRY).and("kpiValidity").
                 in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
         if (kpiIds.isEmpty()) {
             criteria = Criteria.where("deleted").is(false).and("tabId").is(tabId).orOperator(Criteria.where("unitId").is(unitId).and("level").is(ConfLevel.UNIT).
-                    and("kpiValidity").in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("countryId").is(countryId).and("level").is(ConfLevel.COUNTRY).and("kpiValidity").
+                    and("kpiValidity").in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("countryId").is(countryId).and("level").is(COUNTRY).and("kpiValidity").
                     in(KPIValidity.MANDATORY, KPIValidity.OPTIONAL), Criteria.where("staffId").is(staffId).and("level").is(level));
         }
         Aggregation aggregation = Aggregation.newAggregation(
@@ -351,7 +352,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         mongoTemplate.remove(query, TabKPIConf.class);
     }
 
-    public void removeDashboardTabOfStaff(Long staffId,Long unitId, ConfLevel level) {
+    public void removeDashboardTabOfStaff(Long staffId, Long unitId, ConfLevel level) {
         Query query = new Query(Criteria.where("deleted").is(false).and("staffId").in(staffId).and("unitId").is(unitId).and("level").is(level));
         mongoTemplate.remove(query, KPIDashboard.class);
     }
@@ -438,7 +439,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                 match(Criteria.where("deleted").is(false).and("staffId").is(refId).and("level").is(level).and("copy").is(copy)),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
                 project().and("kpi").arrayElementAt(0).as("kpi"),
-                Aggregation.group("kpi._id", "kpi.title", "kpi.counter","kpi.type"),
+                Aggregation.group("kpi._id", "kpi.title", "kpi.counter", "kpi.type"),
                 project().and("_id").as("_id").and("kpi.type").as("type")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
@@ -454,7 +455,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                 match(Criteria.where("applicableKpi.staffId").is(staffId)),
                 lookup("counter", "applicableKpi.activeKpiId", "_id", "kpi"),
                 project().and("kpi").arrayElementAt(0).as("kpi"),
-                Aggregation.group("kpi._id", "kpi.title", "kpi.counter","kpi.type"),
+                Aggregation.group("kpi._id", "kpi.title", "kpi.counter", "kpi.type"),
                 project().and("_id").as("_id").and("kpi.type").as("type")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
@@ -565,16 +566,17 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
-    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(Long unitId,ConfLevel level, List<Long> staffIds) {
+    public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(Long unitId, ConfLevel level, List<Long> staffIds) {
         Criteria matchCriteria = Criteria.where("deleted").is(false).and("unitId").is(unitId).and("staffId").in(staffIds).and("level").is(level);
         Query query = new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
-    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds){
-        Criteria matchCriteria = Criteria.where("activeKpiId").in(kpiIds).and("kpiRepresentation").is(INDIVIDUAL_STAFF).and(DELETED).is(false);
+    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds, ConfLevel confLevel, Long referenceId) {
+        String queryField = getRefQueryField(confLevel);
+        Criteria matchCriteria = Criteria.where("activeKpiId").in(kpiIds).and("kpiRepresentation").is(INDIVIDUAL_STAFF).and(DELETED).is(false).and(queryField).is(referenceId).and("level").is(confLevel);
         Query query = new Query(matchCriteria);
-        return mongoTemplate.find(query,ApplicableKPI.class).size()==kpiIds.size();
+        return mongoTemplate.find(query, ApplicableKPI.class).size() == kpiIds.size();
     }
 
 
