@@ -248,13 +248,8 @@ public class ShiftServiceUnitTest {
         Date startDate = shiftDTO.getStartDate();
         Date endDate = shiftDTO.getEndDate();
         ActivityWrapper activityWrapper=ObjectMapperUtils.jsonStringToObject(getActivityDetailsJson(),ActivityWrapper.class);
-        List<ShiftViolatedRules> shiftViolatedRules=ObjectMapperUtils.JsonStringToList(getListOfShiftViolationRules(),ShiftViolatedRules.class);
-        List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
-        when(shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId())).thenReturn(true);
         when(shiftMongoRepository.findOne(shiftDTO.getId())).thenReturn(shift);
         when(activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId())).thenReturn(activityWrapper);
-        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()))).thenReturn(shiftViolatedRules);
-        when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
         ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
