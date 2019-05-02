@@ -24,7 +24,6 @@ public class KPISetRepositoryImpl implements CustomKPISetRepository{
         Criteria criteria=Criteria.where("referenceId").is(countryId).and(DELETED).is(false);
         Aggregation aggregation=Aggregation.newAggregation(
                 match(criteria),
-                unwind("kpiIds",true),
                 lookup("orgTypeKPIEntry","kpiIds","kpiId","orgTypeKPIEntry"),
                 match(Criteria.where("orgTypeKPIEntry.orgTypeId").in(orgSubTypeIds)),
                 group("id", "name","kpiIds","timeType","phaseId","referenceId","confLevel").addToSet("orgTypeKPIEntry.kpiId").as("kpiIds"),
