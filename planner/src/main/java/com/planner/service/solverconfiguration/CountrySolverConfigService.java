@@ -150,7 +150,9 @@ public class CountrySolverConfigService {
                     countryConstraints.add(new CountryConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
                 }
             }
-            constraintsRepository.saveList(countryConstraints);
+            if(isCollectionNotEmpty(countryConstraints)) {
+                constraintsRepository.saveList(countryConstraints);
+            }
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             List<BigInteger> countraintids = countryConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
             countrySolverConfig.setConstraintIds(countraintids);
