@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.client.ClientEnum;
 import com.kairos.enums.Gender;
+import com.kairos.enums.client.ClientEnum;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
 

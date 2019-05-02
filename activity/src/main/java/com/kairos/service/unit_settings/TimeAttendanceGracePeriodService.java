@@ -1,10 +1,10 @@
 package com.kairos.service.unit_settings;
 
+import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

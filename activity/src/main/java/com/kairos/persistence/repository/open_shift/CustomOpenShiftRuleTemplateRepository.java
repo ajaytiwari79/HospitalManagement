@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.open_shift;
 
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
+
 import java.util.List;
 
 

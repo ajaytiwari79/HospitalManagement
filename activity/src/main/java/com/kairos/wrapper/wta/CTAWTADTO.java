@@ -1,9 +1,7 @@
 package com.kairos.wrapper.wta;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 
 public class CTAWTADTO {
     private CTAResponseDTO cta;

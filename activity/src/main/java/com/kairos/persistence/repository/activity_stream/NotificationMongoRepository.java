@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.activity_stream;
 
 import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.math.BigInteger;
 import java.util.List;

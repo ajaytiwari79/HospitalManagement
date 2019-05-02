@@ -6,12 +6,9 @@ import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 import com.kairos.scheduler.service.scheduler_panel.UserToSchedulerQueueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-
-import static com.kairos.scheduler.constants.AppConstants.USER_TO_SCHEDULER_JOB_QUEUE_TOPIC;
 
 @Component
 public class UserToSchedulerJobQueueListener {
@@ -27,7 +24,7 @@ public class UserToSchedulerJobQueueListener {
     //@KafkaListener(topics=USER_TO_SCHEDULER_JOB_QUEUE_TOPIC)
     public void processMessage(String message) {
         try {
-            KairosScheduleJobDTO job = ObjectMapperUtils.JsonStringToObject(message,KairosScheduleJobDTO.class);
+            KairosScheduleJobDTO job = ObjectMapperUtils.jsonStringToObject(message,KairosScheduleJobDTO.class);
             userToSchedulerQueueService.handleJob(job);
 
             logger.info("received content = '{}'", job.toString());

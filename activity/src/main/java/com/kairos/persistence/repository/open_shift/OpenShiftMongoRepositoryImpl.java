@@ -1,12 +1,9 @@
 package com.kairos.persistence.repository.open_shift;
 
 import com.kairos.persistence.model.open_shift.OpenShift;
-
-
 import com.kairos.persistence.model.open_shift.OpenShiftActivityWrapper;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -15,9 +12,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * Created by vipul on 14/5/18.

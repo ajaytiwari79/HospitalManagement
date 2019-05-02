@@ -2,15 +2,15 @@ package com.kairos.dto.activity.shift;
 
 public class ShiftCountDTO {
 
-    private Long unitPositionId;
+    private Long employmentId;
     private Integer count;
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Integer getCount() {

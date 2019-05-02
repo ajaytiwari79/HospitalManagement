@@ -1,9 +1,10 @@
 package com.kairos.service;
+
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
@@ -36,6 +38,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
+    @Deprecated
     public <T extends MongoBaseEntity> T save(@Valid T entity){
 
         Assert.notNull(entity, "Entity must not be null!");
@@ -66,6 +69,7 @@ public class MongoBaseService {
         return entity;
     }
 
+    @Deprecated
     public <T extends MongoBaseEntity> List<T> save(@Valid List<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
@@ -161,6 +165,7 @@ public class MongoBaseService {
         }
     }
 
+    @Deprecated
     public <T extends MongoBaseEntity> Set<T> save(@Valid Set<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");

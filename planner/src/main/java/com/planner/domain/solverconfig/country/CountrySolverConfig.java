@@ -2,15 +2,13 @@ package com.planner.domain.solverconfig.country;
 
 import com.planner.domain.solverconfig.common.SolverConfig;
 
-import java.math.BigInteger;
-
+import java.util.List;
 
 public class CountrySolverConfig extends SolverConfig{
 
    
     private Long countryId;
-    private Long organizationServiceId;
-    private Long organizationSubServiceId;
+    private List<Long> organizationSubServiceIds;
     
    //~ Getters/Setters
 
@@ -22,19 +20,11 @@ public class CountrySolverConfig extends SolverConfig{
         this.countryId = countryId;
     }
 
-    public Long getOrganizationServiceId() {
-        return organizationServiceId;
+    public List<Long> getOrganizationSubServiceIds() {
+        return organizationSubServiceIds;
     }
 
-    public void setOrganizationServiceId(Long organizationServiceId) {
-        this.organizationServiceId = organizationServiceId;
-    }
-
-    public Long getOrganizationSubServiceId() {
-        return organizationSubServiceId;
-    }
-
-    public void setOrganizationSubServiceId(Long organizationSubServiceId) {
-        this.organizationSubServiceId = organizationSubServiceId;
+    public void setOrganizationSubServiceIds(List<Long> organizationSubServiceIds) {
+        this.organizationSubServiceIds = organizationSubServiceIds;
     }
 }

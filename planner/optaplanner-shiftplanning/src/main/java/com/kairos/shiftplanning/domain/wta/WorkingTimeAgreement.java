@@ -32,7 +32,7 @@ public class WorkingTimeAgreement  {
 
    // private OrganizationType organizationSubType;
 
-    private Long unitPositionId;
+    private Long employmentId;
 
     private Long countryId;
 
@@ -59,12 +59,12 @@ public class WorkingTimeAgreement  {
     }
 
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {

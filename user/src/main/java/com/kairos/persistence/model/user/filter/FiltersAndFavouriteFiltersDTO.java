@@ -1,7 +1,5 @@
 package com.kairos.persistence.model.user.filter;
 
-import com.kairos.persistence.model.staff.StaffFavouriteFilter;
-
 import java.util.List;
 
 /**

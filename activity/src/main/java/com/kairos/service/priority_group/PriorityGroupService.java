@@ -8,7 +8,7 @@ import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -219,19 +219,19 @@ public class PriorityGroupService extends MongoBaseService {
 
     }
 
-    public void sendNotificationsToStaff(Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap) {
+    public void sendNotificationsToStaff(Map<BigInteger,List<StaffEmploymentQueryResult>> openShiftStaffMap) {
         OpenShiftNotification openShiftNotification;
         List<OpenShiftNotification> openShiftNotifications = new ArrayList<>();
 
-        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry:openShiftStaffMap.entrySet()) {
+        for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry:openShiftStaffMap.entrySet()) {
 
             int fibonacciCounter = 0;//Using it to put fibonacci order in email for testing.
-            for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
+            for(StaffEmploymentQueryResult staffEmploymentQueryResult :entry.getValue()) {
 
                 mailService.sendMailWithSendGrid(null,null, String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
-                        staffUnitPositionQueryResult.getAccumulatedTimeBank(),staffUnitPositionQueryResult.getDeltaWeeklytimeBank(),
-                        staffUnitPositionQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT,staffUnitPositionQueryResult.getStaffEmail());
-                openShiftNotification = new OpenShiftNotification(entry.getKey(),staffUnitPositionQueryResult.getStaffId());
+                        staffEmploymentQueryResult.getAccumulatedTimeBank(), staffEmploymentQueryResult.getDeltaWeeklytimeBank(),
+                        staffEmploymentQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT, staffEmploymentQueryResult.getStaffEmail());
+                openShiftNotification = new OpenShiftNotification(entry.getKey(), staffEmploymentQueryResult.getStaffId());
                 openShiftNotifications.add(openShiftNotification);
             }
         }

@@ -8,14 +8,13 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<FunctionalPayment, Long> {
-    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0}" +
+    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0}" +
             " RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.percentageValue as percentageValue,functionalPayment.published as published, " +
             " functionalPayment.paymentUnit as paymentUnit ORDER BY startDate ASC")
     List<FunctionalPaymentDTO> getFunctionalPaymentOfExpertise(Long expertiseId);
@@ -46,7 +45,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query("MATCH(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) \n" +
             "WHERE id(childFunctionalPayment)={0} AND id(functionalPayment)={1}\n" +
-            " set functionalPayment.hasDraftCopy=false set functionalPayment.endDate={2} detach delete relation")
+            "set functionalPayment.endDate={2} detach delete relation")
     void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, String endDate);
 
     @Query("MATCH(parent:Expertise)-[:VERSION_OF]-(child:Expertise) WHERE id(parent)={0} AND id(child)={1}\n" +
@@ -99,11 +98,15 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "RETURN id(functionalPayment) as id ,functionalPayment.published as published,functionalPayment.startDate as startDate, functionalPayment.endDate as endDate, functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreasIds:payGroupAreasIds,seniorityLevelFunction:seniorityLevelFunction}) as functionalPaymentMatrices")
     List<FunctionalPaymentQueryResult> getFunctionalPaymentData(List<Long> functionalPaymentIds);
 
-    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN functionalPayment ORDER BY functionalPayment.startDate DESC LIMIT 1 ")
+    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN functionalPayment ORDER BY functionalPayment.startDate DESC LIMIT 1 ")
     FunctionalPayment findByExpertiseId(Long expertiseId);
 
     @Query("MATCH(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) " +
             "WHERE id(childFunctionalPayment)={0} AND id(functionalPayment)={1} " +
             "set functionalPayment.hasDraftCopy=false  detach delete relation")
     void detachFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId);
+
+    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:false}) WHERE id(functionalPayment)={0}" +
+            "SET functionalPayment.deleted=true RETURN count(functionalPayment)>0")
+    boolean deleteFunctionalPayment(Long functionPaymentId);
 }

@@ -1,13 +1,11 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.activity.task.EscalatedTasksWrapper;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
-import com.kairos.dto.activity.task_type.OrgTaskTypeAggregateResult;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.staff.ImportShiftDTO;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
-import com.kairos.wrapper.ResponseEnvelope;
+import com.kairos.dto.user.staff.ImportShiftDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +39,7 @@ public class TaskServiceRestClient {
      * @param unitId
      * @return
      */
-    public Boolean createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId){
+    public void createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId){
         String baseUrl = getBaseUrl(false);
         try {
             HttpEntity<ImportShiftDTO> request = new HttpEntity<>(shift);
@@ -52,9 +50,7 @@ public class TaskServiceRestClient {
                             HttpMethod.POST, request, typeReference,unitId,staffId);
 
             RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException(response.getMessage());
             }
         }catch (HttpClientErrorException e) {
@@ -64,8 +60,6 @@ public class TaskServiceRestClient {
             exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
 
         }
-        return null;
-
     }
 
 
@@ -103,69 +97,7 @@ public class TaskServiceRestClient {
 
         }
         return null;
-
-
     }
-
-
-    /**
-     *  @auther anil maurya
-     *
-     * @param clientId
-     * @param serviceId
-     * @param unitId
-     * @return
-     */
-    public List<Object> getClientTaskByServiceIdAndUnitId(Long clientId,Long serviceId,Long unitId){
-
-        ResponseEntity<List> restExchange =
-                restTemplate.exchange(
-                        getBaseUrl()+"task/{clientId}/{serviceId}/{unitId}",
-                        HttpMethod.GET,
-                        null,List.class);
-
-        List<Object> clientTaks = restExchange.getBody();
-        return clientTaks;
-    }
-
-
-    /**
-     * @auther anil maurya
-     * @param orgainationId
-     * @return
-     */
-    public  List<Object> getTaskTypesByOrganizarion(Long orgainationId){
-
-
-        final String baseUrl=getBaseUrl(false);
-
-        try {
-            ResponseEntity<ResponseEnvelope> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/task_types",
-                            HttpMethod.
-                                    GET,null, ResponseEnvelope.class);
-
-            ResponseEnvelope response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-                List<OrgTaskTypeAggregateResult> OrgTaskTypeList= (List<OrgTaskTypeAggregateResult>) response.getData();
-                List<Object> taskTypesList= (List<Object>) response.getData();
-                return taskTypesList;
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e) {
-
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
-
-        }
-        return null;
-
-    }
-
 
     public List<EscalatedTasksWrapper> getStaffNotAssignedTasks(Long unitId){
 

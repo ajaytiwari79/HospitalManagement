@@ -1,55 +1,5 @@
 package com.kairos.service.staff;
 
-import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.custom_exception.InvalidSize;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.dto.user.staff.staff.StaffCreationDTO;
-import com.kairos.dto.user.staff.staff.StaffDTO;
-import com.kairos.enums.Gender;
-import com.kairos.enums.OrganizationLevel;
-import com.kairos.enums.StaffStatusEnum;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
-import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.ActivityIntegrationService;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
-
 //@RunWith(MockitoJUnitRunner.class)
 public class StaffCreationServiceTest {
 
@@ -212,7 +162,7 @@ public class StaffCreationServiceTest {
 
 
         //staff.setFirstName(staffDTO.getFirstName());
-        //doNothing().when(staffCreationService).createEmployment(null,null,null,null,null,false);
+        //doNothing().when(staffCreationService).createPosition(null,null,null,null,null,false);
         when(accessGroupRepository.findOne(accessGroup.getId())).thenReturn(accessGroup);
         //when(staffCreationService.createStaffFromWeb(1L,staffCreationDTO)).thenReturn(staffDTO);
 

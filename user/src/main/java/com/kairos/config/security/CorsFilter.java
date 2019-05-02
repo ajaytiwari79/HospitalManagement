@@ -1,8 +1,5 @@
 package com.kairos.config.security;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -30,9 +27,11 @@ public class CorsFilter implements Filter {
 
     @Override
     public void destroy() {
+        //This is overridden method and we are not using it.
     }
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config){
+        //This is overridden method and we are not using it.
     }
 }

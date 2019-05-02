@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.client_aggregator;
 
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
-import com.kairos.wrapper.VisitatedHoursTasksCount;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.wrapper.VisitatedHoursTasksCount;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 

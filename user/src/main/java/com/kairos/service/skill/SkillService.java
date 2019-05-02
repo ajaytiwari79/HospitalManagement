@@ -2,14 +2,15 @@ package com.kairos.service.skill;
 
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.user.country.skill.SkillDTO;
+import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.time_care.TimeCareSkill;
@@ -32,8 +33,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
-import com.kairos.utils.DateConverter;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,6 +43,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.*;
 
 /**
@@ -406,9 +406,9 @@ public class SkillService {
             Map<String, Object> staffSkillRelInfo = (Map<String, Object>) staffSkillRel.get("data");
             copyMap = new HashMap<>();
             copyMap.putAll(staffSkillRelInfo);
-            copyMap.put("startDate", DateConverter.getDate((long) staffSkillRelInfo.get("startDate")));
-            copyMap.put("endDate", DateConverter.getDate((long) staffSkillRelInfo.get("endDate")));
-            copyMap.put("lastSyncInVisitour", DateConverter.getDate((long) staffSkillRelInfo.get("lastSyncInVisitour")));
+            copyMap.put("startDate", getDate((long) staffSkillRelInfo.get("startDate")));
+            copyMap.put("endDate", getDate((long) staffSkillRelInfo.get("endDate")));
+            copyMap.put("lastSyncInVisitour", getDate((long) staffSkillRelInfo.get("lastSyncInVisitour")));
             list.add(copyMap);
         }
         return list;

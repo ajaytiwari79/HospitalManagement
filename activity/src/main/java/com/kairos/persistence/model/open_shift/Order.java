@@ -2,7 +2,6 @@ package com.kairos.persistence.model.open_shift;
 
 import com.kairos.dto.activity.open_shift.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;

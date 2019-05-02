@@ -4,7 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -37,7 +37,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
 /**
@@ -46,7 +47,7 @@ import static com.kairos.enums.phase.PhaseType.ACTUAL;
 @Service
 @Transactional
 public class PhaseService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhaseService.class);
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
@@ -71,7 +72,7 @@ public class PhaseService extends MongoBaseService {
                 phases.add(phase);
             }
             if (!phases.isEmpty()) {
-                save(phases);
+                phaseMongoRepository.saveEntities(phases);
             }
         }
         return phases;
@@ -155,7 +156,7 @@ public class PhaseService extends MongoBaseService {
     public Phase createPhaseInCountry(Long countryId, PhaseDTO phaseDTO) {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
-            logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+            LOGGER.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
             exceptionService.dataNotFoundByIdException("message.country.phase.sequence", phaseDTO.getCountryId());
         }
         Phase phase = buildPhaseForCountry(phaseDTO);
@@ -197,7 +198,7 @@ public class PhaseService extends MongoBaseService {
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            logger.info("Phase not found in country " + phaseId);
+            LOGGER.info("Phase not found in country " + phaseId);
             exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
         }
         phase.setDeleted(true);
@@ -209,14 +210,14 @@ public class PhaseService extends MongoBaseService {
     public Phase updatePhases(Long countryId, BigInteger phaseId, PhaseDTO phaseDTO) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            logger.info("Phase not found in country " + phaseId);
+            LOGGER.info("Phase not found in country " + phaseId);
             exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
 
         }
         if (phase.getSequence() != phaseDTO.getSequence()) {
             long phaseInUse = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
             if (phaseInUse > 0) {
-                logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+                LOGGER.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
                 exceptionService.duplicateDataException("message.country.phase.sequence", phaseDTO.getCountryId());
             }
         }
@@ -331,12 +332,11 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), v->v));
         Map<BigInteger,Phase> phaseAndIdMap=phases.stream().collect(Collectors.toMap(Phase::getId, v->v));
-        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay() == null?DayOfWeek.MONDAY:phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay()).atStartOfDay().minusSeconds(1);
-        LocalDateTime previousMonday=DateUtils.getDateForPreviousDay(DateUtils.getLocalDateFromTimezone(timeZone),DayOfWeek.MONDAY).atStartOfDay();
+        DayOfWeek tentativeDayOfWeek = phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay() == null ? DayOfWeek.MONDAY : phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay();
+        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativeDayOfWeek).atStartOfDay().minusSeconds(1);
         Set<LocalDate> localDates=new HashSet<>();
-        dates.forEach(d->{localDates.add(d.toLocalDate());});
+        dates.forEach(d->localDates.add(d.toLocalDate()));
         List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
-
         for(LocalDateTime requestedDate:dates){
             Phase phase;
             if(requestedDate.isAfter(untilTentative)){
@@ -415,13 +415,13 @@ public class PhaseService extends MongoBaseService {
         if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
         }
-        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
-                : getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
+        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getEmployment(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
+                : getApplicablePlannedType(staffAdditionalInfoDTO.getEmployment(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
     }
 
-    private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
-        if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
-            plannedTypeId = plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+    private BigInteger getApplicablePlannedType(StaffEmploymentDetails staffEmploymentDetails, BigInteger plannedTypeId) {
+        if (Optional.ofNullable(staffEmploymentDetails.getIncludedPlannedTime()).isPresent()) {
+            plannedTypeId = plannedTypeId.equals(staffEmploymentDetails.getExcludedPlannedTime()) ? staffEmploymentDetails.getIncludedPlannedTime() : plannedTypeId;
         }
         return plannedTypeId;
 

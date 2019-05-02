@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
-import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
+import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;

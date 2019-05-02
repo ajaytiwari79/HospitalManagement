@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.user.UserType.SYSTEM_ACCOUNT;
 
 /**
@@ -365,10 +366,10 @@ public class BootDataService {
         kairosCountryLevel.setKairosHub(true);
         kairosCountryLevel.setBoardingCompleted(true);
         kairosCountryLevel.setFormalName("Kairos (HUB)");
-        kairosCountryLevel.setName("Kairos");
+        kairosCountryLevel.setName(KAIROS);
         kairosCountryLevel.setEanNumber("501234567890");
-        kairosCountryLevel.setEmail("kairos_denmark@kairos.com");
-        kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", "kairos_denmark@kairos.com", "431311", "653322"));
+        kairosCountryLevel.setEmail(KAIROS_DENMARK_EMAIL);
+        kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", KAIROS_DENMARK_EMAIL, "431311", "653322"));
 //        kairosCountryLevel.setContactAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
 //        kairosCountryLevel.setOrganizationType(privateOrganization);
         kairosCountryLevel.setCostCenterCode("OD12");
@@ -406,11 +407,11 @@ public class BootDataService {
         admin = new User();
         admin.setCprNumber("0309514297");
         admin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(admin.getCprNumber()));
-        admin.setUserName("ulrik@kairos.com");
-        admin.setEmail("ulrik@kairos.com");
+        admin.setUserName(ULRIK_EMAIL);
+        admin.setEmail(ULRIK_EMAIL);
         admin.setPassword(new BCryptPasswordEncoder().encode("admin@kairos"));
-        admin.setFirstName("Ulrik");
-        admin.setNickName("Ulrik");
+        admin.setFirstName(ULRIK);
+        admin.setNickName(ULRIK);
         admin.setLastName("Rasmussen");
         admin.setGender(Gender.MALE);
 //        admin.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
@@ -441,11 +442,11 @@ public class BootDataService {
         adminAsStaff.setCardNumber("LPSPSW1134");
         adminAsStaff.setCopyKariosMailToLogin(true);
         adminAsStaff.setContactDetail(new ContactDetail("admin@kairos.com", "admin@kairos.com", "536533", "facebook.com/ulrik"));
-        adminAsStaff.setFamilyName("Ulrik");
-        adminAsStaff.setFirstName("Ulrik");
+        adminAsStaff.setFamilyName(ULRIK);
+        adminAsStaff.setFirstName(ULRIK);
         adminAsStaff.setLastName("Rasmussen");
         adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
-        adminAsStaff.setEmail("ulrik@kairos.com");
+        adminAsStaff.setEmail(ULRIK_EMAIL);
         adminAsStaff.setNationalInsuranceNumber("NIN44500331");
         adminAsStaff.setLanguage(danish);
         adminAsStaff.setPassword("kairos");
@@ -504,11 +505,11 @@ public class BootDataService {
 
 
         kairosRegionLevel = new OrganizationBuilder().createOrganization();
-        kairosRegionLevel.setFormalName("Kairos");
-        kairosRegionLevel.setName("Kairos");
+        kairosRegionLevel.setFormalName(KAIROS);
+        kairosRegionLevel.setName(KAIROS);
         kairosRegionLevel.setEanNumber("501234567890");
         kairosRegionLevel.setEmail("kairos_zealand@kairos.com");
-        kairosRegionLevel.setContactDetail(new ContactDetail("info@kairos.com", "kairos_denmark@kairos.com", "431311", "653322"));
+        kairosRegionLevel.setContactDetail(new ContactDetail("info@kairos.com", KAIROS_DENMARK_EMAIL, "431311", "653322"));
         //    kairosRegionLevel.setOrganizationType(privateOrganization);
         kairosRegionLevel.setCostCenterCode("OD12");
         kairosRegionLevel.setOrganizationLevel(OrganizationLevel.REGION);

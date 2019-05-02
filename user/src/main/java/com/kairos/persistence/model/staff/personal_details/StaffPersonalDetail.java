@@ -7,15 +7,14 @@ import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 
 /**
  * Created by prabjot on 10/1/17.

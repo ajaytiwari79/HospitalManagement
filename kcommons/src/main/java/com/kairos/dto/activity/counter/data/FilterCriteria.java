@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.counter.data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.enums.FilterType;
 
 import java.util.List;

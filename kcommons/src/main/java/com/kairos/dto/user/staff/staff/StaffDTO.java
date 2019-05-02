@@ -2,7 +2,6 @@ package com.kairos.dto.user.staff.staff;
 
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -42,6 +41,8 @@ public class StaffDTO {
 
     public StaffDTO() {
     }
+
+
 
     public Long getId() {
         return id;

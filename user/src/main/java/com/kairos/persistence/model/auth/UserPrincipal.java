@@ -1,15 +1,12 @@
 package com.kairos.persistence.model.auth;
 
 import com.kairos.config.security.CurrentUserDetails;
-import com.kairos.persistence.model.country.Country;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class UserPrincipal implements UserDetails, Authentication {
     private static final long serialVersionUID = 1L;

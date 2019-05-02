@@ -22,26 +22,26 @@ public class OrganizationDetailsValidator {
             if (!Optional.ofNullable(organization.getCompanyCategory()).isPresent()) {
                 exceptionService.invalidRequestException("error.organization.companyCategory.notNull", organization.getName());
             }
-            if (!Optional.ofNullable(organization.getOrganizationType()).isPresent()) {
-                exceptionService.invalidRequestException("error.Organization.orgType.notNull", organization.getName());
-            }
-            if (!Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent() || organization.getOrganizationSubTypes().isEmpty()) {
-                exceptionService.invalidRequestException("error.Organization.orgSubType.notNull", organization.getName());
-            }
-            if (!Optional.ofNullable(organization.getBusinessTypes()).isPresent()) {
-                exceptionService.invalidRequestException("error.Organization.businesstype.notnull", organization.getName());
-            }
+            validateTypeDetails(exceptionService, organization);
             if (CompanyType.COMPANY.equals(organization.getCompanyType()) && !Optional.ofNullable(organization.getAccountType()).isPresent()) {
                 exceptionService.invalidRequestException("error.Organization.accountType.notNull", organization.getName());
             }
             if (!Optional.ofNullable(organization.getKairosCompanyId()).isPresent()) {
                 exceptionService.invalidRequestException("error.Organization.kairosId.notnull", organization.getName());
             }
-
-//            if (!Optional.ofNullable(organization.getVatId()).isPresent()) {
-//                exceptionService.invalidRequestException("error.Organization.vattype.notnull", organization.getName());
-//            }
         });
+    }
+
+    private static void validateTypeDetails(ExceptionService exceptionService, Organization organization) {
+        if (!Optional.ofNullable(organization.getOrganizationType()).isPresent()) {
+            exceptionService.invalidRequestException("error.Organization.orgType.notNull", organization.getName());
+        }
+        if (!Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent() || organization.getOrganizationSubTypes().isEmpty()) {
+            exceptionService.invalidRequestException("error.Organization.orgSubType.notNull", organization.getName());
+        }
+        if (!Optional.ofNullable(organization.getBusinessTypes()).isPresent()) {
+            exceptionService.invalidRequestException("error.Organization.businesstype.notnull", organization.getName());
+        }
     }
 
     public static void validateUserDetails(List<StaffPersonalDetailDTO> staffPersonalDetailDTOS, ExceptionService exceptionService) {

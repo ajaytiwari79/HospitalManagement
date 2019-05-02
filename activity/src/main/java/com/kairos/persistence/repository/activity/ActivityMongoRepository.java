@@ -1,11 +1,8 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.LocationActivityTabWithActivityIdDTO;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

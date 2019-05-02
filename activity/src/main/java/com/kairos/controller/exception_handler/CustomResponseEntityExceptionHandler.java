@@ -2,9 +2,7 @@ package com.kairos.controller.exception_handler;
 
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
-
 import com.kairos.commons.service.mail.MailService;
-import com.kairos.config.env.EnvConfig;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
@@ -37,7 +35,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 
 @ControllerAdvice
@@ -400,7 +400,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    /*@ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({AddressNotVerifiedByTomTom.class,
             ZipCodeNotFound.class, CitizenNotFoundException.class})
     @ResponseBody
@@ -412,7 +412,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(ex.getMessage());
         return errorMessage;
 
-    }
+    }*/
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(value = ActionNotPermittedException.class)

@@ -3,22 +3,9 @@ package com.planner.service.config;
 
 //import org.junit.Test;
 
-import com.kairos.dto.planner.constarints.ConstraintDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.planner.commonUtil.StaticField;
-import org.drools.compiler.lang.api.PackageDescrBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.List;
-
-import org.drools.compiler.lang.DrlDumper;
-import org.drools.compiler.lang.api.DescrFactory;
-import org.drools.compiler.lang.descr.PackageDescr;
 
 
 @Service

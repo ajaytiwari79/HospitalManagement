@@ -1,24 +1,23 @@
 package com.kairos.service.planner;
 
-import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskStatus;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import com.kairos.wrapper.task.TaskGanttDTO;
+import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;

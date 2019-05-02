@@ -1,7 +1,7 @@
 package com.kairos.dto.activity.attendance;
 
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.UnitPositionDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 
 import java.util.List;
 
@@ -9,16 +9,17 @@ public class OrganizationAndReasonCodeDTO {
     private Long id;
     private String name;
     private List<ReasonCodeDTO> reasonCode;
-    private List<UnitPositionDTO> unitPosition;
+    private List<EmploymentDTO> employment;
 
     public OrganizationAndReasonCodeDTO() {
+        //Default Constructor
     }
 
-    public OrganizationAndReasonCodeDTO(Long id, String name, List<ReasonCodeDTO> reasonCode,List<UnitPositionDTO> unitPosition) {
+    public OrganizationAndReasonCodeDTO(Long id, String name, List<ReasonCodeDTO> reasonCode,List<EmploymentDTO> employment) {
         this.id = id;
         this.name = name;
         this.reasonCode = reasonCode;
-        this.unitPosition=unitPosition;
+        this.employment = employment;
     }
 
     public Long getId() {
@@ -45,11 +46,11 @@ public class OrganizationAndReasonCodeDTO {
         this.reasonCode = reasonCode;
     }
 
-    public List<UnitPositionDTO> getUnitPosition() {
-        return unitPosition;
+    public List<EmploymentDTO> getEmployment() {
+        return employment;
     }
 
-    public void setUnitPosition(List<UnitPositionDTO> unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setEmployment(List<EmploymentDTO> employment) {
+        this.employment = employment;
     }
 }

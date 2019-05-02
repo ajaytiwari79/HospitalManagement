@@ -21,7 +21,7 @@ public class Contract {
     private String IsExportable;
 
     public Contract() {
-
+       //Default Constructor
     }
 
     @Override

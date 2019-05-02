@@ -1,9 +1,9 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
-import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.joda.time.LocalDate;

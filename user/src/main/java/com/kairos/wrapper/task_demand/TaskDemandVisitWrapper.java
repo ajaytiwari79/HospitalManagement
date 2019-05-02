@@ -1,8 +1,8 @@
 package com.kairos.wrapper.task_demand;
 
+import com.kairos.dto.planner.vrp.TaskAddress;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.dto.planner.vrp.TaskAddress;
 
 import java.time.LocalDate;
 import java.util.List;

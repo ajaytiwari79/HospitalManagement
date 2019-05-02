@@ -1,9 +1,7 @@
 package com.kairos.persistence.repository.repository_impl;
+
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.persistence.repository.task_type.CustomTaskDemandMongoRepository;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;

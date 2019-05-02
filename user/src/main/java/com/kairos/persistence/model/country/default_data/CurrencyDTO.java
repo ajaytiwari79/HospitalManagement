@@ -15,6 +15,7 @@ public class CurrencyDTO {
     private String currencyCode;
 
     public CurrencyDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

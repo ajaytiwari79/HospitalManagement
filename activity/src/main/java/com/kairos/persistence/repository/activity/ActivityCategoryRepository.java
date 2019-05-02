@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.activity;
 
 
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

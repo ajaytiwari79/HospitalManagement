@@ -8,7 +8,7 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,8 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.service.shift.ShiftValidatorService.*;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**

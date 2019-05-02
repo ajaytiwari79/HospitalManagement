@@ -4,8 +4,8 @@ import com.kairos.persistence.model.organization.OrganizationExternalServiceRela
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

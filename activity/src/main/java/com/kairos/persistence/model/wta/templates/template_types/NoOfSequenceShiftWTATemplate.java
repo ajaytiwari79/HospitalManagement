@@ -86,7 +86,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-
+        //This is override method
     }
 
     public NoOfSequenceShiftWTATemplate(String name, boolean disabled, String description,  PartOfDay sequenceShiftFrom, PartOfDay sequenceShiftTo) {

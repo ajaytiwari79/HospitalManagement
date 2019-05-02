@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.attendence_setting;
 
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlot;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;

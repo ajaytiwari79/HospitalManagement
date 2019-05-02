@@ -1,5 +1,8 @@
 package com.kairos.service.task_type;
 
+import com.kairos.dto.user.organization.Shifts;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
 import com.kairos.persistence.model.task_demand.MonthlyFrequency;
@@ -15,9 +18,6 @@ import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.dto.user.organization.Shifts;
-import com.kairos.dto.user.staff.client.ClientFilterDTO;
-import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.utils.JsonUtils;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;

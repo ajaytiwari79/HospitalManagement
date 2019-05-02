@@ -9,8 +9,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotBlank;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 

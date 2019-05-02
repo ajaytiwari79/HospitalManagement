@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.wta;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.wrapper.wta.CTAWTADTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -22,8 +21,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WTAQueryResultDTO getOne(BigInteger wtaId);
 
-    List<WTAQueryResultDTO> getAllWTAByOrganizationTypeId(long organizationId);
-
     List<WTAQueryResultDTO> getAllWTAByCountryId(long countryId);
 
     List<WTAQueryResultDTO> getAllWTAByOrganizationSubTypeIdAndCountryId(long organizationSubTypeId, long countryId);
@@ -34,8 +31,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
 
-    WTAQueryResultDTO getVersionOfWTA(BigInteger wtaId);
-
     List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate);
 
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
@@ -44,27 +39,26 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByUpIds(Set<Long> upIds, Date date);
 
-    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> unitPositionIds);
+    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> employmentIds);
 
-    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> unitPositionIds);
+    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> employmentIds);
 
-    WTAQueryResultDTO getWTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
+    WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long employmentId, Date date);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
+    List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> employmentIds, Date date);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate);
 
-    WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
+    WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date);
 
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
-    void setEndDateToWTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
+    void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate);
 
-    boolean wtaExistsByUnitPositionIdAndDates(Long unitPositionId,Date startDate,Date endDate);
-    boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId,Date startDate,Date endDate);
+    boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDates(Long unitPositionId, Date startDate, Date endDate);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIdAndDatesWithRuleTemplateType(Long unitPositionId, Date startDate, Date endDate, WTATemplateType templateType);
+    List<WTAQueryResultDTO> getWTAByEmploymentIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType);
 
 }

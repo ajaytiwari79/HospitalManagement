@@ -1,14 +1,14 @@
 package com.kairos.configuration;
 
-import com.kairos.annotations.PermissionMethod;
-import com.kairos.annotations.PermissionModel;
-import com.kairos.annotations.PermissionSubModel;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionModel;
+import com.kairos.annotations.KPermissionSubModel;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -23,24 +23,23 @@ public class PermissionSchemaScanner {
         List<Map<String, Object>> modelData = new ArrayList<>();
         try {
             Reflections reflections = new Reflections(ClasspathHelper.forPackage(domainPackagePath));
-            reflections.getTypesAnnotatedWith(PermissionModel.class).stream()
+            reflections.getTypesAnnotatedWith(KPermissionModel.class).stream()
                     .forEach( permissionClass -> {
                         Map<String, Object> modelMetaData= new HashMap<>();
                         Set<Map<String, String>> fields = new HashSet<>();
-                        Arrays.stream(permissionClass.getDeclaredMethods())
-                                .filter(entityMethod -> entityMethod.isAnnotationPresent(PermissionMethod.class))
-                                .forEach(permissionEntityMethod -> {
+                        Arrays.stream(permissionClass.getDeclaredFields())
+                                .filter(entityField -> entityField.isAnnotationPresent(KPermissionField.class))
+                                .forEach(permissionEntityField -> {
                                     Map<String, String> fieldsData = new HashMap<>();
-                                    PermissionMethod annotation = permissionEntityMethod.getAnnotation(PermissionMethod.class);
-                                    fieldsData.put(FIELD_NAME,annotation.value());
+                                    KPermissionField annotation = permissionEntityField.getAnnotation(KPermissionField.class);
+                                    fieldsData.put(FIELD_NAME,permissionEntityField.getName());
                                     fields.add(fieldsData);
                                 });
-                        findSubModelData(permissionClass, fields);
-                        if(!fields.isEmpty()) {
+                        List<Map<String, Object>> subModelData= findSubModelData(permissionClass, fields);
                             modelMetaData.put(MODEL_NAME, permissionClass.getSimpleName());
                             modelMetaData.put(FIELDS, fields);
+                            modelMetaData.put(SUB_MODELS, subModelData);
                             modelData.add(modelMetaData);
-                        }
                     });
             LOGGER.info("model=="+modelData);
 
@@ -50,36 +49,48 @@ public class PermissionSchemaScanner {
         return modelData;
     }
 
-    private void findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
+    private List<Map<String, Object>> findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
+        List<Map<String, Object>> subModelData = new ArrayList<>();
         Arrays.stream(permissionClass.getDeclaredFields())
-                .filter(entityField -> entityField.isAnnotationPresent(PermissionSubModel.class))
+                .filter(entityField -> entityField.isAnnotationPresent(KPermissionSubModel.class))
                 .forEach(permissionField -> {
+                    Map<String, Object> subModelMetaData= new HashMap<>();
+                    Set<Map<String, String>> subModelFields = new HashSet<>();
                     if (Collection.class.isAssignableFrom(permissionField.getType())) {
                         Type genericFieldType = permissionField.getGenericType();
                         ParameterizedType aType = (ParameterizedType) genericFieldType;
                         Type[] fieldArgTypes = aType.getActualTypeArguments();
                         for (Type fieldArgType : fieldArgTypes) {
                             Class fieldArgClass = (Class) fieldArgType;
-                            for (Method subModelMethod : fieldArgClass.getDeclaredMethods()) {
-                                if (subModelMethod.isAnnotationPresent(PermissionMethod.class)) {
+                            getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(),subModelFields);
+                            for (Field subModelField : fieldArgClass.getDeclaredFields()) {
+                                if (subModelField.isAnnotationPresent(KPermissionField.class)) {
                                     Map<String, String> fieldsData = new HashMap<>();
-                                    PermissionMethod annotation = subModelMethod.getAnnotation(PermissionMethod.class);
-                                    fieldsData.put(FIELD_NAME,annotation.value());
-                                    fields.add(fieldsData);
+                                    fieldsData.put(FIELD_NAME,subModelField.getName());
+                                    subModelFields.add(fieldsData);
                                 }
                             }
                         }
                     } else {
-                        for (Method subModelMethod : permissionField.getType().getDeclaredMethods()) {
-                            if (subModelMethod.isAnnotationPresent(PermissionMethod.class)) {
-                                Map<String, String> fieldsData = new HashMap<>();
-                                PermissionMethod annotation = subModelMethod.getAnnotation(PermissionMethod.class);
-                                fieldsData.put(FIELD_NAME,annotation.value());
-                                fields.add(fieldsData);
-                            }
-                        }
+                        getFieldsOFModelAndSubModel(permissionField.getType().getDeclaredFields(),subModelFields);
+                    }
+                    if(!subModelFields.isEmpty()){
+                        subModelMetaData.put(MODEL_NAME, permissionField.getName());
+                        subModelMetaData.put(FIELDS, subModelFields);
+                        subModelData.add(subModelMetaData);
                     }
                 });
+        return subModelData;
     }
+
+            private void getFieldsOFModelAndSubModel(Field[] fields, Set<Map<String, String>> subModelFields){
+                for (Field field : fields) {
+                    if (field.isAnnotationPresent(KPermissionField.class)) {
+                        Map<String, String> fieldsData = new HashMap<>();
+                        fieldsData.put(FIELD_NAME,field.getName());
+                        subModelFields.add(fieldsData);
+                    }
+                }
+            }
 
 }

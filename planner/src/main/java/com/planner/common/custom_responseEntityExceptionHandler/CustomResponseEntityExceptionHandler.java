@@ -1,16 +1,61 @@
 package com.planner.common.custom_responseEntityExceptionHandler;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.planner.common.custum_exceptions.DataNotFoundByIdException;
 import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
+
+    @Inject
+    private LocaleService localeService;
+
+    private String convertMessage(String message, Object... params) {
+        for (int i = 0; i < params.length; i++) {
+            try {
+                params[i] = localeService.getMessage(params[i].toString());
+            } catch (Exception e) {
+                // intentionally left empty
+            }
+        }
+        return localeService.getMessage(message, params);
+    }
+
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.error("exception in planner service", ex);
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
+        List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
+        //  String error;
+        for (FieldError fieldError : fieldErrors) {
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), convertMessage(fieldError.getDefaultMessage()));
+            errors.add(error);
+        }
+        for (ObjectError objectError : globalErrors) {
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
+            errors.add(error);
+        }
+
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setErrors(errors);
+        errorMessage.setSuccess(false);
+
+        return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
+
+    }
 
     @ExceptionHandler({DataNotFoundByIdException.class})
     public ResponseEntity<Object> handleDataNotFoundException(final Exception ex, final WebRequest request) {

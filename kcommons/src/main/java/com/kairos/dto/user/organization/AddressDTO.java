@@ -2,8 +2,6 @@ package com.kairos.dto.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.time.LocalDate;
-
 /**
  * Created by prabjot on 19/1/17.
  */

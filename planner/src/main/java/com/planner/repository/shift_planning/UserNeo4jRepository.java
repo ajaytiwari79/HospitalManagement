@@ -26,19 +26,19 @@ public class UserNeo4jRepository {
      * @param staffIds
      */
 
-    public String getStaffByIdsAndSkillAndUnitPositionAndExpertise(Long[] staffIds)
+    public String getStaffByIdsAndSkillAndEmploymentAndExpertise(Long[] staffIds)
     {
         String cypherQuery="Match(staff:Staff)  where id(staff) in {staffIds} with staff " +
                            "Optional Match(skill:Skill{isEnabled:true})<-[:"+STAFF_HAS_SKILLS+"]-(staff) " +
-                           "Optional Match(unitPosition:UnitPosition{history:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff) " +
-                           "Optional Match(expertise:Expertise)<-[:"+HAS_EXPERTISE_IN+"]-(unitPosition) " +
+                           "Optional Match(employment:Employment{history:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff) " +
+                           "Optional Match(expertise:Expertise)<-[:"+HAS_EXPERTISE_IN+"]-(employment) " +
                            "return " +
                            "{" +
                            "staffId :id(staff),"+
                            "staffName:staff.firstName+staff.lastName,"+
                            "staffSkills:case when skill is null then [] else collect({skillid:id(skill),name:skill.name,weight:skill.weight}) end,"+
-                          "staffUnitPosition:collect(unitPosition) ," +
-                           "unitPositionExpertise:expertise" +
+                          "staffEmployment:collect(employment) ," +
+                           "employmentExpertise:expertise" +
                            "} as resultMap";
         Map<String,Object> map=new HashMap<>();
         map.put("staffIds",staffIds);

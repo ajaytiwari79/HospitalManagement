@@ -1,5 +1,5 @@
 // Neo4j
-MATCH(pl:UnitPositionLine) set pl.hourlyCost=toString(pl.hourlyCost);
+MATCH(pl:EmploymentLine) set pl.hourlyCost=toString(pl.hourlyCost);
 
 MATCH(parentOrg:Organization) where parentOrg.isParentOrganization=true AND parentOrg.organizationLevel='CITY'
 MATCH(countryHub:Organization) where countryHub.organizationLevel='COUNTRY'

@@ -2,7 +2,6 @@ package com.kairos.rule_validator.task;
 
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.task.Task;
-import com.kairos.rule_validator.task.AbstractTaskSpecification;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -11,8 +11,6 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class BankRepositoryImpl implements CustomBankRepository{

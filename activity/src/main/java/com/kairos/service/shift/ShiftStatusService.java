@@ -11,6 +11,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityResponseDTO;
 import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
@@ -29,11 +30,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
+import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
 import static com.kairos.enums.shift.ShiftStatus.*;
-import static com.kairos.enums.shift.ShiftStatus.VALIDATE;
 
 @Service
 public class ShiftStatusService {
@@ -153,5 +154,14 @@ public class ShiftStatusService {
             }
         }
         return activityShiftStatusSettings;
+    }
+
+    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift) {
+        Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
+        if(isNull(mainShift.getId()) && validPhaseForPublishingShift.contains(phase.getPhaseEnum())){
+            for (ShiftActivity shiftActivity : mainShift.getActivities()) {
+                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+            }
+        }
     }
 }

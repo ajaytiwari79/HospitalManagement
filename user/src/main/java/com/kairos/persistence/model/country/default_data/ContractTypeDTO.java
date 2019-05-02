@@ -18,6 +18,7 @@ public class ContractTypeDTO {
     private String description;
 
     public ContractTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

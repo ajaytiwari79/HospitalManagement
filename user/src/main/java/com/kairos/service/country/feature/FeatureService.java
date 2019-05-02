@@ -1,5 +1,7 @@
 package com.kairos.service.country.feature;
 
+import com.kairos.dto.user.country.feature.FeatureDTO;
+import com.kairos.dto.user.country.feature.VehicleFeaturesDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.feature.Feature;
 import com.kairos.persistence.model.country.feature.FeatureQueryResult;
@@ -10,11 +12,8 @@ import com.kairos.persistence.repository.user.country.FeatureGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.feature.FeatureDTO;
-import com.kairos.dto.user.country.feature.VehicleFeaturesDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

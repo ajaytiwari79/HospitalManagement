@@ -1,10 +1,10 @@
 package com.kairos.dto.user.organization.skill;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

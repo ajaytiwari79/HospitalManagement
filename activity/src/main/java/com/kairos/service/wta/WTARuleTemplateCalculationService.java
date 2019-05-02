@@ -5,22 +5,17 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.template_types.DurationBetweenShiftsWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-
 import com.kairos.service.phase.PhaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.kairos.service.shift.ShiftValidatorService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -47,8 +42,10 @@ public class WTARuleTemplateCalculationService {
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private ShiftValidatorService shiftValidatorService;
 
-    public List<ShiftDTO> updateRestingTimeInShifts(List<ShiftDTO> shifts, UserAccessRoleDTO userAccessRole) {
+    public <T extends ShiftDTO> List<T> updateRestingTimeInShifts(List<T> shifts, UserAccessRoleDTO userAccessRole) {
         if (isCollectionNotEmpty(shifts)) {
             if (!(shifts instanceof ArrayList)) {
                 shifts = new ArrayList<>(shifts);
@@ -61,10 +58,11 @@ public class WTARuleTemplateCalculationService {
             Date endDate = getStartOfDay(plusDays(shifts.get(shifts.size() - 1).getEndDate(), 1));
             List<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toList());
             Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds).stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
-            List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDatesWithRuleTemplateType(shifts.get(0).getUnitPositionId(), startDate, endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
+            List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(shifts.get(0).getEmploymentId(), startDate, endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
             Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap = getIntervalWTARuletemplateMap(workingTimeAgreements, asLocalDate(endDate).plusDays(1));
             Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
+            Set<BigInteger> escalationFreeShiftIds= shiftValidatorService.getEscalationFreeShifts(shifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()));
             for (ShiftDTO shift : shifts) {
                 int restingMinutes = 0;
                 Map.Entry<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> dateTimeIntervalListEntry = intervalWTARuletemplateMap.entrySet().stream().filter(dateTimeIntervalList -> dateTimeIntervalList.getKey().contains(shift.getStartDate()) || dateTimeIntervalList.getKey().getEndLocalDate().equals(shift.getStartDate())).findAny().orElse(null);
@@ -82,6 +80,7 @@ public class WTARuleTemplateCalculationService {
                 }
                 shift.setRestingMinutes(restingMinutes);
                 shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons():newHashSet());
+                shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId()));
 
             }
         }

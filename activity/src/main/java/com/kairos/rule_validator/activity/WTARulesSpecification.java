@@ -3,8 +3,8 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

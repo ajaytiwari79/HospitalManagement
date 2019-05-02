@@ -10,12 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_V1 +COUNTRY_URL+"/timeType")

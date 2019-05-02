@@ -19,7 +19,9 @@ public class OrganizationServiceCustomNameRelationship extends UserBaseEntity {
     private OrganizationService organizationService;
     private String customName;
 
-    public OrganizationServiceCustomNameRelationship(){};
+    public OrganizationServiceCustomNameRelationship(){
+            //Default Constructor
+    }
 
     public Organization getOrganization() {
         return organization;

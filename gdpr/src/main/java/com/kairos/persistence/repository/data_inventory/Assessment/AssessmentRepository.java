@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 
 
 import com.kairos.enums.gdpr.AssessmentStatus;
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;

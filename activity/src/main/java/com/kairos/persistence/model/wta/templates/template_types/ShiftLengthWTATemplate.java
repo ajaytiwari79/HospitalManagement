@@ -8,7 +8,7 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-
-import static com.kairos.constants.AppConstants.HOURS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**

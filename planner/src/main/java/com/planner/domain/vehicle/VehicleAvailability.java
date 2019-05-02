@@ -2,9 +2,10 @@ package com.planner.domain.vehicle;
 
 import com.planner.domain.common.BaseEntity;
 import com.planner.enums.ShiftType;
-////import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.Date;
+
+////import org.springframework.data.cassandra.core.mapping.Table;
 
 ////@Table
 public class VehicleAvailability extends BaseEntity{

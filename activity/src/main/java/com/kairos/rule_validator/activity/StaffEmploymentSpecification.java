@@ -3,11 +3,11 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.shift.ShiftValidatorService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +38,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                 }
             }
             if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())){
+                if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())){
                     return false;
                 }
             }
@@ -62,7 +62,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                 if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()) {
                     ShiftValidatorService.throwException("message.management.authority.phase");
                 }
-                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
+                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
                     ShiftValidatorService.throwException("message.staff.employmentType.absent");
                 }
             }

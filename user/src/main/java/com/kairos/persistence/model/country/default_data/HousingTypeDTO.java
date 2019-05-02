@@ -13,6 +13,7 @@ public class HousingTypeDTO {
     private String description;
 
     public HousingTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

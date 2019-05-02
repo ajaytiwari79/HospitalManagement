@@ -1,8 +1,7 @@
 package com.kairos.persistence.repository.time_type;
 
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -12,7 +11,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,4 +42,14 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,TimeType.class,Map.class);
         return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toSet());
     }
+
+    @Override
+    public List<TimeTypeDTO> findTimeTypeWithItsParent() {
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("deleted").is(false)),
+                Aggregation.graphLookup("time_Type").startWith("upperLevelTimeTypeId").connectFrom("upperLevelTimeTypeId").connectTo("_id").as("parent"));
+        AggregationResults<TimeTypeDTO> results = mongoTemplate.aggregate(aggregation,TimeType.class,TimeTypeDTO.class);
+        return results.getMappedResults();
+    }
+
 }

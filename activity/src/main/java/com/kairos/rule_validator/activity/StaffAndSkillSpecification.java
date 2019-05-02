@@ -4,7 +4,7 @@ import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 

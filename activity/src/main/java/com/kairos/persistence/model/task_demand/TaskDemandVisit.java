@@ -20,7 +20,7 @@ public class TaskDemandVisit extends MongoBaseEntity {
     protected String preferredTime;
 
     public TaskDemandVisit(){
-
+    //Default Constructor
     }
 
 

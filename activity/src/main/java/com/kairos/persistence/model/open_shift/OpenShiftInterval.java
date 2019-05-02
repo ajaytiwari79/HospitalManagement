@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.open_shift;
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.DurationType;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 //Domain name can be changed
