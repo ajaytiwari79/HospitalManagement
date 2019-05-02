@@ -45,34 +45,6 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
-//TODO not remove
-//    private List<CommonKpiDataUnit> calculateDurationOfShiftAndActivity(List<ShiftWithActivityDTO> shiftWithActivityDTOS, LocalDate startDate, LocalDate endDate) {
-//        List<CommonKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
-//        if (isCollectionNotEmpty(shiftWithActivityDTOS)) {
-//            Map<String, String> activityNameAndColorCodeMap = new HashMap<>();
-//            Map<LocalDate, List<ShiftWithActivityDTO>> dateAndShiftWithActivityMap = shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(t -> asLocalDate(t.getStartDate()), Collectors.toList()));
-//            while (startDateIsEqualsOrBeforeEndDate(startDate, endDate)) {
-//                Integer shiftDurationMinutes = 0;
-//                List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
-//                Map<String, Integer> activityNameAndTotalDurationMinutesMap = new HashMap<>();
-//                List<ShiftWithActivityDTO> shiftWithActivityDTO = dateAndShiftWithActivityMap.get(startDate);
-//                if (CollectionUtils.isNotEmpty(shiftWithActivityDTO)) {
-//                    for (ShiftWithActivityDTO shift : shiftWithActivityDTO) {
-//                        shift.getActivities().forEach(activity -> {
-//                            int activityDuration = activityNameAndTotalDurationMinutesMap.getOrDefault(activity.getActivityName(), 0);
-//                            activityNameAndTotalDurationMinutesMap.put(activity.getActivityName(), activityDuration + activity.getDurationMinutes());
-//                            activityNameAndColorCodeMap.putIfAbsent(activity.getActivityName(), (isNotNull(activity.getBackgroundColor()) && !BLANK_STRING.equals(activity.getBackgroundColor())) ? activity.getBackgroundColor() : AppConstants.KPI_DEFAULT_COLOR);
-//                        });
-//                        shiftDurationMinutes += shift.getDurationMinutes();
-//                    }
-//                }
-//                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT, DateUtils.getHoursByMinutes(shiftDurationMinutes.doubleValue())));
-//                activityNameAndTotalDurationMinutesMap.keySet().forEach(s -> subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(s, activityNameAndColorCodeMap.get(s), DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(s)))));
-//
-//            }
-//        }
-//        return clusteredBarChartKpiDataUnits;
-//    }
 
     private List<CommonKpiDataUnit> getDurationOfShiftAndActivity(Long organizationId, Map<FilterType, List> filterBasedCriteria, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
@@ -201,8 +173,8 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             shiftDurationMinutes += shift.getDurationMinutes();
         }
         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT, DateUtils.getHoursByMinutes(shiftDurationMinutes.doubleValue())));
-        for (String s : activityNameAndTotalDurationMinutesMap.keySet()) {
-            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(s, activityNameAndColorCodeMap.get(s), DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(s))));
+        for (String activityName : activityNameAndTotalDurationMinutesMap.keySet()) {
+            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityName, activityNameAndColorCodeMap.get(activityName), DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(activityName))));
         }
         return subClusteredBarValue;
     }
