@@ -23,3 +23,23 @@ db.applicableKPI.update(
     { $pull: { $applicableFilter:{criteriaList: { $elemMatch: {type: "TIME_INTERVAL" } }} }},
     { multi: true }
 )
+
+// Queries related to changes from UnitPosition to employment
+db.costTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.payOutPerShift.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.shifts.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.staffActivitySetting.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.dailyTimeBankEntries.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.staffWTACounter.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
+
+db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
+db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+
