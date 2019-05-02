@@ -1,4 +1,4 @@
-package com.kairos.commons.service.redis;
+package com.kairos.service.redis;
 
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import org.slf4j.Logger;

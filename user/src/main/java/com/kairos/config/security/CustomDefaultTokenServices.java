@@ -1,6 +1,6 @@
 package com.kairos.config.security;
 
-import com.kairos.commons.service.redis.RedisService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.service.auth.UserService;
