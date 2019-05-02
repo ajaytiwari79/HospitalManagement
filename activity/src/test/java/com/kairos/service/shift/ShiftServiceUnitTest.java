@@ -238,79 +238,107 @@ public class ShiftServiceUnitTest {
         assertTrue(result.getEscalationFreeShiftIds().containsAll(escalationFreeShiftIds));
     }
 
+
+    @Test
+    public void escalationShouldNotResolveFromShifts(){
+        ShiftDTO shiftDTO=ObjectMapperUtils.jsonStringToObject(getShiftDTOJSON(),ShiftDTO.class);
+        Shift shift=ObjectMapperUtils.jsonStringToObject(getShiftDTOJSON(),Shift.class);
+        Date updatedStartDate=DateUtils.parseDate("2019-05-12T04:00:00.000Z");
+        Date updatedEndDate=DateUtils.parseDate("2019-05-12T09:00:00.000Z");
+        Date startDate = shiftDTO.getStartDate();
+        Date endDate = shiftDTO.getEndDate();
+        ActivityWrapper activityWrapper=ObjectMapperUtils.jsonStringToObject(getActivityDetailsJson(),ActivityWrapper.class);
+        List<ShiftViolatedRules> shiftViolatedRules=ObjectMapperUtils.JsonStringToList(getListOfShiftViolationRules(),ShiftViolatedRules.class);
+        List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
+        when(shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId())).thenReturn(true);
+        when(shiftMongoRepository.findOne(shiftDTO.getId())).thenReturn(shift);
+        when(activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId())).thenReturn(activityWrapper);
+        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()))).thenReturn(shiftViolatedRules);
+        when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
+        shiftDTO.setStartDate(updatedStartDate);
+        shiftDTO.setEndDate(updatedEndDate);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
+        List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
+        escalationFreeShiftIds.add(new BigInteger("2636"));
+        escalationFreeShiftIds.add(new BigInteger("2637"));
+
+
+        assertTrue(!result.getEscalationFreeShiftIds().containsAll(escalationFreeShiftIds));
+    }
+
     private String getShiftDTOJSON(){
-        return "{\n" +
-                "   \"id\":2636,\n" +
-                "   \"startDate\":1557640800000,\n" +
-                "   \"endDate\":1557662400000,\n" +
-                "   \"bid\":0,\n" +
-                "   \"pId\":0,\n" +
-                "   \"amount\":0,\n" +
-                "   \"probability\":0,\n" +
-                "   \"unitId\":1172,\n" +
-                "   \"staffId\":1002,\n" +
-                "   \"employmentId\":19902,\n" +
-                "   \"shiftDate\":\"2019-05-12\",\n" +
-                "   \"activities\":[\n" +
-                "      {\n" +
-                "         \"status\":[\n" +
-                "\n" +
-                "         ],\n" +
-                "         \"message\":null,\n" +
-                "         \"success\":false,\n" +
-                "         \"activity\":null,\n" +
-                "         \"activityId\":823,\n" +
-                "         \"startDate\":1557640800000,\n" +
-                "         \"endDate\":1557662400000,\n" +
-                "         \"scheduledMinutes\":0,\n" +
-                "         \"durationMinutes\":360,\n" +
-                "         \"activityName\":\"Er tilgængelig\",\n" +
-                "         \"bid\":0,\n" +
-                "         \"pId\":0,\n" +
-                "         \"reasonCodeId\":null,\n" +
-                "         \"absenceReasonCodeId\":null,\n" +
-                "         \"remarks\":\"\",\n" +
-                "         \"id\":null,\n" +
-                "         \"timeType\":\"NON_WORKING_TYPE\",\n" +
-                "         \"backgroundColor\":null,\n" +
-                "         \"haltBreak\":false,\n" +
-                "         \"plannedTimeId\":null,\n" +
-                "         \"breakShift\":false,\n" +
-                "         \"breakReplaced\":true,\n" +
-                "         \"reasonCode\":null,\n" +
-                "         \"allowedBreakDurationInMinute\":null,\n" +
-                "         \"timeBankCtaBonusMinutes\":0,\n" +
-                "         \"timeBankCTADistributions\":[\n" +
-                "\n" +
-                "         ],\n" +
-                "         \"location\":null,\n" +
-                "         \"description\":null,\n" +
-                "         \"wtaRuleViolations\":null,\n" +
-                "         \"plannedMinutesOfTimebank\":0,\n" +
-                "         \"startLocation\":\"\",\n" +
-                "         \"endLocation\":\"\",\n" +
-                "         \"scheduledMinutesOfTimebank\":0,\n" +
-                "         \"scheduledMinutesOfPayout\":0\n" +
-                "      }\n" +
-                "   ],\n" +
-                "   \"scheduledMinutes\":0,\n" +
-                "   \"durationMinutes\":0,\n" +
-                "   \"editable\":false,\n" +
-                "   \"functionDeleted\":false,\n" +
-                "   \"timeBankCtaBonusMinutes\":0,\n" +
-                "   \"deltaTimeBankMinutes\":0,\n" +
-                "   \"accumulatedTimeBankMinutes\":0,\n" +
-                "   \"plannedMinutesOfTimebank\":0,\n" +
-                "   \"multipleActivity\":false,\n" +
-                "   \"restingMinutes\":0,\n" +
-                "   \"escalationReasons\":[\n" +
-                "\n" +
-                "   ],\n" +
-                "   \"escalationFreeShiftIds\":[\n" +
-                "\n" +
-                "   ],\n" +
-                "   \"escalationResolved\":false\n" +
-                "}" ;
+       return "{\n" +
+               "   \"id\":2636,\n" +
+               "   \"startDate\":1557640800000,\n" +
+               "   \"endDate\":1557662400000,\n" +
+               "   \"bid\":0,\n" +
+               "   \"pId\":0,\n" +
+               "   \"amount\":0,\n" +
+               "   \"probability\":0,\n" +
+               "   \"unitId\":1172,\n" +
+               "   \"staffId\":1002,\n" +
+               "   \"employmentId\":19902,\n" +
+               "   \"shiftDate\":\"2019-05-12\",\n" +
+               "   \"activities\":[\n" +
+               "      {\n" +
+               "         \"status\":[\n" +
+               "\n" +
+               "         ],\n" +
+               "         \"message\":null,\n" +
+               "         \"success\":false,\n" +
+               "         \"activity\":null,\n" +
+               "         \"activityId\":823,\n" +
+               "         \"startDate\":1557640800000,\n" +
+               "         \"endDate\":1557662400000,\n" +
+               "         \"scheduledMinutes\":0,\n" +
+               "         \"durationMinutes\":360,\n" +
+               "         \"activityName\":\"Er tilgængelig\",\n" +
+               "         \"bid\":0,\n" +
+               "         \"pId\":0,\n" +
+               "         \"reasonCodeId\":null,\n" +
+               "         \"absenceReasonCodeId\":null,\n" +
+               "         \"remarks\":\"\",\n" +
+               "         \"id\":null,\n" +
+               "         \"timeType\":\"NON_WORKING_TYPE\",\n" +
+               "         \"backgroundColor\":null,\n" +
+               "         \"haltBreak\":false,\n" +
+               "         \"plannedTimeId\":null,\n" +
+               "         \"breakShift\":false,\n" +
+               "         \"breakReplaced\":true,\n" +
+               "         \"reasonCode\":null,\n" +
+               "         \"allowedBreakDurationInMinute\":null,\n" +
+               "         \"timeBankCtaBonusMinutes\":0,\n" +
+               "         \"timeBankCTADistributions\":[\n" +
+               "\n" +
+               "         ],\n" +
+               "         \"location\":null,\n" +
+               "         \"description\":null,\n" +
+               "         \"wtaRuleViolations\":null,\n" +
+               "         \"plannedMinutesOfTimebank\":0,\n" +
+               "         \"startLocation\":\"\",\n" +
+               "         \"endLocation\":\"\",\n" +
+               "         \"scheduledMinutesOfTimebank\":0,\n" +
+               "         \"scheduledMinutesOfPayout\":0\n" +
+               "      }\n" +
+               "   ],\n" +
+               "   \"scheduledMinutes\":0,\n" +
+               "   \"durationMinutes\":0,\n" +
+               "   \"editable\":false,\n" +
+               "   \"functionDeleted\":false,\n" +
+               "   \"timeBankCtaBonusMinutes\":0,\n" +
+               "   \"deltaTimeBankMinutes\":0,\n" +
+               "   \"accumulatedTimeBankMinutes\":0,\n" +
+               "   \"plannedMinutesOfTimebank\":0,\n" +
+               "   \"multipleActivity\":false,\n" +
+               "   \"restingMinutes\":0,\n" +
+               "   \"escalationReasons\":[\n" +
+               "\n" +
+               "   ],\n" +
+               "   \"escalationFreeShiftIds\":[\n" +
+               "\n" +
+               "   ],\n" +
+               "   \"escalationResolved\":false\n" +
+               "}" ;
     }
 
     private String getShiftViolation(){

@@ -1,5 +1,29 @@
 db.getCollection('dailyTimeBankEntries').updateMany({},{$set:{"publishedBalances":{}}});
 
+//kpi configuration changes
+db.applicableKPI.update({}, {$set: {
+"kpiRepresentation" : "REPRESENT_PER_INTERVAL",
+    "frequencyType" : "DAYS",
+    "value" : 2,
+    "interval" : "LAST"
+}}, {multi:true})
+
+
+
+
+db.counter.update(
+    { },
+    { $pull: { filterTypes: { $in: [ "TIME_INTERVAL" ] }} },
+    { multi: true }
+)
+
+
+db.applicableKPI.update(
+    { },
+    { $pull: { $applicableFilter:{criteriaList: { $elemMatch: {type: "TIME_INTERVAL" } }} }},
+    { multi: true }
+)
+
 // Queries related to changes from UnitPosition to employment
 db.costTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } );
 
@@ -18,3 +42,4 @@ db.workingTimeAgreement.updateMany( {}, { $rename: { 'unitPositionId': 'employme
 db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
 db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
+

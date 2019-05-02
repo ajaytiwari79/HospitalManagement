@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
@@ -109,6 +110,10 @@ public class FibonacciKPIService {
         for (KPIDTO kpiCounter : fibonacciKPIDTO.getKpiCounters()) {
             counterServiceMapping.getService(kpiCounter.getType()).getFibonacciCalculatedCounter(null, UserContext.getUserDetails().getLastSelectedOrganizationId());
         }
+    }
+
+    public boolean fibonacciKPIExists(Set<BigInteger> kpiIds){
+        return fibonacciKPIRepository.existsByIdIn(kpiIds);
     }
 
 }

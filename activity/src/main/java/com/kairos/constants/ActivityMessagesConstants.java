@@ -33,8 +33,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_STAFF_NOT_FOUND_BY_USER = "message.staff.notFound.byUser";
     public static final String EXCEPTION_NO_BLOCK_TYPE_FOUND = "exception.no.block.type.found";
     public static final String ERROR_NAME_DUPLICATE = "error.name.duplicate";
-    public static final String ERROR_USER_PASSWORD_NOTNULL = "error.User.password.notnull";
-    public static final String ERROR_USER_PASSWORD_SIZE = "error.User.password.size";
+    public static final String ERROR_USER_PASSCODE_NOTNULL = "error.User.password.notnull";
+    public static final String ERROR_USER_PASSCODE_SIZE = "error.User.password.size";
     public static final String ERROR_TASKDEMAND_PRIORITY_RANGE = "error.TaskDemand.priority.range";
     public static final String ERROR_TASKDEMAND_STAFFCOUNT_MINIMUMONE = "error.TaskDemand.staffCount.minimumOne";
     public static final String MESSAGE_CTA_RULETEMPLATE_ALREADYEXIST = "message.cta.ruleTemplate.alreadyExist";

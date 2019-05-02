@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
-import static com.kairos.constants.CommonConstants.RESET_PASSWORD;
+import static com.kairos.constants.CommonConstants.RESET_PASSCODE;
 
 
 /**
@@ -521,15 +521,17 @@ public class UserService {
                 exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
             }
         }
-        String token = tokenService.createForgotPasswordToken(currentUser);
-        Map<String, Object> templateParam = new HashMap<>();
-        templateParam.put("receiverName", currentUser.getFullName());
-        templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
-        templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
-        templateParam.put("hyperLinkName", RESET_PASSWORD);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
-        return true;
-    }
+
+            String token = tokenService.createForgotPasswordToken(currentUser);
+            Map<String, Object> templateParam = new HashMap<>();
+            templateParam.put("receiverName", currentUser.getFullName());
+            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
+            templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
+            templateParam.put("hyperLinkName", RESET_PASSCODE);
+            mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+            return true;
+        }
+
 
     public boolean resetPassword(String token, PasswordUpdateDTO passwordUpdateDTO) {
         if (!passwordUpdateDTO.isValid()) {
