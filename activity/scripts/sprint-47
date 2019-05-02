@@ -43,3 +43,4 @@ db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentI
 
 db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
+db.dailyTimeBankEntries.createIndex({ employmentId:1,date:1,deleted:1}, { unique: true });
