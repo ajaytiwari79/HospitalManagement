@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.commons.config.redis.RedisConfig;
+import com.kairos.commons.service.redis.RedisService;
 import com.planner.appConfig.UserContextInterceptor;
 import com.planner.repository.common.MongoBaseRepositoryImpl;
 import org.slf4j.Logger;
@@ -32,7 +34,7 @@ import java.time.LocalDate;
 @ComponentScan(basePackages = "com.planner")
 @EnableAsync
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(exclude = {RedisConfig.class, RedisService.class})
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableNeo4jRepositories(basePackages ={"com.planner.repository"})
