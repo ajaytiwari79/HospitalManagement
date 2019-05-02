@@ -23,7 +23,7 @@ public class AccessGroupPermissionModelRelationshipType extends UserBaseEntity {
 
 
     @StartNode
-    private PermissionModel permissionModel;
+    private KPermissionModel KPermissionModel;
 
     @EndNode
     private AccessGroup accessGroup;

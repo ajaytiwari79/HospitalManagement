@@ -2,6 +2,8 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -25,13 +27,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Staff extends UserBaseEntity {
-
+    @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
     //address tab
+    @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_ADDRESS)
     private ContactAddress contactAddress;
 
+    @KPermissionSubModel
     @Relationship(type = SECONDARY_CONTACT_ADDRESS)
     private ContactAddress secondaryContactAddress;
 
@@ -45,30 +49,44 @@ public class Staff extends UserBaseEntity {
 
     private String generalNote;
     private String reqFromPerson;
+    @KPermissionField
     private String cardNumber;
     private boolean copyKariosMailToLogin;
+    @KPermissionField
     private String sendNotificationBy;
     private String profilePic;
+    @KPermissionField
     private String email;
+    @KPermissionField
     private String badgeNumber;
+    @KPermissionField
     private String userName;
 
     //time care external id`
+    @KPermissionField
     private Long externalId;
 
     //monaco id
     private String manacoId;
 
     //personal info
+    @KPermissionField
     private String firstName;
+    @KPermissionField
     private String lastName;
+    @KPermissionField
     private String familyName;
+    @KPermissionField
     private String signature;
+    @KPermissionField
     private String password;
     private String nationalInsuranceNumber;
+    @KPermissionField
     private StaffStatusEnum currentStatus;
+    @KPermissionField
     private Long inactiveFrom;
     private long organizationId;
+    @KPermissionField
     private Language language;
     // Visitour Speed Profile
     private Integer speedPercent;
