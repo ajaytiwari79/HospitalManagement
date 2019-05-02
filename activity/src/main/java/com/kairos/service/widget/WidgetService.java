@@ -60,7 +60,7 @@ public class WidgetService {
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
-        Date startDate = asDate(LocalDate.now().minusDays(2));
+        Date startDate = asDate(LocalDate.now().minusDays(1));
         Date endDate = asDate(LocalDate.now().plusDays(2));
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ShiftWithActivityDTO> shiftDTOs = shiftMongoRepository.findAllShiftBetweenDurationByUnitId(unitId, startDate, endDate);

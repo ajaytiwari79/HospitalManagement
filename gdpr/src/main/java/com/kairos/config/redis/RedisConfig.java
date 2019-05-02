@@ -34,10 +34,9 @@ public class RedisConfig {
     @Value("${spring.redis.password}")
     private String password;
 
-
     @Bean
-    public RedisTemplate<String, Map<String, String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Map<String, String>> template = new RedisTemplate<>();
+    public RedisTemplate<String, Map<String,String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Map<String,String>> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());

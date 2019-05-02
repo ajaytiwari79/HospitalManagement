@@ -259,7 +259,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate){
-        Aggregation aggregation = getShiftWithActivityAggregation(Criteria.where("unitId").is(unitId).and("startDate").gte(startDate).lte(endDate));
+        Aggregation aggregation = getShiftWithActivityAggregation(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).lte(endDate));
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }

@@ -1,7 +1,7 @@
 [ {
   "id" : 2581,
-  "startDate" : 1555781400000,
-  "endDate" : 1555810200000,
+  "startDate" : 1555801200000,
+  "endDate" : 1555830000000,
   "bid" : 0,
   "pId" : 0,
   "amount" : 0,
@@ -281,8 +281,8 @@
       "parentActivity" : false
     },
     "activityId" : 268,
-    "startDate" : 1555781400000,
-    "endDate" : 1555810200000,
+    "startDate" : 1555801200000,
+    "endDate" : 1555830000000,
     "scheduledMinutes" : 480,
     "durationMinutes" : 480,
     "activityName" : "Pleje ATA",

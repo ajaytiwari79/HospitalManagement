@@ -208,7 +208,7 @@ public class ShiftServiceUnitTest {
         try {
             shiftValidatorService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
         }catch (Exception e){
-        thrown=false;
+            thrown=false;
         }
         assertTrue(thrown);
 
@@ -223,21 +223,18 @@ public class ShiftServiceUnitTest {
         Date startDate = shiftDTO.getStartDate();
         Date endDate = shiftDTO.getEndDate();
         ActivityWrapper activityWrapper=ObjectMapperUtils.jsonStringToObject(getActivityDetailsJson(),ActivityWrapper.class);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO=ObjectMapperUtils.jsonStringToObject(getShiftViolation(),ShiftWithViolatedInfoDTO.class);
         List<ShiftViolatedRules> shiftViolatedRules=ObjectMapperUtils.JsonStringToList(getListOfShiftViolationRules(),ShiftViolatedRules.class);
         List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
         when(shiftMongoRepository.findOne(shiftDTO.getId())).thenReturn(shift);
         when(activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId())).thenReturn(activityWrapper);
         when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()))).thenReturn(shiftViolatedRules);
-        when(shiftMongoRepository.findShiftBetweenDurationByStaffId(shift.getStaffId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
+        when(shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
         ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));
-
-
         assertTrue(result.getEscalationFreeShiftIds().containsAll(escalationFreeShiftIds));
     }
 
@@ -251,7 +248,6 @@ public class ShiftServiceUnitTest {
         Date startDate = shiftDTO.getStartDate();
         Date endDate = shiftDTO.getEndDate();
         ActivityWrapper activityWrapper=ObjectMapperUtils.jsonStringToObject(getActivityDetailsJson(),ActivityWrapper.class);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO=ObjectMapperUtils.jsonStringToObject(getShiftViolation(),ShiftWithViolatedInfoDTO.class);
         List<ShiftViolatedRules> shiftViolatedRules=ObjectMapperUtils.JsonStringToList(getListOfShiftViolationRules(),ShiftViolatedRules.class);
         List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
         when(shiftMongoRepository.shiftOverLapped(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), shift.getId())).thenReturn(true);

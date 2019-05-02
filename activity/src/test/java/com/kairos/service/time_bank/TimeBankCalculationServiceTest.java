@@ -3,6 +3,7 @@ package com.kairos.service.time_bank;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constaints.JsonConstaints;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -11,7 +12,6 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constaints.JsonConstaints.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.FileReaderUtil.getFileDataAsString;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TimeBankCalculationServiceTest {
@@ -50,6 +51,8 @@ public class TimeBankCalculationServiceTest {
 
     @InjectMocks
     private TimeBankCalculationService timeBankCalculationService;
+    @Mock
+    private TimeBankCalculationService timeBankCalculationServiceMock;
     @Mock
     private TimeBankRepository timeBankRepository;
     @Mock private PlanningPeriodMongoRepository planningPeriodMongoRepository;
@@ -66,10 +69,7 @@ public class TimeBankCalculationServiceTest {
     private boolean validatedByPlanner;
     private Activity activity;
 
-    static{
-        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
-        System.setProperty("user.timezone", "UTC");
-    }
+    DailyTimeBankEntry todayDailyTimeBankEntry;
 
     @Before
     public void init(){
@@ -82,13 +82,14 @@ public class TimeBankCalculationServiceTest {
         dayTypeDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(DAYTYPE), DayTypeDTO.class);
         activity = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(ACTIVITY_FOR_TIMEBANK_CALCULATION), Activity.class);
         shifts = ObjectMapperUtils.JsonStringToList(getFileDataAsString(JsonConstaints.SHIFT), Shift.class);
-
+        todayDailyTimeBankEntry = new DailyTimeBankEntry(115l,154l,LocalDate.now());
     }
 
     @Test
-    public void getTimeBankByInterval() {
-        /*TimeBankCalculationService listWithData = mock(TimeBankCalculationService.class, Mockito.RETURNS_DEEP_STUBS);
-        when(listWithData.updatePublishedBalances(new DailyTimeBankEntry(),staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getUnitId(),new DailyTimeBankEntry().getDeltaAccumulatedTimebankMinutes())).thenReturn(null);
+    public void calculateDailyTimeBank() {
+        /*todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
+        when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
+        when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
@@ -102,6 +103,7 @@ public class TimeBankCalculationServiceTest {
         ctaDistributionCalculation.put(new BigInteger("3068"), 192);
         ctaDistributionCalculation.put(new BigInteger("3071"), 0);
         for (TimeBankCTADistribution timeBankCTADistribution : dailyTimeBankEntry.getTimeBankCTADistributionList()) {
+            LOGGER.debug("RuleTemplateId {}",timeBankCTADistribution.getCtaRuleTemplateId());
             Assert.assertEquals(ctaDistributionCalculation.get(timeBankCTADistribution.getCtaRuleTemplateId()), timeBankCTADistribution.getMinutes());
         }
         Assert.assertEquals(dailyTimeBankEntry.getScheduledMinutesOfTimeBank(), 480);
@@ -115,7 +117,10 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void getTimeBankByIntervalForNightShift() {
-        /*shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
+       /* todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
+        when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
+        when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
+        shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
@@ -183,7 +188,7 @@ public class TimeBankCalculationServiceTest {
         Map<LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals, dailyTimeBankEntries, unitPositionWithCtaDetailsDTO, startDate, endDate);*/
     }
 
-  //  @Test
+    //  @Test
     public void diffChecker(){
 
         DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(153l,179l,LocalDate.now());
@@ -191,35 +196,35 @@ public class TimeBankCalculationServiceTest {
 
         //DiffNode diff = ObjectDifferBuilder.buildDefault().compare(dailyTimeBankEntry, dailyTimeBankEntry2);
 
-            ObjectDifferBuilder builder = ObjectDifferBuilder.startBuilding();
-            //builder.inclusion().exclude().propertyNameOfType(User.class, "authorities");
-            DiffNode diff = builder.build().compare(dailyTimeBankEntry, dailyTimeBankEntry2);
-            final Map<String , Object> result = new  HashMap<String, Object>();
-            diff.visit(new DiffNode.Visitor()
-            {
-                @Override
-                public void node(DiffNode arg0, Visit arg1) {
-                    String path = arg0.getPath().getLastElementSelector().toHumanReadableString().toString();
-                    final Object oldValue = arg0.canonicalGet(dailyTimeBankEntry2);
-                    final Object newValue = arg0.canonicalGet(dailyTimeBankEntry);
-                    String properteyName = arg0.getPropertyName();
-                    if(isNotNull(properteyName) && isValid(arg0) || isValidPa(arg0)) {
-                        if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/")) {
-                            result.put("new_" + path, newValue);
-                            result.put("old_" + path, oldValue);
-                        }
-                        if((oldValue == null || newValue == null)) {
-                            result.put("new" + path, newValue);
-                            result.put("old" + path, oldValue);
-                        }
-                        if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/") && !arg0.hasChildren()) {
-                            result.put("new" + path, newValue);
-                            result.put("old" + path, oldValue);
-                        }
+        ObjectDifferBuilder builder = ObjectDifferBuilder.startBuilding();
+        //builder.inclusion().exclude().propertyNameOfType(User.class, "authorities");
+        DiffNode diff = builder.build().compare(dailyTimeBankEntry, dailyTimeBankEntry2);
+        final Map<String , Object> result = new  HashMap<String, Object>();
+        diff.visit(new DiffNode.Visitor()
+        {
+            @Override
+            public void node(DiffNode arg0, Visit arg1) {
+                String path = arg0.getPath().getLastElementSelector().toHumanReadableString().toString();
+                final Object oldValue = arg0.canonicalGet(dailyTimeBankEntry2);
+                final Object newValue = arg0.canonicalGet(dailyTimeBankEntry);
+                String properteyName = arg0.getPropertyName();
+                if(isNotNull(properteyName) && isValid(arg0) || isValidPa(arg0)) {
+                    if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/")) {
+                        result.put("new_" + path, newValue);
+                        result.put("old_" + path, oldValue);
+                    }
+                    if((oldValue == null || newValue == null)) {
+                        result.put("new" + path, newValue);
+                        result.put("old" + path, oldValue);
+                    }
+                    if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/") && !arg0.hasChildren()) {
+                        result.put("new" + path, newValue);
+                        result.put("old" + path, oldValue);
                     }
                 }
+            }
 
-            });
+        });
         LOGGER.info("test {}",result);
     }
 

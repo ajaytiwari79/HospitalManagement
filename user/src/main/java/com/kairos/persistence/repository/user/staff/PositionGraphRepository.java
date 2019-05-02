@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
@@ -57,8 +58,8 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             " MATCH(position)-[r:"+ HAS_REASON_CODE +"]-(reasonCode:ReasonCode) WHERE id(staff)={0} delete r")
     void deletePositionReasonCodeRelation(Long staffId);
     
-    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]-(position:Position) WHERE id(position)={0} RETURN id(staff)")
-    Long findStaffByPositionId(Long positionId);
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]-(position:Position) WHERE id(position)={0} RETURN staff")
+    Staff findStaffByPositionId(Long positionId);
 
     @Query("MATCH (organization:Organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
             "Match (organization)<-[:" + HAS_SUB_ORGANIZATION+"*]-(org:Organization{isParentOrganization:true,isKairosHub:false})" +

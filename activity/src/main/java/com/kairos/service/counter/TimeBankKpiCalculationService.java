@@ -208,6 +208,7 @@ public class TimeBankKpiCalculationService implements CounterService {
         Map<Long, List<DailyTimeBankEntry>> longListMap;
         Map<DateTimeInterval,List<DailyTimeBankEntry>> dateTimeIntervalListMap1 = getDailyTimeBankEntryByInterval(employmentAndDailyTimeBank,dateTimeIntervals);
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+            subClusteredBarValue=new ArrayList<>();
           longListMap=dateTimeIntervalListMap1.getOrDefault(dateTimeInterval,new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
             for (Long unitId : unitIds) {
                 Long totalTimeBankOfUnit = 0l;

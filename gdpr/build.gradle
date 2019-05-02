@@ -107,4 +107,4 @@ dependencyManagement {
 }
 
 
-bootRun.systemProperties = System.properties
+//bootRun.systemProperties = System.properties
