@@ -683,4 +683,51 @@ public class PositionService {
         }
         return true;
     }
+
+    public void createPosition(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        if(!Optional.ofNullable(accessGroup).isPresent()) {
+            exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
+
+        }
+        if(accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
+            exceptionService.actionNotPermittedException("error.access.expired", accessGroup.getName());
+        }
+        Position position;
+        if(employmentAlreadyExist) {
+            position = (Optional.ofNullable(organization).isPresent()) ? positionGraphRepository.findPosition(organization.getId(), staff.getId()) : positionGraphRepository.findPosition(unit.getId(), staff.getId());
+        } else {
+            position = new Position();
+        }
+        position.setName("Working as staff");
+        position.setStaff(staff);
+        position.setStartDateMillis(employedSince);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(unit);
+        unitPermission.setAccessGroup(accessGroup);
+        position.getUnitPermissions().add(unitPermission);
+        positionGraphRepository.save(position);
+        if(Optional.ofNullable(organization).isPresent()) {
+            if(Optional.ofNullable(organization.getPositions()).isPresent()) {
+                organization.getPositions().add(position);
+                organizationGraphRepository.save(organization);
+            } else {
+                List<Position> positions = new ArrayList<>();
+                positions.add(position);
+                organization.setPositions(positions);
+                organizationGraphRepository.save(organization);
+            }
+        } else {
+            if(Optional.ofNullable(unit.getPositions()).isPresent()) {
+                unit.getPositions().add(position);
+                organizationGraphRepository.save(unit);
+            } else {
+                List<Position> positions = new ArrayList<>();
+                positions.add(position);
+                unit.setPositions(positions);
+                organizationGraphRepository.save(unit);
+            }
+
+        }
+    }
 }

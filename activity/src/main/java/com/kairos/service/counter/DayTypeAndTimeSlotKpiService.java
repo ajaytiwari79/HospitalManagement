@@ -40,6 +40,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
 import static com.kairos.commons.utils.ObjectUtils.*;
 
+
 @Service
 public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Inject

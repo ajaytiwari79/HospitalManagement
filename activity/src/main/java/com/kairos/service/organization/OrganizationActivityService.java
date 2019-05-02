@@ -41,6 +41,7 @@ import com.kairos.service.activity.ActivityPriorityService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
@@ -125,6 +126,8 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject private ActivityPriorityService activityPriorityService;
     @Inject
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
+    @Inject
+    private KPISetService kpiSetService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
@@ -482,6 +485,7 @@ public class OrganizationActivityService extends MongoBaseService {
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId,orgTypeAndSubTypeDTO);
+        kpiSetService.copyKPISets(unitId,orgTypeAndSubTypeDTO.getSubTypeId(),orgTypeAndSubTypeDTO.getCountryId());
 
         return true;
     }
