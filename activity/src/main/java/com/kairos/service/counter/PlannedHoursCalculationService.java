@@ -49,19 +49,17 @@ public class PlannedHoursCalculationService implements CounterService {
     private double getPlannedHoursOfStaff(List<Shift> shifts) {
         long plannedHours = 0l;
         for (Shift shift : shifts) {
-            for (ShiftActivity shiftActivity : shift.getActivities()) {
-                plannedHours += shiftActivity.getTimeBankCtaBonusMinutes() + shiftActivity.getScheduledMinutes();
-            }
+            plannedHours += shift.getPlannedMinutesOfTimebank() + shift.getPlannedMinutesOfPayout();
         }
         return DateUtils.getHoursByMinutes(plannedHours);
     }
 
-    public Map<Object, Double> calculatePlannedHours(List<Long> staffIds, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts) {
+    public Map<Object, Double> calculatePlannedHours(List<Long> staffIds, KPIRepresentation kpiRepresentation, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts) {
         Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
-        return calculateDataByKpiRepresentation(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getKpiRepresentation(), shifts);
+        return calculateDataByKpiRepresentation(staffIds, dateTimeIntervalListMap, dateTimeIntervals, kpiRepresentation, shifts);
     }
 
 
@@ -90,7 +88,7 @@ public class PlannedHoursCalculationService implements CounterService {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         staffIds=staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
-        Map<Object, Double> staffPlannedHours = calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
+        Map<Object, Double> staffPlannedHours = calculatePlannedHours(staffIds, applicableKPI.getKpiRepresentation(), dateTimeIntervals, shifts);
         getKpiDataUnits(multiplicationFactor, staffPlannedHours, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
         return kpiDataUnits;
     }
