@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
+import com.kairos.commons.service.redis.RedisService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.redis.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -145,7 +145,7 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
     }
 
     private boolean removeTokenFromRedis(String userName, String accessToken) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, accessToken);
+        return redisService.removeUserTokenFromRedisByUserNameAndToken(userName, accessToken);
     }
 
 }

@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.service.redis.RedisService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -40,7 +41,6 @@ import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.auth.RedisService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
