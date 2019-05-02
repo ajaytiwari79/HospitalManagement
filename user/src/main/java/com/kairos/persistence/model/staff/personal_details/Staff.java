@@ -2,8 +2,8 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.annotations.PermissionField;
-import com.kairos.annotations.PermissionSubModel;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -27,15 +27,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Staff extends UserBaseEntity {
-    @PermissionSubModel
+    @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
     //address tab
-    @PermissionSubModel
+    @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_ADDRESS)
     private ContactAddress contactAddress;
 
-    @PermissionSubModel
+    @KPermissionSubModel
     @Relationship(type = SECONDARY_CONTACT_ADDRESS)
     private ContactAddress secondaryContactAddress;
 
@@ -49,44 +49,44 @@ public class Staff extends UserBaseEntity {
 
     private String generalNote;
     private String reqFromPerson;
-    @PermissionField
+    @KPermissionField
     private String cardNumber;
     private boolean copyKariosMailToLogin;
-    @PermissionField
+    @KPermissionField
     private String sendNotificationBy;
     private String profilePic;
-    @PermissionField
+    @KPermissionField
     private String email;
-    @PermissionField
+    @KPermissionField
     private String badgeNumber;
-    @PermissionField
+    @KPermissionField
     private String userName;
 
     //time care external id`
-    @PermissionField
+    @KPermissionField
     private Long externalId;
 
     //monaco id
     private String manacoId;
 
     //personal info
-    @PermissionField
+    @KPermissionField
     private String firstName;
-    @PermissionField
+    @KPermissionField
     private String lastName;
-    @PermissionField
+    @KPermissionField
     private String familyName;
-    @PermissionField
+    @KPermissionField
     private String signature;
-    @PermissionField
+    @KPermissionField
     private String password;
     private String nationalInsuranceNumber;
-    @PermissionField
+    @KPermissionField
     private StaffStatusEnum currentStatus;
-    @PermissionField
+    @KPermissionField
     private Long inactiveFrom;
     private long organizationId;
-    @PermissionField
+    @KPermissionField
     private Language language;
     // Visitour Speed Profile
     private Integer speedPercent;

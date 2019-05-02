@@ -2,7 +2,7 @@ package com.kairos.persistence.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.annotations.PermissionField;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.HousingType;
@@ -23,19 +23,19 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class ContactAddress extends UserBaseEntity{
-    @PermissionField
+    @KPermissionField
     private String street;
-    @PermissionField
+    @KPermissionField
     private int floorNumber;
-    @PermissionField
+    @KPermissionField
     private String houseNumber;
-    @PermissionField
+    @KPermissionField
     private String city;
-    @PermissionField
+    @KPermissionField
     private String regionCode;
 
     private String regionName;
-    @PermissionField
+    @KPermissionField
     private String province;
 
     @Relationship(type = TYPE_OF_HOUSING)
@@ -51,7 +51,7 @@ public class ContactAddress extends UserBaseEntity{
 
     private long endDate;
 
-    @PermissionField
+    @KPermissionField
     private String country;
 
     private boolean privateAddress;
@@ -66,10 +66,10 @@ public class ContactAddress extends UserBaseEntity{
         return isAddressProtected;
     }
 
-    @PermissionField
+    @KPermissionField
     private boolean isAddressProtected;
 
-    @PermissionField
+    @KPermissionField
     private String streetUrl;
 
     private boolean isEnabled = true;
@@ -81,14 +81,14 @@ public class ContactAddress extends UserBaseEntity{
 
     @Relationship(type = CURRENCY)
     private Currency currency;
-    @PermissionField
+    @KPermissionField
     @Relationship(type = ZIP_CODE)
     private ZipCode zipCode;
 
     @Relationship(type = ADDRESS_ACCESS_DEAILS)
     private AccessToLocation accessToLocation;
 
-    @PermissionField
+    @KPermissionField
     @Relationship(type = MUNICIPALITY)
     private Municipality municipality;
 

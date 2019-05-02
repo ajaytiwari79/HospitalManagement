@@ -17,18 +17,18 @@ import static org.neo4j.ogm.annotation.Relationship.OUTGOING;
 @Setter
 @NoArgsConstructor
 @NodeEntity
-public class PermissionModel extends UserBaseEntity {
+public class KPermissionModel extends UserBaseEntity {
     @NotBlank(message = "error.name.notnull")
     private String modelName;
 
 
     @Relationship(type = HAS_FIELD,direction = OUTGOING)
-    private List<PermissionField> fields = new ArrayList<>();
+    private List<KPermissionField> fields = new ArrayList<>();
 
     private boolean isPermissionSubModel;
 
     @Relationship(type = HAS_SUB_MODEL,direction = OUTGOING)
-    private List<PermissionModel> subModels = new ArrayList<>();
+    private List<KPermissionModel> subModels = new ArrayList<>();
 
 
 }

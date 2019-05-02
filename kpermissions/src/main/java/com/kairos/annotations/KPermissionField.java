@@ -8,6 +8,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface PermissionSubModel {
+public @interface KPermissionField {
+
+    public boolean enabled() default true;
+    //public String value();
 
 }
