@@ -1,4 +1,4 @@
-package com.kairos.config.redis;
+package com.kairos.commons.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,12 +31,13 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int redisPort;
 
-    @Value("${spring.redis.password}")
-    private String password;
+    @Value("${spring.redis.passcode}")
+    private String passcode;
+
 
     @Bean
-    public RedisTemplate<String, Map<String,String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Map<String,String>> template = new RedisTemplate<>();
+    public RedisTemplate<String, Map<String, String>> redisTemplateUser(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Map<String, String>> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());
@@ -53,7 +54,7 @@ public class RedisConfig {
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName,redisPort);
-        standaloneConfiguration.setPassword(RedisPassword.of(password));
+        standaloneConfiguration.setPassword(RedisPassword.of(passcode));
         return new JedisConnectionFactory(standaloneConfiguration);
     }
 

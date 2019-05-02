@@ -1,8 +1,8 @@
 package com.kairos.config.security;
 
+import com.kairos.commons.service.redis.RedisService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.auth.UserPrincipal;
-import com.kairos.service.auth.RedisService;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
