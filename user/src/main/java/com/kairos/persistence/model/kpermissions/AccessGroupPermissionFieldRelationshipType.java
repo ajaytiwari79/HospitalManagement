@@ -23,7 +23,7 @@ public class AccessGroupPermissionFieldRelationshipType extends UserBaseEntity {
 
 
     @StartNode
-    private PermissionField permissionField;
+    private KPermissionField KPermissionField;
 
     @EndNode
     private AccessGroup accessGroup;
