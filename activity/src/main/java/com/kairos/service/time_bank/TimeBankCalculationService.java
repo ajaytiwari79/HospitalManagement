@@ -214,7 +214,7 @@ public class TimeBankCalculationService {
     public int calculateCTARuleTemplateBonus(CTARuleTemplateDTO ctaRuleTemplateDTO, DateTimeInterval dateTimeInterval, DateTimeInterval shiftDateTimeInterval) {
         int ctaTimeBankMin = 0;
         Interval shiftInterval = new Interval(shiftDateTimeInterval.getStartDate().getTime(), shiftDateTimeInterval.getEndDate().getTime());
-        LOGGER.debug("rule template : {} shiftInterval",ctaRuleTemplateDTO.getId(),shiftInterval);
+        LOGGER.debug("rule template : {} shiftInterval {}",ctaRuleTemplateDTO.getId(),shiftInterval);
         for (CompensationTableInterval ctaInterval : ctaRuleTemplateDTO.getCompensationTable().getCompensationTableInterval()) {
             List<Interval> intervalOfCTAs = getCTAInterval(ctaInterval, new DateTime(dateTimeInterval.getStartDate()));
             LOGGER.debug("rule template : {} interval size {}",ctaRuleTemplateDTO.getId(),intervalOfCTAs);
