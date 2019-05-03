@@ -1,5 +1,8 @@
 package com.kairos.persistence.model.auth;
 
+import com.kairos.annotations.KPermissionRelationshipChild;
+import com.kairos.annotations.KPermissionRelationshipModel;
+import com.kairos.annotations.KPermissionRelationshipParent;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -13,12 +16,14 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF
 /**
  * Created by oodles on 21/10/16.
  */
+@KPermissionRelationshipModel
 @RelationshipEntity(type = STAFF_HAS_SKILLS)
 public class StaffSkillLevelRelationship extends UserBaseEntity {
-
+    @KPermissionRelationshipParent
     @StartNode
     private Staff staff;
 
+    @KPermissionRelationshipChild
     @EndNode
     private Skill skill;
 
