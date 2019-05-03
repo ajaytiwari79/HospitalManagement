@@ -49,7 +49,9 @@ public class PlannedHoursCalculationService implements CounterService {
     private double getPlannedHoursOfStaff(List<Shift> shifts) {
         long plannedHours = 0l;
         for (Shift shift : shifts) {
-            plannedHours += shift.getPlannedMinutesOfTimebank() + shift.getPlannedMinutesOfPayout();
+            for (ShiftActivity shiftActivity : shift.getActivities()) {
+                plannedHours += shiftActivity.getTimeBankCtaBonusMinutes() + shiftActivity.getScheduledMinutes();
+            }
         }
         return DateUtils.getHoursByMinutes(plannedHours);
     }
