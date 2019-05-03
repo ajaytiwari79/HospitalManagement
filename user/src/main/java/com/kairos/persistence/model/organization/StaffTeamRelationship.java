@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
  */
 
 @RelationshipEntity(type = TEAM_HAS_MEMBER)
-public class StaffRelationship extends UserBaseEntity {
+public class StaffTeamRelationship extends UserBaseEntity {
 
     @StartNode
     private Team team;
@@ -25,11 +25,12 @@ public class StaffRelationship extends UserBaseEntity {
 
     private boolean isEnabled = true;
 
-    public StaffRelationship() {
+    public StaffTeamRelationship() {
+        //Default Constructor
     }
 
 
-    public StaffRelationship(Team team, Staff staff) {
+    public StaffTeamRelationship(Team team, Staff staff) {
         this.team = team;
         this.staff = staff;
     }
