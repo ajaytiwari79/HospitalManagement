@@ -1,4 +1,4 @@
-package com.kairos.commons.config.redis;
+package com.kairos.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

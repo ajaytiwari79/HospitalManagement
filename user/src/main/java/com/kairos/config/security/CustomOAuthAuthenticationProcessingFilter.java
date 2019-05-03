@@ -1,6 +1,6 @@
 package com.kairos.config.security;
 
-import com.kairos.commons.service.redis.RedisService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
