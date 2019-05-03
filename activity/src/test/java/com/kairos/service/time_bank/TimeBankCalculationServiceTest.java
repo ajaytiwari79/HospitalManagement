@@ -70,6 +70,12 @@ public class TimeBankCalculationServiceTest {
 
     DailyTimeBankEntry todayDailyTimeBankEntry;
 
+    static {
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
+        DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
+    }
+
     @Before
     public void init(){
         staffEmploymentDetails = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(EMPLOYMENT_DETAILS),StaffEmploymentDetails.class);
@@ -86,21 +92,10 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void calculateDailyTimeBank() {
-        LOGGER.info("time zone ========> {}",java.util.TimeZone.getDefault());
-        LOGGER.info("System time zone ========> {}",System.getProperty("user.timezone"));
-        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
-        System.setProperty("user.timezone", "UTC");
-        DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
-        LOGGER.info("Date time zone ========> {}",DateTimeZone.getDefault());
-        LOGGER.info("time zone ========> {}",java.util.TimeZone.getDefault());
-        LOGGER.info("System time zone ========> {}",System.getProperty("user.timezone"));
-        LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
-        LOGGER.info("date time interval {} endDate {}",interval.getStart(),interval.getEnd());
         todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
-        LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
         ctaDistributionCalculation.put(new BigInteger("3061"), 480);
         ctaDistributionCalculation.put(new BigInteger("3062"), 0);
