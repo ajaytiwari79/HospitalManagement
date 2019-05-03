@@ -34,13 +34,14 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -134,6 +135,7 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private PlanningPeriodService planningPeriodService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private ActivityPriorityMongoRepository activityPriorityMongoRepository;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
@@ -911,6 +913,7 @@ public class ActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findByNameAndOrganizationId(activityDTO.getActivityPriority().getName(),activityDTO.getUnitId());
         Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(), Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
@@ -918,7 +921,8 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
-        save(activityCopied);
+        if(Optional.ofNullable(activityPriority).isPresent()) activityCopied.setActivityPriorityId(activityPriority.getId());
+        activityMongoRepository.save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         activityDTO.setActivityCanBeCopied(true);
         return activityDTO;
