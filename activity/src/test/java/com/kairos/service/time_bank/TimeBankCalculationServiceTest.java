@@ -87,9 +87,8 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void calculateDailyTimeBank() {
-        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
-        System.setProperty("user.timezone", "UTC");
         LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
+        System.out.println("Shift time {}"+shiftWithActivityDTOS.get(0).getStartDate());
         todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
