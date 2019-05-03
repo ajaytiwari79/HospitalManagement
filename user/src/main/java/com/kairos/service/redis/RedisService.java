@@ -24,15 +24,15 @@ public class RedisService extends CommonsExceptionUtil {
 
     public void saveTokenInRedis(String userName, String accessToken) {
 
-        Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
+        Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
         String tokenKey = getTokenKey(accessToken);
-        if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
-            userTokensFromDifferentMachine.put(tokenKey, accessToken);
+        if (Optional.ofNullable(userTokens).isPresent()) {
+            userTokens.put(tokenKey, accessToken);
         } else {
-            userTokensFromDifferentMachine = new HashMap<>();
-            userTokensFromDifferentMachine.put(tokenKey, accessToken);
+            userTokens = new HashMap<>();
+            userTokens.put(tokenKey, accessToken);
         }
-        valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
+        valueOperations.opsForValue().set(userName, userTokens);
         LOGGER.info("saved user token into redis");
 
     }
@@ -45,10 +45,10 @@ public class RedisService extends CommonsExceptionUtil {
 
 
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
-        Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
+        Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
         boolean validToken = false;
-        if (userTokensFromDifferentMachine != null) {
-            String userAccessToken = userTokensFromDifferentMachine.get(getTokenKey(accessToken));
+        if (userTokens != null) {
+            String userAccessToken = userTokens.get(getTokenKey(accessToken));
             if (accessToken.equalsIgnoreCase(userAccessToken)) {
                 validToken = true;
             }
@@ -58,17 +58,17 @@ public class RedisService extends CommonsExceptionUtil {
 
     public boolean removeUserTokenFromRedisByUserNameAndToken(String userName,  String accessToken) {
         boolean tokenRemoved = false;
-        Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
-        if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
+        Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
+        if (Optional.ofNullable(userTokens).isPresent()) {
             String tokenKey=getTokenKey(accessToken);
-            if (userTokensFromDifferentMachine.size()==1)
+            if (userTokens.size()==1)
                 valueOperations.delete(userName);
             else {
-                if (!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
+                if (!userTokens.get(tokenKey).equalsIgnoreCase(accessToken)) {
                     internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
                 }
-                userTokensFromDifferentMachine.remove(tokenKey);
-                valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
+                userTokens.remove(tokenKey);
+                valueOperations.opsForValue().set(userName, userTokens);
             }
             tokenRemoved = true;
         } else {

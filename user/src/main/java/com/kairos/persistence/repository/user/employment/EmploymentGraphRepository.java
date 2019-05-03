@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentLineEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.employment.query_result.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -311,6 +312,12 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(employment)-[:"+IN_UNIT+"]-(org:Organization)\n" +
             "RETURN id(employment) as id,employment.startDate as startDate,employment.endDate as endDate,org.name as unitName \n ")
     EmploymentQueryResult findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate, long id, EmploymentSubType employmentSubType);
+
+
+
+    @Query("MATCH(employment:Employment)-[:"+HAS_EMPLOYMENT_LINES+"]->(employmentLines:EmploymentLine{deleted:false}) " +
+            "WHERE id(employment) IN {0} AND ( employmentLines.endDate IS NULL OR DATE(employmentLines.endDate) > DATE({1})) WITH employmentLines SET employmentLines.endDate = {1} RETURN  COUNT(employmentLines)>0")
+    boolean updateEmploymentLineEndDateByEmploymentIds(Set<Long> employmentIds,String endDate);
 
 
 }
