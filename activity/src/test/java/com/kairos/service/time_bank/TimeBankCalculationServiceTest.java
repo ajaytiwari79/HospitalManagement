@@ -94,6 +94,7 @@ public class TimeBankCalculationServiceTest {
         LOGGER.info("time zone ========> {}",java.util.TimeZone.getDefault());
         LOGGER.info("System time zone ========> {}",System.getProperty("user.timezone"));
         LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
+        LOGGER.info("date time interval {} endDate {}",interval.getStart(),interval.getEnd());
         todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
