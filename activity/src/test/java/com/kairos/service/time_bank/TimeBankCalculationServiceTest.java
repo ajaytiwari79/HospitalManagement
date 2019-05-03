@@ -73,6 +73,8 @@ public class TimeBankCalculationServiceTest {
 
     @Before
     public void init(){
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
         staffEmploymentDetails = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(EMPLOYMENT_DETAILS),StaffEmploymentDetails.class);
         staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmploymentDetails,dayTypeDTOS);
         interval = new DateTimeInterval(1555718400000l,1555804800000l);
