@@ -315,8 +315,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
 
 
-    @Query("Match(employment:Employment)-[:"+HAS_EMPLOYMENT_LINES+"]->(employmentLines:EmploymentLine{deleted:false}) " +
-            "where id(employment) in {0} And ( employmentLines.endDate IS NULL OR DATE(employmentLines.endDate) > DATE({1}))  with employmentLines set employmentLines.endDate = {1} return  count(employmentLines)>0")
+    @Query("MATCH(employment:Employment)-[:"+HAS_EMPLOYMENT_LINES+"]->(employmentLines:EmploymentLine{deleted:false}) " +
+            "WHERE id(employment) IN {0} AND ( employmentLines.endDate IS NULL OR DATE(employmentLines.endDate) > DATE({1})) WITH employmentLines SET employmentLines.endDate = {1} RETURN  COUNT(employmentLines)>0")
     boolean updateEmploymentLineEndDateByEmploymentIds(Set<Long> employmentIds,String endDate);
 
 
