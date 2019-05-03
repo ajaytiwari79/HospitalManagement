@@ -868,7 +868,7 @@ public class ShiftValidatorService {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
         overLappedShifts.forEach(overLappedShift -> {
-            if (!shiftOverLappedWithOther(overLappedShift) && !shiftViolatedRulesMap.get(overLappedShift.getId()).getEscalationReasons().contains(ShiftEscalationReason.WORK_TIME_AGREEMENT)) {
+            if (!shiftOverLappedWithOther(overLappedShift) && isCollectionEmpty(shiftViolatedRulesMap.get(overLappedShift.getId()).getWorkTimeAgreements())) {
                 shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
                 shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
             }
@@ -880,8 +880,8 @@ public class ShiftValidatorService {
 
     public Set<BigInteger> getEscalationFreeShifts(List<BigInteger> shiftIds) {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
-        List<ShiftViolatedRules> escalationFreeViolatedRules = shiftViolatedRules.stream().filter(k -> k.isEscalationResolved()).collect(Collectors.toList());
-        return escalationFreeViolatedRules.stream().map(k -> k.getShiftId()).collect(Collectors.toSet());
+        List<ShiftViolatedRules> escalationFreeViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isEscalationResolved).collect(Collectors.toList());
+        return escalationFreeViolatedRules.stream().map(ShiftViolatedRules::getShiftId).collect(Collectors.toSet());
     }
 
     private boolean shiftOverLappedWithOther(Shift shift) {
