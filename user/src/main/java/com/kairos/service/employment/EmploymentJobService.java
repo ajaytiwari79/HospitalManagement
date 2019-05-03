@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,12 +136,16 @@ public class EmploymentJobService {
         if (!reasonCode.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
         }
-
         for (Employment employment : employments) {
             employment.setEndDate(DateUtils.getLocalDate(endDateMillis));
             if (!Optional.ofNullable(employment.getReasonCode()).isPresent()) {
                 employment.setReasonCode(reasonCode.get());
             }
+        }
+        if (CollectionUtils.isNotEmpty(employments))
+        {
+            Set<Long> employmentIds=employments.stream().map(Employment::getId).collect(Collectors.toSet());
+            employmentGraphRepository.updateEmploymentLineEndDateByEmploymentIds(employmentIds,DateUtils.getLocalDate(endDateMillis).toString());
         }
 
         Position position = positionGraphRepository.findByStaffId(staffId);
