@@ -109,6 +109,7 @@ public class TimeBankCalculationService {
                 for (ShiftWithActivityDTO shift : shifts) {
                     for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                         ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                        LOGGER.info("rule template : {} valid {}", ruleTemplate.getId(),ruleTemplateValid);
                         if(ruleTemplateValid) {
                             int ctaBonusAndScheduledMinutes = 0;
                             if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && dateTimeInterval.contains(shiftActivity.getStartDate().getTime())) {
@@ -117,6 +118,7 @@ public class TimeBankCalculationService {
                                 shiftActivity.setScheduledMinutesOfTimebank(shiftActivity.getScheduledMinutes() + shiftActivity.getScheduledMinutesOfTimebank());
                             } else if(ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                 ctaBonusAndScheduledMinutes = getAndUpdateCtaBonusMinutes(dateTimeInterval, ctaTimeBankMinMap, ruleTemplate, shiftActivity);
+                                LOGGER.info("rule template : {} minutes {}", ruleTemplate.getId(),ctaBonusAndScheduledMinutes);
                             }
                             shiftActivity.setPlannedMinutesOfTimebank(ctaBonusAndScheduledMinutes);
                             totalDailyPlannedMinutes += ctaBonusAndScheduledMinutes;

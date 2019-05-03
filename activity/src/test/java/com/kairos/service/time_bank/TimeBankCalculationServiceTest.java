@@ -111,7 +111,7 @@ public class TimeBankCalculationServiceTest {
         ctaDistributionCalculation.put(new BigInteger("3068"), 192);
         ctaDistributionCalculation.put(new BigInteger("3071"), 0);
         for (TimeBankCTADistribution timeBankCTADistribution : dailyTimeBankEntry.getTimeBankCTADistributionList()) {
-            LOGGER.debug("RuleTemplateId {}",timeBankCTADistribution.getCtaRuleTemplateId());
+            LOGGER.debug("RuleTemplateId {} {}",timeBankCTADistribution.getCtaRuleTemplateId(),timeBankCTADistribution.getMinutes());
             Assert.assertEquals(ctaDistributionCalculation.get(timeBankCTADistribution.getCtaRuleTemplateId()), timeBankCTADistribution.getMinutes());
         }
         Assert.assertEquals(dailyTimeBankEntry.getScheduledMinutesOfTimeBank(), 480);
