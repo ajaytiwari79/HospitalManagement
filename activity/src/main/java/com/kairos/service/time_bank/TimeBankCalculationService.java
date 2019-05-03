@@ -1124,6 +1124,7 @@ public class TimeBankCalculationService {
             todayDailyTimeBankEntry = new DailyTimeBankEntry(dailyTimeBankEntry.getEmploymentId(), dailyTimeBankEntry.getStaffId(), java.time.LocalDate.now());
             todayDailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(-contractualMinutes);
             todayDailyTimeBankEntry.setContractualMinutes(contractualMinutes);
+            todayDailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
         }
         todayDailyTimeBankEntry.getPublishedBalances().put(dailyTimeBankEntry.getDate(), deltaAccumulatedTimebankMinutes);
         return timeBankRepository.save(todayDailyTimeBankEntry);
@@ -1136,20 +1137,21 @@ public class TimeBankCalculationService {
         endDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : endDate.isBefore(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
         Set<PhaseDefaultName> validPhaseForActualTimeBank = newHashSet(DRAFT, PhaseDefaultName.REALTIME, TIME_ATTENDANCE, PhaseDefaultName.TENTATIVE, PhaseDefaultName.PAYROLL);
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
+            int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                //TODO please remove this if else after complete KP-7067
-                if(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() == 0 && validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
-                    int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
+                if(deltaTimeBankMinutes!=dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes()) {
                     actualTimebank += deltaTimeBankMinutes;
-                }else {
-                    actualTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
                 }
+                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();//-deltaTimeBankMinutes;
+                actualTimebank+=deltaTimeBankMinutes;
+                LOGGER.debug("delta timebank {}",dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
+                LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             } else if(validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
-                int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
                 actualTimebank += deltaTimeBankMinutes;
+                LOGGER.debug("delta timebank {}",deltaTimeBankMinutes);
+                LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             }
-            LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return actualTimebank;

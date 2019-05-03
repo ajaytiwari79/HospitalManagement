@@ -1,14 +1,11 @@
-package com.kairos.service.auth;
+package com.kairos.service.redis;
 
-import com.kairos.service.exception.ExceptionService;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,15 +14,13 @@ import java.util.Optional;
  * created by @bobby sharma
  */
 @Service
-public class RedisService {
+public class RedisService extends CommonsExceptionUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(RedisService.class);
+
+    private static Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
 
     @Inject
     private RedisTemplate<String, Map<String, String>> valueOperations;
-
-    @Inject
-    private ExceptionService exceptionService;
 
     public void saveTokenInRedis(String userName, String accessToken) {
 
@@ -38,7 +33,7 @@ public class RedisService {
             userTokensFromDifferentMachine.put(tokenKey, accessToken);
         }
         valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
-        logger.info("saved user token into redis");
+        LOGGER.info("saved user token into redis");
 
     }
 
@@ -46,6 +41,8 @@ public class RedisService {
     public void invalidateAllTokenOfUser(String userName) {
         valueOperations.delete(userName);
     }
+
+
 
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
@@ -59,23 +56,23 @@ public class RedisService {
         return validToken;
     }
 
-    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName, String accessToken) {
+    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName,  String accessToken) {
         boolean tokenRemoved = false;
         Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
         if (Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
-            String tokenKey = getTokenKey(accessToken);
-            if (Integer.valueOf(userTokensFromDifferentMachine.size()).equals(1))
+            String tokenKey=getTokenKey(accessToken);
+            if (userTokensFromDifferentMachine.size()==1)
                 valueOperations.delete(userName);
             else {
                 if (!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
-                    exceptionService.internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
+                    internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
                 }
                 userTokensFromDifferentMachine.remove(tokenKey);
                 valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
             }
             tokenRemoved = true;
         } else {
-            exceptionService.internalServerError("message.user.notFoundInRedis");
+            internalServerError("message.user.notFoundInRedis");
         }
         return tokenRemoved;
     }
@@ -84,5 +81,4 @@ public class RedisService {
         String[] tokenSplitString = accessToken.split("\\.");
         return tokenSplitString[tokenSplitString.length - 1].toLowerCase();
     }
-
 }

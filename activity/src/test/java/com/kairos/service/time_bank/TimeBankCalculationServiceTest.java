@@ -87,6 +87,7 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void calculateDailyTimeBank() {
+        LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
         /*todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
@@ -117,6 +118,7 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void getTimeBankByIntervalForNightShift() {
+        LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
        /* todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);

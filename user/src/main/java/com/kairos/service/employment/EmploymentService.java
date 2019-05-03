@@ -272,7 +272,6 @@ public class EmploymentService {
         List<FunctionWithAmountQueryResult> functions = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevelAndIds
                 (employmentDTO.getUnitId(), employmentDTO.getExpertiseId(), employmentDTO.getSeniorityLevelId(), employmentDTO.getStartDate().toString(),
                         funIds);
-
         if (functions.size() != employmentDTO.getFunctions().size()) {
             exceptionService.actionNotPermittedException("message.employment.functions.unable");
         }

@@ -36,8 +36,8 @@ public class UserMessagesConstants {
     public static final String START_DATE_LESS_FROM_END_DATE = "start_date.less.from.end_date";
     public static final String ERROR_DAY_TYPE_ABSENT = "error.day_type.absent";
     public static final String ERROR_ALLOWED_DAY_TYPE_ABSENT = "error.allowed.day_type.absent";
-    public static final String ERROR_USER_PASSWORD_NOTNULL = "error.User.password.notnull";
-    public static final String ERROR_USER_PASSWORD_SIZE = "error.User.password.size";
+    public static final String ERROR_USER_PASSCODE_NOTNULL = "error.User.password.notnull";
+    public static final String ERROR_USER_PASSCODE_SIZE = "error.User.password.size";
     public static final String ERROR_ORGANIZATION_NAME_INSUFFIENT = "error.Organization.name.insuffient";
     public static final String ERROR_ORGANIZATION_DESIREDURL_DUPLICATE = "error.Organization.desiredUrl.duplicate";
     public static final String ERROR_ORGANIZATION_NAME_DUPLICATE = "error.Organization.name.duplicate";

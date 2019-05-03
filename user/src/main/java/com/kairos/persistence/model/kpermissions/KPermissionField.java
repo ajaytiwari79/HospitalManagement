@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @Setter
 @NoArgsConstructor
 @NodeEntity
-public class PermissionField extends UserBaseEntity {
+public class KPermissionField extends UserBaseEntity {
 
     @NotBlank(message = "error.name.notnull")
     private String fieldName;
@@ -26,7 +26,7 @@ public class PermissionField extends UserBaseEntity {
     @Relationship(type = HAS_PERMISSION)
     private List<AccessGroup> accessGroups = new ArrayList<>();
 
-    public PermissionField(@NotBlank(message = "error.name.notnull") String fieldName) {
+    public KPermissionField(@NotBlank(message = "error.name.notnull") String fieldName) {
         this.fieldName = fieldName;
     }
 }

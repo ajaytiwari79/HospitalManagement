@@ -43,7 +43,7 @@ public class PhaseSettingsService extends MongoBaseService {
             PhaseSettings phaseSetting=new PhaseSettings(phase.getId(),phase.getName(),phase.getDescription(),true,true,true,true,unitId,phase.getSequence());
             phaseSettings.add(phaseSetting);
         });
-        save(phaseSettings);
+        phaseSettingsRepository.saveEntities(phaseSettings);
         return true;
     }
 }

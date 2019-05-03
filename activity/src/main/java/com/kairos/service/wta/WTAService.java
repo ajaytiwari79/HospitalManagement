@@ -500,7 +500,7 @@ public class WTAService extends MongoBaseService {
         if (wtaQueryResultDTO.getEndDate() != null) {
             workingTimeAgreement.setEndDate(wtaQueryResultDTO.getEndDate());
         }
-        workingTimeAgreement.setStartDate(wtaQueryResultDTO.getStartDate());
+        workingTimeAgreement.setStartDate(startLocalDate);
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentId(wtaQueryResultDTO.getId());
