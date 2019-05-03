@@ -466,7 +466,7 @@ public class BootDataService {
 
 
     private void linkingOfStaffAndTeam() {
-        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, adminAsStaff));
+        staffRelationshipGraphRespository.save(new StaffTeamRelationship(nestingTeam, adminAsStaff));
     }
 
 
