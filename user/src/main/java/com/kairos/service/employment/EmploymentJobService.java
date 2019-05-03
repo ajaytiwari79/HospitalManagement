@@ -41,15 +41,24 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class EmploymentJobService {
-    @Inject private EmploymentGraphRepository employmentGraphRepository;
-    @Inject private KafkaProducer kafkaProducer;
-    @Inject private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
-    @Inject private OrganizationGraphRepository organizationGraphRepository;
-    @Inject private PositionGraphRepository positionGraphRepository;
-    @Inject private ExceptionService exceptionService;
-    @Inject private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject private UserToSchedulerQueueService userToSchedulerQueueService;
-    @Inject private UserGraphRepository userGraphRepository;
+    @Inject
+    private EmploymentGraphRepository employmentGraphRepository;
+    @Inject
+    private KafkaProducer kafkaProducer;
+    @Inject
+    private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private PositionGraphRepository positionGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private UserToSchedulerQueueService userToSchedulerQueueService;
+    @Inject
+    private UserGraphRepository userGraphRepository;
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
 
@@ -124,9 +133,10 @@ public class EmploymentJobService {
 
 
     }
+
     public EmploymentAndPositionDTO updateEmploymentEndDateFromPosition(Long staffId, Long unitId, PositionDTO positionDTO) {
         Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
-        String employmentStartDateMax= employmentGraphRepository.getMaxEmploymentStartDate(staffId);
+        String employmentStartDateMax = employmentGraphRepository.getMaxEmploymentStartDate(staffId);
         if (Optional.ofNullable(employmentStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(employmentStartDateMax))) {
             exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", employmentStartDateMax);
 
@@ -142,12 +152,9 @@ public class EmploymentJobService {
                 employment.setReasonCode(reasonCode.get());
             }
         }
-        if (CollectionUtils.isNotEmpty(employments))
-        {
-            Set<Long> employmentIds=employments.stream().map(Employment::getId).collect(Collectors.toSet());
-            employmentGraphRepository.updateEmploymentLineEndDateByEmploymentIds(employmentIds,DateUtils.getLocalDate(endDateMillis).toString());
+        if (CollectionUtils.isNotEmpty(employments)) {
+            employmentGraphRepository.updateEmploymentLineEndDateByEmploymentIds(employments.stream().map(Employment::getId).collect(Collectors.toSet()), DateUtils.getLocalDate(endDateMillis).toString());
         }
-
         Position position = positionGraphRepository.findByStaffId(staffId);
 //        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
 //                unit.getTimeZone());
