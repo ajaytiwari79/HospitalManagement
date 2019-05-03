@@ -24,6 +24,9 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private Staff staff;
 
     private boolean isEnabled = true;
+    private LeaderType leaderType;
+
+
 
     public StaffTeamRelationship() {
         //Default Constructor
@@ -57,26 +60,22 @@ public class StaffTeamRelationship extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public enum StaffRole {
-
-        PLANNER, VISITATOR, MANAGER, TEAM_LEADER;
-
-        public String value;
-
-        public static StaffRole getByValue(String value) {
-            for (StaffRole role : StaffRole.values()) {
-                if (role.value.equals(value)) {
-                    return role;
-                }
-            }
-            return null;
-        }
-    }
-
     public boolean isEnabled() {
         return isEnabled;
     }
 
+    public LeaderType getLeaderType() {
+        return leaderType;
+    }
+
+    public void setLeaderType(LeaderType leaderType) {
+        this.leaderType = leaderType;
+    }
+
+    //Enum to set the leader type in team
+    public enum LeaderType{
+        MAIN_LEAD,ACTING_LEAD
+    }
 }
 
 

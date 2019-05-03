@@ -3,9 +3,13 @@ package com.kairos.persistence.model.organization.team;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 
 /**
  * Created by prabjot on 20/1/17.
@@ -23,6 +27,8 @@ public class TeamDTO {
     private List<BigInteger> activityIds;
     private List<Long> teamMemberIds;
     private List<Long> skillIds;
+    private Set<Long> mainTeamLeaderIds;
+    private Set<Long> actingTeamLeaderIds;
 
     public Long getId() {
         return id;
@@ -87,4 +93,32 @@ public class TeamDTO {
     public void setSkillIds(List<Long> skillIds) {
         this.skillIds = skillIds;
     }
+
+    public Set<Long> getMainTeamLeaderIds() {
+        return mainTeamLeaderIds;
+    }
+
+    public void setMainTeamLeaderIds(Set<Long> mainTeamLeaderIds) {
+        this.mainTeamLeaderIds = mainTeamLeaderIds;
+    }
+
+    public Set<Long> getActingTeamLeaderIds() {
+        return actingTeamLeaderIds;
+    }
+
+    public void setActingTeamLeaderIds(Set<Long> actingTeamLeaderIds) {
+        this.actingTeamLeaderIds = actingTeamLeaderIds;
+    }
+
+    @AssertTrue(message = "Please provide a valid user name")
+    public boolean isValid() {
+        if(isCollectionEmpty(mainTeamLeaderIds) || isCollectionEmpty(actingTeamLeaderIds)){
+            return true;
+        }
+
+
+
+    }
+
+
 }

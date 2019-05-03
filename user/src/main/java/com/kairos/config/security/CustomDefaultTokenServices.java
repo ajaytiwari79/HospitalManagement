@@ -47,7 +47,7 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         userDetails.put("details", userDetailsMap);
         authentication.setDetails(userDetails);
         OAuth2AccessToken accessToken = super.createAccessToken(authentication);
-        saveTokenInRedisServer(user, accessToken.toString());
+        //saveTokenInRedisServer(user, accessToken.toString());
         return accessToken;
     }
 
