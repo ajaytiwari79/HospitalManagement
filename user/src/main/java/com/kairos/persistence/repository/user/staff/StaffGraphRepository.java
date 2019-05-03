@@ -4,7 +4,7 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.StaffRelationship;
+import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
@@ -80,7 +80,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     List<StaffAdditionalInfoQueryResult> getStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds,String imgUrl);
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} MATCH (team)-[r:"+TEAM_HAS_MEMBER+"]->(staff) SET r.isEnabled=false RETURN r")
-    List<StaffRelationship> removeStaffFromAllTeams(long staffId);
+    List<StaffTeamRelationship> removeStaffFromAllTeams(long staffId);
 
     @Query("MATCH (team:Team),(staff:Staff) WHERE id(team) IN {1} AND id(staff)={0} CREATE UNIQUE (team)-[:"+TEAM_HAS_MEMBER+"]-(staff) RETURN team")
     Staff editStaffWorkPlaces(long staffId, List<Long> staffIds);
