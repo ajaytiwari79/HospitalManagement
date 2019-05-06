@@ -54,10 +54,13 @@ public class KPISetService {
 
     public KPISetDTO updateKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
-        KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetRepository.findOne(kpiSetDTO.getId()), KPISet.class);
+        KPISet kpiSet = kpiSetRepository.findOne(kpiSetDTO.getId());
         if (isNull(kpiSet)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "KPISet", kpiSetDTO.getId());
         }
+        kpiSetDTO.setReferenceId(referenceId);
+        kpiSetDTO.setConfLevel(confLevel);
+        kpiSet=ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO,KPISet.class);
         kpiSetRepository.save(kpiSet);
         return kpiSetDTO;
     }
