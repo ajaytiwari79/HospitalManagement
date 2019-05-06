@@ -36,7 +36,7 @@
                             getRelationShipTypeModelData(permissionClass, fields,reflections);
                             modelMetaData.put(MODEL_NAME, permissionClass.getSimpleName());
                             modelMetaData.put(FIELDS, fields);
-                            modelMetaData.put(SUB_MODELS, subModelData);
+                            modelMetaData.put(SUB_MODEL, subModelData);
                             modelData.add(modelMetaData);
                         });
                 LOGGER.info("model=="+modelData);
@@ -48,13 +48,13 @@
         }
 
         private void getRelationShipTypeModelData(Class permissionClass,Set<Map<String, String>> fields, Reflections reflections){
-            reflections.getTypesAnnotatedWith(KPermissionRelationshipModel.class).forEach(kpermissionRelationModel -> {
+            reflections.getTypesAnnotatedWith(KPermissionRelatedModel.class).forEach(kpermissionRelationModel -> {
                 Arrays.stream(kpermissionRelationModel.getDeclaredFields())
-                        .filter(entityField -> entityField.isAnnotationPresent(KPermissionRelationshipParent.class))
+                        .filter(entityField -> entityField.isAnnotationPresent(KPermissionRelationshipFrom.class))
                         .findAny().ifPresent(field -> {
                     if(field.getGenericType().equals(permissionClass)){
                         Arrays.stream(kpermissionRelationModel.getDeclaredFields())
-                                .filter(entityField -> entityField.isAnnotationPresent(KPermissionRelationshipChild.class))
+                                .filter(entityField -> entityField.isAnnotationPresent(KPermissionRelationshipTo.class))
                                 .findAny().ifPresent(childField -> {
                             Map<String, String> fieldsData = new HashMap<>();
                             fieldsData.put(FIELD_NAME,childField.getName());
@@ -63,7 +63,6 @@
                     }
                 });
             });
-            //return fields;
         }
 
         private List<Map<String, Object>> findSubModelData(Class permissionClass, Set<Map<String, String>> fields){
@@ -80,13 +79,6 @@
                             for (Type fieldArgType : fieldArgTypes) {
                                 Class fieldArgClass = (Class) fieldArgType;
                                 getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(),subModelFields);
-                                for (Field subModelField : fieldArgClass.getDeclaredFields()) {
-                                    if (subModelField.isAnnotationPresent(KPermissionField.class)) {
-                                        Map<String, String> fieldsData = new HashMap<>();
-                                        fieldsData.put(FIELD_NAME,subModelField.getName());
-                                        subModelFields.add(fieldsData);
-                                    }
-                                }
                             }
                         } else {
                             getFieldsOFModelAndSubModel(permissionField.getType().getDeclaredFields(),subModelFields);

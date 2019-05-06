@@ -2,9 +2,9 @@ package com.kairos.persistence.model.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.annotations.KPermissionRelationshipChild;
-import com.kairos.annotations.KPermissionRelationshipModel;
-import com.kairos.annotations.KPermissionRelationshipParent;
+import com.kairos.annotations.KPermissionRelationshipTo;
+import com.kairos.annotations.KPermissionRelatedModel;
+import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -20,15 +20,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF
 /**
  * Created by pavan on 27/3/18.
  */
-@KPermissionRelationshipModel
+@KPermissionRelatedModel
 @RelationshipEntity(type = STAFF_HAS_EXPERTISE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffExpertiseRelationShip extends UserBaseEntity{
-    @KPermissionRelationshipParent
+    @KPermissionRelationshipFrom
     @StartNode
     private Staff staff;
-    @KPermissionRelationshipChild
+    @KPermissionRelationshipTo
     @EndNode
     private Expertise expertise;
     private Integer relevantExperienceInMonths;
