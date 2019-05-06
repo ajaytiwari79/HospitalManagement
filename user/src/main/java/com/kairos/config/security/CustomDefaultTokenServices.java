@@ -56,6 +56,7 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
     }
 
 
+    @Override
     public void setTokenStore(TokenStore tokenStore) {
         super.setTokenStore(tokenStore);
         this.tokenStore = tokenStore;

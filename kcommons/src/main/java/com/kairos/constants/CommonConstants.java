@@ -21,6 +21,7 @@ public class CommonConstants {
     public static final String[] KAIROS_BACKEND_MAIL_IDS = new String[]{"pradeep.singh@oodlestechnologies.com","yasir.zuberi@oodlestechnologies.com","pavan.kumar@oodlestechnologies.com"};
     public static final String PRODUCTION = "production";
     public static final String QA = "qa";
+    public static final String LOCAL = "local";
     public static final String PACKAGE_NAME  = "com.kairos";
 
 
