@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FieldDTO {
 
+    private Long id;
     private String fieldName;
 
 }
