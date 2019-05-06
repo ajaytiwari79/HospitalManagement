@@ -679,38 +679,38 @@ public class EmploymentService {
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
         Map<Long, List<EmploymentLinesQueryResult>> employmentLinesMap = employmentLines.stream().collect(Collectors.groupingBy(EmploymentLinesQueryResult::getEmploymentId));
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAAndAccumulatedTimebankByEmployment(employmentLinesMap, unitId);
-        employmentQueryResults.forEach(u -> {
-            u.setEmploymentLines(employmentLinesMap.get(u.getId()));
-            u.getEmploymentLines().forEach(employmentLine -> {
+        employmentQueryResults.forEach(employment -> {
+            employment.setEmploymentLines(employmentLinesMap.get(employment.getId()));
+            employment.getEmploymentLines().forEach(employmentLine -> {
                 BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
                 employmentLine.setHourlyCost(hourlyCost);
 
                 ctawtaAndAccumulatedTimebankWrapper.getCta().forEach(cta -> {
 
-                    if (u.getId().equals(cta.getEmploymentId()) && employmentLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(employmentLine.getStartDate())) ||
+                    if (employment.getId().equals(cta.getEmploymentId()) && employmentLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(employmentLine.getStartDate())) ||
                             employmentLine.getEndDate() != null && (cta.getStartDate().isBefore(employmentLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(employmentLine.getStartDate()) || cta.getEndDate().equals(employmentLine.getStartDate())))
                     {
                         employmentLine.setCostTimeAgreement(cta);
                     }
                     //This is the Map of employmentLineId and accumulated timebank in minutes map
-                    Map<Long, Long> employmentLineAndTimebankMinutes = ctawtaAndAccumulatedTimebankWrapper.getEmploymentLineAndTimebankMinuteMap().getOrDefault(u.getId(), new HashMap<>());
+                    Map<Long, Long> employmentLineAndTimebankMinutes = ctawtaAndAccumulatedTimebankWrapper.getEmploymentLineAndTimebankMinuteMap().getOrDefault(employment.getId(), new HashMap<>());
                     employmentLine.setAccumulatedTimebankMinutes(employmentLineAndTimebankMinutes.getOrDefault(employmentLine.getId(), 0l));
                 });
 
                 ctawtaAndAccumulatedTimebankWrapper.getWta().forEach(wta -> {
                     LocalDate wtaStartDate = wta.getStartDate();
                     LocalDate wtaEndDate = wta.getEndDate();
-                    if (u.getId().equals(wta.getEmploymentId()) && employmentLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(employmentLine.getStartDate())) ||
+                    if (employment.getId().equals(wta.getEmploymentId()) && employmentLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(employmentLine.getStartDate())) ||
                             employmentLine.getEndDate() != null && (wtaStartDate.isBefore(employmentLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(employmentLine.getStartDate()) || wtaEndDate.equals(employmentLine.getStartDate())))
                     {
                         employmentLine.setWorkingTimeAgreement(wta);
                     }
                 });
-                if (u.getEndDate() != null && employmentLine.getEndDate() != null) {
-                    u.setEndDate(employmentLine.getEndDate());
-                    u.setEditable(!employmentLine.getEndDate().isBefore(DateUtils.getCurrentLocalDate()));
+                if (employment.getEndDate() != null && employmentLine.getEndDate() != null) {
+                    employment.setEndDate(employmentLine.getEndDate());
+                    employment.setEditable(!employmentLine.getEndDate().isBefore(DateUtils.getCurrentLocalDate()));
                 } else {
-                    u.setEditable(true);
+                    employment.setEditable(true);
                 }
             });
         });
