@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.ArrayUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
@@ -110,14 +111,12 @@ public class TeamDTO {
         this.actingTeamLeaderIds = actingTeamLeaderIds;
     }
 
-    @AssertTrue(message = "Please provide a valid user name")
+    @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
     public boolean isValid() {
         if(isCollectionEmpty(mainTeamLeaderIds) || isCollectionEmpty(actingTeamLeaderIds)){
             return true;
         }
-
-
-
+        return ArrayUtil.getIntersectedItems(mainTeamLeaderIds,actingTeamLeaderIds).isEmpty();
     }
 
 

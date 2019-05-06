@@ -38,6 +38,11 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.staff = staff;
     }
 
+    public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType) {
+        this.team = team;
+        this.staff = staff;
+        this.leaderType = leaderType;
+    }
 
     public Team getTeam() {
         return team;

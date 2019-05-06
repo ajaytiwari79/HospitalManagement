@@ -57,17 +57,17 @@ public class ArrayUtil {
         return matchedDates;
     }
 
-    public static <T> Set<T> getIntersectedDates(Set<T> first, Set<T> second) {
-        Set<LocalDate> matchedDates = new HashSet<>();
+    public static <T> Set<T> getIntersectedItems(Set<T> first, Set<T> second) {
+        Set<T> matchedItems = new HashSet<>();
         if (CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)) {
-            return matchedDates;
+            return matchedItems;
         }
-        for (LocalDate currentLocalDate : second) {
-            if (first.contains(currentLocalDate)) {
-                matchedDates.add(currentLocalDate);
+        for (T currentItem : second) {
+            if (first.contains(currentItem)) {
+                matchedItems.add(currentItem);
             }
 
         }
-        return matchedDates;
+        return matchedItems;
     }
 }

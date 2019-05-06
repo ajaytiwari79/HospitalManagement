@@ -5,5 +5,5 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StaffRelationshipGraphRespository extends Neo4jBaseRepository<StaffTeamRelationship,Long> {
+public interface StaffTeamRelationshipGraphRespository extends Neo4jBaseRepository<StaffTeamRelationship,Long> {
 }
