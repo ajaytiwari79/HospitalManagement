@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,15 +41,24 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class EmploymentJobService {
-    @Inject private EmploymentGraphRepository employmentGraphRepository;
-    @Inject private KafkaProducer kafkaProducer;
-    @Inject private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
-    @Inject private OrganizationGraphRepository organizationGraphRepository;
-    @Inject private PositionGraphRepository positionGraphRepository;
-    @Inject private ExceptionService exceptionService;
-    @Inject private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject private UserToSchedulerQueueService userToSchedulerQueueService;
-    @Inject private UserGraphRepository userGraphRepository;
+    @Inject
+    private EmploymentGraphRepository employmentGraphRepository;
+    @Inject
+    private KafkaProducer kafkaProducer;
+    @Inject
+    private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private PositionGraphRepository positionGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private UserToSchedulerQueueService userToSchedulerQueueService;
+    @Inject
+    private UserGraphRepository userGraphRepository;
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
 
@@ -123,9 +133,10 @@ public class EmploymentJobService {
 
 
     }
+
     public EmploymentAndPositionDTO updateEmploymentEndDateFromPosition(Long staffId, Long unitId, PositionDTO positionDTO) {
         Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
-        String employmentStartDateMax= employmentGraphRepository.getMaxEmploymentStartDate(staffId);
+        String employmentStartDateMax = employmentGraphRepository.getMaxEmploymentStartDate(staffId);
         if (Optional.ofNullable(employmentStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(employmentStartDateMax))) {
             exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", employmentStartDateMax);
 
@@ -135,14 +146,15 @@ public class EmploymentJobService {
         if (!reasonCode.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
         }
-
         for (Employment employment : employments) {
             employment.setEndDate(DateUtils.getLocalDate(endDateMillis));
             if (!Optional.ofNullable(employment.getReasonCode()).isPresent()) {
                 employment.setReasonCode(reasonCode.get());
             }
         }
-
+        if (CollectionUtils.isNotEmpty(employments)) {
+            employmentGraphRepository.updateEmploymentLineEndDateByEmploymentIds(employments.stream().map(Employment::getId).collect(Collectors.toSet()), DateUtils.getLocalDate(endDateMillis).toString());
+        }
         Position position = positionGraphRepository.findByStaffId(staffId);
 //        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
 //                unit.getTimeZone());
