@@ -47,9 +47,9 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffTeamRelationshipGraphRespository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionAndAccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
+import com.kairos.persistence.repository.user.staff.staffTeamRelationshipGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OpenningHourService;
@@ -125,7 +125,7 @@ public class BootDataService {
     private UserBaseRepository userBaseRepository;
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
-    @Inject private StaffTeamRelationshipGraphRespository staffTeamRelationshipGraphRespository;
+    @Inject private staffTeamRelationshipGraphRepository staffTeamRelationshipGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
 
@@ -466,7 +466,7 @@ public class BootDataService {
 
 
     private void linkingOfStaffAndTeam() {
-        staffTeamRelationshipGraphRespository.save(new StaffTeamRelationship(nestingTeam, adminAsStaff));
+        staffTeamRelationshipGraphRepository.save(new StaffTeamRelationship(nestingTeam, adminAsStaff));
     }
 
 

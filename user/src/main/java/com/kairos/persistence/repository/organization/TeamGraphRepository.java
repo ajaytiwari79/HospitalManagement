@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
@@ -24,9 +25,21 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
-    @Query("MATCH (org:Organization)-[:"+ HAS_TEAMS +"]->(team:Team {isEnabled:true}) WHERE id(org)={0} with team\n" +
-            "RETURN COLLECT({id:id(team), name:team.name, description:team.description, teamLeaderStaffId:team.teamLeaderStaffId}) as teams")
+    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team {isEnabled:true}) WHERE id(org)={0} with team \n" +
+            "OPTIONAL MATCH (team)-[rel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) WHERE EXISTS(rel.leaderType) \n" +
+            "WITH team,collect(teamMembers) as teamMembers,collect(rel) as rel,\n" +
+            "CASE when rel.leaderType='MAIN_LEAD' then collect(id(teamMembers)) ELSE [] end as mainTeamLeaderIds,\n" +
+            "CASE when rel.leaderType='ACTING_LEAD' then collect(id(teamMembers)) ELSE [] end as actingTeamLeaderIds\n" +
+            "RETURN  collect({id:id(team),name:team.name,description:team.description,mainTeamLeaderIds:mainTeamLeaderIds,actingTeamLeaderIds:actingTeamLeaderIds}) as teams")
     List<Map<String,Object>> getTeams(long unitId);
+
+    @Query("MATCH (org:Organization)-[:HAS_TEAMS]->(team:Team {isEnabled:true}) WHERE id(org)={0} with team\n" +
+            "OPTIONAL MATCH (team)-[rel:TEAM_HAS_MEMBER]->(teamMembers:Staff) WHERE exists(rel.leaderType)\n" +
+            "with team,rel,teamMembers\n" +
+            "RETURN COLLECT({id:id(team), name:team.name, description:team.description, \n" +
+            "mainTeamLeaderIds:CASE when rel.leaderType='MAIN_LEAD' then []+id(teamMembers)ELSE [] end,\n" +
+            "actingTeamLeaderIds:CASE when rel.leaderType='ACTING_LEAD' then []+id(teamMembers) else [] end}) as teams")
+    List<TeamDTO> getTeamData(Long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
             "OPTIONAL MATCH (team)-[:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) with team,  COLLECT (id(teamMembers)) as teamMemberIds  \n"+
@@ -85,7 +98,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "MATCH (team)-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE NOT id(staff) IN {1} DETACH DELETE staffTeamRel")
     void updateStaffsInTeam(long teamId, Set<Long> staffIds);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} DETACH DELETE staffTeamRel")
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true}),(staff:Staff) WHERE id(staff)={0} AND id(team) IN {1}  " +
