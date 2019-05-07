@@ -105,7 +105,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
             shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.asZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())) || shift1.getEndDate().equals(infoWrapper.getShift().getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
             if (!shifts.isEmpty()) {
-                if(infoWrapper.getShift().getTimeType().equals(String.valueOf(TimeTypes.WORKING_TYPE))){
+                if((String.valueOf(TimeTypes.WORKING_TYPE)).equals(infoWrapper.getShift().getTimeType())){
                     if(!isAbsenceTypeShift(shifts,infoWrapper)){
                         ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(shifts.get(shifts.size() - 1).getEndDate());
                         timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
@@ -142,8 +142,8 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
 
     public boolean isAbsenceTypeShift( List<ShiftWithActivityDTO> shifts,RuleTemplateSpecificInfo infoWrapper){
-         if((infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab() .getTimeType().equals(TimeTypeEnum.ABSENCE))){
-           if(isCollectionNotEmpty(shifts) && shifts.get(shifts.size()-1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE)){
+         if(TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab() .getTimeType())){
+           if(isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size()-1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType())){
              return true;
            }
         }
