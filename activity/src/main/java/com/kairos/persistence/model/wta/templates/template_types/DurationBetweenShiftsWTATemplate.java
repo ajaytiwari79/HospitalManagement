@@ -105,7 +105,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
             shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.asZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())) || shift1.getEndDate().equals(infoWrapper.getShift().getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
             if (!shifts.isEmpty()) {
-                if(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType().equals(String.valueOf(TimeTypes.WORKING_TYPE))){
+                if(infoWrapper.getShift().getTimeType().equals(String.valueOf(TimeTypes.WORKING_TYPE))){
                     if(!isAbsenceTypeShift(shifts,infoWrapper)){
                         ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(shifts.get(shifts.size() - 1).getEndDate());
                         timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
