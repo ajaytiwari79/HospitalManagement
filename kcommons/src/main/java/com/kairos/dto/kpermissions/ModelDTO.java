@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ModelDTO {
 
+    private Long id;
     private String modelName;
 
     private List<FieldDTO> fields = new ArrayList<>();
