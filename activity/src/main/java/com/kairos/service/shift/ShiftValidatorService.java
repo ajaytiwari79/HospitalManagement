@@ -888,6 +888,7 @@ public class ShiftValidatorService {
             if(isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())){
                 Date startDate = getStartOfDay(shift.getStartDate());
                 Date endDate = getMidNightOfDay(shift.getEndDate());
+               // Date endDate = getMidNightOfDay(shift.getStartDate());
                 shift.getActivities().get(0).setStartDate(startDate);
                 shift.getActivities().get(0).setEndDate(endDate);
                 shift.setStartDate(startDate);
@@ -898,8 +899,10 @@ public class ShiftValidatorService {
     }
 
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO){
+        if(isNotNull(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
         return activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK) || activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION);
     }
+        return  false;
 
-
+    }
 }
