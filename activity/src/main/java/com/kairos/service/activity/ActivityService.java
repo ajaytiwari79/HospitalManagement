@@ -913,7 +913,7 @@ public class ActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        ActivityPriority activityPriority = activityPriorityMongoRepository.findByNameAndOrganizationId(activityDTO.getActivityPriority().getName(),activityDTO.getUnitId());
+
         Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(), Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
@@ -921,7 +921,6 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
-        if(Optional.ofNullable(activityPriority).isPresent()) activityCopied.setActivityPriorityId(activityPriority.getId());
         activityMongoRepository.save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         activityDTO.setActivityCanBeCopied(true);
