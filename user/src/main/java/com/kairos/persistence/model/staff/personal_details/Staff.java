@@ -3,6 +3,7 @@ package com.kairos.persistence.model.staff.personal_details;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionModel;
 import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
@@ -23,6 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by prabjot on 24/10/16.
  */
+@KPermissionModel
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
