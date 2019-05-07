@@ -106,7 +106,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
             shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.asZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())) || shift1.getEndDate().equals(infoWrapper.getShift().getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
             if (!shifts.isEmpty()) {
                 if(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType().equals(String.valueOf(TimeTypes.WORKING_TYPE))){
-                    if(!CompareIsAbsenceTypeShift(shifts,infoWrapper)){
+                    if(!isAbsenceTypeShift(shifts,infoWrapper)){
                         ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(shifts.get(shifts.size() - 1).getEndDate());
                         timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
                         Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
@@ -141,18 +141,11 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public boolean CompareIsAbsenceTypeShift( List<ShiftWithActivityDTO> shifts,RuleTemplateSpecificInfo infoWrapper){
-         if((infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab() .getTimeType().equals(TimeTypeEnum.ABSENCE)) && (infoWrapper.getShifts().get(shifts.size()-1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE))){
+    public boolean isAbsenceTypeShift( List<ShiftWithActivityDTO> shifts,RuleTemplateSpecificInfo infoWrapper){
+         if((infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab() .getTimeType().equals(TimeTypeEnum.ABSENCE))){
+           if(isCollectionNotEmpty(shifts) && shifts.get(shifts.size()-1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE)){
              return true;
-         }
-       // if(shifts.get(shifts.size() - 2).getActivities().get(0).getTimeType().equals(String.valueOf(TimeTypes
-        // .NON_WORKING_TYPE)) || shifts.get(shifts.size() - 2).getActivities().get(0).getTimeType().equals(String.valueOf(TimeTypes.NON_WORKING_TYPE))){
-            if(infoWrapper.getShifts().get(shifts.size() - 1).getActivities().get(0).getTimeType().equals(String.valueOf(TimeTypes.NON_WORKING_TYPE))){
-            if(infoWrapper.getShifts().get(shifts.size() - 1).getActivities().get(0).getStartDate().equals(infoWrapper.getShifts().get(shifts.size() - 2).getActivities().get(0).getStartDate())) {
-                if((infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab() .getTimeType().equals(TimeTypeEnum.ABSENCE)) && ((infoWrapper.getShifts().get(shifts.size() - 3).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE)))){
-                    return true;
-                }
-            }
+           }
         }
         return false;
     }
