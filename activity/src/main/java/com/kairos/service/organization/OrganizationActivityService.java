@@ -23,6 +23,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -192,8 +193,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId, type);
-        if (Optional.ofNullable(activities).isPresent()) {
-            if (Optional.ofNullable(activities.getActivityDTOList()).isPresent())
+        if (Optional.ofNullable(activities).isPresent() && Optional.ofNullable(activities.getActivityDTOList()).isPresent()) {
                 activityDetails.setAllActivities(activities.getActivityDTOList());
         }
         List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
@@ -267,7 +267,15 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
-        activityCopied.setActivityPriorityId(activity.getActivityPriorityId());
+        //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
+        ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(activity.getActivityPriorityId());
+        if(activityPriority!=null){
+            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(),unitId);
+            if(unitActivityPriority!=null) {
+                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
+            }
+        }
+
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
