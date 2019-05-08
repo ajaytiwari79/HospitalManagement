@@ -14,6 +14,7 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -34,7 +35,9 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
+import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
+import static com.kairos.commons.utils.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.BLANK_STRING;
 
@@ -68,8 +71,9 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
-        Map<Object, List<ClusteredBarChartKpiDataUnit>> objectDoubleMap = calculateDataByKpiRepresentation(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getKpiRepresentation(), shifts);
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> objectDoubleMap = calculateDataByKpiRepresentation(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI, shifts);
         getKpiDataUnits(objectDoubleMap, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
+        sortKpiDataByDateTimeInterval(kpiDataUnits);
         return kpiDataUnits;
     }
 
@@ -82,7 +86,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getDurationOfShiftAndActivity(organizationId, filterBasedCriteria, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
@@ -105,13 +109,13 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         }
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, KPIRepresentation kpiRepresentation, List<ShiftWithActivityDTO> shifts) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals,  ApplicableKPI applicableKPI, List<ShiftWithActivityDTO> shifts) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap = new HashedMap();
         Map<String, Integer> activityNameAndTotalDurationMinutesMap = new HashMap<>();
         Integer shiftDurationMinutes = 0;
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         Map<String, String> activityNameAndColorCodeMap = new HashMap<>();
-        switch (kpiRepresentation) {
+        switch (applicableKPI.getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
                 objectListMap = getShiftAndActivityByRepresentPerStaff(staffIds, shifts, objectListMap, activityNameAndColorCodeMap);
                 break;
@@ -119,15 +123,16 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                 objectListMap = getShiftAndActivityByRepresentTotalData(dateTimeIntervals, shifts, objectListMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes, subClusteredBarValue, activityNameAndColorCodeMap);
                 break;
             case REPRESENT_PER_INTERVAL:
-                objectListMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, objectListMap, activityNameAndColorCodeMap);
+                objectListMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, objectListMap, activityNameAndColorCodeMap ,applicableKPI.getFrequencyType());
                 break;
             default:
+                objectListMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, objectListMap, activityNameAndColorCodeMap ,applicableKPI.getFrequencyType());
                 break;
         }
         return objectListMap;
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentPerInterval(Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<String, String> activityNameAndColorCodeMap) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentPerInterval(Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<String, String> activityNameAndColorCodeMap , DurationType frequencyType) {
         Map<String, Integer> activityNameAndTotalDurationMinutesMap;
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue;
         Integer shiftDurationMinutes;
@@ -139,7 +144,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             if (CollectionUtils.isNotEmpty(shiftWithActivityDTO)) {
                 subClusteredBarValue = getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, subClusteredBarValue, shiftDurationMinutes,shiftWithActivityDTO);
             }
-            objectListMap.put(getDateTimeintervalString(dateTimeInterval), subClusteredBarValue);
+            objectListMap.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), subClusteredBarValue);
         }
         return objectListMap;
     }

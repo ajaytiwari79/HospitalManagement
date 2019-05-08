@@ -836,6 +836,9 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return dateTimeInterval.getStartLocalDate()+" - "+dateTimeInterval.getEndLocalDate();
+        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+    }
+    public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
+        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+"";
     }
 }

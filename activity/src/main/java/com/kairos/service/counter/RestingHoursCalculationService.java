@@ -13,6 +13,7 @@ import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -31,7 +32,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
+import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
+import static com.kairos.commons.utils.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @Service
@@ -64,7 +67,7 @@ public class RestingHoursCalculationService implements CounterService {
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
-        return calculateDataByKpiRepresentation(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getKpiRepresentation(), shifts);
+        return calculateDataByKpiRepresentation(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI, shifts);
     }
 
     private List<CommonKpiDataUnit> getRestingHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, boolean averageDay, boolean kpi, ApplicableKPI applicableKPI) {
@@ -85,6 +88,7 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Object, Double> staffRestingHours = calculateRestingHours(staffIds, applicableKPI, dateTimeIntervals);
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         getKpiDataUnits(multiplicationFactor, staffRestingHours, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
+        sortKpiDataByDateTimeInterval(kpiDataUnits);
         return kpiDataUnits;
     }
 
@@ -113,7 +117,7 @@ public class RestingHoursCalculationService implements CounterService {
     @Override
     public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getRestingHoursKpiData(filterBasedCriteria, organizationId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList,  new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
@@ -121,10 +125,10 @@ public class RestingHoursCalculationService implements CounterService {
         return new HashMap<>();
     }
 
-    private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, KPIRepresentation kpiRepresentation, List<Shift> shifts) {
+    private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Shift> shifts) {
         Map<Object, Double> staffRestingHours ;
         Double restingHours = 0d;
-        switch (kpiRepresentation) {
+        switch (applicableKPI.getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
                 staffRestingHours = getStaffRestingHoursByRepresentPerStaff(staffIds, dateTimeIntervals, shifts);
                 break;
@@ -132,10 +136,10 @@ public class RestingHoursCalculationService implements CounterService {
                 staffRestingHours = getStaffRestingHoursByRepresentTotalData(staffIds, dateTimeIntervals, shifts, restingHours);
                 break;
             case REPRESENT_PER_INTERVAL:
-                staffRestingHours =  getStaffRestingHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals);
+                staffRestingHours =  getStaffRestingHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals ,applicableKPI.getFrequencyType() );
                 break;
             default:
-                staffRestingHours = getStaffRestingHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals);
+                staffRestingHours = getStaffRestingHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals ,applicableKPI.getFrequencyType());
                 break;
         }
         return staffRestingHours;
@@ -165,7 +169,7 @@ public class RestingHoursCalculationService implements CounterService {
         return staffRestingHours;
     }
 
-    private Map<Object, Double> getStaffRestingHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals) {
+    private Map<Object, Double> getStaffRestingHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals , DurationType frequencyType) {
         Double restingHours;
         Map<Object, Double> staffRestingHours = new HashMap<>();
         Map<Long, List<Shift>> staffShiftMapping;
@@ -177,7 +181,7 @@ public class RestingHoursCalculationService implements CounterService {
             for (Long staffId : staffIds) {
                 restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), DateUtils.asLocalDate(dateTimeInterval.getEndDate()));
             }
-            staffRestingHours.put(getDateTimeintervalString(dateTimeInterval), restingHours);
+            staffRestingHours.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), restingHours);
         }
         return staffRestingHours;
     }

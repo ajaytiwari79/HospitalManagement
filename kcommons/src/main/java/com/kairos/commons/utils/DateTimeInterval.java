@@ -16,7 +16,7 @@ import static javax.management.timer.Timer.ONE_MINUTE;
  * @date - 14/5/18
  */
 
-public class DateTimeInterval {
+public class DateTimeInterval  {
 
     private Long start;
     private Long end;
@@ -31,6 +31,7 @@ public class DateTimeInterval {
         this.start = start.getTime();
         this.end = end.getTime();
     }
+
     public DateTimeInterval(LocalDate start, LocalDate end) {
         this.start = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         this.end = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -45,11 +46,11 @@ public class DateTimeInterval {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(start), ZoneId.systemDefault());
     }
 
-    public Date getStartDate(){
+    public Date getStartDate() {
         return new Date(this.start);
     }
 
-    public Date getEndDate(){
+    public Date getEndDate() {
         return new Date(this.end);
     }
 
@@ -81,28 +82,28 @@ public class DateTimeInterval {
         this.start = endTo.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
-    public LocalDate getStartLocalDate(){
+    public LocalDate getStartLocalDate() {
         return getStart().toLocalDate();
     }
 
-    public LocalDate getEndLocalDate(){
+    public LocalDate getEndLocalDate() {
         return getEnd().toLocalDate();
     }
 
 
-    public LocalTime getStartLocalTime(){
+    public LocalTime getStartLocalTime() {
         return getStart().toLocalTime();
     }
 
-    public LocalTime getEndLocalTime(){
+    public LocalTime getEndLocalTime() {
         return getEnd().toLocalTime();
     }
 
-    public LocalDateTime getStartLocalDateTime(){
+    public LocalDateTime getStartLocalDateTime() {
         return getStart().toLocalDateTime();
     }
 
-    public LocalDateTime getEndLocalDateTime(){
+    public LocalDateTime getEndLocalDateTime() {
         return getEnd().toLocalDateTime();
     }
 
@@ -124,11 +125,11 @@ public class DateTimeInterval {
         return new DateTimeInterval(start, end);
     }
 
-    public DateTimeInterval addInterval(DateTimeInterval interval){
+    public DateTimeInterval addInterval(DateTimeInterval interval) {
         DateTimeInterval dateTimeInterval = null;
-        if (isNull(interval)){
+        if (isNull(interval)) {
             dateTimeInterval = this;
-        }else {
+        } else {
             long start = Math.min(this.start, interval.getStartMillis());
             long end = Math.max(this.end, interval.getEndMillis());
             dateTimeInterval = new DateTimeInterval(start, end);
@@ -142,7 +143,7 @@ public class DateTimeInterval {
         if (interval == null) {
             long now = ZonedDateTime.now().toInstant().toEpochMilli();
             return (thisStart < now && now < thisEnd);
-        }  else {
+        } else {
             long otherStart = interval.getStartMillis();
             long otherEnd = interval.getEndMillis();
             return (thisStart < otherEnd && otherStart < thisEnd);
@@ -199,28 +200,28 @@ public class DateTimeInterval {
         }
     }
 
-    public boolean containsInterval(DateTimeInterval interval){
-        return this.start<=interval.getStartMillis() && this.end>=interval.getEndMillis();
+    public boolean containsInterval(DateTimeInterval interval) {
+        return this.start <= interval.getStartMillis() && this.end >= interval.getEndMillis();
     }
 
-    public long getMinutes(){
-        return (this.end - this.start)/ONE_MINUTE;
+    public long getMinutes() {
+        return (this.end - this.start) / ONE_MINUTE;
     }
 
-    public int getHours(){
-        return (int) (this.end - this.start)/3600000;
+    public int getHours() {
+        return (int) (this.end - this.start) / 3600000;
     }
 
-    public int getSeconds(){
-        return (int) (this.end - this.start)/1000;
+    public int getSeconds() {
+        return (int) (this.end - this.start) / 1000;
     }
 
-    public Long getMilliSeconds(){
+    public Long getMilliSeconds() {
         return (this.end - this.start);
     }
 
-    public long getDays(){
-        return ChronoUnit.DAYS.between(getStart(),getEnd());
+    public long getDays() {
+        return ChronoUnit.DAYS.between(getStart(), getEnd());
     }
 
     @Override
@@ -252,4 +253,6 @@ public class DateTimeInterval {
                 ", end=" + getEnd() +
                 '}';
     }
+
+
 }
