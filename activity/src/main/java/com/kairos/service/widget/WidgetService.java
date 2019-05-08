@@ -29,14 +29,12 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.widget.WidgetFilterType.*;
 
 /**
  * pradeep
@@ -72,7 +70,7 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         if(isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
-            DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
+
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
             Map<Long, List<ShiftWithActivityDTO>> employementIdAndStaffMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getEmploymentId, Collectors.toList()));
             Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
@@ -83,10 +81,14 @@ public class WidgetService {
             List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null,organizationDTO.getCountryId());
             updateTimeTypeDetails(shiftDTOs);
             dashBoardWidgetDTO = new DashboardWidgetDTO(nightTimeSlot, shiftDTOs, idAndStaffMap, realTimePhase.getRealtimeDuration(),timeTypeDTOS);
-            if(isNotNull(dashboardWidget)){
-                dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
-                dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
+            DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
+            if(isNull(dashboardWidget)){
+                dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING,UPCOMING_SHIFTS,ON_LEAVE,RESTING,SLEEPING));
+                dashboardWidget.setUserId(UserContext.getUserDetails().getId());
+                widgetMongoRepository.save(dashboardWidget);
             }
+            dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
+            dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
         }
         return dashBoardWidgetDTO;
     }

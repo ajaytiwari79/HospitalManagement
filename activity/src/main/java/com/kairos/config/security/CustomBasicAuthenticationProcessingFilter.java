@@ -146,6 +146,6 @@ public class CustomBasicAuthenticationProcessingFilter extends OAuth2Authenticat
     }
 
     private boolean removeTokenFromRedis(String userName, String accessToken) {
-        return redisService.removeUserTokenFromRedisByClientIpAddress(userName, accessToken);
+        return redisService.removeUserTokenFromRedisByUserNameAndToken(userName, accessToken);
     }
 }

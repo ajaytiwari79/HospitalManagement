@@ -39,4 +39,7 @@ public interface ActivityPriorityMongoRepository extends MongoBaseRepository<Act
 
     @Query("{deleted:false,organizationId:?1,sequence:?0}")
     ActivityPriority findBySequenceAndOrganizationId(int sequence,Long organizationId);
+
+    @Query("{deleted:false,organizationId:?1,name:?0}")
+    ActivityPriority findByNameAndOrganizationId(String name,Long organizationId);
 }

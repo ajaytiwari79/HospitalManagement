@@ -1,6 +1,6 @@
 package com.kairos.config.security;
 
-import com.kairos.service.auth.RedisService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 @EnableAuthorizationServer

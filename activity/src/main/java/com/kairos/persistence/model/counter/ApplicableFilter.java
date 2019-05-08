@@ -9,6 +9,7 @@ public class ApplicableFilter {
     private boolean modified;
 
     public ApplicableFilter() {
+        //DC
     }
 
     public ApplicableFilter(List<FilterCriteria> criteriaList, boolean modified) {

@@ -23,6 +23,7 @@ import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
@@ -55,6 +56,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static java.util.stream.Collectors.toList;
 
@@ -94,6 +96,7 @@ public class CounterDataService extends MongoBaseService {
 
 
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
+        Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
@@ -101,23 +104,12 @@ public class CounterDataService extends MongoBaseService {
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
         if (filters.getFilters() != null && isCollectionNotEmpty(filters.getFilters())) {
             filters.getFilters().forEach(filter -> filterBasedCriteria.put(filter.getType(), filter.getValues()));
+            kpiIdAndApplicableKPIMap.put(kpis.get(0).getId(),new ApplicableKPI(filters.getKpiRepresentation(),filters.getValue(),filters.getInterval(),filters.getFrequencyType()));
         } else {
-            List<ApplicableKPI> staffApplicableKPIS;
-            if (filters.isCountryAdmin()) {
-                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
-            } else {
-                staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
-            }
-            for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
-                Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
-                if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
-                    staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
-                    staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
-                }
-            }
+            getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
-            Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId));
+            Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId),kpiIdAndApplicableKPIMap.get(kpiId));
             Future<CommonRepresentationData> responseData = executorService.submit(data);
             kpiResults.add(responseData);
         }
@@ -134,6 +126,34 @@ public class CounterDataService extends MongoBaseService {
 
 
         return kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData));
+    }
+
+    private void getStaffKPiFilterAndApplicableKpi(FilterCriteriaDTO filters, Long staffId, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap, List<KPI> kpis, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera) {
+        List<ApplicableKPI> staffApplicableKPIS;
+        if (filters.isCountryAdmin()) {
+            staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
+        } else {
+            staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
+        }
+        for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
+            Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
+            if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
+                staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
+                if(KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
+                    staffFilterBasedCriteria.put(FilterType.STAFF_IDS, Arrays.asList(isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
+                }
+                if(isNotNull(filters.getFrequencyType())){
+                    staffApplicableKPI.setInterval(filters.getInterval());
+                    staffApplicableKPI.setValue(filters.getValue());
+                    staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
+                }
+                if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
+                    staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
+                }
+                staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
+            }
+            kpiIdAndApplicableKPIMap.put(staffApplicableKPI.getActiveKpiId(),staffApplicableKPI);
+        }
     }
 
     //kpi default data and copy and save filter
@@ -156,12 +176,20 @@ public class CounterDataService extends MongoBaseService {
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
-        kpi.setDefaultFilters(criteriaList);
-        kpi.setTitle(applicableKPIS.get(0).getTitle());
-        if (isNotNull(applicableKPIS.get(0).getApplicableFilter())) {
-            kpi.setSelectedFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
-        }
+        setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;
+    }
+
+    private void setKpiProperty(ApplicableKPI applicableKPI, List<FilterCriteria> criteriaList, KPIDTO kpiDTO) {
+        kpiDTO.setDefaultFilters(criteriaList);
+        kpiDTO.setTitle(applicableKPI.getTitle());
+        kpiDTO.setValue(applicableKPI.getValue());
+        kpiDTO.setFrequencyType(applicableKPI.getFrequencyType());
+        kpiDTO.setInterval(applicableKPI.getInterval());
+        kpiDTO.setKpiRepresentation(applicableKPI.getKpiRepresentation());
+        if (isNotNull(applicableKPI.getApplicableFilter())) {
+            kpiDTO.setSelectedFilters(applicableKPI.getApplicableFilter().getCriteriaList());
+        }
     }
 
     private void getSelectedFilterDefaultData(ConfLevel level, List<FilterCriteria> criteriaList, KPIDTO kpi, DefaultKpiDataDTO defaultKpiDataDTO) {
@@ -294,13 +322,22 @@ public class CounterDataService extends MongoBaseService {
             if (applicableKPI.getTitle().equals(applicableKPIS.get(0).getTitle())) {
                 applicableKPI.setTitle(counterDTO.getTitle().trim());
             }
+            setIntervalConfigurationOfKpi(counterDTO, applicableKPI);
         }
         applicableKPIS.get(0).setTitle(counterDTO.getTitle());
+        setIntervalConfigurationOfKpi(counterDTO, applicableKPIS.get(0));
         applicableKPIS.addAll(updateApplicableKPI);
         save(applicableKPIS);
         save(kpi);
         kpi.setTitle(counterDTO.getTitle());
         return getTabKpiData(kpi, counterDTO, accessGroupPermissionCounterDTO);
+    }
+
+    private void setIntervalConfigurationOfKpi(CounterDTO counterDTO, ApplicableKPI applicableKPIS) {
+        applicableKPIS.setKpiRepresentation(counterDTO.getKpiRepresentation());
+        applicableKPIS.setValue(counterDTO.getValue());
+        applicableKPIS.setFrequencyType(counterDTO.getFrequencyType());
+        applicableKPIS.setInterval(counterDTO.getInterval());
     }
 
     public TabKPIDTO copyKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
@@ -335,12 +372,12 @@ public class CounterDataService extends MongoBaseService {
         save(copyKpi);
         List<ApplicableKPI> applicableKPIs = new ArrayList<>();
         if (ConfLevel.COUNTRY.equals(level) || accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), refId, null, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), refId, null, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()));
         } else if (ConfLevel.UNIT.equals(level)) {
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()));
         } else if (isNotNull(tabId) && ConfLevel.STAFF.equals(level)) {
-            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy));
+            applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()));
             tabKPIConf = new TabKPIConf(tabId, copyKpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), level, new KPIPosition(0, 0), KPIValidity.BASIC, LocationType.FIX, counterDistService.calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX));
             save(tabKPIConf);
         }
@@ -352,21 +389,26 @@ public class CounterDataService extends MongoBaseService {
     }
 
     public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
+        AccessGroupPermissionCounterDTO  accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         KPI kpi = counterRepository.getKPIByid(kpiId);
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
         filterCriteria.setKpiIds(Arrays.asList(kpiId));
         refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
-        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, null);
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
+    }
+
+    public TabKPIDTO getKpiDataByInterval(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
+        return getKpiPreviewWithFilter(kpiId,refId,filterCriteria,ConfLevel.STAFF);
     }
 
     private TabKPIDTO getTabKpiData(KPI copyKpi, CounterDTO counterDTO, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
         tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
-        Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin(),counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(copyKpi.getId()));
         return tabKPIDTO;
     }

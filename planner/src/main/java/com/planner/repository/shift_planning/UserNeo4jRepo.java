@@ -38,24 +38,24 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
      * @param countryId
      * @return
      */
-    @Query("Match(c:Country) where id(c)={0} with c " +
-            "Match (os:OrganizationService)<-[:" + HAS_ORGANIZATION_SERVICES + "]-(c) " +
-            "Match (osSub:OrganizationService)<-[:" + ORGANIZATION_SUB_SERVICE + "]-(os) " +
+    @Query("Match(c:Country{deleted:false}) where id(c)={0} with c " +
+            "Match (os:OrganizationService{deleted:false,isEnabled:true})<-[:" + HAS_ORGANIZATION_SERVICES + "]-(c) " +
+            "Match (osSub:OrganizationService{deleted:false,isEnabled:true})<-[:" + ORGANIZATION_SUB_SERVICE + "]-(os) " +
             "return id(os) as id,os.name as name,CASE WHEN osSub IS NULL THEN [] ELSE collect({id:id(osSub),name:osSub.name}) END as organizationSubServices")
     List<OrganizationServiceQueryResult> getAllOrganizationServices(Long countryId);
 
-    @Query("Match(os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService)<-[:"+PROVIDE_SERVICE+"]-(o:Organization) where id(os)={0} AND id(ossub)={1} return id(o)")
+    @Query("Match(os:OrganizationService{deleted:false,isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService{deleted:false,isEnabled:true})<-[:"+PROVIDE_SERVICE+"]-(o:Organization) where id(os)={0} AND id(ossub)={1} return id(o)")
     List<Long> getUnitIdsByOrganizationServiceAndSubServiceId(Long organizationServiceId,Long organizationSubServiceId);
 
 
-    @Query("Match(os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService)<-[:"+PROVIDE_SERVICE+"]-(o:Organization) WHERE id(ossub) IN {0} RETURN DISTINCT id(o)")
+    @Query("Match(os:OrganizationService{deleted:false,isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService{deleted:false,isEnabled:true})<-[:"+PROVIDE_SERVICE+"]-(o:Organization) WHERE id(ossub) IN {0} RETURN DISTINCT id(o)")
     List<Long> getUnitIdsByOrganizationSubServiceIds(List<Long> organizationSubServiceIds);
 
 
     //=======Below validations might not required============FixMe
     @Query("Optional Match(c:Country) where id(c)={0} " +
-            "Optional Match(os:OrganizationService) where id(os)={1} " +
-            "Optional Match(osSub:OrganizationService) where id(osSub)={2} " +
+            "Optional Match(os:OrganizationService{deleted:false,isEnabled:true}) where id(os)={1} " +
+            "Optional Match(osSub:OrganizationService{deleted:false,isEnabled:true}) where id(osSub)={2} " +
             "Optional Match (c)-[link:"+HAS_ORGANIZATION_SERVICES+"]-(os)-[child:"+ORGANIZATION_SUB_SERVICE+"]-(osSub) " +
             "return " +
             "case when c is null then \"countryNotExists\" " +
@@ -66,8 +66,8 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
     String validateCountryOrganizationServiceAndSubService(Long countryId,Long organizationServiceId,Long organizationSubServiceId);
 
     @Query("Optional Match(c:Country) where id(c)={0} " +
-            "Optional Match(os:OrganizationService) where id(os)={1} " +
-            "Optional Match(osSub:OrganizationService) where id(osSub)={2} " +
+            "Optional Match(os:OrganizationService{deleted:false,isEnabled:true}) where id(os)={1} " +
+            "Optional Match(osSub:OrganizationService{deleted:false,isEnabled:true}) where id(osSub)={2} " +
             "Optional Match (c)-[link:"+HAS_ORGANIZATION_SERVICES+"]-(os)-[child:"+ORGANIZATION_SUB_SERVICE+"]-(osSub) " +
             "return " +
             "case when c is null then \"countryNotExists\" " +

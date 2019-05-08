@@ -127,8 +127,8 @@ public class CounterDistController {
     }
 
     @PostMapping(COUNTER_STAFF_UNIT_DIST_URL + TAB + "/{tabId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId, @RequestBody FilterCriteriaDTO filtersDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId, unitId, ConfLevel.STAFF, filtersDTO));
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId, @RequestBody FilterCriteriaDTO filtersDTO,@RequestParam(required = false) Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId, unitId, ConfLevel.STAFF, filtersDTO,staffId));
     }
 
     @PutMapping(COUNTER_UNIT_DIST_URL + TAB + "/{tabId}")
@@ -305,5 +305,15 @@ public class CounterDistController {
     @PostMapping(COUNTRY_URL + KPI_URL + "/preview_kpi")
     public ResponseEntity<Map<String, Object>> kpiPreviewDataOfCountry(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiPreviewWithFilter(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY));
+    }
+
+    @PostMapping(UNIT_URL + KPI_URL + "/kpi_data")
+    public ResponseEntity<Map<String, Object>> kpiDataOfUnitByInterval(@PathVariable BigInteger kpiId, @PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, unitId, filterCriteria, ConfLevel.UNIT));
+    }
+
+    @PostMapping(COUNTRY_URL + KPI_URL + "/kpi_data")
+    public ResponseEntity<Map<String, Object>> kpiDataOfCountryByInterval(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY));
     }
 }
