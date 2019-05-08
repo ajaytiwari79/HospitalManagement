@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.KPIUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
@@ -30,17 +29,15 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
 import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
 import static com.kairos.commons.utils.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 
 @Service
 public class PlannedHoursCalculationService implements CounterService {
@@ -134,6 +131,7 @@ public class PlannedHoursCalculationService implements CounterService {
         }
     }
 
+
     private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Shift> shifts) {
         Map<Object, Double> staffplannedHours;
         Double plannedHours = 0d;
@@ -182,7 +180,7 @@ public class PlannedHoursCalculationService implements CounterService {
         return staffplannedHours;
     }
 
-    private Map<Object, Double> getStaffPlannedHoursByRepresentPerStaff(List<Long> staffIds, List<Shift> shifts) {
+    public Map<Object, Double> getStaffPlannedHoursByRepresentPerStaff(List<Long> staffIds, List<Shift> shifts) {
         Double plannedHours;
         Map<Object, Double> staffplannedHours = new HashMap<>();
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));

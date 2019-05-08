@@ -15,6 +15,7 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -53,7 +54,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
 
     // use for calculate hours of given days of daytype
     private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Day> days) {
-        Long totalMilliSeconds = 0l;
+        Long totalMilliSeconds = 0L;
         //TODO  when remove Everyday from day enum then remove if statement and use dayOfWeek of java
         if (days.get(0).equals(Day.EVERYDAY)) {
             days.addAll(newHashSet(Day.values()));
@@ -74,7 +75,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     }
 
     private Double getTotalHoursOfHolidayDayType(Map<LocalDate, List<ShiftWithActivityDTO>> localDateShiftMap, TimeSlotDTO timeSlotDTO, List<CountryHolidayCalenderDTO> countryHolidayCalenderDTOS) {
-        Long totalMilliSeconds = 0l;
+        Long totalMilliSeconds = 0L;
         LocalTime startTime = LocalTime.of(timeSlotDTO.getStartHour(), timeSlotDTO.getStartMinute());
         LocalTime endTime = LocalTime.of(timeSlotDTO.getEndHour(), timeSlotDTO.getEndMinute());
         if (isCollectionNotEmpty(countryHolidayCalenderDTOS)) {
@@ -119,22 +120,20 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
-        List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(dayTypeDTO -> dayTypeDTO.getId()).collect(Collectors.toList());
+        List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
         List<Long> timeSlotIds = filterBasedCriteria.containsKey(FilterType.TIME_SLOT) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_SLOT)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.TIME_SLOT)) : Arrays.asList(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getId());
-        Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         //filter staffids base on kpi filter rest call
-        staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
+        staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         if (!ObjectUtils.isCollectionEmpty(dayTypeIds)) {
-            dayTypeIds.forEach(daysTypeId -> {
-                daysTypeIdAndDayTypeMap.get(daysTypeId).getValidDays().forEach(day -> {
-                    //TODO if remove Everyday from day enum then remove if statement and use dayOfWeek of java
-                    if (day.equals(Day.EVERYDAY)) {
-                        daysOfWeek.addAll(newHashSet(DayOfWeek.values()));
-                    } else {
-                        daysOfWeek.add(DayOfWeek.valueOf(day.toString()));
-                    }
-                });
-            });
+            dayTypeIds.forEach(daysTypeId -> daysTypeIdAndDayTypeMap.get(daysTypeId).getValidDays().forEach(day -> {
+                //TODO if remove Everyday from day enum then remove if statement and use dayOfWeek of java
+                if (day.equals(Day.EVERYDAY)) {
+                    daysOfWeek.addAll(newHashSet(DayOfWeek.values()));
+                } else {
+                    daysOfWeek.add(DayOfWeek.valueOf(day.toString()));
+                }
+            }));
         }
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
@@ -144,7 +143,8 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
         // filter staffIds if given staff has shift
-        staffIds = shifts.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId()).distinct().collect(Collectors.toList());
+
+        staffIds = shifts.stream().map(ShiftDTO::getStaffId).distinct().collect(Collectors.toList());
         TimeSlotDTO timeSlotDTO = defaultKpiDataDTO.getTimeSlotDTOS().stream().filter(timeSlotDto -> timeSlotIds.contains(timeSlotDto.getId())).findFirst().get();
         Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = calculateDataByKpiRepresentation(staffIds,dateTimeIntervalListMap, dateTimeIntervals, applicableKPI, timeSlotDTO, dayTypeIds, daysTypeIdAndDayTypeMap,shifts);
         getKpiDataUnits(staffIdAndTotalHours, kpiDataUnits, applicableKPI, defaultKpiDataDTO.getStaffKpiFilterDTOs());
@@ -188,7 +188,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         return staffIdAndTotalHours;
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByInterval(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap,List<DateTimeInterval> dateTimeIntervals,Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap , DurationType frequencyType) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByInterval(TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap,List<DateTimeInterval> dateTimeIntervals,Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap , DurationType frequencyType) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> intervalAndTotalHours = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             Map<LocalDate, List<ShiftWithActivityDTO>> localDateShiftMap = dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(k -> asLocalDate(k.getStartDate()), Collectors.toList()));
@@ -204,7 +204,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         return intervalAndTotalHours;
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByTotalData(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap, List<DateTimeInterval> dateTimeIntervals, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByTotalData(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap, List<DateTimeInterval> dateTimeIntervals) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> intervalAndTotalHours = new HashMap<>();
         String dateTimeInterval=getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()));
         intervalAndTotalHours.putIfAbsent(dateTimeInterval, new ArrayList<>());
@@ -226,13 +226,13 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
                 objectListMap= getTotalHoursOfTimeSlotByStaff(staffIds,shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap);
                 break;
             case REPRESENT_TOTAL_DATA:
-                objectListMap = getTotalHoursOfTimeSlotByTotalData(shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap);
+                objectListMap = getTotalHoursOfTimeSlotByTotalData(shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals);
                 break;
             case REPRESENT_PER_INTERVAL:
-                objectListMap = getTotalHoursOfTimeSlotByInterval(shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap , applicableKPI.getFrequencyType());
+                objectListMap = getTotalHoursOfTimeSlotByInterval(timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap,applicableKPI.getFrequencyType());
                 break;
             default:
-                objectListMap = getTotalHoursOfTimeSlotByInterval(shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap , applicableKPI.getFrequencyType());
+                objectListMap = getTotalHoursOfTimeSlotByInterval(timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap,applicableKPI.getFrequencyType());
                 break;
         }
         return objectListMap;
