@@ -23,6 +23,7 @@ public class DateTimeInterval {
 
 
     public DateTimeInterval() {
+        //default constructor
     }
 
     public DateTimeInterval(ZonedDateTime start, ZonedDateTime end) {

@@ -147,12 +147,6 @@ public class TimeBankCalculationServiceTest {
     }
 
     @Test
-    public void test(){
-        System.out.println(LocalDate.now()+" - "+LocalDate.now().minusWeeks(1));
-    }
-
-
-    @Test
     public void calculateScheduledAndDurationMinutes() {
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
