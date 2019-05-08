@@ -137,14 +137,14 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public boolean isAbsenceTypeShift(List<ShiftWithActivityDTO> shifts, RuleTemplateSpecificInfo infoWrapper) {
-        if (isCollectionNotEmpty(shifts) &&(String.valueOf(TimeTypes.NON_WORKING_TYPE)).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType())) {
-            if (shifts.size() > 2 && (isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size() - 2).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType())))) {
+    public boolean isAbsenceTypeShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, RuleTemplateSpecificInfo infoWrapper) {
+        if ((String.valueOf(TimeTypes.NON_WORKING_TYPE)).equals(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getActivities().get(0).getTimeType())) {
+            if (shiftWithActivityDTOS.size() > 2 && (TimeTypeEnum.ABSENCE).equals(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 2).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
                     return true;
             }
             return true;
         }
-            if (isCollectionNotEmpty(shifts) && (String.valueOf(TimeTypes.WORKING_TYPE)).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType()) && isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
+            if ((String.valueOf(TimeTypes.WORKING_TYPE)).equals(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getActivities().get(0).getTimeType()) &&  (TimeTypeEnum.ABSENCE).equals(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
                     return true;
             }
         return false;
