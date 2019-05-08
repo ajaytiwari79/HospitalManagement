@@ -7,10 +7,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -107,11 +105,9 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
             if(shifts.isEmpty()){
                 checkShiftExistence(infoWrapper);
-            }
 
-            if (!shifts.isEmpty()) {
-                if ((String.valueOf(TimeTypes.WORKING_TYPE)).equals(infoWrapper.getShift().getTimeType())) {
-                    if (!isAbsenceTypeShift(shifts, infoWrapper)) {
+            }else{
+                if ((String.valueOf(TimeTypes.WORKING_TYPE)).equals(infoWrapper.getShift().getTimeType()) && !isAbsenceTypeShift(shifts, infoWrapper)) {
                         ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(shifts.get(shifts.size() - 1).getEndDate());
                         timefromPrevShift = (int) new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
                         Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
@@ -128,7 +124,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                             }
                         }
                         brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS, getHoursByMinutes(limitAndCounter[0]));
-                    }
                 }
             }
         }
@@ -144,32 +139,25 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
     public boolean isAbsenceTypeShift(List<ShiftWithActivityDTO> shifts, RuleTemplateSpecificInfo infoWrapper) {
         if (isCollectionNotEmpty(shifts) &&(String.valueOf(TimeTypes.NON_WORKING_TYPE)).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType())) {
-            if (shifts.size() > 2) {
-                if (isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size() - 2).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
+            if (shifts.size() > 2 && (isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size() - 2).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType())))) {
                     return true;
-                }
             }
             return true;
         }
-            if (isCollectionNotEmpty(shifts) && (String.valueOf(TimeTypes.WORKING_TYPE)).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType())) {
-                if (isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
+            if (isCollectionNotEmpty(shifts) && (String.valueOf(TimeTypes.WORKING_TYPE)).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getTimeType()) && isCollectionNotEmpty(shifts) && (TimeTypeEnum.ABSENCE).equals(shifts.get(shifts.size() - 1).getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()) && (TimeTypeEnum.ABSENCE.equals(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
                     return true;
-                }
-                return false;
             }
         return false;
-
     }
 
 
     public void checkShiftExistence(RuleTemplateSpecificInfo infoWrapper){
         List<ShiftWithActivityDTO> shifts;
         boolean isValid;
-        int timefromPrevShift = 0;
+        int timefromPrevShift;
         Integer[] limitAndCounter;
             shifts = (List<ShiftWithActivityDTO>) infoWrapper.getShifts().stream().filter(shift1 -> infoWrapper.getShift().getEndDate().before(shift1.getStartDate()) || shift1.getStartDate().equals(infoWrapper.getShift().getEndDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
-            if (!shifts.isEmpty()) {
-                if (!isAbsenceTypeShift(shifts, infoWrapper)) {
+            if (!shifts.isEmpty() && !isAbsenceTypeShift(shifts, infoWrapper)) {
                     ZonedDateTime prevShiftstart = DateUtils.asZoneDateTime(shifts.get(0).getStartDate());
                     timefromPrevShift = (int) new DateTimeInterval(DateUtils.asZoneDateTime(infoWrapper.getShift().getEndDate()), prevShiftstart).getMinutes();
                     limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
@@ -177,7 +165,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                     if(!isValid){
                         brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS, getHoursByMinutes(limitAndCounter[0]));
                     }
-                }
             }
     }
 
