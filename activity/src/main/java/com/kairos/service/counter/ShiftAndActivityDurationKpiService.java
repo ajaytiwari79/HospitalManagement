@@ -14,6 +14,7 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -60,7 +61,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypes, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
+        staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), activitiesIds, dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
@@ -106,28 +107,28 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, KPIRepresentation kpiRepresentation, List<ShiftWithActivityDTO> shifts) {
-        Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap = new HashedMap();
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
         Map<String, Integer> activityNameAndTotalDurationMinutesMap = new HashMap<>();
         Integer shiftDurationMinutes = 0;
-        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         Map<String, String> activityNameAndColorCodeMap = new HashMap<>();
         switch (kpiRepresentation) {
             case REPRESENT_PER_STAFF:
-                objectListMap = getShiftAndActivityByRepresentPerStaff(staffIds, shifts, objectListMap, activityNameAndColorCodeMap);
+                staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentPerStaff(staffIds, shifts, activityNameAndColorCodeMap);
                 break;
             case REPRESENT_TOTAL_DATA:
-                objectListMap = getShiftAndActivityByRepresentTotalData(dateTimeIntervals, shifts, objectListMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes, subClusteredBarValue, activityNameAndColorCodeMap);
+                staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentTotalData(dateTimeIntervals, shifts, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes, activityNameAndColorCodeMap);
                 break;
             case REPRESENT_PER_INTERVAL:
-                objectListMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, objectListMap, activityNameAndColorCodeMap);
+                staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, activityNameAndColorCodeMap);
                 break;
             default:
                 break;
         }
-        return objectListMap;
+        return staffIdAndShiftAndActivityDurationMap;
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentPerInterval(Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<String, String> activityNameAndColorCodeMap) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentPerInterval(Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, Map<String, String> activityNameAndColorCodeMap) {
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
         Map<String, Integer> activityNameAndTotalDurationMinutesMap;
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue;
         Integer shiftDurationMinutes;
@@ -137,33 +138,34 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             shiftDurationMinutes = 0;
             List<ShiftWithActivityDTO> shiftWithActivityDTO = dateTimeIntervalListMap.get(dateTimeInterval);
             if (CollectionUtils.isNotEmpty(shiftWithActivityDTO)) {
-                subClusteredBarValue = getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, subClusteredBarValue, shiftDurationMinutes,shiftWithActivityDTO);
+                subClusteredBarValue = getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes,shiftWithActivityDTO);
             }
-            objectListMap.put(getDateTimeintervalString(dateTimeInterval), subClusteredBarValue);
+            staffIdAndShiftAndActivityDurationMap.put(getDateTimeintervalString(dateTimeInterval), subClusteredBarValue);
         }
-        return objectListMap;
+        return staffIdAndShiftAndActivityDurationMap;
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentTotalData(List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<String, Integer> activityNameAndTotalDurationMinutesMap, Integer shiftDurationMinutes, List<ClusteredBarChartKpiDataUnit> subClusteredBarValue, Map<String, String> activityNameAndColorCodeMap) {
-        objectListMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, subClusteredBarValue, shiftDurationMinutes,shifts));
-        return objectListMap;
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentTotalData(List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts, Map<String, Integer> activityNameAndTotalDurationMinutesMap, Integer shiftDurationMinutes, Map<String, String> activityNameAndColorCodeMap) {
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
+        staffIdAndShiftAndActivityDurationMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes,shifts));
+        return staffIdAndShiftAndActivityDurationMap;
     }
 
-    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentPerStaff(List<Long> staffIds, List<ShiftWithActivityDTO> shifts, Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, Map<String, String> activityNameAndColorCodeMap) {
+    private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentPerStaff(List<Long> staffIds, List<ShiftWithActivityDTO> shifts, Map<String, String> activityNameAndColorCodeMap) {
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
         Map<String, Integer> activityNameAndTotalDurationMinutesMap;
-        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue;
         Integer shiftDurationMinutes;
-        Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
+        Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()));
         for (Long staffId : staffIds) {
             activityNameAndTotalDurationMinutesMap = new HashMap<>();
-            subClusteredBarValue = new ArrayList<>();
             shiftDurationMinutes = 0;
-            objectListMap.put(staffId, getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, subClusteredBarValue, shiftDurationMinutes, staffShiftMapping.getOrDefault(staffId,new ArrayList<>())));
+            staffIdAndShiftAndActivityDurationMap.put(staffId, getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes, staffShiftMapping.getOrDefault(staffId,new ArrayList<>())));
         }
-        return objectListMap;
+        return staffIdAndShiftAndActivityDurationMap;
     }
 
-    private List<ClusteredBarChartKpiDataUnit> getShiftAndActivityDurationMap(Map<String, String> activityNameAndColorCodeMap, Map<String, Integer> activityNameAndTotalDurationMinutesMap, List<ClusteredBarChartKpiDataUnit> subClusteredBarValue, Integer shiftDurationMinutes, List<ShiftWithActivityDTO> shifts) {
+    private List<ClusteredBarChartKpiDataUnit> getShiftAndActivityDurationMap(Map<String, String> activityNameAndColorCodeMap, Map<String, Integer> activityNameAndTotalDurationMinutesMap, Integer shiftDurationMinutes, List<ShiftWithActivityDTO> shifts) {
+        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (ShiftWithActivityDTO shift : shifts) {
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 int activityDuration = activityNameAndTotalDurationMinutesMap.getOrDefault(activity.getActivityName(), 0);

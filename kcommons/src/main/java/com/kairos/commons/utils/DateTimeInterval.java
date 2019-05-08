@@ -22,6 +22,10 @@ public class DateTimeInterval {
     private Long end;
 
 
+    public DateTimeInterval() {
+        //default constructor
+    }
+
     public DateTimeInterval(ZonedDateTime start, ZonedDateTime end) {
         this.start = start.toInstant().toEpochMilli();
         this.end = end.toInstant().toEpochMilli();

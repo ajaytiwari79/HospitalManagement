@@ -146,7 +146,6 @@ public class TimeBankCalculationServiceTest {
         Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);*/
     }
 
-
     @Test
     public void calculateScheduledAndDurationMinutes() {
         for (Shift shift : shifts) {
