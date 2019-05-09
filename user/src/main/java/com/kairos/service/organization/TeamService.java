@@ -58,13 +58,7 @@ public class TeamService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    private ZipCodeGraphRepository zipCodeGraphRepository;
-    @Inject
     private StaffGraphRepository staffGraphRepository;
-    @Inject
-    private CountryGraphRepository countryGraphRepository;
-    @Inject
-    private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
     private RegionGraphRepository regionGraphRepository;
     @Inject
@@ -135,8 +129,6 @@ public class TeamService {
 
         organization.getTeams().add(team);
         organizationGraphRepository.save(organization, 2);
-
-
         if (ObjectUtils.isNotNull(teamDTO.getTeamLeaderStaffId())) {
             teamGraphRepository.updateTeamLeaderOfTeam(team.getId(), teamDTO.getTeamLeaderStaffId());
         }
@@ -217,11 +209,6 @@ public class TeamService {
                 activity.getValue())).collect(Collectors.toList());
         map.put("activityList", activityCategoryListDTOS);
         return map;
-    }
-
-    public List<TeamDTO> getTeams(Long unitId) {
-        List<TeamDTO> staffRelationShips = staffTeamRelationshipGraphRepository.findAllStaffTeamRelationShipIds(unitId);
-        return null;
     }
 
     public boolean deleteTeamByTeamId(long teamId) {
@@ -336,8 +323,7 @@ public class TeamService {
     }
 
     public Organization getOrganizationByTeamId(Long teamId) {
-        Organization organization = organizationGraphRepository.getOrganizationByTeamId(teamId);
-        return organization;
+        return organizationGraphRepository.getOrganizationByTeamId(teamId);
     }
 
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {

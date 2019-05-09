@@ -3,6 +3,7 @@ package com.kairos.persistence.model.organization.team;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.ArrayUtil;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
@@ -126,7 +127,7 @@ public class TeamDTO {
         if(isCollectionEmpty(mainTeamLeaderIds) || isCollectionEmpty(actingTeamLeaderIds)){
             return true;
         }
-        return ArrayUtil.getIntersectedItems(mainTeamLeaderIds,actingTeamLeaderIds).isEmpty();
+        return !CollectionUtils.containsAny(mainTeamLeaderIds,actingTeamLeaderIds);
     }
 
 
