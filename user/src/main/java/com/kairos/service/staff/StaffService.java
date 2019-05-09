@@ -317,16 +317,7 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        if (isCollectionEmpty(staffPersonalDetail.getTeamIdsOfStaff())) {
-            teamGraphRepository.removeStaffFromAllTeams(staffId);
-        } else {
-            teamGraphRepository.assignStaffInTeams(staffId, staffPersonalDetail.getTeamIdsOfStaff());
-        }
-        if(isCollectionEmpty(staffPersonalDetail.getTeamDetails())){
-            teamGraphRepository.removeStaffFromAllTeams(staffId);
-        } else {
-            //teamGraphRepository
-        }
+        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails());
         return staffPersonalDetail;
     }
 

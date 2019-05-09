@@ -9,6 +9,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDT
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
+import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ArrayUtil.getUnionOfList;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 
 /**
@@ -174,24 +176,25 @@ public class TeamService {
         return true;
     }
 
-    public boolean updateStaffsInTeam(Long teamId, Set<Long> staffIds) {
-        Team team=teamGraphRepository.findByIdAndDeletedFalse(teamId);
-        List<Staff> staffList=staffGraphRepository.findAllById(new ArrayList<>(staffIds));
-        //Map<Long, Staff> staffMap = staffList.stream().collect(Collectors.toMap(k -> k.getId(), Function.identity()));
-        List<StaffTeamRelationship> staffTeamRelationships = staffTeamRelationshipGraphRepository.findAllByStaffIdAndTeamId(staffIds,teamId);
-        Map<Long,StaffTeamRelationship> staffTeamRelationshipMap=staffTeamRelationships.stream().collect(Collectors.toMap(k->k.getStaff().getId(),Function.identity()));
-        List<StaffTeamRelationship> staffTeamRelationshipList=new ArrayList<>();
-        staffList.forEach(staff -> {
-              staffTeamRelationshipList.add(staffTeamRelationshipMap.getOrDefault(staff.getId(),new StaffTeamRelationship(team,staff)));
-        });
-        if(isCollectionNotEmpty(staffTeamRelationshipList)){
-            staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
+    public boolean updateStaffsInTeam(Long teamId, StaffTeamDTO staffTeamDTOS) {
+        if(staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTOS.getStaffId(),teamId)){
+            exceptionService.actionNotPermittedException("staff.main_team.exists");
         }
-//        if (ObjectUtils.isCollectionEmpty(staffIds)) {
-//            teamGraphRepository.removeAllStaffsFromTeam(teamId);
-//        } else {
-//            teamGraphRepository.updateStaffsInTeam(teamId, staffIds);
+        Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
+        //Set<Long> staffIds = staffTeamDTOS.stream().map(StaffTeamDTO::getStaffId).collect(Collectors.toSet());
+        Staff staff = staffGraphRepository.findByStaffId(staffTeamDTOS.getStaffId());
+        //Map<Long, Staff> staffMap = staffList.stream().collect(Collectors.toMap(Staff::getId, Function.identity()));
+        StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTOS.getStaffId(), teamId);
+        //Map<Long, StaffTeamRelationShipQueryResult> staffTeamRelationshipMap = staffTeamRelationships.stream().collect(Collectors.toMap(k -> k.getStaff().getId(), Function.identity()));
+        //List<StaffTeamRelationship> staffTeamRelationshipList = new ArrayList<>();
+           // StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipMap.get(staff.getStaffId());
+            StaffTeamRelationship staffTeamRelationship = isNull(staffTeamRelationShipQueryResult) ? new StaffTeamRelationship(null, team, staff, staffTeamDTOS.getLeaderType(), staffTeamDTOS.getTeamType()) :
+                    new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTOS.getTeamType());
+            //staffTeamRelationshipList.add(staffTeamRelationship);
+//        if (isCollectionNotEmpty(staffTeamRelationshipList)) {
+//            staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
 //        }
+        staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
         return true;
     }
 
@@ -216,9 +219,9 @@ public class TeamService {
         return map;
     }
 
-    public List<TeamDTO> getTeams(Long unitId){
-         List<TeamDTO> staffRelationShips=staffTeamRelationshipGraphRepository.findAllStaffTeamRelationShipIds(unitId);
-         return null;
+    public List<TeamDTO> getTeams(Long unitId) {
+        List<TeamDTO> staffRelationShips = staffTeamRelationshipGraphRepository.findAllStaffTeamRelationShipIds(unitId);
+        return null;
     }
 
     public boolean deleteTeamByTeamId(long teamId) {
@@ -381,19 +384,21 @@ public class TeamService {
         }
     }
 
-//    public void assignStaffInTeams(Staff staff, List<StaffTeamDTO> staffTeamDTO){
-//        List<Team> teams=teamGraphRepository.findAllById(new ArrayList<>(staffTeamDTO.stream().map(k->k.getTeamId()).collect(Collectors.toSet())));
-//        Map<Long,Team> teamMap=teams.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
-//        List<StaffTeamRelationship> staffTeamRelationships = staffTeamRelationshipGraphRepository.findAllByStaffIdAndTeamId(staffIds,teamId);
-//        Map<Long,StaffTeamRelationship> staffTeamRelationshipMap=staffTeamRelationships.stream().collect(Collectors.toMap(k->k.getStaff().getId(),Function.identity()));
-//        List<StaffTeamRelationship> staffTeamRelationshipList=new ArrayList<>();
-//        staffList.forEach(staff -> {
-//            staffTeamRelationshipList.add(staffTeamRelationshipMap.getOrDefault(staff.getId(),new StaffTeamRelationship(team,staff)));
-//        });
-//        if(isCollectionNotEmpty(staffTeamRelationshipList)){
-//            staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
-//        }
-//
-//
-//    }
+    public void assignStaffInTeams(Staff staff, List<StaffTeamDTO> staffTeamDetails){
+        teamGraphRepository.removeStaffFromAllTeams(staff.getId());
+        List<Team> teams=teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k->k.getTeamId()).collect(Collectors.toSet())));
+        Map<Long,Team> teamMap=teams.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
+        List<StaffTeamRelationship> staffTeamRelationshipList=new ArrayList<>();
+        staffTeamDetails.forEach(staffTeamDetail -> {
+            StaffTeamRelationship staffTeamRelationship=new StaffTeamRelationship(null,teamMap.get(staffTeamDetail.getTeamId()),staff,staffTeamDetail.getLeaderType(),staffTeamDetail.getTeamType());
+            staffTeamRelationshipList.add(staffTeamRelationship);
+        });
+        if(isCollectionNotEmpty(staffTeamRelationshipList)){
+            staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
+        }
+    }
+
+    public boolean removeStaffFromTeam(Long teamId,Long staffId){
+        return teamGraphRepository.removeStaffFromTeam(staffId,teamId);
+    }
 }

@@ -8,22 +8,18 @@ import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@QueryResult
 public class StaffTeamDTO {
     private Long staffId;
     private Long teamId;
     private StaffTeamRelationship.TeamType teamType;
-    private boolean mainTeamLeader;
-    private boolean actingTeamLeader;
-
-    @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
-    public boolean isValid() {
-        return mainTeamLeader && actingTeamLeader;
-    }
+    private StaffTeamRelationship.LeaderType leaderType;
 
 }

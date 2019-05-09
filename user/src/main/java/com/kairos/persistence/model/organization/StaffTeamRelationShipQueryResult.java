@@ -4,6 +4,8 @@ package com.kairos.persistence.model.organization;
  *
  */
 
+import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -15,6 +17,14 @@ public class StaffTeamRelationShipQueryResult {
     private Long id;
     private StaffTeamRelationship.LeaderType leaderType;
     private StaffTeamRelationship.TeamType teamType;
-    private Long staffId;
-    private Long teamId;
+    private Staff staff;
+    private Team team;
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
 }

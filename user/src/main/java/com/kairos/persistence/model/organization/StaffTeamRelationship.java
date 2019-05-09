@@ -40,10 +40,17 @@ public class StaffTeamRelationship extends UserBaseEntity {
     }
 
     public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType) {
+        this.team = team;
+        this.staff = staff;
+        this.leaderType = leaderType;
+    }
+
+    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType) {
         this.id=id;
         this.team = team;
         this.staff = staff;
         this.leaderType = leaderType;
+        this.teamType = teamType;
     }
 
     public Team getTeam() {
@@ -93,7 +100,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
     }
 
     //Enum to set the team type in team
-    public enum TeamType{
+    public  enum TeamType{
         MAIN,SECONDARY
     }
 }

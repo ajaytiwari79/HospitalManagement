@@ -1,6 +1,7 @@
     package com.kairos.controller.organization;
 
     import com.kairos.persistence.model.organization.team.TeamDTO;
+    import com.kairos.persistence.model.staff.StaffTeamDTO;
     import com.kairos.service.organization.TeamService;
     import com.kairos.utils.response.ResponseHandler;
     import io.swagger.annotations.ApiOperation;
@@ -130,9 +131,17 @@
         @ApiOperation(value = "Update Staffs in Team")
         @RequestMapping(value = "/team/{teamId}/update_staffs", method = RequestMethod.PUT)
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody Set<Long> staffIds) {
+        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody StaffTeamDTO staffDetails) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.updateStaffsInTeam(teamId,staffIds));
+                    teamService.updateStaffsInTeam(teamId,staffDetails));
+        }
+
+        @ApiOperation(value = "Remove Staff from Team")
+        @DeleteMapping(value = "/team/{teamId}/remove_staff/{staffId}")
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> removeStaffFromTeam(@PathVariable Long teamId,@PathVariable Long staffId ) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.removeStaffFromTeam(teamId,staffId));
         }
 
         @ApiOperation(value = "get staff of unit")

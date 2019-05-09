@@ -2,6 +2,7 @@ package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.ArrayUtil;
+import com.kairos.persistence.model.staff.StaffTeamDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
@@ -30,6 +31,7 @@ public class TeamDTO {
     private List<Long> skillIds;
     private Set<Long> mainTeamLeaderIds;
     private Set<Long> actingTeamLeaderIds;
+    private List<StaffTeamDTO> staffDetails;
 
     public Long getId() {
         return id;
@@ -109,6 +111,14 @@ public class TeamDTO {
 
     public void setActingTeamLeaderIds(Set<Long> actingTeamLeaderIds) {
         this.actingTeamLeaderIds = actingTeamLeaderIds;
+    }
+
+    public List<StaffTeamDTO> getStaffDetails() {
+        return staffDetails;
+    }
+
+    public void setStaffDetails(List<StaffTeamDTO> staffDetails) {
+        this.staffDetails = staffDetails;
     }
 
     @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
