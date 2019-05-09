@@ -388,11 +388,7 @@ public class TeamService {
         teamGraphRepository.removeStaffFromAllTeams(staff.getId());
         List<Team> teams=teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k->k.getTeamId()).collect(Collectors.toSet())));
         Map<Long,Team> teamMap=teams.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
-        List<StaffTeamRelationship> staffTeamRelationshipList=new ArrayList<>();
-        staffTeamDetails.forEach(staffTeamDetail -> {
-            StaffTeamRelationship staffTeamRelationship=new StaffTeamRelationship(null,teamMap.get(staffTeamDetail.getTeamId()),staff,staffTeamDetail.getLeaderType(),staffTeamDetail.getTeamType());
-            staffTeamRelationshipList.add(staffTeamRelationship);
-        });
+        List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail ->new StaffTeamRelationship(null,teamMap.get(staffTeamDetail.getTeamId()),staff,staffTeamDetail.getLeaderType(),staffTeamDetail.getTeamType())).collect(Collectors.toList());
         if(isCollectionNotEmpty(staffTeamRelationshipList)){
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
         }
