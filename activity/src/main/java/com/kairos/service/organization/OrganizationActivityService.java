@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -169,12 +170,11 @@ public class OrganizationActivityService extends MongoBaseService {
             }
             activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
-            save(activityCopied);
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
         }
-        save(activityCopied);
+        activityMongoRepository.save(activityCopied);
         return retrieveBasicDetails(activityCopied);
     }
 
@@ -186,6 +186,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if(timeType.isPresent()){
             activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
         }*/
+        activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
         return activityDTO;
 
     }
@@ -329,7 +330,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
         activityService.updateNotesTabOfActivity(generalDTO, activity);
-        save(activity);
+        activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
@@ -405,7 +406,7 @@ public class OrganizationActivityService extends MongoBaseService {
             activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
             activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
             activityCopied.setState(ActivityStateEnum.DRAFT);
-            save(activityCopied);
+            activityMongoRepository.save(activityCopied);
             activityDTO.setId(activityCopied.getId());
             activityDTO.setActivityCanBeCopied(true);
             activityDTO.setUnitId(unitId);
