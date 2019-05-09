@@ -26,9 +26,7 @@ public class TeamDTO {
     private String name;
     private String description;
     private boolean hasAddressOfUnit;
-    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
     private List<BigInteger> activityIds;
-    private List<Long> teamMemberIds;
     private List<Long> skillIds;
     private Set<Long> mainTeamLeaderIds;
     private Set<Long> actingTeamLeaderIds;
@@ -66,28 +64,12 @@ public class TeamDTO {
         this.description = description;
     }
 
-    public Long getTeamLeaderStaffId() {
-        return teamLeaderStaffId;
-    }
-
-    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
-        this.teamLeaderStaffId = teamLeaderStaffId;
-    }
-
     public List<BigInteger> getActivityIds() {
         return activityIds;
     }
 
     public void setActivityIds(List<BigInteger> activityIds) {
         this.activityIds = activityIds;
-    }
-
-    public List<Long> getTeamMemberIds() {
-        return teamMemberIds;
-    }
-
-    public void setTeamMemberIds(List<Long> teamMemberIds) {
-        this.teamMemberIds = teamMemberIds;
     }
 
     public List<Long> getSkillIds() {

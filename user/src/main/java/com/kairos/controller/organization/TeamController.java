@@ -50,6 +50,13 @@
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getTeamDetails( teamId));
         }
 
+        @ApiOperation(value = "Get all teams of unit")
+        @GetMapping(value = "/teams")
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> getAllTeamByUnitId(@PathVariable Long unitId) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getAllTeamsOfOrganization( unitId));
+        }
+
 
         @ApiOperation(value = "Get All Teams with additional data")
         @GetMapping(value = "/teams_prerequisite")
@@ -150,22 +157,6 @@
         public ResponseEntity<Map<String, Object>> getStaffOfUnit(@PathVariable long teamId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.getStaffForImportInTeam(teamId));
-        }
-
-        @ApiOperation(value = "Get Staff in Team")
-        @RequestMapping(value = "/staff/{teamI", method = RequestMethod.GET)
-        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> getStaffOfTeam(@PathVariable Long teamID) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.getAllUsers(teamID));
-        }
-
-        @ApiOperation(value = "Get User StaffType")
-        @RequestMapping(value = "/staff/user/{userId}", method = RequestMethod.GET)
-        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> getUserStaffType(@PathVariable Long userId) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.getUserStaffType(userId));
         }
 
         @ApiOperation(value = "Get Organization Id by team")
