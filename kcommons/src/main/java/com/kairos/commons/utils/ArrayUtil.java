@@ -56,18 +56,4 @@ public class ArrayUtil {
         }
         return matchedDates;
     }
-
-    public static <T> Set<T> getIntersectedDates(Set<T> first, Set<T> second) {
-        Set<LocalDate> matchedDates = new HashSet<>();
-        if (CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)) {
-            return matchedDates;
-        }
-        for (LocalDate currentLocalDate : second) {
-            if (first.contains(currentLocalDate)) {
-                matchedDates.add(currentLocalDate);
-            }
-
-        }
-        return matchedDates;
-    }
 }
