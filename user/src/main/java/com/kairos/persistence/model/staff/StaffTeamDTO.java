@@ -19,6 +19,7 @@ import javax.validation.constraints.AssertTrue;
 public class StaffTeamDTO {
     private Long staffId;
     private Long teamId;
+    private String name;
     private StaffTeamRelationship.TeamType teamType;
     private StaffTeamRelationship.LeaderType leaderType;
 

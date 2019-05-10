@@ -12,7 +12,6 @@
 
     import javax.inject.Inject;
     import java.math.BigInteger;
-    import java.text.ParseException;
     import java.util.Map;
     import java.util.Set;
 
@@ -99,14 +98,14 @@
         }
 
         @ApiOperation(value = "Get Team Selected Service")
-        @RequestMapping(value = "/service/{teamId}", method = RequestMethod.GET)
+        @GetMapping(value = "/service/{teamId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> getTeamSelectedService(@PathVariable Long teamId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, this.teamService.getTeamSelectedServices(teamId));
         }
 
         @ApiOperation(value = "Add Service to Team")
-        @RequestMapping(value = "/service/{teamId}", method = RequestMethod.PUT)
+        @PutMapping(value = "/service/{teamId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> addTeamService(@PathVariable Long teamId, @RequestBody Map<String, Long[]> data) {
             Long[] serviceIds = data.get("data");
@@ -118,7 +117,7 @@
 
         // Team
         @ApiOperation(value = "Add Staff to Team")
-        @RequestMapping(value = "/team/{teamId}/staff", method = RequestMethod.POST)
+        @PostMapping(value = "/team/{teamId}/staff")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> addStaffInTeam(@PathVariable long unitId,@PathVariable long teamId, @RequestBody Map<String, Object> staffInfo, @RequestParam("type") String type) {
             if(TEAM.equalsIgnoreCase(type)){
@@ -136,7 +135,7 @@
         }
 
         @ApiOperation(value = "Update Staffs in Team")
-        @RequestMapping(value = "/team/{teamId}/update_staffs", method = RequestMethod.PUT)
+        @PutMapping(value = "/team/{teamId}/update_staffs")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody StaffTeamDTO staffDetails) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -152,7 +151,7 @@
         }
 
         @ApiOperation(value = "get staff of unit")
-        @RequestMapping(value = "/team/{teamId}/staff", method = RequestMethod.GET)
+        @GetMapping(value = "/team/{teamId}/staff")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> getStaffOfUnit(@PathVariable long teamId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -160,14 +159,14 @@
         }
 
         @ApiOperation(value = "Get Organization Id by team")
-        @RequestMapping(value = "/team/organizationId", method = RequestMethod.GET)
+        @GetMapping(value = "/team/organizationId")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> getOrganizationIdByTeamId(@PathVariable Long unitId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getOrganizationIdByTeamId(unitId));
         }
 
         @ApiOperation(value = "Get Organization Id by team")
-        @RequestMapping(value = "/staff/{staffId}/team_activities", method = RequestMethod.GET)
+        @GetMapping(value = "/staff/{staffId}/team_activities")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> getTeamActivitiesOfStaff(@PathVariable Long staffId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getTeamActivitiesOfStaff(staffId));
@@ -176,7 +175,7 @@
         @PutMapping("/team/general")
         @ApiOperation("update general details of team")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO) throws ParseException {
+        public ResponseEntity<Map<String, Object>> updateTeamGeneralDetails(@PathVariable long unitId, @Validated @RequestBody TeamDTO teamDTO){
             return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTeamGeneralDetails(unitId, teamDTO));
         }
 

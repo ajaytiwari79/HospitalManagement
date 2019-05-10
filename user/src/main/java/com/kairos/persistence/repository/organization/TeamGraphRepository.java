@@ -86,7 +86,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void removeStaffFromAllTeams(long staffId);
 
     @Query("MATCH (team:Team{isEnabled:true,deleted:false})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} RETURN \n" +
-            "id(team) as teamId,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType")
+            "id(team) as teamId,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType")
     List<StaffTeamDTO> getTeamDetailsOfStaff(Long staffId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
@@ -97,8 +97,11 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "RETURN DISTINCT {id:id(staff),firstName:staff.firstName+\" \" +staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,isSelected:CASE when r is null then false else r.isEnabled end,profilePic: {1} + staff.profilePic} as data order by data.firstName")
     List<Map<String,Object>> getAllStaffByOrganization(long teamId, String imageUrl);
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:TeamisEnabled:true,deleted:false) WHERE id(org)={0} RETURN {id:id(team),name:team.name} as data order by data.name")
+    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN {id:id(team),name:team.name} as data order by data.name")
     List<Map<String,Object>> getAllTeamsInOrganization(long organizationId);
+
+    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN id(team) as id,team.name as name")
+    List<TeamDTO> findAllTeamsInOrganization(long organizationId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
             "MATCH (team)-[:"+TEAM_HAS_LOCATION+"]->(contactAddress:ContactAddress) with contactAddress\n" +

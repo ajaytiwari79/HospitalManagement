@@ -293,8 +293,8 @@ public class TeamService {
 
     }
 
-    public List<Map<String,Object>> getAllTeamsOfOrganization(Long unitId){
-        return teamGraphRepository.getAllTeamsInOrganization(unitId);
+    public List<TeamDTO> getAllTeamsOfOrganization(Long unitId){
+        return teamGraphRepository.findAllTeamsInOrganization(unitId);
     }
 
     public Long getOrganizationIdByTeamId(Long teamId) {
