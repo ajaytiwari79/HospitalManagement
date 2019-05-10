@@ -14,7 +14,7 @@ import javax.inject.Inject;
 public class ExceptionService {
     //~ Instance variables
     @Inject
-    public LocaleService localeService;
+    private LocaleService localeService;
 
 
     public String convertMessage(String message, Object... params) {
