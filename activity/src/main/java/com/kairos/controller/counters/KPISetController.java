@@ -8,6 +8,7 @@ import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -70,7 +72,12 @@ public class KPISetController {
     }
 
 
-
+    @GetMapping(UNIT_URL+"/testKPI")
+    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId,
+                                                                       @RequestParam  @DateTimeFormat(pattern = "yyyy" +
+                                                                               "-MM-dd") Date startDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISetCalculation(unitId,startDate));
+    }
 
 
 }

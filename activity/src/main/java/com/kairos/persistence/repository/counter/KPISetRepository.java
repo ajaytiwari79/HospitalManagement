@@ -25,4 +25,6 @@ public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>
     boolean existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(String name, Long referenceId, BigInteger id);
 
     boolean existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(BigInteger phaseId, TimeTypeEnum timeType,BigInteger id);
+
+    List<KPISetDTO> findByPhaseId(BigInteger phaseId);
 }

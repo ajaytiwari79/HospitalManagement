@@ -4,9 +4,11 @@ package com.kairos.service.counter;
  *
  */
 
+
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPISet;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -14,18 +16,24 @@ import com.kairos.persistence.repository.counter.KPISetRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+
+
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 @Service
 public class KPISetService {
@@ -41,6 +49,11 @@ public class KPISetService {
     private CounterRepository counterRepository;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
+    @Inject
+    private PhaseService phaseService;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(KPISetService.class);
 
     public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
@@ -60,7 +73,7 @@ public class KPISetService {
         }
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
-        kpiSet=ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO,KPISet.class);
+        kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
         return kpiSetDTO;
     }
@@ -95,12 +108,12 @@ public class KPISetService {
         if (existByName) {
             exceptionService.duplicateDataException("message.kpi_set.name.duplicate");
         }
-        boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType(),kpiSetDTO.getId());
+        boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType(), kpiSetDTO.getId());
         if (existsByPhaseAndTimeType) {
             exceptionService.duplicateDataException("message.kpi_set.exist.phase_and_time_type");
         }
-        boolean kpisBelongsToIndividual=counterRepository.allKPIsBelongsToIndividualType(kpiSetDTO.getKpiIds(),confLevel,referenceId);
-        if(!kpisBelongsToIndividual){
+        boolean kpisBelongsToIndividual = counterRepository.allKPIsBelongsToIndividualType(kpiSetDTO.getKpiIds(), confLevel, referenceId);
+        if (!kpisBelongsToIndividual) {
             exceptionService.actionNotPermittedException("message.kpi_set.belongs_to.individual");
         }
 
@@ -108,11 +121,11 @@ public class KPISetService {
 
     public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
         List<KPISet> kpiSets = kpiSetRepository.findAllByCountryIdAndDeletedFalse(orgSubTypeIds, countryId);
-        List<Phase> unitPhaseList=phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<BigInteger,Phase> unitPhaseMap=unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId,Function.identity()));
-        List<KPISet> unitKPISets=new ArrayList<>();
+        List<Phase> unitPhaseList = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        Map<BigInteger, Phase> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Function.identity()));
+        List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
-            if(isCollectionNotEmpty(kpiSet.getKpiIds())) {
+            if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                 KPISet unitKPISet = new KPISet();
                 unitKPISet.setId(null);
                 unitKPISet.setName(kpiSet.getName());
@@ -124,8 +137,33 @@ public class KPISetService {
                 unitKPISets.add(unitKPISet);
             }
         });
-        if(isCollectionNotEmpty(unitKPISets)){
+        if (isCollectionNotEmpty(unitKPISets)) {
             kpiSetRepository.saveEntities(unitKPISets);
         }
+    }
+
+
+    public Map<BigInteger, Object> createKPISetCalculation(Long unitId, Date startDate) {
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
+                asDate(asLocalDate(startDate).atTime(LocalTime.MAX)));
+        logger.info(phase.getName()+">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        List<ApplicableKPI> applicableKPI;
+        Map<BigInteger, Object> unitPhaseMap = new HashMap<>();
+        if (isNotNull(phase)) {
+            List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseId(phase.getId());
+            logger.info(kpiSetDTOList.size()+">>>>>>>>>>>>>>>>>>>>>>>>>>");
+            if (isCollectionNotEmpty(kpiSetDTOList)) {
+                kpiSetDTOList.forEach(kpiSet -> {
+                    if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
+                        List<ApplicableKPI>    applicableKPIS = counterRepository.getKPIByKPIId(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId,ConfLevel.UNIT);
+                       logger.info(applicableKPIS.get(0).getActiveKpiId().toString());
+                        unitPhaseMap.put(applicableKPIS.get(0).getActiveKpiId(),applicableKPIS);
+
+                    }
+                });
+
+            }
+        }
+  return unitPhaseMap;
     }
 }
