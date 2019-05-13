@@ -94,4 +94,6 @@ public interface CustomActivityMongoRepository {
     List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
 
     ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
+
+    List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId);
 }

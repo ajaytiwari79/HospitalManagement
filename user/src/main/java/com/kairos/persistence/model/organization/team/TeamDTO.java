@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.ArrayUtil;
+import com.kairos.persistence.model.staff.StaffTeamDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
@@ -23,10 +26,11 @@ public class TeamDTO {
     private String name;
     private String description;
     private boolean hasAddressOfUnit;
-    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
     private List<BigInteger> activityIds;
-    private List<Long> teamMemberIds;
     private List<Long> skillIds;
+    private Set<Long> mainTeamLeaderIds;
+    private Set<Long> actingTeamLeaderIds;
+    private List<StaffTeamDTO> staffDetails;
 
     public Long getId() {
         return id;
@@ -60,28 +64,12 @@ public class TeamDTO {
         this.description = description;
     }
 
-    public Long getTeamLeaderStaffId() {
-        return teamLeaderStaffId;
-    }
-
-    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
-        this.teamLeaderStaffId = teamLeaderStaffId;
-    }
-
     public List<BigInteger> getActivityIds() {
         return activityIds;
     }
 
     public void setActivityIds(List<BigInteger> activityIds) {
         this.activityIds = activityIds;
-    }
-
-    public List<Long> getTeamMemberIds() {
-        return teamMemberIds;
-    }
-
-    public void setTeamMemberIds(List<Long> teamMemberIds) {
-        this.teamMemberIds = teamMemberIds;
     }
 
     public List<Long> getSkillIds() {
@@ -92,4 +80,35 @@ public class TeamDTO {
         this.skillIds = skillIds;
     }
 
+    public Set<Long> getMainTeamLeaderIds() {
+        return mainTeamLeaderIds;
+    }
+
+    public void setMainTeamLeaderIds(Set<Long> mainTeamLeaderIds) {
+        this.mainTeamLeaderIds = mainTeamLeaderIds;
+    }
+
+    public Set<Long> getActingTeamLeaderIds() {
+        return actingTeamLeaderIds;
+    }
+
+    public void setActingTeamLeaderIds(Set<Long> actingTeamLeaderIds) {
+        this.actingTeamLeaderIds = actingTeamLeaderIds;
+    }
+
+    public List<StaffTeamDTO> getStaffDetails() {
+        return staffDetails;
+    }
+
+    public void setStaffDetails(List<StaffTeamDTO> staffDetails) {
+        this.staffDetails = staffDetails;
+    }
+
+    @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
+    public boolean isValid() {
+        if(isCollectionEmpty(mainTeamLeaderIds) || isCollectionEmpty(actingTeamLeaderIds)){
+            return true;
+        }
+        return !CollectionUtils.containsAny(mainTeamLeaderIds,actingTeamLeaderIds);
+    }
 }

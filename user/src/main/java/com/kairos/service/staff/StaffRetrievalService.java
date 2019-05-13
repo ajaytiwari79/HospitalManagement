@@ -232,7 +232,8 @@ public class StaffRetrievalService {
         map.put("costHour", staff.getCostHour());
         map.put("costHourOvertime", staff.getCostHourOvertime());
         map.put("capacity", staff.getCapacity());
-        map.put("teamIdsOfStaff", teamGraphRepository.getTeamsOfStaff(staff.getId()));
+        map.put("teamDetails", teamGraphRepository.getTeamDetailsOfStaff(staff.getId()));
+
         return map;
     }
 
@@ -270,14 +271,14 @@ public class StaffRetrievalService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs, StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId) {
-        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(UserId, ReasonCodeType.ATTENDANCE);
+    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long userId) {
+        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(userId, ReasonCodeType.ATTENDANCE);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
     }
 
-    public List<StaffResultDTO> getStaffIdsUnitByUserId(Long UserId) {
-        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffIdsAndUnitByUserId(UserId);
+    public List<StaffResultDTO> getStaffIdsUnitByUserId(Long userId) {
+        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffIdsAndUnitByUserId(userId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
     }
