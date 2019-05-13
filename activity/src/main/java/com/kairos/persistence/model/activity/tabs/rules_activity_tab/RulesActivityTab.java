@@ -7,6 +7,7 @@ import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForStaffingLevel;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private List<BigInteger> approvalAllowedPhaseIds;
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
@@ -268,5 +270,13 @@ public class RulesActivityTab implements Serializable{
 
     public void setCutOffBalances(CutOffIntervalUnit.CutOffBalances cutOffBalances) {
         this.cutOffBalances = cutOffBalances;
+    }
+
+    public List<BigInteger> getApprovalAllowedPhaseIds() {
+        return approvalAllowedPhaseIds;
+    }
+
+    public void setApprovalAllowedPhaseIds(List<BigInteger> approvalAllowedPhaseIds) {
+        this.approvalAllowedPhaseIds = approvalAllowedPhaseIds;
     }
 }

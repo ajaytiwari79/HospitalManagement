@@ -204,7 +204,7 @@ public class AbsenceShiftService {
             }
             shift.setPlanningPeriodId(planningPeriodByShift.get().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
-            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift);
+            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift,activityWrapperMap);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());

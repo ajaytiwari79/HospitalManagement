@@ -3,17 +3,17 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
-import com.kairos.dto.activity.shift.ShiftActivitiesIdDTO;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftActivityResponseDTO;
-import com.kairos.dto.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -48,11 +49,12 @@ public class ShiftStatusService {
     @Inject private TimeBankService timeBankService;
     @Inject private LocaleService localeService;
 
-    public List<ShiftActivityResponseDTO> updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
+    public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
         Set<BigInteger> shiftActivitiyIds = ((Set<BigInteger>) objects[1]);
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
+        List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
         Set<BigInteger> allActivities = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
         List<Activity> activities = activityMongoRepository.findAllPhaseSettingsByActivityIds(allActivities);
         Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getPhaseSettingsActivityTab));
@@ -70,7 +72,7 @@ public class ShiftStatusService {
                         boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
-                            removeOppositeStatus(shiftActivity, shiftPublishDTO.getStatus());
+                            removeOppositeStatus(shift , shiftActivity, shiftPublishDTO.getStatus());
                             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true, shiftActivity.getStatus()));
                         } else {
                             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("access.group.not.matched"), false));
@@ -78,11 +80,12 @@ public class ShiftStatusService {
                         shiftActivityResponseDTOS.add(shiftActivityResponseDTO);
                     }
                 }
+                shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class));
             }
             shiftMongoRepository.saveEntities(shifts);
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         }
-        return shiftActivityResponseDTOS;
+        return new ShiftAndActivtyStatusDTO( new ArrayList<>() , shiftActivityResponseDTOS);
     }
 
     private Object[] getActivitiesAndShiftIds(List<ShiftActivitiesIdDTO> shifts) {
@@ -96,7 +99,7 @@ public class ShiftStatusService {
     }
 
 
-    private void removeOppositeStatus(ShiftActivity shiftActivity, ShiftStatus shiftStatus) {
+    private void removeOppositeStatus(Shift shift , ShiftActivity shiftActivity, ShiftStatus shiftStatus) {
         switch (shiftStatus) {
             case LOCK:
                 shiftActivity.getStatus().removeAll(Arrays.asList(UNLOCK, UNPUBLISH, REQUEST));
@@ -114,7 +117,13 @@ public class ShiftStatusService {
                 shiftActivity.getStatus().add(APPROVE);
                 break;
             case REJECT:
-                shiftActivity.getStatus().removeAll(Arrays.asList(APPROVE, REQUEST));
+                if(shift.getActivities().size()>1){
+                    shift.getActivities().remove(shiftActivity);
+                    shift.setStartDate(shift.getActivities().get(0).getStartDate());
+                    shift.setEndDate(shift.getActivities().get(shift.getActivities().size()-1).getEndDate());
+                }else{
+                    shift.setDeleted(true);
+                }
                 break;
             case UNLOCK:
                 shiftActivity.getStatus().removeAll(Arrays.asList(LOCK, REQUEST));
@@ -156,11 +165,13 @@ public class ShiftStatusService {
         return activityShiftStatusSettings;
     }
 
-    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift) {
-        Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
-        if(isNull(mainShift.getId()) && validPhaseForPublishingShift.contains(phase.getPhaseEnum())){
-            for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift ,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
+        for (ShiftActivity shiftActivity : mainShift.getActivities()) {
+            if(isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds())){
+                if(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())){
+                    shiftActivity.getStatus().add(userAccessRoleDTO.getManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
+                }
             }
         }
     }
