@@ -72,6 +72,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("$activityPriorityId").as("activityPriorityId")
                         .push("tags_data").as("tags")
 
         );
