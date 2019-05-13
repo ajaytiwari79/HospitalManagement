@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -23,6 +24,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -168,12 +170,11 @@ public class OrganizationActivityService extends MongoBaseService {
             }
             activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
-            save(activityCopied);
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
         }
-        save(activityCopied);
+        activityMongoRepository.save(activityCopied);
         return retrieveBasicDetails(activityCopied);
     }
 
@@ -185,6 +186,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if(timeType.isPresent()){
             activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
         }*/
+        activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
         return activityDTO;
 
     }
@@ -192,8 +194,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId, type);
-        if (Optional.ofNullable(activities).isPresent()) {
-            if (Optional.ofNullable(activities.getActivityDTOList()).isPresent())
+        if (Optional.ofNullable(activities).isPresent() && Optional.ofNullable(activities.getActivityDTOList()).isPresent()) {
                 activityDetails.setAllActivities(activities.getActivityDTOList());
         }
         List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
@@ -267,7 +268,15 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
-        activityCopied.setActivityPriorityId(activity.getActivityPriorityId());
+        //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
+        ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(activity.getActivityPriorityId());
+        if(activityPriority!=null){
+            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(),unitId);
+            if(unitActivityPriority!=null) {
+                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
+            }
+        }
+
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
@@ -321,7 +330,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
         activityService.updateNotesTabOfActivity(generalDTO, activity);
-        save(activity);
+        activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
@@ -397,7 +406,7 @@ public class OrganizationActivityService extends MongoBaseService {
             activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
             activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
             activityCopied.setState(ActivityStateEnum.DRAFT);
-            save(activityCopied);
+            activityMongoRepository.save(activityCopied);
             activityDTO.setId(activityCopied.getId());
             activityDTO.setActivityCanBeCopied(true);
             activityDTO.setUnitId(unitId);

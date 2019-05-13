@@ -111,6 +111,4 @@ public class TeamDTO {
         }
         return !CollectionUtils.containsAny(mainTeamLeaderIds,actingTeamLeaderIds);
     }
-
-
 }

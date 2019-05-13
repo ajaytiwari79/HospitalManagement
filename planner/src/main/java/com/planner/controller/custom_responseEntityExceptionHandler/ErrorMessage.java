@@ -1,4 +1,4 @@
-package com.planner.common.custom_responseEntityExceptionHandler;
+package com.planner.controller.custom_responseEntityExceptionHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
