@@ -180,15 +180,15 @@ public class CounterDataService extends MongoBaseService {
         return kpi;
     }
 
-    private void setKpiProperty(ApplicableKPI applicableKPI, List<FilterCriteria> criteriaList, KPIDTO kpi) {
-        kpi.setDefaultFilters(criteriaList);
-        kpi.setTitle(applicableKPI.getTitle());
-        kpi.setValue(applicableKPI.getValue());
-        kpi.setFrequencyType(applicableKPI.getFrequencyType());
-        kpi.setInterval(applicableKPI.getInterval());
-        kpi.setKpiRepresentation(applicableKPI.getKpiRepresentation());
+    private void setKpiProperty(ApplicableKPI applicableKPI, List<FilterCriteria> criteriaList, KPIDTO kpiDTO) {
+        kpiDTO.setDefaultFilters(criteriaList);
+        kpiDTO.setTitle(applicableKPI.getTitle());
+        kpiDTO.setValue(applicableKPI.getValue());
+        kpiDTO.setFrequencyType(applicableKPI.getFrequencyType());
+        kpiDTO.setInterval(applicableKPI.getInterval());
+        kpiDTO.setKpiRepresentation(applicableKPI.getKpiRepresentation());
         if (isNotNull(applicableKPI.getApplicableFilter())) {
-            kpi.setSelectedFilters(applicableKPI.getApplicableFilter().getCriteriaList());
+            kpiDTO.setSelectedFilters(applicableKPI.getApplicableFilter().getCriteriaList());
         }
     }
 

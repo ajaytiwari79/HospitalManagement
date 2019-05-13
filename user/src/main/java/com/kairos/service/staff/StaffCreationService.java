@@ -372,6 +372,7 @@ public class StaffCreationService {
             user = new User();
             user.setUserLanguage(systemLanguage);
             setBasicDetailsOfUser(user, staffCreationData);
+            user.setCountryId(organization.getCountry().getId());
             userGraphRepository.save(user);
         }
         staffService.setUnitManagerAndPosition(organization, user, staffCreationData.getAccessGroupId());

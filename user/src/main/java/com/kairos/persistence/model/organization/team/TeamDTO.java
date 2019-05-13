@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.commons.utils.ArrayUtil;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -111,6 +110,4 @@ public class TeamDTO {
         }
         return !CollectionUtils.containsAny(mainTeamLeaderIds,actingTeamLeaderIds);
     }
-
-
 }
