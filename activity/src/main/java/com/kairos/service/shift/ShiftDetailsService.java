@@ -1,15 +1,21 @@
 package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.service.phase.PhaseService;
+import com.kairos.service.unit_settings.ActivityConfigurationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -40,6 +46,10 @@ public class ShiftDetailsService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
+    @Inject
+    private PhaseService phaseService;
+    @Inject
+    private ActivityConfigurationService activityConfigurationService;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
@@ -77,5 +87,14 @@ public class ShiftDetailsService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", absenceReasonCodeIds.toString()));
         return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
+    }
+
+    public void addPlannedTimeInShift(ShiftDTO shiftDTO){
+        Shift shift=shiftMongoRepository.findOne(shiftDTO.getId());
+        Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate());
+        ActivityConfiguration activityConfiguration=
+
+
+
     }
 }

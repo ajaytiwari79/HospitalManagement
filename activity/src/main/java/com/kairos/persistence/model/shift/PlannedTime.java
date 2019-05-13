@@ -3,6 +3,7 @@ package com.kairos.persistence.model.shift;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 /*
@@ -12,9 +13,8 @@ import java.util.Date;
 @Getter
 @Setter
 public class PlannedTime {
-    private short normalTime;
-    private short overTime;
-    private short extraTime;
+    private BigInteger plannedTimeId;
+    private short plannedTimeInMinutes;
     private Date startDate;
     private Date endDate;
 }
