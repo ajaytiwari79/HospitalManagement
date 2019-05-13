@@ -613,7 +613,7 @@ public class UserIntegrationService {
 
     //TODO write implementation previously inside OrganizationRestClient this implementation was written only(here added so as not to break current functionality )
     public boolean isExistOrganization(Long orgId) {
-        return true;
+        return getOrganizationDTO(orgId)!=null;
     }
 
     public Map<String, Object> getTaskDemandSupplierInfo() {
