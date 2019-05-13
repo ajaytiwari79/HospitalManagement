@@ -1,4 +1,4 @@
-package com.planner.common.custom_responseEntityExceptionHandler;
+package com.planner.controller.custom_responseEntityExceptionHandler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

@@ -331,6 +331,7 @@ public class CompanyCreationService {
                 user.setLastName(unitManagerDTO.getLastName());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 user.setUserNameUpdated(true);
+                user.setCountryId(organization.getCountry().getId());
                 userGraphRepository.save(user);
                 if(unitManagerDTO.getAccessGroupId() != null) {
                     setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
@@ -351,6 +352,7 @@ public class CompanyCreationService {
                                 ,true);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
+                    user.setCountryId(organization.getCountry().getId());
                     userGraphRepository.save(user);
                     staffService.setUserAndPosition(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
 

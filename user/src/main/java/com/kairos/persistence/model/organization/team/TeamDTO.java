@@ -3,9 +3,13 @@ package com.kairos.persistence.model.organization.team;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 
 /**
  * Created by prabjot on 20/1/17.
@@ -87,4 +91,5 @@ public class TeamDTO {
     public void setSkillIds(List<Long> skillIds) {
         this.skillIds = skillIds;
     }
+
 }

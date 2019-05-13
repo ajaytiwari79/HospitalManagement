@@ -25,6 +25,8 @@ public class StaffTeamRelationship extends UserBaseEntity {
 
     private boolean isEnabled = true;
 
+
+
     public StaffTeamRelationship() {
         //Default Constructor
     }
@@ -57,26 +59,9 @@ public class StaffTeamRelationship extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public enum StaffRole {
-
-        PLANNER, VISITATOR, MANAGER, TEAM_LEADER;
-
-        public String value;
-
-        public static StaffRole getByValue(String value) {
-            for (StaffRole role : StaffRole.values()) {
-                if (role.value.equals(value)) {
-                    return role;
-                }
-            }
-            return null;
-        }
-    }
-
     public boolean isEnabled() {
         return isEnabled;
     }
-
 }
 
 

@@ -4,6 +4,7 @@ package com.kairos.persistence.repository.counter;
  *
  */
 
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.counter.KPISet;
@@ -26,5 +27,5 @@ public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>
 
     boolean existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(BigInteger phaseId, TimeTypeEnum timeType,BigInteger id);
 
-    List<KPISetDTO> findByPhaseId(BigInteger phaseId);
+    List<KPISetDTO> findByPhaseIdAndReferenceIdAndConfLevel(BigInteger phaseId, Long referenceId, ConfLevel confLevel);
 }

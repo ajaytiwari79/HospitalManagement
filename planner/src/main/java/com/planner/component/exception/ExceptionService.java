@@ -6,6 +6,7 @@ import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
 import com.planner.common.custum_exceptions.RelationShipNotValidException;
 import com.planner.component.locale.LocaleService;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
@@ -15,9 +16,8 @@ public class ExceptionService {
     @Inject
     private LocaleService localeService;
 
-    //=======================common=============================
 
-    private String convertMessage(String message, Object... params) {
+    public String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
             try {
                 params[i] = localeService.getMessage(params[i].toString());
