@@ -98,9 +98,9 @@ public class CustomBasicAuthenticationProcessingFilter extends OAuth2Authenticat
         String token = (String) authentication.getPrincipal();
         OAuth2Authentication auth = loadAuthentication(token);
 
-//        if (!redisService.verifyTokenInRedisServer(auth.getName(), token)) {
-//            throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
-//        }
+        if (!redisService.verifyTokenInRedisServer(auth.getName(), token)) {
+            throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
+        }
         auth.setDetails(authentication.getDetails());
         auth.setAuthenticated(true);
         return auth;
