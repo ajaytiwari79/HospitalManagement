@@ -36,13 +36,14 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -136,8 +137,9 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private PlanningPeriodService planningPeriodService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private ActivityPriorityMongoRepository activityPriorityMongoRepository;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
+    private static final  Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
@@ -413,14 +415,14 @@ public class ActivityService extends MongoBaseService {
             exceptionService.illegalArgumentException("message.activity.notallow");
         }
         List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
-        List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
+        Set<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toSet());
         activity.setCompositeActivities(compositeActivities);
         updateCompositeActivity(activityList, activity, compositeActivities);
         save(activity);
         return compositeShiftActivityDTOs;
     }
 
-    private void updateCompositeActivity(List<Activity> activityList, Activity activity, List<CompositeActivity> compositeActivities) {
+    private void updateCompositeActivity(List<Activity> activityList, Activity activity, Set<CompositeActivity> compositeActivities) {
         Map<BigInteger, Activity> activityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
@@ -447,7 +449,7 @@ public class ActivityService extends MongoBaseService {
         }
         organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
-        //updateCompositeActivity(activityList, activity, compositeActivities);
+        updateCompositeActivities(childActivitiesIds,activity);
         save(activity);
         return childActivitiesIds;
     }
@@ -915,6 +917,7 @@ public class ActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
+
         Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(), Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
@@ -922,7 +925,7 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
-        save(activityCopied);
+        activityMongoRepository.save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         activityDTO.setActivityCanBeCopied(true);
         return activityDTO;

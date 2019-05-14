@@ -75,6 +75,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("$activityPriorityId").as("activityPriorityId")
                         .push("tags_data").as("tags")
 
         );
@@ -125,7 +126,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 lookup("tag", "tags", "_id", "tags"),
-
                 project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab", "tags", "activityPriorityId").and("balanceSettingsActivityTab.timeTypeId").as("balanceSettingsActivityTab.timeTypeId")
                         .and("timeCalculationActivityTab.methodForCalculatingTime").as("methodForCalculatingTime")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
@@ -751,5 +751,18 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
 
         return mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class).getUniqueMappedResult();
+    }
+
+    @Override
+    public List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab")
+                        .and("timeType").arrayElementAt(0).as("timeType"),
+                match(Criteria.where("timeType.partOfTeam").is(false))
+        );
+        AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
+        return result.getMappedResults();
     }
 }

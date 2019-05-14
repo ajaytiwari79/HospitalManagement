@@ -274,29 +274,7 @@ public class StaffService {
         List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
         Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
         staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, expertises);
-        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
-        for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
-            Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
-            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
-            Long id = null;
-            if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
-                id = staffExperienceInExpertiseDTO.getId();
-            Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
-            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
-            boolean isSeniorityLevelMatched = false;
-            for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
-                if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
-                    isSeniorityLevelMatched = true;
-                    break;
-                }
-            }
-            if (!isSeniorityLevelMatched) {
-                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound", "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
-            }
-        }
-        if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
-            staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
-        }
+        assignExpertiseToStaff(staffPersonalDetail, staffToUpdate, expertiseMap, staffExperienceInExpertiseDTOMap);
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
         staffToUpdate.setLanguage(language);
@@ -339,12 +317,34 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        if (isCollectionEmpty(staffPersonalDetail.getTeamIdsOfStaff())) {
-            teamGraphRepository.removeStaffFromAllTeams(staffId);
-        } else {
-            teamGraphRepository.assignStaffInTeams(staffId, staffPersonalDetail.getTeamIdsOfStaff());
-        }
+        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails());
         return staffPersonalDetail;
+    }
+
+    private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
+        for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
+            Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            Long id = null;
+            if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
+                id = staffExperienceInExpertiseDTO.getId();
+            Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
+            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
+            boolean isSeniorityLevelMatched = false;
+            for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
+                if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
+                    isSeniorityLevelMatched = true;
+                    break;
+                }
+            }
+            if (!isSeniorityLevelMatched) {
+                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound", "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+            }
+        }
+        if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
+            staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
+        }
     }
 
     public Map<String, Object> saveNotes(long staffId, String generalNote, String requestFromPerson) {
@@ -709,8 +709,10 @@ public class StaffService {
             Organization mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
             mainOrganization.getPositions().add(position);
             organizationGraphRepository.save(mainOrganization);
+            user.setCountryId(mainOrganization.getCountry().getId());
         } else {
             organization.getPositions().add(position);
+            user.setCountryId(organization.getCountry().getId());
         }
         organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
@@ -723,7 +725,7 @@ public class StaffService {
             }
         }
         position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position);
+        positionGraphRepository.save(position,2);
     }
 
     public void setUnitManagerAndPosition(Organization organization, User user, Long accessGroupId) {
@@ -910,7 +912,7 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
         if (allStaffRequired) {
             Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
             // unit is parent so fetching all staff from itself

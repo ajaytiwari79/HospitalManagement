@@ -186,11 +186,11 @@ public class ShiftStatusService {
 
     public void sendMailToStaffWhenStatusChange(Shift shift , ShiftActivity activity , ShiftStatus shiftStatus){
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
-        String body = "The status of the" +activity.getActivityName() + "has been changed from "+ activity.getStatus() +" to "+shiftStatus +" by "+ UserContext.getUserDetails().getFullName() +"\n\n Thanks";
+        String body = "The status of the " +activity.getActivityName() + "has been changed from "+ activity.getStatus() +" to "+shiftStatus +" by "+ UserContext.getUserDetails().getFullName() +"\n\n Thanks";
         //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
         String subject = "Shift Activiy Staus";
         Map<String, Object> templateParam = new HashMap<>();
-        templateParam.put("receiverName", staffDTO.getFullName());
+        templateParam.put("receiverName","Hi ," + staffDTO.getFullName());
         templateParam.put("description", body);
         mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, subject, staffDTO.getEmail());
     }

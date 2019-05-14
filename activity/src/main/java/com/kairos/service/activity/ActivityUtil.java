@@ -1,4 +1,5 @@
-package com.kairos.service.activity;/*
+package com.kairos.service.activity;
+/*
  *Created By Pavan on 29/10/18
  *
  */
@@ -227,8 +228,12 @@ public class ActivityUtil {
         BalanceSettingsActivityTab balanceSettingsActivityTab = new BalanceSettingsActivityTab(false, false);
 
         activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
+    }
 
-
+    public static void updateCompositeActivities(Set<BigInteger> activityIds,Activity activity){
+        Set<CompositeActivity> compositeActivities=new HashSet<>();
+        activityIds.forEach(activityId-> compositeActivities.add(new CompositeActivity(activityId,false,false)));
+        activity.getCompositeActivities().addAll(compositeActivities);
 
     }
 

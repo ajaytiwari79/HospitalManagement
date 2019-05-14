@@ -351,6 +351,7 @@ public class CompanyCreationService {
                                 ,true);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
+
                     userGraphRepository.save(user);
                     staffService.setUserAndPosition(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
 

@@ -55,6 +55,7 @@ public class ActivityDTO {
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
+    private BigInteger activityPriorityId;
 
     public ActivityDTO() {
         //default constructor
@@ -318,11 +319,21 @@ public class ActivityDTO {
         this.childActivityIds = childActivityIds;
     }
 
+
     public List<ShiftStatus> getActivityStatus() {
         return activityStatus;
     }
 
     public void setActivityStatus(List<ShiftStatus> activityStatus) {
         this.activityStatus = activityStatus;
+    }
+
+    public BigInteger getActivityPriorityId() {
+        return activityPriorityId;
+    }
+
+    public void setActivityPriorityId(BigInteger activityPriorityId) {
+        this.activityPriorityId = activityPriorityId;
+
     }
 }
