@@ -11,6 +11,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
@@ -347,7 +348,7 @@ public class User extends UserBaseEntity {
     }
 
     public String getFullName(){
-        return this.firstName+" "+this.lastName;
+        return StringUtils.capitalize(this.firstName)+" "+StringUtils.capitalize(this.lastName);
     }
 
     public Long getCountryId() {
