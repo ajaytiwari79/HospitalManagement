@@ -52,6 +52,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.SUPER_ADMIN;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ACCOUNTTYPE_NOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ACCOUNTTYPE_SELECT;
 
 
 /**
@@ -601,11 +603,11 @@ public class AccessGroupService {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
         if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypeIds().isEmpty()) {
-            exceptionService.actionNotPermittedException("message.accountType.select");
+            exceptionService.actionNotPermittedException(MESSAGE_ACCOUNTTYPE_SELECT);
         }
         List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
         if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
-            exceptionService.dataNotMatchedException("message.accountType.notFound");
+            exceptionService.dataNotMatchedException(MESSAGE_ACCOUNTTYPE_NOTFOUND);
         }
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
@@ -845,7 +847,7 @@ public class AccessGroupService {
         } else {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
             if(accessGroupQueryResult==null){
-                exceptionService.actionNotPermittedException("message.staff.invalid.unit");
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
             }
             String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
             boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);

@@ -340,8 +340,8 @@ public class ActivityMessagesConstants {
     public static final String ERROR_GLIDE_TIME_CHECKIN_BEFORE_EXCEEDS_LIMIT = "error.glide_time.checkin.before.exceeds.limit";
     public static final String ERROR_GLIDE_TIME_CHECKOUT_AFTER_EXCEEDS_LIMIT = "error.glide_time.checkout.after.exceeds.limit";
     public static final String ERROR_GLIDE_TIME_CHECKOUT_BEFORE_EXCEEDS_LIMIT = "error.glide_time.checkout.before.exceeds.limit";
-    public static final String END_DATE_FROM_END_DATE = "end_date.from.end_date";
-    public static final String START_DATE_FROM_END_DATE = "start_date.from.end_date";
+    public static final String END_DATE_FROM_END_DATE = "END_DATE_FROM_END_DATE";
+    public static final String START_DATE_FROM_END_DATE = "START_DATE_FROM_END_DATE";
     public static final String ERROR_GLIDETIME_NOTFOUND_COUNTRY = "error.glidetime.notfound.country";
     public static final String MESSAGE_WEEKLYVIEW_INCORRECT_DATE = "message.weeklyview.incorrect.date";
     public static final String PAYROLL_ALREADY_EXISTS_NAME = "payroll.already.exists.name";

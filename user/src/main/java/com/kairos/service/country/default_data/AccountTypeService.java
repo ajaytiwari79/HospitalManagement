@@ -16,6 +16,9 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ACCOUNTTYPE;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNITTYPE_NOTFOUND;
+
 @Service
 public class AccountTypeService {
 
@@ -38,7 +41,7 @@ public class AccountTypeService {
 
         Boolean exists = accountTypeRepository.checkAccountTypeExistInCountry(countryId, "(?i)" + accountTypeDTO.getName(), -1L);
         if (exists) {
-            exceptionService.duplicateDataException("message.duplicate", "message.accountType", accountTypeDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ACCOUNTTYPE, accountTypeDTO.getName());
         }
         AccountType newAccount = new AccountType(accountTypeDTO.getName(), country.get());
         accountTypeRepository.save(newAccount);
@@ -74,7 +77,7 @@ public class AccountTypeService {
 
         Optional<AccountType> accountType = accountTypeRepository.findById(id);
         if (!accountType.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accountType", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_ACCOUNTTYPE, id);
         }
         return accountType.get();
 
@@ -83,12 +86,12 @@ public class AccountTypeService {
     public AccountTypeDTO updateAccountTypeName(Long countryId, Long id, AccountTypeDTO accountTypeDTO) {
         Optional<AccountType> accountType = accountTypeRepository.findById(accountTypeDTO.getId(), 0);
         if (!accountType.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unitType.notFound", accountTypeDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNITTYPE_NOTFOUND, accountTypeDTO.getId());
         }
 
         Boolean exists = accountTypeRepository.checkAccountTypeExistInCountry(countryId, "(?i)" + accountTypeDTO.getName(), id);
         if (exists) {
-            exceptionService.duplicateDataException("message.duplicate", "message.accountType", accountTypeDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ACCOUNTTYPE, accountTypeDTO.getName());
         }
         accountType.get().setName(accountTypeDTO.getName());
         accountTypeRepository.save(accountType.get());
@@ -99,7 +102,7 @@ public class AccountTypeService {
     public Boolean deleteAccountTypeById( Long id) {
         Optional<AccountType> accountType = accountTypeRepository.findById(id, 0);
         if (!accountType.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unitType.notFound", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNITTYPE_NOTFOUND, id);
         }
         accountType.get().setDeleted(true);
         accountTypeRepository.save(accountType.get());

@@ -1,7 +1,6 @@
 package com.kairos.service.auth;
 
 import com.kairos.commons.service.mail.MailService;
-import com.kairos.service.redis.RedisService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -34,6 +33,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
@@ -535,7 +535,7 @@ public class UserService {
 
     public boolean resetPassword(String token, PasswordUpdateDTO passwordUpdateDTO) {
         if (!passwordUpdateDTO.isValid()) {
-            exceptionService.actionNotPermittedException("message.staff.user.password.notmatch");
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
         }
         User user = findByForgotPasswordToken(token);
         if (!Optional.ofNullable(user).isPresent()) {

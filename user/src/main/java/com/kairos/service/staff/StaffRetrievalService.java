@@ -86,6 +86,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.Day.EVERYDAY;
 
 /*
@@ -162,7 +163,7 @@ public class StaffRetrievalService {
             staff = Optional.ofNullable(staffPositionDTO).isPresent() ? staffPositionDTO.getStaff() : null;
         }
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.idandunitid.notfound", staffId, type, unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, type, unitId);
 
         }
 
@@ -553,7 +554,7 @@ public class StaffRetrievalService {
     public StaffAdditionalInfoDTO getStaffEmploymentDataByEmploymentId(LocalDate startDate, Long employmentId, long organizationId, String type, Set<Long> reasonCodeIds) {
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndEmploymentId(employmentId);
         if (isNull(staffAdditionalInfoQueryResult)) {
-            exceptionService.dataNotFoundByIdException("message.staff.unit.permission.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT_PERMISSION_NOTFOUND);
         }
         return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, type, reasonCodeIds);
     }
@@ -570,7 +571,7 @@ public class StaffRetrievalService {
     public StaffAdditionalInfoDTO getStaffEmploymentDataByEmploymentIdAndStaffId(LocalDate startDate, long staffId, Long employmentId, long organizationId, String type, Set<Long> reasonCodeIds) {
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organizationId, staffId);
         if (isNull(staffAdditionalInfoQueryResult)) {
-            exceptionService.dataNotFoundByIdException("message.staff.unit.permission.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT_PERMISSION_NOTFOUND);
         }
         return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, type, reasonCodeIds);
     }
@@ -655,7 +656,7 @@ public class StaffRetrievalService {
     public StaffAdditionalInfoDTO getStaffEmploymentData(Long employmentId, Long unitId) {
         StaffEmploymentDetails employmentDetails = employmentService.getEmploymentDetails(employmentId);
         if (!Optional.ofNullable(employmentDetails).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.employment.id.notexist", employmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, employmentId);
         }
         UserAccessRoleDTO userAccessRole = accessGroupService.findUserAccessRole(unitId);
         List<FunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(employmentDetails.getAppliedFunctions(), FunctionDTO.class);

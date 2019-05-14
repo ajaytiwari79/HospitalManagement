@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 //  Created By vipul   On 9/8/18
 @Service
 @Transactional
@@ -41,11 +43,11 @@ public class UnitTypeService{
         }
         Boolean exists = unitTypeGraphRepository.checkUnitTypeExistInCountry(country.get().getId(), "(?i)" + unitTypeDTO.getName(), -1L);
         if (exists) {
-            exceptionService.dataNotFoundByIdException("message.unitType.alreadyExist",unitTypeDTO.getName());
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNITTYPE_ALREADYEXIST,unitTypeDTO.getName());
         }
         List<AccessPage> modules=accessPageRepository.findAllModulesByIds(unitTypeDTO.getModuleIds());
         if (modules.size()!=unitTypeDTO.getModuleIds().size()){
-            exceptionService.invalidRequestException("message.modules.notfound",unitTypeDTO.getName());
+            exceptionService.invalidRequestException(MESSAGE_MODULES_NOTFOUND,unitTypeDTO.getName());
         }
 
         UnitType unitType = new UnitType(unitTypeDTO.getName(), unitTypeDTO.getDescription(), country.get(),modules);
@@ -66,15 +68,15 @@ public class UnitTypeService{
     public UnitTypeDTO updateUnitTypeOfCountry(Long countryId, UnitTypeDTO unitTypeDTO) {
         Optional<UnitType> unitType = unitTypeGraphRepository.findById(unitTypeDTO.getId(), 1);
         if (!unitType.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unitType.notFound",unitTypeDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNITTYPE_NOTFOUND,unitTypeDTO.getId());
         }
         Boolean exists = unitTypeGraphRepository.checkUnitTypeExistInCountry(countryId, "(?i)" + unitTypeDTO.getName(), unitTypeDTO.getId());
         if (exists) {
-            exceptionService.dataNotFoundByIdException("message.unitType.alreadyExist",unitTypeDTO.getName());
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNITTYPE_ALREADYEXIST,unitTypeDTO.getName());
         }
         List<AccessPage> modules=accessPageRepository.findAllModulesByIds(unitTypeDTO.getModuleIds());
         if (modules.size()!=unitTypeDTO.getModuleIds().size()){
-            exceptionService.invalidRequestException("message.modules.notfound",unitTypeDTO.getName());
+            exceptionService.invalidRequestException(MESSAGE_MODULES_NOTFOUND,unitTypeDTO.getName());
         }
         unitType.get().setAccessPage(modules);
         unitType.get().setName(unitTypeDTO.getName());

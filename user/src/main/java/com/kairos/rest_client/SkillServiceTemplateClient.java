@@ -65,7 +65,7 @@ public class SkillServiceTemplateClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
             //throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
         return null;

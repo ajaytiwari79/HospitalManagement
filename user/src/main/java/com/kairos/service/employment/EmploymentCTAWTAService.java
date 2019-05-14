@@ -47,6 +47,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
+import static com.kairos.constants.UserMessagesConstants.END_DATE_FROM_END_DATE;
+import static com.kairos.constants.UserMessagesConstants.START_DATE_FROM_END_DATE;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 
 /**
@@ -103,10 +105,10 @@ public class EmploymentCTAWTAService {
 
         }
         if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException("end_date.from.end_date");
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
         }
         if (employment.getEndDate() != null && updateDTO.getStartDate().isAfter(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException("start_date.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
         }
         updateDTO.setId(wtaId);
         updateDTO.setEmploymentEndDate(employment.getEndDate());

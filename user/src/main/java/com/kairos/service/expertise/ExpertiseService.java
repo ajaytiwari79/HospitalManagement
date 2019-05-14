@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
 /**
@@ -149,7 +150,7 @@ public class ExpertiseService {
             }
             Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
                 if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
-                    exceptionService.invalidRequestException("message.publish.expertise.union");
+                    exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
                 }
             });
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
@@ -609,7 +610,7 @@ public class ExpertiseService {
         }
         validateExpertiseBeforePublishing(expertise);
         if (!Optional.ofNullable(expertise.getUnion().getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(expertise.getUnion().getId())) {
-            exceptionService.invalidRequestException("message.publish.expertise.union");
+            exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
         }
         List<Long> seniorityLevelId = new ArrayList<>();
         for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
@@ -663,19 +664,19 @@ public class ExpertiseService {
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
         } else if (!Optional.ofNullable(expertise.getStartDateMillis()).isPresent()) {
-            exceptionService.invalidRequestException("message.startDateMillis.null");
+            exceptionService.invalidRequestException(MESSAGE_STARTDATEMILLIS_NULL);
         } else if (!Optional.ofNullable(expertise.getBreakPaymentSetting()).isPresent()) {
-            exceptionService.invalidRequestException("message.breakPaymentType.null");
+            exceptionService.invalidRequestException(MESSAGE_BREAKPAYMENTTYPE_NULL);
         } else if (!Optional.ofNullable(expertise.getUnion()).isPresent()) {
-            exceptionService.invalidRequestException("message.union.null");
+            exceptionService.invalidRequestException(MESSAGE_UNION_NULL);
         } else if (!Optional.ofNullable(expertise.getOrganizationServices()).isPresent()) {
-            exceptionService.invalidRequestException("message.service.absent");
+            exceptionService.invalidRequestException(MESSAGE_SERVICE_ABSENT);
         } else if (!Optional.ofNullable(expertise.getOrganizationLevel()).isPresent()) {
-            exceptionService.invalidRequestException("message.organizationLevel.null");
+            exceptionService.invalidRequestException(MESSAGE_ORGANIZATIONLEVEL_NULL);
         } else if (!Optional.ofNullable(expertise.getSector()).isPresent()) {
-            exceptionService.actionNotPermittedException("message.sector.absent");
+            exceptionService.actionNotPermittedException(MESSAGE_SECTOR_ABSENT);
         } else if (isCollectionEmpty(expertise.getSeniorityLevel())) {
-            exceptionService.actionNotPermittedException("message.seniority_level.absent");
+            exceptionService.actionNotPermittedException(MESSAGE_SENIORITY_LEVEL_ABSENT);
         }
     }
 

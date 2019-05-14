@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
+
 @Service
 public class PermissionService {
 
@@ -111,7 +113,7 @@ public class PermissionService {
                 KPermissionModel = KPermissionFieldQueryResult.getKPermissionModel();
                 KPermissionField KPermissionField = KPermissionFieldQueryResult.getKPermissionField();
                 if(KPermissionField == null){
-                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.permission.field", fieldPermissionDTO.getFieldId());
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_PERMISSION_FIELD, fieldPermissionDTO.getFieldId());
                 }else{
                     accessGroups.forEach(accessGroup -> {
                         accessGroupPermissionFieldRelationshipTypes.add(new AccessGroupPermissionFieldRelationshipType(KPermissionField, accessGroup, FieldLevelPermissions.getByValue(fieldPermissionDTO.getFieldPermission())));

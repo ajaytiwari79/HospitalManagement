@@ -30,6 +30,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 @Service
 @Transactional
 public class FunctionalPaymentService {
@@ -90,7 +92,7 @@ public class FunctionalPaymentService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalPaymentDTO.getId());
         }
         if (!functionalPayment.get().getStartDate().equals(functionalPaymentDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.functionalPayment.uneditable", "startdate");
+            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENT_UNEDITABLE, "startdate");
         }
         functionalPayment.get().setPaymentUnit(functionalPaymentDTO.getPaymentUnit());
         functionalPayment.get().setEndDate(functionalPaymentDTO.getEndDate());
@@ -249,13 +251,13 @@ public class FunctionalPaymentService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalPaymentDTO.getId());
         }
         if (functionalPayment.get().getFunctionalPaymentMatrices().isEmpty()) {
-            exceptionService.actionNotPermittedException("message_functional_Payment_empty_matrix");
+            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
         }
         if (functionalPayment.get().isPublished()) {
-            exceptionService.dataNotFoundByIdException("message.functionalPayment.alreadyPublished");
+            exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);
         }
         if (functionalPayment.get().getStartDate().isAfter(functionalPaymentDTO.getStartDate())) {
-            exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan.startDate");
+            exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE);
         }
         functionalPayment.get().setPublished(true);
         functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
@@ -271,7 +273,7 @@ public class FunctionalPaymentService {
         }
         if (!onGoingUpdated && Optional.ofNullable(parentFunctionalPayment).isPresent()) {
             if (parentFunctionalPayment.getStartDate().isEqual(functionalPaymentDTO.getStartDate()) || parentFunctionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate())){
-                exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan_or_equals.parent_startDate");
+                exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE);
             }
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
                     functionalPaymentDTO.getStartDate().minusDays(1L).toString());

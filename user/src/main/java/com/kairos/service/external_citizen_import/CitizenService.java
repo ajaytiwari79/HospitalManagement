@@ -62,7 +62,7 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectMapperUtils.jsonStringToObject;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
-
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_CITIZEN_STAFF_ALREADYEXIST;
 
 
 /**
@@ -537,7 +537,7 @@ public class CitizenService {
         if (user != null) {
             Staff alreadyExistStaff = staffGraphRepository.getByUser(user.getId());
             if (alreadyExistStaff != null)
-                exceptionService.dataNotFoundByIdException("message.citizen.staff.alreadyexist");
+                exceptionService.dataNotFoundByIdException(MESSAGE_CITIZEN_STAFF_ALREADYEXIST);
 
             staff = staffCreationService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
         }

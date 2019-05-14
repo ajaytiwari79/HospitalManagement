@@ -4,8 +4,8 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
@@ -19,8 +19,8 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -74,6 +74,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
 
 /**
@@ -152,7 +153,7 @@ public class CompanyCreationService {
         if(CompanyType.COMPANY.equals(orgDetails.getCompanyType()) && Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()) {
             AccountType accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId(), 0);
             if(!Optional.ofNullable(accountType).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.accountType.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ACCOUNTTYPE_NOTFOUND);
             }
             organization.setAccountType(accountType);
             accessGroupService.createDefaultAccessGroups(organization, Collections.emptyList());
@@ -206,11 +207,11 @@ public class CompanyCreationService {
         organization.setWorkcentre(orgDetails.isWorkcentre());
         if(parent && CompanyType.COMPANY.equals(orgDetails.getCompanyType())) {
             if(!Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.accountType.select");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ACCOUNTTYPE_SELECT);
             }
             AccountType accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId(), 0);
             if(!Optional.ofNullable(accountType).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.accountType.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ACCOUNTTYPE_NOTFOUND);
             }
             //accountType is Changed for parent organization We need to add this account type to child organization as well
             if(organization.getAccountType() == null || !organization.getAccountType().getId().equals(orgDetails.getAccountTypeId())) {
@@ -314,14 +315,14 @@ public class CompanyCreationService {
             }
         } else {
             if(unitManagerDTO.getCprNumber() != null && unitManagerDTO.getCprNumber().length() != 10) {
-                exceptionService.actionNotPermittedException("message.cprNumber.size");
+                exceptionService.actionNotPermittedException(MESSAGE_CPRNUMBER_SIZE);
             }
             // user can fill any random property and we need to fetch
             User user = userGraphRepository.getUserOfOrganization(organization.getId());
             if(user != null) {
                 byte anotherUserExistBySameEmailOrCPR = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
                 if(anotherUserExistBySameEmailOrCPR != 0) {
-                    exceptionService.duplicateDataException("message.cprNumberEmail.notNull");
+                    exceptionService.duplicateDataException(MESSAGE_CPRNUMBEREMAIL_NOTNULL);
                 }
 
                 user.setEmail(unitManagerDTO.getEmail());

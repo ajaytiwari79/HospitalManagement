@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 public class IsGreaterThanStartDate extends AbstractSpecification<FunctionalPaymentDTO> {
     private Logger logger = LoggerFactory.getLogger(IsGreaterThanStartDate.class);
     private Expertise expertise;
@@ -23,15 +25,15 @@ public class IsGreaterThanStartDate extends AbstractSpecification<FunctionalPaym
     @Override
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
         if (expertise.getStartDateMillis().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.functionalPaymentStartDate.greater");
+            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENTSTARTDATE_GREATER);
         }
         if ( Optional.ofNullable(expertise.getEndDateMillis()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
                 expertise.getEndDateMillis().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getEndDate())) {
-            exceptionService.actionNotPermittedException("message.date.greaterthan.date","functionalPayment","expertise");
+            exceptionService.actionNotPermittedException(MESSAGE_DATE_GREATERTHAN_DATE,FUNCTIONALPAYMENT,"expertise");
         }
 
         if (Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() && functionalPaymentDTO.getStartDate().isAfter(functionalPaymentDTO.getEndDate())) {
-            exceptionService.actionNotPermittedException("message.lastdate.notlessthan.startdate");
+            exceptionService.actionNotPermittedException(MESSAGE_LASTDATE_NOTLESSTHAN_STARTDATE);
         }
 
         return true;

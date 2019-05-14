@@ -2,7 +2,6 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.service.redis.RedisService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -43,6 +42,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -65,6 +65,7 @@ import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 
 /**
@@ -123,12 +124,12 @@ public class PositionService {
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
         } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
-            exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_EXTERNALID_NOTCHANGED);
         }
         if (isNotNull(objectToUpdate.getExternalId()) && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId())) {
             Staff staff = staffGraphRepository.findByExternalId(staffPositionDetail.getTimeCareExternalId());
             if (Optional.ofNullable(staff).isPresent()) {
-                exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
+                exceptionService.duplicateDataException(MESSAGE_STAFF_EXTERNALID_ALREADYEXIST);
             }
         }
         Long positionStartDate = DateUtils.getIsoDateInLong(staffPositionDetail.getEmployedSince());
@@ -169,7 +170,7 @@ public class PositionService {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
 
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
-            exceptionService.actionNotPermittedException("error.access.expired", accessGroup.getName());
+            exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null) {
@@ -189,7 +190,7 @@ public class PositionService {
         }
         Position position = positionGraphRepository.findPosition(parentOrganization.getId(), staffId);
         if (!Optional.ofNullable(position).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", staffId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EMPLOYMENT_NOTFOUND, staffId);
 
         }
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO;
@@ -202,7 +203,7 @@ public class PositionService {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
             if (Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
-                exceptionService.dataNotFoundByIdException("message.position.unitpermission.alreadyexist");
+                exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_UNITPERMISSION_ALREADYEXIST);
 
             } else if (!Optional.ofNullable(unitPermission).isPresent()) {
                 unitPermission = new UnitPermission();
@@ -223,7 +224,7 @@ public class PositionService {
             staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
             // need to remove unit permission
             if (unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId) <= 1) {
-                exceptionService.actionNotPermittedException("error.permission.remove");
+                exceptionService.actionNotPermittedException(ERROR_PERMISSION_REMOVE);
             }
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
         }
@@ -248,7 +249,7 @@ public class PositionService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
         } else {
-            exceptionService.internalServerError("error.type.notvalid");
+            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
         }
 
@@ -280,7 +281,7 @@ public class PositionService {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup == null) {
-            exceptionService.internalServerError("error.position.accessgroup.notfound");
+            exceptionService.internalServerError(ERROR_POSITION_ACCESSGROUP_NOTFOUND);
 
         }
         Position position = new Position();
@@ -319,7 +320,7 @@ public class PositionService {
             unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
 
         } else {
-            exceptionService.internalServerError("error.type.notvalid");
+            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
         }
         if (unit == null) {
@@ -441,7 +442,7 @@ public class PositionService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(id);
         } else {
-            exceptionService.internalServerError("error.type.notvalid");
+            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
         }
         PartialLeave partialLeave;
@@ -471,7 +472,7 @@ public class PositionService {
             }
 
             if (unitPermission == null) {
-                exceptionService.internalServerError("error.unit.permission.null");
+                exceptionService.internalServerError(ERROR_UNIT_PERMISSION_NULL);
 
             }
 
@@ -510,7 +511,7 @@ public class PositionService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(id);
         } else {
-            exceptionService.internalServerError("error.type.notvalid");
+            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
         }
         List<PartialLeave> partialLeaves = staffGraphRepository.getPartialLeaves(unit.getId(), staffId);
@@ -618,7 +619,7 @@ public class PositionService {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         ReasonCode reasonCode = null;
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.parentorganization.notfound", unit.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, unit.getId());
         }
 
         Position position = positionGraphRepository.findPosition(parentOrganization.getId(), staffId);
@@ -676,9 +677,9 @@ public class PositionService {
         EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), employmentId, employmentDTO.getEmploymentSubType());
         if (employmentQueryResult != null) {
             if (employmentQueryResult.getEndDate() == null) {
-                exceptionService.actionNotPermittedException("message.main_employment.exists", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());
+                exceptionService.actionNotPermittedException(MESSAGE_MAIN_EMPLOYMENT_EXISTS, employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate());
             } else {
-                exceptionService.actionNotPermittedException("message.main_employment.exists_with_end_date", employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate(), employmentQueryResult.getEndDate());
+                exceptionService.actionNotPermittedException(MESSAGE_MAIN_EMPLOYMENT_EXISTS_WITH_END_DATE, employmentQueryResult.getUnitName(), employmentQueryResult.getStartDate(), employmentQueryResult.getEndDate());
             }
         }
         return true;
@@ -687,11 +688,11 @@ public class PositionService {
     public void createPosition(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if(!Optional.ofNullable(accessGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
+            exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
 
         }
         if(accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
-            exceptionService.actionNotPermittedException("error.access.expired", accessGroup.getName());
+            exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
         Position position;
         if(employmentAlreadyExist) {

@@ -238,10 +238,10 @@ public class CostTimeAgreementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getEndDate() != null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException("end_date.from.end_date", ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException("END_DATE_FROM_END_DATE", ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException("start_date.from.end_date", ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException("START_DATE_FROM_END_DATE", ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;

@@ -49,6 +49,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_HOUSENUMBER_NULL;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_NOTFOUND;
 
 /**
  * Created by vipul on 13/2/18.
@@ -370,7 +372,7 @@ public class UnionService {
     }
 
     public boolean validateAddress(ContactAddressDTO addressDTO) {
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()), exceptionService.convertMessage("message.houseNumber.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()), exceptionService.convertMessage(MESSAGE_HOUSENUMBER_NULL));
         Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()), exceptionService.convertMessage("message.province.null"));
         Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getStreet()), exceptionService.convertMessage("message.street.null"));
         Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getCity()), exceptionService.convertMessage("message.city.null"));
@@ -529,7 +531,7 @@ public class UnionService {
         List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
