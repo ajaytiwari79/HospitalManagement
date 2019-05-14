@@ -8,14 +8,14 @@ import java.util.List;
 @Getter
 @Setter
 public class ShiftAndActivtyStatusDTO {
-  List<ShiftDTO> shiftDTOList;
-  List<ShiftActivityResponseDTO> shiftActivityResponseDTOS;
+  List<ShiftDTO> shifts;
+  List<ShiftActivityResponseDTO> shiftActivityStatusResponse;
 
     public ShiftAndActivtyStatusDTO() {
     }
 
-    public ShiftAndActivtyStatusDTO(List<ShiftDTO> shiftDTOList, List<ShiftActivityResponseDTO> shiftActivityResponseDTOS) {
-        this.shiftDTOList = shiftDTOList;
-        this.shiftActivityResponseDTOS = shiftActivityResponseDTOS;
+    public ShiftAndActivtyStatusDTO(List<ShiftDTO> shifts, List<ShiftActivityResponseDTO> shiftActivityStatusResponse) {
+        this.shifts = shifts;
+        this.shiftActivityStatusResponse = shiftActivityStatusResponse;
     }
 }

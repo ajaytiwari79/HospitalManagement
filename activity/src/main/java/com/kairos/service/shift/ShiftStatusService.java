@@ -2,15 +2,17 @@ package com.kairos.service.shift;
 
 
 import com.kairos.commons.service.locale.LocaleService;
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
-import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -22,19 +24,21 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
-import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
+import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
+import static com.kairos.constants.CommonConstants.RESET_PASSCODE;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 @Service
@@ -48,6 +52,8 @@ public class ShiftStatusService {
     @Inject private ShiftValidatorService shiftValidatorService;
     @Inject private TimeBankService timeBankService;
     @Inject private LocaleService localeService;
+    @Inject
+    private MailService mailService;
 
     public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
@@ -85,7 +91,7 @@ public class ShiftStatusService {
             shiftMongoRepository.saveEntities(shifts);
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         }
-        return new ShiftAndActivtyStatusDTO( new ArrayList<>() , shiftActivityResponseDTOS);
+        return new ShiftAndActivtyStatusDTO(shiftDTOS , shiftActivityResponseDTOS);
     }
 
     private Object[] getActivitiesAndShiftIds(List<ShiftActivitiesIdDTO> shifts) {
@@ -108,15 +114,16 @@ public class ShiftStatusService {
             case FIX:
                 shiftActivity.getStatus().removeAll(Arrays.asList(UNFIX, REQUEST));
                 shiftActivity.getStatus().add(FIX);
+                sendMailToStaffWhenStatusChange(shift,shiftActivity,shiftStatus);
                 break;
             case UNFIX:
                 shiftActivity.getStatus().removeAll(Arrays.asList(FIX, REQUEST));
                 break;
             case APPROVE:
-                shiftActivity.getStatus().removeAll(Arrays.asList(REJECT, UNPUBLISH, REQUEST));
+                shiftActivity.getStatus().removeAll(Arrays.asList(DISAPPROVE, UNPUBLISH, REQUEST));
                 shiftActivity.getStatus().add(APPROVE);
                 break;
-            case REJECT:
+            case DISAPPROVE:
                 if(shift.getActivities().size()>1){
                     shift.getActivities().remove(shiftActivity);
                     shift.setStartDate(shift.getActivities().get(0).getStartDate());
@@ -129,7 +136,7 @@ public class ShiftStatusService {
                 shiftActivity.getStatus().removeAll(Arrays.asList(LOCK, REQUEST));
                 break;
             case PUBLISH:
-                shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST, UNPUBLISH, REJECT));
+                shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST, UNPUBLISH, DISAPPROVE));
                 shiftActivity.getStatus().add(PUBLISH);
                 break;
             case UNPUBLISH:
@@ -165,14 +172,26 @@ public class ShiftStatusService {
         return activityShiftStatusSettings;
     }
 
-    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift ,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
+    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift ,Map<BigInteger, ActivityWrapper> activityWrapperMap ,UserAccessRoleDTO userAccessRoleDTO) {
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-            if(isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds())){
+            if(isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())){
                 if(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())){
                     shiftActivity.getStatus().add(userAccessRoleDTO.getManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
             }
         }
+    }
+
+
+
+    public void sendMailToStaffWhenStatusChange(Shift shift , ShiftActivity activity , ShiftStatus shiftStatus){
+        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        String body = "The status of the" +activity.getActivityName() + "has been changed from "+ activity.getStatus() +" to "+shiftStatus +" by "+ UserContext.getUserDetails().getFullName() +"\n\n Thanks";
+        //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
+        String subject = "Shift Activiy Staus";
+        Map<String, Object> templateParam = new HashMap<>();
+        templateParam.put("receiverName", staffDTO.getFullName());
+        templateParam.put("description", body);
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, subject, staffDTO.getEmail());
     }
 }

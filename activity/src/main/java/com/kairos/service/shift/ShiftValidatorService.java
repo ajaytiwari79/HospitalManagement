@@ -363,12 +363,30 @@ public class ShiftValidatorService {
 
     public void validateStatusOfShiftActivity(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-           boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX);  // || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) || shiftActivity.getStatus().contains(ShiftStatus.LOCK) || shiftActivity.getStatus().contains(ShiftStatus.APPROVE);
+           boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX);
             if (notValid) {
                 exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
             }
         }
+    }
 
+    public void updateStatusOfShiftActvity(Shift shift, ShiftDTO shiftDTO) {
+        Map<BigInteger, ShiftActivityDTO> activityIdAndShiftActivityDTOMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(k -> k.getActivityId(), v -> v));
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            if (activityIdAndShiftActivityDTOMap.containsKey(shiftActivity.getActivityId())) {
+                if (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getEndDate())) {
+                    if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
+                        shiftActivity.getStatus().add(ShiftStatus.MOVED);
+                    } else if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
+                        exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+                    }
+                }
+            }else{
+                if(shiftActivity.getStatus().contains(ShiftStatus.FIX)){
+                    exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+                }
+            }
+        }
     }
 
     public static List<ShiftWithActivityDTO> filterShiftsByPlannedTypeAndTimeTypeIds(List<ShiftWithActivityDTO> shifts, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
