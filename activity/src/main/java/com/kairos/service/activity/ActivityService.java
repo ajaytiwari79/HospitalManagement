@@ -137,7 +137,7 @@ public class ActivityService extends MongoBaseService {
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private ActivityPriorityMongoRepository activityPriorityMongoRepository;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
+    private static final  Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
