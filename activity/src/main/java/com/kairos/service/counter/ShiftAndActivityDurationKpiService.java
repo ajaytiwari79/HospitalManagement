@@ -99,10 +99,12 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             switch (applicableKPI.getKpiRepresentation()) {
                 case REPRESENT_PER_STAFF:
                     Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue()));
+                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()),
+                            (Long)entry.getKey(), entry.getValue()));
                     break;
                 default:
-                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue()));
+                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(),
+                            (Long)entry.getKey(), entry.getValue()));
                     break;
 
             }

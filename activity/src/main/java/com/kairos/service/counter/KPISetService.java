@@ -10,7 +10,9 @@ import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPISet;
@@ -28,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -150,14 +151,14 @@ public class KPISetService {
     }
 
 
-    public Map<BigInteger, Object> createKPISetCalculation(Long unitId, Date startDate) {
+    public Map<String, Object> createKPISetCalculation(Long unitId, Date startDate) {
         List<ApplicableKPI>    applicableKPIS =new ArrayList<>();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
                 asDate(asLocalDate(startDate).atTime(LocalTime.MAX)));
         logger.info(phase.getName()+">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         List<ApplicableKPI> applicableKPI;
-        Map<BigInteger, Object> unitPhaseMap = new HashMap<>();
+        Map<String,Object> unitPhaseMap = new HashMap<>();
         if (isNotNull(phase)) {
             List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseIdAndReferenceIdAndConfLevel(phase.getId(),
                     unitId,ConfLevel.UNIT);
@@ -165,9 +166,11 @@ public class KPISetService {
             if (isCollectionNotEmpty(kpiSetDTOList)) {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
+                        unitPhaseMap.put("kpiSetId",kpiSet.getId());
+                        unitPhaseMap.put("kpiSetName",kpiSet.getName());
                           applicableKPIS = counterRepository.getKPIByKPIId(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId,ConfLevel.UNIT);
                        logger.info(applicableKPIS.get(0).getActiveKpiId().toString());
-                        unitPhaseMap.put(applicableKPIS.get(0).getActiveKpiId(),applicableKPIS);
+                      //  unitPhaseMap.put(applicableKPIS.get(0).getActiveKpiId(),applicableKPIS);
                         for (ApplicableKPI kpi : applicableKPIS) {
                             kpi.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                         }
@@ -184,11 +187,27 @@ public class KPISetService {
                 filterCriteriaDTO.setValue(applicableKPIS.get(0).getValue());
 
 
+
                 Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteriaDTO
                         , unitId,
                         accessGroupPermissionCounterDTO.getStaffId());
+
+            data.entrySet().forEach(result ->{
+                    Map<String,Object> kpiSetMap = new HashMap<>();
+                    result.getValue().getDataList().stream().forEach(dataList ->{
+                        kpiSetMap.put( "kpiId" ,dataList.getRefId());
+                        //objectMap.put("value", dataList)
+
+                    });
+                   new KPISetResponseDTO(result.getValue().getCounterId(),result.getValue().getTitle(),kpiSetMap);
+                });
+
             }
         }
   return unitPhaseMap;
+    }
+
+    private void get(CounterType counterType){
+
     }
 }
