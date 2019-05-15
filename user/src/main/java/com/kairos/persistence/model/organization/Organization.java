@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL;
+import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_FORMAL_NOTNULL;
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -68,7 +70,7 @@ public class Organization extends UserBaseEntity {
     private String childLevel;
 
     private String eanNumber;
-    @NotNull(message = "error.Organization.formal.notnull")
+    @NotNull(message = ERROR_ORGANIZATION_FORMAL_NOTNULL)
     private String formalName;
     private String costCenterCode;
     private String costCenterName;
@@ -136,7 +138,7 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_BILLING_ADDRESS)
     private ContactAddress billingAddress;
 
-    @NotNull(message = "error.Organization.ContactAddress.notnull")
+    @NotNull(message = ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL)
     @Relationship(type = CONTACT_DETAIL)
     private ContactDetail contactDetail;
 

@@ -2,15 +2,10 @@ package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
-import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Set;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEAMS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_MEMBER;
 
 @Repository

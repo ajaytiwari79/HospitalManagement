@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_PAGE;
 
 
@@ -22,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_P
 @NodeEntity
 public class AccessPage extends UserBaseEntity {
 
-    @NotNull(message = "error.name.notnull")
+    @NotNull(message = ERROR_NAME_NOTNULL)
     private String name;
     private boolean isModule;
     private boolean kpiEnabled;

@@ -90,6 +90,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.CitizenHealthStatus.DECEASED;
 import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
 
@@ -183,7 +184,7 @@ public class ClientService {
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
         }
 
         User user = userGraphRepository.findUserByCprNumber(clientMinimumDTO.getCprnumber());
@@ -193,11 +194,11 @@ public class ClientService {
             client = clientGraphRepository.getClientByUserId(user.getId());
             if (Optional.ofNullable(client).isPresent()) {
                 if (client.isCitizenDead()) {
-                    exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen", clientMinimumDTO.getCprnumber());
+                    exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DEADCITIZEN, clientMinimumDTO.getCprnumber());
                 }
                 int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
                 if (count != 0) {
-                    exceptionService.duplicateDataException("message.client.CRPNumber.duplicate");
+                    exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DUPLICATE);
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
                 ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDateMillis());
@@ -263,7 +264,7 @@ public class ClientService {
     public Map<String, Object> setGeneralDetails(ClientPersonalDto client) {
         Client currentClient = clientGraphRepository.findOne(client.getId());
         if (currentClient == null || currentClient.getUser() == null) {
-            exceptionService.dataNotFoundByIdException("message.client.citizen.notFound", client.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND, client.getId());
         }
         currentClient.getUser().setCprNumber(client.getCprNumber());
         currentClient.getUser().setFirstName(client.getFirstName());
@@ -349,7 +350,7 @@ public class ClientService {
         Client currentClient = clientGraphRepository.findOne(clientId);
         //Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
         if (!Optional.ofNullable(currentClient).isPresent() || !Optional.ofNullable(currentClient.getUser()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
         }
         // Client General Information
         Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
@@ -554,13 +555,13 @@ public class ClientService {
         Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent() || !Optional.ofNullable(client.getUser()).isPresent()) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
 
         }
 
         // Check if assigning household member as himself
         if (minimumDTO.getCprnumber().equals(client.getUser().getCprNumber())) {
-            exceptionService.dataNotMatchedException("message.client.anotherHouseHold");
+            exceptionService.dataNotMatchedException(MESSAGE_CLIENT_ANOTHERHOUSEHOLD);
 
         }
 
@@ -595,10 +596,10 @@ public class ClientService {
     private Client getDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO) {
         Client houseHoldPeople = clientGraphRepository.getClientByCPR(clientMinimumDTO.getCprnumber());
         if (!Optional.ofNullable(houseHoldPeople).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientMinimumDTO.getCprnumber());
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientMinimumDTO.getCprnumber());
         }
         if (houseHoldPeople.isCitizenDead()) {
-            exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen", clientMinimumDTO.getCprnumber());
+            exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DEADCITIZEN, clientMinimumDTO.getCprnumber());
         }
         return houseHoldPeople;
     }
@@ -606,7 +607,7 @@ public class ClientService {
     private void addHouseHoldInOrganization(Client houseHold, long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound", organizationId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, organizationId);
 
         }
         ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHold, organization, new DateTime().getMillis());
@@ -660,7 +661,7 @@ public class ClientService {
     public boolean markClientAsDead(Long clientId, String deathDate) throws ParseException {
         Client citizen = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(citizen).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
 
         }
         Date deathDateInDateFormat = DateUtils.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
@@ -988,7 +989,7 @@ public class ClientService {
         Client client = getCitizenById(clientId);
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
         if (client == null || staff == null) {
-            exceptionService.dataNotFoundByIdException("message.clientOrStaff.id.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENTORSTAFF_ID_NOTFOUND);
 
         }
         return new ClientStaffInfoDTO(client.getId(), staff.getId());
@@ -1020,7 +1021,7 @@ public class ClientService {
         Client citizen = clientGraphRepository.findOne(citizenId);
         if (!Optional.ofNullable(citizen).isPresent() || !Optional.ofNullable(citizen.getUser()).isPresent()) {
             logger.debug("Searching client in database by id " + citizenId);
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", citizenId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, citizenId);
 
         }
         citizenDetails.put("id", citizen.getId());
@@ -1047,7 +1048,7 @@ public class ClientService {
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
         if (citizen.getHomeAddress() == null) {
-            exceptionService.dataNotFoundByIdException("message.client.homeAddress.notAvailabe");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_HOMEADDRESS_NOTAVAILABE);
         }
         Map<String, Object> citizenPlanningMap = new HashMap<>();
         List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
@@ -1105,18 +1106,18 @@ public class ClientService {
         }
 
         if (zipCode == null) {
-            exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
 
         }
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
         }
         logger.info("Geography Data: " + geographyData);
         clientTemporaryAddress.setMunicipality(municipality);
@@ -1278,14 +1279,14 @@ public class ClientService {
         Client client = clientGraphRepository.findOne(clientId, unitId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Finding client by id " + client.getId());
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
 
         }
         Client houseHoldPerson = clientGraphRepository.getClientByCPR(cprNumber);
         ClientMinimumDTO clientMinimumDTO = null;
         if (Optional.ofNullable(houseHoldPerson).isPresent()) {
             if (houseHoldPerson.isCitizenDead()) {
-                exceptionService.dataNotFoundByIdException("message.client.CRPNumber.deadcitizen", cprNumber);
+                exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CRPNUMBER_DEADCITIZEN, cprNumber);
 
             } else {
                 User user = clientGraphRepository.getUserByClientId(clientId);
@@ -1455,7 +1456,7 @@ public class ClientService {
     public ClientContactPersonStructuredData updateContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
         Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
         }
         deleteContactPersonForService(contactPersonDTO.getServiceTypeId(), clientId);
         return saveContactPerson(clientId, contactPersonDTO);
@@ -1469,7 +1470,7 @@ public class ClientService {
 
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
         }
 
         List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));

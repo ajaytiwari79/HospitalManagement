@@ -88,6 +88,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.EMPLOYMENT_ABSENT;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 import static com.kairos.service.employment.EmploymentUtility.convertStaffEmploymentObject;
@@ -158,11 +159,11 @@ public class EmploymentService {
 
         Position position = positionGraphRepository.findByStaffId(employmentDTO.getStaffId());
         if (!Optional.ofNullable(position).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", employmentDTO.getStaffId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EMPLOYMENT_NOTFOUND, employmentDTO.getStaffId());
         }
         if (position.getStartDateMillis() != null) {
             if (employmentDTO.getStartDate().isBefore(DateUtils.getDateFromEpoch(position.getStartDateMillis()))) {
-                exceptionService.actionNotPermittedException("message.staff.data.employmentdate.lessthan");
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_DATA_EMPLOYMENTDATE_LESSTHAN);
             }
         }
 
@@ -174,7 +175,7 @@ public class EmploymentService {
 
         EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentOrganization.getId(), employmentDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", employmentDTO.getEmploymentTypeId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
         }
         List<FunctionWithAmountQueryResult> functions = findAndValidateFunction(employmentDTO);
         Employment employment = new Employment(organization, employmentDTO.getStartDate(), employmentDTO.getTimeCareExternalId(), !saveAsDraft, employmentDTO.getTaxDeductionPercentage(), employmentDTO.getAccumulatedTimebankMinutes(), employmentDTO.getAccumulatedTimebankDate());
@@ -215,10 +216,10 @@ public class EmploymentService {
     private CTAWTAAndAccumulatedTimebankWrapper assignCTAAndWTAToEmployment(Employment employment, EmploymentDTO employmentDTO) {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = workingTimeAgreementRestClient.assignWTAToEmployment(employment.getId(), employmentDTO.getWtaId(), employmentDTO.getCtaId(), employmentDTO.getStartDate());
         if (ctawtaAndAccumulatedTimebankWrapper.getWta().isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.wta.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_WTA_ID);
         }
         if (ctawtaAndAccumulatedTimebankWrapper.getCta().isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.cta.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CTA_ID);
         }
         return ctawtaAndAccumulatedTimebankWrapper;
     }
@@ -238,28 +239,28 @@ public class EmploymentService {
             // if null date is set
             if (employment.getEndDate() != null) {
                 if (employmentStartDate.isBefore(employment.getEndDate()) && employmentStartDate.isAfter(employment.getStartDate())) {
-                    exceptionService.actionNotPermittedException("message.employment.positioncode.alreadyexist.withvalue", employmentEndDate, employment.getStartDate());
+                    exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_POSITIONCODE_ALREADYEXIST_WITHVALUE, employmentEndDate, employment.getStartDate());
                 }
                 if (employmentEndDate != null) {
                     Interval previousInterval = new Interval(DateUtils.getDateFromEpoch(employment.getStartDate()), DateUtils.getDateFromEpoch(employment.getEndDate()));
                     Interval interval = new Interval(DateUtils.getDateFromEpoch(employmentStartDate), DateUtils.getDateFromEpoch(employmentEndDate));
                     LOGGER.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
                     if (previousInterval.overlaps(interval))
-                        exceptionService.actionNotPermittedException("message.employment.positioncode.alreadyexist");
+                        exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_POSITIONCODE_ALREADYEXIST);
                 } else {
                     if (employmentStartDate.isBefore(employment.getEndDate())) {
-                        exceptionService.actionNotPermittedException("message.employment.positioncode.alreadyexist.withvalue", employmentEndDate, employment.getEndDate());
+                        exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_POSITIONCODE_ALREADYEXIST_WITHVALUE, employmentEndDate, employment.getEndDate());
                     }
                 }
             } else {
                 // unitEmploymentEnd date is null
                 if (employmentEndDate != null) {
                     if (employmentEndDate.isAfter(employment.getStartDate())) {
-                        exceptionService.actionNotPermittedException("message.employment.positioncode.alreadyexist.withvalue", employmentEndDate, employment.getStartDate());
+                        exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_POSITIONCODE_ALREADYEXIST_WITHVALUE, employmentEndDate, employment.getStartDate());
 
                     }
                 } else {
-                    exceptionService.actionNotPermittedException("message.employment.positioncode.alreadyexist");
+                    exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_POSITIONCODE_ALREADYEXIST);
                 }
             }
         });
@@ -274,17 +275,17 @@ public class EmploymentService {
                 (employmentDTO.getUnitId(), employmentDTO.getExpertiseId(), employmentDTO.getSeniorityLevelId(), employmentDTO.getStartDate().toString(),
                         funIds);
         if (functions.size() != employmentDTO.getFunctions().size()) {
-            exceptionService.actionNotPermittedException("message.employment.functions.unable");
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_FUNCTIONS_UNABLE);
         }
         return functions;
     }
 
     private EmploymentLine createEmploymentLine(Employment oldEmployment, EmploymentLine oldEmploymentLine, EmploymentDTO employmentDTO) {
         if (Optional.ofNullable(employmentDTO.getEndDate()).isPresent() && employmentDTO.getStartDate().isAfter(employmentDTO.getEndDate())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.enddate");
+            exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_NOTLESSTHAN_ENDDATE);
         }
         if (Optional.ofNullable(employmentDTO.getLastWorkingDate()).isPresent() && employmentDTO.getStartDate().isAfter(employmentDTO.getLastWorkingDate())) {
-            exceptionService.actionNotPermittedException("message.lastdate.notlessthan.enddate");
+            exceptionService.actionNotPermittedException(MESSAGE_LASTDATE_NOTLESSTHAN_ENDDATE);
         }
         oldEmployment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
         EmploymentLine employmentLine = new EmploymentLine.EmploymentLineBuilder()
@@ -302,12 +303,12 @@ public class EmploymentService {
         if (Optional.ofNullable(employmentDTO.getEndDate()).isPresent()) {
 
             if (!Optional.ofNullable(employmentDTO.getReasonCodeId()).isPresent()) {
-                exceptionService.actionNotPermittedException("message.region.enddate");
+                exceptionService.actionNotPermittedException(MESSAGE_REGION_ENDDATE);
             }
             if (oldEmployment.getReasonCode() == null || !oldEmployment.getReasonCode().getId().equals(employmentDTO.getReasonCodeId())) {
                 Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
                 if (!Optional.ofNullable(reasonCode).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", employmentDTO.getReasonCodeId());
+                    exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
                 }
                 oldEmployment.setReasonCode(reasonCode.get());
             }
@@ -379,7 +380,7 @@ public class EmploymentService {
     private void linkEmploymentLineWithEmploymentType(EmploymentLine employmentLine, EmploymentDTO employmentDTO) {
         EmploymentType employmentType = employmentTypeGraphRepository.findOne(employmentDTO.getEmploymentTypeId());
         if (!Optional.ofNullable(employmentType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", employmentDTO.getEmploymentTypeId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
         }
 
         EmploymentLineEmploymentTypeRelationShip relationShip = new EmploymentLineEmploymentTypeRelationShip(employmentLine, employmentType, employmentDTO.getEmploymentTypeCategory());
@@ -397,12 +398,12 @@ public class EmploymentService {
 
         Employment oldEmployment = employmentGraphRepository.findOne(employmentId, 2);
         if (!Optional.ofNullable(oldEmployment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.positionid.notfound", employmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_POSITIONID_NOTFOUND, employmentId);
         }
         EmploymentLine currentEmploymentLine = oldEmployment.getEmploymentLines().stream().filter(employmentLine -> employmentLine.getId().equals(employmentDTO.getEmploymentLineId()))
                 .findFirst().orElse(null);
         if (currentEmploymentLine == null) {
-            exceptionService.dataNotFoundByIdException("message.position_line.notfound", employmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_LINE_NOTFOUND, employmentId);
         }
 
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("employmentId", employmentId + ""), new BasicNameValuePair("startDate", currentEmploymentLine.getStartDate().toString()));
@@ -410,7 +411,7 @@ public class EmploymentService {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>() {
                 });
         if (existingCtaWtaAndAccumulatedTimebankWrapper.getCta().isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.employment.ctamissing", employmentDTO.getStartDate(), employmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_CTAMISSING, employmentDTO.getStartDate(), employmentId);
         }
         if (existingCtaWtaAndAccumulatedTimebankWrapper.getWta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.employment.wtamissing", employmentDTO.getStartDate(), employmentId);
@@ -554,7 +555,7 @@ public class EmploymentService {
     public PositionQueryResult removeEmployment(long positionId, Long unitId) throws Exception {
         Employment employment = employmentGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.employment.id.notexist", positionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, positionId);
 
         }
         employment.setDeleted(true);
@@ -576,7 +577,7 @@ public class EmploymentService {
         Callable<Expertise> expertiseCallable = () -> {
             Optional<Expertise> expertise = expertiseGraphRepository.findById(employmentDTO.getExpertiseId(), 1);
             if (!expertise.isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.employment.ctamissing", employmentDTO.getExpertiseId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_CTAMISSING, employmentDTO.getExpertiseId());
             }
             return expertise.get();
         };
@@ -587,7 +588,7 @@ public class EmploymentService {
             Callable<Organization> organizationCallable = () -> organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(employmentDTO.getUnionId());
             Future<Organization> organizationFuture = asynchronousService.executeAsynchronously(organizationCallable);
             if (!Optional.ofNullable(organizationFuture.get()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.union.notexist", employmentDTO.getUnionId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_UNION_NOTEXIST, employmentDTO.getUnionId());
             }
             employment.setUnion(organizationFuture.get());
         }
@@ -595,7 +596,7 @@ public class EmploymentService {
         Callable<Staff> staffCallable = () -> staffGraphRepository.findOne(employmentDTO.getStaffId());
         Future<Staff> staffFuture = asynchronousService.executeAsynchronously(staffCallable);
         if (!Optional.ofNullable(staffFuture.get()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.employment.staff.notfound", employmentDTO.getStaffId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_STAFF_NOTFOUND, employmentDTO.getStaffId());
         }
         employment.setExpertise(expertiseFuture.get());
         employment.setStaff(staffFuture.get());
@@ -611,14 +612,14 @@ public class EmploymentService {
         employment.setStartDate(employmentDTO.getStartDate());
         if (Optional.ofNullable(employmentDTO.getEndDate()).isPresent()) {
             if (employmentDTO.getStartDate().isAfter(employmentDTO.getEndDate())) {
-                exceptionService.actionNotPermittedException("message.startdate.notlessthan.enddate");
+                exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_NOTLESSTHAN_ENDDATE);
             }
             if (!Optional.ofNullable(employmentDTO.getReasonCodeId()).isPresent()) {
-                exceptionService.actionNotPermittedException("message.region.enddate");
+                exceptionService.actionNotPermittedException(MESSAGE_REGION_ENDDATE);
             }
             Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
             if (!Optional.ofNullable(reasonCode).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", employmentDTO.getReasonCodeId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
             }
             employment.setReasonCode(reasonCode.get());
             employment.setEndDate(employmentDTO.getEndDate());
@@ -626,7 +627,7 @@ public class EmploymentService {
 
         if (Optional.ofNullable(employmentDTO.getLastWorkingDate()).isPresent()) {
             if (employmentDTO.getStartDate().isAfter(employmentDTO.getLastWorkingDate())) {
-                exceptionService.actionNotPermittedException("message.lastdate.notlessthan.startdate");
+                exceptionService.actionNotPermittedException(MESSAGE_LASTDATE_NOTLESSTHAN_STARTDATE);
             }
             employment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
         }
@@ -635,7 +636,7 @@ public class EmploymentService {
         SeniorityLevel seniorityLevel = getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), employment.getExpertise());
 
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.seniorityLevel.id.notfound", employmentDTO.getReasonCodeId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_SENIORITYLEVEL_ID_NOTFOUND, employmentDTO.getReasonCodeId());
         }
 
         EmploymentLine employmentLine = new EmploymentLine.EmploymentLineBuilder()
@@ -660,7 +661,7 @@ public class EmploymentService {
     public EmploymentAndPositionDTO getEmploymentsOfStaff(long unitId, long staffId, boolean allOrganization) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.employment.staff.notfound", staffId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_STAFF_NOTFOUND, staffId);
         }
 
         User user = userGraphRepository.getUserByStaffId(staffId);
@@ -818,7 +819,7 @@ public class EmploymentService {
     private boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId, Long expertiseId) throws Exception {
         Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.employment.organization.externalid", unitExternalId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ORGANIZATION_EXTERNALID, unitExternalId);
         }
         Organization parentOrganization = organizationService.fetchParentOrganization(organization.getId());
         Long countryId = organizationService.getCountryIdOfOrganization(parentOrganization.getId());
@@ -831,11 +832,11 @@ public class EmploymentService {
             expertise = expertiseGraphRepository.getExpertiesOfCountry(countryId, expertiseId);
         }
         if (expertise == null) {
-            exceptionService.dataNotFoundByIdException("message.employment.expertise.notfound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTFOUND, expertiseId);
         }
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
         if (!CollectionUtils.isNotEmpty(ctawtaAndAccumulatedTimebankWrapper.getCta())) {
-            exceptionService.dataNotFoundByIdException("message.organization.cta.notfound", organization.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_CTA_NOTFOUND, organization.getId());
         }
         if (!CollectionUtils.isNotEmpty(ctawtaAndAccumulatedTimebankWrapper.getWta())) {
             exceptionService.dataNotFoundByIdException("message.wta.notFound", organization.getId());
@@ -843,7 +844,7 @@ public class EmploymentService {
         for (TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
             Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
             if (staff == null) {
-                exceptionService.dataNotFoundByIdException("message.staff.externalid.notexist", timeCareEmploymentDTO.getPersonID());
+                exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXTERNALID_NOTEXIST, timeCareEmploymentDTO.getPersonID());
             }
             EmploymentDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId(), ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId(), organization.getId());
             createEmployment(organization.getId(), "Organization", unitEmploymentPosition, true, true);
@@ -869,7 +870,7 @@ public class EmploymentService {
     public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) {
         StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, currentExpertise.getId());
         if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !Optional.ofNullable(currentExpertise).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.expertise.notassigned");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXPERTISE_NOTASSIGNED);
         }
         Integer experienceInMonth = (int) ChronoUnit.MONTHS.between(DateUtils.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
         LOGGER.info("user has current experience in months :{}", experienceInMonth);
@@ -947,9 +948,9 @@ public class EmploymentService {
         List<EmploymentDTO> employmentDTOList = new ArrayList<>();
         if (object instanceof String) {
             if (ORGANIZATION.equals(object)) {
-                exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
+                exceptionService.unitNotFoundException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
             } else if (STAFF.equals(object)) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Staff", staffId);
             }
         } else {
             List<Map<Object, Object>> employments = (List<Map<Object, Object>>) object;
