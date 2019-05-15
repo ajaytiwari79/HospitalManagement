@@ -192,7 +192,6 @@ public class AbsenceShiftService {
         Date startDate = shiftDTOS.get(0).getStartDate();
         Date endDate = shiftDTOS.get(shiftDTOS.size()-1).getEndDate();
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndBetweenDates(staffAdditionalInfoDTO.getUnitId(),startDate,endDate);
-        Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
         for (ShiftDTO shiftDTO : shiftDTOS) {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap,staffAdditionalInfoDTO,phaseMapByDate.get(shiftDTO.getStartDate()));

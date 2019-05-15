@@ -841,4 +841,9 @@ public  class DateUtils {
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+"";
     }
+
+    public static String getDateWithFormet(LocalDateTime dateTime){
+        String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+dateTime.getHour()+":"+dateTime.getMinute();
+        return date;
+    }
 }

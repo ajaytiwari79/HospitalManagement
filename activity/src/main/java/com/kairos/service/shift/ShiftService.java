@@ -468,9 +468,6 @@ public class ShiftService extends MongoBaseService {
         }
         Date currentShiftStartDate = shift.getStartDate();
         Date currentShiftEndDate = shift.getEndDate();
-        if (!byTAndAView) {
-            shiftValidatorService.updateStatusOfShiftActvity(shift,shiftDTO);
-        }
         Set<Long> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()).collect(Collectors.toSet());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), type, shiftDTO.getEmploymentId(), reasonCodeIds);
         Set<BigInteger> activityIdsSet = ArrayUtil.getUnionOfList(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
@@ -511,6 +508,9 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             shiftDTO.setShiftType(ShiftType.PRESENCE);
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
+            if (!byTAndAView) {
+                shiftValidatorService.updateStatusOfShiftActvity(shift,shiftDTO);
+            }
             phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
             shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO);
             shift.setPhaseId(phase.getId());
@@ -679,6 +679,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setId(shiftId);
         shiftDTO.setStartDate(shift.getStartDate());
         shiftDTO.setEndDate(shift.getEndDate());
+        shiftDTO.setDeleted(true);
         shiftDTO.setActivities(ObjectMapperUtils.copyPropertiesOfListByMapper(shift.getActivities(), ShiftActivityDTO.class));
         shiftValidatorService.escalationCorrectionInShift(shiftDTO, shift.getStartDate(), shift.getEndDate());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);

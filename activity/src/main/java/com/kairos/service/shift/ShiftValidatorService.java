@@ -365,7 +365,7 @@ public class ShiftValidatorService {
 
     public void validateStatusOfShiftActivity(Shift shift) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-           boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX);
+            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIX);
             if (notValid) {
                 exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
             }
@@ -373,21 +373,20 @@ public class ShiftValidatorService {
     }
 
     public void updateStatusOfShiftActvity(Shift shift, ShiftDTO shiftDTO) {
+        boolean valid = false;
         Map<BigInteger, ShiftActivityDTO> activityIdAndShiftActivityDTOMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(k -> k.getActivityId(), v -> v));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            if (activityIdAndShiftActivityDTOMap.containsKey(shiftActivity.getActivityId())) {
-                if (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getEndDate())) {
-                    if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
-                        shiftActivity.getStatus().add(ShiftStatus.MOVED);
-                    } else if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
-                        exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
-                    }
-                }
-            }else{
-                if(shiftActivity.getStatus().contains(ShiftStatus.FIX)){
-                    exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+            if (activityIdAndShiftActivityDTOMap.containsKey(shiftActivity.getActivityId()) && (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getEndDate()))) {
+                if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
+                    shiftActivity.getStatus().add(ShiftStatus.MOVED);
+                } else if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
+                    valid = true;
                 }
             }
+            if (valid) {
+                exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+            }
+
         }
     }
 
@@ -436,7 +435,7 @@ public class ShiftValidatorService {
                                 || (rankOfExisting.getRank() > rankOfReplaced.getRank() && BALANCED.equals(staffingLevelForReplacedActivity))
                                 || (BALANCED.equals(staffingLevelForReplacedActivity) && BALANCED.equals(staffingLevelForExistingActivity))
                                 || (staffingLevelForReplacedActivity == null && rankOfExisting.getRank() > rankOfReplaced.getRank())
-                        ) {
+                                ) {
                             logger.info("shift can be replaced");
                         } else {
                             exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
@@ -913,7 +912,7 @@ public class ShiftValidatorService {
             if (isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())) {
                 Date startDate = getStartOfDay(shift.getStartDate());
                 Date endDate = getMidNightOfDay(shift.getEndDate());
-               // Date endDate = getMidNightOfDay(shift.getStartDate());
+                // Date endDate = getMidNightOfDay(shift.getStartDate());
                 shift.getActivities().get(0).setStartDate(startDate);
                 shift.getActivities().get(0).setEndDate(endDate);
                 shift.setStartDate(startDate);
@@ -923,7 +922,7 @@ public class ShiftValidatorService {
         return shifts;
     }
 
-    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO){
+    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
         return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
 
     }

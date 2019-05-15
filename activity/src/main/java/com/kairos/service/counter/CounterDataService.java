@@ -388,7 +388,7 @@ public class CounterDataService extends MongoBaseService {
         return tabKPIDTO;
     }
 
-    public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
+    public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level ) {
         AccessGroupPermissionCounterDTO  accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         KPI kpi = counterRepository.getKPIByid(kpiId);
