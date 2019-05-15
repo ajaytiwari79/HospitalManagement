@@ -356,7 +356,7 @@ public class ShiftActivity {
     }
 
     public List<PlannedTime> getPlannedTimes() {
-        return plannedTimes;
+        return plannedTimes=Optional.ofNullable(plannedTimes).orElse(new ArrayList<>());
     }
 
     public void setPlannedTimes(List<PlannedTime> plannedTimes) {
