@@ -28,7 +28,6 @@ public class RulesActivityTab implements Serializable{
     private List<Long> dayTypes= new ArrayList<>();
     private boolean eligibleForStaffingLevel;
     private boolean breakAllowed = false;
-    private boolean approvalAllowed = false;
     private List<BigInteger> approvalAllowedPhaseIds;
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;
@@ -149,14 +148,6 @@ public class RulesActivityTab implements Serializable{
 
     public void setBreakAllowed(boolean breakAllowed) {
         this.breakAllowed = breakAllowed;
-    }
-
-    public boolean isApprovalAllowed() {
-        return approvalAllowed;
-    }
-
-    public void setApprovalAllowed(boolean approvalAllowed) {
-        this.approvalAllowed = approvalAllowed;
     }
 
 

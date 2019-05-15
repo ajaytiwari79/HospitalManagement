@@ -205,6 +205,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public Map<String, Object> getAllActivityByUnit(Long unitId,boolean includeTeamActivity) {
+        includeTeamActivity =true;
         Map<String, Object> response = new HashMap<>();
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false):activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
