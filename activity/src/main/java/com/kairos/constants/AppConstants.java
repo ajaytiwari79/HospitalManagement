@@ -229,8 +229,7 @@ public class AppConstants {
     public static final String BLANK_STRING="";
     public static final String DELETED="deleted";
 
-    //mail
-    public static final String STATUS_CHANGE_MAIL_BODY ="The status of the {0} has been changed from {1} to {2} by {3} ";
-    public static final String MAIL_SUBJECT ="Shift Activiy Staus";
+    //activity status mail
+    public static final String MAIL_SUBJECT ="Activiy Status";
 
 }
