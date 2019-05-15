@@ -306,7 +306,7 @@ public class Expertise extends UserBaseEntity {
         map.put("id", this.id);
         map.put("name", this.name);
         map.put("description", this.description);
-        map.put(COUNTRY, this.country.getName());
+        map.put("country", this.country.getName());
         map.put("lastModificationDate", this.getLastModificationDate());
         map.put("creationDate", this.getCreationDate());
         return map;

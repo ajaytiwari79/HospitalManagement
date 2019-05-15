@@ -125,7 +125,7 @@ public class EmploymentFunctionService {
         } else if (STAFF.equals(inValidField)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Staff", staffId);
         } else if (EMPLOYMENT.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_DATANOTFOUND", "Employment", employmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Employment", employmentId);
         } else if (EMPLOYMENT_ORGANIZATION_RELATIONSHIP.equals(inValidField)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "employmentOrgRel");
         } else if (EMPLOYMENT_STAFF_RELATIONSHIP.equals(inValidField)) {
