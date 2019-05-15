@@ -15,6 +15,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 public class PensionProviderService extends MongoBaseService {
 
@@ -38,7 +40,7 @@ public class PensionProviderService extends MongoBaseService {
         validatePensionProviderDetails(alreadyExist,pensionProviderDTO);
         PensionProvider pensionProvider=pensionProviderRepository.getByIdAndDeletedFalse(pensionProviderId);
         if(!Optional.ofNullable(pensionProvider).isPresent()){
-            exceptionService.dataNotFoundByIdException("pension_provider.not.found");
+            exceptionService.dataNotFoundByIdException(PENSION_PROVIDER_NOT_FOUND);
         }
         pensionProvider=new PensionProvider(pensionProvider.getId(),pensionProviderDTO.getName(),pensionProviderDTO.getPaymentNumber(),pensionProvider.getCountryId());
         pensionProviderRepository.save(pensionProvider);
@@ -62,10 +64,10 @@ public class PensionProviderService extends MongoBaseService {
     private void validatePensionProviderDetails(PensionProvider pensionProvider, PensionProviderDTO pensionProviderDTO){
         if(pensionProvider!=null){
             if (pensionProviderDTO.getName().equalsIgnoreCase(pensionProvider.getName())) {
-                exceptionService.duplicateDataException("pension_provider.already.exists.name", pensionProviderDTO.getName());
+                exceptionService.duplicateDataException(PENSION_PROVIDER_ALREADY_EXISTS_NAME, pensionProviderDTO.getName());
             }
             if (pensionProviderDTO.getPaymentNumber().equalsIgnoreCase(pensionProvider.getPaymentNumber())) {
-                exceptionService.duplicateDataException("pension_provider.already.exists.payment_number", pensionProviderDTO.getPaymentNumber());
+                exceptionService.duplicateDataException(PENSION_PROVIDER_ALREADY_EXISTS_PAYMENT_NUMBER, pensionProviderDTO.getPaymentNumber());
             }
         }
 

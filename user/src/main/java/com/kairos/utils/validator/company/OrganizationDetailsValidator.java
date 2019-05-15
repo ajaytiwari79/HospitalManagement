@@ -10,6 +10,7 @@ import com.kairos.service.exception.ExceptionService;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_LASTNAME_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
