@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
 
 /**
  * CreatedBy vipulpandey on 28/11/18
@@ -119,15 +121,15 @@ public class EmploymentFunctionService {
     public List<EmploymentLineFunctionQueryResult> getEmploymentLinesWithHourlyCost(Long unitId, Long staffId, Long employmentId) {
         String inValidField = employmentGraphRepository.validateOrganizationStaffEmployment(unitId, staffId, employmentId);
         if (ORGANIZATION.equals(inValidField)) {
-            exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
+            exceptionService.unitNotFoundException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         } else if (STAFF.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Staff", staffId);
         } else if (EMPLOYMENT.equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("MESSAGE_DATANOTFOUND", "Employment", employmentId);
         } else if (EMPLOYMENT_ORGANIZATION_RELATIONSHIP.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "employmentOrgRel");
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "employmentOrgRel");
         } else if (EMPLOYMENT_STAFF_RELATIONSHIP.equals(inValidField)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "employmentStaffRel");
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "employmentStaffRel");
         }
         List<EmploymentLineFunctionQueryResult> hourlyCostByEmploymentLines = employmentGraphRepository.getFunctionalHourlyCostByEmploymentId(unitId, employmentId);
         BigDecimal leapYearConst = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(LEAP_YEAR));

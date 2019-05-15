@@ -8,6 +8,7 @@ import com.kairos.service.exception.ExceptionService;
 import java.util.Optional;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_FUNCTIONALPAYMENT_ALREADYACTIVE;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_STARTDATE_ALLOWED;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class IsFunctionalPaymentAvailable extends AbstractSpecification<FunctionalPaymentDTO> {

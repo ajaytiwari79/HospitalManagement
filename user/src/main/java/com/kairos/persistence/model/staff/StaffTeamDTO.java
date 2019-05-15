@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.AssertTrue;
-
 @Getter
 @Setter
 @NoArgsConstructor

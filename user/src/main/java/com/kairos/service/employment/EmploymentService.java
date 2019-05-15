@@ -307,7 +307,7 @@ public class EmploymentService {
             if (oldEmployment.getReasonCode() == null || !oldEmployment.getReasonCode().getId().equals(employmentDTO.getReasonCodeId())) {
                 Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
                 if (!Optional.ofNullable(reasonCode).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", employmentDTO.getReasonCodeId());
+                    exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
                 }
                 oldEmployment.setReasonCode(reasonCode.get());
             }
@@ -618,7 +618,7 @@ public class EmploymentService {
             }
             Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
             if (!Optional.ofNullable(reasonCode).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", employmentDTO.getReasonCodeId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
             }
             employment.setReasonCode(reasonCode.get());
             employment.setEndDate(employmentDTO.getEndDate());
@@ -947,9 +947,9 @@ public class EmploymentService {
         List<EmploymentDTO> employmentDTOList = new ArrayList<>();
         if (object instanceof String) {
             if (ORGANIZATION.equals(object)) {
-                exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
+                exceptionService.unitNotFoundException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
             } else if (STAFF.equals(object)) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Staff", staffId);
             }
         } else {
             List<Map<Object, Object>> employments = (List<Map<Object, Object>>) object;

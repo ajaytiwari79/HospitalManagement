@@ -10,6 +10,8 @@ import com.kairos.service.exception.ExceptionService;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * CreatedBy vipulpandey on 22/8/18
  **/
@@ -17,30 +19,30 @@ public class OrganizationDetailsValidator {
     public static void validateBasicDetails(List<Organization> organizations, ExceptionService exceptionService) {
         organizations.forEach(organization -> {
             if (!Optional.ofNullable(organization.getDesiredUrl()).isPresent()) {
-                exceptionService.invalidRequestException("error.Organization.desiredUrl.notNull", organization.getName());
+                exceptionService.invalidRequestException(ERROR_ORGANIZATION_DESIREDURL_NOTNULL, organization.getName());
             }
             if (!Optional.ofNullable(organization.getCompanyCategory()).isPresent()) {
-                exceptionService.invalidRequestException("error.organization.companyCategory.notNull", organization.getName());
+                exceptionService.invalidRequestException(ERROR_ORGANIZATION_COMPANYCATEGORY_NOTNULL, organization.getName());
             }
             validateTypeDetails(exceptionService, organization);
             if (CompanyType.COMPANY.equals(organization.getCompanyType()) && !Optional.ofNullable(organization.getAccountType()).isPresent()) {
-                exceptionService.invalidRequestException("error.Organization.accountType.notNull", organization.getName());
+                exceptionService.invalidRequestException(ERROR_ORGANIZATION_ACCOUNTTYPE_NOTNULL, organization.getName());
             }
             if (!Optional.ofNullable(organization.getKairosCompanyId()).isPresent()) {
-                exceptionService.invalidRequestException("error.Organization.kairosId.notnull", organization.getName());
+                exceptionService.invalidRequestException(ERROR_ORGANIZATION_KAIROSID_NOTNULL, organization.getName());
             }
         });
     }
 
     private static void validateTypeDetails(ExceptionService exceptionService, Organization organization) {
         if (!Optional.ofNullable(organization.getOrganizationType()).isPresent()) {
-            exceptionService.invalidRequestException("error.Organization.orgType.notNull", organization.getName());
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGTYPE_NOTNULL, organization.getName());
         }
         if (!Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent() || organization.getOrganizationSubTypes().isEmpty()) {
-            exceptionService.invalidRequestException("error.Organization.orgSubType.notNull", organization.getName());
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGSUBTYPE_NOTNULL, organization.getName());
         }
         if (!Optional.ofNullable(organization.getBusinessTypes()).isPresent()) {
-            exceptionService.invalidRequestException("error.Organization.businesstype.notnull", organization.getName());
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_BUSINESSTYPE_NOTNULL, organization.getName());
         }
     }
 
@@ -48,39 +50,39 @@ public class OrganizationDetailsValidator {
         if(ObjectUtils.isCollectionNotEmpty(staffPersonalDetailDTOS)) {
             staffPersonalDetailDTOS.forEach(staffPersonalDetailDTO -> {
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent() || staffPersonalDetailDTO.getCprNumber().length() != 10) {
-                    exceptionService.invalidRequestException("error.cprnumber.notnull", staffPersonalDetailDTO.getOrganizationId());
+                    exceptionService.invalidRequestException(ERROR_CPRNUMBER_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getFirstName()).isPresent()) {
-                    exceptionService.invalidRequestException("error.firstname.notnull", staffPersonalDetailDTO.getOrganizationId());
+                    exceptionService.invalidRequestException(ERROR_FIRSTNAME_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getLastName()).isPresent()) {
-                    exceptionService.invalidRequestException("error.lastname.notnull", staffPersonalDetailDTO.getOrganizationId());
+                    exceptionService.invalidRequestException(ERROR_LASTNAME_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getEmail()).isPresent()) {
-                    exceptionService.invalidRequestException("error.email.notnull", staffPersonalDetailDTO.getOrganizationId());
+                    exceptionService.invalidRequestException(ERROR_EMAIL_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getAccessGroupId()).isPresent()) {
-                    exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroup.notnull", staffPersonalDetailDTO.getOrganizationId());
+                    exceptionService.invalidRequestException(ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUP_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
             });
         }else{
-            exceptionService.invalidRequestException("error.user.details.missing");
+            exceptionService.invalidRequestException(ERROR_USER_DETAILS_MISSING);
         }
     }
 
     public static void validateAddressDetails(List<OrganizationContactAddress> organizationContactAddresses, ExceptionService exceptionService) {
         organizationContactAddresses.forEach(address -> {
             if (!Optional.ofNullable(address.getContactAddress()).isPresent() || !Optional.ofNullable(address.getContactAddress().getHouseNumber()).isPresent()) {
-                exceptionService.invalidRequestException("error.ContactAddress.HouseNumber.notnull", address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_HOUSENUMBER_NOTNULL, address.getOrganization().getName());
             }
             if (!Optional.ofNullable(address.getContactAddress().getStreet()).isPresent()) {
-                exceptionService.invalidRequestException("error.ContactAddress.street.notnull", address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_STREET_NOTNULL, address.getOrganization().getName());
             }
             if (!Optional.ofNullable(address.getZipCode()).isPresent()) {
-                exceptionService.invalidRequestException("error.ContactAddress.zipcode.notnull", address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_ZIPCODE_NOTNULL, address.getOrganization().getName());
             }
             if (!Optional.ofNullable(address.getMunicipality()).isPresent()) {
-                exceptionService.invalidRequestException("error.ContactAddress.municipality.notnull", address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_MUNICIPALITY_NOTNULL, address.getOrganization().getName());
             }
         });
     }

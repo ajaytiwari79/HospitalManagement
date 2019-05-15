@@ -135,7 +135,7 @@ public class ExpertiseService {
     public ExpertiseResponseDTO saveExpertise(long countryId, ExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
         }
         ExpertiseResponseDTO expertiseResponseDTO;
         Expertise expertise;
@@ -146,7 +146,7 @@ public class ExpertiseService {
             else
                 isExpertiseExists = expertiseGraphRepository.findExpertiseByUniqueName("(?i)" + expertiseDTO.getName().trim());
             if (isExpertiseExists) {
-                exceptionService.duplicateDataException("message.duplicate", "expertise", expertiseDTO.getName());
+                exceptionService.duplicateDataException(MESSAGE_DUPLICATE, EXPERTISE, expertiseDTO.getName());
             }
             Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
                 if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
@@ -180,7 +180,7 @@ public class ExpertiseService {
             // Expertise is already created only need to add Sr level
             expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
             if (!Optional.ofNullable(expertise).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "expertise", expertiseDTO.getId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId());
             }
             validateSeniorityLevel(expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), -1L);
 
@@ -202,16 +202,16 @@ public class ExpertiseService {
         for (SeniorityLevel seniorityLevel : seniorityLevels) {
             if (!seniorityLevel.getId().equals(currentSeniorityLevelId)) { // we are skipping the current
                 if (seniorityLevelDTO.getTo() == null && seniorityLevel.getTo() == null) {
-                    exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.present", seniorityLevel.getId());
+                    exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_SENIORITYLEVEL_PRESENT, seniorityLevel.getId());
 
                 } else if (seniorityLevelDTO.getTo() == null && seniorityLevel.getTo() != null) {
                     if (seniorityLevelDTO.getFrom() < seniorityLevel.getTo()) {
-                        exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.greaterThan", seniorityLevel.getTo(), seniorityLevel.getId());
+                        exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_SENIORITYLEVEL_GREATERTHAN, seniorityLevel.getTo(), seniorityLevel.getId());
 
                     }
                 } else if (seniorityLevelDTO.getTo() != null && seniorityLevel.getTo() == null) {
                     if (seniorityLevelDTO.getTo() > seniorityLevel.getFrom()) {
-                        exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.lessThan", seniorityLevel.getFrom(), seniorityLevel.getId());
+                        exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_SENIORITYLEVEL_LESSTHAN, seniorityLevel.getFrom(), seniorityLevel.getId());
                     }
                 } else {
                     if (seniorityLevelDTO.getFrom() < seniorityLevel.getFrom() && !(seniorityLevelDTO.getTo() <= seniorityLevel.getFrom())) {
@@ -284,14 +284,14 @@ public class ExpertiseService {
         Optional.ofNullable(expertiseDTO.getOrganizationLevelId()).ifPresent(orgLevelId -> {
             Level level = countryGraphRepository.getLevel(country.getId(), orgLevelId);
             if (!Optional.ofNullable(level).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "level", orgLevelId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "level", orgLevelId);
             }
             expertise.setOrganizationLevel(level);
         });
         Optional.ofNullable(expertiseDTO.getOrganizationServiceIds()).ifPresent(orgServiceIds -> {
             Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(orgServiceIds);
             if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != orgServiceIds.size()) {
-                exceptionService.dataNotFoundByIdException("message.multipleDataNotFound", "services");
+                exceptionService.dataNotFoundByIdException(MESSAGE_MULTIPLEDATANOTFOUND, SERVICES);
             }
             expertise.setOrganizationServices(organizationService);
         });
@@ -315,7 +315,7 @@ public class ExpertiseService {
 
         PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
         if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "pay-grade", seniorityLevelDTO.getPayGradeId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, PAY_GRADE, seniorityLevelDTO.getPayGradeId());
         }
         seniorityLevel.setPayGrade(payGrade);
         expertise.getSeniorityLevel().add(seniorityLevel);
@@ -332,7 +332,7 @@ public class ExpertiseService {
     public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseDTO expertiseDTO) {
         Expertise currentExpertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
         if (!Optional.ofNullable(currentExpertise).isPresent() || currentExpertise.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "expertise", expertiseDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId());
         }
         if (!currentExpertise.getName().equalsIgnoreCase(expertiseDTO.getName().trim())) {
             boolean isExpertiseExists;
@@ -341,19 +341,19 @@ public class ExpertiseService {
             else
                 isExpertiseExists = expertiseGraphRepository.findExpertiseByUniqueName("(?i)" + expertiseDTO.getName().trim());
             if (isExpertiseExists) {
-                exceptionService.duplicateDataException("message.duplicate", "expertise");
+                exceptionService.duplicateDataException(MESSAGE_DUPLICATE, EXPERTISE);
             }
         }
         Optional<SeniorityLevel> seniorityLevelToUpdate = Optional.empty();
         if (CollectionUtils.isNotEmpty(currentExpertise.getSeniorityLevel()) && Optional.ofNullable(expertiseDTO.getSeniorityLevel()).isPresent()) {
             seniorityLevelToUpdate = currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
             if (!seniorityLevelToUpdate.isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.expertise.seniorityLevel.notFound", expertiseDTO.getSeniorityLevel().getId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_SENIORITYLEVEL_NOTFOUND, expertiseDTO.getSeniorityLevel().getId());
             }
         }
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
         }
         ExpertiseResponseDTO expertiseResponseDTO;
 
@@ -441,7 +441,7 @@ public class ExpertiseService {
             PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId(), 0);
 
             if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
-                exceptionService.dataNotFoundByIdException("message.expertise.payGradeId.notFound", seniorityLevelDTO.getPayGradeId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_PAYGRADEID_NOTFOUND, seniorityLevelDTO.getPayGradeId());
             }
             seniorityLevel.setPayGrade(payGrade);
         }
@@ -464,7 +464,7 @@ public class ExpertiseService {
         if (!expertise.getOrganizationLevel().getId().equals(expertiseDTO.getOrganizationLevelId())) {
             Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", expertiseDTO.getOrganizationLevelId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, expertiseDTO.getOrganizationLevelId());
 
             }
             expertise.setOrganizationLevel(level);
@@ -482,11 +482,11 @@ public class ExpertiseService {
     public ExpertiseQueryResult deleteExpertise(Long expertiseId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
 
         }
         if (expertise.isPublished()) {
-            exceptionService.actionNotPermittedException("message.expertise.cannotRemoved");
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_CANNOTREMOVED);
         }
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
@@ -508,11 +508,11 @@ public class ExpertiseService {
     public boolean removeSeniorityLevelFromExpertise(Long expertiseId, Long seniorityLevelId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
 
         }
         if (expertise.isPublished()) {
-            exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.idCannotRemoved");
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_SENIORITYLEVEL_IDCANNOTREMOVED);
 
         }
 
@@ -587,7 +587,7 @@ public class ExpertiseService {
     public UnionServiceWrapper getUnionsAndService(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
@@ -605,7 +605,7 @@ public class ExpertiseService {
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
 
         }
         validateExpertiseBeforePublishing(expertise);
@@ -619,7 +619,7 @@ public class ExpertiseService {
         }
         boolean payGradesExistsForSeniorityLevels = seniorityLevelGraphRepository.checkPayGradesInSeniorityLevel(seniorityLevelId);
         if (!payGradesExistsForSeniorityLevels) {
-            exceptionService.actionNotPermittedException("message.seniorityLevel.payGrade.missing");
+            exceptionService.actionNotPermittedException(MESSAGE_SENIORITYLEVEL_PAYGRADE_MISSING);
         }
         expertise.setPublished(true);
         expertise.setStartDateMillis(new Date(publishedDateMillis));
@@ -627,7 +627,7 @@ public class ExpertiseService {
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDateMillis()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
             //exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
-            exceptionService.actionNotPermittedException("message.expertise.publish.with.future.startDate");
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_PUBLISH_WITH_FUTURE_STARTDATE);
         }
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
@@ -662,7 +662,7 @@ public class ExpertiseService {
 
     private void validateExpertiseBeforePublishing(Expertise expertise) {
         if (expertise.isPublished()) {
-            exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_ALREADYPUBLISHED);
         } else if (!Optional.ofNullable(expertise.getStartDateMillis()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_STARTDATEMILLIS_NULL);
         } else if (!Optional.ofNullable(expertise.getBreakPaymentSetting()).isPresent()) {
@@ -684,7 +684,7 @@ public class ExpertiseService {
     public ExpertiseQueryResult getExpertiseById(Long expertiseId) {
         ExpertiseQueryResult expertise = expertiseGraphRepository.getExpertiseById(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
 
         }
         return expertise;
@@ -711,7 +711,7 @@ public class ExpertiseService {
     public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent() || expertise.get().isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
 
         }
         validateAgeRange(ageRangeDTO);
@@ -733,9 +733,9 @@ public class ExpertiseService {
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
-                exceptionService.actionNotPermittedException("message.expertise.age.rangeInvalid", ageRangeDTO.get(i).getFrom(), ageRangeDTO.get(i).getTo());
+                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_RANGEINVALID, ageRangeDTO.get(i).getFrom(), ageRangeDTO.get(i).getTo());
             if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
-                exceptionService.actionNotPermittedException("message.expertise.age.overlap");
+                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
 
         }
 
@@ -744,7 +744,7 @@ public class ExpertiseService {
     public Boolean addPlannedTimeInExpertise(Long expertiseId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseEmploymentTypeDTO.getExpertiseId());
         }
         linkPlannedTimeTypeWithExpertise(expertiseEmploymentTypeDTO, expertise.get());
         return true;
@@ -753,7 +753,7 @@ public class ExpertiseService {
     public List<ExpertisePlannedTimeQueryResult> getPlannedTimeInExpertise(Long expertiseId) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
         }
         return expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
     }
@@ -761,7 +761,7 @@ public class ExpertiseService {
     public Boolean updatePlannedTimeInExpertise(Long expertiseId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
         }
         expertiseEmploymentTypeRelationshipGraphRepository.removeAllPreviousEmploymentType(expertiseId);
         linkPlannedTimeTypeWithExpertise(expertiseEmploymentTypeDTO, expertise.get());
@@ -801,16 +801,16 @@ public class ExpertiseService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "country", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
         }
         boolean isExpertiseExists = expertiseGraphRepository.checkExpertiseNameUniqueInOrganizationLevel(copyExpertiseDTO.getOrganizationLevelId(), "(?i)" + copyExpertiseDTO.getName(), -1L);
         if (isExpertiseExists) {
-            exceptionService.duplicateDataException("message.duplicate", "expertise");
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, EXPERTISE);
         }
 
         Optional<Expertise> sourceExpertise = expertiseGraphRepository.findById(expertiseId);
         if (!sourceExpertise.isPresent() || sourceExpertise.get().isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
         }
         Expertise targetExpertise = new Expertise(copyExpertiseDTO.getName(), copyExpertiseDTO.getDescription(), sourceExpertise.get().getCountry(), DateUtils.getDateFromLocalDate(copyExpertiseDTO.getStartDate()), DateUtils.getDateFromLocalDate(copyExpertiseDTO.getEndDate()),
                 copyExpertiseDTO.getFullTimeWeeklyMinutes() != null ? copyExpertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
@@ -826,7 +826,7 @@ public class ExpertiseService {
         if (!expertiseDTO.getOrganizationLevelId().equals(sourceExpertise.getOrganizationLevel().getId())) {
             Level level = countryGraphRepository.getLevel(sourceExpertise.getCountry().getId(), expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "level", expertiseDTO.getOrganizationLevelId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "level", expertiseDTO.getOrganizationLevelId());
             }
             targetExpertise.setOrganizationLevel(level);
         } else {
@@ -836,7 +836,7 @@ public class ExpertiseService {
         addSeniorityLevelsInExpertise(targetExpertise, expertiseDTO, sourceExpertise);
         Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
         if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != expertiseDTO.getOrganizationServiceIds().size()) {
-            exceptionService.dataNotFoundByIdException("message.multipleDataNotFound", "services");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MULTIPLEDATANOTFOUND, SERVICES);
         }
         targetExpertise.setOrganizationServices(organizationService);
         targetExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(), expertiseDTO.getUnion().getName(), country));
@@ -900,7 +900,7 @@ public class ExpertiseService {
         if (Optional.ofNullable(unionId).isPresent()) {
             union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
             if (!Optional.ofNullable(union).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "union", unionId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, UNION, unionId);
             }
         } else {
             union = new Organization(unionName, true, country);
@@ -924,7 +924,7 @@ public class ExpertiseService {
     public Map<String, Object> getPlannedTimeAndEmploymentTypeForUnit(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         return getPlannedTimeAndEmploymentType(organization.getCountry().getId());
     }

@@ -67,7 +67,7 @@ public class PayTableService {
     public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, LocalDate startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYTABLE_LEVEL_NOTFOUND);
 
         }
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
@@ -97,7 +97,7 @@ public class PayTableService {
     public List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, countryId);
         }
         return payTableGraphRepository.getOrganizationLevelWisePayGroupAreas(countryId);
     }
@@ -106,7 +106,7 @@ public class PayTableService {
         LOGGER.info(payTableDTO.toString());
         Level level = countryGraphRepository.getLevel(countryId, payTableDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYTABLE_LEVEL_NOTFOUND);
         }
 
         Boolean isAlreadyExists = payTableGraphRepository.

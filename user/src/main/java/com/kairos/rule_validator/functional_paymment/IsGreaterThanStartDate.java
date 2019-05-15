@@ -29,7 +29,7 @@ public class IsGreaterThanStartDate extends AbstractSpecification<FunctionalPaym
         }
         if ( Optional.ofNullable(expertise.getEndDateMillis()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
                 expertise.getEndDateMillis().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getEndDate())) {
-            exceptionService.actionNotPermittedException(MESSAGE_DATE_GREATERTHAN_DATE,FUNCTIONALPAYMENT,"expertise");
+            exceptionService.actionNotPermittedException(MESSAGE_DATE_GREATERTHAN_DATE,FUNCTIONALPAYMENT,EXPERTISE);
         }
 
         if (Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() && functionalPaymentDTO.getStartDate().isAfter(functionalPaymentDTO.getEndDate())) {

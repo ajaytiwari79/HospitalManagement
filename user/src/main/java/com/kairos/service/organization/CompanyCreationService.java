@@ -143,10 +143,10 @@ public class CompanyCreationService {
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         if(StringUtils.isEmpty(orgDetails.getName()) || orgDetails.getName().length() < 3) {
-            exceptionService.actionNotPermittedException("error.Organization.name.insuffient");
+            exceptionService.actionNotPermittedException(ERROR_ORGANIZATION_NAME_INSUFFIENT);
         }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(orgDetails);
         Organization organization = new OrganizationBuilder().setIsParentOrganization(true).setCountry(country).setName(orgDetails.getName()).setCompanyType(orgDetails.getCompanyType()).setKairosCompanyId(kairosCompanyId).setVatId(orgDetails.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setShortCompanyName(orgDetails.getShortCompanyName()).setDesiredUrl(orgDetails.getDesiredUrl()).setDescription(orgDetails.getDescription()).createOrganization();
@@ -176,7 +176,7 @@ public class CompanyCreationService {
     public OrganizationBasicDTO updateParentOrganization(OrganizationBasicDTO orgDetails, long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 1);
         if(!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
 
         }
         updateOrganizationDetails(organization, orgDetails, true);
@@ -189,13 +189,13 @@ public class CompanyCreationService {
         if(orgDetails.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
             Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
             if(orgExistWithUrl) {
-                exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
+                exceptionService.dataNotFoundByIdException(ERROR_ORGANIZATION_DESIREDURL_DUPLICATE, orgDetails.getDesiredUrl());
             }
         }
         if(!orgDetails.getName().equalsIgnoreCase(organization.getName())) {
             Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
             if(orgExistWithName) {
-                exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate", orgDetails.getName());
+                exceptionService.dataNotFoundByIdException(ERROR_ORGANIZATION_NAME_DUPLICATE, orgDetails.getName());
             }
         }
         organization.setName(orgDetails.getName());
@@ -238,10 +238,10 @@ public class CompanyCreationService {
     private String validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
         CompanyValidationQueryResult orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrlOrName("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
         if(orgExistWithUrl.getName()) {
-            exceptionService.invalidRequestException("error.Organization.name.duplicate", orgDetails.getName());
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_NAME_DUPLICATE, orgDetails.getName());
         }
         if(orgDetails.getDesiredUrl() != null && orgExistWithUrl.getDesiredUrl()) {
-            exceptionService.invalidRequestException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_DESIREDURL_DUPLICATE, orgDetails.getDesiredUrl());
         }
         String kairosId;
         if(orgExistWithUrl.getKairosCompanyId() == null) {
@@ -268,7 +268,7 @@ public class CompanyCreationService {
         } else {
             Organization organization = organizationGraphRepository.findOne(unitId);
             if(!Optional.ofNullable(organization).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
             }
             contactAddress = new ContactAddress();
             prepareAddress(contactAddress, addressDTO);
@@ -293,7 +293,7 @@ public class CompanyCreationService {
             boardingCompleted = organization.isBoardingCompleted();
         }
         if(!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         // set all properties
         if(boardingCompleted) {
@@ -387,7 +387,7 @@ public class CompanyCreationService {
     public OrganizationBasicDTO setOrganizationTypeAndSubTypeInOrganization(OrganizationBasicDTO organizationBasicDTO, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if(!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
         organizationGraphRepository.save(organization);
@@ -416,10 +416,10 @@ public class CompanyCreationService {
     public OrganizationBasicDTO addNewUnit(OrganizationBasicDTO organizationBasicDTO, Long parentOrganizationId) {
         Organization parentOrganization = organizationGraphRepository.findOne(parentOrganizationId);
         if(!Optional.ofNullable(parentOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", parentOrganizationId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, parentOrganizationId);
         }
         if(parentOrganization.getName().equalsIgnoreCase(organizationBasicDTO.getName())) {
-            exceptionService.duplicateDataException("error.Organization.name.duplicate", organizationBasicDTO.getName());
+            exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Organization unit = new OrganizationBuilder().setName(WordUtils.capitalize(organizationBasicDTO.getName())).setDescription(organizationBasicDTO.getDescription()).setDesiredUrl(organizationBasicDTO.getDesiredUrl()).setShortCompanyName(organizationBasicDTO.getShortCompanyName()).setCompanyType(organizationBasicDTO.getCompanyType()).setVatId(organizationBasicDTO.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setKairosCompanyId(kairosCompanyId).setWorkcentre(organizationBasicDTO.isWorkcentre()).createOrganization();
@@ -465,7 +465,7 @@ public class CompanyCreationService {
     public OrganizationBasicDTO updateUnit(OrganizationBasicDTO organizationBasicDTO, Long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if(!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         unit.setUnitType(getUnitType(organizationBasicDTO.getUnitTypeId()));
         updateOrganizationDetails(unit, organizationBasicDTO, false);
@@ -483,7 +483,7 @@ public class CompanyCreationService {
         if(addressDTO.getZipCodeId() != null) {
             ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId(), 0);
             if(zipCode == null) {
-                exceptionService.dataNotFoundByIdException("message.zipcode.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
             }
             contactAddress.setCity(zipCode.getName());
             contactAddress.setZipCode(zipCode);
@@ -491,12 +491,12 @@ public class CompanyCreationService {
         if(addressDTO.getMunicipalityId() != null) {
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId(), 0);
             if(municipality == null) {
-                exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
             }
             contactAddress.setMunicipality(municipality);
             Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
             if(geographyData == null) {
-                exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
             }
             contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
             contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
@@ -524,7 +524,7 @@ public class CompanyCreationService {
         if(companyCategoryId != null) {
             companyCategory = companyCategoryGraphRepository.findOne(companyCategoryId, 0);
             if(!Optional.ofNullable(companyCategory).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound", companyCategoryId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_COMPANYCATEGORY_ID_NOTFOUND, companyCategoryId);
 
             }
         }
@@ -546,7 +546,7 @@ public class CompanyCreationService {
     public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if(!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization

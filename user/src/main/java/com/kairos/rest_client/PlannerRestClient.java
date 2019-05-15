@@ -16,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_EXCEPTION_TASKMICROSERVICE;
+
 @Component
 public class PlannerRestClient {
     private static final Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);

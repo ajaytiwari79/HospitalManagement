@@ -17,6 +17,8 @@ import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTEMPTY;
+import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
@@ -27,7 +29,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Expertise extends UserBaseEntity {
-    @NotBlank(message = "error.Expertise.name.notnull")
+    @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL)
     private String name;
     private String description;
 
@@ -244,7 +246,7 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
+    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
         this.name = name;
         this.id = id;
         this.description = description;
@@ -255,7 +257,7 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
     }
 
-    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,Sector sector) {
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,Sector sector) {
         this.name = name;
         this.description = description;
         this.country = country;
@@ -270,7 +272,7 @@ public class Expertise extends UserBaseEntity {
         this.sector = sector;
     }
 
-    public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description) {
+    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description) {
 
         this.name = name;
         this.id = id;
@@ -304,7 +306,7 @@ public class Expertise extends UserBaseEntity {
         map.put("id", this.id);
         map.put("name", this.name);
         map.put("description", this.description);
-        map.put("country", this.country.getName());
+        map.put(COUNTRY, this.country.getName());
         map.put("lastModificationDate", this.getLastModificationDate());
         map.put("creationDate", this.getCreationDate());
         return map;

@@ -15,6 +15,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
+import static com.kairos.constants.UserMessagesConstants.ERROR_STARTDATE_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PARENT_ACCESS_GROUP;
 
@@ -25,7 +27,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @NodeEntity
 public class AccessGroup extends UserBaseEntity {
 
-    @NotBlank(message = "error.name.notnull")
+    @NotBlank(message = ERROR_NAME_NOTNULL)
     private String name;
     private boolean enabled = true;
     private boolean typeOfTaskGiver;
@@ -35,7 +37,7 @@ public class AccessGroup extends UserBaseEntity {
     private AccessGroupRole role;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private List<AccountType> accountType;
-    @NotNull(message = "error.startDate.notnull")
+    @NotNull(message = ERROR_STARTDATE_NOTNULL)
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean allowedDayTypes;
@@ -47,7 +49,7 @@ public class AccessGroup extends UserBaseEntity {
         //Default Constructor
     }
 
-    public AccessGroup(@NotBlank(message = "error.name.notnull") String name, String description, AccessGroupRole role) {
+    public AccessGroup(@NotBlank(message = ERROR_NAME_NOTNULL) String name, String description, AccessGroupRole role) {
         this.name = name;
         this.description = description;
         this.role = role;
@@ -62,7 +64,7 @@ public class AccessGroup extends UserBaseEntity {
         this.endDate=endDate;
     }
 
-    public AccessGroup(@NotBlank(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
+    public AccessGroup(@NotBlank(message = ERROR_NAME_NOTNULL) @NotNull(message = ERROR_NAME_NOTNULL) String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.description = description;
         this.role = role;

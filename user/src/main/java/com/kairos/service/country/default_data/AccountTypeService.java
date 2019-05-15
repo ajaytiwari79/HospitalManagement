@@ -16,8 +16,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_ACCOUNTTYPE;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNITTYPE_NOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 @Service
 public class AccountTypeService {
@@ -36,12 +35,12 @@ public class AccountTypeService {
     public AccountTypeDTO createAccountType(Long countryId, AccountTypeDTO accountTypeDTO) {
         Optional<Country> country = countryGraphRepository.findById(countryId, 0);
         if (!country.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
 
         Boolean exists = accountTypeRepository.checkAccountTypeExistInCountry(countryId, "(?i)" + accountTypeDTO.getName(), -1L);
         if (exists) {
-            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ACCOUNTTYPE, accountTypeDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ACCOUNTTYPE, accountTypeDTO.getName());
         }
         AccountType newAccount = new AccountType(accountTypeDTO.getName(), country.get());
         accountTypeRepository.save(newAccount);
@@ -77,7 +76,7 @@ public class AccountTypeService {
 
         Optional<AccountType> accountType = accountTypeRepository.findById(id);
         if (!accountType.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_ACCOUNTTYPE, id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_ACCOUNTTYPE, id);
         }
         return accountType.get();
 
@@ -91,7 +90,7 @@ public class AccountTypeService {
 
         Boolean exists = accountTypeRepository.checkAccountTypeExistInCountry(countryId, "(?i)" + accountTypeDTO.getName(), id);
         if (exists) {
-            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ACCOUNTTYPE, accountTypeDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ACCOUNTTYPE, accountTypeDTO.getName());
         }
         accountType.get().setName(accountTypeDTO.getName());
         accountTypeRepository.save(accountType.get());

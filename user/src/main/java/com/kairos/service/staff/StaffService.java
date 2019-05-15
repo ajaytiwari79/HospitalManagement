@@ -251,7 +251,7 @@ public class StaffService {
 
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
         if (staffToUpdate == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         }
         if (isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
             if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentOrganization.getId()) != null) {
@@ -340,7 +340,7 @@ public class StaffService {
                 }
             }
             if (!isSeniorityLevelMatched) {
-                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound", "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
             }
         }
         if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
@@ -421,7 +421,7 @@ public class StaffService {
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 0);
+                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW, 0);
 
             }
             Set<Long> externalIdsOfStaffToBeSaved = new HashSet<>();
@@ -762,7 +762,7 @@ public class StaffService {
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 2);
+                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW, 2);
             }
             Staff staff;
             Cell cell;
@@ -855,7 +855,7 @@ public class StaffService {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         Staff staff = staffGraphRepository.getStaffByUnitId(parentOrganization.getId(), staffId);
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
 
         }
         List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId, date);
@@ -877,7 +877,7 @@ public class StaffService {
     public ClientStaffInfoDTO getStaffInfo(String loggedInUserName) {
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
 
         }
         return new ClientStaffInfoDTO(staff.getId());
@@ -908,7 +908,7 @@ public class StaffService {
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
@@ -1035,7 +1035,7 @@ public class StaffService {
     public StaffEmploymentTypeWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());

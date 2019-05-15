@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.UserMessagesConstants.EXPERTISE;
 
 @RestController
 @RequestMapping()
@@ -68,7 +69,7 @@ public class FunctionController {
     @ApiOperation(value = "Get functions by expertise id")
     @RequestMapping(value =  API_V1 +"/function", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = "expertise") Long expertiseId) {
+    public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = EXPERTISE) Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByExpertiseId(expertiseId));
 
     }

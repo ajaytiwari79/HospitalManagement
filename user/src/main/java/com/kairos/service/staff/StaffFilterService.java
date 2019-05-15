@@ -95,13 +95,13 @@ public class StaffFilterService {
             //TODO please Optimise these DB calls
             organization = organizationGraphRepository.findOne(unitId);
             if (!Optional.ofNullable(organization).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
             }
             organization = organization.isParentOrganization() ? organization : organizationService.fetchParentOrganization(unitId);
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTEXIST);
         }
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
@@ -269,7 +269,7 @@ public class StaffFilterService {
     public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&

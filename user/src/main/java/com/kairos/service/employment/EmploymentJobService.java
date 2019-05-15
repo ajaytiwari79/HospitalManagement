@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_POSITION_END_DATE_GREATER_THAN_EMPLOYMENT_START_DATE;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_REASONCODE_ID_NOTFOUND;
 
 /**
  * CreatedBy vipulpandey on 27/10/18
@@ -148,7 +149,7 @@ public class EmploymentJobService {
         List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
         Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(positionDTO.getReasonCodeId(), 0);
         if (!reasonCode.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, positionDTO.getReasonCodeId());
         }
         for (Employment employment : employments) {
             employment.setEndDate(DateUtils.getLocalDate(endDateMillis));

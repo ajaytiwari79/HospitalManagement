@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_EXCEPTION_TASKMICROSERVICE;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Component

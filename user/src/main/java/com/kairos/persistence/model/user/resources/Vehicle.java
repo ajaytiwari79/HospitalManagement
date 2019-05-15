@@ -12,6 +12,9 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
+import static com.kairos.constants.UserMessagesConstants.ERROR_RESOURCE_ICON_NOTNULL;
+
 /**
  * Created by Jasgeet on 18/9/17.
  */
@@ -19,10 +22,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Vehicle extends UserBaseEntity {
-    @NotBlank(message = "error.name.notnull")
+    @NotBlank(message = ERROR_NAME_NOTNULL)
     private String name;
     private String description;
-    @NotBlank(message = "error.Resource.icon.notnull")
+    @NotBlank(message = ERROR_RESOURCE_ICON_NOTNULL)
     private String icon;
     private boolean enabled = true;
 

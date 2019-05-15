@@ -47,8 +47,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
-import static com.kairos.constants.UserMessagesConstants.END_DATE_FROM_END_DATE;
-import static com.kairos.constants.UserMessagesConstants.START_DATE_FROM_END_DATE;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 
 /**
@@ -101,7 +100,7 @@ public class EmploymentCTAWTAService {
     public EmploymentQueryResult updateEmploymentWTA(Long unitId, Long employmentId, BigInteger wtaId, WTADTO updateDTO) {
         Employment employment = employmentGraphRepository.findOne(employmentId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_INVALIDEMPLOYMENTID, employmentId);
 
         }
         if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {

@@ -122,7 +122,7 @@ public class PositionService {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_EXTERNALID_NOTCHANGED);
         }
@@ -174,18 +174,18 @@ public class PositionService {
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.notfound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND, unitId);
 
         }
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
         Position position = positionGraphRepository.findPosition(parentOrganization.getId(), staffId);
@@ -324,7 +324,7 @@ public class PositionService {
 
         }
         if (unit == null) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
 
         }
         List<AccessGroup> accessGroups;
@@ -432,7 +432,7 @@ public class PositionService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
         Organization unit = null;
@@ -500,7 +500,7 @@ public class PositionService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
 

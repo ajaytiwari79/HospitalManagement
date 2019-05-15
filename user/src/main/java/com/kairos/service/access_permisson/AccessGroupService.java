@@ -52,8 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.SUPER_ADMIN;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_ACCOUNTTYPE_NOTFOUND;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_ACCOUNTTYPE_SELECT;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 
 /**
@@ -97,11 +96,11 @@ public class AccessGroupService {
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
         if (isAccessGroupExistWithSameName) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
 
         }
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -132,7 +131,7 @@ public class AccessGroupService {
             accessGroupDTO.setId(accessGroup.getId());
             return accessGroupDTO;
         } else {
-            exceptionService.actionNotPermittedException("message.permitted", "access-group");
+            exceptionService.actionNotPermittedException(MESSAGE_PERMITTED, ACCESS_GROUP);
 
         }
         return null;
@@ -142,15 +141,15 @@ public class AccessGroupService {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
 
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGrpToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
 
         }
         if (accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId)) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
 
         }
         List<DayType> dayTypes = new ArrayList<>();
@@ -323,7 +322,7 @@ public class AccessGroupService {
         if (Optional.ofNullable(countryId).isPresent()) {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
 
             }
         }
@@ -384,7 +383,7 @@ public class AccessGroupService {
         if (Optional.ofNullable(countryId).isPresent()) {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
 
             }
         }
@@ -497,7 +496,7 @@ public class AccessGroupService {
 
         Organization unit = organizationGraphRepository.findOne(accessPermissionDTO.getUnitId(), 0);
         if (unit == null) {
-            exceptionService.internalServerError("error.unit.notNull");
+            exceptionService.internalServerError(ERROR_UNIT_NOTNULL);
         }
         Organization parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
@@ -600,7 +599,7 @@ public class AccessGroupService {
     public CountryAccessGroupDTO createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypeIds().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACCOUNTTYPE_SELECT);
@@ -625,7 +624,7 @@ public class AccessGroupService {
         }
 
         if (isAccessGroupExistWithSameName) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
 
         }
 
@@ -644,11 +643,11 @@ public class AccessGroupService {
     public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         Optional<AccessGroup> accessGrpToUpdate = accessGroupRepository.findById(accessGroupId);
         if (!accessGrpToUpdate.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
 
         }
         Boolean isAccessGroupExistWithSameName;
@@ -658,7 +657,7 @@ public class AccessGroupService {
             isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId);
         }
         if (isAccessGroupExistWithSameName) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
         }
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
@@ -679,7 +678,7 @@ public class AccessGroupService {
     public boolean deleteCountryAccessGroup(long accessGroupId) {
         AccessGroup accessGroupToDelete = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroupToDelete).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
 
         }
         accessGroupToDelete.setDeleted(true);
@@ -750,11 +749,11 @@ public class AccessGroupService {
     public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
         if (!organization.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
 
         }
         Organization parent;
@@ -765,17 +764,17 @@ public class AccessGroupService {
             parent = organizationGraphRepository.getParentOfOrganization(organization.get().getId());
         }
         if (Optional.ofNullable(parent).isPresent()) {
-            exceptionService.actionNotPermittedException("message.accessGroup.copied");
+            exceptionService.actionNotPermittedException(MESSAGE_ACCESSGROUP_COPIED);
 
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
         if (isAccessGroupExistWithSameName) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName().trim());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName().trim());
 
         }
         AccessGroupQueryResult currentAccessGroup = accessGroupRepository.findByAccessGroupId(organizationId, accessGroupDTO.getId());
         if (currentAccessGroup == null) {
-            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupDTO.getId());
 
         }
         AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
@@ -791,21 +790,21 @@ public class AccessGroupService {
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
         validateDayTypes(countryAccessGroupDTO.isAllowedDayTypes(), countryAccessGroupDTO.getDayTypeIds());
         if (countryAccessGroupDTO.getEndDate() != null && countryAccessGroupDTO.getEndDate().isBefore(countryAccessGroupDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+            exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         Optional<Country> country = countryGraphRepository.findById(countryId);
         if (!country.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString());
         if (isAccessGroupExistWithSameName) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", countryAccessGroupDTO.getName().trim());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, countryAccessGroupDTO.getName().trim());
 
         }
         Optional<AccessGroup> currentAccessGroup = accessGroupRepository.findById(countryAccessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", countryAccessGroupDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, countryAccessGroupDTO.getId());
 
         }
         AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), currentAccessGroup.get().getRole(), currentAccessGroup.get().getAccountType(), currentAccessGroup.get().getDayTypes(), currentAccessGroup.get().getStartDate(), currentAccessGroup.get().getEndDate());
@@ -826,7 +825,7 @@ public class AccessGroupService {
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.HUB.toString(), AccessGroupRole.MANAGEMENT.toString()));
         accessGroupForParentOrganizationCreation.put("organization",
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.ORGANIZATION.toString(), AccessGroupRole.MANAGEMENT.toString()));
-        accessGroupForParentOrganizationCreation.put("union",
+        accessGroupForParentOrganizationCreation.put(UNION,
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.UNION.toString(), AccessGroupRole.MANAGEMENT.toString()));
         return accessGroupForParentOrganizationCreation;
     }
@@ -902,9 +901,9 @@ public class AccessGroupService {
 
     private void validateDayTypes(boolean allowedDayTypes, Set<Long> dayTypeIds) {
         if ((allowedDayTypes && CollectionUtils.isEmpty(dayTypeIds))) {
-            exceptionService.actionNotPermittedException("error.day_type.absent");
+            exceptionService.actionNotPermittedException(ERROR_DAY_TYPE_ABSENT);
         } else if ((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))) {
-            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+            exceptionService.actionNotPermittedException(ERROR_ALLOWED_DAY_TYPE_ABSENT);
         }
 
 

@@ -182,7 +182,7 @@ public class StaffRetrievalService {
         personalInfo.put("employmentInfo", positionService.retrieveEmploymentDetails(staffPositionDTO));
 
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
-        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, unit.getId()));
+        personalInfo.put(EXPERTISE, getExpertisesOfUnitByCountryId(countryId, unit.getId()));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
 
@@ -364,7 +364,7 @@ public class StaffRetrievalService {
                 for (DayTypeCountryHolidayCalenderQueryResult dayType : dayTypeList) {
                     if (!dayType.isHolidayType()) {
                         if (isNull(dayType.getValidDays())) {
-                            exceptionService.dataNotMatchedException("message.day_type.absent", accessGroupDayTypes.getAccessGroup().getName());
+                            exceptionService.dataNotMatchedException(MESSAGE_DAY_TYPE_ABSENT, accessGroupDayTypes.getAccessGroup().getName());
                         }
                         List<String> validDays = dayType.getValidDays().stream().map(day -> day.name()).collect(Collectors.toList());
                         if (validDays.contains(loginDay.toString()) || validDays.contains(EVERYDAY)) {
@@ -446,7 +446,7 @@ public class StaffRetrievalService {
     public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
         return staffGraphRepository.getAllStaffHavingEmploymentByUnitIdMap(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
     }
@@ -454,7 +454,7 @@ public class StaffRetrievalService {
     public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
@@ -470,7 +470,7 @@ public class StaffRetrievalService {
     public List<StaffAdditionalInfoQueryResult> getStaffWithAdditionalInfo(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (unit == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.notfound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND, unitId);
         }
         return staffGraphRepository.getStaffAndCitizenDetailsOfUnit(unitId);
     }

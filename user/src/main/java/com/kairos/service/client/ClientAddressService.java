@@ -34,6 +34,7 @@ import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
 
@@ -79,7 +80,7 @@ public class ClientAddressService{
         Client citizen = clientGraphRepository.getClientByClientIdAndUnitId(clientId,unitId);
         if (citizen == null) {
             logger.error("Citizen not found : citizenId " + clientId+" unitId "+unitId);
-            exceptionService.dataNotFoundByIdException("message.client.citizen.notFound",clientId,unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND,clientId,unitId);
 
         }
 
@@ -182,7 +183,7 @@ public class ClientAddressService{
 
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
-            exceptionService.dataNotFoundByIdException("message.client.citizen.notFound",clientId,unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND,clientId,unitId);
 
         }
         ContactAddress contactAddress;
@@ -265,7 +266,7 @@ public class ClientAddressService{
 
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
-            exceptionService.dataNotFoundByIdException("message.client.citizen.notFound",clientId,unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND,clientId,unitId);
 
         }
 
@@ -276,7 +277,7 @@ public class ClientAddressService{
             contactAddress = contactAddressGraphRepository.findOne(addressId);
         }
         if (contactAddress == null) {
-            exceptionService.dataNotFoundByIdException("message.client.contactaAddress.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CONTACTAADDRESS_NOTFOUND);
 
         }
 
@@ -328,7 +329,7 @@ public class ClientAddressService{
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
 
@@ -336,7 +337,7 @@ public class ClientAddressService{
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND,municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -451,7 +452,7 @@ public class ClientAddressService{
     public Object updateAddressCoordinates(AddressDTO address) {
         ContactAddress contactAddress = contactAddressGraphRepository.findOne(address.getId());
         if (contactAddress == null) {
-            exceptionService.dataNotFoundByIdException("message.client.contactaAddress.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CONTACTAADDRESS_NOTFOUND);
 
         }
         contactAddress.setLongitude(address.getLongitude());

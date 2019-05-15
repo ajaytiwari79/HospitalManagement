@@ -63,7 +63,7 @@ public class FunctionalPaymentService {
     public FunctionalPaymentDTO saveFunctionalPayment(Long expertiseId, FunctionalPaymentDTO functionalPaymentDTO) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "expertise", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId);
         }
         FunctionalPayment functionalPayment = validateAndGetDomainObject(functionalPaymentDTO, expertise.get());
         functionalPaymentGraphRepository.save(functionalPayment);
@@ -89,7 +89,7 @@ public class FunctionalPaymentService {
     public FunctionalPaymentDTO updateFunctionalPayment(Long expertiseId, FunctionalPaymentDTO functionalPaymentDTO) {
         Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalPaymentDTO.getId());
         if (!functionalPayment.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalPaymentDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "functionalpayment", functionalPaymentDTO.getId());
         }
         if (!functionalPayment.get().getStartDate().equals(functionalPaymentDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENT_UNEDITABLE, "startdate");
@@ -106,7 +106,7 @@ public class FunctionalPaymentService {
 
         Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalSeniorityLevelDTO.getFunctionalPaymentId());
         if (!functionalPayment.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalSeniorityLevelDTO.getFunctionalPaymentId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "functionalpayment", functionalSeniorityLevelDTO.getFunctionalPaymentId());
         }
         List<FunctionalPaymentMatrix> list = new ArrayList<FunctionalPaymentMatrix>(1);
         List<Function> functions = getFunctions(functionalPaymentMatrixDTOS);
@@ -127,7 +127,7 @@ public class FunctionalPaymentService {
         if (Optional.ofNullable(functionalPaymentMatrixDTO.getPayGroupAreasIds()).isPresent() && !functionalPaymentMatrixDTO.getPayGroupAreasIds().isEmpty()) {
             List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixDTO.getPayGroupAreasIds());
             if (payGroupAreas.size() != functionalPaymentMatrixDTO.getPayGroupAreasIds().size())
-                exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
+                exceptionService.actionNotPermittedException(MESSAGE_MULTIPLEDATANOTFOUND, PAYGROUP_AREAS);
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
         }
         functionalPaymentMatrix.setSeniorityLevelFunction(getSeniorityLevelFunction(functionalPaymentMatrixDTO.getSeniorityLevelFunction(), seniorityLevels, functions));
@@ -169,7 +169,7 @@ public class FunctionalPaymentService {
                         .collect(Collectors.toSet());
         List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
         if (functionIds.size() != functions.size()) {
-            exceptionService.actionNotPermittedException("message.multipleDataNotFound", "functions");
+            exceptionService.actionNotPermittedException(MESSAGE_MULTIPLEDATANOTFOUND, "functions");
         }
         return functions;
     }
@@ -182,7 +182,7 @@ public class FunctionalPaymentService {
                 .collect(Collectors.toSet());
         List<SeniorityLevel> seniorityLevels = seniorityLevelGraphRepository.findAll(seniorityLevelIds);
         if (seniorityLevelIds.size() != seniorityLevels.size()) {
-            exceptionService.actionNotPermittedException("message.multipleDataNotFound", "seniority-level");
+            exceptionService.actionNotPermittedException(MESSAGE_MULTIPLEDATANOTFOUND, "seniority-level");
         }
         return seniorityLevels;
     }
@@ -190,7 +190,7 @@ public class FunctionalPaymentService {
     public FunctionalSeniorityLevelDTO updateMatrixInFunctionalPayment(FunctionalSeniorityLevelDTO functionalSeniorityLevelDTO) {
         Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalSeniorityLevelDTO.getFunctionalPaymentId());
         if (!functionalPayment.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalSeniorityLevelDTO.getFunctionalPaymentId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "functionalpayment", functionalSeniorityLevelDTO.getFunctionalPaymentId());
         }
         List<FunctionalPaymentMatrixDTO> functionalPaymentMatrixDTOS = functionalSeniorityLevelDTO.getFunctionalPaymentMatrix();
         List<FunctionalPaymentMatrix> list = new ArrayList<>(1);
@@ -248,7 +248,7 @@ public class FunctionalPaymentService {
     public FunctionalPaymentDTO publishFunctionalPayment(Long functionalPaymentId, FunctionalPaymentDTO functionalPaymentDTO) {
         Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalPaymentId);
         if (!functionalPayment.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalPaymentDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "functionalpayment", functionalPaymentDTO.getId());
         }
         if (functionalPayment.get().getFunctionalPaymentMatrices().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
@@ -376,7 +376,7 @@ public class FunctionalPaymentService {
                         .collect(Collectors.toSet());
         List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
         if (functionIds.size() != functions.size()) {
-            exceptionService.actionNotPermittedException("message.multipleDataNotFound", "functions");
+            exceptionService.actionNotPermittedException(MESSAGE_MULTIPLEDATANOTFOUND, "functions");
         }
         return functions;
     }
@@ -394,7 +394,7 @@ public class FunctionalPaymentService {
         if (Optional.ofNullable(functionalPaymentMatrixQueryResult.getPayGroupAreasIds()).isPresent() && !functionalPaymentMatrixQueryResult.getPayGroupAreasIds().isEmpty()) {
             List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixQueryResult.getPayGroupAreasIds());
             if (payGroupAreas.size() != functionalPaymentMatrixQueryResult.getPayGroupAreasIds().size())
-                exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
+                exceptionService.actionNotPermittedException(MESSAGE_MULTIPLEDATANOTFOUND, PAYGROUP_AREAS);
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
         }
         functionalPaymentMatrix.setSeniorityLevelFunction(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue));

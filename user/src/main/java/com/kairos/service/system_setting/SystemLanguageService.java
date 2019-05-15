@@ -126,7 +126,7 @@ public class SystemLanguageService {
     public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultLanguage, Boolean selected) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId, 0);
         if (!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
@@ -172,7 +172,7 @@ public class SystemLanguageService {
     public List<SystemLanguageDTO> getSystemLanguageOfCountry(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
         return systemLanguageDTOS;
@@ -181,7 +181,7 @@ public class SystemLanguageService {
     public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getActiveSystemLanguages(), SystemLanguageDTO.class);
         List<SystemLanguageQueryResult> selectedLanguageOfCountry = systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId);
