@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.TimeTypeEnum.*;
 
 @Service
@@ -39,11 +40,11 @@ public class TimeTypeService extends MongoBaseService {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
         TimeType timeTypeResult = timeTypeMongoRepository.findByLabelsAndCountryId(timeTypeLabels, countryId);
         if (Optional.ofNullable(timeTypeResult).isPresent()) {
-            exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
+            exceptionService.duplicateDataException(MESSAGE_TIMETYPE_NAME_ALREADYEXIST);
         }
         BigInteger upperLevelTimeTypeId = timeTypeDTOs.get(0).getUpperLevelTimeTypeId();
         if (activityMongoRepository.existsByTimeTypeId(upperLevelTimeTypeId)) {
-            exceptionService.actionNotPermittedException("activity.already.exists.time_type");
+            exceptionService.actionNotPermittedException(ACTIVITY_ALREADY_EXISTS_TIME_TYPE);
         }
         TimeType upperTimeType = timeTypeMongoRepository.findOneById(upperLevelTimeTypeId);
         timeTypeDTOs.forEach(timeTypeDTO -> {
@@ -70,7 +71,7 @@ public class TimeTypeService extends MongoBaseService {
 
         boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
         if (timeTypesExists) {
-            exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
+            exceptionService.duplicateDataException(MESSAGE_TIMETYPE_NAME_ALREADYEXIST);
         }
 
         TimeType timeType = timeTypeMongoRepository.findOneById(timeTypeDTO.getId());
@@ -83,7 +84,7 @@ public class TimeTypeService extends MongoBaseService {
             Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
             if (timeType.getUpperLevelTimeTypeId() == null && !timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
                 //User Cannot Update NAME for TimeTypes of Second Level
-                exceptionService.actionNotPermittedException("message.timetype.rename.notAllowed", timeType.getLabel());
+                exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_RENAME_NOTALLOWED, timeType.getLabel());
             }
             timeType.setLabel(timeTypeDTO.getLabel());
             timeType.setDescription(timeTypeDTO.getDescription());
@@ -94,7 +95,7 @@ public class TimeTypeService extends MongoBaseService {
             Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
                 if (activityCanBeCopiedForOrganizationHierarchy.size() == 1 && activityCanBeCopiedForOrganizationHierarchy.contains(OrganizationHierarchy.UNIT)) { //user cannot allow copy acitivity for Unit, without allowing copy activity for Organization
-                    exceptionService.actionNotPermittedException("message.timetype.copy.activity.withoutOrganization.notAllowed");
+                    exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_COPY_ACTIVITY_WITHOUTORGANIZATION_NOTALLOWED);
                 }
                 timeType.setActivityCanBeCopiedForOrganizationHierarchy(activityCanBeCopiedForOrganizationHierarchy);
             } else {
@@ -136,7 +137,7 @@ public class TimeTypeService extends MongoBaseService {
             }
             save(timeTypes);
         } else {
-            exceptionService.dataNotFoundByIdException("message.timetype.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND);
         }
         return timeTypeDTO;
     }
@@ -243,19 +244,19 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
         boolean reasonCodeExists=userIntegrationService.isReasonCodeLinkedToTimeType(countryId,timeTypeId);
         if(reasonCodeExists){
-            exceptionService.actionNotPermittedException("message.timetype.linked.reason_code");
+            exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_LINKED_REASON_CODE);
         }
         if (activity.isEmpty() && timeTypes.isEmpty()) {
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
             if (timeType != null && timeType.getUpperLevelTimeTypeId() == null) {
                 //User Cannot Delete TimeType of Second Level
-                exceptionService.actionNotPermittedException("message.timetype.deletion.notAllowed", timeType.getLabel());
+                exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_DELETION_NOTALLOWED, timeType.getLabel());
             } else {
                 activityCategoryService.removeTimeTypeRelatedCategory(countryId, timeTypeId);
                 timeType.setDeleted(true);
                 save(timeType);
             }
-        } else exceptionService.timeTypeLinkedException("message.timetype.linked");
+        } else exceptionService.timeTypeLinkedException(MESSAGE_TIMETYPE_LINKED);
         return true;
     }
 

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_ABSENT;
 
 /*
  * Created By Mohit Shakya
@@ -109,7 +110,7 @@ public class PayOutService extends MongoBaseService {
     public boolean requestPayOut(Long staffId, Long employmentId, int amount) {
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getEmploymentDetails(employmentId);
         if (employmentWithCtaDetailsDTO == null) {
-            exceptionService.invalidRequestException("message.employment.absent");
+            exceptionService.invalidRequestException(MESSAGE_EMPLOYMENT_ABSENT);
         }
         PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId, employmentId, PayOutTrasactionStatus.REQUESTED, amount, LocalDate.now());
         save(requestPayOutTransaction);

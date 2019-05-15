@@ -3,14 +3,15 @@ package com.kairos.rule_validator.activity;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_EXPERTISE_MATCH;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
@@ -38,7 +39,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         if (!expertiseIds.contains(expertise.getId())) {
             return false;
         }
-        throwException("message.activity.expertise.match");
+        throwException(MESSAGE_ACTIVITY_EXPERTISE_MATCH);
         return true;
     }
 
@@ -48,7 +49,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ActivityRuleViolation activityRuleViolation = null;
             if (isNotNull(shiftActivityDTO.getActivity().getExpertises()) && !shiftActivityDTO.getActivity().getExpertises().contains(expertise.getId())) {
-                errorMessages.add(convertMessage("message.activity.expertise.match", shiftActivityDTO.getActivity().getName(), expertise.getName()));
+                errorMessages.add(convertMessage(MESSAGE_ACTIVITY_EXPERTISE_MATCH, shiftActivityDTO.getActivity().getName(), expertise.getName()));
                 activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
                 if (activityRuleViolation == null) {
                     activityRuleViolation = new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(), shiftActivityDTO.getActivity().getName(), 0, errorMessages);
@@ -65,7 +66,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
         expertiseIds.addAll(shift.getActivities().stream().flatMap(a -> a.getActivity().getExpertises().stream()).collect(Collectors.toList()));
         if (!expertiseIds.contains(expertise.getId())) {
-            return Arrays.asList("message.activity.expertise.match");
+            return Arrays.asList(MESSAGE_ACTIVITY_EXPERTISE_MATCH);
         }
         return Collections.emptyList();
     }

@@ -30,6 +30,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
  * Calls ResourceGraphRepository to perform CRUD operation on Resources.
@@ -124,7 +125,7 @@ public class ResourceService {
             resource.setDeleted(true);
             return resourceGraphRepository.save(resource) != null;
         }
-        exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+        exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_ID_NOTFOUND);
         return false;
     }
 
@@ -151,20 +152,20 @@ public class ResourceService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
         }
         Resource dbResourceObject = resourceGraphRepository.getResourceByRegistrationNumberAndUnit(unitId,resourceDTO.getRegistrationNumber());
 
         if(Optional.ofNullable(dbResourceObject).isPresent()){
-            exceptionService.duplicateDataException("message.resource.alreadyexist",resourceDTO.getRegistrationNumber());
+            exceptionService.duplicateDataException(MESSAGE_RESOURCE_ALREADYEXIST,resourceDTO.getRegistrationNumber());
 
         }
 
         Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Vehicle type not found " + resourceDTO.getVehicleTypeId());
-            exceptionService.dataNotFoundByIdException("message.resource.vehicletype.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_VEHICLETYPE_NOTFOUND);
 
         }
         Resource resource = new Resource(vehicle, resourceDTO.getRegistrationNumber(), resourceDTO.getNumber(),
@@ -184,13 +185,13 @@ public class ResourceService {
         Resource resource = (Optional.ofNullable(resourceId).isPresent()) ? resourceGraphRepository.findOne(resourceId) : null;
         if (!Optional.ofNullable(resource).isPresent()) {
             logger.error("Incorrect resource id" + resourceId);
-            exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_ID_NOTFOUND);
 
         }
         Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Vehicle type not found " + resourceDTO.getVehicleTypeId());
-            exceptionService.dataNotFoundByIdException("message.resource.vehicletype.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_VEHICLETYPE_NOTFOUND);
 
         }
         resource.setVehicleType(vehicle);
@@ -212,7 +213,7 @@ public class ResourceService {
         Resource resource = resourceGraphRepository.findOne(resourceId);
         if (!Optional.ofNullable(resource).isPresent()) {
             logger.error("Resource not found by id " + resource);
-            exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_ID_NOTFOUND);
 
         }
         List<ResourceUnavailabilityRelationship> resourceUnavailabilityRelationships = new ArrayList<>
@@ -230,7 +231,7 @@ public class ResourceService {
                 resourceUnavailabilityRelationships.add(resourceUnavailabilityRelationship);
                 resourceUnAvailabilities.add(resourceUnAvailability);
             } catch (ParseException e) {
-                exceptionService.internalServerError("error.resource.date.incorrect");
+                exceptionService.internalServerError(ERROR_RESOURCE_DATE_INCORRECT);
 
             }
         }
@@ -243,7 +244,7 @@ public class ResourceService {
         ResourceUnAvailability resourceUnAvailability = resourceGraphRepository.getResourceUnavailabilityById(resourceId,unAvailabilityId);
         if(!Optional.ofNullable(resourceUnAvailability).isPresent()){
             logger.error("Incorrect id of Resource unavailability " + unAvailabilityId);
-            exceptionService.dataNotFoundByIdException("message.resource.unavailability.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_UNAVAILABILITY_NOTFOUND);
 
         }
         if(unavailabilityDTO.isFullDay()){
@@ -274,7 +275,7 @@ public class ResourceService {
         Resource resource = resourceGraphRepository.findOne(resourceId);
         if(!Optional.ofNullable(resource).isPresent()){
             logger.error("Resource not found by id " + resource);
-                exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_RESOURCE_ID_NOTFOUND);
 
         }
         Instant instant = Instant.parse(date);

@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
-import com.kairos.service.redis.RedisService;
 import com.kairos.service.auth.UserOauth2Service;
+import com.kairos.service.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;

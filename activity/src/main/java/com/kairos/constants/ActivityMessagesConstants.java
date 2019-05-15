@@ -283,7 +283,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_KPI_CATEGORY_DUPLICATE  = "error.kpi_category.duplicate ";
     public static final String ERROR_DIST_CATEGORY_KPI_INVALID_OPERATION  = "error.dist.category_kpi.invalid_operation ";
     public static final String ERROR_KPI_CATEGORY_AVAILABILITY  = "error.kpi_category.availability ";
-    public static final String ERROR_KPI_INVALIDDATA  = "error.kpi.invalidData ";
+    public static final String ERROR_KPI_INVALIDDATA  = "error.kpi.invalidData";
     public static final String MESSAGE_PHASESETTINGS_ABSENT = "message.phaseSettings.absent";
     public static final String ERROR_PRESENCEACTIVITYCONFIGURATION_NOTFOUND = "error.presenceActivityConfiguration.notFound";
     public static final String ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND = "error.absenceActivityConfiguration.notFound";

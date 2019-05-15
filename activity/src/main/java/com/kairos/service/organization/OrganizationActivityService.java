@@ -3,7 +3,6 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -75,6 +74,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
  * Created by vipul on 5/12/17.
@@ -141,11 +141,11 @@ public class OrganizationActivityService extends MongoBaseService {
         if (checked) {
             Activity activity = activityMongoRepository.findOne(activityId);
             if (!Optional.ofNullable(activity).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
             }
             Activity isActivityAlreadyExist = activityMongoRepository.findByNameIgnoreCaseAndUnitIdAndByDate(activity.getName().trim(), unitId, activity.getGeneralActivityTab().getStartDate(), activity.getGeneralActivityTab().getEndDate());
             if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
-                exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
+                exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
             Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a -> a.getActivityShiftStatusSettings().stream().flatMap(b -> b.getAccessGroupIds().stream())).collect(Collectors.toSet());
@@ -226,7 +226,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId, Long unitId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
@@ -290,22 +290,22 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!isPartOfTeam) {
             boolean isActivityPresent = userIntegrationService.verifyingIsActivityAlreadyAssigned(generalDTO.getActivityId(), unitId);
             if (isActivityPresent) {
-                exceptionService.actionNotPermittedException("message.activity.timeType.already.in.team");
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_ALREADY_IN_TEAM);
             }
         }
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
         }
         Activity isActivityAlreadyExist = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(), unitId, generalDTO.getStartDate(), generalDTO.getEndDate());
         if (Optional.ofNullable(isActivityAlreadyExist).isPresent() && generalDTO.getStartDate().isBefore(isActivityAlreadyExist.getGeneralActivityTab().getStartDate())) {
-            exceptionService.actionNotPermittedException("message.activity.overlaping");
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
         }
         if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
-            exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
+            exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
         if (activityCategory == null) {
-            exceptionService.dataNotFoundByIdException("message.category.notExist");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NOTEXIST);
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
@@ -389,14 +389,14 @@ public class OrganizationActivityService extends MongoBaseService {
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(), activityDTO.getEndDate());
         if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())) {
-            exceptionService.actionNotPermittedException("message.activity.overlaping");
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
         }
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
         //Checking the time type of activity whether it's eligible for copy or not
         TimeType timeType = timeTypeMongoRepository.findOneById(activityFromDatabase.get().getBalanceSettingsActivityTab().getTimeTypeId());
@@ -415,7 +415,7 @@ public class OrganizationActivityService extends MongoBaseService {
             activityDTO.setActivityCanBeCopied(true);
             activityDTO.setUnitId(unitId);
         } else {
-            exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
+            exceptionService.actionNotPermittedException(ACTIVITY_NOT_ELIGIBLE_FOR_COPY);
         }
         return activityDTO;
     }
@@ -546,22 +546,22 @@ public class OrganizationActivityService extends MongoBaseService {
     public void verifyChildActivity(List<ActivityDTO> activities, Activity parentActivity) {
         TimeType timeType = timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if (!timeType.isAllowChildActivities()) {
-            exceptionService.actionNotPermittedException("message.activity.setting.enable", parentActivity.getName());
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_SETTING_ENABLE, parentActivity.getName());
 
         }
         if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
-            exceptionService.actionNotPermittedException("message.activity.being_used_as_child", parentActivity.getName());
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, parentActivity.getName());
         }
 
         List<Activity> activityList = activityMongoRepository.findByActivityIdInChildActivities(parentActivity.getId(), activities.stream().map(k -> k.getId()).collect(Collectors.toList()));
         if (isCollectionNotEmpty(activityList)) {
             List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
-            exceptionService.actionNotPermittedException("message.activity.being_used_as_child", activityNames);
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, activityNames);
         }
         activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).collect(Collectors.toList());
         if (isCollectionNotEmpty(activities)) {
             List<String> activityNames = activities.stream().map(k -> k.getName()).collect(Collectors.toList());
-            exceptionService.actionNotPermittedException("message.activity.being_used_as_parent", activityNames);
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_PARENT, activityNames);
         }
 
     }

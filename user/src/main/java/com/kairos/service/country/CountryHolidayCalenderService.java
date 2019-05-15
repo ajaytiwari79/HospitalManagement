@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.UserMessagesConstants.START_DATE_LESS_FROM_END_DATE;
 
 /**
  * Created by oodles on 20/9/16.
@@ -57,7 +58,7 @@ public class CountryHolidayCalenderService {
         if (calender!=null){
             if (dayType!=null){
                 if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
-                    exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+                    exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
                 }
                 dayType.setColorCode(countryHolidayCalenderDTO.getColorCode());
                 calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
@@ -114,7 +115,7 @@ public class CountryHolidayCalenderService {
                 DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
                 if(dayType!=null){
                     if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
-                        exceptionService.actionNotPermittedException("start_date.less.from.end_date");
+                        exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
                     }
                     countryHolidayCalender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
                     countryHolidayCalender.setDescription(countryHolidayCalenderDTO.getDescription());

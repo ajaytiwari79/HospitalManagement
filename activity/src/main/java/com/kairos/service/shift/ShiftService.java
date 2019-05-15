@@ -19,12 +19,14 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.enums.shift.*;
+import com.kairos.enums.shift.ShiftEscalationReason;
+import com.kairos.enums.shift.ShiftFilterParam;
+import com.kairos.enums.shift.ShiftType;
+import com.kairos.enums.shift.ViewType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.open_shift.OpenShift;
@@ -65,7 +67,6 @@ import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.event.ShiftNotificationEvent;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
@@ -77,16 +78,14 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
-import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 import static com.kairos.enums.shift.ShiftStatus.REQUEST;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -201,12 +200,12 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()));
         if (isNull(planningPeriod)) {
-            exceptionService.actionNotPermittedException("message.periodsetting.notFound");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIODSETTING_NOTFOUND);
         }
         Shift mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate()));
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-            exceptionService.actionNotPermittedException("message.wta.notFound");
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
         }
         List<BigInteger> activityIds = shiftDTO.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
@@ -296,7 +295,7 @@ public class ShiftService extends MongoBaseService {
                 dateAndFunctionIdMap.put(asLocalDate(shift.getStartDate()), functionId);
                 userIntegrationService.applyFunction(shift.getUnitId(), shift.getEmploymentId(), dateAndFunctionIdMap, HttpMethod.POST, null);
             } else {
-                exceptionService.actionNotPermittedException("error.function.can.not.apply.with.absence.activity");
+                exceptionService.actionNotPermittedException(ERROR_FUNCTION_CAN_NOT_APPLY_WITH_ABSENCE_ACTIVITY);
             }
         } else {
             BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", asLocalDate(shift.getStartDate()).toString());
@@ -385,7 +384,7 @@ public class ShiftService extends MongoBaseService {
         shift.setPhaseId(phase.getId());
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shiftWithViolatedInfo.getShifts().get(0).getActivities().get(0).getStartDate()));
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-            exceptionService.actionNotPermittedException("message.wta.notFound");
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
         }
         // replace id from shift id if request come form detailed view and compact view
         if (isNotNull(shiftDTO.getShiftId())) {
@@ -448,7 +447,7 @@ public class ShiftService extends MongoBaseService {
         BigInteger plannedTimeId = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
             if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
+                exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
             }
             plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
             break;
@@ -464,7 +463,7 @@ public class ShiftService extends MongoBaseService {
         Long functionId = shiftDTO.getFunctionId();
         Shift shift = shiftMongoRepository.findOne(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
         if (!Optional.ofNullable(shift).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftDTO.getId());
         }
         Date currentShiftStartDate = shift.getStartDate();
         Date currentShiftEndDate = shift.getEndDate();
@@ -497,11 +496,11 @@ public class ShiftService extends MongoBaseService {
             }
         } else {
             if (staffAdditionalInfoDTO.getUnitId() == null) {
-                exceptionService.dataNotFoundByIdException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
+                exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
             }
             WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getActivities().get(0).getStartDate());
             if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-                exceptionService.actionNotPermittedException("message.wta.notFound");
+                exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
             }
             //copy old state of activity object
             Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
@@ -573,7 +572,7 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId) {
         if (staffId == null) {
-            exceptionService.actionNotPermittedException("staff_id.null");
+            exceptionService.actionNotPermittedException(STAFF_ID_NULL);
         }
         Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
         List<ReasonCodeDTO> reasonCodeDTOS;
@@ -581,10 +580,10 @@ public class ShiftService extends MongoBaseService {
         if (Optional.ofNullable(employmentId).isPresent()) {
             staffAdditionalInfoDTO = userIntegrationService.verifyEmploymentAndFindFunctionsAfterDate(staffId, employmentId);
             if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_BELONGS, staffId);
             }
             if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-                exceptionService.actionNotPermittedException("message.employment.absent", startDate.toString());
+                exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT, startDate.toString());
             }
             reasonCodeDTOS = staffAdditionalInfoDTO.getReasonCodes();
             List<FunctionDTO> appliedFunctionDTOs = null;
@@ -647,7 +646,7 @@ public class ShiftService extends MongoBaseService {
         ShiftDTO shiftDTO = new ShiftDTO();
         Shift shift = shiftMongoRepository.findOne(shiftId);
         if (!Optional.ofNullable(shift).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.shift.id", shiftId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftId);
         }
         shiftValidatorService.validateStatusOfShiftActivity(shift);
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
@@ -727,7 +726,7 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, ViewType viewType) {
         if (endLocalDate == null) {
-            exceptionService.actionNotPermittedException("endDate.null");
+            exceptionService.actionNotPermittedException(ENDDATE_NULL);
         }
         Date startDate = asDate(startLocalDate);
         Date endDate = asDate(endLocalDate);
@@ -788,7 +787,7 @@ public class ShiftService extends MongoBaseService {
 
     private List<ShiftDTO> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long expertiseId) {
         if (staffId == null || endDate == null || expertiseId == null) {
-            exceptionService.actionNotPermittedException("staff_id.end_date.null");
+            exceptionService.actionNotPermittedException(STAFF_ID_END_DATE_NULL);
         }
         Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, expertiseId);
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
@@ -988,7 +987,7 @@ public class ShiftService extends MongoBaseService {
                 object = getDetailedAndCompactViewData(staffId, unitId, asDate(startDate));
                 break;
             default:
-                exceptionService.actionNotPermittedException("please.select.valid.criteria");
+                exceptionService.actionNotPermittedException(PLEASE_SELECT_VALID_CRITERIA);
         }
         return object;
     }

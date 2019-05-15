@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDateWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.ACCESS_GROUP_NOT_MATCHED;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_STATUS_ADDED;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
