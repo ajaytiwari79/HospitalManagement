@@ -181,7 +181,7 @@ public class StaffRetrievalService {
         }
         personalInfo.put("employmentInfo", positionService.retrieveEmploymentDetails(staffPositionDTO));
 
-        personalInfo.put("personalInfo", retrievePersonalInfo(staff));
+        personalInfo.put("personalInfo", retrievePersonalInfo(staff,unitId));
         personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, unit.getId()));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
@@ -202,7 +202,7 @@ public class StaffRetrievalService {
     }
 
 
-    private Map<String, Object> retrievePersonalInfo(Staff staff) {
+    private Map<String, Object> retrievePersonalInfo(Staff staff,Long unitId) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("userNameUpdated",user.isUserNameUpdated());
@@ -233,7 +233,7 @@ public class StaffRetrievalService {
         map.put("costHour", staff.getCostHour());
         map.put("costHourOvertime", staff.getCostHourOvertime());
         map.put("capacity", staff.getCapacity());
-        map.put("teamDetails", teamGraphRepository.getTeamDetailsOfStaff(staff.getId()));
+        map.put("teamDetails", teamGraphRepository.getTeamDetailsOfStaff(staff.getId(),unitId));
 
         return map;
     }

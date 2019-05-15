@@ -710,8 +710,10 @@ public class StaffService {
             Organization mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
             mainOrganization.getPositions().add(position);
             organizationGraphRepository.save(mainOrganization);
+            user.setCountryId(mainOrganization.getCountry().getId());
         } else {
             organization.getPositions().add(position);
+            user.setCountryId(organization.getCountry().getId());
         }
         organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
@@ -724,7 +726,7 @@ public class StaffService {
             }
         }
         position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position);
+        positionGraphRepository.save(position,2);
     }
 
     public void setUnitManagerAndPosition(Organization organization, User user, Long accessGroupId) {

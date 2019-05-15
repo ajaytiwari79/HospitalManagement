@@ -58,9 +58,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
-import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
-import static com.kairos.constants.CommonConstants.RESET_PASSCODE;
+import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
+
 
 
 /**
@@ -525,8 +525,8 @@ public class UserService {
 
             String token = tokenService.createForgotPasswordToken(currentUser);
             Map<String, Object> templateParam = new HashMap<>();
-            templateParam.put("receiverName", currentUser.getFullName());
-            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
+            templateParam.put("receiverName", EMAIL_GREETING + currentUser.getFullName());
+            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token);
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
             mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
