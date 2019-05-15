@@ -788,9 +788,9 @@ public class ShiftValidatorService {
                 shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
             }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
-        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), WORKING_TYPE);
+        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), WORKING_TYPE,false);
         if (!shiftExists) {
-            shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.NON_WORKING_TYPE);
+            shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.NON_WORKING_TYPE,true);
             if (shiftExists && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
                 shiftExists = false;
                 shiftOverlappedWithNonWorkingType = true;
