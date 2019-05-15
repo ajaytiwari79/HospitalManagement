@@ -59,6 +59,8 @@ public class EmploymentJobService {
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
     private UserGraphRepository userGraphRepository;
+    @Inject
+    private EmploymentService employmentService;
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
 
@@ -168,7 +170,7 @@ public class EmploymentJobService {
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
         PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
-        return new EmploymentAndPositionDTO(positionQueryResult, employmentGraphRepository.getAllEmploymentsByUser(user.getId()));
+        return employmentService.getEmploymentsOfStaff(unitId,staffId,true);
 
     }
 
