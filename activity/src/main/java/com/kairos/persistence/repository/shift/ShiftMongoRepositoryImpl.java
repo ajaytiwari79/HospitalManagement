@@ -267,7 +267,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(criteria),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", ACTIVITY),
+                lookup("activities", "activityId", "_id", "activity"),
                 new CustomAggregationOperation(shiftWithActivityProjection()),
                 new CustomAggregationOperation(shiftWithActivityGroup()),
                 new CustomAggregationOperation(anotherShiftWithActivityProjection()),
@@ -405,8 +405,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(match(where("activities.status").in(shiftActivityStatus)));
         }
         if (CollectionUtils.isNotEmpty(timeTypeIds)) {
-            aggregationOperation.add(lookup("activities", "activities.activityId", "_id", ACTIVITY));
-            aggregationOperation.add(unwind(ACTIVITY));
+            aggregationOperation.add(lookup("activities", "activities.activityId", "_id", "activity"));
+            aggregationOperation.add(unwind("activity"));
             aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
@@ -426,7 +426,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         if (CollectionUtils.isNotEmpty(activitiesIds)) {
             aggregationOperation.add(match(where("activities.activityId").in(activitiesIds)));
         }
-        aggregationOperation.add(lookup("activities", "activities.activityId", "_id", ACTIVITY));
+        aggregationOperation.add(lookup("activities", "activities.activityId", "_id", "activity"));
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityKpiProjection()));
         if (CollectionUtils.isNotEmpty(dayOfWeeks)) {
             aggregationOperation.add(match(where("dayOfWeek").in(dayOfWeeks)));
@@ -556,8 +556,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("activities", "activities.activityId", "_id", ACTIVITY),
-                unwind(ACTIVITY),
+                lookup("activities", "activities.activityId", "_id", "activity"),
+                unwind("activity"),
                 lookup("time_Type", "activity.balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 match(where("timeType.timeTypes").is(timeType))
         );
@@ -579,7 +579,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Criteria criteria = where("unitId").is(unitId).and("deleted").is(false).and("staffId").is(staffId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("activities", "activities.activityId", "_id", ACTIVITY),
+                lookup("activities", "activities.activityId", "_id", "activity"),
                 match(new Criteria().orOperator(where("activity.timeCalculationActivityTab.methodForCalculatingTime").is(FULL_DAY_CALCULATION), where("activity.timeCalculationActivityTab.methodForCalculatingTime").is(FULL_WEEK))));
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
     }

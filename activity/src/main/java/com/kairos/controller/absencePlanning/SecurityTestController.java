@@ -29,7 +29,7 @@ public class SecurityTestController {
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("user", user.getUserAuthentication().getPrincipal());
         userInfo.put("authorities", AuthorityUtils.authorityListToSet(user.getUserAuthentication().getAuthorities()));
-        userInfo.put(ACTIVITY,"activity test authorition header security");
+        userInfo.put("activity","activity test authorition header security");
         return userInfo;
     }
 }

@@ -23,7 +23,7 @@ public class OpenShiftNotificationMongoRepositoryImpl implements CustomOpenShift
     public List<OpenShift> findValidOpenShiftsForStaff(Long staffId, Date startDate, Date endDate) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("staffId").is(staffId).and("deleted").is(false)),
-                Aggregation.lookup(OPENSHIFT,"openShiftId","_id","openShifts"),
+                Aggregation.lookup("openShift","openShiftId","_id","openShifts"),
                 Aggregation.unwind("openShifts"),
                 Aggregation.match(Criteria.where("openShifts.startDate").gte(startDate).and("openShifts.endDate").lte(endDate)),
                 Aggregation.replaceRoot("openShifts"),
