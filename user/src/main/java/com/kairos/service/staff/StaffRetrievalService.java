@@ -182,7 +182,7 @@ public class StaffRetrievalService {
         personalInfo.put("employmentInfo", positionService.retrieveEmploymentDetails(staffPositionDTO));
 
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
-        personalInfo.put(EXPERTISE, getExpertisesOfUnitByCountryId(countryId, unit.getId()));
+        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId, unit.getId()));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
 
@@ -686,6 +686,7 @@ public class StaffRetrievalService {
         // TODO incorrect we dont need to set in all staff
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
             staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
+
             staffAdditionalInfoDTO.setUnitId(organization.getId());
             staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));

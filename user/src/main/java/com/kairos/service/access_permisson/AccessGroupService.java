@@ -825,7 +825,7 @@ public class AccessGroupService {
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.HUB.toString(), AccessGroupRole.MANAGEMENT.toString()));
         accessGroupForParentOrganizationCreation.put("organization",
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.ORGANIZATION.toString(), AccessGroupRole.MANAGEMENT.toString()));
-        accessGroupForParentOrganizationCreation.put(UNION,
+        accessGroupForParentOrganizationCreation.put("union",
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.UNION.toString(), AccessGroupRole.MANAGEMENT.toString()));
         return accessGroupForParentOrganizationCreation;
     }

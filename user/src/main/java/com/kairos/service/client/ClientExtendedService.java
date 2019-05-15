@@ -430,7 +430,7 @@ public class ClientExtendedService{
                 contactAddress.setStreet((String) relativeProperties.get("street1"));
                 contactAddress.setCity((String) relativeProperties.get("city"));
 //                contactAddress.setZipCodeValue((Integer) relativeProperties.get("zipCode"));
-                contactAddress.setCountry((String) relativeProperties.get(COUNTRY));
+                contactAddress.setCountry((String) relativeProperties.get("country"));
 
                 contactAddress.setLongitude(Float.valueOf((Integer) relativeProperties.get("longitude")));
                 contactAddress.setLatitude(Float.valueOf((Integer) relativeProperties.get("latitude")));
@@ -487,7 +487,7 @@ public class ClientExtendedService{
                 contactAddress.setStreet((String) relativeProperties.get("street1"));
                 contactAddress.setCity((String) relativeProperties.get("city"));
 //                contactAddress.setZipCodeValue((Integer) relativeProperties.get("zipCode"));
-                contactAddress.setCountry((String) relativeProperties.get(COUNTRY));
+                contactAddress.setCountry((String) relativeProperties.get("country"));
                 contactAddress.setLongitude(Float.valueOf((Integer) relativeProperties.get("longitude")));
                 contactAddress.setLatitude(Float.valueOf((Integer) relativeProperties.get("latitude")));
             }

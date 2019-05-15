@@ -44,6 +44,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.END_DATE_FROM_END_DATE;
+import static com.kairos.constants.ActivityMessagesConstants.START_DATE_FROM_END_DATE;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
@@ -238,10 +240,10 @@ public class CostTimeAgreementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getEndDate() != null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException("END_DATE_FROM_END_DATE", ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException("START_DATE_FROM_END_DATE", ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;

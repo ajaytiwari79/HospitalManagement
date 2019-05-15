@@ -547,7 +547,7 @@ public class ClientService {
 
     public Map<String, Object> getClientServiceData(Long clientId, Long orgId) {
         Map<String, Object> response = new HashMap<>();
-        response.put(SERVICES, getClientServices(clientId, orgId));
+        response.put("services", getClientServices(clientId, orgId));
         return response;
     }
 

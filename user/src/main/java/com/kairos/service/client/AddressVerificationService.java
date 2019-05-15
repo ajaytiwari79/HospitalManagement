@@ -116,7 +116,7 @@ public class AddressVerificationService {
                 "\n Street: " + contactAddress.getStreet());
 
         Map<String, Object> addressToVerify = new HashMap<>();
-        addressToVerify.put(COUNTRY, "DK");
+        addressToVerify.put("country", "DK");
         addressToVerify.put("zip", zipCode.getZipCode());
         addressToVerify.put("city", municipalityName);
         addressToVerify.put("street", contactAddress.getStreet());
