@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class KPISetService {
@@ -56,7 +57,7 @@ public class KPISetService {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
         KPISet kpiSet = kpiSetRepository.findOne(kpiSetDTO.getId());
         if (isNull(kpiSet)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "KPISet", kpiSetDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "KPISet", kpiSetDTO.getId());
         }
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
@@ -68,7 +69,7 @@ public class KPISetService {
     public boolean deleteKPISet(BigInteger kpiSetId) {
         KPISet kpiSet = kpiSetRepository.findOne(kpiSetId);
         if (isNull(kpiSet)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "KPISet", kpiSetId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "KPISet", kpiSetId);
             return false;
         }
         kpiSet.setDeleted(true);
@@ -86,9 +87,9 @@ public class KPISetService {
 
     private void verifyDetails(Long referenceId, ConfLevel confLevel, KPISetDTO kpiSetDTO) {
         if (confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
-            exceptionService.dataNotFoundByIdException("message.country.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
         }else if (confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)) {
-            exceptionService.dataNotFoundByIdException("message.organization.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
         boolean existByName = kpiSetRepository.existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(kpiSetDTO.getName().trim(), referenceId, kpiSetDTO.getId());
         if (existByName) {

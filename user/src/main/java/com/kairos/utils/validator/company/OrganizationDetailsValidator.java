@@ -10,6 +10,8 @@ import com.kairos.service.exception.ExceptionService;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_LASTNAME_NOTNULL;
+
 /**
  * CreatedBy vipulpandey on 22/8/18
  **/
@@ -54,7 +56,7 @@ public class OrganizationDetailsValidator {
                     exceptionService.invalidRequestException("error.firstname.notnull", staffPersonalDetailDTO.getOrganizationId());
                 }
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getLastName()).isPresent()) {
-                    exceptionService.invalidRequestException("error.lastname.notnull", staffPersonalDetailDTO.getOrganizationId());
+                    exceptionService.invalidRequestException(ERROR_LASTNAME_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getEmail()).isPresent()) {
                     exceptionService.invalidRequestException("error.email.notnull", staffPersonalDetailDTO.getOrganizationId());

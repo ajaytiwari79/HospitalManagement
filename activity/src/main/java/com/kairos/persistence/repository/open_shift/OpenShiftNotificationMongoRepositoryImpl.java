@@ -15,13 +15,15 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.constants.ActivityMessagesConstants.OPENSHIFT;
+
 public class OpenShiftNotificationMongoRepositoryImpl implements CustomOpenShiftNotificationMongoRepository {
     @Inject private MongoTemplate mongoTemplate;
     @Override
     public List<OpenShift> findValidOpenShiftsForStaff(Long staffId, Date startDate, Date endDate) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("staffId").is(staffId).and("deleted").is(false)),
-                Aggregation.lookup("openShift","openShiftId","_id","openShifts"),
+                Aggregation.lookup(OPENSHIFT,"openShiftId","_id","openShifts"),
                 Aggregation.unwind("openShifts"),
                 Aggregation.match(Criteria.where("openShifts.startDate").gte(startDate).and("openShifts.endDate").lte(endDate)),
                 Aggregation.replaceRoot("openShifts"),

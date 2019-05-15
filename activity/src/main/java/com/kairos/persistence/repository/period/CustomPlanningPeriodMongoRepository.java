@@ -4,7 +4,6 @@ import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.mongodb.client.result.UpdateResult;
 
 import java.time.LocalDate;
 import java.util.Date;

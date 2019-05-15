@@ -2,10 +2,9 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
-import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -15,7 +14,6 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -32,9 +30,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -269,7 +267,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(criteria),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
+                lookup("activities", "activityId", "_id", ACTIVITY),
                 new CustomAggregationOperation(shiftWithActivityProjection()),
                 new CustomAggregationOperation(shiftWithActivityGroup()),
                 new CustomAggregationOperation(anotherShiftWithActivityProjection()),
@@ -407,8 +405,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(match(where("activities.status").in(shiftActivityStatus)));
         }
         if (CollectionUtils.isNotEmpty(timeTypeIds)) {
-            aggregationOperation.add(lookup("activities", "activities.activityId", "_id", "activity"));
-            aggregationOperation.add(unwind("activity"));
+            aggregationOperation.add(lookup("activities", "activities.activityId", "_id", ACTIVITY));
+            aggregationOperation.add(unwind(ACTIVITY));
             aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
@@ -428,7 +426,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         if (CollectionUtils.isNotEmpty(activitiesIds)) {
             aggregationOperation.add(match(where("activities.activityId").in(activitiesIds)));
         }
-        aggregationOperation.add(lookup("activities", "activities.activityId", "_id", "activity"));
+        aggregationOperation.add(lookup("activities", "activities.activityId", "_id", ACTIVITY));
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityKpiProjection()));
         if (CollectionUtils.isNotEmpty(dayOfWeeks)) {
             aggregationOperation.add(match(where("dayOfWeek").in(dayOfWeeks)));
@@ -558,8 +556,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("activities", "activities.activityId", "_id", "activity"),
-                unwind("activity"),
+                lookup("activities", "activities.activityId", "_id", ACTIVITY),
+                unwind(ACTIVITY),
                 lookup("time_Type", "activity.balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 match(where("timeType.timeTypes").is(timeType))
         );
@@ -581,7 +579,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Criteria criteria = where("unitId").is(unitId).and("deleted").is(false).and("staffId").is(staffId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("activities", "activities.activityId", "_id", "activity"),
+                lookup("activities", "activities.activityId", "_id", ACTIVITY),
                 match(new Criteria().orOperator(where("activity.timeCalculationActivityTab.methodForCalculatingTime").is(FULL_DAY_CALCULATION), where("activity.timeCalculationActivityTab.methodForCalculatingTime").is(FULL_WEEK))));
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
     }

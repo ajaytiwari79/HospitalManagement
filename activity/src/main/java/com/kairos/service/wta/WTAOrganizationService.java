@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
 /**
@@ -67,7 +68,7 @@ public class WTAOrganizationService extends MongoBaseService {
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         OrganizationDTO organization = userIntegrationService.getOrganization();
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
         }
         List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
@@ -80,17 +81,17 @@ public class WTAOrganizationService extends MongoBaseService {
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
         if (updateDTO.getStartDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.wta.start-end-date");
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_START_ENDDATE);
         }
         WorkingTimeAgreement WTADuplicate = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
         if (Optional.ofNullable(WTADuplicate).isPresent()) {
             logger.info("Duplicate WTA name in organization :", wtaId);
-            exceptionService.duplicateDataException("message.wta.name.alreadyExists", updateDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_WTA_NAME_ALREADYEXISTS, updateDTO.getName());
         }
         WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
-            exceptionService.dataNotFoundByIdException("message.wta.id", wtaId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_WTA_ID, wtaId);
         }
         if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
             logger.info("Expertise cant be changed at unit level :", wtaId);
@@ -98,7 +99,7 @@ public class WTAOrganizationService extends MongoBaseService {
         }
         OrganizationDTO organization = userIntegrationService.getOrganizationWithCountryId(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
         }
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         BeanUtils.copyProperties(oldWta, newWta);

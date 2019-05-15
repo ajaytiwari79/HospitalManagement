@@ -10,6 +10,7 @@ import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
@@ -41,7 +42,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -66,6 +66,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY_END_DATE_LESS_THAN_START_DATE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
@@ -261,7 +262,7 @@ public class TimeBankCalculationService {
 
     public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails) {
         if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
-            exceptionService.invalidRequestException("activity.end_date.less_than.start_date", shiftActivity.getActivityName());
+            exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, shiftActivity.getActivityName());
         }
         int scheduledMinutes = 0;
         int duration = 0;

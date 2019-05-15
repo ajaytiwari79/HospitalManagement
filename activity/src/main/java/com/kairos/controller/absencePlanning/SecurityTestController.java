@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY;
 import static com.kairos.constants.ApiConstants.API_V1;
 
 @RestController
@@ -28,7 +29,7 @@ public class SecurityTestController {
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("user", user.getUserAuthentication().getPrincipal());
         userInfo.put("authorities", AuthorityUtils.authorityListToSet(user.getUserAuthentication().getAuthorities()));
-        userInfo.put("activity","activity test authorition header security");
+        userInfo.put(ACTIVITY,"activity test authorition header security");
         return userInfo;
     }
 }

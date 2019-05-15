@@ -87,6 +87,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.EMPLOYMENT_ABSENT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 import static com.kairos.service.employment.EmploymentUtility.convertStaffEmploymentObject;
@@ -922,7 +923,7 @@ public class EmploymentService {
         Map<Long, StaffEmploymentDetails> staffEmploymentDetailsMap = staffData.stream().collect(Collectors.toMap(StaffEmploymentDetails::getStaffId, Function.identity()));
         List<String> invalidStaffs = staffAdditionalInfoQueryResult.stream().filter(staffAdditionalInfoQueryResult1 -> !staffEmploymentDetailsMap.containsKey(staffAdditionalInfoQueryResult1.getId())).map(StaffAdditionalInfoQueryResult::getName).collect(Collectors.toList());
         if (isCollectionNotEmpty(invalidStaffs)) {
-            exceptionService.dataNotMatchedException("employment.absent", invalidStaffs);
+            exceptionService.dataNotMatchedException(EMPLOYMENT_ABSENT, invalidStaffs);
         }
         Map<Long, StaffEmploymentDetails> employmentDetailsMap = staffData.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));
         List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
