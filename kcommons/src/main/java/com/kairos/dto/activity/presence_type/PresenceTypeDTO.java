@@ -12,8 +12,7 @@ import java.math.BigInteger;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class PresenceTypeDTO {//extends UserBaseEntity {
+public class PresenceTypeDTO {
     @NotBlank(message = "error.PresenceTypeDTO.name.notEmpty")
     private String name;
     private BigInteger id;

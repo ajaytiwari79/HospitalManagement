@@ -337,7 +337,7 @@ public class TeamService {
     }
 
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
-        Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getMainTeamLeaderIds()));
+        Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
         teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId());
         List<StaffTeamRelationship> staffTeamRelationships = new ArrayList<>();
