@@ -398,10 +398,12 @@ public class CounterDataService extends MongoBaseService {
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
+
     }
 
-    public TabKPIDTO getKpiDataByInterval(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level) {
-        return getKpiPreviewWithFilter(kpiId,refId,filterCriteria,ConfLevel.STAFF);
+    public TabKPIDTO getKpiDataByInterval(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level ,Long staffId ) {
+        filterCriteria.setStaffId(staffId);
+        return getKpiPreviewWithFilter(kpiId,refId,filterCriteria,ConfLevel.UNIT);
     }
 
     private TabKPIDTO getTabKpiData(KPI copyKpi, CounterDTO counterDTO, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
