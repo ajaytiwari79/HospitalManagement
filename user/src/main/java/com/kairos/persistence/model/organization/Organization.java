@@ -92,7 +92,7 @@ public class Organization extends UserBaseEntity {
 
     // Relationships
 
-    @Relationship(type = COUNTRY)
+    @Relationship(type = BELONGS_TO)
     private Country country;
 
     @Relationship(type = HAS_TEAMS)
