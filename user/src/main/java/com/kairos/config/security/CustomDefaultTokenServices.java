@@ -1,9 +1,9 @@
 package com.kairos.config.security;
 
-import com.kairos.service.redis.RedisService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.service.auth.UserService;
+import com.kairos.service.redis.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;

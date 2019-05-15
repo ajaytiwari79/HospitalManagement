@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
+
 /**
  * Created by oodles on 22/12/16.
  */
@@ -76,7 +78,7 @@ public class MunicipalityService {
     public Map<String, Object> addZipCodeToMunicipality(Long municipalityId, ZipCode zipCode) {
         Municipality municipality = municipalityGraphRepository.findOne(municipalityId);
         if(municipality == null){
-            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
         List<Municipality> municipalities = zipCode.getMunicipalities();

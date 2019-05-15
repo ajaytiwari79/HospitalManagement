@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
+import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
@@ -43,8 +45,8 @@ public class User extends UserBaseEntity {
     private String email;
     private Long lastSelectedOrganizationId;
     private LocalDate dateOfBirth;
-    @NotNull(message = "error.User.password.notnull")
-    @Size(min = 8, max = 50, message = "error.User.password.size")
+    @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
+    @Size(min = 8, max = 50, message = ERROR_USER_PASSCODE_SIZE)
     private String password;
 
     protected int age;

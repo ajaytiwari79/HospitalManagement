@@ -2,6 +2,8 @@ package com.kairos.persistence.model.user.resources;
 
 import javax.validation.constraints.NotNull;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_DESCRIPTION_NOTNULL;
+
 /**
  * Created by prabjot on 13/10/17.
  */
@@ -10,7 +12,7 @@ public class ResourceDTO {
     @NotNull(message = "Registration number can't be empty")
     private String registrationNumber;
     private String number;
-    @NotNull(message = "error.description.notnull")
+    @NotNull(message = ERROR_DESCRIPTION_NOTNULL)
     private String modelDescription;
     @NotNull(message = "Cost per km can not be null")
     private float costPerKM;

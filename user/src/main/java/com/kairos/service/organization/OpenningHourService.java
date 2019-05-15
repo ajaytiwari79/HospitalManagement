@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNIT_ID_NOTFOUND;
+
 /**
  * Created by prabjot on 6/4/17.
  */
@@ -87,7 +89,7 @@ public class OpenningHourService {
     public boolean setDefaultOpeningHours(long unitId) {
         Organization unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
         }
         OrganizationSetting organizationSetting = getDefaultSettings();

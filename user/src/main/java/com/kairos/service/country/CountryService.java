@@ -7,8 +7,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 
 /**
@@ -121,7 +122,7 @@ public class CountryService {
             countryGraphRepository.save(country);
             return country.retrieveDetails();
         } else {
-            exceptionService.duplicateDataException("message.country.name.duplicate");
+            exceptionService.duplicateDataException(MESSAGE_COUNTRY_NAME_DUPLICATE);
 
         }
         return null;
@@ -135,7 +136,7 @@ public class CountryService {
     public CountryDTO getCountryById(Long id) {
         Country country = countryGraphRepository.findOne(id);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, id);
         }
         CountryDTO countryDTO = new CountryDTO(country.getId(), country.getName());
         Currency currency = currencyService.getCurrencyByCountryId(id);
@@ -151,12 +152,12 @@ public class CountryService {
     public Map<String, Object> updateCountry(Country country) {
         List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry("(?i)" + country.getName(), country.getId());
         if (!duplicateCountryList.isEmpty()) {
-            exceptionService.duplicateDataException("message.country.name.duplicate");
+            exceptionService.duplicateDataException(MESSAGE_COUNTRY_NAME_DUPLICATE);
 
         }
         Country currentCountry = countryGraphRepository.findOne(country.getId());
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", country.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, country.getId());
 
         }
         currentCountry.setName(country.getName());
@@ -219,7 +220,7 @@ public class CountryService {
         List<CountryHolidayCalender> calenderList = new ArrayList<>();
         Country country = countryGraphRepository.findOne(countryId, 2);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         try {
@@ -335,7 +336,7 @@ public class CountryService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             logger.debug("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),-1L)){
@@ -350,7 +351,7 @@ public class CountryService {
         Level levelToUpdate = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToUpdate == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", levelId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, levelId);
 
         }
         if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),levelToUpdate.getId())){
@@ -367,7 +368,7 @@ public class CountryService {
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToDelete == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound", levelId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, levelId);
 
         }
 
@@ -383,7 +384,7 @@ public class CountryService {
     public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
 
         Boolean relationTypeExistInCountryByName = countryGraphRepository.relationTypeExistInCountryByName(countryId, "(?i)" + relationTypeDTO.getName(), -1L);
@@ -409,7 +410,7 @@ public class CountryService {
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {
         RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
         if (relationType == null) {
-            exceptionService.dataNotFoundByIdException("message.country.realtionType.id.notFound", relationTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_REALTIONTYPE_ID_NOTFOUND, relationTypeId);
         }
         relationType.setEnabled(false);
         relationTypeGraphRepository.save(relationType);
@@ -421,12 +422,12 @@ public class CountryService {
                 null;
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         boolean vehicleExistInCountryByName = countryGraphRepository.vehicleExistInCountryByName(countryId, "(?i)" + vehicle.getName(), -1L);
         if (vehicleExistInCountryByName) {
-            exceptionService.duplicateDataException("message.country.vehicle.name.alreadyExist", vehicle.getName());
+            exceptionService.duplicateDataException(MESSAGE_COUNTRY_VEHICLE_NAME_ALREADYEXIST, vehicle.getName());
         }
 
         country.addResources(vehicle);
@@ -437,7 +438,7 @@ public class CountryService {
     public List<Vehicle> getVehicleList(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.id.notNull");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTNULL);
             //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesByCountry(countryId);
@@ -446,7 +447,7 @@ public class CountryService {
     public List<VehicleQueryResult> getAllVehicleListWithFeatures(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.id.notNull");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTNULL);
             //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
@@ -457,7 +458,7 @@ public class CountryService {
                 countryGraphRepository.getResources(countryId, resourcesId) : null;
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Finding vehicle by id::" + resourcesId + " Country id " + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_VEHICLE_ID_NOTFOUND);
         }
         vehicle.setEnabled(false);
         vehicalGraphRepository.save(vehicle);
@@ -469,12 +470,12 @@ public class CountryService {
                 countryGraphRepository.getResources(countryId, resourcesId) : null;
         if (!Optional.ofNullable(vehicleToUpdate).isPresent()) {
             logger.debug("Finding vehicle by id::" + resourcesId);
-            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_VEHICLE_ID_NOTFOUND);
 
         }
         boolean vehicleExistInCountryByName = countryGraphRepository.vehicleExistInCountryByName(countryId, "(?i)" + vehicle.getName(), -1L);
         if (vehicleExistInCountryByName) {
-            exceptionService.duplicateDataException("message.country.vehicle.name.alreadyExist", vehicle.getName());
+            exceptionService.duplicateDataException(MESSAGE_COUNTRY_VEHICLE_NAME_ALREADYEXIST, vehicle.getName());
         }
         vehicleToUpdate.setName(vehicle.getName());
         vehicleToUpdate.setDescription(vehicle.getDescription());
@@ -586,7 +587,7 @@ public class CountryService {
             country.setPayRollTypeIds(payRollTypeIds);
             countryGraphRepository.save(country);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Country", countryId);
         }
         return true;
     }

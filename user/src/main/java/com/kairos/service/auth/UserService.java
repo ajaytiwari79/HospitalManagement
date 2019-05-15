@@ -1,7 +1,6 @@
 package com.kairos.service.auth;
 
 import com.kairos.commons.service.mail.MailService;
-import com.kairos.service.redis.RedisService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -34,6 +33,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
@@ -59,6 +59,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
+
 
 
 /**
@@ -287,7 +289,7 @@ public class UserService {
             smsService.sendSms(user.getContactDetail().getMobilePhone(), message);
             return true;
         } else {
-            exceptionService.dataNotFoundByIdException("message.user.mobileNumber.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_MOBILENUMBER_NOTFOUND);
         }
         return false;
     }
@@ -328,7 +330,7 @@ public class UserService {
         currentUser = generateTokenToUser(currentUser);
         Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
         if (org == null) {
-            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
         Map<String, Object> map = new HashMap<>();
@@ -359,7 +361,7 @@ public class UserService {
             currentUser = generateTokenToUser(currentUser);
             Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
             if (org == null) {
-                exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
             }
             Map<String, Object> map = new HashMap<>();
@@ -381,7 +383,7 @@ public class UserService {
         User user = userGraphRepository.findByEmail("(?i)" + firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             LOGGER.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", firstTimePasswordUpdateDTO.getEmail());
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, firstTimePasswordUpdateDTO.getEmail());
 
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
@@ -509,7 +511,7 @@ public class UserService {
     public boolean forgotPassword(String userEmail) {
         if (userEmail.endsWith("kairos.com") || userEmail.endsWith("kairosplanning.com")) {
             LOGGER.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
-            exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_MAIL_INVALID, userEmail);
         }
         User currentUser = userGraphRepository.findByEmail("(?i)" + userEmail);
         if (!Optional.ofNullable(currentUser).isPresent()) {
@@ -517,7 +519,7 @@ public class UserService {
             currentUser = userGraphRepository.findUserByUserName("(?i)" + userEmail);
             if (!Optional.ofNullable(currentUser).isPresent()) {
                 LOGGER.error("No User found by userName " + userEmail);
-                exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
+                exceptionService.dataNotFoundByIdException(MESSAGE_USER_USERNAME_NOTFOUND, userEmail);
             }
         }
 
@@ -534,18 +536,18 @@ public class UserService {
 
     public boolean resetPassword(String token, PasswordUpdateDTO passwordUpdateDTO) {
         if (!passwordUpdateDTO.isValid()) {
-            exceptionService.actionNotPermittedException("message.staff.user.password.notmatch");
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
         }
         User user = findByForgotPasswordToken(token);
         if (!Optional.ofNullable(user).isPresent()) {
             LOGGER.error("No User found by token");
-            exceptionService.dataNotFoundByIdException("message.user.token.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_TOKEN_NOTFOUND);
         }
         //We are validating password reset token for 2 hours.
         DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()), DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
         if (!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))) {
             LOGGER.error("Password reset token expired");
-            exceptionService.dataNotFoundByIdException("message.user.token.expired");
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_TOKEN_EXPIRED);
         }
         CharSequence password = CharBuffer.wrap(passwordUpdateDTO.getConfirmPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
@@ -558,7 +560,7 @@ public class UserService {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
         if (ObjectUtils.isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, userDetailsDTO.getEmail());
         } else {
             if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
                 user.setUserNameUpdated(true);
