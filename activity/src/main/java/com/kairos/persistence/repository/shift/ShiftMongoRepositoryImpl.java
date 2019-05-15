@@ -556,13 +556,24 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
         }
+
         Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                unwind("activities", true),
+                lookup("activities", "activities.activityId", "_id", "activities.activity"),
+                lookup("activities", "activityId", "_id", "activity"),
+                new CustomAggregationOperation(shiftWithActivityProjection()),
+                new CustomAggregationOperation(shiftWithActivityGroup()),
+                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
+                new CustomAggregationOperation(replaceRootForShift()),
+                sort(Sort.Direction.ASC, "startDate"));
+        /*Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("activities", "activities.activityId", "_id", "activity"),
                 unwind("activity"),
                 lookup("time_Type", "activity.balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 match(where("timeType.timeTypes").is(timeType))
-        );
+        );*/
 
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
     }
