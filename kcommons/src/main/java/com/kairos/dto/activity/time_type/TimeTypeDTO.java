@@ -31,6 +31,7 @@ public class TimeTypeDTO {
     private boolean partOfTeam;
     private boolean allowChildActivities;
     private List<TimeTypeDTO> parent = new ArrayList<>();
+    private boolean allowedConflicts;
 
     public TimeTypeDTO() {
     }

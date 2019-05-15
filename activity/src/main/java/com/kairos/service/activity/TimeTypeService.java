@@ -89,6 +89,7 @@ public class TimeTypeService extends MongoBaseService {
             timeType.setDescription(timeTypeDTO.getDescription());
             timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+            timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
             timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
 
             Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
@@ -134,7 +135,7 @@ public class TimeTypeService extends MongoBaseService {
             if (timeType.isLeafNode()) {
                 activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
             }
-            save(timeTypes);
+            timeTypeMongoRepository.saveEntities(timeTypes);
         } else {
             exceptionService.dataNotFoundByIdException("message.timetype.notfound");
         }

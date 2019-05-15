@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.UserMessagesConstants.PARENTACCESSPAGE;
+
 /**
  * Created by prabjot on 3/1/17.
  */
@@ -56,7 +58,7 @@ public class AccessPageService {
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
                 LOGGER.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
-                exceptionService.dataNotFoundByIdException("message.dataNotFound","parentAccessPage",accessPageDTO.getParentTabId());
+                exceptionService.dataNotFoundByIdException("message.dataNotFound",PARENTACCESSPAGE,accessPageDTO.getParentTabId());
 
             }
             List<AccessPage> childTabs = parentTab.getSubPages();

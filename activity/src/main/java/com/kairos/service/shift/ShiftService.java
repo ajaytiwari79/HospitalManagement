@@ -84,6 +84,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.PLEASE_SELECT_VALID_CRITERIA;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
 import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
@@ -153,6 +154,8 @@ public class ShiftService extends MongoBaseService {
     private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
+    @Inject
+    private ShiftDetailsService shiftDetailsService;
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type) {
         Set<Long> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(ShiftActivityDTO::getAbsenceReasonCodeId).collect(Collectors.toSet());
@@ -222,6 +225,7 @@ public class ShiftService extends MongoBaseService {
         if (!breakActivities.isEmpty()) {
             mainShift.setActivities(breakActivities);
         }
+        shiftDetailsService.addPlannedTimeInShift(mainShift,activityWrapperMap.get(activityWrapperMap.keySet().iterator().next()),staffAdditionalInfoDTO);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -431,7 +435,7 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfo;
     }
 
-    private BigInteger addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public BigInteger addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         /**
          * This is used for checking the activity is for presence type
          **/
@@ -450,8 +454,33 @@ public class ShiftService extends MongoBaseService {
             if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
             }
-            plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
-            break;
+            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
+                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
+                break;
+            } else {
+                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
+            }
+        }
+        // checking weather this is allowed to staff or not
+        if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime()).isPresent() && plannedTimeId.equals(staffAdditionalInfoDTO.getEmployment().getExcludedPlannedTime())) {
+            plannedTimeId = staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime();
+        }
+        return plannedTimeId;
+    }
+
+    private BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        BigInteger plannedTimeId = null;
+        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
+            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
+                exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
+            }
+            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
+                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
+                break;
+            } else {
+                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
+            }
         }
         // checking weather this is allowed to staff or not
         if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime()).isPresent() && plannedTimeId.equals(staffAdditionalInfoDTO.getEmployment().getExcludedPlannedTime())) {
@@ -522,6 +551,7 @@ public class ShiftService extends MongoBaseService {
             if (!breakActivities.isEmpty()) {
                 shift.setActivities(breakActivities);
             }
+            shiftDetailsService.addPlannedTimeInShift(shift,activityWrapperMap.get(activityWrapperMap.keySet().iterator().next()),staffAdditionalInfoDTO);
             ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap, staffAdditionalInfoDTO, phase);
             shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, shift, activityWrapperMap, true, false);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
@@ -988,7 +1018,7 @@ public class ShiftService extends MongoBaseService {
                 object = getDetailedAndCompactViewData(staffId, unitId, asDate(startDate));
                 break;
             default:
-                exceptionService.actionNotPermittedException("please.select.valid.criteria");
+                exceptionService.actionNotPermittedException(PLEASE_SELECT_VALID_CRITERIA);
         }
         return object;
     }

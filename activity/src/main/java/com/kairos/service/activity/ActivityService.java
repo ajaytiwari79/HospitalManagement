@@ -33,10 +33,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityPriority;
-import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.activity.*;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
@@ -61,6 +58,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
+import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -88,6 +86,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SELFROSTERING_METADATA_NULL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.activity.ActivityUtil.*;
 
@@ -728,7 +727,7 @@ public class ActivityService extends MongoBaseService {
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
         SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
         if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
-            exceptionService.internalServerError("message.selfRostering.metaData.null");
+            exceptionService.internalServerError(MESSAGE_SELFROSTERING_METADATA_NULL);
         }
         List<DayType> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();
         LocalDate date = LocalDate.now();
@@ -774,7 +773,9 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         LocalDate firstRequestPhasePlanningPeriodEndDate = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId).getEndDate();
-        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(), publicHolidayDayTypeWrapper.getPublicHolidays(),firstRequestPhasePlanningPeriodEndDate);
+        List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
+                publicHolidayDayTypeWrapper.getPublicHolidays(),firstRequestPhasePlanningPeriodEndDate,plannedTimes);
     }
 
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
