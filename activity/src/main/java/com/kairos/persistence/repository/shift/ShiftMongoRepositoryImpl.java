@@ -551,22 +551,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType) {
+    public List<ShiftWithActivityDTO> findOverlappedShiftsByEmploymentId(BigInteger shiftId, Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("employmentId").is(employmentId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
         }
 
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
-                new CustomAggregationOperation(shiftWithActivityProjection()),
-                new CustomAggregationOperation(shiftWithActivityGroup()),
-                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift()),
-                sort(Sort.Direction.ASC, "startDate"));
+        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         /*Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("activities", "activities.activityId", "_id", "activity"),
@@ -575,7 +566,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(where("timeType.timeTypes").is(timeType))
         );*/
 
-        return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
+        return mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class).getMappedResults();
     }
 
 
