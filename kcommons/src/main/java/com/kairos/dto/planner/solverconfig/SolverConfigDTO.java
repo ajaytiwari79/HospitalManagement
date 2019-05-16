@@ -23,17 +23,17 @@ public class SolverConfigDTO {
     @NotBlank(message = "error.name.notnull")
     protected String name;//Unique
     protected String description;
-    @NotNull
+    @NotNull(message = "error.phaseId.not.exists")
     protected Long phaseId;
     protected Long planningPeriodId;
     protected byte threadCount;
     protected short terminationTimeInMinutes;
-    @NotNull
+    @NotNull(message = "error.planningproblem.not.exists")
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
     protected BigInteger parentSolverConfigId;
     private List<ConstraintDTO> constraints;
-    @NotNull
+    @NotNull(message = "error.timetype.not.exists")
     protected TimeTypeEnum typeOfTimeType;
 
     public SolverConfigDTO() {

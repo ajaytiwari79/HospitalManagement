@@ -31,8 +31,6 @@ import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
 import static com.kairos.constants.CommonConstants.*;
 
 
-//import javax.validation.constraints.Email;
-
 
 /**
  * Created by oodles on 11/11/16.
@@ -40,7 +38,7 @@ import static com.kairos.constants.CommonConstants.*;
 
 @Service
 public class MailService {
-    final static Logger logger = LoggerFactory.getLogger(MailService.class);
+    static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
     @Inject
     private JavaMailSender javaMailSender;
@@ -65,7 +63,6 @@ public class MailService {
             request.setEndpoint(MAIL_REQUEST_ENDPOINT);
             request.setBody(mail.build());
             Response response = sendGrid.api(request);
-            logger.info("Email sent to {}", receiver.toString());
             logger.info("Mail response {}", response.getBody());
         } catch (IOException ex) {
             logger.error("exception occured {}", ex);
@@ -84,15 +81,13 @@ public class MailService {
 
             StringBuilder sb = getRecipientsFromArray(recipients);
             String recipientsString = sb.toString();
-            logger.info("List: "+recipientsString);
-            //InternetAddress me = new InternetAddress("info@kairosplanning.com");
+            logger.info("List: {}",recipientsString);
             mail.setFrom("info@kairosplanning.com");
-            //mail.setFrom(me);
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
             mail.setText(message);
             bodyPart.setFileName(source.getName());
-            logger.info("File has dataType: "+source.getContentType());
+            logger.info("File has dataType: {}",source.getContentType());
             bodyPart.setDataHandler(new DataHandler(source));
             multipart.addBodyPart(bodyPart);
             mail.setContent(multipart);
@@ -166,14 +161,15 @@ public class MailService {
 
     //Todo Please don't use this method for sending any Custom exception
     public void sendMailToBackendOnException(Exception ex){
-        if(envConfigCommon.getCurrentProfile().equals(PRODUCTION) || envConfigCommon.getCurrentProfile().equals(QA)){
-            StringBuffer body = new StringBuffer("");
+       //TODO commented below as we using free account for of send grid which limits 100 emails per day
+         if(envConfigCommon.getCurrentProfile().equals(PRODUCTION) || envConfigCommon.getCurrentProfile().equals(QA)){
+            StringBuilder body = new StringBuilder();
             for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
                 if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
                     body.append(stackTraceElement.toString()).append(" ").append(System.getProperty("line.separator")).append(" ");
                 }
             }
-            sendMailWithSendGrid(null,null,body.toString(),"Exception in Activity | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
+            //sendMailWithSendGrid(null,null,body.toString(),"Exception in Activity | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
         }
     }
 

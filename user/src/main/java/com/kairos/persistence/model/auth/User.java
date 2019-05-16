@@ -11,6 +11,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
@@ -22,6 +23,8 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
+import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
@@ -42,8 +45,8 @@ public class User extends UserBaseEntity {
     private String email;
     private Long lastSelectedOrganizationId;
     private LocalDate dateOfBirth;
-    @NotNull(message = "error.User.password.notnull")
-    @Size(min = 8, max = 50, message = "error.User.password.size")
+    @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
+    @Size(min = 8, max = 50, message = ERROR_USER_PASSCODE_SIZE)
     private String password;
 
     protected int age;
@@ -73,15 +76,6 @@ public class User extends UserBaseEntity {
     @Transient
     private Boolean hubMember;
 
-
-    public boolean isUserNameUpdated() {
-        return isUserNameUpdated;
-    }
-
-    public void setUserNameUpdated(boolean userNameUpdated) {
-        isUserNameUpdated = userNameUpdated;
-    }
-
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
@@ -89,9 +83,10 @@ public class User extends UserBaseEntity {
     private SystemLanguage userLanguage;
 
     //define, first time UserName updated or not
-    private boolean isUserNameUpdated;
+    private boolean userNameUpdated;
 
     private Long countryId;
+
 
     public int getOtp() {
         return otp;
@@ -291,7 +286,7 @@ public class User extends UserBaseEntity {
         this.email = email;
         this.cprNumber = cprNumber;
         this.userName = userName;
-        this.isUserNameUpdated = isUserNameUpdated;
+        this.userNameUpdated = isUserNameUpdated;
     }
 
 
@@ -355,7 +350,7 @@ public class User extends UserBaseEntity {
     }
 
     public String getFullName(){
-        return this.firstName+" "+this.lastName;
+        return StringUtils.capitalize(this.firstName)+" "+StringUtils.capitalize(this.lastName);
     }
 
     public Long getCountryId() {
@@ -413,6 +408,14 @@ public class User extends UserBaseEntity {
             age = period.getYears();
             this.age = age;
         return this.age;
+    }
+
+    public boolean isUserNameUpdated() {
+        return userNameUpdated;
+    }
+
+    public void setUserNameUpdated(boolean isUserNameUpdated) {
+        this.userNameUpdated = isUserNameUpdated;
     }
 
     @Override

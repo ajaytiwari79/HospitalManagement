@@ -5,6 +5,8 @@ import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.FilterType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -22,8 +24,8 @@ import static com.kairos.enums.FilterType.TIME_INTERVAL;
  * pradeep
  * 10/4/19
  */
-//@Setter
-//@Getter
+@Setter
+@Getter
 public class FibonacciKPIDTO {
 
     private BigInteger id;

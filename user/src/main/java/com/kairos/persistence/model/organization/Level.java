@@ -8,13 +8,15 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotBlank;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_LEVEL_NAME_NOTEMPTY;
+
 /**
  * Created by prabjot on 21/8/17.
  */
 @NodeEntity
 public class Level extends UserBaseEntity {
 
-    @NotBlank(message = "message.country.level.name.notEmpty")
+    @NotBlank(message = MESSAGE_COUNTRY_LEVEL_NAME_NOTEMPTY)
     private String name;
     private String description;
     private boolean isEnabled = true;

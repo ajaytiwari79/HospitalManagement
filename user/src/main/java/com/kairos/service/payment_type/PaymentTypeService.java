@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
+
 /**
  * Created by prabjot on 9/1/17.
  */
@@ -30,7 +32,7 @@ public class PaymentTypeService {
         Country country = countryGraphRepository.findOne(countryId);
         PaymentType paymentType = null;
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         } else {
             Boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), -1L);
             if (paymentTypeExistInCountryByName) {

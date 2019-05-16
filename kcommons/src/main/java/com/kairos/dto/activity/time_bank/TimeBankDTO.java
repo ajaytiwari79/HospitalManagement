@@ -2,6 +2,8 @@ package com.kairos.dto.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +17,8 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class TimeBankDTO {
 
     private Long employmentId;
@@ -52,6 +56,7 @@ public class TimeBankDTO {
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
     private float hourlyCost;
     private long totalPlannedMinutes;
+    private long actualTimebankMinutes;
 
     public TimeBankDTO(Long employmentId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
@@ -101,234 +106,5 @@ public class TimeBankDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public long getPaidoutChange() {
-        return paidoutChange;
-    }
 
-    public void setPaidoutChange(long paidoutChange) {
-        this.paidoutChange = paidoutChange;
-    }
-
-    public long getApprovePayOut() {
-        return approvePayOut;
-    }
-
-    public void setApprovePayOut(long approvePayOut) {
-        this.approvePayOut = approvePayOut;
-    }
-
-    public long getRequestPayOut() {
-        return requestPayOut;
-    }
-
-    public void setRequestPayOut(long requestPayOut) {
-        this.requestPayOut = requestPayOut;
-    }
-
-    public ScheduleTimeByTimeTypeDTO getWorkingTimeType() {
-        return workingTimeType;
-    }
-
-    public void setWorkingTimeType(ScheduleTimeByTimeTypeDTO workingTimeType) {
-        this.workingTimeType = workingTimeType;
-    }
-
-    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType() {
-        return nonWorkingTimeType;
-    }
-
-    public void setNonWorkingTimeType(ScheduleTimeByTimeTypeDTO nonWorkingTimeType) {
-        this.nonWorkingTimeType = nonWorkingTimeType;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    public long getTotalTimeBankAfterCtaMin() {
-        return totalTimeBankAfterCtaMin;
-    }
-
-    public void setTotalTimeBankAfterCtaMin(long totalTimeBankAfterCtaMin) {
-        this.totalTimeBankAfterCtaMin = totalTimeBankAfterCtaMin;
-    }
-
-    public long getTotalTimeBankBeforeCtaMin() {
-        return totalTimeBankBeforeCtaMin;
-    }
-
-    public void setTotalTimeBankBeforeCtaMin(long totalTimeBankBeforeCtaMin) {
-        this.totalTimeBankBeforeCtaMin = totalTimeBankBeforeCtaMin;
-    }
-
-    public long getTotalScheduledMin() {
-        return totalScheduledMin;
-    }
-
-    public void setTotalScheduledMin(long totalScheduledMin) {
-        this.totalScheduledMin = totalScheduledMin;
-    }
-
-    public long getTotalTimeBankMin() {
-        return totalTimeBankMin;
-    }
-
-    public void setTotalTimeBankMin(long totalTimeBankMin) {
-        this.totalTimeBankMin = totalTimeBankMin;
-    }
-
-    public long getTotalContractedMin() {
-        return totalContractedMin;
-    }
-
-    public void setTotalContractedMin(long totalContractedMin) {
-        this.totalContractedMin = totalContractedMin;
-    }
-
-    public long getTotalTimeBankMinLimit() {
-        return totalTimeBankMinLimit;
-    }
-
-    public void setTotalTimeBankMinLimit(long totalTimeBankMinLimit) {
-        this.totalTimeBankMinLimit = totalTimeBankMinLimit;
-    }
-
-    public long getTotalTimeBankMaxLimit() {
-        return totalTimeBankMaxLimit;
-    }
-
-    public void setTotalTimeBankMaxLimit(long totalTimeBankMaxLimit) {
-        this.totalTimeBankMaxLimit = totalTimeBankMaxLimit;
-    }
-
-    public long getTotalTimeBankInPercent() {
-        return totalTimeBankInPercent;
-    }
-
-    public void setTotalTimeBankInPercent(long totalTimeBankInPercent) {
-        this.totalTimeBankInPercent = totalTimeBankInPercent;
-    }
-
-    public long getTotalTimeBankDiff() {
-        return totalTimeBankDiff;
-    }
-
-    public void setTotalTimeBankDiff(long totalTimeBankDiff) {
-        this.totalTimeBankDiff = totalTimeBankDiff;
-    }
-
-    public TimeBankCTADistributionDTO getTimeBankDistribution() {
-        return timeBankDistribution;
-    }
-
-    public void setTimeBankDistribution(TimeBankCTADistributionDTO timeBankDistribution) {
-        this.timeBankDistribution = timeBankDistribution;
-    }
-
-    public EmploymentWithCtaDetailsDTO getCostTimeAgreement() {
-        return costTimeAgreement;
-    }
-
-    public void setCostTimeAgreement(EmploymentWithCtaDetailsDTO costTimeAgreement) {
-        this.costTimeAgreement = costTimeAgreement;
-    }
-
-    public List<TimeBankIntervalDTO> getWeeklyIntervalsTimeBank() {
-        return weeklyIntervalsTimeBank;
-    }
-
-    public void setWeeklyIntervalsTimeBank(List<TimeBankIntervalDTO> weeklyIntervalsTimeBank) {
-        this.weeklyIntervalsTimeBank = weeklyIntervalsTimeBank;
-    }
-
-    public List<TimeBankIntervalDTO> getMonthlyIntervalsTimeBank() {
-        return monthlyIntervalsTimeBank;
-    }
-
-    public void setMonthlyIntervalsTimeBank(List<TimeBankIntervalDTO> monthlyIntervalsTimeBank) {
-        this.monthlyIntervalsTimeBank = monthlyIntervalsTimeBank;
-    }
-
-    public void setTotalContractedMin(int totalContractedMin) {
-        this.totalContractedMin = totalContractedMin;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public List<TimeBankIntervalDTO> getTimeIntervals() {
-        return timeIntervals;
-    }
-
-    public void setTimeIntervals(List<TimeBankIntervalDTO> timeIntervals) {
-        this.timeIntervals = timeIntervals;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-
-    public int getTotalWeeklyMin() {
-        return totalWeeklyMin;
-    }
-
-    public void setTotalWeeklyMin(int totalWeeklyMin) {
-        this.totalWeeklyMin = totalWeeklyMin;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-
-    public long getTotalPlannedMinutes() {
-        return totalPlannedMinutes;
-    }
-
-    public void setTotalPlannedMinutes(long totalPlannedMinutes) {
-        this.totalPlannedMinutes = totalPlannedMinutes;
-    }
 }

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_EXCEPTION_TASKMICROSERVICE;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Component
@@ -57,7 +58,7 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
     }
@@ -93,7 +94,7 @@ public class TaskServiceRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
         return null;
@@ -120,7 +121,7 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
         return null;
@@ -157,7 +158,7 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
         return false;
@@ -206,7 +207,7 @@ public class TaskServiceRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
         return null;
@@ -231,7 +232,7 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
     }

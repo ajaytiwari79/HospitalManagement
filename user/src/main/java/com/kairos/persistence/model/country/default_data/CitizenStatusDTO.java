@@ -4,11 +4,13 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_CITIZENSTATUS_NAME_NOTEMPTY;
+
 @QueryResult
 public class CitizenStatusDTO {
 
     private Long id;
-    @NotBlank(message = "error.CitizenStatus.name.notEmpty")
+    @NotBlank(message = ERROR_CITIZENSTATUS_NAME_NOTEMPTY)
     String name;
     String description;
 

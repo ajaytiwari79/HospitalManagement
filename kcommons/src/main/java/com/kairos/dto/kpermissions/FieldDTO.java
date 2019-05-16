@@ -1,17 +1,15 @@
 package com.kairos.dto.kpermissions;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class FieldDTO {
 
+    private Long id;
     private String fieldName;
 
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    public FieldDTO() {
-    }
 }

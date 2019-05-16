@@ -162,7 +162,7 @@ public class StaffCreationServiceTest {
 
 
         //staff.setFirstName(staffDTO.getFirstName());
-        //doNothing().when(staffCreationService).createEmployment(null,null,null,null,null,false);
+        //doNothing().when(staffCreationService).createPosition(null,null,null,null,null,false);
         when(accessGroupRepository.findOne(accessGroup.getId())).thenReturn(accessGroup);
         //when(staffCreationService.createStaff(1L,staffCreationDTO)).thenReturn(staffDTO);
 

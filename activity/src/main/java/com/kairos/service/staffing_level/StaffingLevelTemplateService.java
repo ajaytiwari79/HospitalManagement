@@ -28,6 +28,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 @Transactional
 public class StaffingLevelTemplateService extends MongoBaseService {
@@ -49,7 +51,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         LOGGER.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
         boolean alreadyExists=staffingLevelTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(staffingLevelTemplateDTO.getName(),unitId);
         if(alreadyExists){
-            exceptionService.duplicateDataException("error.name.duplicate",staffingLevelTemplateDTO.getName());
+            exceptionService.duplicateDataException(ERROR_NAME_DUPLICATE,staffingLevelTemplateDTO.getName());
         }
         //validating Activities
         List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
@@ -93,7 +95,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplate.getPresenceStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
             } else {
-            exceptionService.dataNotFoundByIdException("message.staffleveltemplate", staffingTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFFLEVELTEMPLATE, staffingTemplateId);
         }
         return staffingLevelTemplateDTO;
 
@@ -147,24 +149,24 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(!Optional.ofNullable(staffingLevelTemplateDTO.getValidity().getEndDate()).isPresent()) {
                     if (!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                             activity.getGeneralActivityTab().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate())) {
-                        errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range", activity.getName()));
+                        errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE, activity.getName()));
                     }
                 }else {
                     if(Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                             (activity.getGeneralActivityTab().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate()) ||
                                     activity.getGeneralActivityTab().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate()))){
-                        errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
+                        errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE,activity.getName()));
                     } else if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                             activity.getGeneralActivityTab().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate())){
-                        errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
+                        errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE,activity.getName()));
                     }
                 }
 
                 if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
+                    errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_NOT_ELIGIBLE_FOR_STAFFING_LEVEL,activity.getName()));
                 }
                 if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getRulesActivityTab().getDayTypes())){
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
+                    errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_NOT_ELIGIBLE_DAYTYPE,activity.getName()));
                 }
 
                 if(!errors.isEmpty()){
@@ -178,7 +180,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     public boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId){
        boolean result= staffingLevelTemplateRepository.deleteStaffingLevelTemplate(staffingLevelTemplateId);
        if(!result){
-           exceptionService.dataNotFoundException("message.dataNotFound","StaffingLevelTemplate",staffingLevelTemplateId);
+           exceptionService.dataNotFoundException(MESSAGE_DATANOTFOUND,"StaffingLevelTemplate",staffingLevelTemplateId);
        }
         return true;
     }

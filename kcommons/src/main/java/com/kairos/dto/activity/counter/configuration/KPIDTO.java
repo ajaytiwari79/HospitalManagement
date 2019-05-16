@@ -5,8 +5,10 @@ import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
-import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.Interval;
+import com.kairos.enums.kpi.KPIRepresentation;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -26,6 +28,12 @@ public class KPIDTO {
     private List<FilterCriteria> selectedFilters;
     private ConfLevel applicableFor;
     private boolean fibonacciKPI;
+    private KPIRepresentation kpiRepresentation;
+    private DurationType frequencyType;
+    // frequency value
+    private int value;
+    private Interval interval;
+
     private String description;
     private Long referenceId;
     private BigInteger categoryId;
@@ -129,6 +137,39 @@ public class KPIDTO {
 
     public void setFibonacciKPI(boolean fibonacciKPI) {
         this.fibonacciKPI = fibonacciKPI;
+    }
+
+    public DurationType getFrequencyType() {
+        return frequencyType;
+    }
+
+    public void setFrequencyType(DurationType frequencyType) {
+        this.frequencyType = frequencyType;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Interval interval) {
+        this.interval = interval;
+    }
+
+    public KPIRepresentation getKpiRepresentation() {
+
+        return kpiRepresentation;
+    }
+
+    public void setKpiRepresentation(KPIRepresentation kpiRepresentation) {
+        this.kpiRepresentation = kpiRepresentation;
     }
 
     public String getDescription() {

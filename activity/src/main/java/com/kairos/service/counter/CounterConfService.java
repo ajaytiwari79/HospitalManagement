@@ -17,6 +17,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE;
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_KPI_INVALIDDATA;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /*
@@ -65,7 +67,7 @@ public class CounterConfService extends MongoBaseService {
                 duplicateEntries.add(category);
             }
         });
-        if(duplicateEntries.size()>0) exceptionService.duplicateDataException("error.dashboard.name.duplicate");
+        if(duplicateEntries.size()>0) exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
     }
 
     private List<String> getTrimmedNames(List<KPICategoryDTO> categories){
@@ -100,7 +102,7 @@ public class CounterConfService extends MongoBaseService {
         List<BigInteger> categoryIds = categories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         List<KPICategoryDTO> categoryDTOs = counterRepository.getKPICategory(categoryIds, level, refId);
         if(categories.size() != categoryDTOs.size()){
-            exceptionService.invalidOperationException("error.kpi.invalidData");
+            exceptionService.invalidOperationException(ERROR_KPI_INVALIDDATA);
         }
         return categoryDTOs;
     }

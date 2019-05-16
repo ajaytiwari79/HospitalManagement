@@ -27,6 +27,7 @@ public class RulesActivityTabDTO {
     private boolean eligibleForStaffingLevel;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private List<BigInteger> approvalAllowedPhaseIds;
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
@@ -274,5 +275,13 @@ public class RulesActivityTabDTO {
 
     public void setCutOffBalances(CutOffIntervalUnit.CutOffBalances cutOffBalances) {
         this.cutOffBalances = cutOffBalances;
+    }
+
+    public List<BigInteger> getApprovalAllowedPhaseIds() {
+        return approvalAllowedPhaseIds;
+    }
+
+    public void setApprovalAllowedPhaseIds(List<BigInteger> approvalAllowedPhaseIds) {
+        this.approvalAllowedPhaseIds = approvalAllowedPhaseIds;
     }
 }

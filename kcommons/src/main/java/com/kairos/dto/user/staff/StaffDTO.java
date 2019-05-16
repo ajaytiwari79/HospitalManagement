@@ -53,6 +53,16 @@ public class StaffDTO {
     private Set<Long> expertiseIds;
     private Long employmentTypeId;
 
+    public StaffDTO() {
+    }
+
+    public StaffDTO(Long id, String firstName, String lastName, String profilePic) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.profilePic = profilePic;
+    }
+
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
     }

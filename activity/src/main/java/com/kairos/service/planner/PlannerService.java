@@ -83,6 +83,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MERGED_TASK_NAME;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
@@ -391,7 +392,7 @@ public class PlannerService extends MongoBaseService {
                     }
                 } else {
                     LOGGER.info("intervalWeeks " + intervalWeeks);
-                    exceptionService.internalError("error.task.demand.date.startandend");
+                    exceptionService.internalError(ERROR_TASK_DEMAND_DATE_STARTANDEND);
                 }
                 randomDates = randomDateGeneratorService.getRandomDates(numOfWeeks, visitCount, createTaskFrom, isWeekend, taskDemandEndDate, publicHolidayList, skipTaskOnPublicHoliday);
             }
@@ -772,7 +773,7 @@ public class PlannerService extends MongoBaseService {
                 clientExceptionService.updateTaskException(citizenId, task);
 
                 if (!validateDaySpecification(taskType, task)) {
-                    exceptionService.internalError("error.task.day.create");
+                    exceptionService.internalError(ERROR_TASK_DAY_CREATE);
                 }
 
                 taskService.save(task);
@@ -836,7 +837,7 @@ public class PlannerService extends MongoBaseService {
             Task proxyTask = new Task();
             proxyTask.setDateFrom(updatedDate);
             if (taskType != null && !validateDaySpecification(taskType, proxyTask)) {
-                exceptionService.internalError("error.task.day.move");
+                exceptionService.internalError(ERROR_TASK_DAY_MOVE);
             }
             Date currentDate = DateUtils.getDate(task.getDateFrom().getTime());
             currentDate.setHours(0);
@@ -882,13 +883,13 @@ public class PlannerService extends MongoBaseService {
         Task proxyTask = new Task();
         proxyTask.setDateFrom(updatedDate);
         if (taskType != null && !validateDaySpecification(taskType, proxyTask)) {
-            exceptionService.internalError("error.task.day.move");
+            exceptionService.internalError(ERROR_TASK_DAY_MOVE);
         }
         if (task.isSingleTask()) {
             return actualPlanningTaskUpdate(unitId, Arrays.asList(taskData));
         }
         if (!task.isSingleTask() && task.getActualPlanningTask() != null) {
-            exceptionService.dataNotModifiedException("message.task.update");
+            exceptionService.dataNotModifiedException(MESSAGE_TASK_UPDATE);
         }
         Date currentDate = DateUtils.getDate(task.getDateFrom().getTime());
         currentDate.setHours(0);
@@ -899,7 +900,7 @@ public class PlannerService extends MongoBaseService {
             daysDifference = TimeUnit.DAYS.convert(updatedDate.getTime() - currentDate.getTime(), TimeUnit.MILLISECONDS);
         }
         if (taskData.getMainTask() != null && taskData.getMainTask() == true && taskData.getUpdateAllByDemand() != null && taskData.getUpdateAllByDemand() == true) {
-            exceptionService.dataNotFoundByIdException("error.task.main.update", task.getName());
+            exceptionService.dataNotFoundByIdException(ERROR_TASK_MAIN_UPDATE, task.getName());
 
         } else {
             if (taskData.getUpdateAllByDemand() != null && taskData.getUpdateAllByDemand() == true) {
@@ -1761,7 +1762,7 @@ public class PlannerService extends MongoBaseService {
         long startTime = System.currentTimeMillis();
         OrganizationDTO unit = userIntegrationService.getOrganization();
         if (unit == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID);
         }
 
         if (unit.isOneTimeSyncPerformed()) {
@@ -1858,7 +1859,7 @@ public class PlannerService extends MongoBaseService {
         LOGGER.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
         if (reduction) {
             if (task.getDuration() - minutes <= 0) {
-                exceptionService.internalError("error.task.duration");
+                exceptionService.internalError(ERROR_TASK_DURATION);
                 //throw new InternalError("Task duration cannot be less then 1");
             }
             timeTo = timeTo.minusMinutes(minutes);

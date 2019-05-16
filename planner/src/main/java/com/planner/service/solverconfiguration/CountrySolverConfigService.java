@@ -79,7 +79,7 @@ public class CountrySolverConfigService {
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
         if (!applicableUnitIdForSolverConfig.isEmpty()) {
             for (Long unitId : applicableUnitIdForSolverConfig) {
-                UnitSolverConfig unitSolverConfig = new UnitSolverConfig();
+                UnitSolverConfig unitSolverConfig;
                 unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
                 unitSolverConfig.setId(null);//Unset Id
                 unitSolverConfig.setUnitId(unitId);
@@ -150,7 +150,9 @@ public class CountrySolverConfigService {
                     countryConstraints.add(new CountryConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
                 }
             }
-            constraintsRepository.saveList(countryConstraints);
+            if(isCollectionNotEmpty(countryConstraints)) {
+                constraintsRepository.saveList(countryConstraints);
+            }
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             List<BigInteger> countraintids = countryConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
             countrySolverConfig.setConstraintIds(countraintids);
@@ -245,13 +247,17 @@ public class CountrySolverConfigService {
         if ("countryNotExists".equals(result)) {
 
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countrySolverConfigDTO.getCountryId());
-        } else if (solverConfigRepository.isNameExistsById(countrySolverConfigDTO.getName(), countrySolverConfigDTO.getId(), true, countrySolverConfigDTO.getCountryId())) {
-            exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
+        } else if () {
+
         } else if ("relationShipNotValid".equals(result)) {
 
             exceptionService.relationShipNotValidException("message.relationship.notValid");
         }
 */
+        if(solverConfigRepository.isNameExistsById(countrySolverConfigDTO.getName(), countrySolverConfigDTO.getId(), true, countrySolverConfigDTO.getCountryId())){
+            exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
+            return false;
+        }
         return true;
     }
 

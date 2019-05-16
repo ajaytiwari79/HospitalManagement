@@ -227,5 +227,9 @@ public class AppConstants {
     public static final String PHASE_IS_NOT_VALID = "phase is not valid";
     public static final String EMPLOYMENT_IS_NOT_VALID = "Employment is not valid";
     public static final String BLANK_STRING="";
+    public static final String DELETED="deleted";
+
+    //activity status mail
+    public static final String MAIL_SUBJECT ="Activiy Status";
 
 }

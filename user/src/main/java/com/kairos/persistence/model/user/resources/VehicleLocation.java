@@ -5,13 +5,15 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotNull;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
+
 /**
  * Created by oodles on 13/12/17.
  */
 @NodeEntity
 public class VehicleLocation  extends UserBaseEntity {
 
-    @NotNull(message = "error.name.notnull")
+    @NotNull(message = ERROR_NAME_NOTNULL)
     private String name;
     private String description;
     private boolean enabled = true;
@@ -19,7 +21,7 @@ public class VehicleLocation  extends UserBaseEntity {
     public VehicleLocation() {
     }
 
-    public VehicleLocation(@NotNull(message = "error.name.notnull") String name, String description) {
+    public VehicleLocation(@NotNull(message = ERROR_NAME_NOTNULL) String name, String description) {
         this.name = name;
         this.description = description;
     }

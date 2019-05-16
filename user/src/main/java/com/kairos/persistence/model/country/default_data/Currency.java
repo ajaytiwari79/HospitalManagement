@@ -8,6 +8,8 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotBlank;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_CURRENCY_CURRENCYCODE_NOTEMPTY;
+import static com.kairos.constants.UserMessagesConstants.ERROR_CURRENCY_NAME_NOTEMPTY;
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 /**
@@ -16,18 +18,18 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class Currency extends UserBaseEntity {
 
-    @NotBlank(message = "error.currency.name.notEmpty")
+    @NotBlank(message = ERROR_CURRENCY_NAME_NOTEMPTY)
     private String name;
     private String description;
     @Relationship(type=BELONGS_TO)
     private Country country;
-    @NotBlank(message = "error.currency.currencyCode.notEmpty")
+    @NotBlank(message = ERROR_CURRENCY_CURRENCYCODE_NOTEMPTY)
     private String currencyCode;
 
     public Currency() {
     }
 
-    public Currency(@NotBlank(message = "error.currency.name.notEmpty") String name, String description, @NotBlank(message = "error.currency.currencyCode.notEmpty") String currencyCode) {
+    public Currency(@NotBlank(message = ERROR_CURRENCY_NAME_NOTEMPTY) String name, String description, @NotBlank(message = ERROR_CURRENCY_CURRENCYCODE_NOTEMPTY) String currencyCode) {
         this.name = name;
         this.description = description;
         this.currencyCode = currencyCode;

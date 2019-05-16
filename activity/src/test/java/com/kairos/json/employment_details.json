@@ -1,0 +1,978 @@
+{
+  "expertise" : {
+    "id" : 795,
+    "name" : "Social-og sundhedspersonale",
+    "breakPaymentSetting" : "PAID"
+  },
+  "staff" : null,
+  "employmentType" : {
+    "name" : "Parttime employment",
+    "allowedForContactPerson" : false,
+    "allowedForShiftPlan" : false,
+    "allowedForFlexPool" : false,
+    "id" : 20604
+  },
+  "workingTimeAgreement" : null,
+  "workingDaysInWeek" : 5,
+  "endDate" : null,
+  "lastModificationDate" : null,
+  "totalWeeklyHours" : 32,
+  "fullTimeWeeklyMinutes" : 2220,
+  "avgDailyWorkingHours" : 0.0,
+  "id" : 18373,
+  "staffId" : 413,
+  "userId" : null,
+  "salary" : null,
+  "totalWeeklyMinutes" : 1920,
+  "ctaRuleTemplates" : [ {
+    "id" : 3061,
+    "name" : "Scheduled Hours for Time Bank",
+    "description" : "Scheduled hours will be moved to Time bank account",
+    "disabled" : false,
+    "ruleTemplateType" : "Scheduled Hours for Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 5,
+      "compensationTableInterval" : [ ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ "STAFF", "PLANNER", "MANAGER" ],
+    "employmentTypes" : [ 20604, 14046, 14044, 20605, 14045 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "SCHEDULED_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 6 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3062,
+    "name" : "Sunday Compensation to Time Bank",
+    "description" : "Bonus for Sunday Compensation",
+    "disabled" : false,
+    "ruleTemplateType" : "Sunday Compensation to Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 0, 0 ],
+        "to" : [ 0, 0 ],
+        "value" : 50.0,
+        "compensationMeasurementType" : "PERCENT"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ "STAFF", "PLANNER", "MANAGER" ],
+    "employmentTypes" : [ 20604, 14046, 14044, 20605, 14045 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3 ],
+    "dayTypeIds" : [ 13991 ],
+    "days" : [ "SUNDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3063,
+    "name" : "Night To Time bank",
+    "description" : "Bonus for Night hours",
+    "disabled" : false,
+    "ruleTemplateType" : "Night To Time bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 23, 0 ],
+        "to" : [ 7, 0 ],
+        "value" : 33.0,
+        "compensationMeasurementType" : "PERCENT"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ "MANAGER", "PLANNER", "STAFF" ],
+    "employmentTypes" : [ 20604, 14046, 14044, 20605, 14045 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3064,
+    "name" : "Extra Time to Time Bank",
+    "description" : "Bonus for Night hours",
+    "disabled" : false,
+    "ruleTemplateType" : "Extra Time to Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 0, 0 ],
+        "to" : [ 0, 0 ],
+        "value" : 1.0,
+        "compensationMeasurementType" : "MINUTES"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ "MANAGER", "PLANNER", "STAFF" ],
+    "employmentTypes" : [ 14046, 20604, 14044, 20605, 14045 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 4, 5, 6 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3065,
+    "name" : "Public Holiday for Time Bank",
+    "description" : "Bonus for evening hours added to Time bank account.",
+    "disabled" : false,
+    "ruleTemplateType" : "Public Holiday for Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 0, 0 ],
+        "to" : [ 0, 0 ],
+        "value" : 50.0,
+        "compensationMeasurementType" : "PERCENT"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ ],
+    "employmentTypes" : [ 20604, 14046 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 4, 5, 6 ],
+    "dayTypeIds" : [ 20481 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3066,
+    "name" : "Evening To Time Bank",
+    "description" : "Bonus for evening hours added to Time bank account.",
+    "disabled" : false,
+    "ruleTemplateType" : "Evening To Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 17, 0 ],
+        "to" : [ 23, 0 ],
+        "value" : 25.0,
+        "compensationMeasurementType" : "PERCENT"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ "STAFF", "PLANNER", "MANAGER" ],
+    "employmentTypes" : [ 14046, 20604 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 4, 5, 6 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3067,
+    "name" : "Overtime to Time Bank",
+    "description" : "Bonus for overtime hours",
+    "disabled" : false,
+    "ruleTemplateType" : "Overtime to Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 0, 0 ],
+        "to" : [ 0, 0 ],
+        "value" : 50.0,
+        "compensationMeasurementType" : "PERCENT"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ ],
+    "employmentTypes" : [ 14046, 20604 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3068,
+    "name" : "Saturday Compensation to Time Bank",
+    "description" : "Bonus for Saturday Compensation",
+    "disabled" : false,
+    "ruleTemplateType" : "Saturday Compensation to Time Bank",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 8, 0 ],
+        "to" : [ 0, 0 ],
+        "value" : 40.0,
+        "compensationMeasurementType" : "PERCENT"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ ],
+    "employmentTypes" : [ 20604, 14046 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 3, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 4, 5, 6 ],
+    "dayTypeIds" : [ 20486 ],
+    "days" : [ "SATURDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3069,
+    "name" : "Scheduled Hours for Paid Out Account",
+    "description" : "Scheduled hours will be moved to Paid out account",
+    "disabled" : false,
+    "ruleTemplateType" : "Scheduled Hours for Paid Out Account",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 5,
+      "compensationTableInterval" : [ ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ ],
+    "employmentTypes" : [ 14046, 20604 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "PAID_OUT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "SCHEDULED_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 4, 5, 6 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3070,
+    "name" : "Night To Paid Out",
+    "description" : "Bonus for Night hours",
+    "disabled" : false,
+    "ruleTemplateType" : "Night To Paid Out",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 1,
+      "compensationTableInterval" : [ {
+        "from" : [ 23, 0 ],
+        "to" : [ 7, 0 ],
+        "value" : 33.0,
+        "compensationMeasurementType" : "MINUTES"
+      } ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ ],
+    "employmentTypes" : [ 14045, 14044, 20605, 20604, 14046 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "PAID_OUT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "BONUS_HOURS",
+    "activityTypeForCostCalculation" : "TIME_TYPE_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 29, 30, 32, 34, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 48, 49, 50, 52, 53, 55, 56, 57, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+    "plannedTimeIds" : [ 1, 2, 3, 4, 5, 6 ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  }, {
+    "id" : 3071,
+    "name" : "Functional Bonus",
+    "description" : null,
+    "disabled" : false,
+    "ruleTemplateType" : "Functional Bonus",
+    "payrollType" : null,
+    "payrollSystem" : null,
+    "calculationUnit" : null,
+    "compensationTable" : {
+      "granularityLevel" : 5,
+      "compensationTableInterval" : [ ]
+    },
+    "calculateValueAgainst" : {
+      "calculateValue" : "HOURLY_WAGE_IN_UNIT_EMPLOYMENT",
+      "scale" : 0.0,
+      "fixedValue" : {
+        "amount" : 0.0,
+        "currency" : null,
+        "currencyId" : null,
+        "type" : "PER_DAY"
+      }
+    },
+    "approvalWorkFlow" : "NO_APPROVAL_NEEDED",
+    "phaseInfo" : [ {
+      "phaseId" : 105,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 106,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 107,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 108,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 109,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 110,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 111,
+      "type" : null,
+      "beforeStart" : 0
+    }, {
+      "phaseId" : 112,
+      "type" : null,
+      "beforeStart" : 0
+    } ],
+    "budgetType" : "ACTIVITY_COST",
+    "calculateValueIfPlanned" : [ ],
+    "employmentTypes" : [ 20604, 14046 ],
+    "planningCategory" : "DEVIATION_FROM_PLANNED",
+    "staffFunctions" : [ 834, 13746, 832, 835, 836, 13745, 833, 13744 ],
+    "plannedTimeWithFactor" : {
+      "scale" : 1.0,
+      "add" : true,
+      "subtract" : false,
+      "accountType" : "TIMEBANK_ACCOUNT"
+    },
+    "calculateScheduledHours" : false,
+    "calculationFor" : "FUNCTIONS",
+    "activityTypeForCostCalculation" : "COST_CALCULATION_ACTIVITY",
+    "activityIds" : [ ],
+    "timeTypeIds" : [ ],
+    "plannedTimeIds" : [ ],
+    "dayTypeIds" : [ 13988, 20484, 13989, 20487, 13990, 20486, 13991, 20481, 13984 ],
+    "days" : [ "TUESDAY", "THURSDAY", "SUNDAY", "FRIDAY", "SATURDAY", "WEDNESDAY", "MONDAY" ],
+    "publicHolidays" : [ ],
+    "ruleTemplateCategoryId" : 4,
+    "ruleTemplateCategoryName" : null,
+    "lastModifiedBy" : null
+  } ],
+  "unitTimeZone" : "UTC",
+  "countryId" : 18712,
+  "appliedFunctions" : [ ],
+  "excludedPlannedTime" : null,
+  "includedPlannedTime" : null,
+  "unitId" : null,
+  "hourlyCost" : 99.72,
+  "functionId" : null,
+  "employmentLines" : [ {
+    "id" : 18374,
+    "employmentId" : null,
+    "startDate" : "2019-02-25",
+    "endDate" : null,
+    "workingDaysInWeek" : 5,
+    "totalWeeklyHours" : 32,
+    "avgDailyWorkingHours" : 0.0,
+    "fullTimeWeeklyMinutes" : 2220,
+    "totalWeeklyMinutes" : 1920,
+    "accumulatedTimebankMinutes" : 0,
+    "hourlyCost" : 99.72,
+    "endDateForAccumulatedTimebank" : "2019-04-30",
+    "interval" : null
+  } ],
+  "history" : null,
+  "editable" : true,
+  "published" : true,
+  "accumulatedTimebankMinutes" : 0,
+  "accumulatedTimebankDate" : null,
+  "costTimeAgreement" : null,
+  "startDate" : "2019-02-25"
+}

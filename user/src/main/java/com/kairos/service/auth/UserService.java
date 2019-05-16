@@ -33,6 +33,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
@@ -40,18 +41,26 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
+import org.springframework.security.oauth2.provider.authentication.TokenExtractor;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
-import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
-import static com.kairos.constants.CommonConstants.RESET_PASSWORD;
+import static com.kairos.constants.CommonConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
+
 
 
 /**
@@ -91,6 +100,11 @@ public class UserService {
     private EnvConfig config;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private RedisService redisService;
+    private TokenExtractor tokenExtractor = new BearerTokenExtractor();
+    @Inject
+    private TokenStore tokenStore;
 
     /**
      * Calls UserGraphRepository,
@@ -170,19 +184,18 @@ public class UserService {
      *
      * @param user
      * @return User
-     *
      */
     public Map<String, Object> authenticateUser(User user) {
-          User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
+        User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
         if (!Optional.ofNullable(currentUser).isPresent()) {
-                return null;
+            return null;
         }
         int otp = OtpGenerator.generateOtp();
         currentUser.setOtp(otp);
         userGraphRepository.save(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
-        map.put("isUserNameUpdated",currentUser.isUserNameUpdated());
+        map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
         return map;
 
@@ -215,6 +228,26 @@ public class UserService {
         user.setAccessToken(null);
         userGraphRepository.save(user);
         return true;
+    }
+
+    public boolean logout(boolean logoutFromAllMachine, HttpServletRequest request) {
+        boolean logoutSuccessfull = false;
+        Authentication authentication = tokenExtractor.extract(request);
+        if (authentication != null) {
+            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication((String) authentication.getPrincipal());
+            if (logoutFromAllMachine) {
+                redisService.invalidateAllTokenOfUser(oAuth2Authentication.getUserAuthentication().getName());
+            } else {
+                redisService.removeUserTokenFromRedisByUserNameAndToken(oAuth2Authentication.getUserAuthentication().getName(),(String) authentication.getPrincipal());
+            }
+            tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
+            SecurityContextHolder.clearContext();
+            logoutSuccessfull = true;
+        } else {
+            exceptionService.internalServerError("message.authentication.null");
+        }
+        return logoutSuccessfull;
+
     }
 
     public List<OrganizationWrapper> getOrganizations(long userId) {
@@ -256,7 +289,7 @@ public class UserService {
             smsService.sendSms(user.getContactDetail().getMobilePhone(), message);
             return true;
         } else {
-            exceptionService.dataNotFoundByIdException("message.user.mobileNumber.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_MOBILENUMBER_NOTFOUND);
         }
         return false;
     }
@@ -297,7 +330,7 @@ public class UserService {
         currentUser = generateTokenToUser(currentUser);
         Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
         if (org == null) {
-            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
         Map<String, Object> map = new HashMap<>();
@@ -328,7 +361,7 @@ public class UserService {
             currentUser = generateTokenToUser(currentUser);
             Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
             if (org == null) {
-                exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
             }
             Map<String, Object> map = new HashMap<>();
@@ -347,10 +380,10 @@ public class UserService {
     }
 
     public boolean updatePassword(FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
-        User user = userGraphRepository.findByEmail("(?i)"+firstTimePasswordUpdateDTO.getEmail());
+        User user = userGraphRepository.findByEmail("(?i)" + firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             LOGGER.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", firstTimePasswordUpdateDTO.getEmail());
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, firstTimePasswordUpdateDTO.getEmail());
 
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
@@ -410,20 +443,20 @@ public class UserService {
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
             Long countryId = UserContext.getUserDetails().getCountryId();
-            List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
-            Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
-            boolean checkDayType=true;
-            List<AccessGroup> accessGroups=accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
-            for (AccessGroup currentAccessGroup:accessGroups){
-                if(!currentAccessGroup.isAllowedDayTypes()){
-                    checkDayType=false;
+            List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
+            Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+            boolean checkDayType = true;
+            List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
+            for (AccessGroup currentAccessGroup : accessGroups) {
+                if (!currentAccessGroup.isAllowedDayTypes()) {
+                    checkDayType = false;
                     break;
                 }
             }
-            if(checkDayType){
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds,organizationId);
+            if (checkDayType) {
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
             } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId,organizationId);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
@@ -443,7 +476,7 @@ public class UserService {
 
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if(currentUser.getLastSelectedOrganizationId()!=organizationId){
+        if (currentUser.getLastSelectedOrganizationId() != organizationId) {
             currentUser.setLastSelectedOrganizationId(organizationId);
             Organization parent = organizationService.fetchParentOrganization(organizationId);
             Long countryId = organizationGraphRepository.getCountryId(parent.getId());
@@ -478,7 +511,7 @@ public class UserService {
     public boolean forgotPassword(String userEmail) {
         if (userEmail.endsWith("kairos.com") || userEmail.endsWith("kairosplanning.com")) {
             LOGGER.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
-            exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_MAIL_INVALID, userEmail);
         }
         User currentUser = userGraphRepository.findByEmail("(?i)" + userEmail);
         if (!Optional.ofNullable(currentUser).isPresent()) {
@@ -486,33 +519,35 @@ public class UserService {
             currentUser = userGraphRepository.findUserByUserName("(?i)" + userEmail);
             if (!Optional.ofNullable(currentUser).isPresent()) {
                 LOGGER.error("No User found by userName " + userEmail);
-                exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
+                exceptionService.dataNotFoundByIdException(MESSAGE_USER_USERNAME_NOTFOUND, userEmail);
             }
         }
+
             String token = tokenService.createForgotPasswordToken(currentUser);
             Map<String, Object> templateParam = new HashMap<>();
-            templateParam.put("receiverName", currentUser.getFullName());
-            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
+            templateParam.put("receiverName", EMAIL_GREETING + currentUser.getFullName());
+            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token);
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
-            templateParam.put("hyperLinkName", RESET_PASSWORD);
+            templateParam.put("hyperLinkName", RESET_PASSCODE);
             mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
             return true;
         }
 
-    public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
-        if(!passwordUpdateDTO.isValid()){
-            exceptionService.actionNotPermittedException("message.staff.user.password.notmatch");
+
+    public boolean resetPassword(String token, PasswordUpdateDTO passwordUpdateDTO) {
+        if (!passwordUpdateDTO.isValid()) {
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
         }
         User user = findByForgotPasswordToken(token);
         if (!Optional.ofNullable(user).isPresent()) {
             LOGGER.error("No User found by token");
-            exceptionService.dataNotFoundByIdException("message.user.token.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_TOKEN_NOTFOUND);
         }
         //We are validating password reset token for 2 hours.
         DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()), DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
         if (!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))) {
             LOGGER.error("Password reset token expired");
-            exceptionService.dataNotFoundByIdException("message.user.token.expired");
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_TOKEN_EXPIRED);
         }
         CharSequence password = CharBuffer.wrap(passwordUpdateDTO.getConfirmPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
@@ -525,9 +560,8 @@ public class UserService {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
         if (ObjectUtils.isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
-        }
-         else {
+            exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, userDetailsDTO.getEmail());
+        } else {
             if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
                 user.setUserNameUpdated(true);
                 userGraphRepository.save(user);
@@ -543,6 +577,6 @@ public class UserService {
             userGraphRepository.save(user);
             return true;
         }
-         return false;
+        return false;
     }
 }

@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_USER_USERNAME_NOTFOUND;
+
 @Service
 public class UserOauth2Service implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(UserOauth2Service.class);
@@ -39,28 +41,31 @@ public class UserOauth2Service implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-         User user= userGraphRepository.findUserByUserName("(?i)"+username);
-         user.setHubMember(accessPageService.isHubMember(user.getId()));
-         Optional<User> loggedUser=Optional.ofNullable(user);
-         String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
-        String password=HttpRequestHolder.getCurrentRequest().getParameter("password");
-        if (passwordEncoder.matches(password, user.getPassword())&&user.getUserType().toString().
-                equals(UserType.SYSTEM_ACCOUNT.toString())){
-            return new UserPrincipal(user,getPermission(user));
+        User user = userGraphRepository.findUserByUserName("(?i)" + username);
+        if (!Optional.ofNullable(user).isPresent()) {
+            exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
-         Optional<Integer>optInt=OptionalUtility.stringToInt(otpString);
+        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        Optional<User> loggedUser = Optional.ofNullable(user);
+        String otpString = HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
+        String password = HttpRequestHolder.getCurrentRequest().getParameter("password");
+        if (passwordEncoder.matches(password, user.getPassword()) && user.getUserType().toString().
+                equals(UserType.SYSTEM_ACCOUNT.toString())) {
+            return new UserPrincipal(user, getPermission(user));
+        }
+        Optional<Integer> optInt = OptionalUtility.stringToInt(otpString);
 
-        if (loggedUser.filter(u->optInt.get().equals(u.getOtp())).isPresent()) {
-            logger.info("user opt match{}",user.getOtp());
-            return new UserPrincipal(user,getPermission(user));
-        }else{
+        if (loggedUser.filter(u -> optInt.get().equals(u.getOtp())).isPresent()) {
+            logger.info("user opt match{}", user.getOtp());
+            return new UserPrincipal(user, getPermission(user));
+        } else {
             // Not found...
-            exceptionService.usernameNotFoundException("message.user.userName.notFound",username);
+            exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
-       return  null;
+        return null;
     }
 
-    private List<GrantedAuthority> getPermission(User user){
+    private List<GrantedAuthority> getPermission(User user) {
         List<GrantedAuthority> permissions = Collections.emptyList();
         return permissions;
     }

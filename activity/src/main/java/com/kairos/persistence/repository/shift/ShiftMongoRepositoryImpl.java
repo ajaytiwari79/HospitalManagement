@@ -2,10 +2,9 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
-import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -15,7 +14,6 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -32,9 +30,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -83,18 +81,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
-                new CustomAggregationOperation(shiftWithActivityProjection()),
-                new CustomAggregationOperation(shiftWithActivityGroup()),
-                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift()),
-                sort(Sort.DEFAULT_DIRECTION, "startDate")
-
-        );
+        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
@@ -103,17 +90,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate).lt(endDate);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
-                new CustomAggregationOperation(shiftWithActivityProjection()),
-                new CustomAggregationOperation(shiftWithActivityGroup()),
-                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift()),
-                sort(Sort.DEFAULT_DIRECTION, "startDate")
-        );
+        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
@@ -135,20 +112,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(List<Long> employmentIds, Date startDate, Date endDate) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)
-                        .and("startDate").lte(endDate).and("endDate").gte(startDate)),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
-                new CustomAggregationOperation(shiftWithActivityProjection()),
-                new CustomAggregationOperation(shiftWithActivityGroup()),
-                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift())
-        );
+        Aggregation aggregation = getShiftWithActivityAggregation(Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)
+                .and("startDate").lte(endDate).and("endDate").gte(startDate));
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
+
+
 
     @Override
     public Long countByActivityId(BigInteger activityId) {
@@ -217,7 +187,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     public List<ShiftResponseDTO> findAllByIdGroupByDate(List<BigInteger> shiftIds) {
-
         Aggregation aggregation = Aggregation.newAggregation(
                 match(where("_id").in(shiftIds)),
                 project().and(DateOperators.dateOf("startDate").toString("%Y-%m-%d")).as("currentDate")
@@ -284,6 +253,27 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId) {
         Query query = new Query(where("planningPeriodId").is(planningPeriodId).and("phaseId").is(phaseId));
         return mongoTemplate.find(query, Shift.class);
+    }
+
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate){
+        Aggregation aggregation = getShiftWithActivityAggregation(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).lte(endDate));
+        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
+        return result.getMappedResults();
+    }
+
+    private Aggregation getShiftWithActivityAggregation(Criteria criteria) {
+        return Aggregation.newAggregation(
+                match(criteria),
+                unwind("activities", true),
+                lookup("activities", "activities.activityId", "_id", "activities.activity"),
+                lookup("activities", "activityId", "_id", "activity"),
+                new CustomAggregationOperation(shiftWithActivityProjection()),
+                new CustomAggregationOperation(shiftWithActivityGroup()),
+                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
+                new CustomAggregationOperation(replaceRootForShift()),
+                sort(Sort.Direction.ASC, "startDate")
+        );
     }
 
     public static Document shiftWithActivityAndDescriptionProjection() {
@@ -405,7 +395,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
+    public List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
         Criteria criteria = where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").gte(startDate).lte(endDate);
         List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
@@ -419,11 +409,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(unwind("activity"));
             aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
-        aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByForPlannedHours())));
-        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
+        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
+//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<BasicChartKpiDateUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, BasicChartKpiDateUnit.class);
-        return result.getMappedResults().stream().map(a -> (CommonKpiDataUnit) a).collect(Collectors.toList());
+        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
+        return result.getMappedResults();
     }
 
     @Override
@@ -481,6 +471,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.plannedTimeId' : 1,\n" +
                 "        'activities.remarks' : 1,\n" +
                 "        'activities.status' : 1,\n" +
+                "        'activities.timeType' : 1,\n" +
                 "        'activities.activityName':1,\n" +
                 "'activities.activity':{  \n" +
                 "            '$arrayElemAt':[  \n" +
@@ -519,8 +510,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     private String groupByForPlannedHours() {
-        return "{'$group':{'_id':'$staffId' \n" +
-                "'plannedHours':{ '$sum': {'$add':['$activities.timeBankCtaBonusMinutes','$activities.scheduledMinutes']}}}}";
+        return "{'$group':{'_id':'$staffId'}}";
     }
 
     private String groupByShiftAndActivity() {
@@ -541,17 +531,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate).orOperator(Criteria.where("endDate").gte(startDate));
         }
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria.and("activities.activityId").in(activityIds)),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
-                new CustomAggregationOperation(shiftWithActivityProjection()),
-                new CustomAggregationOperation(shiftWithActivityGroup()),
-                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift()),
-                sort(Sort.DEFAULT_DIRECTION, "startDate")
-        );
+        Aggregation aggregation = getShiftWithActivityAggregation(criteria.and("activities.activityId").in(activityIds));
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
@@ -567,24 +547,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         }
         return mongoTemplate.exists(new Query(criteria), Shift.class);
     }
-
-    //@Override
-    public ShiftDTO findOneByIdWithActivityPriority(BigInteger shiftId) {
-        Criteria criteria = Criteria.where("_id").is(shiftId).and("deleted").is(false);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                new CustomAggregationOperation(Document.parse(getShiftWithPrioritiesProjection())),
-                lookup("activityPriority", "activities.activity.activityPriorityId", "_id", "activities.activity.activityPriority"),
-                new CustomAggregationOperation(Document.parse(getSecondShiftActivityPriority())),
-                new CustomAggregationOperation(Document.parse(getShiftActivityPriorityGroup())),
-                new CustomAggregationOperation(Document.parse(getThirdShiftActivityPriority()))
-        );
-        List<ShiftDTO> shiftDTOS = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults();
-        return shiftDTOS.isEmpty() ? null : shiftDTOS.get(0);
-    }
-
 
     @Override
     public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType) {

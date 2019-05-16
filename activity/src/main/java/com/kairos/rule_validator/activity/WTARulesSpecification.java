@@ -1,9 +1,9 @@
 package com.kairos.rule_validator.activity;
 
 
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

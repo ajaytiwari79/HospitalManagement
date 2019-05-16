@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNIT_NOTFOUND;
+
 /**
  * Created by prabjot on 19/5/17.
  */
@@ -67,7 +69,7 @@ public class ApiExternalStaffService {
             Organization unit =organizationGraphRepository.findOne(orgnaizationId,0);
 
             if(unit == null){
-                exceptionService.dataNotFoundByIdException("message.unit.notfound",orgnaizationId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND,orgnaizationId);
                 //throw new InternalError("unit can't be null");
             }
 

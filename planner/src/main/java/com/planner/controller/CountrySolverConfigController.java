@@ -24,7 +24,8 @@ public class CountrySolverConfigController {
 
     @PostMapping
     @ApiOperation("Create Country Solver Config")
-    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid
+            CountrySolverConfigDTO countrySolverConfigDTO) {
         ;
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.createCountrySolverConfig(countryId,countrySolverConfigDTO));
     }

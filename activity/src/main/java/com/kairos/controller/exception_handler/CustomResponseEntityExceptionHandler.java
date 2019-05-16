@@ -400,7 +400,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    /*@ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({AddressNotVerifiedByTomTom.class,
             ZipCodeNotFound.class, CitizenNotFoundException.class})
     @ResponseBody
@@ -412,7 +412,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(ex.getMessage());
         return errorMessage;
 
-    }
+    }*/
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(value = ActionNotPermittedException.class)

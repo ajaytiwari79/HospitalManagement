@@ -4,7 +4,9 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /*
 * Created By Pradeep singh rajawat
@@ -31,16 +33,18 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int deltaAccumulatedTimebankMinutes;
     //It is the sum of scheduledMinutesOfTimeBank + ctaBonusMinutesOfTimeBank
     private int plannedMinutesOfTimebank;
+    private Map<LocalDate,Integer> publishedBalances;
 
 
     public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {
         this.employmentId = employmentId;
         this.staffId = staffId;
         this.date = date;
+        this.publishedBalances = new HashMap<>();
     }
 
     public List<TimeBankCTADistribution> getTimeBankCTADistributionList() {
-        return timeBankCTADistributionList;
+        return isNullOrElse(timeBankCTADistributionList,new ArrayList<>());
     }
 
     public void setTimeBankCTADistributionList(List<TimeBankCTADistribution> timeBankCTADistributionList) {
@@ -129,6 +133,14 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
 
     public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
         this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
+    }
+
+    public Map<LocalDate, Integer> getPublishedBalances() {
+        return publishedBalances= Optional.ofNullable(publishedBalances).orElse(new HashMap<>());
+    }
+
+    public void setPublishedBalances(Map<LocalDate, Integer> publishedBalances) {
+        this.publishedBalances = publishedBalances;
     }
 
     @Override

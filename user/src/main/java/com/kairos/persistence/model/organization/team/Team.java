@@ -35,7 +35,6 @@ public class Team extends UserBaseEntity {
 
     private boolean isEnabled = true;
     private Set<BigInteger> activityIds;
-    private Long teamLeaderStaffId; //Id of Staff who is assigned as team leader
 
     public Team() {
     }
@@ -99,11 +98,4 @@ public class Team extends UserBaseEntity {
         this.activityIds = activityIds;
     }
 
-    public Long getTeamLeaderStaffId() {
-        return teamLeaderStaffId;
-    }
-
-    public void setTeamLeaderStaffId(Long teamLeaderStaffId) {
-        this.teamLeaderStaffId = teamLeaderStaffId;
-    }
 }
