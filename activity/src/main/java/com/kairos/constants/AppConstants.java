@@ -229,4 +229,7 @@ public class AppConstants {
     public static final String BLANK_STRING="";
     public static final String DELETED="deleted";
 
+    //activity status mail
+    public static final String MAIL_SUBJECT ="Activiy Status";
+
 }

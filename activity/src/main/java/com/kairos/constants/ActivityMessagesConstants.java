@@ -204,6 +204,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_STATUS_ADDED = "message.shift.status.added";
     public static final String ERROR_SHIFT_STATUS = "error.shift.status";
     public static final String ACCESS_GROUP_NOT_MATCHED = "access.group.not.matched";
+    public static final String ACTIVITY_STATUS_INVALID = "activity.status.not.invalid";
     public static final String ERROR_START_TIME_GREATER_THAN_EARLIEST_TIME = "error.start_time.greater_than.earliest_time";
     public static final String ERROR_START_TIME_LESS_THAN_LATEST_TIME = "error.start_time.less_than.latest_time";
     public static final String ERROR_SHIFT_DURATION_EXCEEDS_LONGEST_TIME = "error.shift.duration_exceeds_longest_time";

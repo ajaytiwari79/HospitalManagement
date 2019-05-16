@@ -49,7 +49,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{childActivityIds:?0, deleted:false}",fields ="{'_id':1}")
     Activity findByChildActivityId(BigInteger childActivityId);
 
-    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1}")
+    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1 ,'rulesActivityTab':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
