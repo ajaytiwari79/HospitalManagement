@@ -160,7 +160,7 @@ public class TeamService {
     }
 
     public StaffTeamDTO updateStaffsInTeam(Long teamId, StaffTeamDTO staffTeamDTO) {
-        if (staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
+        if (StaffTeamRelationship.TeamType.MAIN.equals(staffTeamDTO.getTeamType()) && staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
             exceptionService.actionNotPermittedException("staff.main_team.exists");
         }
         Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
