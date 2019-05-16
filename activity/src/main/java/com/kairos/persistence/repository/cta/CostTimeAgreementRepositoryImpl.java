@@ -81,7 +81,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public Boolean isCTAExistWithSameNameInUnit(Long unitId, String name, BigInteger ctaId) {
-        Query query = new Query(Criteria.where("organization._id").is(unitId).and("name").is(name).and("_id").ne(ctaId).and("deleted").is(false).and("disabled").is(false));
+        Query query = new Query(Criteria.where("organization._id").is(unitId).and("name").is(name).and("_id").ne(ctaId).and("deleted").is(false).and("disabled").is(false).and("employmentId").exists(false));
         return mongoTemplate.exists(query, CostTimeAgreement.class);
     }
 
