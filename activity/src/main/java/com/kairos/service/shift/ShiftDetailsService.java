@@ -1,7 +1,10 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.PlannedTime;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -26,16 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getMinutesBetweenDate;
 import static com.kairos.commons.utils.DateUtils.isEqualOrBefore;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static java.util.Comparator.comparing;
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.toMap;
+
 
 /**
  * CreatedBy vipulpandey on 17/12/18

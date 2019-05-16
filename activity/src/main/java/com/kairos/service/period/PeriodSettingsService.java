@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_PERIODSETTING_UNIT;
+
 /**
  * Created by prerna on 30/3/18.
  */
@@ -56,7 +58,7 @@ public class PeriodSettingsService extends MongoBaseService {
     public PeriodSettings updatePeriodSettings(Long unitId, PeriodSettingsDTO periodSettingsDTO) {
         PeriodSettings periodSettings = periodSettingsMongoRepository.findByUnit(unitId);
         if (!Optional.ofNullable(periodSettings).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.periodsetting.unit",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_PERIODSETTING_UNIT,unitId);
         }
         periodSettings.setPresenceLimitInYear(periodSettingsDTO.getPresenceLimitInYear());
         periodSettings.setAbsenceLimitInYear(periodSettingsDTO.getAbsenceLimitInYear());

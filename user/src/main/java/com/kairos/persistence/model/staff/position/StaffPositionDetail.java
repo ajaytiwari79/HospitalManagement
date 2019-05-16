@@ -3,6 +3,8 @@ package com.kairos.persistence.model.staff.position;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_STAFF_EMPLOYEDSINCE_NOTNULL;
+
 /**
  * Created by prabjot on 10/1/17.
  */
@@ -12,7 +14,7 @@ public class StaffPositionDetail {
     private String sendNotificationBy;
     private String email;
     private boolean copyKariosMailToLogin;
-    @NotNull(message = "error.Staff.employedsince.notnull")
+    @NotNull(message = ERROR_STAFF_EMPLOYEDSINCE_NOTNULL)
     private String employedSince;
     private long visitourId;
     private long engineerTypeId;

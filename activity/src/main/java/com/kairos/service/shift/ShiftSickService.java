@@ -43,6 +43,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -82,28 +83,28 @@ public class ShiftSickService extends MongoBaseService {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(activityId);
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
         if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(ENTERED_MANUALLY)) {
             if (duration == null || duration.getFrom() == null || duration.getTo() == null) {
-                exceptionService.actionNotPermittedException("error.startEnd.notBlank");
+                exceptionService.actionNotPermittedException(ERROR_STARTEND_NOTBLANK);
             }
         }
         if (!activity.getRulesActivityTab().isAllowedAutoAbsence()) {
-            exceptionService.actionNotPermittedException("activity.notEligible.for.absence", activity.getName());
+            exceptionService.actionNotPermittedException(ACTIVITY_NOTELIGIBLE_FOR_ABSENCE, activity.getName());
         }
         StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, StringUtils.capitalize(ORGANIZATION));
         if (!Optional.ofNullable(staffEmploymentDetails).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staffEmployment.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFFEMPLOYMENT_NOTFOUND);
         }
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffEmploymentDetails.getId(), DateUtils.getDateFromLocalDate(null));
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.cta.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_CTA_NOTFOUND);
         }
         staffEmploymentDetails.setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findCurrentDatePlanningPeriod(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getCurrentLocalDate());
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
-            exceptionService.actionNotPermittedException("message.periodsetting.notFound");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIODSETTING_NOTFOUND);
         }
         logger.info("The current planning period is {}", planningPeriod.getName());
         List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Collections.singletonList(staffId), DateUtils.getDateFromLocalDate(null), DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activity.getRulesActivityTab().getRecurrenceDays()));
@@ -249,7 +250,7 @@ public class ShiftSickService extends MongoBaseService {
                 scheduledMinutes = new Double(shiftDurationInMinute * timeCalculationActivityTab.getMultiplyWithValue()).intValue();
                 break;
             default:
-                exceptionService.illegalArgumentException("error.activity.timeCalculation.InvalidArgument");
+                exceptionService.illegalArgumentException(ERROR_ACTIVITY_TIMECALCULATION_INVALIDARGUMENT);
         }
         shiftActivity.setDurationMinutes(shiftDurationInMinute);
         shiftActivity.setScheduledMinutes(scheduledMinutes);
@@ -262,7 +263,7 @@ public class ShiftSickService extends MongoBaseService {
 
         StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, StringUtils.capitalize(ORGANIZATION));
         if (!Optional.ofNullable(staffEmploymentDetails).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staffEmployment.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFFEMPLOYMENT_NOTFOUND);
         }
         List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsByEmploymentIdAndUnitId(staffEmploymentDetails.getId(), unitId, DateUtils.getCurrentLocalDate());
         Map<Long, Set<LocalDate>> dateAndFunctionIdMap = new HashMap<>();

@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_TIMETYPE_EXCEPTIONOCCURRED;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Component
@@ -49,7 +50,7 @@ public class PlannedTimeTypeRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.timeType.exceptionOccurred",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_TIMETYPE_EXCEPTIONOCCURRED,e.getMessage());
 
         }
 

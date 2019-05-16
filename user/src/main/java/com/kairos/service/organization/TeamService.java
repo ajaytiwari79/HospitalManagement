@@ -41,6 +41,7 @@ import static com.kairos.commons.utils.ArrayUtil.getUnionOfList;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
  * Created by oodles on 7/10/16.
@@ -76,11 +77,11 @@ public class TeamService {
 
         OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByOrganizationId(unitId);
         if (organizationContactAddress.getOrganization() == null) {
-            exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound.by.group");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
         }
         boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
         if (teamExistInOrganizationByName) {
-            exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
         }
 
         Organization organization = organizationContactAddress.getOrganization();
@@ -92,17 +93,17 @@ public class TeamService {
         zipCode = organizationContactAddress.getZipCode();
         LOGGER.debug("zip code found is " + zipCode);
         if (zipCode == null) {
-            exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
         }
         municipality = organizationContactAddress.getMunicipality();
         if (municipality == null) {
-            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
         }
         contactAddress = new ContactAddress();
         contactAddress.setMunicipality(municipality);
@@ -133,7 +134,7 @@ public class TeamService {
     public TeamDTO updateTeam(Long unitId, Long teamId, TeamDTO teamDTO) {
         boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, teamId, "(?i)" + teamDTO.getName());
         if (teamExistInOrganizationAndGroupByName) {
-            exceptionService.duplicateDataException("message.teamservice.team.alreadyexists.in.unit", teamDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
         }
         Team team = teamGraphRepository.findOne(teamId, 0);
         if (team != null) {
@@ -141,7 +142,7 @@ public class TeamService {
             team.setDescription(teamDTO.getDescription());
             teamGraphRepository.save(team);
         } else {
-            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND);
         }
         assignTeamLeadersToTeam(teamDTO, team);
         return teamDTO;
@@ -153,7 +154,7 @@ public class TeamService {
             team.setActivityIds(activityIds);
             teamGraphRepository.save(team);
         } else {
-            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND);
         }
         return true;
     }
@@ -198,7 +199,7 @@ public class TeamService {
             team.setEnabled(false);
             teamGraphRepository.save(team);
         } else {
-            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND);
         }
         return true;
     }
@@ -210,7 +211,7 @@ public class TeamService {
         Staff staff = staffGraphRepository.findOne(staffId);
         Team team = teamGraphRepository.findOne(teamId, 0);
         if (staff == null || team == null) {
-            exceptionService.internalServerError("error.teamservice.stafforteam.notEmpty");
+            exceptionService.internalServerError(ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY);
         }
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId, staffId);
         if (countOfRel == 0) {
@@ -219,7 +220,7 @@ public class TeamService {
             if (countOfRelCreated > 0) {
                 return true;
             } else {
-                exceptionService.dataNotFoundByIdException("message.teamservice.somethingwrong");
+                exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_SOMETHINGWRONG);
             }
         } else {
             int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId, staffId, DateUtils.getCurrentDate().getTime(), isAssigned);
@@ -229,7 +230,7 @@ public class TeamService {
                 }
                 return true;
             } else {
-                exceptionService.dataNotFoundByIdException("message.teamservice.somethingwrong");
+                exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_SOMETHINGWRONG);
 
             }
         }
@@ -246,7 +247,7 @@ public class TeamService {
     public List<Map<String, Object>> getStaffForImportInTeam(long teamId) {
         Team team = teamGraphRepository.findOne(teamId, 0);
         if (team == null) {
-            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound", teamId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId);
         }
         List<Map<String, Object>> queryResult = teamGraphRepository.getAllStaffByOrganization(teamId, envConfig.getServerHost() + FORWARD_SLASH);
         List<Map<String, Object>> staff = new ArrayList<>();
@@ -309,7 +310,7 @@ public class TeamService {
 
         Team team = teamGraphRepository.findOne(teamId);
         if (team == null) {
-            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound", teamId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId);
         }
         team.setName(teamDTO.getName());
         teamGraphRepository.save(team);

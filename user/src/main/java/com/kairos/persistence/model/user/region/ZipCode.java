@@ -9,6 +9,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.MUNICIPALITY;
 
 
@@ -19,11 +20,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MUNIC
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ZipCode extends UserBaseEntity {
 
-    @NotBlank(message = "error.ZipCode.name.notEmpty")
+    @NotBlank(message = ERROR_ZIPCODE_NAME_NOTEMPTY)
     private String name;
-    @Range(min=1,message = "error.ZipCode.zipCode.notnull")
+    @Range(min=1,message = ERROR_ZIPCODE_ZIPCODE_NOTNULL)
     private int zipCode;
-    @NotBlank(message = "error.ZipCode.geoFence.notEmpty")
+    @NotBlank(message = ERROR_ZIPCODE_GEOFENCE_NOTEMPTY)
     private String geoFence;
 
     private boolean isEnable = true;

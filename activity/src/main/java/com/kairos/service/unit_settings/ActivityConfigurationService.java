@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 
 @Service
@@ -45,8 +46,8 @@ public class ActivityConfigurationService extends MongoBaseService {
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases) {
-        if (activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)) {
-            exceptionService.actionNotPermittedException("message.already.exists");
+        if(activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)){
+            exceptionService.actionNotPermittedException(MESSAGE_ALREADY_EXISTS);
         }
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty())
@@ -81,7 +82,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     public PresencePlannedTime updatePresenceActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, presencePlannedTime.getPhaseId());
         if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.presenceActivityConfiguration.notFound");
+            exceptionService.dataNotFoundByIdException(ERROR_PRESENCEACTIVITYCONFIGURATION_NOTFOUND);
         }
         activityConfiguration.getPresencePlannedTime().setManagementPlannedTimeId(presencePlannedTime.getManagementPlannedTimeId());
         activityConfiguration.getPresencePlannedTime().setStaffPlannedTimeId(presencePlannedTime.getStaffPlannedTimeId());
@@ -92,8 +93,8 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public AbsencePlannedTime updateAbsenceActivityConfiguration(BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
         Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
-        if (!activityConfiguration.isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
+        if (!Optional.of(activityConfiguration).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND);
         }
         if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
             activityConfiguration.get().getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
@@ -107,7 +108,7 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public BigInteger createAbsenceExceptionActivityConfiguration(Long unitId, AbsencePlannedTime absencePlannedTime) {
         if (!Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.timetype.unselected");
+            exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
         }
         ActivityConfiguration activityConfiguration = new ActivityConfiguration(unitId, new AbsencePlannedTime(absencePlannedTime.getPhaseId(), absencePlannedTime.getTimeTypeId(), absencePlannedTime.getPlannedTimeId(), true));
         activityConfigurationRepository.save(activityConfiguration);
@@ -132,7 +133,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     public ActivityConfigurationWrapper getDefaultData(Long unitId) {
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
         }
         List<PhaseResponseDTO> phases = phaseMongoRepository.getAllPlanningPhasesByUnit(unitId);
         return getDefaultDataForCountry(phases, countryId);
@@ -173,7 +174,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     public PresencePlannedTime updatePresenceActivityConfigurationForCountry(Long countryId, PresencePlannedTime presencePlannedTime) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByCountryIdAndPhaseId(countryId, presencePlannedTime.getPhaseId());
         if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.presenceActivityConfiguration.notFound");
+            exceptionService.dataNotFoundByIdException(ERROR_PRESENCEACTIVITYCONFIGURATION_NOTFOUND);
         }
         activityConfiguration.getPresencePlannedTime().setManagementPlannedTimeId(presencePlannedTime.getManagementPlannedTimeId());
         activityConfiguration.getPresencePlannedTime().setStaffPlannedTimeId(presencePlannedTime.getStaffPlannedTimeId());
@@ -184,8 +185,8 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public AbsencePlannedTime updateAbsenceActivityConfigurationForCountry(BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
         Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
-        if (!activityConfiguration.isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
+        if (!Optional.of(activityConfiguration).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND);
         }
         if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
             activityConfiguration.get().getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
@@ -199,7 +200,7 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public BigInteger createAbsenceExceptionActivityConfigurationForCountry(Long countryId, AbsencePlannedTime absencePlannedTime) {
         if (!Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.timetype.unselected");
+            exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
         }
         ActivityConfiguration activityConfiguration = new ActivityConfiguration(new AbsencePlannedTime(absencePlannedTime.getPhaseId(), absencePlannedTime.getTimeTypeId(), absencePlannedTime.getPlannedTimeId(), true), countryId);
         activityConfigurationRepository.save(activityConfiguration);

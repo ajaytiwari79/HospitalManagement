@@ -16,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_EXCEPTION_TASKMICROSERVICE;
+
 @Component
 public class PlannerRestClient {
     private static final Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
@@ -54,7 +56,7 @@ public class PlannerRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
            // throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
         }
 return false;

@@ -11,6 +11,9 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_VEHICLELOCATIONSERVICES_ID_NOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_VEHICLELOCATION_NAME_EXIST;
+
 /**
  * Created by oodles on 13/12/17.
  */
@@ -27,7 +30,7 @@ public class VehicleLocationService {
     public VehicleLocationDTO createVehicleLocation(VehicleLocationDTO vehicleLocationDTO) {
         Boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), -1L);
         if (vehicleLocationExistByName) {
-            exceptionService.duplicateDataException("message.VehicleLocation.name.exist");
+            exceptionService.duplicateDataException(MESSAGE_VEHICLELOCATION_NAME_EXIST);
         }
         VehicleLocation vehicleLocation = new VehicleLocation(vehicleLocationDTO.getName(), vehicleLocationDTO.getDescription());
         vehicleLocationRepository.save(vehicleLocation);
@@ -38,7 +41,7 @@ public class VehicleLocationService {
     public VehicleLocationDTO updateVehicleLocation(VehicleLocationDTO vehicleLocationDTO) {
         Boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), vehicleLocationDTO.getId());
         if (vehicleLocationExistByName) {
-            exceptionService.duplicateDataException("message.VehicleLocation.name.exist");
+            exceptionService.duplicateDataException(MESSAGE_VEHICLELOCATION_NAME_EXIST);
         }
         VehicleLocation existingVehicleLocation = vehicleLocationRepository.findOne(vehicleLocationDTO.getId());
         if (Optional.ofNullable(existingVehicleLocation).isPresent()) {
@@ -46,7 +49,7 @@ public class VehicleLocationService {
             existingVehicleLocation.setDescription(vehicleLocationDTO.getDescription());
             vehicleLocationRepository.save(existingVehicleLocation);
         } else {
-            exceptionService.dataNotFoundByIdException("message.vehiclelocationservices.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_VEHICLELOCATIONSERVICES_ID_NOTFOUND);
 
         }
         return vehicleLocationDTO;
@@ -63,7 +66,7 @@ public class VehicleLocationService {
             vehicleLocation.setEnabled(false);
             return vehicleLocationRepository.save(vehicleLocation) != null;
         } else {
-            exceptionService.dataNotFoundByIdException("message.vehiclelocationservices.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_VEHICLELOCATIONSERVICES_ID_NOTFOUND);
         }
         return false;
     }

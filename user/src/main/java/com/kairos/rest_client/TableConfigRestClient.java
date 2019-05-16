@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_EXCEPTION_TASKMICROSERVICE;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Component
@@ -56,7 +57,7 @@ public class TableConfigRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
         return null;

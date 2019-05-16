@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 public class OpenShiftRuleTemplateService extends MongoBaseService {
     @Inject
@@ -32,7 +34,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     public OpenShiftRuleTemplateDTO createRuleTemplateForOpenShift(long countryId, OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
         boolean isExistWithSameName=openShiftRuleTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndCountryId(openShiftRuleTemplateDTO.getName().trim(),countryId);
         if(isExistWithSameName){
-            exceptionService.duplicateDataException("exception.duplicate.openShiftRuleTemplate",openShiftRuleTemplateDTO.getName());
+            exceptionService.duplicateDataException(EXCEPTION_DUPLICATE_OPENSHIFTRULETEMPLATE,openShiftRuleTemplateDTO.getName());
         }
         OpenShiftRuleTemplate openShiftRuleTemplate = new OpenShiftRuleTemplate();
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO, openShiftRuleTemplate);
@@ -55,7 +57,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     public OpenShiftRuleTemplateDTO updateRuleTemplateForOpenShift(long countryId, BigInteger ruleTemplateId, OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
         OpenShiftRuleTemplate openShiftRuleTemplate = openShiftRuleTemplateRepository.findByIdAndCountryIdAndDeletedFalse(ruleTemplateId, countryId);
         if (!Optional.ofNullable(openShiftRuleTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShiftRuleTemplate", ruleTemplateId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO, openShiftRuleTemplate);
         save(openShiftRuleTemplate);
@@ -66,7 +68,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     public boolean deleteOpenShiftRuleTemplate(long countryId, BigInteger ruleTemplateId) {
         OpenShiftRuleTemplate openShiftRuleTemplate = openShiftRuleTemplateRepository.findByIdAndCountryIdAndDeletedFalse(ruleTemplateId, countryId);
         if (!Optional.ofNullable(openShiftRuleTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShiftRuleTemplate", ruleTemplateId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         openShiftRuleTemplate.setDeleted(true);
         save(openShiftRuleTemplate);
@@ -110,7 +112,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     public OpenShiftRuleTemplateDTO updateRuleTemplateOfUnit(long unitId,BigInteger ruleTemplateId,OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO){
         OpenShiftRuleTemplate openShiftRuleTemplate=openShiftRuleTemplateRepository.findByIdAndUnitIdAndDeletedFalse(ruleTemplateId,unitId);
         if (!Optional.ofNullable(openShiftRuleTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShiftRuleTemplate", ruleTemplateId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
         save(openShiftRuleTemplate);
@@ -121,7 +123,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     public boolean deleteRuleTemplateOfUnit(BigInteger ruleTemplateId,long unitId){
         OpenShiftRuleTemplate openShiftRuleTemplate = openShiftRuleTemplateRepository.findByIdAndUnitIdAndDeletedFalse(ruleTemplateId, unitId);
         if (!Optional.ofNullable(openShiftRuleTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShiftRuleTemplate", ruleTemplateId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         openShiftRuleTemplate.setDeleted(true);
         save(openShiftRuleTemplate);
@@ -152,7 +154,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     public OpenShiftRuleTemplateDTO createRuleTemplateForUnit(Long unitId,OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO){
         boolean isExistWithSameName=openShiftRuleTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(openShiftRuleTemplateDTO.getName().trim(),unitId);
         if(isExistWithSameName){
-            exceptionService.duplicateDataException("exception.duplicate.openShiftRuleTemplate",openShiftRuleTemplateDTO.getName());
+            exceptionService.duplicateDataException(EXCEPTION_DUPLICATE_OPENSHIFTRULETEMPLATE,openShiftRuleTemplateDTO.getName());
         }
         OpenShiftRuleTemplate openShiftRuleTemplate=new OpenShiftRuleTemplate();
         openShiftRuleTemplateDTO.setUnitId(unitId);

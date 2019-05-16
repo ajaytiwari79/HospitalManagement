@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 
 /**
  * Created by prabjot on 20/1/17.
@@ -21,7 +22,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 public class TeamDTO {
 
     private Long id;
-    @NotBlank(message = "error.name.notnull")
+    @NotBlank(message = ERROR_NAME_NOTNULL)
     private String name;
     private String description;
     private boolean hasAddressOfUnit;

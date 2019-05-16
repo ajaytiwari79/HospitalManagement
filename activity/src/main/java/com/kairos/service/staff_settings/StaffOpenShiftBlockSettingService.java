@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.DayOfWeek;
 
+import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_NO_BLOCK_TYPE_FOUND;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 @Service
@@ -41,7 +42,7 @@ public class StaffOpenShiftBlockSettingService extends MongoBaseService {
                 staffOpenShiftBlockSetting.getDateForWeek().add(staffPreferencesDTO.getStartDate().with(previousOrSame(DayOfWeek.MONDAY)));
                 break;
             default:
-                exceptionService.actionNotPermittedException("exception.no.block.type.found");
+                exceptionService.actionNotPermittedException(EXCEPTION_NO_BLOCK_TYPE_FOUND);
         }
         save(staffOpenShiftBlockSetting);
         return true;

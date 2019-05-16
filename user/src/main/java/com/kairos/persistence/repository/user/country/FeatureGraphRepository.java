@@ -60,7 +60,7 @@ public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long
             "return id(feature) as id, feature.name as name, feature.description as description")
     List<FeatureQueryResult> getResourcesSelectedFeatures(Long organizationId, Long resourceId, boolean deleted);
 
-    @Query("Match (o:Organization)-[:"+COUNTRY+"]->(country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
+    @Query("Match (o:Organization)-[:"+BELONGS_TO+"]->(country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
             "WHERE id(o)={0} AND feature.deleted= false AND id(feature) IN {3} with feature\n" +
             "MATCH (res:Resource{deleted:{2}})-[:VEHICLE_TYPE]->(vehicle:Vehicle)-[r:"+VEHICLE_HAS_FEATURE+"]->(feature)\n" +
             "WHERE id(res) ={1}\n" +

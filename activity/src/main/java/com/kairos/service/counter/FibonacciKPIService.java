@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class FibonacciKPIService {
@@ -33,13 +34,13 @@ public class FibonacciKPIService {
     public FibonacciKPIDTO createFibonacciKPI(Long referenceId, FibonacciKPIDTO fibonacciKPIDTO, ConfLevel confLevel) {
         boolean existByName = fibonacciKPIRepository.existByName(null,fibonacciKPIDTO.getTitle(),confLevel,referenceId);
         if(existByName){
-            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+            exceptionService.duplicateDataException(ERROR_KPI_NAME_DUPLICATE);
         }
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
-            exceptionService.dataNotFoundByIdException("message.country.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
         }
         if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
-            exceptionService.dataNotFoundByIdException("message.organization.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
         fibonacciKPIDTO.setReferenceId(referenceId);
         fibonacciKPIDTO.setConfLevel(confLevel);
@@ -59,19 +60,19 @@ public class FibonacciKPIService {
     public FibonacciKPIDTO updateFibonacciKPI(Long referenceId,FibonacciKPIDTO fibonacciKPIDTO,ConfLevel confLevel){
         boolean existByName = fibonacciKPIRepository.existByName(fibonacciKPIDTO.getId(),fibonacciKPIDTO.getTitle(),confLevel,referenceId);
         if(existByName){
-            exceptionService.duplicateDataException("error.kpi.name.duplicate");
+            exceptionService.duplicateDataException(ERROR_KPI_NAME_DUPLICATE);
         }
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
-            exceptionService.dataNotFoundByIdException("message.country.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
         }
         if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
-            exceptionService.dataNotFoundByIdException("message.organization.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
         fibonacciKPIDTO.setReferenceId(referenceId);
         fibonacciKPIDTO.setConfLevel(confLevel);
         FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findFibonacciKPIById(fibonacciKPIDTO.getId());
         if(isNull(fibonacciKPI)){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","FibonacciKPI",fibonacciKPIDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIDTO.getId());
         }
         fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO,FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
@@ -97,7 +98,7 @@ public class FibonacciKPIService {
     public boolean deleteFibonacciKPI(BigInteger fibonacciKPIId){
         FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findFibonacciKPIById(fibonacciKPIId);
         if(isNull(fibonacciKPI)){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","FibonacciKPI",fibonacciKPIId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIId);
             return false;
         }
         fibonacciKPI.setDeleted(true);

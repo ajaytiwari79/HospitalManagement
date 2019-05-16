@@ -27,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.constants.UserMessagesConstants.PARENTACCESSPAGE;
+import static com.kairos.constants.UserMessagesConstants.*;
+
 
 /**
  * Created by prabjot on 3/1/17.
@@ -58,8 +59,7 @@ public class AccessPageService {
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
                 LOGGER.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
-                exceptionService.dataNotFoundByIdException("message.dataNotFound",PARENTACCESSPAGE,accessPageDTO.getParentTabId());
-
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,PARENTACCESSPAGE,accessPageDTO.getParentTabId());
             }
             List<AccessPage> childTabs = parentTab.getSubPages();
             childTabs.add(accessPage);
@@ -75,7 +75,7 @@ public class AccessPageService {
         AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
                 updateAccessTab(accessPageId,accessPageDTO.getName()): null;
         if(!Optional.ofNullable(accessPage).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","tab",accessPageId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,TAB,accessPageId);
 
         }
         return accessPage;
@@ -222,7 +222,7 @@ public class AccessPageService {
         if(Optional.ofNullable(accessPageLanguageDTO.getId()).isPresent()){
             Optional<AccessPageLanguageRelationShip> accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findById(accessPageLanguageDTO.getId());
             if(!accessPageLanguageRelationShip.isPresent()){
-                exceptionService.dataNotFoundByIdException("access_page.lang.description.absent",accessPageLanguageDTO.getLanguageId());
+                exceptionService.dataNotFoundByIdException(ACCESS_PAGE_LANG_DESCRIPTION_ABSENT,accessPageLanguageDTO.getLanguageId());
             }
             accessPageLanguageRelationShip.get().setDescription(accessPageLanguageDTO.getDescription());
             accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip.get());
@@ -231,11 +231,11 @@ public class AccessPageService {
 
         AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
         if(!Optional.ofNullable(accessPage).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","Access Page",moduleId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"Access Page",moduleId);
         }
         SystemLanguage systemLanguage=systemLanguageGraphRepository.findSystemLanguageById(accessPageLanguageDTO.getLanguageId());
         if(!Optional.ofNullable(systemLanguage).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","SystemLanguage", accessPageLanguageDTO.getLanguageId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"SystemLanguage", accessPageLanguageDTO.getLanguageId());
         }
 
         AccessPageLanguageRelationShip accessPageLanguageRelationShip=new AccessPageLanguageRelationShip(accessPageLanguageDTO.getId(),accessPage,systemLanguage, accessPageLanguageDTO.getDescription());
