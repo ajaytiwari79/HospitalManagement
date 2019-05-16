@@ -309,6 +309,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.remarks' : 1,\n" +
                 "        'activities.backgroundColor' : 1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
                 "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
                 "      }\n" +
                 "   }";
