@@ -29,6 +29,7 @@ import java.util.*;
 
 import static com.kairos.constants.UserMessagesConstants.*;
 
+
 /**
  * Created by prabjot on 3/1/17.
  */
@@ -59,7 +60,6 @@ public class AccessPageService {
             if(!Optional.ofNullable(parentTab).isPresent()){
                 LOGGER.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
                 exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,PARENTACCESSPAGE,accessPageDTO.getParentTabId());
-
             }
             List<AccessPage> childTabs = parentTab.getSubPages();
             childTabs.add(accessPage);

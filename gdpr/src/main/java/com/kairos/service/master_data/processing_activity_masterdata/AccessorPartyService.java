@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_DATANOTFOUND;
+
 
 @Service
 public class AccessorPartyService {
@@ -113,7 +115,7 @@ public class AccessorPartyService {
         }
         Integer resultCount = accessorPartyRepository.updateMasterMetadataName(accessorPartyDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.accessorParty", id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }
