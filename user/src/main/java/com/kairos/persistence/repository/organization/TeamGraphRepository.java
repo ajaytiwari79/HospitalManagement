@@ -24,13 +24,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true}) WHERE id(org)={0} with distinct team \n" +
+    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true}) WHERE id(org)={0} with DISTINCT team \n" +
             "OPTIONAL MATCH (team)-[rel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) WHERE EXISTS(rel.leaderType) \n" +
             "WITH team,COLLECT(teamMembers) as teamMembers,COLLECT(rel) as rel,\n" +
             "CASE when rel.leaderType='MAIN_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS mainTeamLeaderIds,\n" +
             "CASE when rel.leaderType='ACTING_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS actingTeamLeaderIds\n" +
-            "WITH DISTINCT team,COLLECT(distinct mainTeamLeaderIds) as mainTeamLeaderIds,COLLECT(distinct actingTeamLeaderIds) as actingTeamLeaderIds\n" +
-            "RETURN COLLECT(distinct{id:id(team),name:team.name,description:team.description,\n" +
+            "WITH DISTINCT team,COLLECT(DISTINCT mainTeamLeaderIds) as mainTeamLeaderIds,COLLECT(DISTINCT actingTeamLeaderIds) as actingTeamLeaderIds\n" +
+            "RETURN COLLECT(DISTINCT{id:id(team),name:team.name,description:team.description,\n" +
             "mainTeamLeaderIds:CASE WHEN mainTeamLeaderIds[0] IS NULL THEN [] ELSE  mainTeamLeaderIds[0] END, \n" +
             "actingTeamLeaderIds:CASE WHEN actingTeamLeaderIds[0] IS NULL THEN [] ELSE  actingTeamLeaderIds[0] END}) AS teams")
     List<Map<String,Object>> getTeams(long unitId);
