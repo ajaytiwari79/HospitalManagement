@@ -466,26 +466,6 @@ public class ShiftService extends MongoBaseService {
         return plannedTimeId;
     }
 
-    private BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
-        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
-        BigInteger plannedTimeId = null;
-        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
-            }
-            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
-                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
-                break;
-            } else {
-                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
-            }
-        }
-        // checking weather this is allowed to staff or not
-        if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime()).isPresent() && plannedTimeId.equals(staffAdditionalInfoDTO.getEmployment().getExcludedPlannedTime())) {
-            plannedTimeId = staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime();
-        }
-        return plannedTimeId;
-    }
 
     public ShiftWithViolatedInfoDTO updateShift(ShiftDTO shiftDTO, String type, boolean byTAndAView, boolean validatedByPlanner) {
         Long functionId = shiftDTO.getFunctionId();
