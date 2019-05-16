@@ -408,7 +408,7 @@ public class CounterDistService extends MongoBaseService {
                 if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                     applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                 }
-                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),applicableKPI.getFibonacciKPIConfigs()));
+                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
                 staffIdKpiMap.get(staffId).put(kpiId, kpiId);
             }
         }));
@@ -463,7 +463,7 @@ public class CounterDistService extends MongoBaseService {
                     if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                         applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                     }
-                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType()));
+                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
                     staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).put(kpiId, kpiId);
                 }
             });
@@ -533,7 +533,7 @@ public class CounterDistService extends MongoBaseService {
                 if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                     applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                 }
-                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),applicableKPI.getFibonacciKPIConfigs()));
+                applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
                 unitIdKpiMap.get(unitId).put(kpiId, kpiId);
             }
         }));
@@ -588,7 +588,7 @@ public class CounterDistService extends MongoBaseService {
             if (kpiIdAndApplicableKpi.containsKey(applicableKPI) && isNotNull(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter())) {
                 applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter().getCriteriaList(), false);
             }
-            applicableKPIS.add(new ApplicableKPI(applicableKPI.getActiveKpiId(), applicableKPI.getBaseKpiId(), null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getTitle(), false,kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getKpiRepresentation(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getInterval(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getValue(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFrequencyType()));
+            applicableKPIS.add(new ApplicableKPI(applicableKPI.getActiveKpiId(), applicableKPI.getBaseKpiId(), null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getTitle(), false,kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getKpiRepresentation(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getInterval(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getValue(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFrequencyType(),kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFibonacciKPIConfigs()));
         }));
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, unitId);
@@ -676,7 +676,7 @@ public class CounterDistService extends MongoBaseService {
             if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                 applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
             }
-            applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType()));
+            applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
         });
         //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
         if (!applicableKPISToSave.isEmpty()) {

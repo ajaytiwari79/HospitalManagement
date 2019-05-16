@@ -125,13 +125,14 @@ public class RestingHoursCalculationService implements CounterService {
 
     @Override
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
-        List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
+        /*List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
         Map<Long, Number> staffRestingHours = calculateRestingHours(staffIds, DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1),true);
         Map<Long, Integer> staffAndRestingHoursMap = new HashMap<>(staffRestingHours.size());
         for (Map.Entry<Long, Number> staffRestingHour : staffRestingHours.entrySet()) {
             staffAndRestingHoursMap.put(staffRestingHour.getKey(), staffRestingHour.getValue().intValue());
         }
-        return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
+        return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);*/
+         return new TreeSet<>();
     }
 
     private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Shift> shifts) {

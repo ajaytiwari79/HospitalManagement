@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.KPIUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
@@ -116,11 +117,6 @@ public class PlannedHoursCalculationService implements CounterService {
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
-    @Override
-    public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
-        return null;
-    }
-
     private void getKpiDataUnits(double multiplicationFactor, Map<Object, Double> staffRestingHours, List<CommonKpiDataUnit> kpiDataUnits, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         for (Map.Entry<Object, Double> entry : staffRestingHours.entrySet()) {
             switch (applicableKPI.getKpiRepresentation()) {
@@ -198,7 +194,7 @@ public class PlannedHoursCalculationService implements CounterService {
 
     @Override
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
-        List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
+       /* List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
         List<String> shiftActivityStatus = new ArrayList<>();
         Set<BigInteger> timeTypeIds = new HashSet<>();
         List<CommonKpiDataUnit> basicChartKpiDateUnits = shiftMongoRepository.findShiftsByKpiFilters(staffIds,Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
@@ -206,7 +202,8 @@ public class PlannedHoursCalculationService implements CounterService {
         basicChartKpiDateUnits.forEach(kpiData -> {
             staffAndPlannedMinutesMap.put((Long) kpiData.getRefId(),(int)((BasicChartKpiDateUnit)kpiData).getValue());
         });
-        return getFibonacciCalculation(staffAndPlannedMinutesMap,sortingOrder);
+        return getFibonacciCalculation(staffAndPlannedMinutesMap,sortingOrder);*/
+        return new TreeSet<>();
     }
 
 }
