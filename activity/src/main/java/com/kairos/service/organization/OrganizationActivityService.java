@@ -204,10 +204,12 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityDetails;
     }
 
-    public Map<String, Object> getAllActivityByUnit(Long unitId,Boolean includeTeamActivity) {
+
+    public Map<String, Object> getAllActivityByUnit(Long unitId,boolean includeTeamActivity) {
+        includeTeamActivity =true;
         Map<String, Object> response = new HashMap<>();
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ActivityTagDTO> activities = includeTeamActivity==null || includeTeamActivity?activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false):activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
+        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false):activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
             boolean activityCanBeCopied = false;
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
