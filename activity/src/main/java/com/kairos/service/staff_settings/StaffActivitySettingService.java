@@ -115,7 +115,6 @@ public class StaffActivitySettingService extends MongoBaseService {
                     activityMap.get(activity.getActivityId()).getRulesActivityTab().setShortestTime(activity.getShortestTime());
                     activityMap.get(activity.getActivityId()).getRulesActivityTab().setLongestTime(activity.getLongestTime());
                 }
-                activity.setActivityId(activity.getId());
             });
             return activityList;
         }
