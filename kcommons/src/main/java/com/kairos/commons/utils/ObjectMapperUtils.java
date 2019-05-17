@@ -8,11 +8,14 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.PropertyAccessorFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +30,8 @@ public class ObjectMapperUtils {
     public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
 
     private static ObjectMapper mapper;
+
+
 
     static {
         mapper = new ObjectMapper();
@@ -94,7 +99,7 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    public static <T> T JsonStringToObject(String jsonString,Class<T> valueType){
+    public static <T> T jsonStringToObject(String jsonString, Class<T> valueType){
         try {
             return mapper.readValue(jsonString, valueType);
         } catch (IOException e) {
@@ -130,6 +135,54 @@ public class ObjectMapperUtils {
     public  static ObjectMapper getObjectMapper(){
         return mapper;
     }
+
+    public static <T extends Object,E extends Object> List<E> copyObjectPropertiesUsingIgnorePropList(List<T> objects, Class className, String... ignoreProperties) {
+        List objectListwithCopiedData = new ArrayList<>();
+         objects.forEach(t -> {
+             try {
+             Object copiedObject = className.newInstance();
+             BeanUtils.copyProperties(t, copiedObject, ignoreProperties);
+                 objectListwithCopiedData.add(copiedObject);
+             }catch (Exception ex){
+                 ex.printStackTrace();
+             }
+         });
+
+        return objectListwithCopiedData;
+    }
+
+    public static <T extends Object, E extends Object>  List<E> copyObjectSpecificPropertiesOfListByMapper(List<T> src, Class className, List<String> props) {
+        List objectListwithCopiedData = new ArrayList();
+        src.forEach(t -> {
+            BeanWrapper targetWrapper = null;
+            try {
+                BeanWrapper srcWrappper = PropertyAccessorFactory.forBeanPropertyAccess(t);
+                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(className.newInstance());
+                for (String prop : props) {
+                    targetWrapper.setPropertyValue(prop, srcWrappper.getPropertyValue(prop));
+                }
+                objectListwithCopiedData.add(targetWrapper.getWrappedInstance());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+        return objectListwithCopiedData;
+    }
+
+    public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<String> props) {
+        BeanWrapper targetWrapper = null;
+        try {
+            BeanWrapper srcWrappper = PropertyAccessorFactory.forBeanPropertyAccess(src);
+            targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
+            for(String prop : props){
+                targetWrapper.setPropertyValue(prop, srcWrappper.getPropertyValue(prop));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return (E)targetWrapper.getWrappedInstance();
+    }
+
 
 
 

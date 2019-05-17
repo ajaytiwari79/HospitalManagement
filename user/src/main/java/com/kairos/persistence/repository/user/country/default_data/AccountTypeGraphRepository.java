@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.user.country.default_data;
 
 
-import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
@@ -12,9 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.DAY_TYPES;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountType, Long> {

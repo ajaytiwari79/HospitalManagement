@@ -1,14 +1,14 @@
 package com.kairos.service.client_exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.client_exception.ClientExceptionCount;
 import com.kairos.dto.user.client.Client;
 import com.kairos.dto.user.client.ClientExceptionCountWrapper;
 import com.kairos.dto.user.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
-import com.kairos.dto.activity.client_exception.ClientExceptionCount;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
 import com.kairos.persistence.model.task.Task;
@@ -19,13 +19,13 @@ import com.kairos.persistence.repository.client_exception.ClientExceptionTypeMon
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.aggregator.AggregatorService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.functional_interface.PerformCalculation;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import org.apache.commons.lang3.StringUtils;
@@ -48,10 +48,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.persistence.model.constants.ClientExceptionConstant.*;
-import static com.kairos.persistence.model.constants.TaskConstants.*;
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
+import static com.kairos.persistence.model.constants.ClientExceptionConstant.*;
+import static com.kairos.persistence.model.constants.TaskConstants.*;
 
 /**
  * Created by oodles on 7/2/17.

@@ -2,10 +2,10 @@ package com.kairos.service.integration;
 
 import com.kairos.dto.activity.activity.activity_tabs.ActivityNoTabsDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.service.organization.OrganizationActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

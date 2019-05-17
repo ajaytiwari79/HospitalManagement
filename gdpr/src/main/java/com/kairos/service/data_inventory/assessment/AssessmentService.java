@@ -50,7 +50,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -155,7 +154,7 @@ public class AssessmentService {
             }
         }
         if (!result) {
-            exceptionService.illegalArgumentException("message.assessment.relativeDeadLine.value.invalid");
+            exceptionService.illegalArgumentException("message.relativeDeadLine.value.invalid");
         }
         return result;
     }

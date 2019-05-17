@@ -1,9 +1,9 @@
 package com.kairos.dto.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.dto.user.country.skill.SkillDTO;
 
 import java.time.LocalDate;
 import java.util.Set;

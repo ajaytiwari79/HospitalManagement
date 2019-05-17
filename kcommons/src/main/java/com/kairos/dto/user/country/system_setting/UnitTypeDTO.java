@@ -1,7 +1,6 @@
 package com.kairos.dto.user.country.system_setting;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import javax.validation.constraints.NotNull;
 import java.util.Set;

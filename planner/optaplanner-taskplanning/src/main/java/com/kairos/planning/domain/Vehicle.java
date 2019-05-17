@@ -1,7 +1,6 @@
 package com.kairos.planning.domain;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 import java.util.List;
 

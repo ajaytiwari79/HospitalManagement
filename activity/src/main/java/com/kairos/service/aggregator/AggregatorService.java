@@ -1,7 +1,12 @@
 package com.kairos.service.aggregator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.client_exception.ClientExceptionCount;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.client.ClientExceptionCountWrapper;
+import com.kairos.dto.user.client.ClientOrganizationIds;
+import com.kairos.dto.user.staff.client.ClientAggregatorDTO;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
@@ -14,25 +19,19 @@ import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRe
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.SchedulerRestClient;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
 import com.kairos.service.planner.RandomDateGeneratorService;
 import com.kairos.service.task_type.TaskDynamicReportService;
-import com.kairos.dto.user.client.Client;
-import com.kairos.dto.user.client.ClientExceptionCountWrapper;
-import com.kairos.dto.user.client.ClientOrganizationIds;
-import com.kairos.dto.user.staff.client.ClientAggregatorDTO;
 import com.kairos.utils.ApplicationUtil;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.functional_interface.PerformCalculation;
 import org.bson.Document;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -51,7 +50,8 @@ import java.util.stream.Collectors;
 import static com.kairos.constants.AppConstants.CITIZEN_ID;
 import static com.kairos.persistence.model.constants.TaskConstants.MONOGDB_QUERY_RECORD_LIMIT;
 import static java.time.ZoneId.systemDefault;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 
 /**
  * Created by oodles on 7/7/17.

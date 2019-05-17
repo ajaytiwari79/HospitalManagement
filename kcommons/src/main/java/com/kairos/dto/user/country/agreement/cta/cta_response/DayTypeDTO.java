@@ -3,7 +3,6 @@ package com.kairos.dto.user.country.agreement.cta.cta_response;
 import com.kairos.enums.Day;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

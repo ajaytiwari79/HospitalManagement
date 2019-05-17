@@ -3,7 +3,6 @@ package com.kairos.config.mongo_converter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 @ReadingConverter

@@ -75,6 +75,13 @@ public  class DateUtils {
         return localDateTimeToDate(startOfDay);
     }
 
+    public static Date getMidNightOfDay(Date date) {
+        LocalDateTime localDateTime = dateToLocalDateTime(date).plusDays(1);
+        LocalDateTime startOfDay = localDateTime.with(LocalTime.MIDNIGHT);
+
+        return localDateTimeToDate(startOfDay);
+    }
+
     public static Date addTimeInDate(Date date, int hour, int minute, int second) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         LocalDateTime startOfDay = localDateTime.with(LocalTime.of(hour, minute, second));
@@ -646,7 +653,7 @@ public  class DateUtils {
         minutes = seconds / 60;
         hours = minutes / 60;
         minutes = minutes % 60;
-        return new Double(hours+"."+minutes);
+        return new Double(Math.abs(hours)+"."+Math.abs(minutes));
     }
 
     public static Double getHoursByMinutes(double totalMinutes){
@@ -743,5 +750,95 @@ public  class DateUtils {
     }
     public static Date minusMonths(Date date,int minusMonths) {
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusMonths(minusMonths));
+    }
+    public static Date parseDate(String date){
+        DateTime dateTime = new DateTime(date);
+        return dateTime.toDate();
+    }
+
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                date = date.plusDays(1);
+                break;
+            case MONTHS:
+                date = date.plusMonths(1);
+                break;
+            case WEEKS:
+                date = date.plusWeeks(1);
+                break;
+            case YEAR:
+                date = date.plusYears(1);
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                date = date.minusDays(1);
+                break;
+            case MONTHS:
+                date = date.minusMonths(1);
+                break;
+            case WEEKS:
+                date = date.minusWeeks(1);
+                break;
+            case YEAR:
+                date = date.minusYears(1);
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static LocalDate getLastLocaDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                date = date.plusDays(1);
+                break;
+            case MONTHS:
+                date = date.with(TemporalAdjusters.lastDayOfMonth());
+                break;
+            case WEEKS:
+                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                date = date.with(TemporalAdjusters.lastDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static LocalDate getFirstLocalDateByDurationType(LocalDate date, DurationType durationType) {
+        switch (durationType) {
+            case DAYS:
+                break;
+            case MONTHS:
+                date = date.with(TemporalAdjusters.firstDayOfMonth());
+                break;
+            case WEEKS:
+                date = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                date = date.with(TemporalAdjusters.firstDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
+
+    public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
+        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+    }
+    public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
+        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+"";
     }
 }

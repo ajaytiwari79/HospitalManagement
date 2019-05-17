@@ -76,7 +76,7 @@ public class Activity {
     private String ArrayOfDayTypeCalc;
 
     public Activity() {
-
+        //Default Constructor
     }
 
     public String getType() {

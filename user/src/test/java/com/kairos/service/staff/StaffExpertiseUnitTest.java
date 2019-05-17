@@ -94,6 +94,7 @@ public class StaffExpertiseUnitTest {
         staff.setId(1956L);
         User user = new User();
         user.setCprNumber("1103843142");
+        user.setUserName("abc@kairosplanning.com");
         ContactDetail contactDetail = new ContactDetail();
         contactDetail.setId(22071L);
         contactDetail.setPrivatePhone("9876767767");
@@ -156,7 +157,7 @@ public class StaffExpertiseUnitTest {
         staffExpertiseQueryResult1.setNextSeniorityLevelInMonths(null);
         staffExpertiseQueryResult1.setSeniorityLevel(seniorityLevel);
         staffExpertiseQueryResult1.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007, 11, 15)));
-        staffExpertiseQueryResult1.setUnitPositionExists(true);
+        staffExpertiseQueryResult1.setEmploymentExists(true);
         staffExpertiseQueryResult1.setSeniorityLevels(seniorityLevels);
 
 
@@ -168,7 +169,7 @@ public class StaffExpertiseUnitTest {
         staffExpertiseQueryResult2.setNextSeniorityLevelInMonths(null);
         staffExpertiseQueryResult2.setSeniorityLevel(seniorityLevel1);
         staffExpertiseQueryResult2.setExpertiseStartDate(DateUtils.asDate(LocalDate.of(2007, 11, 15)));
-        staffExpertiseQueryResult2.setUnitPositionExists(true);
+        staffExpertiseQueryResult2.setEmploymentExists(true);
         staffExpertiseQueryResult2.setSeniorityLevels(seniorityLevels);
         staffExpertiseQueryResults.add(staffExpertiseQueryResult1);
         staffExpertiseQueryResults.add(staffExpertiseQueryResult2);
@@ -190,6 +191,7 @@ public class StaffExpertiseUnitTest {
         when(expertiseGraphRepository.findAllById(expertiseIds)).thenReturn(expertiseList);
         when(userGraphRepository.getUserByStaffId(1956L)).thenReturn(user);
         when(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(1956L)).thenReturn(sectorWiseExpertise);
+        when(staffGraphRepository.save(staff)).thenReturn(staff);
         StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L, staffPersonalDetail, 20123);
         staffPersonalDetail1.setSectorWiseExpertise(sectorWiseExpertise);
         assertEquals(staffPersonalDetail1, staffPersonalDetailResult);

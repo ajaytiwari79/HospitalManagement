@@ -31,9 +31,11 @@ public class CorsFilter implements Filter {
 
     @Override
     public void destroy() {
+        //This is Override method
     }
 
     @Override
     public void init(FilterConfig config) throws ServletException {
+        //This is Override method
     }
 }

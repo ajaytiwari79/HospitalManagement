@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.region;
 
-import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.config.neo4j.converter.LocalTimeConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;

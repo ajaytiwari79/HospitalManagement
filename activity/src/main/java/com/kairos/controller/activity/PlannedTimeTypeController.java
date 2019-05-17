@@ -1,8 +1,8 @@
 package com.kairos.controller.activity;
 
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +13,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /*
  * @author: Mohit Shakya

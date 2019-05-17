@@ -22,6 +22,11 @@ public class ClientException extends MongoBaseEntity {
     private Date toTime;
     private boolean isDeleted;
 
+
+    public ClientException() {
+        //Default Constructor
+    }
+
     public boolean isDeleted() {
         return isDeleted;
     }
@@ -214,8 +219,6 @@ public class ClientException extends MongoBaseEntity {
         this.houseHoldMembers = houseHoldMembers;
     }
 
-    public ClientException() {
-    }
 
     public TaskOperation getTaskStatus() {
         return taskStatus;

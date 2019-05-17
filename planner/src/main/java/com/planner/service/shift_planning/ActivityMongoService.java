@@ -6,10 +6,10 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityConstraint.*;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
@@ -96,8 +96,8 @@ public class ActivityMongoService {
      * @param toDate
      * @return
      */
-    public List<Shift> getAllShiftsByUnitPositionIds(List<Long> organizationPositionIds, Date fromDate, Date toDate) {
-        return activityMongoRepository.getAllShiftsByUnitPositionIds(organizationPositionIds, fromDate, toDate);
+    public List<Shift> getAllShiftsByEmploymentIds(List<Long> organizationPositionIds, Date fromDate, Date toDate) {
+        return activityMongoRepository.getAllShiftsByEmploymentIds(organizationPositionIds, fromDate, toDate);
     }
 /***********************************************CTAService******************************************************************/
     /**
@@ -107,8 +107,8 @@ public class ActivityMongoService {
      * @param toPlanningDate
      * @return
      */
-    public  List<CTAResponseDTO>  getCTARuleTemplateByUnitPositionIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
-        return  activityMongoRepository.getCTARuleTemplateByUnitPositionIds(organizationPositionIds, fromPlanningDate, toPlanningDate);
+    public  List<CTAResponseDTO> getCTARuleTemplateByEmploymentIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+        return  activityMongoRepository.getCTARuleTemplateByEmploymentIds(organizationPositionIds, fromPlanningDate, toPlanningDate);
     }
     /*************************************WTAService***********************************************/
     /**Used in {@link WTAService}
@@ -117,8 +117,8 @@ public class ActivityMongoService {
      * @param toPlanningDate
      * @return
      */
-    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
-        return activityMongoRepository.getWTARuleTemplateByUnitPositionIds(organizationPositionIds,fromPlanningDate,toPlanningDate);
+    public List<WorkingTimeAgreement> getWTARuleTemplateByEmploymentIds(List<Long> organizationPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+        return activityMongoRepository.getWTARuleTemplateByEmploymentIds(organizationPositionIds,fromPlanningDate,toPlanningDate);
     }
 
     //TODO temporary use ObjectMapperUtils(currently not working)

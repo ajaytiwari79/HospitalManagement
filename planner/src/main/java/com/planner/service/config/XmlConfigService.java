@@ -3,7 +3,6 @@ package com.planner.service.config;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

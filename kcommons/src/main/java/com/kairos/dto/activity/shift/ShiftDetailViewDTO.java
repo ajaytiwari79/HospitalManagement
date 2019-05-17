@@ -1,8 +1,5 @@
 package com.kairos.dto.activity.shift;
 
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-
-import java.time.LocalTime;
 import java.util.List;
 
 /**

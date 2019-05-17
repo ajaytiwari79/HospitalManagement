@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.organization.union;
 
-import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;

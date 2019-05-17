@@ -3,7 +3,7 @@ package com.kairos.planning.domain;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TaskTest {
     @Test

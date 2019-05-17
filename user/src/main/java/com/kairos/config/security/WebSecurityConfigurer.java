@@ -1,5 +1,6 @@
 package com.kairos.config.security;
 
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.auth.UserOauth2Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -8,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -17,18 +17,26 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+
+import javax.inject.Inject;
 
 import static com.kairos.constants.AppConstants.*;
 
 
 @Configuration
-@EnableWebSecurity()
+@EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserOauth2Service userDetailsService;
-    
+    @Inject
+    private RedisService redisService;
+    @Inject
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
+
+
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -49,19 +57,17 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
+    public CustomAuthenticationProvider authenticationProvider() {
+        return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
+
     }
 
     /*
-	 * @see org.springframework.security.config.annotation.web.configuration.
-	 * WebSecurityConfigurerAdapter#configure(org.springframework.security.
-	 * config.annotation.web.builders.HttpSecurity) This method is where the
-	 * actual URL-based security is set up.
-	 */
+     * @see org.springframework.security.config.annotation.web.configuration.
+     * WebSecurityConfigurerAdapter#configure(org.springframework.security.
+     * config.annotation.web.builders.HttpSecurity) This method is where the
+     * actual URL-based security is set up.
+     */
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -87,23 +93,35 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/api/v1/login");
         web.ignoring().antMatchers("/api/v1/create_permission_schema");
         web.ignoring().antMatchers("/api/v1/forgot");
-        web.ignoring().antMatchers("/api/v1/reset");
+        web.ignoring().antMatchers("/api/v1/reset","/api/v1/logout");
 
     }
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-    	 http
-                  .csrf().disable()
-                  .anonymous().disable()
-                  .sessionManagement()
-                  .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                   .and()
-                  .authorizeRequests()
-                  .antMatchers("/oauth/*").permitAll()
-                   .antMatchers(HttpMethod.OPTIONS).permitAll()
-                   .anyRequest().authenticated()
-                   .and()
-                 .formLogin();
+        http
+                .csrf().disable()
+                .anonymous().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/oauth/*").permitAll()
+                .antMatchers(HttpMethod.OPTIONS).permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin();
     }
+
+
+   /* @Bean
+    public FilterRegistrationBean registration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean(getAuthenticationFilter());
+        registration.setEnabled(true);
+        return registration;
+    }
+*/
+
+
 }
+

@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by oodles on 9/1/17.
@@ -72,6 +71,6 @@ public class EngineerTypeService{
         } else {
             exceptionService.dataNotFoundByIdException("error.EngineerType.notfound");
         }
-        return true;
+        return false;
     }
 }

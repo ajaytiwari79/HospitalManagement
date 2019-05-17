@@ -1,1 +1,9 @@
 {server URL}/kairos/activity/api/v1/unit/{unitId}/timeBank/update_daily_timebank GET
+
+
+
+// To drop old db entries
+db.staffActivitySetting.drop();
+
+// Unique constraints on staffId and activityId
+db.staffActivitySetting.createIndex( { staffId:1,activityId:1 }, { unique: true } )

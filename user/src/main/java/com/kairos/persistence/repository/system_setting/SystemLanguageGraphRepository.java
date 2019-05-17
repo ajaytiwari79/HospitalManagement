@@ -7,7 +7,8 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SYSTEM_LANGUAGE;
 
 @Repository
 public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<SystemLanguage,Long> {

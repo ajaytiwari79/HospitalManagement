@@ -18,7 +18,7 @@ import java.util.Properties;
  * Created by oodles on 29/1/17.
  */
 public class BeanFactoryUtil {
-    private static final Logger logger = LoggerFactory.getLogger(BeanFactoryUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BeanFactoryUtil.class);
 
     /**
      * Helper method to register a bean in spring bean factory
@@ -30,7 +30,7 @@ public class BeanFactoryUtil {
      */
     public synchronized static void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         getDefaultListableBeanFactory().registerBeanDefinition(beanName, beanDefinition);
-        logger.info(String.format("Bean registered in spring bean factory with name %s", beanName));
+        LOGGER.info(String.format("Bean registered in spring bean factory with name %s", beanName));
     }
 
     /**

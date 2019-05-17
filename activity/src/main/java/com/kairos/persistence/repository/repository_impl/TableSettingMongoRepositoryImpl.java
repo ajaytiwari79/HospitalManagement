@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 
-import java.util.List;
-
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
 @Repository

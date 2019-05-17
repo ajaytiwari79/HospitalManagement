@@ -1,8 +1,8 @@
 package com.kairos.service.country;
 
-import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.IndustryType;
+import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.IndustryTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;

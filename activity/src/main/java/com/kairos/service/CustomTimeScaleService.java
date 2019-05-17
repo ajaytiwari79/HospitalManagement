@@ -1,9 +1,9 @@
 package com.kairos.service;
 
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

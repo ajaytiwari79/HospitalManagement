@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
@@ -54,6 +53,7 @@ public class ActivityDTO {
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
+    private BigInteger activityPriorityId;
 
     public ActivityDTO() {
         //default constructor
@@ -315,5 +315,13 @@ public class ActivityDTO {
 
     public void setChildActivityIds(Set<BigInteger> childActivityIds) {
         this.childActivityIds = childActivityIds;
+    }
+
+    public BigInteger getActivityPriorityId() {
+        return activityPriorityId;
+    }
+
+    public void setActivityPriorityId(BigInteger activityPriorityId) {
+        this.activityPriorityId = activityPriorityId;
     }
 }

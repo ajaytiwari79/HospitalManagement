@@ -3,8 +3,6 @@ package com.kairos.rule_validator;
 import com.kairos.rule_validator.activity.AndActivitySpecification;
 import com.kairos.rule_validator.activity.OrActivitySpecification;
 
-import java.util.List;
-
 /**
  * Created by vipul on 30/1/18.
  */

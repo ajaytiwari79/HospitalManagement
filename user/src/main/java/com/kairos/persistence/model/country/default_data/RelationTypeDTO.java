@@ -14,6 +14,7 @@ public class RelationTypeDTO {
 
 
     public RelationTypeDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.country.default_data;
+
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
@@ -6,6 +7,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotBlank;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 /**

@@ -1,9 +1,9 @@
 package com.kairos.shiftplanning.constraints.activityConstraint;
 
+import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.wta.ConstraintHandler;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 

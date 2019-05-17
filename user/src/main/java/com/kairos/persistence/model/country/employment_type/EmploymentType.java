@@ -29,14 +29,14 @@ public class EmploymentType extends UserBaseEntity {
     private Set<EmploymentCategory> employmentCategories;
     private PaidOutFrequencyEnum paymentFrequency;
     //Added By Pavan
-    private boolean editableAtUnitPosition;
+    private boolean editableAtEmployment;
     private Short weeklyMinutes;
 
     public EmploymentType() {
         //Default Constructor
     }
 
-    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtUnitPosition) {
+    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtEmployment) {
         this.id=id;
         this.name = name;
         this.description = description;
@@ -45,7 +45,7 @@ public class EmploymentType extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
         this.employmentCategories = employmentCategories;
         this.paymentFrequency = paymentFrequency;
-        this.editableAtUnitPosition = editableAtUnitPosition;
+        this.editableAtEmployment = editableAtEmployment;
     }
 
     public String getName() {
@@ -104,12 +104,12 @@ public class EmploymentType extends UserBaseEntity {
         this.paymentFrequency = paymentFrequency;
     }
 
-    public boolean isEditableAtUnitPosition() {
-        return editableAtUnitPosition;
+    public boolean isEditableAtEmployment() {
+        return editableAtEmployment;
     }
 
-    public void setEditableAtUnitPosition(boolean editableAtUnitPosition) {
-        this.editableAtUnitPosition = editableAtUnitPosition;
+    public void setEditableAtEmployment(boolean editableAtEmployment) {
+        this.editableAtEmployment = editableAtEmployment;
     }
 
     public Short getWeeklyMinutes() {

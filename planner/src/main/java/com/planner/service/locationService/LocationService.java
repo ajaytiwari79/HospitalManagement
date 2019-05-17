@@ -6,7 +6,6 @@ import com.planner.domain.location.LocationDistance;
 import com.planner.domain.location.PlanningLocation;
 import com.planner.repository.locationRepository.LocationRepository;
 import com.planner.repository.locationRepository.PlanningLocationRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

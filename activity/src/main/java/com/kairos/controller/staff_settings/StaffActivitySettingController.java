@@ -1,8 +1,8 @@
 package com.kairos.controller.staff_settings;
 
-import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
+import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

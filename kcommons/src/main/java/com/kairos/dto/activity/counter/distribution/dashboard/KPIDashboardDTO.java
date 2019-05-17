@@ -2,8 +2,6 @@ package com.kairos.dto.activity.counter.distribution.dashboard;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 
-import java.math.BigInteger;
-
 public class KPIDashboardDTO {
     //private BigInteger id;
     private String parentModuleId;

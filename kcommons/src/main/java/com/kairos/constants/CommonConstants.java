@@ -16,11 +16,13 @@ public class CommonConstants {
     public static final String FORWARD_SLASH = "/";
     public static final String USER_DEFAULT_IMAGE = "user-default-img.png";
     public static final String KAIROS_LOGO = "Kairoslogo.png";
-    public static final String RESET_PASSWORD = "Reset password";
+    public static final String RESET_PASSCODE = "Reset password";
 
     public static final String[] KAIROS_BACKEND_MAIL_IDS = new String[]{"pradeep.singh@oodlestechnologies.com","yasir.zuberi@oodlestechnologies.com","pavan.kumar@oodlestechnologies.com"};
-    public static final String PRODUCTION = "production";
-    public static final String QA = "qa";
+    public static final String PRODUCTION_PROFILE = "production";
+    public static final String QA_PROFILE = "qa";
+    public static final String LOCAL_PROFILE = "local";
+
     public static final String PACKAGE_NAME  = "com.kairos";
 
 

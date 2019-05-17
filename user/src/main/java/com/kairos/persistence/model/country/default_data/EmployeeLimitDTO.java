@@ -15,6 +15,7 @@ public class EmployeeLimitDTO {
     private int  maximum;
 
     public EmployeeLimitDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

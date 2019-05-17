@@ -5,7 +5,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -203,9 +202,9 @@ public class AppConstants {
 
     //Query result Keys
     public static final String STAFF="staff";
-    public static final String UNIT_POSITION="unitPosition";
-    public static final String UNIT_POSITION_ORGANIZATION_RELATIONSHIP="unitPositionOrgRel";
-    public static final String UNIT_POSITION_STAFF_RELATIONSHIP="unitPositionStaffRel";
+    public static final String EMPLOYMENT ="employment";
+    public static final String EMPLOYMENT_ORGANIZATION_RELATIONSHIP ="employmentOrgRel";
+    public static final String EMPLOYMENT_STAFF_RELATIONSHIP ="employmentStaffRel";
 
     //organization Hierarchy Filter constants
     public static final String ORGANIZATION_TYPES = "organizationType";
@@ -220,5 +219,10 @@ public class AppConstants {
 
     //country and system langange relation
     public static final String HAS_SYSTEM_LANGUAGE = "HAS_SYSTEM_LANGUAGE";
+    public static final String KAIROS="Kairos";
+    public static final String KAIROS_DENMARK_EMAIL="kairos_denmark@kairos.com";
+    public static final String ULRIK_EMAIL="ulrik@kairos.com";
+    public static final String ULRIK="Ulrik";
+    public static final String AUTHORIZATION = "Authorization";
 
 }

@@ -50,6 +50,7 @@ public class WorkPlace {
     private String CostPlace;
 
     public WorkPlace() {
+        //Default Constructor
     }
 
     public String getExternalNodeId() {

@@ -8,16 +8,14 @@ import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstants.*;
-import static com.kairos.constants.ApiConstants.API_V1;
+
 
 /**
  * pradeep

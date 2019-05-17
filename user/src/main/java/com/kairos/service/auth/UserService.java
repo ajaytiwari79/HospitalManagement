@@ -1,6 +1,7 @@
 package com.kairos.service.auth;
 
 import com.kairos.commons.service.mail.MailService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -40,18 +41,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
+import org.springframework.security.oauth2.provider.authentication.TokenExtractor;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
-import static com.kairos.constants.CommonConstants.RESET_PASSWORD;
+import static com.kairos.constants.CommonConstants.RESET_PASSCODE;
 
 
 /**
@@ -91,6 +99,11 @@ public class UserService {
     private EnvConfig config;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private RedisService redisService;
+    private TokenExtractor tokenExtractor = new BearerTokenExtractor();
+    @Inject
+    private TokenStore tokenStore;
 
     /**
      * Calls UserGraphRepository,
@@ -170,12 +183,11 @@ public class UserService {
      *
      * @param user
      * @return User
-     *
      */
     public Map<String, Object> authenticateUser(User user) {
-          User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
+        User currentUser = userDetailsService.loadUserByUserName(user.getUserName(), user.getPassword());
         if (!Optional.ofNullable(currentUser).isPresent()) {
-                return null;
+            return null;
         }
         int otp = OtpGenerator.generateOtp();
         currentUser.setOtp(otp);
@@ -215,6 +227,26 @@ public class UserService {
         user.setAccessToken(null);
         userGraphRepository.save(user);
         return true;
+    }
+
+    public boolean logout(boolean logoutFromAllMachine, HttpServletRequest request) {
+        boolean logoutSuccessfull = false;
+        Authentication authentication = tokenExtractor.extract(request);
+        if (authentication != null) {
+            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication((String) authentication.getPrincipal());
+            if (logoutFromAllMachine) {
+                redisService.invalidateAllTokenOfUser(oAuth2Authentication.getUserAuthentication().getName());
+            } else {
+                redisService.removeUserTokenFromRedisByUserNameAndToken(oAuth2Authentication.getUserAuthentication().getName(),(String) authentication.getPrincipal());
+            }
+            tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
+            SecurityContextHolder.clearContext();
+            logoutSuccessfull = true;
+        } else {
+            exceptionService.internalServerError("message.authentication.null");
+        }
+        return logoutSuccessfull;
+
     }
 
     public List<OrganizationWrapper> getOrganizations(long userId) {
@@ -347,7 +379,7 @@ public class UserService {
     }
 
     public boolean updatePassword(FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
-        User user = userGraphRepository.findByEmail("(?i)"+firstTimePasswordUpdateDTO.getEmail());
+        User user = userGraphRepository.findByEmail("(?i)" + firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             LOGGER.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", firstTimePasswordUpdateDTO.getEmail());
@@ -410,20 +442,20 @@ public class UserService {
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
             Long countryId = UserContext.getUserDetails().getCountryId();
-            List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
-            Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
-            boolean checkDayType=true;
-            List<AccessGroup> accessGroups=accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
-            for (AccessGroup currentAccessGroup:accessGroups){
-                if(!currentAccessGroup.isAllowedDayTypes()){
-                    checkDayType=false;
+            List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
+            Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+            boolean checkDayType = true;
+            List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
+            for (AccessGroup currentAccessGroup : accessGroups) {
+                if (!currentAccessGroup.isAllowedDayTypes()) {
+                    checkDayType = false;
                     break;
                 }
             }
-            if(checkDayType){
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds,organizationId);
+            if (checkDayType) {
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
             } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId,organizationId);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
@@ -443,7 +475,7 @@ public class UserService {
 
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if(currentUser.getLastSelectedOrganizationId()!=organizationId){
+        if (currentUser.getLastSelectedOrganizationId() != organizationId) {
             currentUser.setLastSelectedOrganizationId(organizationId);
             Organization parent = organizationService.fetchParentOrganization(organizationId);
             Long countryId = organizationGraphRepository.getCountryId(parent.getId());
@@ -489,18 +521,20 @@ public class UserService {
                 exceptionService.dataNotFoundByIdException("message.user.userName.notFound", userEmail);
             }
         }
+
             String token = tokenService.createForgotPasswordToken(currentUser);
             Map<String, Object> templateParam = new HashMap<>();
             templateParam.put("receiverName", currentUser.getFullName());
             templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))/*+config.getForgotPasswordApiLink()+token*/);
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
-            templateParam.put("hyperLinkName", RESET_PASSWORD);
+            templateParam.put("hyperLinkName", RESET_PASSCODE);
             mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
             return true;
         }
 
-    public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
-        if(!passwordUpdateDTO.isValid()){
+
+    public boolean resetPassword(String token, PasswordUpdateDTO passwordUpdateDTO) {
+        if (!passwordUpdateDTO.isValid()) {
             exceptionService.actionNotPermittedException("message.staff.user.password.notmatch");
         }
         User user = findByForgotPasswordToken(token);
@@ -526,8 +560,7 @@ public class UserService {
         if (ObjectUtils.isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userDetailsDTO.getEmail());
-        }
-         else {
+        } else {
             if (user.getUserName().equalsIgnoreCase(userDetailsDTO.getUserName())) {
                 user.setUserNameUpdated(true);
                 userGraphRepository.save(user);
@@ -543,6 +576,6 @@ public class UserService {
             userGraphRepository.save(user);
             return true;
         }
-         return false;
+        return false;
     }
 }

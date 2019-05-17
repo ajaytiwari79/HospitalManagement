@@ -35,8 +35,4 @@ public class FibonacciKPIDTO {
     private BigInteger categoryId;
     private boolean fibonacciKPI;
     private List<KPIDTO> kpiCounters;
-
-    public void setTitle(String title) {
-        this.title = title.trim();
-    }
 }

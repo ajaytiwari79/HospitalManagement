@@ -13,6 +13,10 @@ public class Twillio  extends UserBaseEntity {
     private String number;
     private Long organizationId;
 
+    public Twillio() {
+        //Default Constructor
+    }
+
     public String getAccountId() {
         return accountId;
     }
@@ -43,9 +47,6 @@ public class Twillio  extends UserBaseEntity {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
-    }
-
-    public Twillio() {
     }
 
     public static Twillio getInstance(){

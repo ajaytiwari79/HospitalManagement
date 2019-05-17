@@ -36,19 +36,19 @@ import java.util.*;
 public class RegionService {
 
     @Inject
-    RegionGraphRepository regionGraphRepository;
+    private RegionGraphRepository regionGraphRepository;
 
     @Inject
-    CountryGraphRepository countryGraphRepository;
+    private CountryGraphRepository countryGraphRepository;
 
 
     @Inject
-    MunicipalityGraphRepository municipalityGraphRepository;
+    private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
-    ZipCodeGraphRepository zipCodeGraphRepository;
+    private ZipCodeGraphRepository zipCodeGraphRepository;
 
     @Inject
-    ProvinceGraphRepository provinceGraphRepository;
+    private ProvinceGraphRepository provinceGraphRepository;
 
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;

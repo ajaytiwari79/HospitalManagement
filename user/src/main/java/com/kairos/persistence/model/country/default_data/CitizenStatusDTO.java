@@ -13,6 +13,7 @@ public class CitizenStatusDTO {
     String description;
 
     public CitizenStatusDTO() {
+        //Default Constructor
     }
 
     public Long getId() {

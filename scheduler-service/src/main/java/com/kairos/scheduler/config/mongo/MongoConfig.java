@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import static com.kairos.scheduler.constants.MongoConstant.DB_NAME;
 import static com.kairos.scheduler.constants.MongoConstant.MONGO_URI;
 

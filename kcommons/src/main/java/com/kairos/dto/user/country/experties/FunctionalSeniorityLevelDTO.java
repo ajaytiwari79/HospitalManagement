@@ -1,9 +1,5 @@
 package com.kairos.dto.user.country.experties;
 
-import com.kairos.dto.activity.shift.Expertise;
-import com.kairos.enums.shift.PaidOutFrequencyEnum;
-
-import java.time.LocalDate;
 import java.util.List;
 
 public class FunctionalSeniorityLevelDTO {

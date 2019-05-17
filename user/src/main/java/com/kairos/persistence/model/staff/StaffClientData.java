@@ -13,7 +13,9 @@ public class StaffClientData {
     private List<Long> staffIds;
     private Long clientId;
 
-
+    public StaffClientData() {
+        //Default Constructor
+    }
     public List<Long> getStaffIds() {
         return staffIds;
     }
@@ -31,6 +33,5 @@ public class StaffClientData {
         this.clientId = clientId;
     }
 
-    public StaffClientData() {
-    }
+
 }

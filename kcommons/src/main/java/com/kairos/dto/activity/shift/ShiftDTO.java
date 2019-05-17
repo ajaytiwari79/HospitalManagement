@@ -19,9 +19,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by vipul on 30/8/17.
@@ -30,51 +28,54 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftDTO {
 
-    private BigInteger id;
-    private Date startDate;
-    private Date endDate;
-    private long bid;
-    private long pId;
-    private long amount;
-    private long probability;
-    private String remarks;
-    private BigInteger parentOpenShiftId;
-    private Long unitId;
+    protected BigInteger id;
+    protected Date startDate;
+    protected Date endDate;
+    protected long bid;
+    protected long pId;
+    protected long amount;
+    protected long probability;
+    protected String remarks;
+    protected BigInteger parentOpenShiftId;
+    protected Long unitId;
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
-    private Long staffId;
+    protected Long staffId;
     @Range(min = 0)
-    @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
-    private Long unitPositionId;
+    @NotNull(message = "error.ShiftDTO.employmentId.notnull")
+    protected Long employmentId;
     @NotNull(message = "message.shift.shiftDate")
-    private LocalDate shiftDate;
-    private Long allowedBreakDurationInMinute;
-    private ShiftTemplateDTO template;
+    protected LocalDate shiftDate;
+    protected Long allowedBreakDurationInMinute;
+    protected ShiftTemplateDTO template;
     @NotEmpty(message = "message.shift.activity.empty")
-    private List<ShiftActivityDTO> activities = new ArrayList<>();
-    private int scheduledMinutes;
-    private int durationMinutes;
-    private BigInteger plannedTimeId;
-    private Long expertiseId;
-    private LocalDate validated;
-    private LocalDateTime clockIn;
-    private LocalDateTime clockOut;
-    private BigInteger shiftId;
-    private AccessGroupRole accessGroupRole;
-    private boolean editable;
-    private boolean functionDeleted;
-    private ShiftType shiftType;
-    private BigInteger shiftStatePhaseId;
-    private int timeBankCtaBonusMinutes;
-    private int deltaTimeBankMinutes;
-    private long accumulatedTimeBankMinutes;
-    private int plannedMinutesOfTimebank;
-    private boolean multipleActivity;
-    private BigInteger planningPeriodId;
-    private BigInteger phaseId;
-    private int restingMinutes;
-    private Set<ShiftEscalationReason> escalationReasons;
-    private Long functionId;
+    protected List<ShiftActivityDTO> activities = new ArrayList<>();
+    protected int scheduledMinutes;
+    protected int durationMinutes;
+    protected BigInteger plannedTimeId;
+    protected Long expertiseId;
+    protected LocalDate validated;
+    protected LocalDateTime clockIn;
+    protected LocalDateTime clockOut;
+    protected BigInteger shiftId;
+    protected AccessGroupRole accessGroupRole;
+    protected boolean editable;
+    protected boolean functionDeleted;
+    protected ShiftType shiftType;
+    protected BigInteger shiftStatePhaseId;
+    protected int timeBankCtaBonusMinutes;
+    protected int deltaTimeBankMinutes;
+    protected long accumulatedTimeBankMinutes;
+    protected int plannedMinutesOfTimebank;
+    protected boolean multipleActivity;
+    protected BigInteger planningPeriodId;
+    protected BigInteger phaseId;
+    protected int restingMinutes;
+    protected Set<ShiftEscalationReason> escalationReasons;
+    protected Long functionId;
+    private Set<BigInteger> escalationFreeShiftIds;
+    private boolean escalationResolved;
+
 
     public ShiftDTO() {
         //default Const
@@ -88,18 +89,18 @@ public class ShiftDTO {
        this.staffId = staffId;
    }
 
-    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
+    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
     }
 
-    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,Date startDate,Date endDate) {
+    public ShiftDTO(List<ShiftActivityDTO> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId, Date startDate, Date endDate) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
+        this.employmentId = employmentId;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -329,12 +330,12 @@ public class ShiftDTO {
         this.unitId = unitId;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getEmploymentId() {
+        return employmentId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setEmploymentId(Long employmentId) {
+        this.employmentId = employmentId;
     }
 
     public Long getAllowedBreakDurationInMinute() {
@@ -447,6 +448,22 @@ public class ShiftDTO {
 
     public void setFunctionId(Long functionId) {
         this.functionId = functionId;
+    }
+
+    public Set<BigInteger> getEscalationFreeShiftIds() {
+        return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
+    }
+
+    public void setEscalationFreeShiftIds(Set<BigInteger> escalationFreeShiftIds) {
+        this.escalationFreeShiftIds = escalationFreeShiftIds;
+    }
+
+    public boolean isEscalationResolved() {
+        return escalationResolved;
+    }
+
+    public void setEscalationResolved(boolean escalationResolved) {
+        this.escalationResolved = escalationResolved;
     }
 
     @Override

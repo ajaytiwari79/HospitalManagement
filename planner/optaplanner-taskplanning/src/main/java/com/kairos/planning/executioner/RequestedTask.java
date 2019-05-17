@@ -1,8 +1,6 @@
 package com.kairos.planning.executioner;
 
 
-import com.thoughtworks.xstream.XStream;
-
 public class RequestedTask {
 	/*public static final int TASK_LIMIT = 100;
 	Logger log= LoggerFactory.getLogger(RequestedTask.class);

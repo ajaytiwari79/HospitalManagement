@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.domain.Sort;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 
 @Repository
@@ -41,4 +39,7 @@ public interface ActivityPriorityMongoRepository extends MongoBaseRepository<Act
 
     @Query("{deleted:false,organizationId:?1,sequence:?0}")
     ActivityPriority findBySequenceAndOrganizationId(int sequence,Long organizationId);
+
+    @Query("{deleted:false,organizationId:?1,name:?0}")
+    ActivityPriority findByNameAndOrganizationId(String name,Long organizationId);
 }

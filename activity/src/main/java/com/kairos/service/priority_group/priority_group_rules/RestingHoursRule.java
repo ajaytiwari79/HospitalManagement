@@ -1,11 +1,11 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
-import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
+import com.kairos.persistence.model.open_shift.OpenShift;
+import com.kairos.persistence.model.shift.Shift;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         this.shifts = shifts;
     }
     @Override
-    public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
+    public void filter(Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
         int restingHoursBeforeStart = priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeBeforeShiftStart();
         int restingHoursAfterEnd = priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeAfterShiftEnd();
 
@@ -41,8 +41,8 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         }
         DateTimeInterval dateTimeIntervalBeforeStart = null;
         DateTimeInterval dateTimeIntervalAfterEnd = null;
-        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()) {
-            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+        for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
+            Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
 
             if(restingBeforeStart) {
                 LocalTime openShiftStartTime = DateUtils.asLocalTime(openShiftMap.get(entry.getKey()).getStartDate());
@@ -58,32 +58,28 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
                Date filterStartDateAfterEnd = openShiftMap.get(entry.getKey()).getEndDate();
                dateTimeIntervalAfterEnd = new DateTimeInterval(filterStartDateAfterEnd.getTime(),filterEndDateAfterEnd.getTime());
            }
-
-            /*DateTimeInterval dateTimeIntervalBeforeStart = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
-            DateTimeInterval dateTimeIntervalAfterEnd = new DateTimeInterval(filterStartDateAfterEnd.getTime(),filterEndDateAfterEnd.getTime());*/
-
-            removeStaffFromListByRestingHours(staffUnitPositionIterator,dateTimeIntervalBeforeStart,dateTimeIntervalAfterEnd,both,restingBeforeStart,restingAfterEnd);
+            removeStaffFromListByRestingHours(staffEmploymentIterator,dateTimeIntervalBeforeStart,dateTimeIntervalAfterEnd,both,restingBeforeStart,restingAfterEnd);
         }
     }
 
 
-    private void removeStaffFromListByRestingHours(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator, DateTimeInterval dateTimeIntervalBeforeStart,
+    private void removeStaffFromListByRestingHours(Iterator<StaffEmploymentQueryResult> staffEmploymentIterator, DateTimeInterval dateTimeIntervalBeforeStart,
                                                    DateTimeInterval dateTimeIntervalAfterEnd, boolean both, boolean restingBeforeStart, boolean restingAfterEnd) {
 
-        Set<Long> unitPositionIds = new HashSet<Long>();
+        Set<Long> employmentIds = new HashSet<>();
         for(Shift shift:shifts) {
             if((both&&dateTimeIntervalBeforeStart.overlaps(shift.getInterval())||dateTimeIntervalAfterEnd.overlaps(shift.getInterval()))||
                     (restingBeforeStart&&dateTimeIntervalBeforeStart.overlaps(shift.getInterval()))||
                     (restingAfterEnd&&dateTimeIntervalAfterEnd.overlaps(shift.getInterval()))) {
-                if(!unitPositionIds.contains(shift.getUnitPositionId())) {
-                    unitPositionIds.add(shift.getUnitPositionId());
+                if(!employmentIds.contains(shift.getEmploymentId())) {
+                    employmentIds.add(shift.getEmploymentId());
                 }
             }
         }
-        while(staffUnitPositionIterator.hasNext()) {
-            StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-            if(unitPositionIds.contains(staffUnitPositionQueryResult.getUnitPositionId())) {
-                staffUnitPositionIterator.remove();
+        while(staffEmploymentIterator.hasNext()) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
+            if(employmentIds.contains(staffEmploymentQueryResult.getEmploymentId())) {
+                staffEmploymentIterator.remove();
             }
         }
     }

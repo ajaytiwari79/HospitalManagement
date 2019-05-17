@@ -2,12 +2,11 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.phase.Phase;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import org.joda.time.DateTime;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

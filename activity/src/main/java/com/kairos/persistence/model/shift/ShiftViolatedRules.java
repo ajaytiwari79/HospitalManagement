@@ -5,12 +5,12 @@ import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.shift.Shift;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -24,7 +24,8 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
-    private Set<ShiftEscalationReason> escalationReasons ;
+    private Set<ShiftEscalationReason> escalationReasons;
+    private boolean escalationResolved;
 
     public ShiftViolatedRules() {
     }
@@ -58,7 +59,7 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     }
 
     public Set<ShiftEscalationReason> getEscalationReasons() {
-        return escalationReasons;
+        return Optional.ofNullable(escalationReasons).orElse(new HashSet<>());
     }
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
@@ -67,5 +68,13 @@ public class ShiftViolatedRules extends MongoBaseEntity {
         } else
 
             this.escalationReasons = escalationReasons;
+    }
+
+    public boolean isEscalationResolved() {
+        return escalationResolved;
+    }
+
+    public void setEscalationResolved(boolean escalationResolved) {
+        this.escalationResolved = escalationResolved;
     }
 }

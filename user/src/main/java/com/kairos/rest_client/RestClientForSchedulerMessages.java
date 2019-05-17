@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.AUTHORIZATION;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Service
@@ -48,7 +49,7 @@ public class RestClientForSchedulerMessages {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization","bearer "+ tokenAuthService.getAuthToken());
+            headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getAuthToken());
             HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplateWithoutAuth.exchange(
@@ -57,8 +58,8 @@ public class RestClientForSchedulerMessages {
                             httpEntity, typeReference);
             if(restExchange.getStatusCode().value()==401) {
                 tokenAuthService.getNewAuthToken();
-                headers.remove("Authorization");
-                headers.add("Authorization", "bearer " + tokenAuthService.getNewAuthToken());
+                headers.remove(AUTHORIZATION);
+                headers.add(AUTHORIZATION, "bearer " + tokenAuthService.getNewAuthToken());
                 httpEntity = new HttpEntity<T>(t, headers);
                 restExchange = restTemplateWithoutAuth.exchange(
                         baseUrl,

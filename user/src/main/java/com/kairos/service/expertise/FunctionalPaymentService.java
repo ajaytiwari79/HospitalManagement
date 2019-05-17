@@ -1,7 +1,6 @@
 package com.kairos.service.expertise;
 
 import com.google.common.base.Functions;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.experties.FunctionalPaymentMatrixDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,7 +75,6 @@ public class FunctionalPaymentService {
 
     private FunctionalPayment validateAndGetDomainObject(FunctionalPaymentDTO functionalPaymentDTO, Expertise expertise) {
         FunctionalPayment functionalPaymentFromDb = functionalPaymentGraphRepository.getLastFunctionalPaymentOfExpertise(expertise.getId());
-
         Specification<FunctionalPaymentDTO> isGreaterThanStartDateAndToday = new IsGreaterThanStartDate(expertise, exceptionService)
                 .and(new IsGreaterThanToday(exceptionService))
                 .and(new IsFunctionalPaymentAvailable(functionalPaymentFromDb, exceptionService));
@@ -441,6 +438,10 @@ public class FunctionalPaymentService {
 
     private List<FunctionalPaymentMatrixQueryResult> getMatrixFromPayGroupAreaWiseMap(Map<Set<Long>,List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap){
         return payGroupAreaWiseMap.entrySet().stream().map(setListEntry->new FunctionalPaymentMatrixQueryResult(setListEntry.getKey(),setListEntry.getValue())).collect(Collectors.toList());
+    }
+
+    public boolean deleteFunctionalPayment(Long functionalPaymentId){
+        return functionalPaymentGraphRepository.deleteFunctionalPayment(functionalPaymentId);
     }
 
 }
