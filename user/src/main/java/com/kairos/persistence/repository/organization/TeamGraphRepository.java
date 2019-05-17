@@ -82,8 +82,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff)={0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
-    boolean removeStaffFromTeam(Long staffId,Long teamId);
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
+    boolean removeStaffsFromTeam(List<Long> staffIds, Long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
     void removeStaffFromAllTeams(long staffId);

@@ -362,7 +362,7 @@ public class TeamService {
         }
     }
 
-    public boolean removeStaffFromTeam(Long teamId, Long staffId) {
-        return teamGraphRepository.removeStaffFromTeam(staffId, teamId);
+    public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
+        return teamGraphRepository.removeStaffsFromTeam(staffIds, teamId);
     }
 }
