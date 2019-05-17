@@ -159,17 +159,19 @@ public class TeamService {
         return true;
     }
 
-    public StaffTeamDTO updateStaffsInTeam(Long teamId, StaffTeamDTO staffTeamDTO) {
-        if (StaffTeamRelationship.TeamType.MAIN.equals(staffTeamDTO.getTeamType()) && staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
-            exceptionService.actionNotPermittedException("staff.main_team.exists");
+    public List<StaffTeamDTO> updateStaffsInTeam(Long teamId, List<StaffTeamDTO> staffTeamDTOs) {
+        for(StaffTeamDTO staffTeamDTO:staffTeamDTOs) {
+            if (StaffTeamRelationship.TeamType.MAIN.equals(staffTeamDTO.getTeamType()) && staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
+                exceptionService.actionNotPermittedException("staff.main_team.exists");
+            }
+            Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
+            Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
+            StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
+            StaffTeamRelationship staffTeamRelationship = isNull(staffTeamRelationShipQueryResult) ? new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType()) :
+                    new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
         }
-        Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
-        Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
-        StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
-        StaffTeamRelationship staffTeamRelationship = isNull(staffTeamRelationShipQueryResult) ? new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType()) :
-                new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
-        staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
-        return staffTeamDTO;
+        return staffTeamDTOs;
     }
 
     public TeamDTO getTeamDetails(Long teamId) {

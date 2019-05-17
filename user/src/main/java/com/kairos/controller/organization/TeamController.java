@@ -12,6 +12,7 @@
 
     import javax.inject.Inject;
     import java.math.BigInteger;
+    import java.util.List;
     import java.util.Map;
     import java.util.Set;
 
@@ -137,7 +138,7 @@
         @ApiOperation(value = "Update Staffs in Team")
         @PutMapping(value = "/team/{teamId}/update_staffs")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody StaffTeamDTO staffDetails) {
+        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody List<StaffTeamDTO> staffDetails) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.updateStaffsInTeam(teamId,staffDetails));
         }
