@@ -19,6 +19,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 public class DynamicTabService extends MongoBaseService {
     @Inject
@@ -96,7 +98,7 @@ public class DynamicTabService extends MongoBaseService {
                 duplicateEntries.add(kpiDashboardDTO);
             }
         });
-        if (duplicateEntries.size() > 0) exceptionService.duplicateDataException("error.dashboard.name.duplicate");
+        if (duplicateEntries.size() > 0) exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
     }
 
     private List<String> getTrimmedNames(List<KPIDashboardDTO> dashboardTabs) {
@@ -107,7 +109,7 @@ public class DynamicTabService extends MongoBaseService {
                 dashboardTabsName.add(kpiDashboardDTO.getName());
             });
         } catch (NullPointerException e) {
-            exceptionService.dataNotFoundException("message.dashboardtab.notfound");
+            exceptionService.dataNotFoundException(MESSAGE_DASHBOARDTAB_NOTFOUND);
         }
         return dashboardTabsName;
     }
@@ -119,7 +121,7 @@ public class DynamicTabService extends MongoBaseService {
         }
         Set<String> dashboardTabNames = dashboardTabs.getUpdateDashboardTab().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if (dashboardTabNames.size() != dashboardTabs.getUpdateDashboardTab().size())
-            exceptionService.duplicateDataException("error.dashboard.name.duplicate");
+            exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
         List<KPIDashboardDTO> deletableDashboardTab = getExistingDashboardTab(dashboardTabs.getDeleteDashboardTab(), level, refId);
         List<KPIDashboardDTO> existingDashboardTab = getExistingDashboardTab(dashboardTabs.getUpdateDashboardTab(), level, refId);
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
@@ -135,7 +137,7 @@ public class DynamicTabService extends MongoBaseService {
         List<String> dashboardIds = dashboardTabs.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<KPIDashboardDTO> dashboardDTOs = counterRepository.getKPIDashboard(dashboardIds, level, refId);
         if (dashboardTabs.size() != dashboardDTOs.size()) {
-            exceptionService.invalidOperationException("error.kpi.invalidData");
+            exceptionService.invalidOperationException(ERROR_KPI_INVALIDDATA);
         }
         return dashboardDTOs;
     }

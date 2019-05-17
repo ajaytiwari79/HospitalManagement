@@ -7,6 +7,8 @@ import com.kairos.service.exception.ExceptionService;
 
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_FUNCTIONALPAYMENT_ALREADYACTIVE;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_STARTDATE_ALLOWED;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class IsFunctionalPaymentAvailable extends AbstractSpecification<FunctionalPaymentDTO> {
@@ -23,9 +25,9 @@ public class IsFunctionalPaymentAvailable extends AbstractSpecification<Function
         if (Optional.ofNullable(functionalPayment).isPresent() && functionalPayment.getEndDate() != null) {
             long daysBetween = DAYS.between(functionalPaymentDTO.getStartDate(), functionalPayment.getEndDate());
             if (daysBetween != -1L) {
-                exceptionService.actionNotPermittedException("message.startdate.allowed", functionalPayment.getEndDate().plusDays(1L));
+                exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_ALLOWED, functionalPayment.getEndDate().plusDays(1L));
             } else {
-                exceptionService.actionNotPermittedException("message.functionalPayment.alreadyactive");
+                exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENT_ALREADYACTIVE);
             }
         }
         return true;

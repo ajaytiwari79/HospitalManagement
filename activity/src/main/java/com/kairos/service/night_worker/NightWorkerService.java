@@ -28,6 +28,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
+
 /**
  * Created by prerna on 8/5/18.
  */
@@ -66,7 +68,7 @@ public class NightWorkerService extends MongoBaseService {
 
     public void validateNightWorkerGeneralDetails(NightWorkerGeneralResponseDTO nightWorkerDTO){
         if(nightWorkerDTO.getQuestionnaireFrequencyInMonths() <= 0){
-            exceptionService.dataNotFoundByIdException("message.questionnaire.frequency");
+            exceptionService.dataNotFoundByIdException(MESSAGE_QUESTIONNAIRE_FREQUENCY);
         }
     }
 

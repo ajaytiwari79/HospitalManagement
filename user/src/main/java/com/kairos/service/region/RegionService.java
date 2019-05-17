@@ -28,6 +28,8 @@ import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * Created by prabjot on 12/12/16.
  */
@@ -150,7 +152,7 @@ public class RegionService {
     public Map<String,Object> getAllZipCodesData(long zipcodeId) {
         ZipCode zipCode = zipCodeGraphRepository.findOne(zipcodeId);
         if(zipCode == null){
-            exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
 
         }
         HashMap<String,Object> responseData = new HashMap<>();
@@ -164,7 +166,7 @@ public class RegionService {
         Country country = countryGraphRepository.findOne(countryId);
         List<Region> response = new ArrayList<>();
         if (country==null){
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
 
         }
 
@@ -181,7 +183,7 @@ public class RegionService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if(!rowIterator.hasNext()){
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow",1);
+                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW,1);
 
             }
 

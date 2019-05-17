@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_SUB_SERVICE;
 
 
@@ -18,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
 
 @NodeEntity
 public class OrganizationService extends UserBaseEntity {
-    @NotBlank(message = "error.OrganizationService.name.notEmpty")
+    @NotBlank(message = ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY)
     private String name;
 
     private String description;

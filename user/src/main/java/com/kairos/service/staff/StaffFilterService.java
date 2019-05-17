@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
  * Created by prerna on 1/5/18.
@@ -94,13 +95,13 @@ public class StaffFilterService {
             //TODO please Optimise these DB calls
             organization = organizationGraphRepository.findOne(unitId);
             if (!Optional.ofNullable(organization).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
             }
             organization = organization.isParentOrganization() ? organization : organizationService.fetchParentOrganization(unitId);
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTEXIST);
         }
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
@@ -136,7 +137,7 @@ public class StaffFilterService {
             }
 
             default:
-                exceptionService.invalidRequestException("message.staff.filter.entity.notfound", filterType.value);
+                exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
@@ -154,7 +155,7 @@ public class StaffFilterService {
     private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         if (!Optional.ofNullable(filterGroup).isPresent()) {
-            exceptionService.invalidRequestException("message.staff.filter.feature.notenabled");
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_FEATURE_NOTENABLED);
 
         }
         List<FilterQueryResult> filterDTOs = new ArrayList<>();
@@ -178,15 +179,15 @@ public class StaffFilterService {
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
 
         if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
-            exceptionService.invalidRequestException("message.staff.filter.name.empty");
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_NAME_EMPTY);
 
         }
         if (staffFilterDTO.getFiltersData().isEmpty()) {
-            exceptionService.invalidRequestException("message.staff.filter.select");
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_SELECT);
 
         }
         if (staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithName(staffFilterDTO.getModuleId(), staffFilterDTO.getName())) {
-            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist", staffFilterDTO.getName());
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_NAME_ALREADYEXIST, staffFilterDTO.getName());
 
         }
         // Fetch filter group to which access page is linked
@@ -207,21 +208,21 @@ public class StaffFilterService {
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
-            exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_FAVOURITEFILTERID_INVALID, filterId);
 
         }
         if (!Optional.ofNullable(favouriteFilterDTO.getName()).isPresent()) {
-            exceptionService.invalidRequestException("message.staff.filter.name.empty");
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_NAME_EMPTY);
 
         }
         if (favouriteFilterDTO.getFiltersData().isEmpty()) {
 
-            exceptionService.invalidRequestException("message.staff.filter.select");
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_SELECT);
 
         }
         if (staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithNameExceptId(favouriteFilterDTO.getModuleId(),
                 favouriteFilterDTO.getName(), staffFavouriteFilter.getId())) {
-            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist", favouriteFilterDTO.getName());
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_NAME_ALREADYEXIST, favouriteFilterDTO.getName());
 
         }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
@@ -239,7 +240,7 @@ public class StaffFilterService {
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
-            exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_FAVOURITEFILTERID_INVALID, filterId);
 
         }
         staffFavouriteFilter.setDeleted(true);
@@ -268,12 +269,12 @@ public class StaffFilterService {
     public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
                 !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
-            exceptionService.dataNotFoundByIdException("message.staff.filter.setting.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_FILTER_SETTING_NOTFOUND);
 
         }
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);

@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.ONE_WEEK_MINUTES;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 
 /**
@@ -90,13 +91,13 @@ public class EmploymentTypeService {
         validateEmploymentType(employmentTypeDTO);
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
 
         }
 
         boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), -1L);
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException("message.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
+            exceptionService.duplicateDataException(MESSAGE_EMPLOYMENTTYPE_NAME_ALREADYEXIST,employmentTypeDTO.getName().trim());
 
         }
         EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
@@ -112,18 +113,18 @@ public class EmploymentTypeService {
         validateEmploymentType(employmentTypeDTO);
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
 
         }
         EmploymentType employmentTypeToUpdate = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToUpdate == null) {
-            exceptionService.dataNotFoundByIdException("message.employmentType.id.notFound",employmentTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENTTYPE_ID_NOTFOUND,employmentTypeId);
 
         }
         if (!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())) {
             boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), employmentTypeId);
             if (isAlreadyExists) {
-                exceptionService.duplicateDataException("message.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
+                exceptionService.duplicateDataException(MESSAGE_EMPLOYMENTTYPE_NAME_ALREADYEXIST,employmentTypeDTO.getName().trim());
 
             }
         }
@@ -138,7 +139,7 @@ public class EmploymentTypeService {
         EmploymentType employmentTypeToDelete = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToDelete == null) {
 //            logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.employmentType.id.notFound",employmentTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENTTYPE_ID_NOTFOUND,employmentTypeId);
 
         }
 
@@ -150,7 +151,7 @@ public class EmploymentTypeService {
     public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
 
         }
         return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
@@ -160,7 +161,7 @@ public class EmploymentTypeService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);
         return organizationGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);
@@ -170,13 +171,13 @@ public class EmploymentTypeService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
         }
         EmploymentType employmentType = employmentTypeGraphRepository.findOne(employmentTypeId, 0);
 //        boolean employmentTypeExistInOrganization = employmentTypeGraphRepository.isEmploymentTypeExistInOrganization(unitId, organizationEmploymentTypeDTO.getEmploymentTypeId(), false);
         if (employmentType == null) {
-            exceptionService.dataNotFoundByIdException("message.employmentType.id.notFound",employmentTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENTTYPE_ID_NOTFOUND,employmentTypeId);
 
         }
 
@@ -188,7 +189,7 @@ public class EmploymentTypeService {
             return organizationEmploymentTypeDTO;
         } else {
             logger.error("Employment type settings could not be updated in organization " + unitId);
-            exceptionService.internalServerError("error.employmentType.notBeupdated");
+            exceptionService.internalServerError(ERROR_EMPLOYMENTTYPE_NOTBEUPDATED);
         }
         return null;
     }
@@ -197,7 +198,7 @@ public class EmploymentTypeService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);
@@ -266,14 +267,14 @@ public class EmploymentTypeService {
 
     private void validateEmploymentType(EmploymentTypeDTO employmentTypeDTO){
         if (employmentTypeDTO.getName().trim().isEmpty()) {
-            exceptionService.dataNotMatchedException("error.employmentType.name.notEmpty");
+            exceptionService.dataNotMatchedException(ERROR_EMPLOYMENTTYPE_NAME_NOTEMPTY);
 
         }
         if(employmentTypeDTO.getWeeklyMinutes()==null){
-            exceptionService.actionNotPermittedException("error.weekly_minutes.absent");
+            exceptionService.actionNotPermittedException(ERROR_WEEKLY_MINUTES_ABSENT);
         }
         if(employmentTypeDTO.getWeeklyMinutes()>ONE_WEEK_MINUTES){
-            exceptionService.actionNotPermittedException("error.weekly_minutes.exceeds");
+            exceptionService.actionNotPermittedException(ERROR_WEEKLY_MINUTES_EXCEEDS);
         }
     }
 

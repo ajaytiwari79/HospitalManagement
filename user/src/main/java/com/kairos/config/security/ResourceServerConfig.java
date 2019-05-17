@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
-import com.kairos.service.redis.RedisService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.redis.RedisService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

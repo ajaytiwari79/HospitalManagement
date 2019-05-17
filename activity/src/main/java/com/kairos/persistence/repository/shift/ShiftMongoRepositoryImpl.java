@@ -2,10 +2,9 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
-import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -15,7 +14,6 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -32,9 +30,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -311,6 +309,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.remarks' : 1,\n" +
                 "        'activities.backgroundColor' : 1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
                 "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
                 "      }\n" +
                 "   }";
@@ -551,7 +550,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType) {
+    public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType,boolean allowedConflicts) {
         Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("employmentId").is(employmentId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
@@ -561,7 +560,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 lookup("activities", "activities.activityId", "_id", "activity"),
                 unwind("activity"),
                 lookup("time_Type", "activity.balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                match(where("timeType.timeTypes").is(timeType))
+                match(where("timeType.timeTypes").is(timeType).and("timeType.allowedConflicts").is(allowedConflicts))
         );
 
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();

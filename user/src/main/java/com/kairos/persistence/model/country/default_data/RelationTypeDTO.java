@@ -4,11 +4,13 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_RELATIONTYPE_NAME_NOTEMPTY;
+
 @QueryResult
 public class RelationTypeDTO {
 
     private Long id;
-    @NotBlank(message = "error.relationType.name.notEmpty")
+    @NotBlank(message = ERROR_RELATIONTYPE_NAME_NOTEMPTY)
     private String name;
     private String description;
 

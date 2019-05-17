@@ -22,6 +22,11 @@ public class PhaseSettingsActivityTab implements Serializable {
         this.phaseTemplateValues = phaseTemplateValues;
     }
 
+    public PhaseSettingsActivityTab(BigInteger activityId, List<PhaseTemplateValue> phaseTemplateValues) {
+        this.activityId = activityId;
+        this.phaseTemplateValues = phaseTemplateValues;
+    }
+
     public BigInteger getActivityId() {
         return activityId;
     }

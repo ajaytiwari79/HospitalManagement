@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ISO_FORMAT;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.EXCLUDED_EMPLOYEES;
 import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.PREFERRED_EMPLOYEES;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
@@ -173,7 +174,7 @@ public class TaskExceptionService extends MongoBaseService {
         RestrictionFrequency restrictionFrequency = restrictionFrequencyService.getRestrictionFrequency(restrictionFrequencyId);
         if(restrictionFrequency == null){
             logger.info("Incorrect id of restriction frequency id " + restrictionFrequencyId);
-            exceptionService.dataNotFoundByIdException("message.restrictionfrequency.id",restrictionFrequencyId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_RESTRICTIONFREQUENCY_ID,restrictionFrequencyId);
         }
         List<Long> citizenIds= userIntegrationService.getCitizenIds();
         //DayOfWeek dayOfWeek = LocalDate.now().getHeaderName();
@@ -441,11 +442,11 @@ public class TaskExceptionService extends MongoBaseService {
 
         Optional<Task> taskOptional = taskMongoRepository.findById(taskId);
         if (!taskOptional.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.task.id");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TASK_ID);
         }
         Task task=taskOptional.get();
         if (!task.isSingleTask()) {
-            exceptionService.internalError("error.task.single");
+            exceptionService.internalError(ERROR_TASK_SINGLE);
         }
         ArrayList<Task> tasksToReturn = new ArrayList<>(taskData.size());
         SimpleDateFormat executionDateFormat = new SimpleDateFormat(ONLY_DATE);

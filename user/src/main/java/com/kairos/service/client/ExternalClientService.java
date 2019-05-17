@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANISATION_NOTFOUND;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
 
@@ -253,7 +254,7 @@ public class ExternalClientService {
     public Client createCitizenFromExternalService(PatientWrapper patientWrapper, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
 

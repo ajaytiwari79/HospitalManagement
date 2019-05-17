@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
@@ -49,12 +50,13 @@ public class ShiftActivity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
+    private List<PlannedTime> plannedTimes;
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }
 
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
+    private Set<ShiftStatus> status = new HashSet<>();
 
     public ShiftActivity() {
     }
@@ -351,5 +353,13 @@ public class ShiftActivity {
 
     public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
         this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
+    }
+
+    public List<PlannedTime> getPlannedTimes() {
+        return plannedTimes=Optional.ofNullable(plannedTimes).orElse(new ArrayList<>());
+    }
+
+    public void setPlannedTimes(List<PlannedTime> plannedTimes) {
+        this.plannedTimes = plannedTimes;
     }
 }

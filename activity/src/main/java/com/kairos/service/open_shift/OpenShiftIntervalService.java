@@ -15,6 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_NOOPENSHIFTINTERVALFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_OVERLAP_INTERVAL;
+
 @Service
 @Transactional
 public class OpenShiftIntervalService extends MongoBaseService {
@@ -26,7 +29,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
     public OpenShiftIntervalDTO createInterval(Long countryId, OpenShiftIntervalDTO openShiftIntervalDTO) {
         boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo(),null);
         if(isIntervalInValid){
-            exceptionService.actionNotPermittedException("exception.overlap.interval");
+            exceptionService.actionNotPermittedException(EXCEPTION_OVERLAP_INTERVAL);
         }
         OpenShiftInterval openShiftInterval = new OpenShiftInterval();
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
@@ -45,11 +48,11 @@ public class OpenShiftIntervalService extends MongoBaseService {
     public OpenShiftIntervalDTO updateInterval(Long countryId, BigInteger openShiftIntervalId, OpenShiftIntervalDTO openShiftIntervalDTO) {
         OpenShiftInterval openShiftInterval = openShiftIntervalRepository.findByIdAndCountryIdAndDeletedFalse(openShiftIntervalId,countryId);
         if (!Optional.ofNullable(openShiftInterval).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.noOpenShiftIntervalFound", "OpenShiftInterval", openShiftIntervalId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_NOOPENSHIFTINTERVALFOUND, "OpenShiftInterval", openShiftIntervalId);
         }
         boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo(),openShiftIntervalId);
         if(isIntervalInValid){
-            exceptionService.actionNotPermittedException("exception.overlap.interval");
+            exceptionService.actionNotPermittedException(EXCEPTION_OVERLAP_INTERVAL);
         }
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
         save(openShiftInterval);
@@ -59,7 +62,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
     public boolean deleteOpenShiftInterval(Long countryId, BigInteger openShiftIntervalId) {
         OpenShiftInterval openShiftInterval = openShiftIntervalRepository.findByIdAndCountryIdAndDeletedFalse(openShiftIntervalId,countryId);
         if (!Optional.ofNullable(openShiftInterval).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.noOpenShiftIntervalFound", "OpenShiftInterval", openShiftIntervalId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_NOOPENSHIFTINTERVALFOUND, "OpenShiftInterval", openShiftIntervalId);
         }
         openShiftInterval.setDeleted(true);
         save(openShiftInterval);
