@@ -362,7 +362,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     // 409
 
-    @ExceptionHandler({DuplicateDataException.class, DataAccessException.class, InvalidDataAccessApiUsageException.class})
+    @ExceptionHandler({DuplicateDataException.class, DataAccessException.class, InvalidDataAccessApiUsageException.class,InvalidRequestException.class})
     protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
         logger.error("exception in activity service", ex);
         final String bodyOfResponse = "This should be application specific";

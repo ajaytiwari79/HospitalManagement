@@ -6,7 +6,7 @@ db.applicableKPI.update({}, {$set: {
     "frequencyType" : "DAYS",
     "value" : 2,
     "interval" : "LAST"
-}}, {multi:true})
+}}, {multi:true});
 
 
 
@@ -15,7 +15,7 @@ db.counter.update(
     { },
     { $pull: { filterTypes: { $in: [ "TIME_INTERVAL" ] }} },
     { multi: true }
-)
+);
 
 
 db.applicableKPI.update(
