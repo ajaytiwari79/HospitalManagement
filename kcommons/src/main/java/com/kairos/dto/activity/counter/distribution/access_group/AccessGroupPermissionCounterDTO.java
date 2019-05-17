@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.counter.distribution.access_group;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AccessGroupPermissionCounterDTO {
     private Long staffId;
@@ -34,7 +36,7 @@ public class AccessGroupPermissionCounterDTO {
     }
 
     public List<Long> getAccessGroupIds() {
-        return accessGroupIds;
+        return Optional.ofNullable(accessGroupIds).orElse(new ArrayList<>());
     }
 
     public void setAccessGroupIds(List<Long> accessGroupIds) {
