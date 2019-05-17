@@ -23,6 +23,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * Created by pavan on 13/3/18.
  */
@@ -48,12 +50,12 @@ public class FunctionService {
     public com.kairos.persistence.model.country.functions.FunctionDTO createFunction(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         Function isAlreadyExists = functionGraphRepository.findByNameIgnoreCase(countryId, functionDTO.getName());
         if (Optional.ofNullable(isAlreadyExists).isPresent()) {
-            exceptionService.duplicateDataException("message.function.name.alreadyExist", functionDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_FUNCTION_NAME_ALREADYEXIST, functionDTO.getName());
 
         }
         List<Level> levels = new ArrayList<>();
@@ -85,17 +87,17 @@ public class FunctionService {
     public com.kairos.persistence.model.country.functions.FunctionDTO updateFunction(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         Function function = functionGraphRepository.findOne(functionDTO.getId());
         if (!Optional.ofNullable(function).isPresent() || function.isDeleted() == true) {
-            exceptionService.dataNotFoundByIdException("message.function.id.notFound", functionDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTION_ID_NOTFOUND, functionDTO.getId());
 
         }
         Function isNameAlreadyExists = functionGraphRepository.findByNameExcludingCurrent(countryId, functionDTO.getId(), functionDTO.getName().trim());
         if (Optional.ofNullable(isNameAlreadyExists).isPresent()) {
-            exceptionService.duplicateDataException("message.function.name.alreadyExist", functionDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_FUNCTION_NAME_ALREADYEXIST, functionDTO.getName());
 
         }
         List<Level> levels = new ArrayList<>();
@@ -124,7 +126,7 @@ public class FunctionService {
     public boolean deleteFunction(long functionId) {
         Function function = functionGraphRepository.findOne(functionId);
         if (!Optional.ofNullable(function).isPresent() || function.isDeleted() == true) {
-            exceptionService.dataNotFoundByIdException("message.function.id.notFound", functionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTION_ID_NOTFOUND, functionId);
 
         }
         function.setDeleted(true);
@@ -196,7 +198,7 @@ public class FunctionService {
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
 

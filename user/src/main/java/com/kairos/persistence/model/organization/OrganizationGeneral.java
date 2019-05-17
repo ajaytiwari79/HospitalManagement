@@ -6,13 +6,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_FORMALNAME_NOTNULL;
+
 /**
  * Created by prabjot on 9/1/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationGeneral {
 
-    @NotBlank(message = "error.Organization.formalname.notnull")
+    @NotBlank(message = ERROR_ORGANIZATION_FORMALNAME_NOTNULL)
     private String name;
     private String shortName;
     private String eanNumber;

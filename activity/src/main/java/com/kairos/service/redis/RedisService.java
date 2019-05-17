@@ -27,23 +27,6 @@ public class RedisService extends CommonsExceptionUtil {
     private RedisTemplate<String, Map<String, String>> valueOperations;
     @Inject private EnvConfigCommon envConfigCommon;
 
-    public void saveTokenInRedis(String userName, String accessToken) {
-        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
-            Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
-            String tokenKey = getTokenKey(accessToken);
-            if(Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
-                userTokensFromDifferentMachine.put(tokenKey, accessToken);
-            } else {
-                userTokensFromDifferentMachine = new HashMap<>();
-                userTokensFromDifferentMachine.put(tokenKey, accessToken);
-            }
-            valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
-            LOGGER.info("saved user token into redis");
-        }
-    }
-
-
-
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
         if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
             Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);

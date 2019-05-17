@@ -17,6 +17,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 public class PayRollService extends MongoBaseService {
 
@@ -39,7 +41,7 @@ public class PayRollService extends MongoBaseService {
         validatePayRoll(alreadyExist,payRollDTO);
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
         if (!Optional.ofNullable(payRoll).isPresent()) {
-            exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
+            exceptionService.dataNotFoundByIdException(PAYROLL_NOT_FOUND,payRollId);
         }
         payRoll = new PayRoll(payRoll.getId(), payRollDTO.getName(), payRollDTO.getCode(), payRollDTO.isActive());
         payRollRepository.save(payRoll);
@@ -62,7 +64,7 @@ public class PayRollService extends MongoBaseService {
     public PayRollDTO linkPayRollWithCountry(Long countryId, BigInteger payRollId, boolean checked) {
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
         if (!Optional.ofNullable(payRoll).isPresent()) {
-            exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
+            exceptionService.dataNotFoundByIdException(PAYROLL_NOT_FOUND,payRollId);
         }
         if (checked){
             payRoll.getCountryIds().add(countryId);
@@ -87,9 +89,9 @@ public class PayRollService extends MongoBaseService {
     private void validatePayRoll(PayRoll payRoll,PayRollDTO payRollDTO){
         if(Optional.ofNullable(payRoll).isPresent()){
             if (payRollDTO.getName().equalsIgnoreCase(payRoll.getName())) {
-                exceptionService.duplicateDataException("payroll.already.exists.name", payRollDTO.getName());
+                exceptionService.duplicateDataException(PAYROLL_ALREADY_EXISTS_NAME, payRollDTO.getName());
             }else if (payRollDTO.getCode()==payRoll.getCode()) {
-                exceptionService.duplicateDataException("payroll.already.exists.code", payRollDTO.getCode());
+                exceptionService.duplicateDataException(PAYROLL_ALREADY_EXISTS_CODE, payRollDTO.getCode());
             }
         }
 

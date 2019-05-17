@@ -18,6 +18,8 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import de.danielbechler.diff.ObjectDifferBuilder;
 import de.danielbechler.diff.node.DiffNode;
 import de.danielbechler.diff.node.Visit;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,10 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
@@ -71,6 +70,12 @@ public class TimeBankCalculationServiceTest {
 
     DailyTimeBankEntry todayDailyTimeBankEntry;
 
+    static {
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
+        DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
+    }
+
     @Before
     public void init(){
         staffEmploymentDetails = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(EMPLOYMENT_DETAILS),StaffEmploymentDetails.class);
@@ -87,12 +92,10 @@ public class TimeBankCalculationServiceTest {
 
     @Test
     public void calculateDailyTimeBank() {
-        LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
-        /*todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
+        todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
-        LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
         ctaDistributionCalculation.put(new BigInteger("3061"), 480);
         ctaDistributionCalculation.put(new BigInteger("3062"), 0);
@@ -104,7 +107,7 @@ public class TimeBankCalculationServiceTest {
         ctaDistributionCalculation.put(new BigInteger("3068"), 192);
         ctaDistributionCalculation.put(new BigInteger("3071"), 0);
         for (TimeBankCTADistribution timeBankCTADistribution : dailyTimeBankEntry.getTimeBankCTADistributionList()) {
-            LOGGER.debug("RuleTemplateId {}",timeBankCTADistribution.getCtaRuleTemplateId());
+            LOGGER.debug("RuleTemplateId {} {}",timeBankCTADistribution.getCtaRuleTemplateId(),timeBankCTADistribution.getMinutes());
             Assert.assertEquals(ctaDistributionCalculation.get(timeBankCTADistribution.getCtaRuleTemplateId()), timeBankCTADistribution.getMinutes());
         }
         Assert.assertEquals(dailyTimeBankEntry.getScheduledMinutesOfTimeBank(), 480);
@@ -112,14 +115,14 @@ public class TimeBankCalculationServiceTest {
         Assert.assertEquals(dailyTimeBankEntry.getCtaBonusMinutesOfTimeBank(), 1392);
         Assert.assertEquals(dailyTimeBankEntry.getDeltaTimeBankMinutes(), 1392);
         Assert.assertEquals(dailyTimeBankEntry.getPlannedMinutesOfTimebank(), 1392);
-        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);*/
+        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);
     }
 
 
     @Test
     public void getTimeBankByIntervalForNightShift() {
         LOGGER.info("Shift time {}",shiftWithActivityDTOS.get(0).getStartDate());
-       /* todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
+        todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
@@ -143,7 +146,7 @@ public class TimeBankCalculationServiceTest {
         Assert.assertEquals(dailyTimeBankEntry.getCtaBonusMinutesOfTimeBank(), 1381);
         Assert.assertEquals(dailyTimeBankEntry.getDeltaTimeBankMinutes(), 1381);
         Assert.assertEquals(dailyTimeBankEntry.getPlannedMinutesOfTimebank(), 1381);
-        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);*/
+        Assert.assertEquals(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes(), 0);
     }
 
     @Test

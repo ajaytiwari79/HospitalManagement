@@ -15,6 +15,8 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATA_NOTFOUND;
+
 @Service
 public class PayRollSystemService {
     Logger logger = LoggerFactory.getLogger(PayRollSystemService.class);
@@ -48,7 +50,7 @@ public class PayRollSystemService {
     public List<PayRollSystemDTO> getDefaultAvailablePayRolls() {
         List<PayRollSystem> payRollSystemList = payRollSystemRepository.findAll();
         if (payRollSystemList.isEmpty()) {
-            exceptionService.dataNotFoundException("message.data.notFound","Defeault Payroll");
+            exceptionService.dataNotFoundException(MESSAGE_DATA_NOTFOUND,"Defeault Payroll");
         }
         List<PayRollSystemDTO> payRollSystemDTOList=null;
         try {

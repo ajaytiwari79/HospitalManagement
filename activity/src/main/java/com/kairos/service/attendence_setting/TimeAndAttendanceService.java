@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
 @Service
@@ -76,7 +77,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         Long userId = UserContext.getUserDetails().getId();
         List<StaffResultDTO> staffAndOrganizationIds = userIntegrationService.getStaffIdsByUserId(userId);
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
-            exceptionService.actionNotPermittedException("message.staff.notfound");
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_NOTFOUND);
         }
         Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
         List<Long> staffIds=staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
@@ -151,11 +152,11 @@ public class TimeAndAttendanceService extends MongoBaseService {
         TimeAndAttendance timeAndAttendance = null;
         StaffResultDTO staffAndOrganizationId;
         if (Optional.ofNullable(unitId).isPresent() &&!Optional.ofNullable(employmentId).isPresent()&&!Optional.ofNullable(reasonCodeId).isPresent()) {
-            exceptionService.actionNotPermittedException("message.unitid.reasoncodeid.notnull", "");
+            exceptionService.actionNotPermittedException(MESSAGE_UNITID_REASONCODEID_NOTNULL, "");
         } else if (Optional.ofNullable(unitId).isPresent() && Optional.ofNullable(reasonCodeId).isPresent()) {
             staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
             if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
-                exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNITID_NOTFOUND);
             }
             TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()),LocalDate.now());
             AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,employmentId,unitId);
@@ -182,10 +183,10 @@ public class TimeAndAttendanceService extends MongoBaseService {
                 duration.setTo(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
                 duration.setClockOutReasonCode(reasonCodeId);
             } else {
-                exceptionService.actionNotPermittedException("message.checkout.exists");
+                exceptionService.actionNotPermittedException(MESSAGE_CHECKOUT_EXISTS);
             }
         } else {
-            exceptionService.actionNotPermittedException("message.attendance.notexists");
+            exceptionService.actionNotPermittedException(MESSAGE_ATTENDANCE_NOTEXISTS);
         }
         return timeAndAttendance;
     }
@@ -220,7 +221,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     private boolean validateGlideTimeWhileCheckOut(Shift checkInshift, Long reasonCodeId, String timeZone,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap){
         ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(checkInshift.getActivities().size()-1).getActivityId()).getCheckOutGlideTime(LocationEnum.OFFICE);
         if(!Optional.ofNullable(glideTimeDetails).isPresent()){
-            exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(checkInshift.getActivities().size()-1).getActivityName());
+            exceptionService.dataNotFoundException(ERROR_GLIDETIME_NOTFOUND,checkInshift.getActivities().get(checkInshift.getActivities().size()-1).getActivityName());
         }
         Date glidStartDateTime=DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getEndDate()).minusMinutes(glideTimeDetails.getBefore()));
         Date glidEndDateTime =DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getEndDate()).plusMinutes(glideTimeDetails.getAfter()));
@@ -231,7 +232,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     private boolean validateGlideTimeWhileCheckIn(Shift checkInshift,String timeZone,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap){
         ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
         if(!Optional.ofNullable(glideTimeDetails).isPresent()){
-            exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(0).getActivityName());
+            exceptionService.dataNotFoundException(ERROR_GLIDETIME_NOTFOUND,checkInshift.getActivities().get(0).getActivityName());
         }
         Date glidStartDateTime=DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getStartDate()).minusMinutes(glideTimeDetails.getBefore()));
         Date glidEndDateTime =DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getStartDate()).plusMinutes(glideTimeDetails.getAfter()));

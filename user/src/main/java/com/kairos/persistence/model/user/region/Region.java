@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 
@@ -20,11 +21,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class Region extends UserBaseEntity {
 
-    @NotBlank(message = "error.Region.name.notEmpty")
+    @NotBlank(message = ERROR_REGION_NAME_NOTEMPTY)
     private String name;
-    @NotBlank(message = "error.Region.code.notEmpty")
+    @NotBlank(message = ERROR_REGION_CODE_NOTEMPTY)
     private String code;
-    @NotBlank(message = "error.Region.geoFence.notEmpty")
+    @NotBlank(message = ERROR_REGION_GEOFENCE_NOTEMPTY)
     private String geoFence;
 
     private float latitude;

@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.time_bank;
 
-import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -13,7 +11,8 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
 /**
  * @author pradeep

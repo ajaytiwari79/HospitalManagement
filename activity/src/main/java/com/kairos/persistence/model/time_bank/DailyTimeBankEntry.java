@@ -4,10 +4,9 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /*
 * Created By Pradeep singh rajawat
@@ -45,7 +44,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     }
 
     public List<TimeBankCTADistribution> getTimeBankCTADistributionList() {
-        return timeBankCTADistributionList;
+        return isNullOrElse(timeBankCTADistributionList,new ArrayList<>());
     }
 
     public void setTimeBankCTADistributionList(List<TimeBankCTADistribution> timeBankCTADistributionList) {

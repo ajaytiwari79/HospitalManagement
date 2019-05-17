@@ -6,6 +6,7 @@ import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.persistence.model.staff.StaffTeamDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -59,6 +60,7 @@ public class StaffPersonalDetail {
     @NotBlank(message = "error.Staff.userName.notnull")
     private String userName;
     private boolean userNameUpdated;
+    private List<StaffTeamDTO> teamDetails;
 
     public StaffPersonalDetail() {
         //Default Constructor
@@ -319,6 +321,14 @@ public class StaffPersonalDetail {
 
     public void setUserNameUpdated(boolean userNameUpdated) {
         this.userNameUpdated = userNameUpdated;
+    }
+
+    public List<StaffTeamDTO> getTeamDetails() {
+        return teamDetails;
+    }
+
+    public void setTeamDetails(List<StaffTeamDTO> teamDetails) {
+        this.teamDetails = teamDetails;
     }
 
     @Override
