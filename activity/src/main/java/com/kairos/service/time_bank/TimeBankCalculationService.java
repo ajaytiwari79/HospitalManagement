@@ -141,7 +141,7 @@ public class TimeBankCalculationService {
         } else if(isNotNull(dailyTimeBankEntry)) {
             resetDailyTimebankEntry(dailyTimeBankEntry, contractualMinutes);
         }
-        //updatePublishedBalances(dailyTimeBankEntry,staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getUnitId(),dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
+        updatePublishedBalances(dailyTimeBankEntry,staffAdditionalInfoDTO.getEmployment().getEmploymentLines(),staffAdditionalInfoDTO.getUnitId(),dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
         return dailyTimeBankEntry;
     }
 
