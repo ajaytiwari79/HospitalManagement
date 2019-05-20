@@ -37,6 +37,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDateStringWithFormat;
+import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -251,7 +252,7 @@ public class ShiftStatusService {
     public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus) {
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
-        String body = "The status of the " + activity.getActivityName() + "activity which is planned on " + getDateStringWithFormat(shift.getStartDate(), "yyyy-MM-dd")  + " has been moved to " + shiftStatus + " by " + UserContext.getUserDetails().getFullName() + "\n Thanks";
+        String body = "The status of the " + activity.getActivityName() + " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to " + shiftStatus + " by " + UserContext.getUserDetails().getFullName() + "\n Thanks";
         //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
         Map<String, Object> templateParam = new HashMap<>();
         templateParam.put("receiverName", EMAIL_GREETING + staffDTO.getFullName());

@@ -847,4 +847,11 @@ public  class DateUtils {
     public static boolean isEqualOrBefore(Date date1,Date date2){
         return date1.equals(date2) || date1.before(date2);
     }
+
+    public static String getEmailDateTimeWithFormat(LocalDateTime dateTime){
+        LocalTime time=getLocalTimeFromLocalDateTime(dateTime);
+        String localtime=time.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
+        return date;
+    }
 }
