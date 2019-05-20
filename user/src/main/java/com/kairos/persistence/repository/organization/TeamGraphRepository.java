@@ -24,12 +24,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team {isEnabled:true}) WHERE id(org)={0} with team \n" +
+    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true}) WHERE id(org)={0} with DISTINCT team \n" +
             "OPTIONAL MATCH (team)-[rel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) WHERE EXISTS(rel.leaderType) \n" +
-            "WITH team,collect(teamMembers) as teamMembers,collect(rel) as rel,\n" +
-            "CASE when rel.leaderType='MAIN_LEAD' then collect(id(teamMembers)) ELSE [] end as mainTeamLeaderIds,\n" +
-            "CASE when rel.leaderType='ACTING_LEAD' then collect(id(teamMembers)) ELSE [] end as actingTeamLeaderIds\n" +
-            "RETURN  collect({id:id(team),name:team.name,description:team.description,mainTeamLeaderIds:mainTeamLeaderIds,actingTeamLeaderIds:actingTeamLeaderIds}) as teams")
+            "WITH team,COLLECT(teamMembers) as teamMembers,COLLECT(rel) as rel,\n" +
+            "CASE when rel.leaderType='MAIN_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS mainTeamLeaderIds,\n" +
+            "CASE when rel.leaderType='ACTING_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS actingTeamLeaderIds\n" +
+            "WITH DISTINCT team,COLLECT(DISTINCT mainTeamLeaderIds) as mainTeamLeaderIds,COLLECT(DISTINCT actingTeamLeaderIds) as actingTeamLeaderIds\n" +
+            "RETURN COLLECT(DISTINCT{id:id(team),name:team.name,description:team.description,\n" +
+            "mainTeamLeaderIds:CASE WHEN mainTeamLeaderIds[0] IS NULL THEN [] ELSE  mainTeamLeaderIds[0] END, \n" +
+            "actingTeamLeaderIds:CASE WHEN actingTeamLeaderIds[0] IS NULL THEN [] ELSE  actingTeamLeaderIds[0] END}) AS teams")
     List<Map<String,Object>> getTeams(long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
@@ -55,7 +58,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "MATCH (sc:SkillCategory)-[:HAS_CATEGORY]-(skill) RETURN  " +
             "{ id:id(sc), " +
             "  name:sc.name, " +
-            "  skills:collect({ " +
+            "  skills:COLLECT({ " +
             "  id:id(skill), " +
             "  name:skill.name " +
             "}) " +
@@ -79,8 +82,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) DETACH DELETE staffTeamRel")
     void removeAllStaffsFromTeam(long teamId);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff)={0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
-    boolean removeStaffFromTeam(Long staffId,Long teamId);
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
+    boolean removeStaffsFromTeam(List<Long> staffIds, Long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
     void removeStaffFromAllTeams(long staffId);
@@ -94,7 +97,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "MATCH (position:Position)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitEmployment)-[:"+ APPLICABLE_IN_UNIT +"]->(organization) with position,team\n" +
             "MATCH (staff:Staff) WHERE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) OR (position)-[:"+BELONGS_TO+"]->(staff) with staff,team\n" +
             "OPTIONAL MATCH (team)-[r:"+TEAM_HAS_MEMBER+"]->(staff) with r,staff\n" +
-            "RETURN DISTINCT {id:id(staff),firstName:staff.firstName+\" \" +staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,isSelected:CASE when r is null then false else r.isEnabled end,profilePic: {1} + staff.profilePic} as data order by data.firstName")
+            "RETURN DISTINCT {id:id(staff),firstName:staff.firstName+\" \" +staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,isSelected:CASE when r is null THEN false else r.isEnabled end,profilePic: {1} + staff.profilePic} as data order by data.firstName")
     List<Map<String,Object>> getAllStaffByOrganization(long teamId, String imageUrl);
 
     @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN {id:id(team),name:team.name} as data order by data.name")
@@ -113,15 +116,15 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
       @Query("MATCH (team:Team) WHERE id(team)={0}\n" +
             "MATCH (team)<-[:"+HAS_TEAMS+"]-(organization:Organization) with organization\n" +
             "MATCH (organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) with os,r\n" +
-            "MATCH (oranizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with {children: CASE when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as availableServices\n" +
-            "RETURN {availableServices:collect(availableServices)} as data\n" +
+            "MATCH (oranizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with {children: CASE when os is NULL THEN [] else COLLECT({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as availableServices\n" +
+            "RETURN {availableServices:COLLECT(availableServices)} as data\n" +
             "UNION\n" +
             "MATCH (team:Team) WHERE id(team)={0} with team\n" +
             "MATCH (team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService{isEnabled:true}) with r,os,team \n" +
             "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with organizationService,r,os,team\n" +
             "OPTIONAL MATCH (team)-[teamServiceCustomNameRelation:"+HAS_CUSTOM_SERVICE_NAME_FOR+"]-(organizationService:OrganizationService)\n" +
-            "with {children: CASE when os is NULL then [] else collect({id:id(os),name:os.name, customName:CASE WHEN r IS null THEN os.name ELSE r.customName END, description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),customName:CASE WHEN teamServiceCustomNameRelation IS NULL THEN organizationService.name ELSE teamServiceCustomNameRelation.customName END,name:organizationService.name,description:organizationService.description} as selectedServices\n" +
-            "RETURN {selectedServices:collect(selectedServices)} as data")
+            "with {children: CASE when os is NULL THEN [] else COLLECT({id:id(os),name:os.name, customName:CASE WHEN r IS null THEN os.name ELSE r.customName END, description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),customName:CASE WHEN teamServiceCustomNameRelation IS NULL THEN organizationService.name ELSE teamServiceCustomNameRelation.customName END,name:organizationService.name,description:organizationService.description} as selectedServices\n" +
+            "RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String,Object>> getOrganizationServicesOfTeam(long teamId);
 
     @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} RETURN COUNT(r) as countOfRel")
@@ -155,10 +158,10 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) \n" +
             "MATCH (subType)-[:"+ORG_TYPE_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with DISTINCT skill,organization\n" +
             "MATCH (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags            \n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
-            "RETURN {availableSkills:collect(availableSkills)} as data\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags            \n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
+            "RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             "UNION\n" +
             "MATCH (team:Team) WHERE id(team)={0} \n" +
             "MATCH (team)<-[:"+ HAS_TEAMS +"]-(organization:Organization) \n" +
@@ -166,10 +169,10 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "MATCH (subType)-[:"+ORG_TYPE_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with DISTINCT skill,organization,team\n" +
             "MATCH (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team,organization\n" +
             "MATCH (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true,tags:ctags+otags})} as selectedSkills\n" +
-            "RETURN {selectedSkills:collect(selectedSkills)} as data")
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true,tags:ctags+otags})} as selectedSkills\n" +
+            "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String,Object>> getSkillsOfTeam(long teamId);
 
     @Query("MATCH (team:Team),(skill:Skill) WHERE id (team)={0} AND id(skill)={1} with team,skill\n" +
@@ -188,8 +191,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "MATCH (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team\n" +
             "MATCH (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r\n" +
             "MATCH (skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skillCategory,skill,r\n" +
-            "OPTIONAL MATCH (staff:Staff)-[staffSkillRel:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skill) WHERE id(staff) IN {1} with {staff:CASE when staffSkillRel is null then [] else collect(id(staff)) end} as staff,skillCategory,skill,r\n" +
-            "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:skill.name,description:skill.description,isSelected:CASE when r is null then false else true end,isEdited:true,staff:staff.staff})} as data")
+            "OPTIONAL MATCH (staff:Staff)-[staffSkillRel:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skill) WHERE id(staff) IN {1} with {staff:CASE when staffSkillRel is null THEN [] else COLLECT(id(staff)) end} as staff,skillCategory,skill,r\n" +
+            "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,isSelected:CASE when r is null THEN false else true end,isEdited:true,staff:staff.staff})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByTeam(long unitId, List<Long> staffId);
 
     @Query("MATCH (organization:Organization)-[:" + HAS_TEAMS + "]->(team:Team {isEnabled:true}) WHERE id(team)={0} RETURN id(organization)")

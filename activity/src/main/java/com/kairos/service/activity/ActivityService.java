@@ -62,6 +62,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
+import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -778,7 +779,10 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_NOTFOUND);
         }
         LocalDate firstRequestPhasePlanningPeriodEndDate = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId).getEndDate();
-        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(), publicHolidayDayTypeWrapper.getPublicHolidays(),firstRequestPhasePlanningPeriodEndDate,phaseSettingsActivityTab);
+        List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
+                publicHolidayDayTypeWrapper.getPublicHolidays(),firstRequestPhasePlanningPeriodEndDate,plannedTimes,phaseSettingsActivityTab);
+
     }
 
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {

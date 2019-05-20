@@ -40,6 +40,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -127,7 +128,7 @@ public class CounterDistService extends MongoBaseService {
         if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
             kpidtos = counterRepository.getCounterListForReferenceId(refId, ConfLevel.UNIT, false);
         } else {
-            if (accessGroupPermissionCounterDTO.getAccessGroupIds() == null) {
+            if (isCollectionEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds())) {
                 exceptionService.dataNotFoundException(MESSAGE_STAFF_INVALID_UNIT);
             }
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, refId, accessGroupPermissionCounterDTO.getStaffId());

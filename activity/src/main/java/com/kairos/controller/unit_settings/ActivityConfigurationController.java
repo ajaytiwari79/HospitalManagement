@@ -35,7 +35,7 @@ public class ActivityConfigurationController {
     @PutMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/absence/{activityConfigurationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId, @RequestBody AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId, activityConfigurationId, absencePlannedTime));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(activityConfigurationId, absencePlannedTime));
     }
 
 
@@ -88,7 +88,7 @@ public class ActivityConfigurationController {
     @PutMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/absence/{activityConfigurationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfigurationForCountry(@PathVariable Long countryId, @PathVariable BigInteger activityConfigurationId, @RequestBody AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfigurationForCountry(countryId, activityConfigurationId, absencePlannedTime));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfigurationForCountry(activityConfigurationId, absencePlannedTime));
     }
 
 

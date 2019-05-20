@@ -309,6 +309,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.remarks' : 1,\n" +
                 "        'activities.backgroundColor' : 1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
                 "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
                 "      }\n" +
                 "   }";
@@ -549,7 +550,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType) {
+    public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType,boolean allowedConflicts) {
         Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("employmentId").is(employmentId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
@@ -559,7 +560,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 lookup("activities", "activities.activityId", "_id", "activity"),
                 unwind("activity"),
                 lookup("time_Type", "activity.balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                match(where("timeType.timeTypes").is(timeType))
+                match(where("timeType.timeTypes").is(timeType).and("timeType.allowedConflicts").is(allowedConflicts))
         );
 
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();

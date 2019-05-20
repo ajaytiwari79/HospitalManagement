@@ -396,7 +396,6 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                 project().and("kpiId").as("kpiId").andExclude("_id")
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, AccessGroupKPIEntry.class, Map.class);
-        List<Map> result = results.getMappedResults();
         List<BigInteger> kpiIds = new ArrayList<>();
         for (Map kpi : results) {
             kpiIds.add(new BigInteger(kpi.get("kpiId").toString()));
