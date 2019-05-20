@@ -534,7 +534,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
         Map<Long, Map<Long, Set<LocalDate>>> employmentWithShiftDateFunctionIdMap = getEmploymentIdWithFunctionIdShiftDateMap(shifts, unitId);
         if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())){
-            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod.getId(),unitId);
+            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod.getId(),unitId,new ArrayList<>());
         }
         createShiftState(shifts, oldPlanningPeriodPhaseId, employmentWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
@@ -782,9 +782,10 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     // use for publish shift after flipping planning period CONSTRUCTION to DRAFT phase
-    public void publishShiftsAfterFlippingPhaseConstructionToDraft(BigInteger planningPeriodId, Long unitId){
+    public void publishShiftsAfterFlippingPhaseConstructionToDraft(BigInteger planningPeriodId, Long unitId , List<Long> employmentTypeIds){
+        List<Long> staffIds = new ArrayList<>();
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
-        List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,ShiftStatus.PUBLISH);
+        List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,staffIds,ShiftStatus.PUBLISH);
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 if(!shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))
