@@ -36,10 +36,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getDateStringWithFormat;
 import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
@@ -144,33 +144,33 @@ public class ShiftStatusService {
         if (isCollectionEmpty(activity.getRulesActivityTab().getApprovalAllowedPhaseIds()) && (shiftStatus.equals(ShiftStatus.FIX) || shiftStatus.equals(ShiftStatus.UNFIX) || shiftStatus.equals(ShiftStatus.PUBLISH))) {
             valid = false;
         } else {
-            valid = activityStatusisValid(shiftStatus, shiftActivity);
+            valid = activityStatusIsValid(shiftStatus, shiftActivity);
         }
         return valid;
     }
 
-    private boolean activityStatusisValid(ShiftStatus shiftStatus, ShiftActivity shiftActivity) {
-         boolean valid = true;
-        if (shiftActivity.getStatus().contains(ShiftStatus.REQUEST)) {
-            if (shiftStatus.equals(ShiftStatus.PENDING) || shiftStatus.equals(ShiftStatus.APPROVE) || shiftStatus.equals(ShiftStatus.DISAPPROVE)) {
-                valid = false;
-            }
-        } else if (shiftActivity.getStatus().contains(ShiftStatus.PENDING)) {
-            if (shiftStatus.equals(ShiftStatus.APPROVE) || shiftStatus.equals(ShiftStatus.DISAPPROVE)) {
-                valid = false;
-            }
-        } else if (shiftActivity.getStatus().contains(ShiftStatus.APPROVE) || shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
-            if (shiftStatus.equals(ShiftStatus.FIX) || shiftStatus.equals(ShiftStatus.UNFIX) || shiftStatus.equals(ShiftStatus.PUBLISH)) {
-                valid = false;
-            }
+    private boolean activityStatusIsValid(ShiftStatus shiftStatus, ShiftActivity shiftActivity) {
+        return getValidShiftStatus(shiftActivity.getStatus()).contains(shiftStatus);
+    }
+
+    private Set<ShiftStatus> getValidShiftStatus(Set<ShiftStatus> shiftStatusSet){
+        Set<ShiftStatus> shiftStatuses;
+        if (shiftStatusSet.contains(ShiftStatus.REQUEST)){
+            shiftStatuses = newHashSet(ShiftStatus.PENDING,APPROVE,DISAPPROVE);
+        }else if(shiftStatusSet.contains(ShiftStatus.PENDING)){
+            shiftStatuses = newHashSet(APPROVE,DISAPPROVE);
+        }else if(shiftStatusSet.contains(ShiftStatus.APPROVE) || shiftStatusSet.contains(ShiftStatus.FIX)) {
+            shiftStatuses = newHashSet(FIX, UNFIX, PUBLISH);
+        }else {
+            shiftStatuses = newHashSet(FIX, PUBLISH);
         }
-        return valid;
+        return shiftStatuses;
     }
 
     private void removeOppositeStatus(Shift shift, ShiftActivity shiftActivity, ShiftStatus shiftStatus) {
         switch (shiftStatus) {
             case LOCK:
-                shiftActivity.getStatus().removeAll(Arrays.asList(UNLOCK, UNPUBLISH, REQUEST));
+                shiftActivity.getStatus().removeAll(Arrays.asList(UNLOCK, REQUEST));
                 shiftActivity.getStatus().add(LOCK);
                 break;
             case FIX:
@@ -252,7 +252,7 @@ public class ShiftStatusService {
     public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus) {
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
-        String body = "The status of the " + activity.getActivityName() + " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to " + shiftStatus + " by " + UserContext.getUserDetails().getFullName() + "\n Thanks";
+        String body = "The status of the " + activity.getActivityName() + " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to " + shiftStatus + " by " + UserContext.getUserDetails().getFullName() + "\n";
         //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
         Map<String, Object> templateParam = new HashMap<>();
         templateParam.put("receiverName", EMAIL_GREETING + staffDTO.getFullName());

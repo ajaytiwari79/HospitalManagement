@@ -9,7 +9,7 @@ import java.util.stream.Stream;
  * Created by vipul on 8/5/18.
  */
 public enum ShiftStatus {
-    PUBLISH,UNPUBLISH,FIX,LOCK,UNLOCK,UNFIX,PENDING,REQUEST,VALIDATE, DISAPPROVE,APPROVE,MOVED,REJECT;
+    PUBLISH,FIX,LOCK,UNLOCK,UNFIX,PENDING,REQUEST,VALIDATE, DISAPPROVE,APPROVE,MOVED,REJECT;
 
     public static List<ShiftStatus> getListByValue(List<String> values) {
         if(Optional.ofNullable(values).isPresent()){
