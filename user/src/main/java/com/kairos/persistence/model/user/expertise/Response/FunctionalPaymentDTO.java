@@ -18,6 +18,7 @@ public class FunctionalPaymentDTO {
     private PaidOutFrequencyEnum paymentUnit;
     private boolean published;
     private BigDecimal percentageValue;
+    private boolean oneTimeUpdatedAfterPublish;
 
 
 
@@ -80,5 +81,13 @@ public class FunctionalPaymentDTO {
 
     public void setPercentageValue(BigDecimal percentageValue) {
         this.percentageValue = percentageValue;
+    }
+
+    public boolean isOneTimeUpdatedAfterPublish() {
+        return oneTimeUpdatedAfterPublish;
+    }
+
+    public void setOneTimeUpdatedAfterPublish(boolean oneTimeUpdatedAfterPublish) {
+        this.oneTimeUpdatedAfterPublish = oneTimeUpdatedAfterPublish;
     }
 }
