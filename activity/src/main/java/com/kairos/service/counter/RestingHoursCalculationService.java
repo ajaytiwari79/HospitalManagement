@@ -11,6 +11,7 @@ import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
@@ -185,6 +186,18 @@ public class RestingHoursCalculationService implements CounterService {
         return staffRestingHours;
     }
 
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        Map<Object,Object> objectMap = new HashedMap();
+        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+        List<CommonKpiDataUnit> dataList = getRestingHoursKpiData(filterBasedCriteria, organizationId, applicableKPI);
+
+
+
+
+
+        return kpiSetResponseDTO;
+
+    }
 
 }
 

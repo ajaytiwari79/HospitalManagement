@@ -13,7 +13,7 @@ public class KPISetResponseDTO {
 
     private String kpiSetName;
 
-    private Map<String ,Object> data;
+    private List<Map<String ,Number> >data;
 
     public BigInteger getKpiId() {
         return kpiId;
@@ -31,17 +31,20 @@ public class KPISetResponseDTO {
         this.kpiSetName = kpiSetName;
     }
 
-    public Map<String, Object> getData() {
+    public List<Map<String, Number>> getData() {
         return data;
     }
 
-    public void setData(Map<String, Object> data) {
+    public void setData(List<Map<String, Number>> data) {
         this.data = data;
     }
 
-    public KPISetResponseDTO(BigInteger kpiId, String kpiSetName, Map<String, Object> data) {
+    public KPISetResponseDTO(BigInteger kpiId, String kpiSetName, List<Map<String, Number>> data) {
         this.kpiId = kpiId;
         this.kpiSetName = kpiSetName;
         this.data = data;
+    }
+
+    public KPISetResponseDTO() {
     }
 }

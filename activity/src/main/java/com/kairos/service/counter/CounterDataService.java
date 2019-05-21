@@ -21,6 +21,7 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
@@ -413,5 +414,43 @@ public class CounterDataService extends MongoBaseService {
         return tabKPIDTO;
     }
 
+
+
+
+    public Map generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
+        Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
+        List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
+        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
+        List<Future<KPISetResponseDTO>> kpiResults = new ArrayList<>();
+        Map<String,Future> stringKPISetResponseDTOMap = new HashMap<>();
+
+        Map<FilterType, List> filterBasedCriteria = new HashMap<>();
+        Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
+        if (filters.getFilters() != null && isCollectionNotEmpty(filters.getFilters())) {
+            filters.getFilters().forEach(filter -> filterBasedCriteria.put(filter.getType(), filter.getValues()));
+            kpiIdAndApplicableKPIMap.put(kpis.get(0).getId(),new ApplicableKPI(filters.getKpiRepresentation(),filters.getValue(),filters.getInterval(),filters.getFrequencyType()));
+        } else {
+            getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
+        }
+        for (BigInteger kpiId : filters.getKpiIds()) {
+            Callable<KPISetResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId),kpiIdAndApplicableKPIMap.get(kpiId));
+            Future<KPISetResponseDTO> responseData = executorService.submit(data);
+            kpiResults.add(responseData);
+            stringKPISetResponseDTOMap.put("data",responseData);
+        }
+        /*List<Object> kpisData = new ArrayList();
+        for (Future<KPISetResponseDTO> data : kpiResults) {
+            try {
+                kpisData.add(data);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            } catch (ExecutionException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData));*/
+        return stringKPISetResponseDTOMap;
+    }
 
 }

@@ -27,5 +27,6 @@ public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>
 
     boolean existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(BigInteger phaseId, TimeTypeEnum timeType,BigInteger id);
 
+    @Query("{deleted:false, phaseId:?0,referenceId:?1,confLevel:?2}")
     List<KPISetDTO> findByPhaseIdAndReferenceIdAndConfLevel(BigInteger phaseId, Long referenceId, ConfLevel confLevel);
 }

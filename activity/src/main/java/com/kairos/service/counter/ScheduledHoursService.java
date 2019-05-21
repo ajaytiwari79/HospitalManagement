@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -9,6 +10,7 @@ import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
 
@@ -59,4 +61,15 @@ public class ScheduledHoursService implements CounterService {
     public Map<Long, Number> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
         return null;
     }
+
+    @Override
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        Map<Object,Object> objectMap = new HashedMap();
+        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+        return kpiSetResponseDTO;
+
+    }
+
+
+
 }

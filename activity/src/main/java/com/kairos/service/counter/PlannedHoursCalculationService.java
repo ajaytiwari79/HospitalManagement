@@ -11,6 +11,7 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
@@ -24,6 +25,8 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -47,6 +50,8 @@ public class PlannedHoursCalculationService implements CounterService {
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+
+    private static Logger LOGGER = LoggerFactory.getLogger(PlannedHoursCalculationService.class);
 
     private double getPlannedHoursOfStaff(List<Shift> shifts) {
         long plannedHours = 0l;
@@ -189,6 +194,34 @@ public class PlannedHoursCalculationService implements CounterService {
             staffplannedHours.put(staffId, plannedHours);
         }
         return staffplannedHours;
+    }
+
+
+
+
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        Map<BigInteger, BigInteger> objectMap = new HashedMap();
+        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+        List< Map<String ,Number>> mapList = new ArrayList<>();
+        Map<String ,Number> stringNumberMap = new HashMap<>();
+        List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, applicableKPI);
+        new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+
+        dataList.forEach(c->{
+            stringNumberMap.put(c.getLabel(),c.getRefId());
+            LOGGER.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+" +c.getLabel()+"%%%%%%%%"+c.getRefId() +"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        });
+
+
+         /*Map<String ,Number>  bigIntegerBigIntegerMap = dataList.stream()
+                 .collect(Collectors.toMap(CommonKpiDataUnit::getLabel, CommonKpiDataUnit::getRefId));*/
+        //  mapList.add(bigIntegerBigIntegerMap);
+        mapList.add(stringNumberMap);
+        kpiSetResponseDTO.setKpiId(kpi.getId());
+        kpiSetResponseDTO.setKpiSetName(kpi.getTitle());
+        kpiSetResponseDTO.setData(mapList);
+        return kpiSetResponseDTO;
+
     }
 
 }

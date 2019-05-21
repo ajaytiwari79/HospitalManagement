@@ -152,6 +152,7 @@ public class KPISetService {
 
 
     public Map<String, Object> createKPISetCalculation(Long unitId, Date startDate) {
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>am in method>>>>>>>>>>>>>>>>>>>");
         List<ApplicableKPI>    applicableKPIS =new ArrayList<>();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
@@ -166,48 +167,45 @@ public class KPISetService {
             if (isCollectionNotEmpty(kpiSetDTOList)) {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
-                        unitPhaseMap.put("kpiSetId",kpiSet.getId());
-                        unitPhaseMap.put("kpiSetName",kpiSet.getName());
-                          applicableKPIS = counterRepository.getKPIByKPIId(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId,ConfLevel.UNIT);
-                       logger.info(applicableKPIS.get(0).getActiveKpiId().toString());
-                      //  unitPhaseMap.put(applicableKPIS.get(0).getActiveKpiId(),applicableKPIS);
+                        unitPhaseMap.put("kpiSetId", kpiSet.getId());
+                        unitPhaseMap.put("kpiSetName", kpiSet.getName());
+                        applicableKPIS = counterRepository.getKPIByKPIId(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId, ConfLevel.UNIT);
+                        logger.info(applicableKPIS.get(0).getActiveKpiId().toString());
+                        //  unitPhaseMap.put(applicableKPIS.get(0).getActiveKpiId(),applicableKPIS);
                         for (ApplicableKPI kpi : applicableKPIS) {
                             kpi.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                         }
                     }
-                }
-                FilterCriteriaDTO filterCriteriaDTO =new FilterCriteriaDTO();
-                filterCriteriaDTO.setCountryAdmin(accessGroupPermissionCounterDTO.isCountryAdmin());
-                filterCriteriaDTO.setStaffId(accessGroupPermissionCounterDTO.getStaffId());
-                filterCriteriaDTO.setKpiIds(new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()));
-                filterCriteriaDTO.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
-                filterCriteriaDTO.setFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
-                filterCriteriaDTO.setInterval(applicableKPIS.get(0).getInterval());
-                filterCriteriaDTO.setFrequencyType(applicableKPIS.get(0).getFrequencyType());
-                filterCriteriaDTO.setValue(applicableKPIS.get(0).getValue());
+
+                    FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO();
+                    filterCriteriaDTO.setCountryAdmin(accessGroupPermissionCounterDTO.isCountryAdmin());
+                    filterCriteriaDTO.setStaffId(accessGroupPermissionCounterDTO.getStaffId());
+                    filterCriteriaDTO.setKpiIds(new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()));
+                    filterCriteriaDTO.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                    filterCriteriaDTO.setFilters(applicableKPIS.get(0).getApplicableFilter().getCriteriaList());
+                    filterCriteriaDTO.setInterval(applicableKPIS.get(0).getInterval());
+                    filterCriteriaDTO.setFrequencyType(applicableKPIS.get(0).getFrequencyType());
+                    filterCriteriaDTO.setValue(applicableKPIS.get(0).getValue());
 
 
+                    Map<BigInteger, KPISetResponseDTO> data = counterDataService.generateKPICalculationData(filterCriteriaDTO
+                            , unitId,
+                            accessGroupPermissionCounterDTO.getStaffId());
 
-                Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteriaDTO
-                        , unitId,
-                        accessGroupPermissionCounterDTO.getStaffId());
-
-            data.entrySet().forEach(result ->{
-                    Map<String,Object> kpiSetMap = new HashMap<>();
+                    data.entrySet().forEach(result -> {
+                    /*Map<String,Object> kpiSetMap = new HashMap<>();
                     result.getValue().getDataList().stream().forEach(dataList ->{
                         kpiSetMap.put( "kpiId" ,dataList.getRefId());
-                        //objectMap.put("value", dataList)
+                        //objectMap.put("value", dataList)*/
 
                     });
-                   new KPISetResponseDTO(result.getValue().getCounterId(),result.getValue().getTitle(),kpiSetMap);
-                });
-
+                    //  new KPISetResponseDTO(result.getValue().getCounterId(),result.getValue().getTitle(),kpiSetMap);
+                    // });
+                }
             }
         }
   return unitPhaseMap;
     }
 
-    private void get(CounterType counterType){
 
-    }
 }
