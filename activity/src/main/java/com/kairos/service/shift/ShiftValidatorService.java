@@ -376,10 +376,10 @@ public class ShiftValidatorService {
         Map<BigInteger, ShiftActivityDTO> activityIdAndShiftActivityDTOMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(ShiftActivityDTO::getActivityId, v -> v));
         for (ShiftActivity shiftActivity : oldStateOfShift.getActivities()) {
             if (activityIdAndShiftActivityDTOMap.containsKey(shiftActivity.getActivityId()) && (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getEndDate()))) {
-                if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
-                    activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStatus().add(ShiftStatus.MOVED);
-                } else if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
+                if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
                     valid = true;
+                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
+                    activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStatus().add(ShiftStatus.MOVED);
                 }
             }
             if (valid) {
