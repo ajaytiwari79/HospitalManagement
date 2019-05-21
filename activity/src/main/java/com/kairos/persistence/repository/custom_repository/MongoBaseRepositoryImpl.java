@@ -38,7 +38,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	/**
 	 *  Sequence collection name prefix
 	 * */
-	private static final String SEQUENCE_POST_FIX = "Sequence";
+	public static final String SEQUENCE_POST_FIX = "Sequence";
 
 	public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID>  entityInformation,
 							  MongoOperations mongoOperations) {

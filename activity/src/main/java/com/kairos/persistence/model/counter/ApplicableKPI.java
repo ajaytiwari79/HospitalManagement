@@ -2,8 +2,8 @@ package com.kairos.persistence.model.counter;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.kpi.Interval;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -25,7 +25,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private DurationType frequencyType;
     // frequency value
     private int value;
-    private Interval interval;
+    private IntervalUnit interval;
     private boolean fibonacciKPI;
     // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
     private boolean copy;
@@ -43,7 +43,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.level = level;
     }
 
-    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy,KPIRepresentation kpiRepresentation ,Interval interval,int value ,DurationType frequencyType,List<FibonacciKPIConfig> fibonacciKPIConfigs) {
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy,KPIRepresentation kpiRepresentation ,IntervalUnit interval,int value ,DurationType frequencyType,List<FibonacciKPIConfig> fibonacciKPIConfigs) {
         this.activeKpiId = activeKpiId;
         this.baseKpiId = baseKpiId;
         this.countryId = countryId;
@@ -60,23 +60,11 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.fibonacciKPIConfigs = fibonacciKPIConfigs;
     }
 
-    public  ApplicableKPI(KPIRepresentation  kpiRepresentation,int value,Interval interval,DurationType frequencyType){
+    public  ApplicableKPI(KPIRepresentation  kpiRepresentation,int value,IntervalUnit interval,DurationType frequencyType){
         this.kpiRepresentation=kpiRepresentation;
         this.value=value;
         this.interval=interval;
         this.frequencyType=frequencyType;
-    }
-    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy) {
-        this.activeKpiId = activeKpiId;
-        this.baseKpiId = baseKpiId;
-        this.countryId = countryId;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.level = level;
-        this.applicableFilter=applicableFilter;
-        this.copy=copy;
-        this.title=title;
-
     }
 
     public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy,List<FibonacciKPIConfig> fibonacciKPIConfigs) {
@@ -200,11 +188,11 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.value = value;
     }
 
-    public Interval getInterval() {
+    public IntervalUnit getInterval() {
         return interval;
     }
 
-    public void setInterval(Interval interval) {
+    public void setInterval(IntervalUnit interval) {
         this.interval = interval;
     }
 }

@@ -540,7 +540,7 @@ public class CitizenService {
             if (alreadyExistStaff != null)
                 exceptionService.dataNotFoundByIdException(MESSAGE_CITIZEN_STAFF_ALREADYEXIST);
 
-            staff = staffCreationService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
+            staff = staffCreationService.updateStaffDetailsOnCreationOfStaff(user, staff, Long.valueOf("1162"), unit);
         }
 
         Organization parent = null;

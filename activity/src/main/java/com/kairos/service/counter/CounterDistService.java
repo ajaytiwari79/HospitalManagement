@@ -20,7 +20,6 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
-import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -323,7 +322,7 @@ public class CounterDistService extends MongoBaseService {
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabIds, kpiIds, refId, level);
         if (!isCountryAdmin) {
-            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds, refId, level);
+            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIIds(kpiIds, refId, level);
             if (kpiIds.size() != applicableKPIS.size()) {
                 exceptionService.actionNotPermittedException(MESSAGE_COUNTER_KPI_NOTFOUND);
             }
@@ -372,7 +371,7 @@ public class CounterDistService extends MongoBaseService {
         Long countryId = ConfLevel.COUNTRY.equals(level) ? refId : null;
         Long unitId = ConfLevel.UNIT.equals(level) ? refId : null;
         List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
-        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(accessGroupKPIConf.getKpiIds(), refId, level);
+        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIIds(accessGroupKPIConf.getKpiIds(), refId, level);
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, v -> v));
         if (accessGroupKPIConf.getKpiIds().size() != applicableKPIS.size()) {
             exceptionService.actionNotPermittedException(MESSAGE_COUNTER_KPI_NOTFOUND);
@@ -502,7 +501,7 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
-        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(orgTypeKPIConf.getKpiIds(), countryId, ConfLevel.COUNTRY);
+        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIIds(orgTypeKPIConf.getKpiIds(), countryId, ConfLevel.COUNTRY);
         if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
             exceptionService.actionNotPermittedException(MESSAGE_COUNTER_KPI_NOTFOUND);
         }

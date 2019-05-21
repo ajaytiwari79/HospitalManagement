@@ -8,8 +8,8 @@ import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.kpi.Interval;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.wta.IntervalUnit;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -33,7 +33,7 @@ public class KPIDTO {
     private DurationType frequencyType;
     // frequency value
     private int value;
-    private Interval interval;
+    private IntervalUnit interval;
 
     private String description;
     private Long referenceId;
@@ -156,11 +156,11 @@ public class KPIDTO {
         this.value = value;
     }
 
-    public Interval getInterval() {
+    public IntervalUnit getInterval() {
         return interval;
     }
 
-    public void setInterval(Interval interval) {
+    public void setInterval(IntervalUnit interval) {
         this.interval = interval;
     }
 

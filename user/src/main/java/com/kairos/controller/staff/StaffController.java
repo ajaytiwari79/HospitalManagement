@@ -457,18 +457,6 @@ public class StaffController {
                 .getAssignedTasksOfStaff(unitId, staffId, date));
     }
 
-    /**
-     * @param unitId
-     * @param staffDTO
-     * @return
-     */
-    @RequestMapping(value = "/createStaff", method = RequestMethod.POST)
-    @ApiOperation("createStaff")
-    public ResponseEntity<Map<String, Object>> createStaff(@PathVariable long unitId, @RequestBody StaffDTO staffDTO) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaffFromPlanningWorkflow(staffDTO, unitId));
-    }
-
      /**
      * @return
      * @auther anil maurya

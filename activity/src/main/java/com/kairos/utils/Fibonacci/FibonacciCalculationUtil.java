@@ -5,6 +5,7 @@ import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeSet;
@@ -24,14 +25,14 @@ public class FibonacciCalculationUtil {
             FibonacciKPICalculation fibonacciKPICalculation = new FibonacciKPICalculation(staffIdAndDurationEntry.getKey(),staffIdAndDurationEntry.getValue());
             fibonacciKPICalculations.add(fibonacciKPICalculation);
         }
-        int fibonacciFirstCount = 0;
-        int fibonacciTotalCount = 1;
+        BigInteger fibonacciFirstCount = new BigInteger("0");
+        BigInteger fibonacciTotalCount = new BigInteger("1");
         for (FibonacciKPICalculation fibonacciKPICalculation : fibonacciKPICalculations) {
             fibonacciKPICalculation.setFibonacciKpiCount(fibonacciTotalCount);
             LOGGER.info("fibonacci counter {}",fibonacciTotalCount);
-            int fibonacciTempCount = fibonacciFirstCount;
+            BigInteger fibonacciTempCount = fibonacciFirstCount;
             fibonacciFirstCount = fibonacciTotalCount;
-            fibonacciTotalCount = fibonacciTempCount+fibonacciTotalCount;
+            fibonacciTotalCount = fibonacciTempCount.add(fibonacciTotalCount);
         }
         return fibonacciKPICalculations;
     }

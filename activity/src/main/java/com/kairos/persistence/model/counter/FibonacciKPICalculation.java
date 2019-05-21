@@ -22,7 +22,7 @@ public class FibonacciKPICalculation implements Comparable{
     private BigInteger kpiId;
     private Long staffId;
     private int value;
-    private int fibonacciKpiCount;
+    private BigInteger fibonacciKpiCount;
     private int impactWeight;
     private Direction sortingOrder;
 
