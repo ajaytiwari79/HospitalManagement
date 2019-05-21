@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
+
 /**
  * Created by oodles on 9/1/17.
  */
@@ -30,7 +32,7 @@ public class VatTypeService {
         Country country = countryGraphRepository.findOne(countryId);
         VatType vatType;
         if ( country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         } else {
             Boolean vatTypeExistInCountryByNameOrCode = vatTypeGraphRepository.vatTypeExistInCountryByNameOrCode(countryId, "(?i)" + vatTypeDTO.getName(), vatTypeDTO.getCode(), -1L);
             if (vatTypeExistInCountryByNameOrCode) {

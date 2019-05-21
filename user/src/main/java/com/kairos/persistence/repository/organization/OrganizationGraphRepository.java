@@ -48,7 +48,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization addStaff(long organzationId, long departmentId, long userId);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
-            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) RETURN org limit 1")
+            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) " +
+            "MATCH (country:Country)<-[r:"+BELONGS_TO+" ]-(org) RETURN org,r, country    limit 1")
     Organization getParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
@@ -448,7 +449,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Long> findAllOrganizationIds();
 
 
-    @Query("MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) WHERE id(o)={0}  RETURN id(country) ")
+    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Organization) WHERE id(o)={0}  RETURN id(country) ")
     Long getCountryId(Long organizationId);
 
 

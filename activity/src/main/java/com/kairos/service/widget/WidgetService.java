@@ -69,27 +69,28 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+        Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null,organizationDTO.getCountryId());
+        dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(),timeTypeDTOS);
         if(isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
-
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
             Map<Long, List<ShiftWithActivityDTO>> employementIdAndStaffMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getEmploymentId, Collectors.toList()));
-            Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
             UserAccessRoleDTO userAccessRoleDTO = staffAdditionalInfoDTOS.get(0).getUserAccessRoleDTO();
             TimeSlotWrapper nightTimeSlotWrapper = staffAdditionalInfoDTOS.get(0).getTimeSlotSets().stream().filter(timeSlotWrapper -> timeSlotWrapper.getName().equals(PartOfDay.NIGHT.getValue())).findFirst().orElseGet(null);
             TimeSlotDTO nightTimeSlot = ObjectMapperUtils.copyPropertiesByMapper(nightTimeSlotWrapper, TimeSlotDTO.class);
             employementIdAndStaffMap.forEach((aLong, shiftDTOS) -> wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO));
-            List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null,organizationDTO.getCountryId());
             updateTimeTypeDetails(shiftDTOs);
-            dashBoardWidgetDTO = new DashboardWidgetDTO(nightTimeSlot, shiftDTOs, idAndStaffMap, realTimePhase.getRealtimeDuration(),timeTypeDTOS);
-            DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
-            if(isNull(dashboardWidget)){
-                dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING,UPCOMING_SHIFTS,ON_LEAVE,RESTING,SLEEPING));
-                dashboardWidget.setUserId(UserContext.getUserDetails().getId());
-                widgetMongoRepository.save(dashboardWidget);
-            }
-            dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
-            dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
+            dashBoardWidgetDTO.setNightTimeSlot(nightTimeSlot);
+            dashBoardWidgetDTO.setStaffIdAndstaffInfoMap(idAndStaffMap);
         }
+        DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
+        if(isNull(dashboardWidget)){
+            dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING,UPCOMING_SHIFTS,ON_LEAVE,RESTING,SLEEPING));
+            dashboardWidget.setUserId(UserContext.getUserDetails().getId());
+            widgetMongoRepository.save(dashboardWidget);
+        }
+        dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
+        dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
         return dashBoardWidgetDTO;
     }
 

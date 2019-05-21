@@ -33,6 +33,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NAME_ALREADYEXIST;
+
 /**
  * @author pradeep
  * @date - 30/7/18
@@ -69,7 +71,7 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("saving CostTimeAgreement country {}", countryId);
         boolean ctaValid = mapWithOrgType ? costTimeAgreementRepository.isCTAExistWithSameOrgTypeAndSubType(collectiveTimeAgreementDTO.getOrganizationType().getId(), collectiveTimeAgreementDTO.getOrganizationSubType().getId(), collectiveTimeAgreementDTO.getName()) : costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName());
         if (ctaValid) {
-            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
         }
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
@@ -100,7 +102,7 @@ public class CountryCTAService extends MongoBaseService {
 
         boolean ctaExistInOrganization = costTimeAgreementRepository.isCTAExistWithSameNameInOrganization(unitId, collectiveTimeAgreementDTO.getName());
         if (ctaExistInOrganization) {
-            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
         }
 
         List<NameValuePair> requestParam = new ArrayList<>();
@@ -241,7 +243,7 @@ public class CountryCTAService extends MongoBaseService {
     public CollectiveTimeAgreementDTO updateCostTimeAgreementInCountry(Long countryId, BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
         boolean ctaExistsInCountry = costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId);
         if (ctaExistsInCountry) {
-            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
         }
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
 
@@ -277,7 +279,7 @@ public class CountryCTAService extends MongoBaseService {
     public CollectiveTimeAgreementDTO updateCostTimeAgreementInUnit(Long unitId, BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
         boolean ctaExistInUnit = costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName(), ctaId);
         if (ctaExistInUnit) {
-            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
         }
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
 

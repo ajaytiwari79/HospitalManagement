@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_SKILLCATEGORY_NAME_DUPLICATE;
+
 /**
  * SkillCategoryService
  */
@@ -35,7 +37,7 @@ public class SkillCategoryService {
         }
         String name = "(?i)"+skillCategory.getName();
         if (!skillCategoryGraphRepository.checkDuplicateSkillCategory(countryId,name).isEmpty()){
-            exceptionService.duplicateDataException("message.skillcategory.name.duplicate");
+            exceptionService.duplicateDataException(MESSAGE_SKILLCATEGORY_NAME_DUPLICATE);
 
         }else {
             skillCategory.setCountry(country);

@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.PROVINCE;
 
 
@@ -18,13 +19,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PROVI
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Municipality extends UserBaseEntity {
-    @NotBlank(message = "error.Municipality.name.notEmpty")
+    @NotBlank(message = ERROR_MUNICIPALITY_NAME_NOTEMPTY)
     private String name;
 
-    @NotBlank(message = "error.Municipality.geoFence.notEmpty")
+    @NotBlank(message = ERROR_MUNICIPALITY_GEOFENCE_NOTEMPTY)
     private String geoFence;
 
-    @NotBlank(message = "error.Municipality.code.notEmpty")
+    @NotBlank(message = ERROR_MUNICIPALITY_CODE_NOTEMPTY)
     private String code;
 
     private float latitude;

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.UserMessagesConstants.EXPERTISE;
 
 @RestController
 @RequestMapping()

@@ -26,6 +26,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 @Transactional
 public class UnitSettingService extends MongoBaseService {
@@ -61,7 +63,7 @@ public class UnitSettingService extends MongoBaseService {
     public UnitAgeSettingDTO updateUnitAgeSettings(Long unitId, UnitAgeSettingDTO unitSettingsDTO) {
         UnitAgeSetting unitAgeSetting = unitAgeSettingMongoRepository.findByUnit(unitId);
         if (!Optional.ofNullable(unitAgeSetting).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.ageSetting.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_AGESETTING_NOTFOUND, unitId);
         }
         unitAgeSetting.setYounger(unitSettingsDTO.getYounger());
         unitAgeSetting.setOlder(unitSettingsDTO.getOlder());
@@ -81,7 +83,7 @@ public class UnitSettingService extends MongoBaseService {
     public UnitSettingDTO updateOpenShiftPhaseSettings(Long unitId, BigInteger unitSettingsId, UnitSettingDTO unitSettingsDTO) {
         Optional<UnitSetting> unitSetting = unitSettingRepository.findById(unitSettingsId);
         if (!unitSetting.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.setting.notFound", unitSettingsId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_SETTING_NOTFOUND, unitSettingsId);
         }
         unitSetting.get().setUnitId(unitId);
         unitSetting.get().setOpenShiftPhaseSetting(unitSettingsDTO.getOpenShiftPhaseSetting());
@@ -95,7 +97,7 @@ public class UnitSettingService extends MongoBaseService {
         }
         List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         if (openShiftPhaseSettings.size() > 0) {
-            exceptionService.actionNotPermittedException("openShift.already.exist", unitId);
+            exceptionService.actionNotPermittedException(OPENSHIFT_ALREADY_EXIST, unitId);
         }
 
         if (Optional.ofNullable(phases).isPresent()) {
@@ -125,7 +127,7 @@ public class UnitSettingService extends MongoBaseService {
     public FlexibleTimeSettingDTO updateFlexibleTime(Long unitId, FlexibleTimeSettingDTO flexibleTimeSettingDTO) {
         UnitSetting unitSetting = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
         if (unitSetting == null) {
-            exceptionService.dataNotFoundException("message.unit.setting.notFound");
+            exceptionService.dataNotFoundException(MESSAGE_UNIT_SETTING_NOTFOUND);
         }
         FlexibleTimeSettings flexibleTimeSettings = ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingDTO, FlexibleTimeSettings.class);
         unitSetting.setUnitId(unitId);

@@ -40,7 +40,7 @@ import static com.kairos.constants.CommonConstants.*;
 
 @Service
 public class MailService {
-    final static Logger logger = LoggerFactory.getLogger(MailService.class);
+    static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
     @Inject
     private JavaMailSender javaMailSender;
@@ -65,7 +65,6 @@ public class MailService {
             request.setEndpoint(MAIL_REQUEST_ENDPOINT);
             request.setBody(mail.build());
             Response response = sendGrid.api(request);
-            logger.info("Email sent to {}", receiver.toString());
             logger.info("Mail response {}", response.getBody());
         } catch (IOException ex) {
             logger.error("exception occured {}", ex);
@@ -84,15 +83,13 @@ public class MailService {
 
             StringBuilder sb = getRecipientsFromArray(recipients);
             String recipientsString = sb.toString();
-            logger.info("List: "+recipientsString);
-            //InternetAddress me = new InternetAddress("info@kairosplanning.com");
+            logger.info("List: {}",recipientsString);
             mail.setFrom("info@kairosplanning.com");
-            //mail.setFrom(me);
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
             mail.setText(message);
             bodyPart.setFileName(source.getName());
-            logger.info("File has dataType: "+source.getContentType());
+            logger.info("File has dataType: {}",source.getContentType());
             bodyPart.setDataHandler(new DataHandler(source));
             multipart.addBodyPart(bodyPart);
             mail.setContent(multipart);
@@ -167,7 +164,7 @@ public class MailService {
     //Todo Please don't use this method for sending any Custom exception
     public void sendMailToBackendOnException(Exception ex){
        //TODO commented below as we using free account for of send grid which limits 100 emails per day
-        /* if(envConfigCommon.getCurrentProfile().equals(PRODUCTION) || envConfigCommon.getCurrentProfile().equals(QA)){
+        /* if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE) || envConfigCommon.getCurrentProfile().equals(QA_PROFILE)){
             StringBuffer body = new StringBuffer("");
             for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
                 if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {

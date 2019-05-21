@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATE_SOMETHINGWRONG;
 
 /**
  * Created by arvind on 6/10/16.
@@ -85,7 +86,7 @@ public class ResourceUnAvailability extends UserBaseEntity {
             }
             return this;
         } catch (Exception e){
-            exceptionService.dataNotFoundByIdException("message.date.somethingwrong");
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATE_SOMETHINGWRONG);
 
         }
         return null;

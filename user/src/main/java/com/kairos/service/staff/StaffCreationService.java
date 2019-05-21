@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.DEFAULT_PASSPHRASE_ENDS_WITH;
 import static com.kairos.constants.AppConstants.KAIROS_EMAIL;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 @Transactional
 @Service
@@ -311,11 +312,11 @@ public class StaffCreationService {
 
     public StaffDTO createStaffFromWeb(Long unitId, StaffCreationDTO payload) {
         if (payload.getCprNumber().length() != 10) {
-            exceptionService.invalidSize("message.cprNumber.size");
+            exceptionService.invalidSize(MESSAGE_CPRNUMBER_SIZE);
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         Organization parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
@@ -325,11 +326,11 @@ public class StaffCreationService {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
         if (staffGraphRepository.findStaffByEmailInOrganization(payload.getPrivateEmail(), unitId) != null) {
-            exceptionService.duplicateDataException("message.email.alreadyExist", "Staff", payload.getPrivateEmail());
+            exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", payload.getPrivateEmail());
         }
         // Check if Staff exists in organization with CPR Number
         if (staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)) {
-            exceptionService.invalidRequestException("error.staff.exists.same.cprNumber", payload.getCprNumber());
+            exceptionService.invalidRequestException(ERROR_STAFF_EXISTS_SAME_CPRNUMBER, payload.getCprNumber());
         }
         User user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
 
@@ -339,12 +340,12 @@ public class StaffCreationService {
 
         Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
         if (Optional.ofNullable(staff).isPresent()) {
-            exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
+            exceptionService.duplicateDataException(MESSAGE_STAFF_EXTERNALID_ALREADYEXIST);
 
         }
         User userWithExistingUserName = userGraphRepository.findUserByUserName("(?i)" +payload.getUserName());
         if(Optional.ofNullable(userWithExistingUserName).isPresent()){
-            exceptionService.duplicateDataException("message.staff.userName.alreadyexist");
+            exceptionService.duplicateDataException(MESSAGE_STAFF_USERNAME_ALREADYEXIST);
         }
 
         setBasicDetailsOfUser(user, payload);
@@ -372,6 +373,7 @@ public class StaffCreationService {
             user = new User();
             user.setUserLanguage(systemLanguage);
             setBasicDetailsOfUser(user, staffCreationData);
+            user.setCountryId(organization.getCountry().getId());
             userGraphRepository.save(user);
         }
         staffService.setUnitManagerAndPosition(organization, user, staffCreationData.getAccessGroupId());
@@ -381,14 +383,14 @@ public class StaffCreationService {
     public boolean importStaffFromTimeCare(List<TimeCareStaffDTO> timeCareStaffDTOS, String externalId) {
         Organization organization = organizationGraphRepository.findByExternalId(externalId);
         if(organization == null) {
-            exceptionService.dataNotFoundByIdException("message.externalid.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXTERNALID_NOTFOUND);
         }
         List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).
                 collect(Collectors.toList());
         ObjectMapper objectMapper = new ObjectMapper();
         AccessGroup accessGroup = accessGroupRepository.findTaskGiverAccessGroup(organization.getId());
         if(accessGroup == null) {
-            exceptionService.dataNotFoundByIdException("message.taskgiver.accesgroup.notPresent");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TASKGIVER_ACCESGROUP_NOTPRESENT);
 
         }
         SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
@@ -397,7 +399,7 @@ public class StaffCreationService {
             User user = Optional.ofNullable(userGraphRepository.findByEmail(email.trim())).orElse(new User());
             user.setUserLanguage(systemLanguage);
             if(staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
-                exceptionService.duplicateDataException("message.staff.alreadyexist");
+                exceptionService.duplicateDataException(MESSAGE_STAFF_ALREADYEXIST);
             }
             if(timeCareStaffDTO.getGender().equalsIgnoreCase("m")) {
                 timeCareStaffDTO.setGender(Gender.MALE.toString());

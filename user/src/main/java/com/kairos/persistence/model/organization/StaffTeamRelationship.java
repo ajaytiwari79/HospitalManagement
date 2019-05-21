@@ -24,6 +24,10 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private Staff staff;
 
     private boolean isEnabled = true;
+    private LeaderType leaderType;
+    private TeamType teamType;
+
+
 
     public StaffTeamRelationship() {
         //Default Constructor
@@ -35,6 +39,19 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.staff = staff;
     }
 
+    public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType) {
+        this.team = team;
+        this.staff = staff;
+        this.leaderType = leaderType;
+    }
+
+    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType) {
+        this.id=id;
+        this.team = team;
+        this.staff = staff;
+        this.leaderType = leaderType;
+        this.teamType = teamType;
+    }
 
     public Team getTeam() {
         return team;
@@ -57,26 +74,35 @@ public class StaffTeamRelationship extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public enum StaffRole {
-
-        PLANNER, VISITATOR, MANAGER, TEAM_LEADER;
-
-        public String value;
-
-        public static StaffRole getByValue(String value) {
-            for (StaffRole role : StaffRole.values()) {
-                if (role.value.equals(value)) {
-                    return role;
-                }
-            }
-            return null;
-        }
-    }
-
     public boolean isEnabled() {
         return isEnabled;
     }
 
+    public LeaderType getLeaderType() {
+        return leaderType;
+    }
+
+    public void setLeaderType(LeaderType leaderType) {
+        this.leaderType = leaderType;
+    }
+
+    public TeamType getTeamType() {
+        return teamType;
+    }
+
+    public void setTeamType(TeamType teamType) {
+        this.teamType = teamType;
+    }
+
+    //Enum to set the leader type in team
+    public enum LeaderType{
+        MAIN_LEAD,ACTING_LEAD
+    }
+
+    //Enum to set the team type in team
+    public  enum TeamType{
+        MAIN,SECONDARY
+    }
 }
 
 

@@ -26,6 +26,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.TeamService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,6 +63,8 @@ public class StaffExpertiseUnitTest {
     UserGraphRepository userGraphRepository;
     @Mock
     AccessGroupService accessGroupService;
+    @Mock
+    TeamService teamService;
     @Mock
     OrganizationService organizationService;
     @Mock

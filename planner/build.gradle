@@ -55,6 +55,7 @@ repositories {
 }
 
 dependencies {
+	compile project(':kcommons')
 	compile project('optaplanner-shiftplanning')
 	compile project('optaplanner-taskplanning')
 	compile project('optaplanner-vrp-taskplanning')

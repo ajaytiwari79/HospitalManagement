@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
+
 /**
  * Created by oodles on 5/1/17.
  */
@@ -32,7 +34,7 @@ public class CitizenStatusService{
         Country country = countryGraphRepository.findOne(countryId);
         CitizenStatus citizenStatus = null;
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         } else {
             Boolean citizenStatusExistInCountryByName = citizenStatusGraphRepository.citizenStatusExistInCountryByName(countryId, "(?i)" + citizenStatusDTO.getName(), -1L);
             if (citizenStatusExistInCountryByName) {
