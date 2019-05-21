@@ -170,7 +170,7 @@ public class ShiftValidatorService {
             graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         }
         if (!graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone))) {
-            exceptionService.invalidRequestException("message.shift.cannot.update");
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_CANNOT_UPDATE);
         }
     }
 
@@ -192,7 +192,7 @@ public class ShiftValidatorService {
         }
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), asLocalDate(shift.getStartDate()));
         if (planningPeriod == null) {
-            exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shift.getStartDate());
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
@@ -677,9 +677,9 @@ public class ShiftValidatorService {
     public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
         } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
         }
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         ShiftState shiftState = null;
@@ -778,10 +778,10 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT);
         }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException("message.shift.not.published");
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
         }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException("message.shift.not.published");
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
         }
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
