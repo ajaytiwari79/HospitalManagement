@@ -476,6 +476,8 @@ public class StaffingLevelService extends MongoBaseService {
                 case 3:
                     fromTimeS = "0" + fromTimeS;
                     break;
+                default:
+                    break;
             }
             switch (toTimeS.length()) {
                 case 1:
@@ -486,6 +488,8 @@ public class StaffingLevelService extends MongoBaseService {
                     break;
                 case 3:
                     toTimeS = "0" + toTimeS;
+                    break;
+                default:
                     break;
             }
 

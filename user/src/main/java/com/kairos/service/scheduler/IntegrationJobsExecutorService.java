@@ -139,6 +139,8 @@ public class IntegrationJobsExecutorService {
                 importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getTimeSlots";
                 restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                 break;
+            default:
+                break;
 
         }
 

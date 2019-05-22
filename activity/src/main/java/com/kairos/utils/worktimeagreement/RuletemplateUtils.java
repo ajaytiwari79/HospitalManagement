@@ -156,6 +156,8 @@ public class RuletemplateUtils {
             case YEARS:
                 interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
+            default:
+                break;
         }
         return interval;
     }
@@ -404,6 +406,8 @@ public class RuletemplateUtils {
                 case DURATION_BETWEEN_SHIFTS:
                     interval = interval.addInterval(new DateTimeInterval(minusMonths(shift.getStartDate(),1),plusMonths(shift.getStartDate(),1)));
                 break;
+                default:
+                    break;
             }
         }
         return interval;

@@ -58,6 +58,8 @@ public class WorkingTimeConstraints {
             case 17:return minimumWeeklyRestPeriod.checkConstraints(shifts);
             case 18:return shortestAndAverageDailyRest.checkConstraints(shifts);
             case 19:return maximumShiftsInInterval.checkConstraints(shifts);
+            default:
+                break;
         }
         return 0;
     }
@@ -124,6 +126,8 @@ public class WorkingTimeConstraints {
                 break;
             case 20:
                 maximumSeniorDaysInYear.breakLevelConstraints(scoreHolder, kContext,contraintPenality);
+                break;
+            default:
                 break;
         }
     }

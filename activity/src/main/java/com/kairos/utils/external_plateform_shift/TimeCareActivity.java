@@ -82,7 +82,7 @@ public class TimeCareActivity {
     private String ArrayOfDayTypeCalc;
 
     public TimeCareActivity() {
-
+        //Not in use
     }
 
     public String getType() {

@@ -169,6 +169,8 @@ public class PlanningPeriodService extends MongoBaseService {
                         planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
                         break;
                     }
+                    default:
+                        break;
                 }
             }
         }
@@ -431,6 +433,8 @@ public class PlanningPeriodService extends MongoBaseService {
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
         return planningPeriod;
