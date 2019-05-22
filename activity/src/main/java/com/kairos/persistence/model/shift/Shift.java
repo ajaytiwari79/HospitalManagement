@@ -63,14 +63,8 @@ public class Shift extends MongoBaseEntity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
+    private Shift draftShift;
 
-    public Long getStaffUserId() {
-        return staffUserId;
-    }
-
-    public void setStaffUserId(Long staffUserId) {
-        this.staffUserId = staffUserId;
-    }
 
     public Shift() {
         //Default Constructor
@@ -135,6 +129,13 @@ public class Shift extends MongoBaseEntity {
         this.shiftType=shiftType;
     }
 
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public ShiftType getShiftType() {
         return shiftType;
@@ -397,6 +398,14 @@ public class Shift extends MongoBaseEntity {
 
     public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
         this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
+    }
+
+    public Shift getDraftShift() {
+        return draftShift;
+    }
+
+    public void setDraftShift(Shift draftShift) {
+        this.draftShift = draftShift;
     }
 
     @Override
