@@ -844,7 +844,7 @@ public class AccessGroupService {
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
         } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
             if (accessGroupQueryResult == null) {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
             }

@@ -311,7 +311,21 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
             "RETURN\n" +
             "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
-    AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long userId);
+    AccessGroupStaffQueryResult getAccessGroupDayTypesAndUserId(Long unitId, Long userId);
+
+
+    @Query("MATCH(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(organization:Organization)\n" +
+            "WHERE id(organization)={0} AND id(staff)={1}\n" +
+            "MATCH (unitPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(organization)\n" +
+            "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]->(dayType:DayType)\n" +
+            "OPTIONAL MATCH(dayType)-[:" + DAY_TYPE + "]-(chc:CountryHolidayCalender)\n" +
+            "WITH organization,id(staff) AS staffId,accessGroup,dayType,\n" +
+            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS countryHolidayCalender\n" +
+            "WITH organization, staffId,accessGroup,countryHolidayCalender,\n" +
+            "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
+            "RETURN\n" +
+            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
+    AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long staffId);
 }
 
 
