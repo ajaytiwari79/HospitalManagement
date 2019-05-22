@@ -1,4 +1,5 @@
-package com.kairos.dto.activity.shift;/*
+package com.kairos.dto.activity.shift;
+/*
  *Created By Pavan on 17/9/18
  *
  */
@@ -10,12 +11,14 @@ public class ShiftTimeDetails {
     private BigInteger activityId;
     private LocalTime activityStartTime;
     private Short totalTime;
+    private boolean overNightActivity;
 
 
-    public ShiftTimeDetails(BigInteger activityId, LocalTime activityStartTime, Short totalTime) {
+    public ShiftTimeDetails(BigInteger activityId, LocalTime activityStartTime, Short totalTime,boolean overNightActivity) {
         this.activityId = activityId;
         this.activityStartTime = activityStartTime;
         this.totalTime = totalTime;
+        this.overNightActivity=overNightActivity;
     }
 
     public ShiftTimeDetails() {
@@ -44,5 +47,13 @@ public class ShiftTimeDetails {
 
     public void setTotalTime(Short totalTime) {
         this.totalTime = totalTime;
+    }
+
+    public boolean isOverNightActivity() {
+        return overNightActivity;
+    }
+
+    public void setOverNightActivity(boolean overNightActivity) {
+        this.overNightActivity = overNightActivity;
     }
 }
