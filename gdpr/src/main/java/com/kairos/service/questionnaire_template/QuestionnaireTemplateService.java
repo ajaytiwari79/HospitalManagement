@@ -277,11 +277,11 @@ public class QuestionnaireTemplateService {
         Map<String, QuestionType> questionTypeMap = new HashMap<>();
         switch (questionnaireTemplateType) {
             case ASSET_TYPE:
-                Arrays.stream(AssetAttributeName.values()).forEach(assetAttributeName -> questionTypeMap.put(assetAttributeName.value, getQuestionTypeByAttributeName(Asset.class, assetAttributeName.value)));
+                Arrays.stream(AssetAttributeName.values()).forEach(assetAttributeName -> questionTypeMap.put(assetAttributeName.name(), getQuestionTypeByAttributeName(Asset.class, assetAttributeName.value)));
                 break;
                 //return AssetAttributeName.values();
             case PROCESSING_ACTIVITY:
-                Arrays.stream(ProcessingActivityAttributeName.values()).forEach(processingActivityAttributeName -> questionTypeMap.put(processingActivityAttributeName.value, getQuestionTypeByAttributeName(ProcessingActivity.class, processingActivityAttributeName.value)));
+                Arrays.stream(ProcessingActivityAttributeName.values()).forEach(processingActivityAttributeName -> questionTypeMap.put(processingActivityAttributeName.name(), getQuestionTypeByAttributeName(ProcessingActivity.class, processingActivityAttributeName.value)));
                 break;
                 //return ProcessingActivityAttributeName.values();
                 default:
