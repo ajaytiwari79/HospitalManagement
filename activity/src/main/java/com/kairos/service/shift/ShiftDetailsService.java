@@ -127,8 +127,8 @@ public class ShiftDetailsService extends MongoBaseService {
         plannedTimeMap = plannedTimeMap.entrySet().stream().filter(map -> map.getKey().overlaps(activityInterval)).collect(toMap(k -> k.getKey(), k -> k.getValue()));
         plannedTimeMap = plannedTimeMap.entrySet().stream().sorted(comparing(k -> k.getKey().getStartDate())).collect(toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
         List<PlannedTime> plannedTimes = new ArrayList<>();
-        final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().contains(endDate));
-        final boolean startDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().contains(startDate));
+        final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(endDate));
+        final boolean startDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(startDate));
         final boolean activityIntervalOverLapped = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().overlaps(activityInterval));
 
         boolean addedAtLeading = false;
