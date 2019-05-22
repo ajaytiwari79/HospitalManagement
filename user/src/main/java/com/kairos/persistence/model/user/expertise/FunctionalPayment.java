@@ -31,6 +31,7 @@ public class FunctionalPayment extends UserBaseEntity {
     private boolean hasDraftCopy = false;
     // this is kept for tracking to show how many percentage got increase via payTable
     private BigDecimal percentageValue;
+    private boolean oneTimeUpdatedAfterPublish;
 
 
     public FunctionalPayment() {
@@ -119,4 +120,11 @@ public class FunctionalPayment extends UserBaseEntity {
         this.percentageValue = percentageValue;
     }
 
+    public boolean isOneTimeUpdatedAfterPublish() {
+        return oneTimeUpdatedAfterPublish;
+    }
+
+    public void setOneTimeUpdatedAfterPublish(boolean oneTimeUpdatedAfterPublish) {
+        this.oneTimeUpdatedAfterPublish = oneTimeUpdatedAfterPublish;
+    }
 }

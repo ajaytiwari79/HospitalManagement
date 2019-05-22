@@ -318,7 +318,7 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails());
+        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
         return staffPersonalDetail;
     }
 

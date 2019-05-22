@@ -267,6 +267,7 @@ public class UserMessagesConstants {
     public static final String ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY = "error.teamservice.stafforteam.notEmpty";
     public static final String MESSAGE_TEAMSERVICE_SOMETHINGWRONG = "message.teamservice.somethingwrong";
     public static final String MESSAGE_TEAMSERVICE_TEAM_NOTFOUND = "message.teamservice.team.notFound";
+    public static final String STAFF_CAN_NOT_BE_TEAM_LEADER="message.staff.team.leader";
     public static final String MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT = "message.teamservice.team.alreadyexists.in.unit";
     public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
     public static final String TIMESLOT_NOT_FOUND  = "timeslot.not.found ";
@@ -436,4 +437,5 @@ public class UserMessagesConstants {
     public static final String MESSAGE_MODEL_PERMISSION_ID_NULL = "message.model.permission.id.null";
     public static final String MESSAGE_ACCESSGROUP_ID_NULL = "message.accessGroup.id.null";
     public static final String MESSAGE_MODEL_PERMISSIONS_NULL = "message.model.permissions.null";
+    public static final String MESSAGE_DRAFT_COPY_CREATED = "message.draft.copy.exists";
 }

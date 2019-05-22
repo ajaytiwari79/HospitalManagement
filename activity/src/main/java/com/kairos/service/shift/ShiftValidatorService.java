@@ -170,7 +170,7 @@ public class ShiftValidatorService {
             graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         }
         if (!graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone))) {
-            exceptionService.invalidRequestException("message.shift.cannot.update");
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_CANNOT_UPDATE);
         }
     }
 
@@ -192,7 +192,7 @@ public class ShiftValidatorService {
         }
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), asLocalDate(shift.getStartDate()));
         if (planningPeriod == null) {
-            exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shift.getStartDate());
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
@@ -262,6 +262,7 @@ public class ShiftValidatorService {
             Short longestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getLongestTime() : staffActivitySettingMap.get(activityId).getLongestTime();
             LocalTime earliestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getEarliestStartTime() : staffActivitySettingMap.get(activityId).getEarliestStartTime();
             LocalTime latestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getLatestStartTime() : staffActivitySettingMap.get(activityId).getLatestStartTime();
+
             if (shortestTime != null && shiftTimeDetails.getTotalTime() < shortestTime) {
                 errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_LESS_THAN_SHORTEST_TIME, getHoursByMinutes(shortestTime)));
             }
@@ -271,13 +272,14 @@ public class ShiftValidatorService {
             if (earliestStartTime != null && earliestStartTime.isAfter(shiftTimeDetails.getActivityStartTime())) {
                 errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_GREATER_THAN_EARLIEST_TIME, earliestStartTime));
             }
-            if (latestStartTime != null && latestStartTime.isBefore(shiftTimeDetails.getActivityStartTime())) {
+            if (latestStartTime != null && !shiftTimeDetails.isOverNightActivity() && latestStartTime.isBefore(shiftTimeDetails.getActivityStartTime())) {
                 errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME, latestStartTime));
             }
             if (!errorMessages.isEmpty()) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
                 activityRuleViolations.add(new ActivityRuleViolation(activityId, activity.getName(), 0, errorMessages));
             }
+
         });
         return activityRuleViolations;
     }
@@ -286,7 +288,7 @@ public class ShiftValidatorService {
         Long shiftDurationInMinute = new DateTimeInterval(shiftActivity.getStartDate(), shiftActivity.getEndDate()).getMinutes();
         ShiftTimeDetails shiftTimeDetails = shiftTimeDetailsMap.get(shiftActivity.getActivityId());
         if (shiftTimeDetails == null) {
-            shiftTimeDetails = new ShiftTimeDetails(shiftActivity.getActivityId(), DateUtils.asLocalTime(shiftActivity.getStartDate()), shiftDurationInMinute.shortValue());
+            shiftTimeDetails = new ShiftTimeDetails(shiftActivity.getActivityId(), DateUtils.asLocalTime(shiftActivity.getStartDate()), shiftDurationInMinute.shortValue(),DateUtils.asLocalTime(shiftActivity.getStartDate()).isAfter(DateUtils.asLocalTime(shiftActivity.getEndDate())));
         } else {
             shiftTimeDetails.setTotalTime((short) (shiftDurationInMinute.shortValue() + shiftTimeDetails.getTotalTime()));
         }
@@ -376,10 +378,10 @@ public class ShiftValidatorService {
         Map<BigInteger, ShiftActivityDTO> activityIdAndShiftActivityDTOMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(ShiftActivityDTO::getActivityId, v -> v));
         for (ShiftActivity shiftActivity : oldStateOfShift.getActivities()) {
             if (activityIdAndShiftActivityDTOMap.containsKey(shiftActivity.getActivityId()) && (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getEndDate()))) {
-                if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
-                    activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStatus().add(ShiftStatus.MOVED);
-                } else if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
+                if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
                     valid = true;
+                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
+                    activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId()).getStatus().add(ShiftStatus.MOVED);
                 }
             }
             if (valid) {
@@ -677,9 +679,9 @@ public class ShiftValidatorService {
     public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
         } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
         }
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         ShiftState shiftState = null;
@@ -778,10 +780,10 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT);
         }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException("message.shift.not.published");
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
         }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException("message.shift.not.published");
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
         }
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());

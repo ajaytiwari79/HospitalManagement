@@ -772,7 +772,7 @@ public class ActivityService extends MongoBaseService {
             }
         }
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
-        List<PhaseSettingsActivityTab> phaseSettingsActivityTab = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId,accessGroupPermissionCounterDTO.getAccessGroupIds());
+        List<PhaseSettingsActivityTab> phaseSettingsActivityTab=activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId,accessGroupPermissionCounterDTO.getAccessGroupIds());
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
         PlanningPeriodDTO planningPeriodDTO = planningPeriodService.getStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         if (isNull(planningPeriodDTO)) {
