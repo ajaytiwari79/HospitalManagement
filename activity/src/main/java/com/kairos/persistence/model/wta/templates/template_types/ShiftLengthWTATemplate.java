@@ -109,7 +109,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                            limitAndCounter[2],DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]));
+                            limitAndCounter[2],DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
 
                 }
             }
