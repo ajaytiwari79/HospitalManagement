@@ -132,21 +132,24 @@ public class ShiftDetailsService extends MongoBaseService {
         final boolean activityIntervalOverLapped = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().overlaps(activityInterval));
 
         boolean addedAtLeading = false;
-        if (!startDateInside && !endDateInside && !activityIntervalOverLapped) {
+        if (!activityIntervalOverLapped) {
             plannedTimes.add(new PlannedTime(plannedTimeId, startDate, endDate));
         } else {
             if (plannedTimeMap.size() != 0) {
                 DateTimeInterval lastInterval = plannedTimeMap.keySet().stream().skip(plannedTimeMap.keySet().size() - 1).findFirst().get();
                 for (Map.Entry<DateTimeInterval, PlannedTime> plannedTimeInterval : plannedTimeMap.entrySet()) {
-                    if (activityInterval.equals(plannedTimeInterval.getKey()) || plannedTimeInterval.getKey().containsInterval(activityInterval)) {
+                    if (plannedTimeInterval.getKey().containsInterval(activityInterval)) {
                         plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(),startDate,endDate));
                         break;
                     }
+                    else if(startDate.after(plannedTimeInterval.getKey().getStartDate())){
+                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(),startDate,plannedTimeInterval.getKey().getEndDate()));
+                    }
                     else if (startDate.before(plannedTimeInterval.getKey().getStartDate()) && isEqualOrBefore(endDate, plannedTimeInterval.getKey().getEndDate())) {
-                        if (!startDateInside) {
+                        if (!startDateInside && !addedAtLeading) {
                             plannedTimes.add(new PlannedTime(plannedTimeId, startDate, plannedTimeInterval.getKey().getStartDate()));
                         }
-                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), plannedTimeInterval.getKey().getStartDate(), plannedTimeInterval.getKey().getEndDate()));
+                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), plannedTimeInterval.getKey().getStartDate(), endDate));
                         break;
                     } else if (startDate.before(plannedTimeInterval.getKey().getStartDate()) && endDate.after(plannedTimeInterval.getKey().getEndDate()) && endDateInside) {
                         if (!addedAtLeading) {
