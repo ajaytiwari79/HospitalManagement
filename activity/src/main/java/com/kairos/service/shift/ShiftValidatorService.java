@@ -18,7 +18,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
@@ -26,6 +25,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -50,6 +50,7 @@ import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepo
 import com.kairos.persistence.repository.staffing_level.StaffingLevelActivityRankRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
@@ -83,6 +84,7 @@ import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
@@ -139,6 +141,7 @@ public class ShiftValidatorService {
     private ShiftService shiftService;
     @Inject
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
 
 
     private static ExceptionService exceptionService;
@@ -300,6 +303,10 @@ public class ShiftValidatorService {
         PlanningPeriod lastPlanningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(staffAdditionalInfoDTO.getUnitId());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, lastPlanningPeriod.getEndDate());
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmployment(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
+        if(isNotNull(shift.getId())){
+            BigInteger shiftId = shift.getId();
+            shifts = shifts.stream().filter(shiftWithActivityDTO -> !shiftWithActivityDTO.getId().equals(shiftId)).collect(Collectors.toList());
+        }
         shifts = updateFullDayAndFullWeekActivityShift(shifts);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
@@ -786,31 +793,40 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
+        DateTimeInterval shiftInterval = null;
+        Date startDate = asDate(shiftDTO.getShiftDate());
+        Date endDate = null;
         if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullWeekCalculationType()))) {
-                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
-            } else {
-                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(7)));
-            }
-
-        } else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals((activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType()))) {
-                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX)));
-            } else {
-                shiftDTO.setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1)));
-            }
+            endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));
+            shiftInterval = new DateTimeInterval(startDate,endDate);
+        } else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+            endDate = asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX));
+            shiftInterval = new DateTimeInterval(startDate,endDate);
+        }else {
+            shiftInterval = new DateTimeInterval(shiftDTO.getStartDate(),shiftDTO.getEndDate());
+            startDate = getStartOfDay(shiftDTO.getStartDate());
+            endDate = getEndOfDay(shiftDTO.getEndDate());
+        }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
-        boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), WORKING_TYPE,false);
-        if (!shiftExists) {
-            shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.NON_WORKING_TYPE,true);
-            if (shiftExists && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
-                shiftExists = false;
+        List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
+                shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDate,
+                endDate);
+        if (isShiftOverlap(overlappedShifts,shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+            //shiftExists = false;
+            shiftOverlappedWithNonWorkingType = true;
+        }
+       /* if (!shiftExists) {
+            shiftExists = shiftMongoRepository.findOverlappedShiftsByEmploymentId(shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(),  startDate,
+                    endDate);
+            if (isShiftOverlap(overlappedShiftsByEmploymentId,dateTimeInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+                //shiftExists = false;
                 shiftOverlappedWithNonWorkingType = true;
             }
         }
         if (shiftExists) {
-            exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftDTO.getStartDate(), shiftDTO.getEndDate());
-        }
+            exceptionService.invalidRequestException("message.shift.date.startandend",  startDate,
+                    endDate);
+        }*/
         return shiftOverlappedWithNonWorkingType;
     }
 
@@ -920,6 +936,33 @@ public class ShiftValidatorService {
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
         return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
 
+    }
+
+    private boolean isShiftOverlap(List<ShiftWithActivityDTO> shiftWithActivityDTOS,DateTimeInterval shiftInterval){
+        boolean shiftNotOverlap = true;
+        for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
+            DateTimeInterval existingShiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(),shiftWithActivityDTO.getEndDate());
+            for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
+                if(activity.getTimeType().equals(WORKING_TYPE.toString()) && shiftInterval.overlaps(shiftInterval)){
+                    exceptionService.invalidRequestException("message.shift.date.startandend",  shiftWithActivityDTO.getStartDate(),
+                            shiftWithActivityDTO.getEndDate());
+                    shiftNotOverlap = false;
+                }else if(FULL_WEEK.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+                    existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()),getEndOfDay(shiftWithActivityDTO.getEndDate()));
+                    if(shiftInterval.overlaps(existingShiftInterval)){
+                        exceptionService.invalidRequestException("message.shift.date.startandend",  shiftWithActivityDTO.getStartDate(),
+                                shiftWithActivityDTO.getEndDate());
+                        shiftNotOverlap = false;
+                    }
+                }if(activity.getTimeType().equals(NON_WORKING_TYPE.toString()) && shiftInterval.overlaps(shiftInterval)){
+                    TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId());
+                    if(isNotNull(timeType) && timeType.isAllowedConflicts()){
+                        shiftNotOverlap = false;
+                    }
+                }
+            }
+        }
+        return shiftNotOverlap;
     }
 
 }
