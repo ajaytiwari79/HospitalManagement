@@ -619,7 +619,7 @@ public class AccessGroupService {
         if ("Organization".equals(accessGroupDTO.getOrganizationCategory().value)) {
             isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupDTO.getAccountTypeIds());
 
-        }else{
+        } else {
             isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
         }
 
@@ -652,9 +652,9 @@ public class AccessGroupService {
         }
         Boolean isAccessGroupExistWithSameName;
         if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory())) {
-            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId, accessGroupDTO.getAccountTypeIds());
-        }else{
-            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId);
+            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId, accessGroupDTO.getAccountTypeIds());
+        } else {
+            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId);
         }
         if (isAccessGroupExistWithSameName) {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
@@ -720,9 +720,9 @@ public class AccessGroupService {
      * @author vipul
      * @Desc This api is used to fetch all access group by account type id in country.
      */
-    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId,String accessGroupRole) {
+    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId, String accessGroupRole) {
         List<String> accessGroupRoles = isNotNull(accessGroupRole) ? Arrays.asList(accessGroupRole) : Arrays.asList(AccessGroupRole.MANAGEMENT.toString(), AccessGroupRole.STAFF.toString());
-        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId,accessGroupRoles);
+        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId, accessGroupRoles);
     }
 
     public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
@@ -831,7 +831,7 @@ public class AccessGroupService {
     }
 
     // Method to fetch list of Management access group of Organization
-    public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId,AccessGroupRole role) {
+    public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId, AccessGroupRole role) {
         return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, role.toString());
     }
 
@@ -844,8 +844,8 @@ public class AccessGroupService {
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
         } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
-            if(accessGroupQueryResult==null){
+            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
+            if (accessGroupQueryResult == null) {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
             }
             String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
@@ -856,6 +856,17 @@ public class AccessGroupService {
         }
         //Todo till here
         return userAccessRoleDTO;
+    }
+
+    public UserAccessRoleDTO findStaffAccessRole(Long unitId, Long staffId) {
+        AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, staffId);
+        if (accessGroupQueryResult == null) {
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
+        }
+        String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+        boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
+        boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
+        return new UserAccessRoleDTO(unitId, staff, management, staffId);
     }
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
