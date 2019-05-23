@@ -26,7 +26,7 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO>
 
     @Override
     public void validateRules(StaffDTO staffDTO) {
-
+        //Not in use
     }
 
     @Override

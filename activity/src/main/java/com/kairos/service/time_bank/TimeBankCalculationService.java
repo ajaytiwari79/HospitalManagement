@@ -294,6 +294,8 @@ public class TimeBankCalculationService {
                 duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
+            default:
+                break;
         }
         shiftActivity.setDurationMinutes(duration);
         if(TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType())) {
@@ -807,7 +809,9 @@ public class TimeBankCalculationService {
                 return StringUtils.capitalize(AppConstants.YEAR) + " " + interval.getStart().getYear();
             case QUATERLY:
                 return StringUtils.capitalize(AppConstants.QUARTER) + " " + getQuaterNumberByDate(interval.getStart());//(interval.getStart().dayOfMonth().withMinimumValue().equals(interval.getStart()) ? interval.getStart().getMonthOfYear() / 3 : (interval.getStart().getMonthOfYear() / 3) + 1);
-            //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
+            default:
+                break;
+        //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
         }
         return "";
     }
@@ -929,6 +933,8 @@ public class TimeBankCalculationService {
                 case QUATERLY:
                     nextEndDay = getQuaterByDate(startDateTime);
                     break;
+                default:
+                    break;
                 //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
             }
             intervals.add(new Interval(startDateTime, nextEndDay.isAfter(endDateTime) ? endDateTime : nextEndDay));
@@ -955,6 +961,8 @@ public class TimeBankCalculationService {
                 break;
             case 4:
                 quaterDateTime = dateTime.withTimeAtStartOfDay().withMonthOfYear(12).dayOfMonth().withMaximumValue().plusDays(1);
+                break;
+            default:
                 break;
         }
         return quaterDateTime;
@@ -1038,6 +1046,8 @@ public class TimeBankCalculationService {
                 weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
                 duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
+                break;
+            default:
                 break;
         }
         return scheduledMinutes;

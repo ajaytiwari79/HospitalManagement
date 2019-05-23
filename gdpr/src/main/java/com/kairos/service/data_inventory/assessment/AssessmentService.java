@@ -588,6 +588,8 @@ public class AssessmentService {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
+            default:
+                break;
         }
         assessment.setAssessmentLastAssistBy(currentUser);
         assessment.setAssessmentStatus(assessmentStatus);
@@ -701,6 +703,8 @@ public class AssessmentService {
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod(Integer.valueOf(((TextChoice) selectedChoice).getTextChoice().trim()));
                 break;
+            default:
+                break;
 
         }
     }
@@ -749,6 +753,8 @@ public class AssessmentService {
                 break;
             case DPO_CONTACT_INFO:
                 processingActivity.setDpoContactInfo(Integer.valueOf(((TextChoice) selectedChoice).getTextChoice().trim()));
+                break;
+            default:
                 break;
         }
     }

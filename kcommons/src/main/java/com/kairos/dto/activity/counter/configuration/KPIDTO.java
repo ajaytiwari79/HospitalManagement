@@ -35,7 +35,7 @@ public class KPIDTO {
     private Interval interval;
 
     public KPIDTO(){
-
+        //Not in use
     }
 
     public ChartType getChart() {

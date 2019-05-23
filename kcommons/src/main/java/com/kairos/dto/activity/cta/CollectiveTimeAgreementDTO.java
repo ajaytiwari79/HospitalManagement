@@ -39,7 +39,7 @@ public class CollectiveTimeAgreementDTO {
     private List<TagDTO> tags =new ArrayList<>();
 
     public CollectiveTimeAgreementDTO() {
-
+        //Not in use
     }
 
     public BigInteger getId() {

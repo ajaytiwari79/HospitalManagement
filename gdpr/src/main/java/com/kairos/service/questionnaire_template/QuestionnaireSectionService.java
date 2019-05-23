@@ -145,6 +145,8 @@ public class QuestionnaireSectionService {
                     }
                     aClass = ProcessingActivity.class.getDeclaredField(ProcessingActivityAttributeName.valueOf(attributeName).value).getType();
                     break;
+                default:
+                    break;
             }
             boolean isQuestionTypeValid=false;
             if (List.class.equals(aClass) && question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
@@ -257,6 +259,8 @@ public class QuestionnaireSectionService {
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType().value);
                 }
+                break;
+            default:
                 break;
         }
     }

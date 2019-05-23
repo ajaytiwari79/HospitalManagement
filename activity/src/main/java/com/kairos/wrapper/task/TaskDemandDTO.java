@@ -95,6 +95,7 @@ public class TaskDemandDTO {
 
     // Constructors
     public TaskDemandDTO() {
+        //Not in use
     }
 
     public String getDayName() {

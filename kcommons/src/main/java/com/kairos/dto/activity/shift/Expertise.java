@@ -15,6 +15,7 @@ public class Expertise {
     private BreakPaymentSetting breakPaymentSetting;
 
     public Expertise() {
+        //Not in use
     }
 
     public Long getId() {

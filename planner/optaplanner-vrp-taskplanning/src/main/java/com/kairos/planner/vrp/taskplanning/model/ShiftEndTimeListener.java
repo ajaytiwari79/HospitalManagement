@@ -17,17 +17,17 @@ public class ShiftEndTimeListener implements VariableListener<TaskOrShift> {
 
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, TaskOrShift task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityAdded(ScoreDirector scoreDirector, TaskOrShift task) {
-
+        //Not in use
     }
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, TaskOrShift task) {
-
+        //Not in use
     }
 
     @Override
@@ -92,11 +92,11 @@ public class ShiftEndTimeListener implements VariableListener<TaskOrShift> {
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, TaskOrShift task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, TaskOrShift task) {
-
+        //Not in use
     }
 }
