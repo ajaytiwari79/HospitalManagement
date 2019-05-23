@@ -430,7 +430,6 @@ public class CounterDataService extends MongoBaseService {
             for(KPI kpi : kpis) {
                 kpiIdAndApplicableKPIMap.put(kpi.getId(),new ApplicableKPI(filters.getKpiRepresentation(),filters.getValue(),filters.getInterval(),filters.getFrequencyType()));
             }
-           // kpiIdAndApplicableKPIMap.put(kpis.get(0).getId(),new ApplicableKPI(filters.getKpiRepresentation(),filters.getValue(),filters.getInterval(),filters.getFrequencyType()));
         } else {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
 
