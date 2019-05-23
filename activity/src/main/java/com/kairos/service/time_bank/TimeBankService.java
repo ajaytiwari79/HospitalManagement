@@ -538,8 +538,8 @@ public class TimeBankService extends MongoBaseService {
 
     public boolean updateDailyTimeBankEntriesForStaffs(List<Shift> shifts) {
         if(isCollectionNotEmpty(shifts)) {
-            List<Long> staffIds = shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
-            List<Long> employmentIds = shifts.stream().map(shift -> shift.getEmploymentId()).collect(Collectors.toList());
+            Set<Long> staffIds = shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toSet());
+            Set<Long> employmentIds = shifts.stream().map(shift -> shift.getEmploymentId()).collect(Collectors.toSet());
             List<NameValuePair> requestParam = new ArrayList<>();
             requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
             requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
@@ -547,7 +547,7 @@ public class TimeBankService extends MongoBaseService {
             Date startDateTime = new DateTime(shifts.get(0).getStartDate()).withTimeAtStartOfDay().toDate();
             Date endDateTime = new DateTime(shifts.get(shifts.size() - 1).getEndDate()).plusDays(1).withTimeAtStartOfDay().toDate();
             List<DailyTimeBankEntry> updateDailyTimeBanks = new ArrayList<>();
-            List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, startDateTime, endDateTime);
+            List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(new ArrayList<>(employmentIds), startDateTime, endDateTime);
             Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
             Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(s -> s.getEmployment().getId(), v -> v));
             for (Shift shift : shifts) {
