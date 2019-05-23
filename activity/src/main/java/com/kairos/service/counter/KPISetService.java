@@ -12,6 +12,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -167,13 +168,19 @@ public class KPISetService {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
                         applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId, ConfLevel.UNIT);
-                        for (ApplicableKPI kpi : applicableKPIS) {
-                            kpi.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                        for (ApplicableKPI applicableKPI : applicableKPIS) {
+                            applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+
+                         //   FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
+                        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSet.getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
+                            List<KPIResponseDTO> data = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                            kpiSetResponseDTO.setKpiData(data);
                         }
                     }
-                    FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
-                    List<KPISetResponseDTO> data = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
-                    kpiSetResponseDTO.setKpiData(data);
+                    //FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
+//                    FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
+ //                   List<KPISetResponseDTO> data = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+ //                   kpiSetResponseDTO.setKpiData(data);
                 }
             }
         }

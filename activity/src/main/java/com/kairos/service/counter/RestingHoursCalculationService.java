@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.utils.counter.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
@@ -192,8 +193,8 @@ public class RestingHoursCalculationService implements CounterService {
         return staffRestingHours;
     }
 
-    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
-        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+    public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        KPIResponseDTO kpiResponseDTO = new KPIResponseDTO();
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = new ArrayList<>();
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
@@ -203,10 +204,10 @@ public class RestingHoursCalculationService implements CounterService {
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(staffIds, null, dateTimeIntervals, applicableKPI, shifts);
         Map<Long, Double> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().doubleValue()));
-        kpiSetResponseDTO.setKpiName(kpi.getTitle());
-        kpiSetResponseDTO.setKpiId(kpi.getId());
-        kpiSetResponseDTO.setStaffKPIValue(staffAndRestingHoursMap);
-        return kpiSetResponseDTO;
+        kpiResponseDTO.setKpiName(kpi.getTitle());
+        kpiResponseDTO.setKpiId(kpi.getId());
+        kpiResponseDTO.setStaffKPIValue(staffAndRestingHoursMap);
+        return kpiResponseDTO;
     }
 
 }

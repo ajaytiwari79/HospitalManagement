@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
@@ -202,7 +203,7 @@ public class PlannedHoursCalculationService implements CounterService {
 
 
 
-    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+    public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();;
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = new ArrayList<>();

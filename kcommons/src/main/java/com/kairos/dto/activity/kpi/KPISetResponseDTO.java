@@ -10,28 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class KPISetResponseDTO {
-
-    private BigInteger kpiId;
+public class KPISetResponseDTO extends KPIResponseDTO {
 
     private String kpiSetName;
 
-    private String kpiName;
-
     private BigInteger kpiSetId;
 
-    private Map<Long ,Double> staffKPIValue;
-
-    private List<KPISetResponseDTO> kpiData;
-
-
-    public BigInteger getKpiId() {
-        return kpiId;
-    }
-
-    public void setKpiId(BigInteger kpiId) {
-        this.kpiId = kpiId;
-    }
+    private List<KPIResponseDTO> kpiData;
 
     public String getKpiSetName() {
         return kpiSetName;
@@ -39,36 +24,6 @@ public class KPISetResponseDTO {
 
     public void setKpiSetName(String kpiSetName) {
         this.kpiSetName = kpiSetName;
-    }
-
-    public Map<Long, Double> getStaffKPIValue() {
-        return staffKPIValue;
-    }
-
-    public void setStaffKPIValue(Map<Long, Double> staffKPIValue) {
-        this.staffKPIValue = staffKPIValue;
-    }
-
-    public List<KPISetResponseDTO> getKpiData() {
-        return kpiData;
-    }
-
-    public void setKpiData(List<KPISetResponseDTO> kpiData) {
-        this.kpiData = kpiData;
-    }
-
-    public KPISetResponseDTO(BigInteger kpiId, String kpiName, Map<Long, Double> staffKPIValue) {
-        this.kpiId = kpiId;
-        this.kpiName = kpiName;
-        this.staffKPIValue = staffKPIValue;
-    }
-
-    public String getKpiName() {
-        return kpiName;
-    }
-
-    public void setKpiName(String kpiName) {
-        this.kpiName = kpiName;
     }
 
     public BigInteger getKpiSetId() {
@@ -79,6 +34,11 @@ public class KPISetResponseDTO {
         this.kpiSetId = kpiSetId;
     }
 
-    public KPISetResponseDTO() {
+    public List<KPIResponseDTO> getKpiData() {
+        return kpiData;
+    }
+
+    public void setKpiData(List<KPIResponseDTO> kpiData) {
+        this.kpiData = kpiData;
     }
 }
