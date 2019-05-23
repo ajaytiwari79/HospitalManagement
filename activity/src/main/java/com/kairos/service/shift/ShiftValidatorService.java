@@ -812,21 +812,8 @@ public class ShiftValidatorService {
                 shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDate,
                 endDate);
         if (isShiftOverlap(overlappedShifts,shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
-            //shiftExists = false;
             shiftOverlappedWithNonWorkingType = true;
         }
-       /* if (!shiftExists) {
-            shiftExists = shiftMongoRepository.findOverlappedShiftsByEmploymentId(shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(),  startDate,
-                    endDate);
-            if (isShiftOverlap(overlappedShiftsByEmploymentId,dateTimeInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
-                //shiftExists = false;
-                shiftOverlappedWithNonWorkingType = true;
-            }
-        }
-        if (shiftExists) {
-            exceptionService.invalidRequestException("message.shift.date.startandend",  startDate,
-                    endDate);
-        }*/
         return shiftOverlappedWithNonWorkingType;
     }
 
@@ -939,30 +926,28 @@ public class ShiftValidatorService {
     }
 
     private boolean isShiftOverlap(List<ShiftWithActivityDTO> shiftWithActivityDTOS,DateTimeInterval shiftInterval){
-        boolean shiftNotOverlap = true;
+        boolean shiftOverlap = false;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             DateTimeInterval existingShiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(),shiftWithActivityDTO.getEndDate());
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)){
                     exceptionService.invalidRequestException("message.shift.date.startandend",  shiftWithActivityDTO.getStartDate(),
                             shiftWithActivityDTO.getEndDate());
-                    shiftNotOverlap = false;
                 }else if(FULL_WEEK.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
                     existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()),getEndOfDay(shiftWithActivityDTO.getEndDate()));
                     if(shiftInterval.overlaps(existingShiftInterval)){
                         exceptionService.invalidRequestException("message.shift.date.startandend",  shiftWithActivityDTO.getStartDate(),
                                 shiftWithActivityDTO.getEndDate());
-                        shiftNotOverlap = false;
                     }
                 }if((NON_WORKING_TYPE.toString().equals(activity.getTimeType()) && shiftInterval.overlaps(existingShiftInterval))){
                     TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId());
                     if(isNotNull(timeType) && timeType.isAllowedConflicts()){
-                        shiftNotOverlap = false;
+                        shiftOverlap = true;
                     }
                 }
             }
         }
-        return shiftNotOverlap;
+        return shiftOverlap;
     }
 
 }
