@@ -9,13 +9,13 @@ import java.util.Map;
 
 public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermissionModel,Long> {
 
-    @Query(value = "MATCH (m:KPermissionModel{isPermissionSubModel:false, deleted:false})-[:HAS_FIELD]-(f:KPermissionField{deleted:false}) RETURN  m as model, collect(f.fieldName) as fields, m.modelName as modelName")
+    @Query(value = "MATCH (m:KPermissionModel{isPermissionSubModel:false, deleted:false})-[:HAS_FIELD]-(f:kPermissionField{deleted:false}) RETURN  m as model, collect(f.fieldName) as fields, m.modelName as modelName")
     List<Map<String, Object>> getPermissionModelWithModelAndFields();
 
-    @Query(value = "MATCH (smf:KPermissionField)<-[:HAS_FIELD]-(sm:KPermissionModel)<-[:HAS_SUB_MODEL]-(m:KPermissionModel)-[:HAS_FIELD]-(f:KPermissionField) RETURN sm as subModel,collect(distinct smf.fieldName) as submodelfields, m as model, collect(distinct f.fieldName) as modelfields")
+    @Query(value = "MATCH (smf:kPermissionField)<-[:HAS_FIELD]-(sm:KPermissionModel)<-[:HAS_SUB_MODEL]-(m:KPermissionModel)-[:HAS_FIELD]-(f:kPermissionField) RETURN sm as subModel,collect(distinct smf.fieldName) as submodelfields, m as model, collect(distinct f.fieldName) as modelfields")
     List<Map<String, Object>> getPermissionModelDataWithFields();
 
-    @Query(value = "MATCH (m:KPermissionModel)-[:HAS_SUB_MODEL]-(sm:KPermissionModel)-[:HAS_FIELD]-(f:KPermissionField) where m.id = {0} RETURN  sm as model, collect(f.fieldName) as fields, f.modelName as modelName")
+    @Query(value = "MATCH (m:KPermissionModel)-[:HAS_SUB_MODEL]-(sm:KPermissionModel)-[:HAS_FIELD]-(f:kPermissionField) where m.id = {0} RETURN  sm as model, collect(f.fieldName) as fields, f.modelName as modelName")
     List<Map<String, Object>> getPermissionSubModelWithFields(Long permissionModelId);
 
     @Query(value = "MATCH (permissionModel:KPermissionModel)-[:HAS_SUB_MODEL]-(permissionSubModel:KPermissionModel) WHERE id(permissionModel)={1} AND id(permissionSubModel)={0} RETURN  permissionSubModel")
