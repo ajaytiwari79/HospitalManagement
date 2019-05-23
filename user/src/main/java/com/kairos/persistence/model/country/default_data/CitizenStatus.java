@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_CITIZENSTATUS_NAME_NOTEMPTY;
 import static com.kairos.persistence.model.constants.RelationshipConstants.CIVILIAN_STATUS;
 
 
@@ -21,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CIVIL
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CitizenStatus extends UserBaseEntity {
 
-    @NotBlank(message = "error.CitizenStatus.name.notEmpty")
+    @NotBlank(message = ERROR_CITIZENSTATUS_NAME_NOTEMPTY)
     String name;
     String description;
     @Relationship(type = CIVILIAN_STATUS)
@@ -31,7 +32,7 @@ public class CitizenStatus extends UserBaseEntity {
     public CitizenStatus() {
     }
 
-    public CitizenStatus(@NotBlank(message = "error.CitizenStatus.name.notEmpty") String name, String description) {
+    public CitizenStatus(@NotBlank(message = ERROR_CITIZENSTATUS_NAME_NOTEMPTY) String name, String description) {
         this.name = name;
         this.description = description;
     }

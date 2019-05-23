@@ -5,6 +5,7 @@ package com.kairos.controller.counters;
  */
 
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -72,11 +73,11 @@ public class KPISetController {
     }
 
 
-    @GetMapping(UNIT_URL+"/testKPI")
+    @GetMapping(UNIT_URL+"/kpi_set_calculation")
     public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId,
-                                                                       @RequestParam  @DateTimeFormat(pattern = "yyyy" +
+                                                                     @RequestParam  @DateTimeFormat(pattern = "yyyy" +
                                                                                "-MM-dd") Date startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.createKPISetCalculation(unitId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getKPISetCalculation(unitId,startDate));
     }
 
 

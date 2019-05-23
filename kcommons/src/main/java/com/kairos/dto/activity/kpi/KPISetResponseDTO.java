@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.kpi;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -7,13 +9,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class KPISetResponseDTO {
 
     private BigInteger kpiId;
 
     private String kpiSetName;
 
-    private List<Map<String ,Number> >data;
+    private String kpiName;
+
+    private BigInteger kpiSetId;
+
+    private Map<Long ,Double> staffKPIValue;
+
+    private List<KPISetResponseDTO> kpiData;
+
 
     public BigInteger getKpiId() {
         return kpiId;
@@ -31,18 +41,42 @@ public class KPISetResponseDTO {
         this.kpiSetName = kpiSetName;
     }
 
-    public List<Map<String, Number>> getData() {
-        return data;
+    public Map<Long, Double> getStaffKPIValue() {
+        return staffKPIValue;
     }
 
-    public void setData(List<Map<String, Number>> data) {
-        this.data = data;
+    public void setStaffKPIValue(Map<Long, Double> staffKPIValue) {
+        this.staffKPIValue = staffKPIValue;
     }
 
-    public KPISetResponseDTO(BigInteger kpiId, String kpiSetName, List<Map<String, Number>> data) {
+    public List<KPISetResponseDTO> getKpiData() {
+        return kpiData;
+    }
+
+    public void setKpiData(List<KPISetResponseDTO> kpiData) {
+        this.kpiData = kpiData;
+    }
+
+    public KPISetResponseDTO(BigInteger kpiId, String kpiName, Map<Long, Double> staffKPIValue) {
         this.kpiId = kpiId;
-        this.kpiSetName = kpiSetName;
-        this.data = data;
+        this.kpiName = kpiName;
+        this.staffKPIValue = staffKPIValue;
+    }
+
+    public String getKpiName() {
+        return kpiName;
+    }
+
+    public void setKpiName(String kpiName) {
+        this.kpiName = kpiName;
+    }
+
+    public BigInteger getKpiSetId() {
+        return kpiSetId;
+    }
+
+    public void setKpiSetId(BigInteger kpiSetId) {
+        this.kpiSetId = kpiSetId;
     }
 
     public KPISetResponseDTO() {

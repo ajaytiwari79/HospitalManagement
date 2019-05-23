@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_USER_USERNAME_NOTFOUND;
+
 @Service
 public class UserOauth2Service implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(UserOauth2Service.class);
@@ -41,7 +43,7 @@ public class UserOauth2Service implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userGraphRepository.findUserByUserName("(?i)" + username);
         if (!Optional.ofNullable(user).isPresent()) {
-            exceptionService.usernameNotFoundException("message.user.userName.notFound", username);
+            exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
         user.setHubMember(accessPageService.isHubMember(user.getId()));
         Optional<User> loggedUser = Optional.ofNullable(user);
@@ -58,7 +60,7 @@ public class UserOauth2Service implements UserDetailsService {
             return new UserPrincipal(user, getPermission(user));
         } else {
             // Not found...
-            exceptionService.usernameNotFoundException("message.user.userName.notFound", username);
+            exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
         return null;
     }

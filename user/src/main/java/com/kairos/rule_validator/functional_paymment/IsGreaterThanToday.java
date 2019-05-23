@@ -8,6 +8,9 @@ import com.kairos.service.exception.ExceptionService;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_LASTDATE_NOTLESSTHAN_STARTDATE;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_STARTDATE_NOTLESSTHAN_CURRENTDATE;
+
 public class IsGreaterThanToday extends AbstractSpecification<FunctionalPaymentDTO> {
 
     private ExceptionService exceptionService;
@@ -20,10 +23,10 @@ public class IsGreaterThanToday extends AbstractSpecification<FunctionalPaymentD
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
         LocalDate currentDate = DateUtils.getCurrentLocalDate();
         if (currentDate.isAfter(functionalPaymentDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
+            exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_NOTLESSTHAN_CURRENTDATE);
         }
         if (Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() && currentDate.isAfter(functionalPaymentDTO.getEndDate())){
-            exceptionService.actionNotPermittedException("message.lastdate.notlessthan.startdate");
+            exceptionService.actionNotPermittedException(MESSAGE_LASTDATE_NOTLESSTHAN_STARTDATE);
         }
 
         return true;

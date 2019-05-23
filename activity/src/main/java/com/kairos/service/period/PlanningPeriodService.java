@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
  * Created by prerna on 6/4/18.
@@ -183,11 +184,11 @@ public class PlanningPeriodService extends MongoBaseService {
     public List<PlanningPeriodDTO> migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
         List<PlanningPeriod> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByRequestPhaseId(unitId, AppConstants.REQUEST_PHASE_NAME);
         if (requestPlanningPeriods.isEmpty()) {
-            exceptionService.actionNotPermittedException("message.period.request.phase.notfound");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_REQUEST_PHASE_NOTFOUND);
         }
         Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(Arrays.asList(unitId));
         if (!unitIdAndPhasesMap.containsKey(unitId)) {
-            exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_PHASES, unitId);
         }
         LocalDate startDate = requestPlanningPeriods.get(0).getStartDate();
         LocalDate endDate = requestPlanningPeriods.get(requestPlanningPeriods.size() - 1).getEndDate();
@@ -218,7 +219,7 @@ public class PlanningPeriodService extends MongoBaseService {
             }
         }
         if (planningPeriods.isEmpty()) {
-            exceptionService.actionNotPermittedException("message.period.request.phase.notfound");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_REQUEST_PHASE_NOTFOUND);
         }
         save(planningPeriods);
     }
@@ -335,12 +336,12 @@ public class PlanningPeriodService extends MongoBaseService {
         Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(Arrays.asList(unitId));
 
         if (!unitIdAndPhasesMap.containsKey(unitId)) {
-            exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_PHASES, unitId);
         }
 
         // period can't be created in past
         if (DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(planningPeriodDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("error.period.past.date.creation");
+            exceptionService.actionNotPermittedException(ERROR_PERIOD_PAST_DATE_CREATION);
         }
 
 
@@ -350,7 +351,7 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriodDTO.setStartDate(lastEndDate.getEndDate().plusDays(1));
         } else {
             if (!validateStartDateForPeriodCreation(planningPeriodDTO.getStartDate(), planningPeriodDTO.getDurationType())) {
-                exceptionService.actionNotPermittedException("error.period.start.date.invalid");
+                exceptionService.actionNotPermittedException(ERROR_PERIOD_START_DATE_INVALID);
             }
         }
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, unitIdAndPhasesMap.get(unitId), planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
@@ -450,7 +451,7 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(periodId);
 
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.period.organization.notfound", periodId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_PERIOD_ORGANIZATION_NOTFOUND, periodId);
         }
         //TODO not delete harish
 //        if (!phaseMongoRepository.checkPhaseBySequence(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_SEQUENCE)) {
@@ -458,7 +459,7 @@ public class PlanningPeriodService extends MongoBaseService {
 //        }
         if (!planningPeriodDTO.getStartDate().isEqual(planningPeriod.getStartDate()) &&
                 !planningPeriodDTO.getEndDate().isEqual(planningPeriod.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.period.startdate.enddate.notupdate");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_STARTDATE_ENDDATE_NOTUPDATE);
         }
         LocalDateTime puzzleFlippingDateTime = (Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent()) ? getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
                 planningPeriodDTO.getRequestToPuzzleDate().getHours(), planningPeriodDTO.getRequestToPuzzleDate().getMinutes(), planningPeriodDTO.getRequestToPuzzleDate().getSeconds()) : null;
@@ -468,7 +469,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 planningPeriodDTO.getConstructionToDraftDate().getMinutes(), planningPeriodDTO.getConstructionToDraftDate().getSeconds()) : null;
         boolean valid = !((puzzleFlippingDateTime == null || (puzzleFlippingDateTime != null && constructionFlippingDate != null && constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate == null || (constructionFlippingDate != null && draftFlippingDate != null && draftFlippingDate.isAfter(constructionFlippingDate))));
         if (valid) {
-            exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_INVALID_FLIPPINGDATE);
         }
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());
@@ -483,21 +484,21 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
 
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.period.unit.id", periodId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_PERIOD_UNIT_ID, periodId);
         }
 
         // Check if it is last period
         PlanningPeriod lastPlanningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
 
         if (!lastPlanningPeriod.getId().equals(planningPeriod.getId())) {
-            exceptionService.actionNotPermittedException("message.period.delete.last");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_DELETE_LAST);
         }
 
         // Check if period is in request phase
         // We are checking request phase by its name, can be done by sequence, need to ask
         // TO DO check phase by sequence
         if (!phaseMongoRepository.checkPhaseByPhaseIdAndPhaseEnum(planningPeriod.getCurrentPhaseId(), PhaseDefaultName.REQUEST)) {
-            exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_PHASE_REQUEST_NAME, planningPeriod.getName());
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
         schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
@@ -512,10 +513,10 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
 
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.period.unit.id", periodId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_PERIOD_UNIT_ID, periodId);
         }
         if (!Optional.ofNullable(planningPeriod.getNextPhaseId()).isPresent()) {
-            exceptionService.actionNotPermittedException("message.period.phase.last");
+            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_PHASE_LAST);
         }
         BigInteger oldPlanningPeriodPhaseId = planningPeriod.getCurrentPhaseId();
         Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
@@ -638,7 +639,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public boolean restoreShiftToPreviousPhase(BigInteger planningPeriodId, Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(planningPeriodId, unitId);
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
-            exceptionService.dataNotFoundException("message.periodsetting.notFound");
+            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_NOTFOUND);
         }
         BigInteger planningPeriodPhaseId = getPlanningPeriodPreviousPhaseId(planningPeriod, unitId);
         if (isNotNull(planningPeriodPhaseId)) {

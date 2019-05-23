@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 public class GlideTimeSettingsService extends MongoBaseService {
 
@@ -38,16 +40,16 @@ public class GlideTimeSettingsService extends MongoBaseService {
     private void validateGlideTime(GlideTimeSettingsDTO glideTimeSettingsDTO) {
 
         if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter()) {
-            exceptionService.actionNotPermittedException("error.glide_time.checkin.after.exceeds.limit");
+            exceptionService.actionNotPermittedException(ERROR_GLIDE_TIME_CHECKIN_AFTER_EXCEEDS_LIMIT);
         }
         if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore()) {
-            exceptionService.actionNotPermittedException("error.glide_time.checkin.before.exceeds.limit");
+            exceptionService.actionNotPermittedException(ERROR_GLIDE_TIME_CHECKIN_BEFORE_EXCEEDS_LIMIT);
         }
         if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter()) {
-            exceptionService.actionNotPermittedException("error.glide_time.checkout.after.exceeds.limit");
+            exceptionService.actionNotPermittedException(ERROR_GLIDE_TIME_CHECKOUT_AFTER_EXCEEDS_LIMIT);
         }
         if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore()) {
-            exceptionService.actionNotPermittedException("error.glide_time.checkout.before.exceeds.limit");
+            exceptionService.actionNotPermittedException(ERROR_GLIDE_TIME_CHECKOUT_BEFORE_EXCEEDS_LIMIT);
         }
     }
 }

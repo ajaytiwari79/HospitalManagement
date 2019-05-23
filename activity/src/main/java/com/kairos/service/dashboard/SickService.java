@@ -31,6 +31,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_EMPTY_STAFF_OR_UNIT_SETTING;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOTFOUND;
+
 /**
  * CreatedBy vipulpandey on 30/8/18
  **/
@@ -60,7 +63,7 @@ public class SickService {
             BasicNameValuePair sickSettingsRequired = new BasicNameValuePair("sickSettingsRequired", "YES");
             List<StaffResultDTO> staffAndOrganizationDetails = userIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
             if (!Optional.ofNullable(staffAndOrganizationDetails).isPresent() && staffAndOrganizationDetails.isEmpty()) {
-                exceptionService.actionNotPermittedException("message.staff.notfound");
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_NOTFOUND);
             }
             if (staffAndOrganizationDetails.size() == 1) {
                 List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(staffAndOrganizationDetails.get(0).getAllowedTimeTypesForSick(), staffAndOrganizationDetails.get(0).getUnitId());
@@ -78,7 +81,7 @@ public class SickService {
     public Map<String, Long> markUserAsFine(Long staffId, Long unitId) {
         Map<String, Long> response = new HashMap<>();
         if (unitId == null || staffId == null) {
-            exceptionService.actionNotPermittedException("error.empty.staff.or.unit.setting");
+            exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
         shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId);
         sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.

@@ -117,7 +117,7 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), null));
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/redis/access_page", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/access_page", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessPageByAccessGroup(@RequestParam("unitId") long unitId, @RequestParam("staffId") long staffId,
                                                                           @PathVariable long accessGroupId) {
@@ -125,7 +125,7 @@ public class AccessGroupController {
 
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/redis/access_page", method = RequestMethod.POST)
+    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/access_page", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> assignPermission(@PathVariable long accessGroupId, @RequestBody AccessPermissionDTO accessPermissionDTO) {
         accessGroupService.assignPermission(accessGroupId,accessPermissionDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);

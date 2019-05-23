@@ -63,6 +63,12 @@ public class ContactDetail extends UserBaseEntity {
         this.facebookAccount = facebookAccount;
     }
 
+    public ContactDetail(String privateEmail, String landLinePhone, String privatePhone) {
+        this.privateEmail = privateEmail;
+        this.landLinePhone = landLinePhone;
+        this.privatePhone = privatePhone;
+    }
+
     public ContactDetail() {
     }
 

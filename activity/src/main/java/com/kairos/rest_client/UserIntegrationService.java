@@ -65,6 +65,8 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOT_FOUND_BY_USER;
 import static com.kairos.constants.ApiConstants.*;
 
 
@@ -82,7 +84,7 @@ public class UserIntegrationService {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, staffId, expertiseId);
         if (value == null) {
-            exceptionService.dataNotFoundByIdException("message.employment.notFound", expertiseId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_NOTFOUND, expertiseId);
         }
         return value;
     }
@@ -169,9 +171,7 @@ public class UserIntegrationService {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, USER_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
 
-        if (value == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notFound.byUser");
-        }
+        if (value == null) exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_NOT_FOUND_BY_USER);
         return value;
     }
 
@@ -613,7 +613,7 @@ public class UserIntegrationService {
 
     //TODO write implementation previously inside OrganizationRestClient this implementation was written only(here added so as not to break current functionality )
     public boolean isExistOrganization(Long orgId) {
-        return true;
+        return getOrganizationDTO(orgId)!=null;
     }
 
     public Map<String, Object> getTaskDemandSupplierInfo() {

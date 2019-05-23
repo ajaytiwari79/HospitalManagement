@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
+
 /**
  * Created by prabjot on 10/10/17.
  */
@@ -14,7 +16,7 @@ import java.util.List;
 public class AccessPageDTO {
 
     private Long id;
-    @NotNull(message = "error.name.notnull")
+    @NotNull(message = ERROR_NAME_NOTNULL)
     private String name;
     private boolean module;
     private Long parentTabId;

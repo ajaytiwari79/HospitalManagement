@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.counter;
 
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPI;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -14,8 +16,9 @@ import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static com.kairos.persistence.repository.counter.CounterRepository.getRefQueryField;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 /**
  * pradeep
@@ -28,13 +31,19 @@ public class FibonacciKPIRepositoryImpl implements CustomFibonacciKPIRepository{
 
 
     @Override
-    public FibonacciKPIDTO getOneByfibonacciId(BigInteger fibonacciId) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("_id").is(fibonacciId);
+    public KPIDTO getOneByfibonacciId(BigInteger fibonacciId,Long referenceId,ConfLevel confLevel) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("activeKpiId").is(fibonacciId).and("level").is(confLevel).and(getRefQueryField(confLevel)).is(referenceId);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("counter", "fibonacciKPIConfigs.kpiId", "_id", "counter")
+                lookup("counter", "activeKpiId", "_id", "kpi"),
+                project("title","fibonacciKPIConfigs").and("kpi").arrayElementAt(0).as("kpi"),
+                match(Criteria.where("kpi.fibonacciKPI").is(true)),
+                project("title","fibonacciKPIConfigs").and("kpi._id").as("_id").and("kpi.type").as("type")
+                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
+                        and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
+                        .and("kpi.referenceId").as("referenceId")
         );
-        AggregationResults<FibonacciKPIDTO> results = mongoTemplate.aggregate(aggregation, FibonacciKPI.class, FibonacciKPIDTO.class);
+        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
     }
 

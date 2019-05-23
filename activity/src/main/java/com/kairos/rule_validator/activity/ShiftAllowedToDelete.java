@@ -7,6 +7,8 @@ import com.kairos.rule_validator.AbstractSpecification;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_PHASE_AUTHORITY_ABSENT;
+
 public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
 
     List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
@@ -44,7 +46,7 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
             }
                 if ((Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement() && !currentPhase.isManagementCanDelete()) ||
                         (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff() && !currentPhase.isStaffCanDelete())) {
-                    errors  = Arrays.asList("message.phase.authority.absent");
+                    errors  = Arrays.asList(MESSAGE_PHASE_AUTHORITY_ABSENT);
                 }
             }
         return errors;

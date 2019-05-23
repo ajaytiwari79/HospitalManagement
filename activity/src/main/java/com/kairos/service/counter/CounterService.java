@@ -4,13 +4,15 @@ package com.kairos.service.counter;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.Direction;
+import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPI;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*
@@ -42,7 +44,7 @@ public interface CounterService {
 
     CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI);
 
-    Map<Long,Number>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId);
+    KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI);
 
-     KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI);
+    TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, ApplicableKPI applicableKPI);
 }

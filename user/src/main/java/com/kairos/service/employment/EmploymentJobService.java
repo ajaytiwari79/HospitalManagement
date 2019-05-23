@@ -35,6 +35,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_POSITION_END_DATE_GREATER_THAN_EMPLOYMENT_START_DATE;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_REASONCODE_ID_NOTFOUND;
+
 /**
  * CreatedBy vipulpandey on 27/10/18
  **/
@@ -59,6 +62,8 @@ public class EmploymentJobService {
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
     private UserGraphRepository userGraphRepository;
+    @Inject
+    private EmploymentService employmentService;
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
 
@@ -138,13 +143,13 @@ public class EmploymentJobService {
         Long endDateMillis = DateUtils.getIsoDateInLong(positionDTO.getEndDate());
         String employmentStartDateMax = employmentGraphRepository.getMaxEmploymentStartDate(staffId);
         if (Optional.ofNullable(employmentStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(employmentStartDateMax))) {
-            exceptionService.actionNotPermittedException("message.position_end_date.greater_than.employment_start_date", employmentStartDateMax);
+            exceptionService.actionNotPermittedException(MESSAGE_POSITION_END_DATE_GREATER_THAN_EMPLOYMENT_START_DATE, employmentStartDateMax);
 
         }
         List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
         Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(positionDTO.getReasonCodeId(), 0);
         if (!reasonCode.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", positionDTO.getReasonCodeId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, positionDTO.getReasonCodeId());
         }
         for (Employment employment : employments) {
             employment.setEndDate(DateUtils.getLocalDate(endDateMillis));
@@ -168,7 +173,7 @@ public class EmploymentJobService {
         positionGraphRepository.save(position);
         User user = userGraphRepository.getUserByStaffId(staffId);
         PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
-        return new EmploymentAndPositionDTO(positionQueryResult, employmentGraphRepository.getAllEmploymentsByUser(user.getId()));
+        return employmentService.getEmploymentsOfStaff(unitId,staffId,true);
 
     }
 

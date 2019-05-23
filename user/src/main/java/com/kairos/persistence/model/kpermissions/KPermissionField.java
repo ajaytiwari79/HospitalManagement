@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PERMISSION;
 
 @Getter
@@ -20,13 +21,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @NodeEntity
 public class KPermissionField extends UserBaseEntity {
 
-    @NotBlank(message = "error.name.notnull")
+    @NotBlank(message = ERROR_NAME_NOTNULL)
     private String fieldName;
 
     @Relationship(type = HAS_PERMISSION)
     private List<AccessGroup> accessGroups = new ArrayList<>();
 
-    public KPermissionField(@NotBlank(message = "error.name.notnull") String fieldName) {
+    public KPermissionField(@NotBlank(message = ERROR_NAME_NOTNULL) String fieldName) {
         this.fieldName = fieldName;
     }
 }

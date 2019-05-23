@@ -13,6 +13,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_TASKDEMAND_PRIORITY_RANGE;
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_TASKDEMAND_STAFFCOUNT_MINIMUMONE;
 import static com.kairos.persistence.model.task_demand.TaskDemand.Status.VISITATED;
 
 /**
@@ -34,7 +36,7 @@ public class TaskDemand extends MongoBaseEntity {
 
     protected boolean needRehabilitation;
 
-    @Min(value = 1, message = "error.TaskDemand.staffCount.minimumOne")
+    @Min(value = 1, message = ERROR_TASKDEMAND_STAFFCOUNT_MINIMUMONE)
     protected int staffCount;
     protected Status status = VISITATED;
 
@@ -69,7 +71,7 @@ public class TaskDemand extends MongoBaseEntity {
 
     protected long createdByStaffId; // Who is creating Task Demand
 
-    @Range(min=1, max=4, message = "error.TaskDemand.priority.range")
+    @Range(min=1, max=4, message = ERROR_TASKDEMAND_PRIORITY_RANGE)
     protected int priority;
 
     protected String remarks;

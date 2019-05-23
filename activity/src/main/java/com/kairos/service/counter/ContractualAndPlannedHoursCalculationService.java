@@ -2,7 +2,6 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.BarLineChartKPiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
@@ -17,8 +16,10 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
@@ -38,11 +39,11 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
-import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
-import static com.kairos.commons.utils.KPIUtils.getDateTimeIntervals;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
+import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 
 @Service
 public class ContractualAndPlannedHoursCalculationService implements CounterService {
@@ -59,6 +60,8 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private PlannedHoursCalculationService plannedHoursCalculationService;
+    @Inject
+    private CounterHelperService counterHelperService;
 
 
     private Map<Long, Set<DateTimeInterval>> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate) {
@@ -74,24 +77,22 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
 
     private List<CommonKpiDataUnit> getContractualAndPlannedHoursKpiDate(Long organizationId, Map<FilterType, List> filterBasedCriteria ,ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> kpiDataUnits ;
-        List<Long> staffIds = filterBasedCriteria.containsKey(FilterType.STAFF_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
-        List<LocalDate> filterDates = new ArrayList<>();
-        if (isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_INTERVAL))) {
-            filterDates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
-        }
-        List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
-        List<Long> employmentType = filterBasedCriteria.containsKey(FilterType.EMPLOYMENT_TYPE) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
-        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentType, organizationId,dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
+        List<Long> staffIds = (List<Long>)filterCriteria[0];
+        List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
+        List<Long> unitIds = (List<Long>)filterCriteria[2];
+        List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
         if (CollectionUtils.isEmpty(unitIds)) {
             unitIds.add(organizationId);
         }
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList()), isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        staffIds=staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
+        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
+        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
+        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters((List<Long>) kpiData[2], isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = plannedHoursCalculationService.calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
         Map<Object, Double> staffContractualAndPlannedHours = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI,unitIds ,staffKpiFilterDTOS);
         kpiDataUnits = getKpiDataUnits(staffPlannedHours,staffContractualAndPlannedHours,applicableKPI,staffKpiFilterDTOS);
+        sortKpiDataByDateTimeInterval(kpiDataUnits);
         return kpiDataUnits;
     }
     /**
@@ -163,8 +164,15 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     @Override
-    public Map<Long,Number>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId) {
-        return new HashMap<>();
+    public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
+        Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
+        List<Long> staffIds = (List<Long>)filterCriteria[0];
+        List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
+        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
+        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
+        Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI, newArrayList(organizationId),staffKpiFilterDTOS);
+        Map<Long, Integer> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
+        return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
     }
 
 
@@ -177,9 +185,6 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
                 break;
             case REPRESENT_TOTAL_DATA:
                 staffContratualHours = calculateContractualHoursTotalData(planningPeriodIntervel,new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())),staffKpiFilterDTOS,dateTimeIntervals);
-                break;
-            case REPRESENT_PER_INTERVAL:
-                staffContratualHours = calculateContractualHoursPerInterval(planningPeriodIntervel,staffKpiFilterDTOS,dateTimeIntervals, applicableKPI.getFrequencyType());
                 break;
             default:
                 staffContratualHours = calculateContractualHoursPerInterval(planningPeriodIntervel,staffKpiFilterDTOS,dateTimeIntervals, applicableKPI.getFrequencyType());

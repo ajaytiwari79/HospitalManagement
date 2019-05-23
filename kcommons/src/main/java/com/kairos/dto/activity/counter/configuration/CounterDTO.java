@@ -6,8 +6,8 @@ import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.kpi.Interval;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.wta.IntervalUnit;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
@@ -33,7 +33,7 @@ public class CounterDTO {
     private DurationType frequencyType;
     // frequency value
     private int value;
-    private Interval interval;
+    private IntervalUnit interval;
 
     public CounterDTO() {
         //Default Constructor
@@ -136,11 +136,11 @@ public class CounterDTO {
         this.value = value;
     }
 
-    public Interval getInterval() {
+    public IntervalUnit getInterval() {
         return interval;
     }
 
-    public void setInterval(Interval interval) {
+    public void setInterval(IntervalUnit interval) {
         this.interval = interval;
     }
 

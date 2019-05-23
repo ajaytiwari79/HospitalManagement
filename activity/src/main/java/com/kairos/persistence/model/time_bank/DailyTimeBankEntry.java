@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.time_bank;
 
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

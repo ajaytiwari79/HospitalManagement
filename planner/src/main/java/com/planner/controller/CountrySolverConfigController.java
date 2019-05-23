@@ -47,7 +47,6 @@ public class CountrySolverConfigController {
     @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("Update Country Solver Configration")
     public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
-        ;
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.updateCountrySolverConfig(countryId,countrySolverConfigDTO));
     }
 
