@@ -36,7 +36,6 @@ public class ShiftActivity {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
-    private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
@@ -129,15 +128,6 @@ public class ShiftActivity {
     public void setReasonCodeId(Long reasonCodeId) {
         this.reasonCodeId = reasonCodeId;
     }
-
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
-
 
     public Set<ShiftStatus> getStatus() {
         return status;

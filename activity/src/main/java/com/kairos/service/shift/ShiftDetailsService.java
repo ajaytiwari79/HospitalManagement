@@ -88,8 +88,7 @@ public class ShiftDetailsService extends MongoBaseService {
 
     private Map<BigInteger, List<WorkTimeAgreementRuleViolation>> findAllWTAViolatedRules(List<BigInteger> shiftIds) {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
-        Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = shiftViolatedRules.stream().collect(toMap(shiftViolatedRule -> shiftViolatedRule.getShiftId(), v -> v.getWorkTimeAgreements(), (previous, current) -> current));
-        return wtaRuleViolationMap;
+        return shiftViolatedRules.stream().collect(toMap(shiftViolatedRule -> shiftViolatedRule.getShiftId(), v -> v.getWorkTimeAgreements(), (previous, current) -> current));
     }
 
     private ReasonCodeWrapper findReasonCodes(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
@@ -136,6 +135,7 @@ public class ShiftDetailsService extends MongoBaseService {
 
             if (plannedTimeMap.size() != 0) {
                 DateTimeInterval lastInterval = plannedTimeMap.keySet().stream().skip(plannedTimeMap.keySet().size() - 1).findFirst().get();
+                boolean addedAtLeading=false;
                 for (Map.Entry<DateTimeInterval, PlannedTime> plannedTimeInterval : plannedTimeMap.entrySet()) {
                     DateTimeInterval shiftActivityInterVal=new DateTimeInterval(startDate,endDate);
                     if (plannedTimeInterval.getKey().containsInterval(shiftActivityInterVal)) {
@@ -144,8 +144,12 @@ public class ShiftDetailsService extends MongoBaseService {
                     }
 
                     else if (startDate.before(plannedTimeInterval.getKey().getStartDate())) {
-                        plannedTimes.add(new PlannedTime(plannedTimeId, startDate, plannedTimeInterval.getKey().getStartDate()));
-                        startDate=plannedTimeInterval.getKey().getStartDate();
+                        if (!addedAtLeading) {
+                            plannedTimes.add(new PlannedTime(plannedTimeId, startDate, plannedTimeInterval.getKey().getStartDate()));
+                            addedAtLeading = true;
+                        }
+                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), plannedTimeInterval.getKey().getStartDate(), plannedTimeInterval.getKey().getEndDate()));
+                        startDate=plannedTimeInterval.getKey().getEndDate();
                     }
 
                     else if(startDate.equals(plannedTimeInterval.getKey().getStartDate())){

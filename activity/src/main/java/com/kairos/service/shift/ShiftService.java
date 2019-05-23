@@ -280,7 +280,6 @@ public class ShiftService extends MongoBaseService {
             }
             shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
             shiftActivity.setActivityName(activityWrapper.getActivity().getName());
-            shiftActivity.setPlannedTimeId(addPlannedTimeInShift(shift.getUnitId(), shift.getPhaseId(), activityWrapper.getActivity(), staffAdditionalInfoDTO));
         }
         shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift,activityWrapperMap ,staffAdditionalInfoDTO.getUserAccessRoleDTO());
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
@@ -347,7 +346,6 @@ public class ShiftService extends MongoBaseService {
                 }
                 shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
                 shiftActivity.setActivityName(activityWrapper.getActivity().getName());
-                shiftActivity.setPlannedTimeId(addPlannedTimeInShift(staffAdditionalInfoDTO.getUnitId(), phaseListByDate.get(shiftActivity.getStartDate()).getId(), activityWrapperMap.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO));
             }
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());
             shift.setScheduledMinutes(scheduledMinutes);
@@ -811,7 +809,6 @@ public class ShiftService extends MongoBaseService {
                 shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
         );
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setPlannedTimeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO));
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
         });
         shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
