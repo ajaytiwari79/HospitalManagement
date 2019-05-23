@@ -152,7 +152,7 @@ public class KPISetService {
     }
 
 
-    public KPISetResponseDTO getKPISetCalculation(Long unitId, Date startDate) {
+    public KPISetResponseDTO getKPISetCalculationData(Long unitId, Date startDate) {
         List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
