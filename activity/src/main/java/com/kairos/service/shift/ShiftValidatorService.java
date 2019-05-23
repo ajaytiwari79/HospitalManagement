@@ -864,6 +864,7 @@ public class ShiftValidatorService {
         }
     }
 
+
     //This method is being used to check overlapping shift with full day and full week activity
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
         Date startDate;
@@ -886,7 +887,7 @@ public class ShiftValidatorService {
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
         List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
-        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()));
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()),false);
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
         overLappedShifts.forEach(overLappedShift -> {
             if (!shiftOverLappedWithOther(overLappedShift) && isCollectionEmpty(shiftViolatedRulesMap.get(overLappedShift.getId()).getWorkTimeAgreements())) {
@@ -900,7 +901,7 @@ public class ShiftValidatorService {
     }
 
     public Set<BigInteger> getEscalationFreeShifts(List<BigInteger> shiftIds) {
-        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,false);
         List<ShiftViolatedRules> escalationFreeViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isEscalationResolved).collect(Collectors.toList());
         return escalationFreeViolatedRules.stream().map(ShiftViolatedRules::getShiftId).collect(Collectors.toSet());
     }
@@ -928,5 +929,7 @@ public class ShiftValidatorService {
         return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
 
     }
+
+
 
 }

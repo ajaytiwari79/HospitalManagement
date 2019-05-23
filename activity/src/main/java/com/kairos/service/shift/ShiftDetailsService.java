@@ -87,7 +87,7 @@ public class ShiftDetailsService extends MongoBaseService {
     }
 
     private Map<BigInteger, List<WorkTimeAgreementRuleViolation>> findAllWTAViolatedRules(List<BigInteger> shiftIds) {
-        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,false);
         Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = shiftViolatedRules.stream().collect(toMap(shiftViolatedRule -> shiftViolatedRule.getShiftId(), v -> v.getWorkTimeAgreements(), (previous, current) -> current));
         return wtaRuleViolationMap;
     }

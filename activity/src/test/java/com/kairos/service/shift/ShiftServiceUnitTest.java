@@ -227,7 +227,7 @@ public class ShiftServiceUnitTest {
         List<Shift> overLappedShifts=ObjectMapperUtils.JsonStringToList(getOverLappedShift(),Shift.class);
         when(shiftMongoRepository.findOne(shiftDTO.getId())).thenReturn(shift);
         when(activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId())).thenReturn(activityWrapper);
-        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()))).thenReturn(shiftViolatedRules);
+        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()),false)).thenReturn(shiftViolatedRules);
         when(shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate())).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);

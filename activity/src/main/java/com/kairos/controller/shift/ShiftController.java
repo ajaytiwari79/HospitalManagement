@@ -193,5 +193,16 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftValidatorService.deleteDuplicateEntryOfShiftViolatedInfo());
     }
 
-
+    @ApiOperation("save draft shift after publish")
+    @PutMapping(value = "/draft_shift")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveDraftShift(@PathVariable Long unitId,
+                                                              @RequestParam(value = "employmentId", required = false) Long employmentId,
+                                                              @RequestParam(value = "startDate")
+                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
+                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
+                                                              @RequestParam(value = "staffId", required = false) Long staffId,
+                                                              @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,shiftService.saveDraftShift(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam));
+    }
 }
