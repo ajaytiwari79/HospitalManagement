@@ -943,7 +943,7 @@ public class ShiftValidatorService {
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             DateTimeInterval existingShiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(),shiftWithActivityDTO.getEndDate());
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
-                if(activity.getTimeType().equals(WORKING_TYPE.toString()) && shiftInterval.overlaps(shiftInterval)){
+                if((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)){
                     exceptionService.invalidRequestException("message.shift.date.startandend",  shiftWithActivityDTO.getStartDate(),
                             shiftWithActivityDTO.getEndDate());
                     shiftNotOverlap = false;
@@ -954,7 +954,7 @@ public class ShiftValidatorService {
                                 shiftWithActivityDTO.getEndDate());
                         shiftNotOverlap = false;
                     }
-                }if(activity.getTimeType().equals(NON_WORKING_TYPE.toString()) && shiftInterval.overlaps(shiftInterval)){
+                }if((NON_WORKING_TYPE.toString().equals(activity.getTimeType()) && shiftInterval.overlaps(existingShiftInterval))){
                     TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId());
                     if(isNotNull(timeType) && timeType.isAllowedConflicts()){
                         shiftNotOverlap = false;
