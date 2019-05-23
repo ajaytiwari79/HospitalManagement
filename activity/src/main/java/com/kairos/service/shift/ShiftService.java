@@ -539,7 +539,7 @@ public class ShiftService extends MongoBaseService {
                 shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, true, functionId,phase,shiftAction);
                 payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
-                shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
+                shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift , ShiftDTO.class);
                 shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
                 //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
@@ -586,12 +586,13 @@ public class ShiftService extends MongoBaseService {
             shift.setDraftShift(shift);
         }else if(valid && ShiftActionType.SAVE.equals(shiftActionType)){
             shift=shift.getDraftShift();
-            shift.
+//            shift.setDraftShift(null);
         }else{
             shift.setDraftShift(null);
         }
         return shift;
     }
+
     private ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId) {
         if (staffId == null) {
             exceptionService.actionNotPermittedException(STAFF_ID_NULL);
