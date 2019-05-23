@@ -21,6 +21,7 @@ public class KPermissionModel extends UserBaseEntity {
     @NotBlank(message = "error.name.notnull")
     private String modelName;
 
+    private String modelClass;
 
     @Relationship(type = HAS_FIELD,direction = OUTGOING)
     private List<KPermissionField> fields = new ArrayList<>();

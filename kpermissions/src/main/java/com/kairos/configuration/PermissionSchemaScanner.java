@@ -35,6 +35,8 @@
                             List<Map<String, Object>> subModelData= findSubModelData(permissionClass, fields);
                             getRelationShipTypeModelData(permissionClass, fields,reflections);
                             modelMetaData.put(MODEL_NAME, permissionClass.getSimpleName());
+                            modelMetaData.put(MODEL_CLASS, permissionClass.toString());
+                            modelMetaData.put(IS_PERMISSION_SUB_MODEL, true);
                             modelMetaData.put(FIELDS, fields);
                             modelMetaData.put(SUB_MODEL, subModelData);
                             modelData.add(modelMetaData);
@@ -78,12 +80,15 @@
                             Type[] fieldArgTypes = aType.getActualTypeArguments();
                             for (Type fieldArgType : fieldArgTypes) {
                                 Class fieldArgClass = (Class) fieldArgType;
+                                subModelMetaData.put(MODEL_CLASS, fieldArgClass.toString());
                                 getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(),subModelFields);
                             }
                         } else {
+                            subModelMetaData.put(MODEL_CLASS, permissionField.getType().toString());
                             getFieldsOFModelAndSubModel(permissionField.getType().getDeclaredFields(),subModelFields);
                         }
                         if(!subModelFields.isEmpty()){
+                            subModelMetaData.put(IS_PERMISSION_SUB_MODEL, false);
                             subModelMetaData.put(MODEL_NAME, permissionField.getName());
                             subModelMetaData.put(FIELDS, subModelFields);
                             subModelData.add(subModelMetaData);
