@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.EXPERTISE_ABSENT_ACTIVITY;
 
 public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
@@ -25,14 +26,14 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO>
 
     @Override
     public void validateRules(StaffDTO staffDTO) {
-
+        //Not in use
     }
 
     @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         List<String> errorMessages = new ArrayList<>();
         if (isNotNull(staffDTO) && !CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
-            errorMessages.add("expertise.absent.activity");
+            errorMessages.add(EXPERTISE_ABSENT_ACTIVITY);
         }
         return errorMessages;
     }

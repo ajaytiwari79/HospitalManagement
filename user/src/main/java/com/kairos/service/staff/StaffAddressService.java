@@ -30,6 +30,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_GEOGRAPHYDATA_NOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
+
 
 /**
  * Created by prabjot on 19/5/17.
@@ -82,7 +85,7 @@ public class StaffAddressService {
                 }
                 Municipality municipality = municipalityMap.get(addressDTO.getMunicipalityId());
                 if (municipality == null) {
-                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+                    exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
                 }
 
@@ -90,7 +93,7 @@ public class StaffAddressService {
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+                    exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
 
                 }
                 LOGGER.info("Geography Data: " + geographyData);

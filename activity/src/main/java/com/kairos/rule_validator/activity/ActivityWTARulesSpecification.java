@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collections;
 import java.util.List;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_EXPIRED_UNIT;
+
 /**
  * Created by vipul on 8/2/18.
  */
@@ -36,14 +38,14 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     @Override
     public boolean isSatisfied(Activity activity) {
         if (wtaResponseDTO.getEndDate()!=null && DateUtils.asDate(wtaResponseDTO.getEndDate()).before(shift.getEndDate())) {
-            exceptionService.actionNotPermittedException("message.wta.expired-unit");
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_EXPIRED_UNIT);
         }
         return true;
     }
 
     @Override
     public void validateRules(Activity activity) {
-
+        //Not in use
     }
 
     @Override

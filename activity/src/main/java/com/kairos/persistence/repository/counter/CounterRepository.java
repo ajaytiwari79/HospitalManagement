@@ -130,10 +130,10 @@ public class CounterRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
-                project("title").and("kpi").arrayElementAt(0).as("kpi"),
+                project("title","kpiRepresentation").and("kpi").arrayElementAt(0).as("kpi"),
                 project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
-                        and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.kpiRepresentation").as("kpiRepresentation")
+                        and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpiRepresentation").as("kpiRepresentation")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();
@@ -374,7 +374,6 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                 project().and("kpiId").as("kpiId").andExclude("_id")
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, AccessGroupKPIEntry.class, Map.class);
-        List<Map> result = results.getMappedResults();
         List<BigInteger> kpiIds = new ArrayList<>();
         for (Map kpi : results) {
             kpiIds.add(new BigInteger(kpi.get("kpiId").toString()));

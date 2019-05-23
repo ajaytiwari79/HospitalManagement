@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 @Transactional
 @Service
@@ -45,16 +46,16 @@ public class SystemLanguageService {
 
         logger.info("featureDTO : " + systemLanguageDTO.getName());
         if (systemLanguageGraphRepository.isSystemLanguageExistsWithSameName(systemLanguageDTO.getName().trim())) {
-            exceptionService.duplicateDataException("message.system.language.name.alreadyExist", systemLanguageDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_SYSTEM_LANGUAGE_NAME_ALREADYEXIST, systemLanguageDTO.getName());
         }
 
         if (systemLanguageDTO.isDefaultLanguage() && !systemLanguageDTO.isActive()) {
-            exceptionService.invalidRequestException("message.system.language.default.must.active");
+            exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_DEFAULT_MUST_ACTIVE);
         } else if (systemLanguageDTO.isDefaultLanguage() && systemLanguageDTO.isActive()) {
             // Set default status of other lanuages as false
             systemLanguageGraphRepository.setDefaultStatusForAllLanguage(false);
         } else if (!systemLanguageGraphRepository.isDefaultSystemLanguageExists()) {
-            exceptionService.invalidRequestException("message.system.language.must.default");
+            exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_MUST_DEFAULT);
         }
 
         SystemLanguage systemLanguage = new SystemLanguage(systemLanguageDTO.getName(), systemLanguageDTO.getCode(), systemLanguageDTO.isDefaultLanguage(), systemLanguageDTO.isActive());
@@ -68,27 +69,27 @@ public class SystemLanguageService {
         logger.info("featureDTO : " + systemLanguageDTO.getName());
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
         if (!Optional.ofNullable(systemLanguage).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.notFound", systemLanguageId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SYSTEM_LANGUAGE_NOTFOUND, systemLanguageId);
         }
 
         if (systemLanguageDTO.isDefaultLanguage() && !systemLanguageDTO.isActive()) {
-            exceptionService.invalidRequestException("message.system.language.default.must.active");
+            exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_DEFAULT_MUST_ACTIVE);
         } else if (systemLanguageDTO.isDefaultLanguage() && systemLanguageDTO.isActive()) {
             // Set default status of all lanuages as false
             systemLanguageGraphRepository.setDefaultStatusForAllLanguage(false);
 
         } else if (systemLanguage.isDefaultLanguage() && !systemLanguageGraphRepository.isDefaultSystemLanguageExistsExceptId(systemLanguageId)) {
             // If no language exists as default
-            exceptionService.invalidRequestException("message.system.language.make.other.default");
+            exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_MAKE_OTHER_DEFAULT);
         }
 
         if (!(systemLanguage.getName().equalsIgnoreCase(systemLanguageDTO.getName())) && systemLanguageGraphRepository.isSystemLanguageExistsWithSameName(systemLanguageDTO.getName())) {
-            exceptionService.duplicateDataException("message.system.language.name.alreadyExist", systemLanguageDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_SYSTEM_LANGUAGE_NAME_ALREADYEXIST, systemLanguageDTO.getName());
         }
 
         // To set inactive status, check if System Language is linked with Country
         if (!systemLanguageDTO.isActive() && systemLanguageGraphRepository.isSystemLanguageSetInAnyCountry(systemLanguageId)) {
-            exceptionService.invalidRequestException("message.system.language.cannot.set.inactive", systemLanguageId);
+            exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_CANNOT_SET_INACTIVE, systemLanguageId);
         }
 
         systemLanguage.setCode(systemLanguageDTO.getCode());
@@ -104,13 +105,13 @@ public class SystemLanguageService {
 
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
         if (!Optional.ofNullable(systemLanguage).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.notFound", systemLanguageId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SYSTEM_LANGUAGE_NOTFOUND, systemLanguageId);
         }
         if (systemLanguage.isDefaultLanguage()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.default.cannot.delete");
+            exceptionService.dataNotFoundByIdException(MESSAGE_SYSTEM_LANGUAGE_DEFAULT_CANNOT_DELETE);
         }
         if (systemLanguageGraphRepository.isSystemLanguageSetInAnyCountry(systemLanguageId)) {
-            exceptionService.invalidRequestException("message.system.language.cannot.set.inactive", systemLanguageId);
+            exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_CANNOT_SET_INACTIVE, systemLanguageId);
         }
         systemLanguage.setDeleted(true);
         systemLanguageGraphRepository.save(systemLanguage);
@@ -125,11 +126,11 @@ public class SystemLanguageService {
     public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultLanguage, Boolean selected) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId, 0);
         if (!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.notFound", systemLanguageId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SYSTEM_LANGUAGE_NOTFOUND, systemLanguageId);
         }
         if (isNotNull(selected) && selected || isNotNull(defaultLanguage) && defaultLanguage) {
             createCountryAndSystemLanguageMapping(country, systemLanguage, defaultLanguage, selected);
@@ -171,7 +172,7 @@ public class SystemLanguageService {
     public List<SystemLanguageDTO> getSystemLanguageOfCountry(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
         return systemLanguageDTOS;
@@ -180,7 +181,7 @@ public class SystemLanguageService {
     public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getActiveSystemLanguages(), SystemLanguageDTO.class);
         List<SystemLanguageQueryResult> selectedLanguageOfCountry = systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId);

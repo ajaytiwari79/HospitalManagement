@@ -6,6 +6,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.enums.gdpr.*;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
@@ -269,24 +271,24 @@ public class QuestionnaireTemplateService {
     }
 
 
-    public  Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
+    public  Map<String, QuestionType> getQuestionnaireTemplateAttributeNames(String templateType) {
 
         QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
         Map<String, QuestionType> questionTypeMap = new HashMap<>();
         switch (questionnaireTemplateType) {
             case ASSET_TYPE:
-               /* Arrays.stream(AssetAttributeName.values()).forEach(assetAttributeName -> questionTypeMap.put(assetAttributeName.value, getQuestionTypeByAttributeName(Asset.class, assetAttributeName.value)));
-                break;*/
-                return AssetAttributeName.values();
+                Arrays.stream(AssetAttributeName.values()).forEach(assetAttributeName -> questionTypeMap.put(assetAttributeName.name(), getQuestionTypeByAttributeName(Asset.class, assetAttributeName.value)));
+                break;
+                //return AssetAttributeName.values();
             case PROCESSING_ACTIVITY:
-               /* Arrays.stream(ProcessingActivityAttributeName.values()).forEach(processingActivityAttributeName -> questionTypeMap.put(processingActivityAttributeName.value, getQuestionTypeByAttributeName(ProcessingActivity.class, processingActivityAttributeName.value)));
-                break;*/
-                return ProcessingActivityAttributeName.values();
+                Arrays.stream(ProcessingActivityAttributeName.values()).forEach(processingActivityAttributeName -> questionTypeMap.put(processingActivityAttributeName.name(), getQuestionTypeByAttributeName(ProcessingActivity.class, processingActivityAttributeName.value)));
+                break;
+                //return ProcessingActivityAttributeName.values();
                 default:
                     return null;
         }
 
-        //return questionTypeMap;
+        return questionTypeMap;
     }
 
     private QuestionType getQuestionTypeByAttributeName(Class aClass, String attributeName) {

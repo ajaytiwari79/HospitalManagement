@@ -5,6 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
@@ -21,7 +22,6 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -63,7 +64,7 @@ public class RuletemplateUtils {
 
     public static DateTimeInterval getIntervalByNumberOfWeeks(Date startDate, int numberOfWeeks, LocalDate validationStartDate, LocalDate planningPeriodEndDate) {
         if (numberOfWeeks == 0 || validationStartDate == null) {
-            throwException("message.ruleTemplate.weeks.notNull");
+            throwException(MESSAGE_RULETEMPLATE_WEEKS_NOTNULL);
         }
         DateTimeInterval dateTimeInterval = null;
         while (validationStartDate.isBefore(planningPeriodEndDate) || validationStartDate.equals(planningPeriodEndDate)) {
@@ -140,7 +141,7 @@ public class RuletemplateUtils {
     public static DateTimeInterval getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
         DateTimeInterval interval = null;
         if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
-            throwException("message.ruleTemplate.interval.notNull");
+            throwException(MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL);
         }
         switch (intervalUnit) {
             case DAYS:
@@ -154,6 +155,8 @@ public class RuletemplateUtils {
                 break;
             case YEARS:
                 interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            default:
                 break;
         }
         return interval;
@@ -248,12 +251,12 @@ public class RuletemplateUtils {
         if (infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()) {
             totalCounterValue = ruleTemplate.getStaffCanIgnoreCounter();
             if (totalCounterValue == null) {
-                throwException("message.ruleTemplate.counter.value.notNull", ruleTemplate.getName());
+                throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
             }
         } else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
             totalCounterValue = ruleTemplate.getManagementCanIgnoreCounter();
             if (totalCounterValue == null) {
-                throwException("message.ruleTemplate.counter.value.notNull", ruleTemplate.getName());
+                throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
             }
         }
         Integer availableCounter = totalCounterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(), totalCounterValue) : null;
@@ -328,13 +331,13 @@ public class RuletemplateUtils {
 
     public static void validateRuleTemplate(int numberOfWeeks, LocalDate validationStartDate) {
         if (numberOfWeeks == 0 || validationStartDate == null) {
-            throwException("message.ruleTemplate.weeks.notNull");
+            throwException(MESSAGE_RULETEMPLATE_WEEKS_NOTNULL);
         }
     }
 
     public static void validateRuleTemplate(long intervalLength, String intervalUnit) {
         if (intervalLength == 0 || isEmpty(intervalUnit)) {
-            throwException("message.ruleTemplate.interval.notNull");
+            throwException(MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL);
         }
     }
 
@@ -403,6 +406,8 @@ public class RuletemplateUtils {
                 case DURATION_BETWEEN_SHIFTS:
                     interval = interval.addInterval(new DateTimeInterval(minusMonths(shift.getStartDate(),1),plusMonths(shift.getStartDate(),1)));
                 break;
+                default:
+                    break;
             }
         }
         return interval;
@@ -471,7 +476,7 @@ public class RuletemplateUtils {
             for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
                 List<Day> currentDay = daytypesMap.get(dayTypeId);
                 if (currentDay == null) {
-                    throwException("error.dayType.notFound", dayTypeId);
+                    throwException(ERROR_DAYTYPE_NOTFOUND, dayTypeId);
                 }
                 currentDay.forEach(day -> {
                     if (!day.name().equals(EVERYDAY)) {
@@ -501,9 +506,9 @@ public class RuletemplateUtils {
         return limitAndCounter;
     }
 
-    public static String getHoursByMinutes(Integer hour){
+    public static String getHoursByMinutes(Integer hour,String name){
         if(isNull(hour) || hour==0){
-            throwException("message.ruleTemplate.hours.notzero");
+            throwException(MESSAGE_RULETEMPLATE_HOURS_NOTZERO,name);
         }
         int hours = hour / 60; //since both are ints, you get an int
         int minutes = hour % 60;

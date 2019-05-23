@@ -43,6 +43,8 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
                 zonedDateTime.plusDays(intervalValue);
                 break;
             }
+            default:
+                break;
         }
         return zonedDateTime.isAfter(ZonedDateTime.now(ZoneId.systemDefault()));
     }
@@ -84,6 +86,8 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
             case PERCENTAGE:{
                 return ( ((applicableShifts.size() * totalShifts)/100) >= expertiseNightWorkerSettings.getMinShiftsValueToCheckNightWorker() );
             }
+            default:
+                break;
         }
         return true;
     }
@@ -128,7 +132,7 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
 
     @Override
     public void validateRules(ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO) {
-
+        //Not in use
     }
 
     @Override

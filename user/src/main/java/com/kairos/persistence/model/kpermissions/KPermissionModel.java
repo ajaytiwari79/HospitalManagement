@@ -10,7 +10,10 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
+import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FIELD;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SUB_MODEL;
 import static org.neo4j.ogm.annotation.Relationship.OUTGOING;
 
 @Getter
@@ -18,7 +21,7 @@ import static org.neo4j.ogm.annotation.Relationship.OUTGOING;
 @NoArgsConstructor
 @NodeEntity
 public class KPermissionModel extends UserBaseEntity {
-    @NotBlank(message = "error.name.notnull")
+    @NotBlank(message = ERROR_NAME_NOTNULL)
     private String modelName;
 
     private String modelClass;

@@ -23,6 +23,7 @@ import java.util.*;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.AppConstants.TEAM;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
  * Created by prabjot on 16/9/16.
@@ -53,7 +54,7 @@ public class OrganizationServiceService{
 
     public Map<String, Object> updateOrganizationService(long id, String name, String description,Long countryId) {
         if(isNull(name) || name.trim().isEmpty()){
-            exceptionService.actionNotPermittedException("error.OrganizationService.name.notEmpty");
+            exceptionService.actionNotPermittedException(ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY);
         }
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
@@ -61,7 +62,7 @@ public class OrganizationServiceService{
         }
         boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, "(?i)" + name.trim(),id);
         if (alreadyExistWithSameName) {
-            exceptionService.duplicateDataException("message.organizationService.service.duplicate");
+            exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSERVICE_SERVICE_DUPLICATE);
         }
         organizationService.setName(name);
         organizationService.setDescription(description);
@@ -128,13 +129,13 @@ public class OrganizationServiceService{
     public Map<String, Object> addCountrySubService(final long serviceId, OrganizationService subService) {
         OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
-            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
 
         }
 
         String name = "(?i)" + subService.getName();
         if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
-            exceptionService.duplicateDataException("message.organizationService.subservice.duplicated");
+            exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSERVICE_SUBSERVICE_DUPLICATED);
 
         }
 
@@ -182,14 +183,14 @@ public class OrganizationServiceService{
 
         OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
         if (organizationService == null) {
-            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
 
         }
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(id);
             if (unit == null) {
-                exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,id);
 
             }
 
@@ -208,7 +209,7 @@ public class OrganizationServiceService{
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                exceptionService.dataNotFoundByIdException("message.organizationService.team.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_TEAM_NOTFOUND);
 
             }
             if (isSelected) {
@@ -282,7 +283,7 @@ public class OrganizationServiceService{
         String name = "(?i)" + organizationService.getName().trim();
         boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, name,-1L);
         if (alreadyExistWithSameName) {
-            exceptionService.duplicateDataException("message.organizationService.service.duplicate");
+            exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSERVICE_SERVICE_DUPLICATE);
         }
         List<OrganizationService> organizationServices = country.getOrganizationServices();
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
@@ -319,7 +320,7 @@ public class OrganizationServiceService{
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                exceptionService.dataNotFoundByIdException("message.organizationService.team.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_TEAM_NOTFOUND);
 
             }
             response = filterSkillData(teamGraphRepository.getOrganizationServicesOfTeam(id));
@@ -394,7 +395,7 @@ public class OrganizationServiceService{
     public OrganizationService findOne(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (!Optional.ofNullable(organizationService).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
 
         }
         return organizationService;

@@ -32,7 +32,6 @@ import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +47,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
@@ -97,7 +97,7 @@ public class ShiftCopyService extends MongoBaseService {
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<ShiftResponseDTO> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
         if (!Optional.ofNullable(shifts).isPresent() || shifts.isEmpty()) {
-            exceptionService.invalidOperationException("message.shift.notBlank");
+            exceptionService.invalidOperationException(MESSAGE_SHIFT_NOTBLANK);
         }
         Set<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getShifts().stream().flatMap(ss -> ss.getActivities().stream().map(a -> a.getActivityId()))).collect(Collectors.toSet());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
@@ -114,7 +114,7 @@ public class ShiftCopyService extends MongoBaseService {
 
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllByUnitIdAndDeletedFalse(unitId); // might we add more optimization later
         if (activityConfigurations.isEmpty()) {
-            exceptionService.dataNotFoundException("error.activityConfiguration.notFound");
+            exceptionService.dataNotFoundException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
         }
         Integer unCopiedShiftCount = 0;
 
@@ -184,7 +184,7 @@ public class ShiftCopyService extends MongoBaseService {
                     }
                     validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffEmployment, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs));
                 } else {
-                    validationMessages.add(convertMessage("message.employment.not.active", shiftCreationStartDate));
+                    validationMessages.add(convertMessage(MESSAGE_EMPLOYMENT_NOT_ACTIVE, shiftCreationStartDate));
                 }
                 shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {

@@ -60,6 +60,7 @@ public class GetWorkShiftsFromWorkPlaceByIdResult {
     private String UpdateUser;
 
     public GetWorkShiftsFromWorkPlaceByIdResult() {
+        //Not in use
     }
 
     public String getEmploymentId() {

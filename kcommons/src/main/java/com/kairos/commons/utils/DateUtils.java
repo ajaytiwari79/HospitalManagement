@@ -1,5 +1,6 @@
 package com.kairos.commons.utils;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.DurationType;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -342,6 +343,7 @@ public  class DateUtils {
             case HOURS: {
                 return (60 * Period.between(startDate, endDate).getDays());
             }
+            default:break;
         }
         return Period.between(startDate, endDate).getDays();
 
@@ -433,6 +435,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.plusMinutes(duration * recurringNumber);
             }
+            default:break;
 
 
         }
@@ -449,8 +452,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.minusMinutes(duration );
             }
-
-
+            default:break;
         }
         return localDateTime;
     }
@@ -469,6 +471,7 @@ public  class DateUtils {
             case YEAR: {
                 return localDate.plusYears(duration * recurringNumber);
             }
+            default:break;
         }
         return localDate;
     }
@@ -836,6 +839,22 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return dateTimeInterval.getStartLocalDate()+" - "+dateTimeInterval.getEndLocalDate();
+        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+    }
+    public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
+        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+"";
+    }
+    public static long getMinutesBetweenDate(Date toDate,Date fromDate){
+        return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();
+    }
+    public static boolean isEqualOrBefore(Date date1,Date date2){
+        return date1.equals(date2) || date1.before(date2);
+    }
+
+    public static String getEmailDateTimeWithFormat(LocalDateTime dateTime){
+        LocalTime time=getLocalTimeFromLocalDateTime(dateTime);
+        String localtime=time.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
+        return date;
     }
 }

@@ -8,12 +8,14 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_EMPTY;
+
 public class IndividualShiftTemplate extends MongoBaseEntity {
     private String name;
     private String remarks;
     private LocalTime startTime;
     private LocalTime endTime;
-    @NotNullOrEmpty(message = "message.activity.empty")
+    @NotNullOrEmpty(message = MESSAGE_ACTIVITY_EMPTY)
     private List<ShiftTemplateActivity> activities;
     private int durationMinutes;
 

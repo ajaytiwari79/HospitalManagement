@@ -46,6 +46,8 @@ public class ShiftFilterCriteria {
                 case ACTIVITY_IDS: setActivityIds(criteria.getValues()); break;
                 case TIME_INTERVAL: setTimeInterval(criteria.getValues()); break;
                 case UNIT_IDS: setUnitIds(criteria.getValues()); break;
+                default:
+                    break;
                 // add planning period criteria
             }
         });

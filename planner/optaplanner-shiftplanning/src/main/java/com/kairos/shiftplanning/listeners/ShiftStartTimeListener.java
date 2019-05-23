@@ -15,17 +15,17 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
 
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, ShiftImp shiftImp) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityAdded(ScoreDirector scoreDirector, ShiftImp shiftImp) {
-
+        //Not in use
     }
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, ShiftImp shiftImp) {
-
+        //Not in use
     }
 
     @Override
@@ -35,12 +35,12 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, ShiftImp shiftImp) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, ShiftImp shiftImp) {
-
+        //Not in use
     }
     private void updateShiftStartAndEndTimes(ScoreDirector scoreDirector, ShiftImp shiftImp){
         //log.info("{} intervals [{}]",shiftImp.getPrettyId(),shiftImp.getActivityLineIntervalsList());

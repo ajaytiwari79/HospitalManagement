@@ -24,6 +24,13 @@ public class StaffEmploymentTypeDTO {
 
     }
 
+    public StaffEmploymentTypeDTO(List<Long> employmentTypeIds, Long organizationId, String startDate, String endDate) {
+        this.employmentTypeIds = employmentTypeIds;
+        this.organizationId = organizationId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
     public List<Long> getUnitIds() {
         return unitIds;
     }

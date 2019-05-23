@@ -75,6 +75,7 @@ public class ShiftDTO {
     protected Long functionId;
     private Set<BigInteger> escalationFreeShiftIds;
     private boolean escalationResolved;
+    private boolean deleted;
 
 
     public ShiftDTO() {
@@ -106,8 +107,13 @@ public class ShiftDTO {
     }
 
 
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
     public boolean isEditable() {
         return editable;

@@ -14,6 +14,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 /**
  * Created by pavan on 16/2/18.
  */
@@ -31,19 +33,19 @@ public class ActivityCategoryService extends MongoBaseService{
     //TODO: need to be removed, not in use as category will be updated accroding to linked time type.
     public ActivityCategory updateActivityCategoryByUnit(Long unitId, BigInteger activityCategoryId, String name){
         if(name.equalsIgnoreCase("NONE")){
-            exceptionService.actionNotPermittedException("message.category.rename");
+            exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_RENAME);
         }
         boolean isAlreadyExists=activityCategoryRepository.existsByNameIgnoreCaseAndDeleted(name,false);
         if(isAlreadyExists){
-            exceptionService.duplicateDataException("message.category.alreadyexists");
+            exceptionService.duplicateDataException(MESSAGE_CATEGORY_ALREADYEXISTS);
         }
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
         if(activityCategory.getName().equals("NONE")){
-            exceptionService.invalidOperationException("message.category.update");
+            exceptionService.invalidOperationException(MESSAGE_CATEGORY_UPDATE);
         }
         if(activityCategory.getCountryId()!=null){
-            exceptionService.invalidOperationException("message.category.country.update");
+            exceptionService.invalidOperationException(MESSAGE_CATEGORY_COUNTRY_UPDATE);
         }
 
         activityCategory.setName(name);
@@ -55,16 +57,16 @@ public class ActivityCategoryService extends MongoBaseService{
     public ActivityCategory updateActivityCategory(Long countryId, BigInteger activityCategoryId, String name){
 
         if(name.equalsIgnoreCase("NONE")){
-            exceptionService.actionNotPermittedException("message.category.rename");
+            exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_RENAME);
         }
         boolean isAlreadyExists=activityCategoryRepository.existsByNameIgnoreCaseAndDeleted(name,false);
         if(isAlreadyExists){
-            exceptionService.duplicateDataException("message.category.alreadyexists",name);
+            exceptionService.duplicateDataException(MESSAGE_CATEGORY_ALREADYEXISTS,name);
         }
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
         if(activityCategory.getName().equals("NONE")){
-            exceptionService.actionNotPermittedException("message.category.update");
+            exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_UPDATE);
         }else {
             activityCategory.setName(name);
             activityCategoryRepository.save(activityCategory);
@@ -85,7 +87,7 @@ public class ActivityCategoryService extends MongoBaseService{
        Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
        if(activityCategory.getName().equals("NONE")){
-           exceptionService.actionNotPermittedException("message.category.delete");
+           exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_DELETE);
        }
        ActivityCategory category=activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE",countryId,false);
 
@@ -104,10 +106,10 @@ public class ActivityCategoryService extends MongoBaseService{
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
         if(activityCategory.getName().equals("NONE")){
-            exceptionService.actionNotPermittedException("message.category.delete");
+            exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_DELETE);
         }
         if(activityCategory.getCountryId()!=null){
-            exceptionService.actionNotPermittedException("message.category.country.unit.delete");
+            exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_COUNTRY_UNIT_DELETE);
 
         }
         ActivityCategory category=activityCategoryRepository.getCategoryByName("NONE");

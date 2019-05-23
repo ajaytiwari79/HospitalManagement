@@ -24,8 +24,12 @@ class UserContextFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) {}
+    public void init(FilterConfig filterConfig) {
+        //Not in use
+    }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+        //Not in use
+    }
 }

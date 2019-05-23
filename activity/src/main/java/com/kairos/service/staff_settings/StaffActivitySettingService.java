@@ -26,6 +26,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 public class StaffActivitySettingService extends MongoBaseService {
 
@@ -57,7 +59,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                 staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
-            exceptionService.dataNotFoundException("message.staff.activity.settings.absent");
+            exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
         }
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
         staffActivitySetting.setUnitId(unitId);
@@ -68,7 +70,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     public boolean deleteStaffActivitySettings(BigInteger staffActivitySettingId){
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
-            exceptionService.dataNotFoundException("message.staff.activity.settings.absent");
+            exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
         }
         staffActivitySetting.setDeleted(true);
         save(staffActivitySetting);
@@ -81,7 +83,7 @@ public class StaffActivitySettingService extends MongoBaseService {
 
     public Map<String,List<StaffActivityResponse>> assignActivitySettingToStaffs(Long unitId, StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
         if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
-            exceptionService.actionNotPermittedException("error.empty.staff.or.activity.setting");
+            exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING);
         }
 
 
@@ -186,7 +188,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
                    activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes());
            staffActivitySettingSet.add(staffActivitySetting);
-           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("default.added"));
+           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage(DEFAULT_ADDED));
            success.add(staffActivityResponse);
 
        });

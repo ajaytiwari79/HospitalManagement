@@ -17,6 +17,7 @@ public class LocationActivityTabDTO {
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 
     public LocationActivityTabDTO() {
+        //Not in use
     }
 
     public BigInteger getActivityId() {

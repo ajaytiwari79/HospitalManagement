@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.constants.CommonConstants.LOCAL;
+import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 
 /**
  * created by @bobby sharma
@@ -20,52 +20,49 @@ import static com.kairos.constants.CommonConstants.LOCAL;
 @Service
 public class RedisService extends CommonsExceptionUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
+
+    private static Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
 
     @Inject
     private RedisTemplate<String, Map<String, String>> valueOperations;
-
-    @Inject
-    private EnvConfigCommon envConfigCommon;
+    @Inject private EnvConfigCommon envConfigCommon;
 
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
-        boolean validToken = false;
-        if(!envConfigCommon.getCurrentProfile().equals(LOCAL)) {
-            Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
-            if(userTokens != null) {
-                String userAccessToken = userTokens.get(getTokenKey(accessToken));
+        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
+            Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
+            boolean validToken = false;
+            if(userTokensFromDifferentMachine != null) {
+                String userAccessToken = userTokensFromDifferentMachine.get(getTokenKey(accessToken));
                 if(accessToken.equalsIgnoreCase(userAccessToken)) {
                     validToken = true;
                 }
             }
-        } else {
-            validToken = true;
+            return validToken;
         }
-        return validToken;
+        return true;
     }
 
-    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName, String accessToken) {
-        boolean tokenRemoved = false;
-        if(!envConfigCommon.getCurrentProfile().equals(LOCAL)) {
-            Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
-            if(Optional.ofNullable(userTokens).isPresent()) {
+    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName,  String accessToken) {
+        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
+            boolean tokenRemoved = false;
+            Map<String, String> userTokensFromDifferentMachine = valueOperations.opsForValue().get(userName);
+            if(Optional.ofNullable(userTokensFromDifferentMachine).isPresent()) {
                 String tokenKey = getTokenKey(accessToken);
-                if(userTokens.size() == 1) valueOperations.delete(userName);
+                if(userTokensFromDifferentMachine.size() == 1) valueOperations.delete(userName);
                 else {
-                    if(!userTokens.get(tokenKey).equalsIgnoreCase(accessToken)) {
+                    if(!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
                         internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
                     }
-                    userTokens.remove(tokenKey);
-                    valueOperations.opsForValue().set(userName, userTokens);
+                    userTokensFromDifferentMachine.remove(tokenKey);
+                    valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
                 }
                 tokenRemoved = true;
             } else {
                 internalServerError("message.user.notFoundInRedis");
             }
-        } else {
-            tokenRemoved = true;
+            return tokenRemoved;
         }
-        return tokenRemoved;
+        return true;
     }
 
     private String getTokenKey(String accessToken) {

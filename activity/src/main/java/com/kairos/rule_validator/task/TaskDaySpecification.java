@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_DAY_INVALID;
 import static com.kairos.enums.Day.*;
 
 /**
@@ -59,7 +60,7 @@ public class TaskDaySpecification extends AbstractTaskSpecification<Task> {
                 taskDay = SATURDAY;
                 break;
             default:
-                exceptionService.internalError("error.day.invalid");
+                exceptionService.internalError(ERROR_DAY_INVALID);
         }
         return taskDay;
 

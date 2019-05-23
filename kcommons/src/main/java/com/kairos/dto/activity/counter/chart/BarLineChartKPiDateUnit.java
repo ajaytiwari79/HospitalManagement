@@ -18,6 +18,12 @@ public class BarLineChartKPiDateUnit extends CommonKpiDataUnit {
         this.lineValue = lineValue;
     }
 
+    public BarLineChartKPiDateUnit(String label, Double barValue,Double lineValue) {
+        super(label);
+        this.barValue = barValue;
+        this.lineValue = lineValue;
+    }
+
     public Double getBarValue() {
         return barValue;
     }

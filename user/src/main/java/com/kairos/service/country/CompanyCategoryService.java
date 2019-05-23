@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * Created by pavan on 6/4/18.
  */
@@ -30,17 +32,17 @@ public class CompanyCategoryService{
 
     public CompanyCategoryDTO createCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
         if (companyCategoryDTO.getName().trim().isEmpty()) {
-            exceptionService.actionNotPermittedException("error.companyCategory.name.notEmpty");
+            exceptionService.actionNotPermittedException(ERROR_COMPANYCATEGORY_NAME_NOTEMPTY);
 
         }
         Optional<Country> country = countryGraphRepository.findById(countryId);
         if (!Optional.ofNullable(country.get()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
 
         }
         boolean isAlreadyExists = companyCategoryGraphRepository.findByCountryAndNameExcludingCurrent(countryId, -1L, "(?i)" + companyCategoryDTO.getName().trim());
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException("message.companyCategory.name.alreadyExist", companyCategoryDTO.getName().trim());
+            exceptionService.duplicateDataException(MESSAGE_COMPANYCATEGORY_NAME_ALREADYEXIST, companyCategoryDTO.getName().trim());
 
         }
         CompanyCategory companyCategory = new CompanyCategory(companyCategoryDTO.getName().trim(), companyCategoryDTO.getDescription(), country.get());
@@ -55,18 +57,18 @@ public class CompanyCategoryService{
     public CompanyCategoryResponseDTO updateCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
 
         if (companyCategoryDTO.getName().trim().isEmpty()) {
-            exceptionService.actionNotPermittedException("error.companyCategory.name.notEmpty");
+            exceptionService.actionNotPermittedException(ERROR_COMPANYCATEGORY_NAME_NOTEMPTY);
 
         }
         CompanyCategory companyCategory = companyCategoryGraphRepository.findByCountryAndCompanycategory(countryId, companyCategoryDTO.getId());
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound",companyCategoryDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_COMPANYCATEGORY_ID_NOTFOUND,companyCategoryDTO.getId());
 
         }
         if (!companyCategoryDTO.getName().trim().equalsIgnoreCase(companyCategory.getName())) {
             boolean isAlreadyExists = companyCategoryGraphRepository.findByCountryAndNameExcludingCurrent(countryId, companyCategoryDTO.getId(), "(?i)" + companyCategoryDTO.getName().trim());
             if (isAlreadyExists) {
-                exceptionService.duplicateDataException("message.companyCategory.name.alreadyExist", companyCategoryDTO.getName().trim());
+                exceptionService.duplicateDataException(MESSAGE_COMPANYCATEGORY_NAME_ALREADYEXIST, companyCategoryDTO.getName().trim());
 
             }
         }
@@ -79,7 +81,7 @@ public class CompanyCategoryService{
     public boolean deleteCompanyCategory(Long countryId, Long companyCategoryId) {
         CompanyCategory companyCategory = companyCategoryGraphRepository.findByCountryAndCompanycategory(countryId, companyCategoryId);
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound",companyCategoryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COMPANYCATEGORY_ID_NOTFOUND,companyCategoryId);
 
         }
         companyCategory.setDeleted(true);

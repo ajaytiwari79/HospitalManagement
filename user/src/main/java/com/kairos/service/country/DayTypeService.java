@@ -28,6 +28,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * Created by oodles on 9/1/17.
  */
@@ -54,11 +56,11 @@ public class DayTypeService {
 
         Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
         if (dayTypeExistInCountryByNameOrCode) {
-            exceptionService.duplicateDataException("message.dayType.name.code.exist");
+            exceptionService.duplicateDataException(MESSAGE_DAYTYPE_NAME_CODE_EXIST);
         }
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         DayType dayType = new DayType(dayTypeDTO.getName(), dayTypeDTO.getCode(), dayTypeDTO.getDescription(), dayTypeDTO.getColorCode(), country, dayTypeDTO.getValidDays(), dayTypeDTO.isHolidayType(), true, dayTypeDTO.isAllowTimeSettings());
         dayTypeGraphRepository.save(dayType);
@@ -82,7 +84,7 @@ public class DayTypeService {
             if (!dayTypeDTO.getName().equalsIgnoreCase(dayType.getName()) || dayTypeDTO.getCode() != dayType.getCode()) {
                 Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
                 if (dayTypeExistInCountryByNameOrCode) {
-                    exceptionService.duplicateDataException("message.dayType.name.code.exist");
+                    exceptionService.duplicateDataException(MESSAGE_DAYTYPE_NAME_CODE_EXIST);
                 }
             }
             dayType.setName(dayTypeDTO.getName());
@@ -94,7 +96,7 @@ public class DayTypeService {
             dayType.setHolidayType(dayTypeDTO.isHolidayType());
             dayTypeGraphRepository.save(dayType);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dayType.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_DAYTYPE_NOTFOUND);
         }
         return dayTypeDTO;
     }
@@ -105,7 +107,7 @@ public class DayTypeService {
             dayType.setEnabled(false);
             dayTypeGraphRepository.save(dayType);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dayType.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_DAYTYPE_NOTFOUND);
         }
         return true;
     }

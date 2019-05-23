@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
+
 public class User implements Serializable{
     protected Long id;
 
@@ -21,7 +23,7 @@ public class User implements Serializable{
     //uniqueness of user
     private String timeCareExternalId;
 
-    @NotNull(message = "error.User.password.notnull")
+    @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
     @Size(min = 8, max = 50, message = "error.User.password.size")
     private String password;
 

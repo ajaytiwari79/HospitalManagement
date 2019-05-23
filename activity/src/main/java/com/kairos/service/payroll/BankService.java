@@ -20,6 +20,7 @@ import java.util.Optional;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class BankService extends MongoBaseService {
@@ -54,7 +55,7 @@ public class BankService extends MongoBaseService {
         validateBankDetails(alreadyExist, bankDTO);
         Bank bank = bankRepository.getByIdAndDeletedFalse(bankId);
         if (!Optional.ofNullable(bank).isPresent()) {
-            exceptionService.dataNotFoundByIdException("bank.not.found");
+            exceptionService.dataNotFoundByIdException(BANK_NOT_FOUND);
         }
         bank = new Bank(bank.getId(), bankDTO.getName(), bankDTO.getDescription(), bankDTO.getRegistrationNumber(), bankDTO.getInternationalAccountNumber(), bankDTO.getSwiftCode(), bank.getCountryId());
         bankRepository.save(bank);
@@ -78,16 +79,16 @@ public class BankService extends MongoBaseService {
     private void validateBankDetails(Bank bank, BankDTO bankDTO) {
         if (Optional.ofNullable(bank).isPresent()) {
             if (bankDTO.getName().equalsIgnoreCase(bank.getName())) {
-                exceptionService.duplicateDataException("bank.already.exists.name", bankDTO.getName());
+                exceptionService.duplicateDataException(BANK_ALREADY_EXISTS_NAME, bankDTO.getName());
             }
             if (bankDTO.getInternationalAccountNumber().equalsIgnoreCase(bank.getInternationalAccountNumber())) {
-                exceptionService.duplicateDataException("bank.already.exists.account", bankDTO.getInternationalAccountNumber());
+                exceptionService.duplicateDataException(BANK_ALREADY_EXISTS_ACCOUNT, bankDTO.getInternationalAccountNumber());
             }
             if (bankDTO.getRegistrationNumber().equalsIgnoreCase(bank.getRegistrationNumber())) {
-                exceptionService.duplicateDataException("bank.already.exists.reg", bankDTO.getRegistrationNumber());
+                exceptionService.duplicateDataException(BANK_ALREADY_EXISTS_REG, bankDTO.getRegistrationNumber());
             }
             if (bankDTO.getSwiftCode().equalsIgnoreCase(bank.getSwiftCode())) {
-                exceptionService.duplicateDataException("bank.already.exists.swift", bankDTO.getSwiftCode());
+                exceptionService.duplicateDataException(BANK_ALREADY_EXISTS_SWIFT, bankDTO.getSwiftCode());
             }
         }
 
@@ -107,7 +108,7 @@ public class BankService extends MongoBaseService {
             if(!staffBankDetailsDTO.getStaffOfficialBank().getUseNemkontoAccount()){
                 Bank bank = bankRepository.getByIdAndDeletedFalse(staffBankDetailsDTO.getStaffOfficialBank().getBankId());
                 if(isNull(bank)){
-                    exceptionService.dataNotFoundException("bank.not.found");
+                    exceptionService.dataNotFoundException(BANK_NOT_FOUND);
                 }
             }
             StaffBankDetails staffBank = staffBankDetailsRepository.findByStaffIdAndDeletedFalse(staffId);
@@ -123,7 +124,7 @@ public class BankService extends MongoBaseService {
         if (isNotNull(staffBankDetailsDTO.getStaffPensionProvider())) {
             PensionProvider pensionProvider = pensionProviderRepository.getByIdAndDeletedFalse(staffBankDetailsDTO.getStaffPensionProvider().getPensionProviderId());
             if(isNull(pensionProvider)){
-                exceptionService.dataNotFoundException("pension_provider.not.found");
+                exceptionService.dataNotFoundException(PENSION_PROVIDER_NOT_FOUND);
             }
             StaffPensionProviderDetails staffPensionProviderDetails = staffPensionProviderRepository.findByStaffIdAndDeletedFalse(staffId);
             if (isNull(staffPensionProviderDetails)) {
@@ -146,7 +147,7 @@ public class BankService extends MongoBaseService {
     public boolean linkBankDetailsForOrganization(Long organizationId, OrganizationBankDetailsDTO organizationBankDetailsDTO) {
         Bank bank = bankRepository.getByIdAndDeletedFalse(organizationBankDetailsDTO.getBankId());
         if(isNull(bank)){
-            exceptionService.dataNotFoundException("bank.not.found");
+            exceptionService.dataNotFoundException(BANK_NOT_FOUND);
         }
         OrganizationBankDetails organizationBankDetails = organizationBankDetailsRepository.findByOrganizationIdAndDeletedFalse(organizationId);
         if (isNull(organizationBankDetails)) {

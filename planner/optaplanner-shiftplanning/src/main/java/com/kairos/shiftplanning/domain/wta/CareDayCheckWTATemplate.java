@@ -87,10 +87,7 @@ public class CareDayCheckWTATemplate implements ConstraintHandler {
     }
 
     public CareDayCheckWTATemplate() {
-    }
-
-    public void checkLevelWithWeight(){
-
+        //Not in use
     }
 
 

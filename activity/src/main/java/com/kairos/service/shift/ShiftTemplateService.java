@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 
@@ -50,7 +51,7 @@ public class ShiftTemplateService extends MongoBaseService {
         List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
         activities.forEach(activity -> {
             if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-                exceptionService.actionNotPermittedException("message.activity.absenceType", activity.getId());
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
             }
         });
 
@@ -58,7 +59,7 @@ public class ShiftTemplateService extends MongoBaseService {
         boolean alreadyExistsByName = shiftTemplateRepository.
                 existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(), unitId, UserContext.getUserDetails().getId());
         if (alreadyExistsByName) {
-            exceptionService.duplicateDataException("message.shiftTemplate.exists", shiftTemplateDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_SHIFTTEMPLATE_EXISTS, shiftTemplateDTO.getName());
         }
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOs = shiftTemplateDTO.getShiftList();
         List<IndividualShiftTemplate> individualShiftTemplates = new ArrayList<>();
@@ -102,7 +103,7 @@ public class ShiftTemplateService extends MongoBaseService {
     public ShiftTemplateDTO updateShiftTemplate(Long unitId, BigInteger shiftTemplateId, ShiftTemplateDTO shiftTemplateDTO) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFTTEMPLATE_ABSENT, shiftTemplateId);
         }
         UserInfo userInfo = shiftTemplate.getCreatedBy();
         shiftTemplateDTO.setId(shiftTemplateId);
@@ -117,7 +118,7 @@ public class ShiftTemplateService extends MongoBaseService {
     public boolean deleteShiftTemplate(BigInteger shiftTemplateId) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFTTEMPLATE_ABSENT, shiftTemplateId);
         }
         List<IndividualShiftTemplate> individualShiftTemplates = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
         individualShiftTemplates.forEach(individualShiftTemplate -> {
@@ -133,7 +134,7 @@ public class ShiftTemplateService extends MongoBaseService {
     public IndividualShiftTemplateDTO updateIndividualShiftTemplate(BigInteger individualShiftTemplateId, IndividualShiftTemplateDTO individualShiftTemplateDTO) {
         Optional<IndividualShiftTemplate> shiftDayTemplate = individualShiftTemplateRepository.findById(individualShiftTemplateId);
         if (!shiftDayTemplate.isPresent() || shiftDayTemplate.get().isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", individualShiftTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, individualShiftTemplateId);
         }
         individualShiftTemplateDTO.setId(shiftDayTemplate.get().getId());
         IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
@@ -145,7 +146,7 @@ public class ShiftTemplateService extends MongoBaseService {
     public IndividualShiftTemplateDTO addIndividualShiftTemplate(BigInteger shiftTemplateId, IndividualShiftTemplateDTO individualShiftTemplateDTO) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", shiftTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, shiftTemplateId);
         }
         IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
         save(individualShiftTemplate);
@@ -158,7 +159,7 @@ public class ShiftTemplateService extends MongoBaseService {
     public boolean deleteIndividualShiftTemplate(BigInteger shiftTemplateId, BigInteger individualShiftTemplateId) {
         IndividualShiftTemplate individualShiftTemplate = individualShiftTemplateRepository.findOneById(individualShiftTemplateId);
         if (!Optional.ofNullable(individualShiftTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", individualShiftTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, individualShiftTemplateId);
         }
         individualShiftTemplate.setDeleted(true);
         save(individualShiftTemplate);

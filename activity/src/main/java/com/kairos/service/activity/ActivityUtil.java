@@ -1,4 +1,5 @@
-package com.kairos.service.activity;/*
+package com.kairos.service.activity;
+/*
  *Created By Pavan on 29/10/18
  *
  */
@@ -77,6 +78,8 @@ public class ActivityUtil {
                 case YEARS:
                     nextEndDate = startDate.plusYears(1).minusDays(1);
                     break;
+                default:
+                    break;
             }
             cutOffIntervals.add(new CutOffInterval(startDate, nextEndDate));
             startDate = nextEndDate.plusDays(1);
@@ -98,6 +101,8 @@ public class ActivityUtil {
                 break;
             case CALCULATED_TIME:
                 calculationType = ENTERED_TIMES;
+                break;
+            default:
                 break;
        /*     case "":
                 break;*/
@@ -227,8 +232,12 @@ public class ActivityUtil {
         BalanceSettingsActivityTab balanceSettingsActivityTab = new BalanceSettingsActivityTab(false, false);
 
         activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
+    }
 
-
+    public static void updateCompositeActivities(Set<BigInteger> activityIds,Activity activity){
+        Set<CompositeActivity> compositeActivities=new HashSet<>();
+        activityIds.forEach(activityId-> compositeActivities.add(new CompositeActivity(activityId,false,false)));
+        activity.getCompositeActivities().addAll(compositeActivities);
 
     }
 

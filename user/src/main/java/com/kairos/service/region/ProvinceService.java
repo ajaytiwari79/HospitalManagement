@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_PROVINCESERVICE_REGION_NOTFOUND;
+
 /**
  * Created by oodles on 7/1/17.
  */
@@ -56,7 +58,7 @@ public class ProvinceService {
     public Map<String, Object> addProvinceToRegion(Province province, Long regionId) {
         Region region = regionGraphRepository.findOne(regionId);
         if(region == null){
-            exceptionService.dataNotFoundByIdException("message.provinceservice.region.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_PROVINCESERVICE_REGION_NOTFOUND);
             
         }
         province.setRegion(region);

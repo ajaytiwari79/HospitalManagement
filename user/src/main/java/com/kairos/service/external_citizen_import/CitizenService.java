@@ -62,7 +62,8 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectMapperUtils.jsonStringToObject;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
-
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_CITIZEN_STAFF_ALREADYEXIST;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
 
 
 /**
@@ -369,6 +370,8 @@ public class CitizenService {
                 case "description":
                     grantObject.put("description", currentElements.getText());
                     break;
+                default:
+                    break;
             }
         }
         grantObject.put("grantName", patientGrant.getName());
@@ -514,7 +517,7 @@ public class CitizenService {
         if(staff == null) staff = new Staff();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null)
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,unitId);
 
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
@@ -537,7 +540,7 @@ public class CitizenService {
         if (user != null) {
             Staff alreadyExistStaff = staffGraphRepository.getByUser(user.getId());
             if (alreadyExistStaff != null)
-                exceptionService.dataNotFoundByIdException("message.citizen.staff.alreadyexist");
+                exceptionService.dataNotFoundByIdException(MESSAGE_CITIZEN_STAFF_ALREADYEXIST);
 
             staff = staffCreationService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
         }
