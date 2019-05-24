@@ -19,6 +19,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
@@ -26,6 +27,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -922,6 +924,17 @@ public class ShiftValidatorService {
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
         return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
 
+    }
+
+
+    private TimeTypeEnum getTimeTypeByActivity(ActivityWrapper activityWrapper) {
+        if(TimeTypeEnum.ABSENCE.equals(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType())){
+            return TimeTypeEnum.ABSENCE;
+        }else if(TimeTypeEnum.PRESENCE.equals(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType())){
+            return TimeTypeEnum.PRESENCE;
+        }else {
+            return activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
+        }
     }
 
 }
