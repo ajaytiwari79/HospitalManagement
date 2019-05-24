@@ -149,13 +149,10 @@ public class ShiftDetailsService extends MongoBaseService {
                         }
                         plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), plannedTimeInterval.getKey().getStartDate(), plannedTimeInterval.getKey().getEndDate()));
                         startDate = plannedTimeInterval.getKey().getEndDate();
-                    } else if (startDate.equals(plannedTimeInterval.getKey().getStartDate())) {
+                    } else if (startDate.equals(plannedTimeInterval.getKey().getStartDate()) || startDate.after(plannedTimeInterval.getKey().getStartDate())) {
                         plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), startDate, plannedTimeInterval.getKey().getEndDate()));
                         startDate = plannedTimeInterval.getKey().getEndDate();
-                    } else if (startDate.after(plannedTimeInterval.getKey().getStartDate())) {
-                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), startDate, plannedTimeInterval.getKey().getEndDate()));
-                        startDate = plannedTimeInterval.getKey().getEndDate();
-                    } else if (!plannedTimeInterval.getKey().overlaps(shiftActivityInterVal)) {
+                    }  else if (!plannedTimeInterval.getKey().overlaps(shiftActivityInterVal)) {
                         plannedTimes.add(new PlannedTime(plannedTimeId, startDate, endDate));
                     }
                 }
