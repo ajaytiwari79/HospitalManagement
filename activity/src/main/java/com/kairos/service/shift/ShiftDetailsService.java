@@ -156,7 +156,7 @@ public class ShiftDetailsService extends MongoBaseService {
                     }
                 }
                 if (!endDateInside) {
-                    plannedTimes.add(new PlannedTime(plannedTimeMap.get(lastInterval).getPlannedTimeId(), lastInterval.getEndDate(), endDate));
+                    plannedTimes.add(new PlannedTime(plannedTimeId, lastInterval.getEndDate(), endDate));
                 }
 
             }
