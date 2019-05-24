@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KPermissionModelFieldDTO {
-    String modelName;
-    List<String> modelFields = new ArrayList<>();
+    private String modelName;
+    private List<String> modelFields = new ArrayList<>();
 }

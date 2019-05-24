@@ -14,6 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @QueryResult
 public class KPermissionSubModelFieldQueryResult {
-    String modelName;
-    List<String> modelFields = new ArrayList<>();
+    private String modelName;
+    private List<String> modelFields = new ArrayList<>();
 }
