@@ -2,11 +2,13 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.cta.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -15,6 +17,7 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
@@ -323,16 +326,16 @@ public class CTARuleTemplateDTO {
         return this.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent();
     }
 
-    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
-        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && this.getPlannedTimeIds().contains(plannedTimeId);
+    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
+        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && CollectionUtils.containsAny(this.getPlannedTimeIds(),plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
     }
 
     private boolean isEmployementTypeValid(Long employmentId){
         return this.getEmploymentTypes().contains(employmentId);
     }
 
-    public boolean isRuleTemplateValid(Long employmentId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,BigInteger plannedTimeId){
-        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimeId) || this.getCalculationFor().equals(FUNCTIONS));
+    public boolean isRuleTemplateValid(Long employmentId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
     }
 
     @Override
