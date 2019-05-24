@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.utils.counter.KPIUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
@@ -56,6 +57,7 @@ public class FibonacciKPIService implements CounterService{
     @Inject private ExceptionService exceptionService;
     @Inject private CounterServiceMapping counterServiceMapping;
     @Inject private CounterRepository counterRepository;
+    @Inject private CounterHelperService counterHelperService;
 
     public FibonacciKPIDTO createFibonacciKPI(Long referenceId, FibonacciKPIDTO fibonacciKPIDTO, ConfLevel confLevel) {
         boolean existByName = fibonacciKPIRepository.existByName(null,fibonacciKPIDTO.getTitle(),confLevel,referenceId);
@@ -170,6 +172,7 @@ public class FibonacciKPIService implements CounterService{
         Map<BigInteger, FibonacciKPIConfig> fibonacciKPIConfigMap = fibonacciKPIConfigs.stream().collect(Collectors.toMap(fibonacciKPIConfig -> fibonacciKPIConfig.getKpiId(), v -> v));
         List<KPI> counters = counterRepository.getKPIsByIds(new ArrayList<>(fibonacciKPIConfigMap.keySet()));
         Map<Long, FibonacciKPICalculation> kpiAndFibonacciDataMap = new HashMap<>();
+        applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
         for (KPI counter : counters) {
             FibonacciKPIConfig fibonacciKPIConfig = fibonacciKPIConfigMap.get(counter.getId());
             TreeSet<FibonacciKPICalculation> kpiCalculation = counterServiceMapping.getService(counter.getType()).getFibonacciCalculatedCounter(filterBasedCriteria, organizationId, fibonacciKPIConfig.getSortingOrder(), staffKpiFilterDTOS, applicableKPI);

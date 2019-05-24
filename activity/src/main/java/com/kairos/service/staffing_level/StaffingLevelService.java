@@ -76,8 +76,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.DateUtils.getWeekNumberByLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
@@ -423,7 +422,7 @@ public class StaffingLevelService extends MongoBaseService {
 
         int i = 0;
         int seq = 0;
-        DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat sourceFormat = new SimpleDateFormat(COMMON_DATE_FORMAT);
         Map<String, String> firstData = processedData.get(0);
         duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         staffingLevelSetting = new StaffingLevelSetting(15, duration);

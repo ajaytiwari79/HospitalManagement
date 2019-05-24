@@ -31,6 +31,7 @@ public  class DateUtils {
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
+    public static final String COMMON_DATE_FORMAT = "dd-MM-yyyy";
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -836,10 +837,10 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+"";
+        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
     }
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
         return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();
