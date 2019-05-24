@@ -10,7 +10,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @NoArgsConstructor
 @QueryResult
 public class KPermissionFieldQueryResult {
-    private KPermissionField kPermissionField;
-    private KPermissionModel kPermissionModel;
+    private KPermissionField KPermissionField;
+    private KPermissionModel KPermissionModel;
 
 }

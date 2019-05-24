@@ -151,7 +151,7 @@ public class QuestionnaireTemplateService {
                     exceptionService.duplicateDataException("message.duplicate.risk.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
                 }
 
-            } else if(Optional.ofNullable(templateDto.getSubAssetType()).isPresent()) {
+            } else {
                 AssetType selectedAssetSubType = assetType.getSubAssetTypes().stream().filter(subAssetType -> subAssetType.getId().equals(templateDto.getSubAssetType())).findFirst().orElse(null);
                 if (!Optional.ofNullable(selectedAssetSubType).isPresent()) {
                     exceptionService.invalidRequestException("message.subAssetType.invalid.selection");
