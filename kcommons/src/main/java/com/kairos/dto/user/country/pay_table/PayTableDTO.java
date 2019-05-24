@@ -34,6 +34,7 @@ public class PayTableDTO {
     private BigDecimal percentageValue; // this value is being used to update paygrade and functional amount
 
     public PayTableDTO() {
+        //Not in use
     }
 
     public Long getId() {

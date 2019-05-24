@@ -1,5 +1,6 @@
 package com.kairos.commons.utils;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.DurationType;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -342,6 +343,7 @@ public  class DateUtils {
             case HOURS: {
                 return (60 * Period.between(startDate, endDate).getDays());
             }
+            default:break;
         }
         return Period.between(startDate, endDate).getDays();
 
@@ -433,6 +435,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.plusMinutes(duration * recurringNumber);
             }
+            default:break;
 
 
         }
@@ -449,8 +452,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.minusMinutes(duration );
             }
-
-
+            default:break;
         }
         return localDateTime;
     }
@@ -469,6 +471,7 @@ public  class DateUtils {
             case YEAR: {
                 return localDate.plusYears(duration * recurringNumber);
             }
+            default:break;
         }
         return localDate;
     }

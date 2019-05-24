@@ -162,7 +162,7 @@ public class ShortestAndAverageDailyRestWTATemplate implements ConstraintHandler
     }
 
     public void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext,int contraintPenality){
-
+        //Not in use
     }
 
 }

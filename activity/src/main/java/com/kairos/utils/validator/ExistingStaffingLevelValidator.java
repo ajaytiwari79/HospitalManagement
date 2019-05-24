@@ -26,7 +26,9 @@ public class ExistingStaffingLevelValidator implements ConstraintValidator<Exist
 
 
 	
-	public void initialize(ExistingStaffingLevel constraintAnnotation) { }
+	public void initialize(ExistingStaffingLevel constraintAnnotation) {
+		//Not in use
+	}
 
 	public boolean isValid(Date selectedDate, ConstraintValidatorContext context){
 		Assert.notNull(selectedDate,"can not be null");

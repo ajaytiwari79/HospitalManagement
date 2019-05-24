@@ -77,7 +77,7 @@ public interface CustomShiftMongoRepository {
     
     boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType,boolean allowedConflicts);
 
-    List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,ShiftStatus shiftStatus);
+    List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,List<Long> staffIds ,List<ShiftStatus> shiftStatus);
 
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);

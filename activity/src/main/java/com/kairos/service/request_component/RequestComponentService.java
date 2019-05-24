@@ -49,6 +49,8 @@ public class RequestComponentService extends MongoBaseService {
 
                     source=MODULE_3;
                     break;
+                default:
+                    break;
             }
             if (organization != null) {
 

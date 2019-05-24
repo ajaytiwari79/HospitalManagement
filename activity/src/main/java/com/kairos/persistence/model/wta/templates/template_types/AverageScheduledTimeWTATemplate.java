@@ -166,6 +166,8 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                 break;
             case YEARS:dateTime.plusYears(intervalLength);
                 break;
+            default:
+                break;
         }
         return zonedDateTime;
     }

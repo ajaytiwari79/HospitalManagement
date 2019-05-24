@@ -225,7 +225,7 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(user.getUserName());
             userGraphRepository.save(user);
         } else {
-            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         return true;
     }
@@ -240,7 +240,7 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(userForStaff.getUserName());
             userGraphRepository.save(userForStaff);
         } else {
-            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         return true;
     }
