@@ -22,8 +22,8 @@ public class UnitSolverConfigController {
 
     @PostMapping
     @ApiOperation("Create UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
-        unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO);
+    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
+        unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO,unitId);
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
@@ -34,7 +34,7 @@ public class UnitSolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{unitSolverConfigId}")
+    @GetMapping
     @ApiOperation("Get UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> getAllUnitSolverConfigByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK, unitSolverConfigService.getAllUnitSolverConfigByUnitId(unitId));

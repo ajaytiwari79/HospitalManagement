@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
@@ -48,6 +49,11 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
         AggregationResults<SolverConfigDTO> result = mongoTemplate.aggregate(aggregation, SolverConfig.class, className);
         return result.getMappedResults();
+    }
+
+    public SolverConfig getSolverConfigById(BigInteger solverConfigId,boolean checkForCountry){
+        Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
+        return (SolverConfig) mongoTemplate.findOne(new Query(Criteria.where("_id").is(solverConfigId)), className,"solverConfig");
     }
 
 

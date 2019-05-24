@@ -77,6 +77,9 @@ public class CountrySolverConfigService {
     private void copyUnitSolverConfigByOrganizationServiceAndSubService(CountrySolverConfig countrySolverConfig) {
         List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
+        PhaseDTO phaseDTO = activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
+        List<PhaseDTO> phaseDTOS = activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
+        Map<Long,PhaseDTO> phaseDTOMap = phaseDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v));
         if (!applicableUnitIdForSolverConfig.isEmpty()) {
             for (Long unitId : applicableUnitIdForSolverConfig) {
                 UnitSolverConfig unitSolverConfig;
@@ -84,12 +87,19 @@ public class CountrySolverConfigService {
                 unitSolverConfig.setId(null);//Unset Id
                 unitSolverConfig.setUnitId(unitId);
                 unitSolverConfig.setParentCountrySolverConfigId(countrySolverConfig.getId());
+                unitSolverConfig.setPhaseId(phaseDTOMap.get(unitId).getId().longValue());
                 unitSolverConfigList.add(unitSolverConfig);
             }
             if (isCollectionNotEmpty(unitSolverConfigList)) {
                 solverConfigRepository.saveList(unitSolverConfigList);
             }
         }
+    }
+
+    public void mapSolverConfigToOrganization(BigInteger solverConfigId,List<Long> organizationSubServiceIds){
+        CountrySolverConfig countrySolverConfig = (CountrySolverConfig)solverConfigRepository.getSolverConfigById(solverConfigId,true);
+        countrySolverConfig.setOrganizationSubServiceIds(organizationSubServiceIds);
+        copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
     }
 
 

@@ -7,7 +7,9 @@ import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.component.exception.ExceptionService;
+import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.unit.UnitSolverConfig;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
@@ -39,8 +41,10 @@ public class UnitSolverConfigService {
 
 
     //===================================================================================
-    public UnitSolverConfigDTO createUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
-        if (preValidateUnitSolverConfigDTO(unitSolverConfigDTO, true)) {
+    public UnitSolverConfigDTO createUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO,Long unitId) {
+        unitSolverConfigDTO.setUnitId(unitId);
+        if (preValidateUnitSolverConfigDTO(unitSolverConfigDTO)) {
+
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             solverConfigRepository.saveEntity(unitSolverConfig);
             unitSolverConfigDTO.setId(unitSolverConfig.getId());
@@ -51,7 +55,7 @@ public class UnitSolverConfigService {
     //========================================================================================
     public UnitSolverConfigDTO copyUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
         SolverConfig constraint = solverConfigRepository.findByIdNotDeleted(unitSolverConfigDTO.getId());
-        if (constraint != null && preValidateUnitSolverConfigDTO(unitSolverConfigDTO, true)) {
+        if (constraint != null && preValidateUnitSolverConfigDTO(unitSolverConfigDTO)) {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             unitSolverConfig.setParentSolverConfigId(unitSolverConfigDTO.getId());
             unitSolverConfig.setId(null);//Unset Id
@@ -64,7 +68,8 @@ public class UnitSolverConfigService {
 
     //=============================================================================
     public List<UnitSolverConfigDTO> getAllUnitSolverConfigByUnitId(Long unitId) {
-        List<SolverConfig> solverConfigList = solverConfigRepository.findAllObjectsNotDeletedById(true, unitId);
+        Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
+        List<SolverConfig> solverConfigList = solverConfigRepository.findAllObjectsNotDeletedById(true, countryId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigList, UnitSolverConfig.class);
     }
 
@@ -93,7 +98,10 @@ public class UnitSolverConfigService {
     /*==============================Country Default Data==================================*/
     public DefaultDataDTO getDefaultData(Long unitId) {
         List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+      //  Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
+                //.setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
+
                 //get All Phases
                 .setPhaseDTOSBuilder(getAllPhases(unitId))
                 //getAllPlanningPeriod
@@ -130,11 +138,11 @@ public class UnitSolverConfigService {
      * @param unitSolverConfigDTO
      * @return
      */
-    private boolean preValidateUnitSolverConfigDTO(UnitSolverConfigDTO unitSolverConfigDTO, boolean isCurrentObjectIdNull) {
+    private boolean preValidateUnitSolverConfigDTO(UnitSolverConfigDTO unitSolverConfigDTO) {
         String result = userNeo4jRepo.validateUnit(unitSolverConfigDTO.getUnitId());
         if ("unitNotExists".equals(result)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Unit", unitSolverConfigDTO.getUnitId());
-        } else if (solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), isCurrentObjectIdNull ? null : unitSolverConfigDTO.getId(), false, unitSolverConfigDTO.getUnitId())) {
+        } else if (solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), unitSolverConfigDTO.getId(), false, unitSolverConfigDTO.getUnitId())) {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         }
         return true;
@@ -143,6 +151,12 @@ public class UnitSolverConfigService {
     public SolverConfigDTO getSolverConfigWithConstraints(BigInteger solverConfigId){
         return solverConfigRepository.getSolverConfigWithConstraints(solverConfigId);
     }
+   /* private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
+        List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
+
+        return organizationServiceDTOS;
+    }*/
 
 
 }

@@ -56,7 +56,9 @@ public class UnitConstraintService {
 
     //====================================================
     public List<UnitConstraint> getUnitConstraintsByUnitId(Long unitId) {
-        List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(false, unitId);
+
+        Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
+        List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, countryId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, UnitConstraint.class);
     }
 

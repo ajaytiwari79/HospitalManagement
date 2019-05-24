@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_COUNTRY_SOLVER_CONFIG_URL;
@@ -67,5 +68,11 @@ public class CountrySolverConfigController {
     @ApiOperation("Get Default Data")
     public ResponseEntity<Map<String, Object>> getDefaultData(@PathVariable Long countryId) {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,countrySolverConfigService.getDefaultData(countryId));
+    }
+    @GetMapping("/map_organization_sub_service_to_solver_configuration")
+    @ApiOperation("Get organization sub service")
+    public  ResponseEntity<Map<String, Object>> getOrganizationSubServiceId(@RequestBody List<Long> OrganizationSubServiceIds, @RequestParam BigInteger solverConfigId) {
+        countrySolverConfigService.mapSolverConfigToOrganization(solverConfigId,OrganizationSubServiceIds);
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,null);
     }
 }

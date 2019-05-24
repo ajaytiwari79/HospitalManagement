@@ -18,6 +18,10 @@ import static com.planner.constants.AppConstants.*;
  * i.e this interface must contain methods annotated with {@Query}
  */
 public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
+    @Query("MATCH (organization:Organization) where id(organization)={0} with organization  " +
+            "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
+            "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
+    Long getCountryIdByUnitId(long unitId);
 
     @Query("Match(unit:Organization) where id(unit)={0} " +
             "Match(staff:Staff)  where id(staff) in {1} with staff,unit " +

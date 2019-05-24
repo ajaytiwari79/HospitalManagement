@@ -64,7 +64,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     @Override
     public boolean isNameExistsById(String name, BigInteger objectIdNotApplicableForCheck, boolean checkForCountry,Long countryOrUnitId) {
         String applicableIdField = checkForCountry ? "countryId" : "unitId";
-        Criteria criteria=Criteria.where("name").is(name).regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(applicableIdField).is(countryOrUnitId);
+        Criteria criteria=Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(applicableIdField).is(countryOrUnitId);
         if (objectIdNotApplicableForCheck != null) criteria=criteria.and("_id").ne(objectIdNotApplicableForCheck);
         return mongoOperations.exists(new Query(criteria),entityInformation.getJavaType());
     }
