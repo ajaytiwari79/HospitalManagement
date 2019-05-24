@@ -156,6 +156,7 @@ public class KPISetService {
     public KPISetResponseDTO getKPISetCalculationData(Long unitId, Date startDate) {
         List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+        List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
                 asDate(asLocalDate(startDate).atTime(LocalTime.MAX)));
@@ -172,9 +173,12 @@ public class KPISetService {
                             applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
 
                          //   FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
-                        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSet.getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
-                            List<KPIResponseDTO> data = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
-                            kpiSetResponseDTO.setKpiData(data);
+                        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),Arrays.asList(applicableKPI.getActiveKpiId()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
+                            KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                            //kpiSetResponseDTO.setKpiData(data);
+                            if(isNotNull(kpiResponseDTO)) {
+                                kpiResponseDTOList.add(kpiResponseDTO);
+                            }
                         }
                     }
                     //FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
@@ -183,6 +187,7 @@ public class KPISetService {
  //                   kpiSetResponseDTO.setKpiData(data);
                 }
             }
+            kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
         }
         return kpiSetResponseDTO;
     }
