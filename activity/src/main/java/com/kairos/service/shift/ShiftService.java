@@ -261,7 +261,6 @@ public class ShiftService extends MongoBaseService {
 
     public Shift saveShiftWithActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift,
                                        StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Long functionId,Phase phase,ShiftActionType shiftAction ) {
-        shift = updateShiftAfterPublish(shift,staffAdditionalInfoDTO.getUserAccessRoleDTO(),shiftAction);
         int scheduledMinutes = 0;
         int durationMinutes = 0;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -304,6 +303,9 @@ public class ShiftService extends MongoBaseService {
         } else {
             BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", asLocalDate(shift.getStartDate()).toString());
             userIntegrationService.applyFunction(shift.getUnitId(), shift.getEmploymentId(), null, HttpMethod.DELETE, Arrays.asList(appliedDate));
+        }
+        if(updateShift) {
+            shift = updateShiftAfterPublish(shift, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
         }
         shiftMongoRepository.save(shift);
         if (!updateShift) {
@@ -469,7 +471,8 @@ public class ShiftService extends MongoBaseService {
 
     public Object saveDraftShift(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType,
                                       ShiftFilterParam shiftFilterParam) {
-
+        List<Shift> saveShifts=new ArrayList<>();
+        List<ShiftViolatedRules> saveShiftViolatedRules= new ArrayList<>();
         List<Shift> draftShifts;
         if(isNotNull(staffId) && isNotNull(employmentId)) {
             draftShifts = shiftMongoRepository.getAllDraftShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
@@ -478,25 +481,28 @@ public class ShiftService extends MongoBaseService {
         }
         if(isCollectionNotEmpty(draftShifts)) {
             for (Shift draftShift : draftShifts) {
-                draftShift = draftShift.getDraftShift();
+                Shift shift= draftShift.getDraftShift();
+                shift.setDraftShift(null);
+               saveShifts.add(shift);
             }
-            shiftMongoRepository.saveEntities(draftShifts);
-            shiftStateService.updateShiftDailyTimeBankAndPaidOut(draftShifts, draftShifts, unitId);
-            List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(draftShifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()));
+            shiftMongoRepository.saveEntities(saveShifts);
+            shiftStateService.updateShiftDailyTimeBankAndPaidOut(saveShifts, saveShifts, unitId);
+            List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(draftShifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()),true);
             Map<BigInteger,ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId,Function.identity()));
             for (ShiftViolatedRules shiftViolatedRule : shiftViolatedRules) {
                 if(isNotNull(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()))){
-                    shiftViolatedRule=draftShiftViolatedRules.get(shiftViolatedRule.getShiftId());
+                    saveShiftViolatedRules.add(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()));
                 }
             }
-            shiftViolatedRulesMongoRepository.saveEntities(shiftViolatedRules);
+            shiftViolatedRulesMongoRepository.saveEntities(saveShiftViolatedRules);
         }
         return  getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam,null);
     }
 
     public ShiftWithViolatedInfoDTO updateShift(ShiftDTO shiftDTO, String type, boolean byTAndAView, boolean validatedByPlanner,ShiftActionType shiftAction) {
         Long functionId = shiftDTO.getFunctionId();
-        Shift shift = shiftMongoRepository.findOne(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
+        Shift originalShift = shiftMongoRepository.findOne(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
+        Shift shift = isNotNull(originalShift.getDraftShift()) ? originalShift.getDraftShift() :originalShift;
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftDTO.getId());
         }
@@ -616,16 +622,18 @@ public class ShiftService extends MongoBaseService {
         shiftViolatedRulesMongoRepository.save(shiftViolatedRules);
     }
 
-    private Shift updateShiftAfterPublish(Shift shift,UserAccessRoleDTO userAccessRoleDTO,ShiftActionType shiftActionType) {
-        boolean valid=shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && userAccessRoleDTO.getManagement();
-        if(valid && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
-            shift.setDraftShift(shift);
-        }else if(valid && ShiftActionType.SAVE.equals(shiftActionType)){
-            shift=shift.getDraftShift();
-        }else{
-            shift.setDraftShift(null);
+    private Shift updateShiftAfterPublish(Shift shift, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {
+        Shift originalShift = shiftMongoRepository.findOne(shift.getId());
+        boolean valid = shift.getActivities().stream().allMatch(activity -> activity.getStatus().contains(ShiftStatus.PUBLISH)) && userAccessRoleDTO.getManagement();
+        if (valid && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
+            Shift draftShift=ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
+            originalShift.setDraftShift(draftShift);
+        } else if (valid && ShiftActionType.SAVE.equals(shiftActionType)) {
+            originalShift = shift;
+        } else {
+            originalShift.setDraftShift(null);
         }
-        return shift;
+        return originalShift;
     }
 
     private ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId) {
