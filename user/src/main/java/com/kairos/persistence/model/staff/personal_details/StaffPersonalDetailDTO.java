@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
+import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.utils.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,6 +52,7 @@ public class StaffPersonalDetailDTO {
     private String email;
     private Staff staff;
     private Set<AccessGroupRole> roles;
+    private List<EmploymentTypeDTO> employmentTypes;
 
 
     public StaffPersonalDetailDTO() {
@@ -303,5 +306,13 @@ public class StaffPersonalDetailDTO {
 
     public void setRoles(Set<AccessGroupRole> roles) {
         this.roles = roles;
+    }
+
+    public List<EmploymentTypeDTO> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 }

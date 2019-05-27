@@ -146,6 +146,7 @@ public class Task extends TaskOrEmployee {
 	}
 
 	public Task() {
+		//Not in use
 	}
 
 	public boolean isTaskDependent() {

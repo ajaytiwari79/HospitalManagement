@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.KAIROS_EMAIL;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 
 
@@ -88,7 +89,7 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 1);
+                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW, 1);
 
             }
 
@@ -148,7 +149,7 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 2);
+                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW, 2);
 
             }
 
@@ -354,12 +355,12 @@ public class ClientBatchService {
 
                     zipCodeDb = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
                     if (zipCodeDb == null) {
-                        exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+                        exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
 
                     }
                     Municipality municipality = municipalityGraphRepository.getMunicipalityByZipCodeId(zipCodeDb.getId());
                     if (municipality == null) {
-                        exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+                        exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
                     }
 
@@ -367,7 +368,7 @@ public class ClientBatchService {
                     Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                     if (geographyData == null) {
                         logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                        exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+                        exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
 
                     }
                     logger.info("Geography Data: " + geographyData);

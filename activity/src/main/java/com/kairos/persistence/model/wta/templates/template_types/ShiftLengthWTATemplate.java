@@ -3,12 +3,12 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -109,7 +109,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                            limitAndCounter[2],DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]));
+                            limitAndCounter[2],DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
 
                 }
             }

@@ -8,6 +8,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotBlank;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_RELATIONTYPE_NAME_NOTEMPTY;
+
 /**
  * Created by Jasgeet on 15/9/17.
  */
@@ -15,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelationType extends UserBaseEntity {
-    @NotBlank(message = "error.relationType.name.notEmpty")
+    @NotBlank(message = ERROR_RELATIONTYPE_NAME_NOTEMPTY)
     private String name;
     private String description;
     private boolean enabled = true;
@@ -23,7 +25,7 @@ public class RelationType extends UserBaseEntity {
     public RelationType() {
     }
 
-    public RelationType(@NotBlank(message = "error.relationType.name.notEmpty") String name, String description) {
+    public RelationType(@NotBlank(message = ERROR_RELATIONTYPE_NAME_NOTEMPTY) String name, String description) {
         this.name = name;
         this.description = description;
     }

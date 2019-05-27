@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_ACTIVITY_NOTASSIGNED;
 import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
 import static com.kairos.constants.AppConstants.SHIFT_LEAST_GRANULARITY;
 import static javax.management.timer.Timer.ONE_MINUTE;
@@ -161,7 +162,7 @@ public class ShiftBreakService {
                 allowedBreakDurationInMinute = breakSettings.get(i).getBreakDurationInMinute();
                 ActivityWrapper currentActivity = breakActivitiesMap.get(breakSettings.get(i).getActivityId());
                 if (!Optional.ofNullable(currentActivity).isPresent()) {
-                    exceptionService.dataNotFoundException("error.activity.notAssigned", breakSettings.get(i).getActivityId());
+                    exceptionService.dataNotFoundException(ERROR_ACTIVITY_NOTASSIGNED, breakSettings.get(i).getActivityId());
                 }
                 breakActivity = currentActivity.getActivity();
                 if (!shiftActivities.isEmpty() && i == 0) { // this means we have already added shift for the blocking period then we need to add the shift

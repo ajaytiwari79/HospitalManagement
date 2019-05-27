@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
+import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -60,7 +62,7 @@ public class ShiftStateService {
 
     public boolean createShiftState(Long unitId, Date startDate, Date endDate){
         if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
-            exceptionService.actionNotPermittedException("past.date.allowed");
+            exceptionService.actionNotPermittedException(PAST_DATE_ALLOWED);
         }
         List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
         createShiftState(shifts,false,unitId);
@@ -181,7 +183,7 @@ public class ShiftStateService {
 
     public void updateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, List<Shift> shiftsList, Long unitId) {
         if (!Optional.ofNullable(shifts).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.shift.ids");
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_IDS);
         }
         List<Long> staffIds = shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
         List<Long> employmentIds = shifts.stream().map(shift -> shift.getEmploymentId()).collect(Collectors.toList());

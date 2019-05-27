@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_GRACEPERIOD_NOTFOUND;
+
 @Service
 public class TimeAttendanceGracePeriodService extends MongoBaseService {
 
@@ -23,7 +25,7 @@ public class TimeAttendanceGracePeriodService extends MongoBaseService {
    public TAndAGracePeriodSettingDTO getTAndAGracePeriodSetting(Long unitId){
        TimeAttendanceGracePeriod tAndAGracePeriod=tAndAGracePeriodRepository.findByUnitId(unitId);
         if(!Optional.ofNullable(tAndAGracePeriod).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.unit.graceperiod.notFound",unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_GRACEPERIOD_NOTFOUND,unitId);
         }
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(tAndAGracePeriod.getStaffGracePeriodDays(),tAndAGracePeriod.getManagementGracePeriodDays());
        return tAndAGracePeriodSettingDTO;

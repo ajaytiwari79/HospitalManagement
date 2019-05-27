@@ -79,6 +79,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.getWeekNumberByLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 
@@ -137,7 +138,7 @@ public class StaffingLevelService extends MongoBaseService {
                 }
                 staffingLevel.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervals);
             } else {
-                exceptionService.duplicateDataException("message.stafflevel.currentdate", presenceStaffingLevelDTO.getCurrentDate());
+                exceptionService.duplicateDataException(MESSAGE_STAFFLEVEL_CURRENTDATE, presenceStaffingLevelDTO.getCurrentDate());
             }
         } else {
             staffingLevel = StaffingLevelUtil.buildPresenceStaffingLevels(presenceStaffingLevelDTO, unitId);
@@ -195,7 +196,7 @@ public class StaffingLevelService extends MongoBaseService {
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
         if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
             LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
-            exceptionService.unsupportedOperationException("message.stafflevel.currentdate.update");
+            exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
         }
         List<ActivityDTO> activityDTOS = activityMongoRepository.findChildActivityActivityIds(presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank().keySet());
         Map<BigInteger, BigInteger> childAndParentActivityIdMap = new HashMap<>();
@@ -475,6 +476,8 @@ public class StaffingLevelService extends MongoBaseService {
                 case 3:
                     fromTimeS = "0" + fromTimeS;
                     break;
+                default:
+                    break;
             }
             switch (toTimeS.length()) {
                 case 1:
@@ -485,6 +488,8 @@ public class StaffingLevelService extends MongoBaseService {
                     break;
                 case 3:
                     toTimeS = "0" + toTimeS;
+                    break;
+                default:
                     break;
             }
 
@@ -730,7 +735,7 @@ public class StaffingLevelService extends MongoBaseService {
                 staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).get();
                 if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
                     LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
-                    exceptionService.unsupportedOperationException("message.stafflevel.currentdate.update");
+                    exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
                 }
                 staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(absenceStaffingLevelDto, unitId, staffingLevel);
             } else {
@@ -869,7 +874,7 @@ public class StaffingLevelService extends MongoBaseService {
 
         StaffingLevelTemplate staffingLevelTemplate = staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(templateId, unitId);
         if (!Optional.ofNullable(staffingLevelTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("staffingLevelTemplate.not.found", templateId);
+            exceptionService.dataNotFoundByIdException(STAFFINGLEVELTEMPLATE_NOT_FOUND, templateId);
         }
         Set<BigInteger> activityIds = staffingLevelFromTemplateDTO.getActivitiesByDate().stream().flatMap(s -> s.getActivityIds().stream()).collect(Collectors.toSet());
         List<ActivityValidationError> activityValidationErrors = staffingLevelTemplateService.validateActivityRules(activityIds, ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevelTemplateDTO.class));
@@ -920,7 +925,7 @@ public class StaffingLevelService extends MongoBaseService {
             DateWiseActivityDTO dateWiseActivityDTO = iterator.next();
             if (dateWiseActivityDTO.getLocalDate().isBefore(startDate) || dateWiseActivityDTO.getLocalDate().isAfter(endDate) || dateWiseActivityDTO.getLocalDate().isBefore(DateUtils.getCurrentLocalDate())) {
                 iterator.remove();
-                activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText("date.out.of.range", dateWiseActivityDTO.getLocalDate()))));
+                activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText(DATE_OUT_OF_RANGE, dateWiseActivityDTO.getLocalDate()))));
             }
         }
     }

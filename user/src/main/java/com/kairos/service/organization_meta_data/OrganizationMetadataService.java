@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNIT_PAYMENTSETTING_UPDATE_UNABLE;
 
 /**
  * Created by neuron on 12/6/17.
@@ -214,7 +215,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
 
             logger.info("Unable to payment while updating payments settings for unit ,{}", unitId);
-            exceptionService.dataNotFoundByIdException("message.unit.paymentsetting.update.unable", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_PAYMENTSETTING_UPDATE_UNABLE, unitId);
 
         }
         updatePaymentSettingsWithDates(paymentSettings, paymentSettingsDTO);

@@ -40,6 +40,7 @@ import java.util.*;
 
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.AppConstants.TEAM;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 
 /**
@@ -108,7 +109,7 @@ public class OrganizationAddressService {
                 List<Country> countries = countryGraphRepository.findByName("Denmark");
                 Country country;
                 if (countries.isEmpty()) {
-                    exceptionService.dataNotFoundByIdException("message.organizationAddress.teamAddress.notBelongs");
+                    exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_TEAMADDRESS_NOTBELONGS);
 
                 }
                 country = countries.get(0);
@@ -132,7 +133,7 @@ public class OrganizationAddressService {
         contactAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
         if (contactAddress == null) {
             logger.info("Creating new Address");
-            exceptionService.dataNotFoundByIdException("message.organizationAddress.contactAddress.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND);
 
         }
 
@@ -176,13 +177,13 @@ public class OrganizationAddressService {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -207,7 +208,7 @@ public class OrganizationAddressService {
 
             Organization organization = organizationGraphRepository.findOne(id);
             if (organization == null) {
-                exceptionService.dataNotFoundByIdException("message.organization.id.notFound", id);
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
 
 
             }
@@ -216,7 +217,7 @@ public class OrganizationAddressService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                exceptionService.dataNotFoundByIdException("message.organizationAddress.team.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_TEAM_NOTFOUND);
             }
             team.setContactAddress(contactAddress);
             teamGraphRepository.save(team);
@@ -228,12 +229,12 @@ public class OrganizationAddressService {
 
         ContactAddress billingAddress = null;
         if (isAddressAlreadyExist && addressDTO.getId() == null) {
-            exceptionService.dataNotFoundByIdException("message.organizationAddress.contactaAddress.notNull");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTAADDRESS_NOTNULL);
             //throw new DataNotFoundByIdException("Address not found to update");
         } else if (isAddressAlreadyExist && addressDTO.getId() != null) {
             billingAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
             if (billingAddress == null)
-                exceptionService.dataNotFoundByIdException("message.organizationAddress.contactAddress.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND);
 
         } else {
             billingAddress = new ContactAddress();
@@ -241,7 +242,7 @@ public class OrganizationAddressService {
 
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
 
         }
 
@@ -277,7 +278,7 @@ public class OrganizationAddressService {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
 
@@ -285,7 +286,7 @@ public class OrganizationAddressService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -313,7 +314,7 @@ public class OrganizationAddressService {
         PaymentType paymentType = paymentTypeGraphRepository.findOne(paymentTypeId);
 
         if (currency == null || paymentType == null) {
-            exceptionService.dataNotFoundByIdException("message.organizationAddress.currencyorpaymentid.incorrect");
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CURRENCYORPAYMENTID_INCORRECT);
 
         }
         billingAddress.setPaymentType(paymentType);

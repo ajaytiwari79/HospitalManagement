@@ -70,6 +70,7 @@ public class ShiftActivityDTO {
     private BigInteger secondLevelTimeTypeId;
     private BigInteger thirdLevelTimeTypeId;
     private BigInteger fourthLevelTimeTypeId;
+    private List<PlannedTime> plannedTimes;
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
         this.activityId = activityId;
@@ -120,6 +121,14 @@ public class ShiftActivityDTO {
 
     public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
         return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>(0));
+    }
+
+    public List<PlannedTime> getPlannedTimes() {
+        return Optional.ofNullable(plannedTimes).orElse(new ArrayList<>());
+    }
+
+    public void setPlannedTimes(List<PlannedTime> plannedTimes) {
+        this.plannedTimes = plannedTimes;
     }
 
     @JsonIgnore

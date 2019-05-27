@@ -12,7 +12,7 @@ public class ResponseFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-
+		//Not in use
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class ResponseFilter implements Filter {
 
 	@Override
 	public void destroy() {
-
+		//Not in use
 	}
 
 }

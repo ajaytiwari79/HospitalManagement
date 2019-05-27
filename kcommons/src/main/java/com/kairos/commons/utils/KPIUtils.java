@@ -1,11 +1,13 @@
 package com.kairos.commons.utils;
 
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.kpi.Interval;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,7 @@ public class KPIUtils {
     }
 
     public static List<BigInteger> getBigIntegerValue(List<Object> objects){
-        return objects.stream().map(o->new BigInteger(((Integer) o).toString())).collect(Collectors.toList());
+        return objects.stream().map(o->new BigInteger((o).toString())).collect(Collectors.toList());
     }
 
     public static Set<DayOfWeek> getDaysOfWeeksfromString(List<Object> objects){
@@ -82,5 +84,14 @@ public class KPIUtils {
         LocalDate nextDate = getPriviousLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(nextDate, currentDate));
         return nextDate;
+    }
+
+    public static void sortKpiDataByDateTimeInterval(List<CommonKpiDataUnit> kpiDataUnits) {
+        String label = kpiDataUnits.get(0).getLabel();
+        if (label.matches("\\d{2}-\\d{2}-\\d{4}")) {
+            kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+        } else if (label.matches("\\d{2}-\\d{2}-\\d{4} - \\d{2}-\\d{2}-\\d{4}")) {
+            kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+        }
     }
 }

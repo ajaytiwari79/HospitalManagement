@@ -17,6 +17,7 @@ public class GetAllActivitiesResponse {
     private List<TimeCareActivity> GetAllActivitiesResult;
 
     public GetAllActivitiesResponse() {
+        //Not in use
     }
 
     public List<TimeCareActivity> getGetAllActivitiesResult() {
