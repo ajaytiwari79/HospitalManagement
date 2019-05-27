@@ -18,5 +18,5 @@ public class ModelDTO {
     private boolean isPermissionSubModel;
     private List<FieldDTO> fields = new ArrayList<>();
 
-    List<ModelDTO> subModels = new ArrayList<>();
+    private List<ModelDTO> subModels = new ArrayList<>();
 }
